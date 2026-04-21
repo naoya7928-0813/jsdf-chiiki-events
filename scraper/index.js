@@ -16,10 +16,7 @@ const fs      = require('fs');
 const iconv   = require('iconv-lite');
 const cheerio = require('cheerio');
 
-// playwright-extra + stealth plugin でCloudflare検知を回避
-const { chromium } = require('playwright-extra');
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-chromium.use(StealthPlugin());
+const { chromium } = require('playwright');
 
 const { parseKanagawa } = require('./parsers/kanagawa');
 const { parseTokyo }    = require('./parsers/tokyo');
@@ -193,7 +190,6 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
  * Playwright ブラウザコンテキストを返す。
  */
 async function createStealthContext(browser) {
-  // StealthPlugin がほとんどの自動化検知を自動処理する
   const context = await browser.newContext({
     userAgent:  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
     viewport:   { width: 1280, height: 800 },
@@ -208,6 +204,14 @@ async function createStealthContext(browser) {
       'sec-ch-ua-platform':        '"Windows"',
     },
   });
+
+  await context.addInitScript(() => {
+    Object.defineProperty(navigator, 'webdriver',  { get: () => undefined });
+    Object.defineProperty(navigator, 'plugins',    { get: () => [1, 2, 3, 4, 5] });
+    Object.defineProperty(navigator, 'languages',  { get: () => ['ja-JP', 'ja', 'en-US'] });
+    window.chrome = { runtime: {} };
+  });
+
   return context;
 }
 
