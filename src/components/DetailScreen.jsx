@@ -112,6 +112,30 @@ export default function DetailScreen({ event, onBack, theme, favorites, onToggle
           </div>
         </div>
 
+        {/* 参加資格・締切 */}
+        {(ev.ageRequirement || ev.deadline) && (
+          <div style={{ padding: '6px 16px 14px' }}>
+            <SectionTitle>参加資格・締切</SectionTitle>
+            <div style={{ background: 'var(--card)', borderRadius: 12, border: '1px solid var(--border)', overflow: 'hidden' }}>
+              {ev.ageRequirement && (
+                <div style={{
+                  display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 14px',
+                  borderBottom: ev.deadline ? '1px solid var(--sep)' : 'none',
+                }}>
+                  <div style={{ fontSize: 10, fontFamily: 'monospace', color: primary, fontWeight: 700, paddingTop: 2, minWidth: 52 }}>年齢</div>
+                  <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.6 }}>{ev.ageRequirement}</div>
+                </div>
+              )}
+              {ev.deadline && (
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 14px' }}>
+                  <div style={{ fontSize: 10, fontFamily: 'monospace', color: primary, fontWeight: 700, paddingTop: 2, minWidth: 52 }}>締切</div>
+                  <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.6 }}>{ev.deadline}</div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* 参加時の注意事項 */}
         {ev.notes && (
           <div style={{ padding: '6px 16px 14px' }}>
@@ -129,7 +153,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, onToggle
                 }}>
                   {ICO.check(primary, 12)}
                 </div>
-                <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.75, flex: 1 }}>
+                <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.75, flex: 1, whiteSpace: 'pre-line' }}>
                   {ev.notes}
                 </div>
               </div>

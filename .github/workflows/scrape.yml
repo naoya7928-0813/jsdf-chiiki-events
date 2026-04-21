@@ -50,8 +50,8 @@ jobs:
         working-directory: scraper
         run: node index.js
         env:
-          # Playwrightがヘッドレスで動作するよう環境変数を設定
           DISPLAY: ''
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       # ── 変更があればコミット & プッシュ ──────────────────────
       - name: 変更をコミット & プッシュ

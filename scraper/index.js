@@ -44,6 +44,130 @@ const MOCK_DATA = {
   ],
 };
 
+// ── OCR（Claude Haiku による画像解析） ─────────────────────────
+
+const OCR_PROMPT = `この自衛隊イベントのポスター画像から情報を抽出してください。
+以下のJSONのみを返してください（説明文不要）。該当情報がない項目はnullにしてください。
+{
+  "title": "ポスターに書かれた正確なイベント名",
+  "ageRequirement": "参加対象年齢（例: 18歳〜32歳未満）",
+  "deadline": "応募締切日（例: 4月24日（金））",
+  "notes": "実施内容・参加条件・注意事項など（箇条書きをそのまま）"
+}`;
+
+/**
+ * ポスター画像URLを受け取り、Claude Haiku でOCRしてJSON を返す。
+ * ANTHROPIC_API_KEY が未設定の場合は null を返す（OCRスキップ）。
+ */
+async function ocrImage(imageUrl) {
+  if (!process.env.ANTHROPIC_API_KEY || !imageUrl) return null;
+
+  try {
+    // 画像をダウンロード
+    const imgRes = await fetch(imageUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Referer':    'https://www.mod.go.jp/',
+      },
+    });
+    if (!imgRes.ok) {
+      console.warn(`[OCR] 画像取得失敗 (${imgRes.status}): ${imageUrl}`);
+      return null;
+    }
+
+    const buf       = await imgRes.arrayBuffer();
+    const base64    = Buffer.from(buf).toString('base64');
+    const mimeType  = (imgRes.headers.get('content-type') || 'image/png').split(';')[0].trim();
+
+    // Claude Haiku API 呼び出し（SDK不要・native fetch）
+    const apiRes = await fetch('https://api.anthropic.com/v1/messages', {
+      method:  'POST',
+      headers: {
+        'x-api-key':         process.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'content-type':      'application/json',
+      },
+      body: JSON.stringify({
+        model:      'claude-haiku-4-5-20251001',
+        max_tokens: 512,
+        messages: [{
+          role:    'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: mimeType, data: base64 } },
+            { type: 'text',  text: OCR_PROMPT },
+          ],
+        }],
+      }),
+    });
+
+    if (!apiRes.ok) {
+      const errText = await apiRes.text();
+      console.warn(`[OCR] API エラー (${apiRes.status}): ${errText.slice(0, 100)}`);
+      return null;
+    }
+
+    const apiJson = await apiRes.json();
+    const text    = apiJson.content?.[0]?.text ?? '';
+
+    // レスポンスからJSON部分を抽出
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return null;
+    return JSON.parse(jsonMatch[0]);
+
+  } catch (err) {
+    console.warn(`[OCR] ${imageUrl} → ${err.message}`);
+    return null;
+  }
+}
+
+/**
+ * OCR結果をイベントオブジェクトにマージする。
+ * - title: OCR が取得できた場合のみ上書き
+ * - ageRequirement / deadline: OCR 優先、元データが既にあれば保持
+ * - notes: OCR と元データを結合
+ */
+function mergeOcr(ev, ocr) {
+  if (!ocr) return ev;
+  return {
+    ...ev,
+    title:          (ocr.title        && ocr.title.trim())         || ev.title,
+    ageRequirement: (ocr.ageRequirement && ocr.ageRequirement.trim()) || ev.ageRequirement || null,
+    deadline:       (ocr.deadline      && ocr.deadline.trim())       || ev.deadline       || null,
+    notes: [ev.notes, ocr.notes].filter(Boolean).join('\n') || null,
+  };
+}
+
+/**
+ * イベント配列に対して順番に OCR を実行し、結果をマージして返す。
+ * 失敗したイベントは元データのまま保持する。
+ */
+async function enrichWithOcr(events) {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.log('[OCR] ANTHROPIC_API_KEY 未設定のためスキップ');
+    return events;
+  }
+
+  console.log(`[OCR] ${events.filter(e => e.imageUrl).length} 件の画像を処理します`);
+  const results = [];
+
+  for (const ev of events) {
+    if (!ev.imageUrl) {
+      results.push(ev);
+      continue;
+    }
+
+    console.log(`[OCR] ${ev.title} (${ev.date})`);
+    const ocr = await ocrImage(ev.imageUrl);
+    if (ocr) console.log(`  → title: ${ocr.title ?? '(変更なし)'}`);
+    results.push(mergeOcr(ev, ocr));
+
+    // API レートリミット対策
+    await sleep(500);
+  }
+
+  return results;
+}
+
 // ── ユーティリティ ────────────────────────────────────────────
 
 /** 現在の日本時間を "YYYY/MM/DD HH:mm" 形式で返す */
@@ -224,9 +348,15 @@ async function main() {
     process.exit(1);
   }
 
+  // ── OCR でイベント内容を補完 ──
+  tokyoEvents = await enrichWithOcr(tokyoEvents);
+
+  // imageUrl は最終出力に含めない（内部用フィールド）
+  const strip = ev => { const { imageUrl: _, ...rest } = ev; return rest; };
+
   const output = {
-    kanagawa:  kanagawaEvents,
-    tokyo:     tokyoEvents,
+    kanagawa:  kanagawaEvents.map(strip),
+    tokyo:     tokyoEvents.map(strip),
     updatedAt: nowJST(),
   };
   writeOutput(output);

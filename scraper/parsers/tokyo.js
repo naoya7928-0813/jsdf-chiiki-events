@@ -83,8 +83,14 @@ function parseTokyo($) {
     const linkEl = $sec.find('.imgsyoukai-url a').first();
     const url = resolveUrl(linkEl.attr('href') || '');
 
-    // ── notes: 実施内容を使用 ──
-    const notes = (fields['実施内容'] || fields['備考'] || fields['注意事項'] || null);
+    // ── ポスター画像URL ──
+    const imgSrc  = $sec.find('.imgsyoukai-img img').first().attr('src') || '';
+    const imageUrl = resolveUrl(imgSrc);
+
+    // ── 応募資格・締切・notes ──
+    const ageRequirement = toHalfWidth(fields['応募資格'] || '').replace(/^\s+/, '').trim() || null;
+    const deadline       = toHalfWidth(fields['応募締切'] || '').replace(/^\s+/, '').trim() || null;
+    const notes          = (fields['実施内容'] || fields['備考'] || fields['注意事項'] || null);
 
     events.push({
       id:      `t-${dateStr.replace(/-/g, '')}-${++idx}`,
@@ -97,7 +103,10 @@ function parseTokyo($) {
       category,
       tag,
       url,
-      notes:   notes || null,
+      notes:          notes || null,
+      ageRequirement,
+      deadline,
+      imageUrl,
     });
   });
 
