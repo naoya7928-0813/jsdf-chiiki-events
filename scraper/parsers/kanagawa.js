@@ -1,42 +1,46 @@
 'use strict';
 
-/**
- * 神奈川地方協力本部 イベントページパーサー
- * 対象: https://www.mod.go.jp/pco/kanagawa/kouho/event/event.html
- *
- * HTML構造の想定:
- *   <H3>令和X年Y月イベント一覧</H3>
- *   <UL>
- *     <LI>4月25日（土）自衛官候補生募集説明会　横浜地域事務所　13:30～15:30</LI>
- *     ...
- *   </UL>
- *
- * Shift_JIS → UTF-8 変換は呼び出し元（index.js）で実施済み。
- * cheerio オブジェクト $ を受け取り、イベント配列を返す。
- */
-
 const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
 
+const BASE_URL = 'https://www.mod.go.jp/pco/kanagawa/kouho/event/event.html';
+
+/** 相対URLを絶対URLに解決する */
+function resolveUrl(href) {
+  if (!href) return '';
+  if (href.startsWith('http')) return href;
+  try {
+    return new URL(href, BASE_URL).href;
+  } catch {
+    return '';
+  }
+}
+
+/** "1000" や "930" → "10:00" / "09:30" */
+function formatHHMM(s) {
+  const n = s.replace(':', '');
+  if (n.length === 3) return `0${n[0]}:${n.slice(1)}`;
+  if (n.length === 4) return `${n.slice(0, 2)}:${n.slice(2)}`;
+  return s;
+}
+
 /**
- * @param {import('cheerio').CheerioAPI} $  cheerio でパース済みのオブジェクト
- * @returns {Array<Object>} イベントオブジェクトの配列
+ * @param {import('cheerio').CheerioAPI} $
+ * @returns {Array<Object>}
  */
 function parseKanagawa($) {
   const events = [];
   let idx = 0;
 
-  // ── H3 タグを順に走査して年月を確定し、直後の UL からイベントを抽出 ──
+  // H3「令和X年Y月イベント一覧」→ 直後の UL を走査
   $('h3, H3').each((_i, h3el) => {
     const h3text = toHalfWidth($(h3el).text());
-
-    // "令和8年4月" のような年月をキャプチャ
     const ymMatch = h3text.match(/令和(\d+)年(\d+)月/);
-    if (!ymMatch) return; // イベント一覧以外の H3 は無視
+    if (!ymMatch) return;
 
     const baseYear  = reiwaToAD(parseInt(ymMatch[1], 10));
     const baseMonth = parseInt(ymMatch[2], 10);
 
-    // 直後の UL を探す（間に他の要素が挟まる場合も考慮）
+    // 直後の UL を探す
     let sibling = $(h3el).next();
     while (sibling.length && !sibling.is('ul, UL')) {
       sibling = sibling.next();
@@ -44,72 +48,56 @@ function parseKanagawa($) {
     if (!sibling.length) return;
 
     sibling.find('li, LI').each((_j, liEl) => {
-      // LI 全体のテキストを正規化
-      const raw = toHalfWidth($(liEl).text().replace(/\s+/g, ' ').trim());
+      const $li = $(liEl);
 
-      // ── 日付・曜日の抽出 ──
-      // 例: "4月25日（土）" or "4月25日(土)"
-      const dateMatch = raw.match(/(\d{1,2})月(\d{1,2})日[（(]([月火水木金土日祝・]+)[）)]/);
+      // 場所とURLはリンク要素から取得
+      const $a   = $li.find('a').first();
+      const place = $a.text().replace(/\s+/g, ' ').trim();
+      const url   = resolveUrl($a.attr('href') || '');
+
+      // LI 全テキストを半角化・正規化
+      const raw = toHalfWidth($li.text()).replace(/\s+/g, ' ').trim();
+
+      // 日付: M/D 形式（例: 4/15、4/26-5/6 の先頭日）
+      const dateMatch = raw.match(/(\d{1,2})\/(\d{1,2})/);
       if (!dateMatch) return;
 
-      const month   = parseInt(dateMatch[1], 10);
-      const day     = parseInt(dateMatch[2], 10);
-      const weekday = dateMatch[3];
+      const m = parseInt(dateMatch[1], 10);
+      const d = parseInt(dateMatch[2], 10);
 
-      // 月が H3 の月より小さければ翌年（年末→年始をまたぐケース）
-      const year = (month < baseMonth && baseMonth >= 11) ? baseYear + 1 : baseYear;
-      const dateStr = `${year}-${padTwo(month)}-${padTwo(day)}`;
+      // 翌年またぎ: H3が11月以降でLIが1月等の場合
+      const year    = (m < baseMonth && baseMonth >= 11) ? baseYear + 1 : baseYear;
+      const dateStr = `${year}-${padTwo(m)}-${padTwo(d)}`;
 
-      // 過去のイベントはスキップ
       if (isPast(dateStr)) return;
 
-      // ── 日付部分を除いた残りテキストを分解 ──
-      const rest = raw
-        .replace(/\d+月\d+日[（(][^）)]+[）)]/, '')
-        .trim();
+      // タイトル: 日付パターンより前のテキスト
+      const datePos = raw.indexOf(dateMatch[0]);
+      const title   = raw.substring(0, datePos).replace(/\s+/g, ' ').trim();
+      if (!title) return;
 
-      // 時刻: "13:30～15:30" or "13:30〜15:30" or "10:00開場"
-      const timeMatch = rest.match(/\d{1,2}:\d{2}[～〜～\-–]?\d{0,2}:?\d{0,2}[^\s　]*/);
-      const time = timeMatch ? timeMatch[0].trim() : '';
-
-      // 時刻を除いた残り（タイトル＋場所）
-      const withoutTime = rest.replace(time, '').replace(/\s+/g, ' ').trim();
-
-      // タイトル・場所を空白または全角スペースで分割
-      // 末尾の塊を "場所" と推定（例: "説明会　横浜地域事務所" → title/place）
-      const parts = withoutTime.split(/\s+|　+/).filter(Boolean);
-      let title, place;
-      if (parts.length >= 2) {
-        place = parts.pop();         // 末尾 = 場所
-        title = parts.join(' ');     // 先頭〜 = タイトル
-      } else {
-        title = withoutTime;
-        place = '';
-      }
-
-      // LI 内にリンクがあれば URL を取得
-      const href = $(liEl).find('a').attr('href') || '';
-      const url  = href.startsWith('http') ? href
-        : href ? `https://www.mod.go.jp${href.startsWith('/') ? '' : '/pco/kanagawa/kouho/event/'}${href}`
+      // 時刻: HHMM-HHMM or HHMM～HHMM（例: 1000-1220、0930～1200）
+      const timeMatch = raw.match(/(\d{3,4})[:\-～~](\d{3,4})/);
+      const time = timeMatch
+        ? `${formatHHMM(timeMatch[1])}～${formatHHMM(timeMatch[2])}`
         : '';
 
       events.push({
         id:       `k-${dateStr.replace(/-/g, '')}-${++idx}`,
         date:     dateStr,
-        weekday,
-        title:    title || withoutTime,
+        weekday:  '',
+        title,
         place,
         address:  '',
         time,
-        category: guessCategory(title || withoutTime),
-        tag:      guessTag(title || withoutTime),
+        category: guessCategory(title),
+        tag:      guessTag(title),
         url,
         notes:    null,
       });
     });
   });
 
-  // 日付昇順でソート
   return events.sort((a, b) => a.date.localeCompare(b.date));
 }
 
