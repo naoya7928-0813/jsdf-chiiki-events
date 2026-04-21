@@ -2,7 +2,7 @@
   "kanagawa": [],
   "tokyo": [
     {
-      "id": "t-20260426-2",
+      "id": "t-20260426-1",
       "date": "2026-04-26",
       "weekday": "日",
       "title": "横須賀基地見学",
@@ -10,12 +10,14 @@
       "address": "",
       "time": "",
       "category": "イベント",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/tokyo/event2/../nishitokyo/setumeikai.html#0426",
-      "notes": null
+      "tag": "応募終了",
+      "url": "https://www.mod.go.jp/pco/tokyo/nishitokyo/setumeikai.html#0426",
+      "notes": "・艦艇見学",
+      "ageRequirement": "18歳～32歳未満の方",
+      "deadline": null
     },
     {
-      "id": "t-20260427-3",
+      "id": "t-20260427-2",
       "date": "2026-04-27",
       "weekday": "月",
       "title": "横須賀基地見学",
@@ -23,12 +25,14 @@
       "address": "",
       "time": "",
       "category": "イベント",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/tokyo/event2/../toshima/index.html#0427",
-      "notes": null
+      "tag": "応募終了",
+      "url": "https://www.mod.go.jp/pco/tokyo/toshima/index.html#0427",
+      "notes": "・潜水艦見学",
+      "ageRequirement": "18歳～32歳未満の方",
+      "deadline": null
     },
     {
-      "id": "t-20260503-4",
+      "id": "t-20260503-3",
       "date": "2026-05-03",
       "weekday": "日",
       "title": "ＦＡＭＩＬＹ ＤＡＹ",
@@ -37,11 +41,13 @@
       "time": "",
       "category": "イベント",
       "tag": "",
-      "url": "https://www.mod.go.jp/pco/tokyo/event2/../shibuya/index.html#gw",
-      "notes": null
+      "url": "https://www.mod.go.jp/pco/tokyo/shibuya/index.html#gw",
+      "notes": "・ＶＲ体験 ・制服試着体験 ・動画放映",
+      "ageRequirement": null,
+      "deadline": null
     },
     {
-      "id": "t-20260522-5",
+      "id": "t-20260522-4",
       "date": "2026-05-22",
       "weekday": "金",
       "title": "横須賀基地見学",
@@ -50,11 +56,13 @@
       "time": "",
       "category": "イベント",
       "tag": "",
-      "url": "https://www.mod.go.jp/pco/tokyo/event2/../kita/index.html#0522",
-      "notes": null
+      "url": "https://www.mod.go.jp/pco/tokyo/kita/index.html#0522",
+      "notes": "・港湾クルーズ ・停泊護衛艦乗艦見学 ・体験喫食（海上自衛隊カレー）",
+      "ageRequirement": "17歳～32歳",
+      "deadline": "4月24日（金）"
     },
     {
-      "id": "t-20260529-6",
+      "id": "t-20260529-5",
       "date": "2026-05-29",
       "weekday": "金",
       "title": "潜水艦×醍２術科学校",
@@ -63,11 +71,13 @@
       "time": "",
       "category": "イベント",
       "tag": "",
-      "url": "https://www.mod.go.jp/pco/tokyo/event2/../adachi/index.html#0529",
-      "notes": null
+      "url": "https://www.mod.go.jp/pco/tokyo/adachi/index.html#0529",
+      "notes": "・潜水艦見学 ・第２術科学校見学 ・体験喫食",
+      "ageRequirement": "17歳～32歳",
+      "deadline": "5月7日（金）"
     },
     {
-      "id": "t-20260529-7",
+      "id": "t-20260529-6",
       "date": "2026-05-29",
       "weekday": "金",
       "title": "百里基地見学",
@@ -76,24 +86,13 @@
       "time": "",
       "category": "イベント",
       "tag": "",
-      "url": "https://www.mod.go.jp/pco/tokyo/event2/../koutou/event.html#0529",
-      "notes": null
+      "url": "https://www.mod.go.jp/pco/tokyo/koutou/event.html#0529",
+      "notes": "・戦闘機見学 ・救難隊見学 ・体験喫食",
+      "ageRequirement": "15歳以上～32歳以下",
+      "deadline": "5月6日（水）"
     },
     {
-      "id": "t-20260619-1",
-      "date": "2026-06-19",
-      "weekday": "金",
-      "title": "イベント",
-      "place": "横須賀基地",
-      "address": "",
-      "time": "",
-      "category": "イベント",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/tokyo/event2/../nishitokyo/setumeikai.html#0426",
-      "notes": null
-    },
-    {
-      "id": "t-20260619-8",
+      "id": "t-20260619-7",
       "date": "2026-06-19",
       "weekday": "金",
       "title": "横須賀基地見学",
@@ -102,9 +101,11 @@
       "time": "",
       "category": "イベント",
       "tag": "",
-      "url": "https://www.mod.go.jp/pco/tokyo/event2/../shinkoiwa/event.html#0619",
-      "notes": null
+      "url": "https://www.mod.go.jp/pco/tokyo/shinkoiwa/event.html#0619",
+      "notes": "・護衛艦見学 ・ミニクルーズ ・売店見学",
+      "ageRequirement": "17歳～32歳",
+      "deadline": "6月1日（月）"
     }
   ],
-  "updatedAt": "2026/04/21 17:44"
+  "updatedAt": "2026/04/21 21:51"
 }
