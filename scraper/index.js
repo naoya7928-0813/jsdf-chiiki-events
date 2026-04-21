@@ -15,7 +15,11 @@ const path    = require('path');
 const fs      = require('fs');
 const iconv   = require('iconv-lite');
 const cheerio = require('cheerio');
-const { chromium } = require('playwright');
+
+// playwright-extra + stealth plugin でCloudflare検知を回避
+const { chromium } = require('playwright-extra');
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+chromium.use(StealthPlugin());
 
 const { parseKanagawa } = require('./parsers/kanagawa');
 const { parseTokyo }    = require('./parsers/tokyo');
@@ -189,33 +193,21 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
  * Playwright ブラウザコンテキストを返す。
  */
 async function createStealthContext(browser) {
+  // StealthPlugin がほとんどの自動化検知を自動処理する
   const context = await browser.newContext({
-    // 実際のChrome に近いユーザーエージェント
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    viewport:  { width: 1280, height: 800 },
-    locale:    'ja-JP',
+    userAgent:  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    viewport:   { width: 1280, height: 800 },
+    locale:     'ja-JP',
     timezoneId: 'Asia/Tokyo',
     extraHTTPHeaders: {
-      'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
-      'Accept':          'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Accept-Language':           'ja,en-US;q=0.9,en;q=0.8',
+      'Accept':                    'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Upgrade-Insecure-Requests': '1',
+      'sec-ch-ua':                 '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+      'sec-ch-ua-mobile':          '?0',
+      'sec-ch-ua-platform':        '"Windows"',
     },
   });
-
-  // webdriver フラグ等の自動化検知を無効化
-  await context.addInitScript(() => {
-    // navigator.webdriver を undefined にする
-    Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
-    // plugins を空でなくする（ヘッドレスブラウザの特徴を隠す）
-    Object.defineProperty(navigator, 'plugins', {
-      get: () => [1, 2, 3, 4, 5],
-    });
-    Object.defineProperty(navigator, 'languages', {
-      get: () => ['ja-JP', 'ja', 'en-US'],
-    });
-    // Chrome オブジェクトが存在するよう偽装
-    window.chrome = { runtime: {} };
-  });
-
   return context;
 }
 
@@ -256,34 +248,49 @@ async function fetchKanagawa(context) {
 
 /**
  * 東京地本ページを取得・パース
- * UTF-8 ページのため page.content() を使用。
+ * Playwright が 403 になった場合は native fetch にフォールバックする。
  */
 async function fetchTokyo(context) {
+  console.log(`[東京] アクセス: ${URLS.tokyo}`);
+
+  // ── Playwright で試みる ──
   const page = await context.newPage();
   try {
-    console.log(`[東京] アクセス: ${URLS.tokyo}`);
-
     const response = await page.goto(URLS.tokyo, {
       waitUntil: 'domcontentloaded',
       timeout:   30_000,
     });
 
-    if (!response || !response.ok()) {
-      throw new Error(`HTTP ${response?.status() ?? 'no response'}`);
+    if (response && response.ok()) {
+      await page.waitForTimeout(2000);
+      const html = await page.content();
+      const $ = cheerio.load(html, { decodeEntities: false });
+      const events = parseTokyo($);
+      console.log(`[東京] ${events.length} 件取得 (Playwright)`);
+      return events;
     }
-
-    // レンダリング後の HTML を取得（Cloudflare チャレンジ通過後を確保するため少し待機）
-    await page.waitForTimeout(1500);
-    const html = await page.content();
-
-    const $ = cheerio.load(html, { decodeEntities: false });
-    const events = parseTokyo($);
-    console.log(`[東京] ${events.length} 件取得`);
-    return events;
-
+    console.warn(`[東京] Playwright: HTTP ${response?.status()} → fetch にフォールバック`);
+  } catch (err) {
+    console.warn(`[東京] Playwright 失敗: ${err.message} → fetch にフォールバック`);
   } finally {
     await page.close();
   }
+
+  // ── native fetch フォールバック ──
+  const res = await fetch(URLS.tokyo, {
+    headers: {
+      'User-Agent':      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+      'Accept':          'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
+      'Referer':         'https://www.mod.go.jp/',
+    },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const html = await res.text();
+  const $ = cheerio.load(html, { decodeEntities: false });
+  const events = parseTokyo($);
+  console.log(`[東京] ${events.length} 件取得 (fetch fallback)`);
+  return events;
 }
 
 // ── メイン処理 ───────────────────────────────────────────────
@@ -303,6 +310,8 @@ async function main() {
   // ── 実スクレイピングモード ──
   let kanagawaEvents = [];
   let tokyoEvents    = [];
+  let kanagawaError  = false;
+  let tokyoError     = false;
 
   const browser = await chromium.launch({
     headless: true,
@@ -319,22 +328,21 @@ async function main() {
   try {
     const context = await createStealthContext(browser);
 
-    // 神奈川を取得（エラーが出ても東京の取得は継続）
     try {
       kanagawaEvents = await fetchKanagawa(context);
     } catch (err) {
       console.error(`[神奈川] 取得失敗: ${err.message}`);
+      kanagawaError = true;
     }
 
-    // ページ間の待機（レートリミット対策）
     console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
-    // 東京を取得（エラーが出ても神奈川の結果は保持）
     try {
       tokyoEvents = await fetchTokyo(context);
     } catch (err) {
       console.error(`[東京] 取得失敗: ${err.message}`);
+      tokyoError = true;
     }
 
     await context.close();
@@ -342,9 +350,9 @@ async function main() {
     await browser.close();
   }
 
-  // どちらも空なら既存ファイルを上書きしない
-  if (kanagawaEvents.length === 0 && tokyoEvents.length === 0) {
-    console.warn('[警告] 両地本ともにデータを取得できませんでした。ファイルを更新しません。');
+  // 両方ともエラーで取得できなかった場合のみ終了（0件は正常の場合もある）
+  if (kanagawaError && tokyoError) {
+    console.warn('[警告] 両地本ともに取得エラーが発生しました。ファイルを更新しません。');
     process.exit(1);
   }
 

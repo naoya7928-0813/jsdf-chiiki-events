@@ -5,11 +5,13 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "mock":  "node index.js --mock"
+    "mock": "node index.js --mock"
   },
   "dependencies": {
-    "cheerio":    "^1.0.0",
+    "cheerio": "^1.0.0",
     "iconv-lite": "^0.6.3",
-    "playwright": "^1.52.0"
+    "playwright": "^1.52.0",
+    "playwright-extra": "^4.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
   }
 }
