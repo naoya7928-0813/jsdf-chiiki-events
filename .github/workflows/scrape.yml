@@ -26,10 +26,10 @@ jobs:
         uses: actions/checkout@v4
 
       # ── Node.js のセットアップ ───────────────────────────────
-      - name: Node.js 20 をセットアップ
+      - name: Node.js 24 をセットアップ
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       # ── scraper の依存パッケージをインストール ───────────────
       # scraper/package.json は本体の package.json とは独立
