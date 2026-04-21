@@ -139,7 +139,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, onToggle
         {/* 参加時の注意事項 */}
         {ev.notes && (
           <div style={{ padding: '6px 16px 14px' }}>
-            <SectionTitle>参加時の注意事項</SectionTitle>
+            <SectionTitle>イベント内容</SectionTitle>
             <div style={{
               background: 'var(--card)', borderRadius: 12,
               border: '1px solid var(--border)', padding: '14px 16px',
