@@ -43,14 +43,6 @@ jobs:
         working-directory: scraper
         run: npx playwright install chromium --with-deps
 
-      # ── 環境確認 ─────────────────────────────────────────────
-      - name: 環境確認
-        working-directory: scraper
-        run: |
-          echo "=== Node version ===" && node --version
-          echo "=== npm version ===" && npm --version
-          echo "=== node_modules exists ===" && ls node_modules | head -5
-
       # ── スクレイピング実行 ────────────────────────────────────
       - name: イベントデータをスクレイピング
         working-directory: scraper
@@ -81,7 +73,7 @@ jobs:
       # ── Vercel に本番デプロイ ─────────────────────────────
       - name: Vercel に本番デプロイ
         if: steps.commit.outputs.changed == 'true'
-        run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }} --yes
+        run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
