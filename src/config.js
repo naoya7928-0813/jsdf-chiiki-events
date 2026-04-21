@@ -15,6 +15,12 @@ export const COLOR_SCHEMES = {
 
 export const DEFAULT_SCHEME = 'jgsdf';
 
+// ─── 地方協力本部 連絡先 ──────────────────────────────────────
+export const REGION_HQ = {
+  kanagawa: { name: '神奈川地方協力本部', tel: '045-662-9476', emblem: '神' },
+  tokyo:    { name: '東京地方協力本部',   tel: '03-3268-3111', emblem: '東' },
+};
+
 // ─── フォールバック用モックデータ ────────────────────────────
 // GAS URL 未設定時・オフライン時に表示する。
 export const MOCK_EVENTS = {

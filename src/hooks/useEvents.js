@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { API_URL, REFRESH_INTERVAL_MS, MOCK_EVENTS } from '../config';
+import { API_URL, REFRESH_INTERVAL_MS } from '../config';
+
+const EMPTY = { kanagawa: [], tokyo: [], updatedAt: null };
 
 export function useEvents() {
   const [data, setData]       = useState(null);
@@ -9,7 +11,6 @@ export function useEvents() {
 
   const fetchEvents = useCallback(async () => {
     try {
-      // cache: 'no-cache' で静的ファイルの古いキャッシュを無視する
       const res = await fetch(`${API_URL}?t=${Date.now()}`, { cache: 'no-cache' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
@@ -19,8 +20,7 @@ export function useEvents() {
       setError(null);
     } catch (err) {
       setError(err.message);
-      // 初回取得失敗時はモックデータで表示を継続
-      if (!hasData.current) setData(MOCK_EVENTS);
+      if (!hasData.current) setData(EMPTY);
     } finally {
       setLoading(false);
     }
@@ -28,16 +28,11 @@ export function useEvents() {
 
   useEffect(() => {
     fetchEvents();
-
-    // 5分ごとに自動再取得
     const interval = setInterval(fetchEvents, REFRESH_INTERVAL_MS);
-
-    // タブがアクティブになったときも再取得（バックグラウンド復帰）
     const onVisibilityChange = () => {
       if (document.visibilityState === 'visible') fetchEvents();
     };
     document.addEventListener('visibilitychange', onVisibilityChange);
-
     return () => {
       clearInterval(interval);
       document.removeEventListener('visibilitychange', onVisibilityChange);
@@ -45,7 +40,7 @@ export function useEvents() {
   }, [fetchEvents]);
 
   return {
-    events:    data ?? MOCK_EVENTS,
+    events:    data ?? EMPTY,
     loading:   loading && !data,
     error,
     refresh:   fetchEvents,
