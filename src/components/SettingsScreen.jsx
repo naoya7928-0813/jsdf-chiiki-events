@@ -1,0 +1,335 @@
+import { useState } from 'react';
+import { ICO } from './Icons';
+import { Emblem, BottomTabBar, F } from './Shared';
+import { COLOR_SCHEMES } from '../config';
+
+// package.json の version を vite.config.js の define で埋め込んだ定数
+/* global __APP_VERSION__ */
+
+export default function SettingsScreen({
+  theme, region, onRegionChange,
+  onColorChange, onDarkModeChange,
+  onOpenHome, onOpenList, onOpenFavorites,
+}) {
+  const { primary, accent, schemeKey, darkMode } = theme;
+
+  // ── 通知設定 ────────────────────────────────────────────────
+  const [notif, setNotif] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('jsdf-notif')) || { event: false, update: false, reminder: false };
+    } catch {
+      return { event: false, update: false, reminder: false };
+    }
+  });
+  // 権限拒否時に表示するエラーメッセージ
+  const [notifError, setNotifError] = useState(null);
+
+  // 通知トグル：ON にする前に権限チェック
+  const handleNotifToggle = async (key) => {
+    const next = !notif[key];
+
+    if (next) {
+      // 通知を ON にしようとした場合
+      if (!('Notification' in window)) {
+        setNotifError('このブラウザは通知に対応していません');
+        return;
+      }
+      if (Notification.permission === 'denied') {
+        setNotifError('ブラウザ設定で通知を許可してください');
+        return;
+      }
+      if (Notification.permission === 'default') {
+        const perm = await Notification.requestPermission();
+        if (perm !== 'granted') {
+          setNotifError('ブラウザ設定で通知を許可してください');
+          return;
+        }
+      }
+      setNotifError(null);
+    } else {
+      // 全て OFF になったらエラー表示をクリア
+      const updated = { ...notif, [key]: false };
+      if (!Object.values(updated).some(Boolean)) setNotifError(null);
+    }
+
+    const updated = { ...notif, [key]: next };
+    setNotif(updated);
+    try { localStorage.setItem('jsdf-notif', JSON.stringify(updated)); } catch {}
+  };
+
+  return (
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)', fontFamily: F.sans }}>
+      {/* ヘッダー */}
+      <div style={{
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)',
+        paddingBottom: 14, background: primary, color: '#fff', flexShrink: 0,
+      }}>
+        <div style={{ padding: '0 20px 10px' }}>
+          <div style={{ fontSize: 10, letterSpacing: 2, color: 'rgba(255,255,255,0.65)', fontWeight: 500 }}>SETTINGS</div>
+          <div style={{ fontFamily: F.serif, fontSize: 19, fontWeight: 600, letterSpacing: 1, marginTop: 2 }}>ユーザー設定</div>
+        </div>
+      </div>
+
+      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '16px 0 8px' }}>
+
+        {/* ─ 1. 地本切替 ─ */}
+        <GroupTitle>地本</GroupTitle>
+        <Card>
+          <div style={{ padding: '12px 14px' }}>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8 }}>表示する地方協力本部</div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {[{ id: 'kanagawa', label: '神奈川地本', ch: '神' }, { id: 'tokyo', label: '東京地本', ch: '都' }].map(v => {
+                const isA = region === v.id;
+                return (
+                  <button key={v.id} onClick={() => onRegionChange(v.id)} style={{
+                    flex: 1, minHeight: 44, padding: '8px',
+                    border: `1px solid ${isA ? primary : 'var(--border)'}`,
+                    background: isA ? primary : 'var(--card)',
+                    color: isA ? '#fff' : 'var(--text)',
+                    borderRadius: 8, cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                    fontFamily: F.sans, fontSize: 13, fontWeight: 600, letterSpacing: 0.5,
+                  }}>
+                    <Emblem ch={v.ch} size={18} primary={isA ? '#fff' : primary} />
+                    {v.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </Card>
+
+        {/* ─ 2. 通知設定 ─ */}
+        <GroupTitle>通知設定</GroupTitle>
+        <Card>
+          <ToggleRow
+            label="イベント公開のお知らせ"
+            sub="新しいイベントが追加された時"
+            on={notif.event}
+            onChange={() => handleNotifToggle('event')}
+            primary={primary}
+          />
+          <ToggleRow
+            label="開催情報の変更"
+            sub="時間・場所・中止等の変更時"
+            on={notif.update}
+            onChange={() => handleNotifToggle('update')}
+            primary={primary}
+          />
+          <ToggleRow
+            label="リマインダー"
+            sub="申込イベントの前日に通知"
+            on={notif.reminder}
+            onChange={() => handleNotifToggle('reminder')}
+            primary={primary}
+            last
+          />
+        </Card>
+        {/* 権限拒否時のインライン注記 */}
+        {notifError && (
+          <div style={{
+            margin: '6px 16px 0',
+            padding: '8px 12px',
+            background: '#fff3f3', border: '1px solid #fca5a5',
+            borderRadius: 8, fontSize: 12, color: '#b91c1c',
+            fontFamily: F.sans, lineHeight: 1.5,
+          }}>
+            ⚠ {notifError}
+          </div>
+        )}
+
+        {/* ─ 3. テーマカラー ─ */}
+        <GroupTitle>テーマカラー</GroupTitle>
+        <Card>
+          <div style={{ padding: '14px' }}>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>
+              アプリの配色（3自衛隊のカラーから選択）
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {Object.entries(COLOR_SCHEMES).map(([k, v]) => {
+                const isA = schemeKey === k;
+                return (
+                  <button key={k} onClick={() => onColorChange(k)} style={{
+                    flex: 1, minHeight: 76, padding: 10,
+                    border: `1.5px solid ${isA ? v.primary : 'var(--border)'}`,
+                    background: isA ? v.primary : 'var(--card)',
+                    borderRadius: 10, cursor: 'pointer',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                    gap: 5, fontFamily: F.sans, transition: 'all 0.15s',
+                  }}>
+                    <div style={{
+                      width: 22, height: 22, borderRadius: '50%',
+                      background: v.primary,
+                      border: '2px solid #fff',
+                      boxShadow: isA ? `0 0 0 2px ${v.primary}` : `0 0 0 1.5px ${v.primary}44`,
+                    }} />
+                    <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: 0.5, color: isA ? '#fff' : 'var(--text)' }}>
+                      {v.label}
+                    </div>
+                    <div style={{ fontSize: 9, letterSpacing: 1.5, fontFamily: F.mono, color: isA ? 'rgba(255,255,255,0.75)' : 'var(--text-muted)' }}>
+                      {v.sub}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </Card>
+
+        {/* ─ 4. ダークモード（3択セグメント） ─ */}
+        <GroupTitle>ダークモード</GroupTitle>
+        <Card>
+          <div style={{ padding: '14px' }}>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>
+              画面の明るさ設定
+            </div>
+            {/* セグメントコントロール */}
+            <div style={{
+              display: 'flex', background: 'var(--badge-bg)',
+              borderRadius: 8, padding: 3, gap: 2,
+            }}>
+              {[
+                { id: 'system', label: 'システム' },
+                { id: 'light',  label: 'ライト'   },
+                { id: 'dark',   label: 'ダーク'   },
+              ].map(m => {
+                const isA = darkMode === m.id;
+                return (
+                  <button key={m.id} onClick={() => onDarkModeChange(m.id)} style={{
+                    flex: 1, height: 32, borderRadius: 6, border: 'none', cursor: 'pointer',
+                    background: isA ? 'var(--card)' : 'transparent',
+                    color: isA ? primary : 'var(--text-muted)',
+                    fontFamily: F.sans, fontSize: 13,
+                    fontWeight: isA ? 600 : 400,
+                    boxShadow: isA ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                    transition: 'all 0.15s',
+                  }}>
+                    {m.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </Card>
+
+        {/* ─ 5. プライバシーポリシー / 利用規約（準備中） ─ */}
+        <GroupTitle>法的情報</GroupTitle>
+        <Card>
+          <ComingSoonRow label="利用規約" />
+          <ComingSoonRow label="プライバシーポリシー" last />
+        </Card>
+
+        {/* ─ 6. バージョン ─ */}
+        <div style={{ textAlign: 'center', padding: '20px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 20px)', fontSize: 11, color: 'var(--text-muted)', fontFamily: F.mono }}>
+          自衛隊地本イベント情報 {__APP_VERSION__}
+        </div>
+      </div>
+
+      <BottomTabBar
+        active="settings"
+        onChange={id => {
+          if (id === 'home')           onOpenHome();
+          else if (id === 'list')      onOpenList();
+          else if (id === 'favorites') onOpenFavorites();
+        }}
+        primary={primary}
+      />
+    </div>
+  );
+}
+
+// ─── 内部コンポーネント ──────────────────────────────────────
+
+function GroupTitle({ children }) {
+  return (
+    <div style={{
+      fontSize: 11, color: 'var(--text-muted)',
+      padding: '14px 24px 6px', letterSpacing: 2,
+      fontFamily: F.sans, fontWeight: 500,
+    }}>{children}</div>
+  );
+}
+
+function Card({ children }) {
+  return (
+    <div style={{
+      background: 'var(--card)', margin: '0 16px',
+      borderRadius: 12, border: '1px solid var(--border)', overflow: 'hidden',
+    }}>{children}</div>
+  );
+}
+
+function ToggleRow({ label, sub, on, onChange, primary, last }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', minHeight: 60,
+      padding: '12px 14px', gap: 12,
+      borderBottom: last ? 'none' : '1px solid var(--sep)',
+    }}>
+      <div style={{ flex: 1 }}>
+        <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', letterSpacing: 0.2 }}>{label}</div>
+        {sub && (
+          <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 3, lineHeight: 1.4 }}>{sub}</div>
+        )}
+      </div>
+      <button
+        role="switch" aria-checked={on}
+        onClick={onChange}
+        style={{
+          width: 44, height: 26, borderRadius: 26,
+          background: on ? primary : 'var(--border)',
+          position: 'relative', cursor: 'pointer', border: 'none',
+          transition: 'background 0.2s', padding: 0, flexShrink: 0,
+        }}
+      >
+        <div style={{
+          position: 'absolute', width: 22, height: 22, borderRadius: '50%',
+          background: '#fff', top: 2, left: on ? 20 : 2,
+          transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+        }} />
+      </button>
+    </div>
+  );
+}
+
+/** 準備中行（タップ不可・バッジ表示） */
+function ComingSoonRow({ label, last }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', minHeight: 50,
+      padding: '12px 14px', gap: 10,
+      borderBottom: last ? 'none' : '1px solid var(--sep)',
+    }}>
+      <div style={{ flex: 1, fontSize: 14, color: 'var(--text-muted)', fontWeight: 500 }}>{label}</div>
+      <span style={{
+        fontSize: 10, padding: '2px 9px', borderRadius: 10,
+        background: 'var(--badge-bg)', color: 'var(--text-muted)',
+        fontFamily: F.mono, letterSpacing: 1, fontWeight: 500,
+      }}>準備中</span>
+    </div>
+  );
+}
+
+/** 外部リンク行（アイコン付き） */
+function ExternalLinkRow({ label, url, last }) {
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        display: 'flex', alignItems: 'center', minHeight: 50,
+        padding: '12px 14px', gap: 10,
+        borderBottom: last ? 'none' : '1px solid var(--sep)',
+        textDecoration: 'none',
+      }}
+    >
+      <div style={{ flex: 1, fontSize: 14, color: 'var(--text)', fontWeight: 500 }}>{label}</div>
+      {/* 外部リンクアイコン */}
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <path d="M14 4h6v6M20 4L10 14M6 6h4M6 6v12h12v-4"
+          stroke="var(--text-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    </a>
+  );
+}
