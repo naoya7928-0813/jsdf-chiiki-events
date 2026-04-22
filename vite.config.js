@@ -35,6 +35,15 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         runtimeCaching: [
           {
+            urlPattern: /\/data\/events\.json/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'events-data',
+              expiration: { maxAgeSeconds: 180 },
+              networkTimeoutSeconds: 8,
+            },
+          },
+          {
             urlPattern: /^\/api\//,
             handler: 'NetworkFirst',
             options: {

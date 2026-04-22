@@ -1,3 +1,7 @@
+// ─── プッシュ通知 (ntfy.sh) ──────────────────────────────────
+export const NTFY_TOPIC = 'jsdf-chiiki-events-7928';
+export const NTFY_URL   = `https://ntfy.sh/${NTFY_TOPIC}`;
+
 // ─── データソース ─────────────────────────────────────────────
 // GitHub Actions が定期スクレイピングし public/data/events.json に書き出す。
 // Vercel はこのファイルを静的配信するため、サーバーレス関数は不要。

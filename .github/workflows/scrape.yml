@@ -77,3 +77,18 @@ jobs:
         env:
           VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      # ── ntfy.sh でプッシュ通知送信 ────────────────────────
+      - name: プッシュ通知を送信
+        if: steps.commit.outputs.changed == 'true'
+        run: |
+          NEW_COUNT=$(node -e "
+            const d = require('./public/data/events.json');
+            console.log((d.kanagawa||[]).length + (d.tokyo||[]).length);
+          ")
+          curl -s \
+            -H "Title: 自衛隊地本イベント情報 更新" \
+            -H "Tags: mega,jp" \
+            -H "Priority: default" \
+            -d "新着・更新イベントがあります（全${NEW_COUNT}件）。アプリを開いて確認してください。" \
+            https://ntfy.sh/jsdf-chiiki-events-7928

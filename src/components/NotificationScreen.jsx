@@ -1,6 +1,7 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ICO } from './Icons';
 import { F, ScreenHeader, splitDate } from './Shared';
+import { NTFY_URL } from '../config';
 
 // ─── 通知一覧画面 ─────────────────────────────────────────────
 // ベルアイコンから遷移。全イベントを通知アイテムとして表示し、
@@ -37,6 +38,32 @@ export default function NotificationScreen({
 
   const unreadItems = items.filter(i => i.isNew);
 
+  // ── プッシュ通知購読状態 ──────────────────────────────────
+  const [pushEnabled, setPushEnabled] = useState(() => {
+    try { return localStorage.getItem('jsdf-push-enabled') === '1'; } catch { return false; }
+  });
+
+  const handleSubscribe = async () => {
+    if (!('Notification' in window)) {
+      alert('このブラウザはプッシュ通知に対応していません。\nntfy アプリをインストールして「jsdf-chiiki-events-7928」トピックを購読してください。');
+      return;
+    }
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') {
+      alert('通知が許可されませんでした。ブラウザの設定から許可してください。');
+      return;
+    }
+    // ntfy.sh のウェブプッシュ購読ページを開く
+    window.open(NTFY_URL, '_blank', 'noopener');
+    setPushEnabled(true);
+    try { localStorage.setItem('jsdf-push-enabled', '1'); } catch {}
+  };
+
+  const handleUnsubscribe = () => {
+    setPushEnabled(false);
+    try { localStorage.removeItem('jsdf-push-enabled'); } catch {}
+  };
+
   return (
     <div style={{
       height: '100%', display: 'flex', flexDirection: 'column',
@@ -61,6 +88,65 @@ export default function NotificationScreen({
       />
 
       <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '12px 0 8px' }}>
+
+        {/* プッシュ通知カード */}
+        <div style={{ margin: '0 16px 16px' }}>
+          <div style={{
+            borderRadius: 12, border: `1px solid ${primary}33`,
+            background: `${primary}0a`, padding: '14px 16px',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: '50%',
+                background: `${primary}18`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              }}>
+                {ICO.bell(primary, 18)}
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+                  プッシュ通知
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
+                  {pushEnabled ? '購読中 — イベント更新時に通知が届きます' : 'イベント更新時に通知を受け取る'}
+                </div>
+              </div>
+            </div>
+            {pushEnabled ? (
+              <div style={{ display: 'flex', gap: 8 }}>
+                <div style={{
+                  flex: 1, height: 36, borderRadius: 8,
+                  background: `${primary}18`, display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', fontSize: 12, color: primary, fontWeight: 600,
+                }}>
+                  通知 ON
+                </div>
+                <button
+                  onClick={handleUnsubscribe}
+                  style={{
+                    height: 36, padding: '0 14px', borderRadius: 8, border: '1px solid var(--border)',
+                    background: 'var(--card)', color: 'var(--text-muted)', fontSize: 12,
+                    cursor: 'pointer', fontFamily: F.sans,
+                  }}
+                >
+                  解除
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={handleSubscribe}
+                style={{
+                  width: '100%', height: 38, borderRadius: 8, border: 'none',
+                  background: primary, color: '#fff', fontSize: 13, fontWeight: 600,
+                  cursor: 'pointer', fontFamily: F.sans, letterSpacing: 0.5,
+                }}
+              >
+                通知を受け取る
+              </button>
+            )}
+          </div>
+        </div>
+
         {items.length === 0 ? (
           <EmptyState />
         ) : (

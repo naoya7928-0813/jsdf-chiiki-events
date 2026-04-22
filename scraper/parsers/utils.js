@@ -43,16 +43,18 @@ function isPast(dateStr) {
  * イベントタイトルからカテゴリを推定
  */
 function guessCategory(title) {
-  if (/説明会/.test(title))                    return '説明会';
-  if (/一般公開|基地公開|駐屯地公開/.test(title)) return '一般公開';
-  if (/体験/.test(title))                      return '体験';
-  if (/座談会/.test(title))                    return '座談会';
-  if (/演奏会|コンサート/.test(title))           return '演奏会';
-  if (/相談会/.test(title))                    return '相談会';
-  if (/交流会/.test(title))                    return '交流会';
-  if (/記念行事|記念式典|祭/.test(title))        return '記念行事';
-  if (/オープンキャンパス|学校説明/.test(title))  return '学校説明';
-  if (/採用試験|試験/.test(title))              return '採用試験';
+  if (/説明会|ガイダンス|制度説明|説明|募集案内/.test(title))                    return '説明会';
+  if (/募集/.test(title))                                                         return '説明会';
+  if (/オープンキャンパス|学校説明/.test(title))                                  return '学校説明';
+  if (/採用試験|試験/.test(title))                                                return '採用試験';
+  if (/一般公開|基地公開|駐屯地公開/.test(title))                                 return '一般公開';
+  if (/見学|体験|乗艦|潜水艦|艦艇|FAMILY|ファミリー|体感/.test(title))            return '体験';
+  if (/座談会/.test(title))                                                        return '座談会';
+  if (/演奏会|コンサート|音楽隊/.test(title))                                     return '演奏会';
+  if (/相談会/.test(title))                                                        return '相談会';
+  if (/交流会/.test(title))                                                        return '交流会';
+  if (/記念行事|記念式典|祭|フェスタ|フェスティバル/.test(title))                  return '記念行事';
+  if (/式典|観閲式|記念/.test(title))                                              return '記念行事';
   return 'イベント';
 }
 
@@ -61,9 +63,9 @@ function guessCategory(title) {
  */
 function guessTag(text) {
   if (/無料|入場無料/.test(text))              return '入場無料';
-  if (/予約|申込|申し込み/.test(text))          return '要予約';
+  if (/予約|申込|申し込み|事前/.test(text))    return '要予約';
   if (/オンライン|Zoom|zoom/.test(text))       return 'オンライン';
-  if (/家族|子ども|お子/.test(text))            return '家族向け';
+  if (/家族|子ども|お子|ファミリー/.test(text)) return '家族向け';
   if (/高校生|学生|大学生/.test(text))          return '学生向け';
   if (/抽選/.test(text))                       return '抽選';
   if (/個別/.test(text))                       return '個別';
