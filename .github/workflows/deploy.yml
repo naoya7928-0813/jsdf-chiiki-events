@@ -1,0 +1,43 @@
+name: フロントエンド デプロイ
+
+on:
+  # master へのプッシュで自動実行（スクレイパー由来のコミットは除外）
+  push:
+    branches:
+      - master
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'scripts/**'
+      - 'index.html'
+      - 'vite.config.js'
+      - 'package.json'
+      - 'package-lock.json'
+
+  # GitHub Actions UI から手動実行も可能
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Vercel 本番デプロイ
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Node.js 20 をセットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 依存パッケージをインストール
+        run: npm ci
+
+      - name: Vercel に本番デプロイ
+        run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
