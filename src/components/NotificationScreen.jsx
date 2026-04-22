@@ -43,17 +43,8 @@ export default function NotificationScreen({
     try { return localStorage.getItem('jsdf-push-enabled') === '1'; } catch { return false; }
   });
 
-  const handleSubscribe = async () => {
-    if (!('Notification' in window)) {
-      alert('このブラウザはプッシュ通知に対応していません。\nntfy アプリをインストールして「jsdf-chiiki-events-7928」トピックを購読してください。');
-      return;
-    }
-    const perm = await Notification.requestPermission();
-    if (perm !== 'granted') {
-      alert('通知が許可されませんでした。ブラウザの設定から許可してください。');
-      return;
-    }
-    // ntfy.sh のウェブプッシュ購読ページを開く
+  // ntfy.sh は独自のプッシュ基盤を持つため、ブラウザ Notification API は不要
+  const handleSubscribe = () => {
     window.open(NTFY_URL, '_blank', 'noopener');
     setPushEnabled(true);
     try { localStorage.setItem('jsdf-push-enabled', '1'); } catch {}

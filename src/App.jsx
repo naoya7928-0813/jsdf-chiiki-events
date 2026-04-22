@@ -90,7 +90,7 @@ export default function App() {
   }, [scheme.primary]);
 
   // ── データ取得 ────────────────────────────────────────────
-  const { events, loading, error, updatedAt, refresh } = useEvents();
+  const { events, loading, error, updatedAt, checkedAt, refresh } = useEvents();
 
   // ── お気に入り ────────────────────────────────────────────
   // Set<string> でイベントIDを管理。変更のたびに localStorage を同期する。
@@ -152,7 +152,7 @@ export default function App() {
       {screen === 'list' && (
         <ListScreen
           events={events} loading={loading} error={error}
-          updatedAt={updatedAt} onRefresh={refresh}
+          updatedAt={updatedAt} checkedAt={checkedAt} onRefresh={refresh}
           theme={theme}
           region={region} onRegionChange={handleRegionChange}
           favorites={favorites}

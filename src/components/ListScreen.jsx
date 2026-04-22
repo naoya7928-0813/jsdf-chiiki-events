@@ -3,7 +3,7 @@ import { ICO } from './Icons';
 import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle } from './Shared';
 
 export default function ListScreen({
-  events, loading, error, updatedAt, onRefresh,
+  events, loading, error, updatedAt, checkedAt, onRefresh,
   region, onRegionChange,
   favorites,
   onOpenHome, onOpenDetail, onOpenSettings, onOpenFavorites,
@@ -63,9 +63,11 @@ export default function ListScreen({
   }, [grouped, searchQuery]);
 
   const { primary, accent } = theme;
-  const updatedLabel = updatedAt
-    ? updatedAt
-    : new Date().toLocaleString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+  // checkedAt: 更新ボタンを押した（または自動フェッチした）時刻（ローカル）
+  // updatedAt: スクレイパーがデータを書いた時刻（JSON内）
+  const checkedLabel = checkedAt ?? updatedAt ?? new Date().toLocaleString('ja-JP', {
+    year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit',
+  }).replace(',', '');
 
   // 更新ボタンの回転アニメーション（spin は main.jsx で定義済み）
   const spinStyle = (isRefreshing || loading)
@@ -267,9 +269,9 @@ export default function ListScreen({
           )
         )}
 
-        {/* 最終更新 */}
+        {/* 最終確認日時（更新ボタンを押すたびに現在時刻に更新） */}
         <div style={{ textAlign: 'center', padding: '10px 20px 16px', fontSize: 10, color: 'var(--text-muted)' }}>
-          最終更新 <span style={{ fontFamily: F.mono, color: 'var(--text)' }}>{updatedLabel}</span>
+          最終確認 <span style={{ fontFamily: F.mono, color: 'var(--text)' }}>{checkedLabel}</span>
         </div>
       </div>
 

@@ -51,6 +51,7 @@ const OCR_PROMPT = `この自衛隊イベントのポスター画像から情報
 以下のJSONのみを返してください（説明文不要）。該当情報がない項目はnullにしてください。
 {
   "title": "ポスターに書かれた正確なイベント名",
+  "time": "開催時間（例: 10:00～16:00）",
   "ageRequirement": "参加対象年齢（例: 18歳〜32歳未満）",
   "deadline": "応募締切日（例: 4月24日（金））",
   "notes": "実施内容・参加条件・注意事項など（箇条書きをそのまま）"
@@ -131,9 +132,10 @@ function mergeOcr(ev, ocr) {
   if (!ocr) return ev;
   return {
     ...ev,
-    title:          (ocr.title        && ocr.title.trim())         || ev.title,
+    title:          (ocr.title          && ocr.title.trim())          || ev.title,
+    time:           (ocr.time           && ocr.time.trim())           || ev.time  || '',
     ageRequirement: (ocr.ageRequirement && ocr.ageRequirement.trim()) || ev.ageRequirement || null,
-    deadline:       (ocr.deadline      && ocr.deadline.trim())       || ev.deadline       || null,
+    deadline:       (ocr.deadline       && ocr.deadline.trim())       || ev.deadline       || null,
     notes: [ev.notes, ocr.notes].filter(Boolean).join('\n') || null,
   };
 }
