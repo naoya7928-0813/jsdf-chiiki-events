@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ICO } from './Icons';
 import { Emblem, BottomTabBar, F } from './Shared';
 import { COLOR_SCHEMES, REGION_SOURCE } from '../config';
+import NtfyGuideModal from './NtfyGuideModal';
 
 // package.json の version を vite.config.js の define で埋め込んだ定数
 /* global __APP_VERSION__ */
@@ -14,7 +15,7 @@ export default function SettingsScreen({
 }) {
   const { primary, accent, schemeKey, darkMode } = theme;
 
-  // ── 通知設定（アプリ内設定フラグ。端末通知はNotificationScreenで管理） ──
+  // ── 通知設定 ────────────────────────────────────────────────
   const [notif, setNotif] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('jsdf-notif')) || { event: false, update: false, reminder: false };
@@ -22,10 +23,16 @@ export default function SettingsScreen({
       return { event: false, update: false, reminder: false };
     }
   });
+  // ntfy ガイドモーダルの表示状態
+  const [showNtfyGuide, setShowNtfyGuide] = useState(false);
 
-  // ブラウザ通知API不要 — 設定値を localStorage に保存するだけ
   const handleNotifToggle = (key) => {
-    const updated = { ...notif, [key]: !notif[key] };
+    const next = !notif[key];
+    // イベント通知・更新通知を ON にするときは ntfy ガイドを表示
+    if (next && (key === 'event' || key === 'update')) {
+      setShowNtfyGuide(true);
+    }
+    const updated = { ...notif, [key]: next };
     setNotif(updated);
     try { localStorage.setItem('jsdf-notif', JSON.stringify(updated)); } catch {}
   };
@@ -98,7 +105,7 @@ export default function SettingsScreen({
             last
           />
         </Card>
-        {/* アプリ内通知の補足説明 */}
+        {/* 通知のヒント */}
         <div style={{
           margin: '6px 16px 0',
           padding: '8px 12px',
@@ -106,7 +113,7 @@ export default function SettingsScreen({
           borderRadius: 8, fontSize: 11, color: 'var(--text-muted)',
           fontFamily: F.sans, lineHeight: 1.6,
         }}>
-          プッシュ通知の設定は通知画面（ベルアイコン）から行ってください
+          「イベント公開」「開催変更」をONにすると、ntfy アプリへの設定方法が表示されます。「リマインダー」はお気に入りイベントの締切が近づいたとき通知画面に表示されます。
         </div>
 
         {/* ─ 3. テーマカラー ─ */}
@@ -236,6 +243,11 @@ export default function SettingsScreen({
         }}
         primary={primary}
       />
+
+      {/* ntfy ガイドモーダル */}
+      {showNtfyGuide && (
+        <NtfyGuideModal primary={primary} onClose={() => setShowNtfyGuide(false)} />
+      )}
     </div>
   );
 }

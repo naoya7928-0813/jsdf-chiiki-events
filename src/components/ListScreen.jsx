@@ -1,6 +1,8 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { ICO } from './Icons';
 import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle } from './Shared';
+import FilterBar from './FilterBar';
+import { daysUntil, deadlineDaysUntil, daysLabel, daysColor } from '../utils/date';
 
 export default function ListScreen({
   events, loading, error, updatedAt, checkedAt, onRefresh,
@@ -36,15 +38,32 @@ export default function ListScreen({
     Promise.resolve(onRefresh()).finally(() => setIsRefreshing(false));
   };
 
+  // ── カテゴリ・タグ フィルター ────────────────────────────
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [activeTag,      setActiveTag]      = useState('all');
+
+  // カテゴリ or タグが変わったら検索をリセット
+  const handleCategoryChange = (cat) => { setActiveCategory(cat); closeSearch(); };
+  const handleTagChange      = (tag) => { setActiveTag(tag);      closeSearch(); };
+
+  // ── フィルター適用済みリスト ──────────────────────────────
+  const filteredList = useMemo(() => {
+    return list.filter(ev => {
+      const catOk = activeCategory === 'all' || ev.category === activeCategory;
+      const tagOk = activeTag      === 'all' || ev.tag      === activeTag;
+      return catOk && tagOk;
+    });
+  }, [list, activeCategory, activeTag]);
+
   // ── イベントグループ化 ─────────────────────────────────────
   const grouped = useMemo(() => {
     const g = {};
-    for (const e of list) {
+    for (const e of filteredList) {
       const k = parseYM(e.date);
       (g[k] = g[k] || []).push(e);
     }
     return g;
-  }, [list]);
+  }, [filteredList]);
 
   // ── 検索フィルタ ──────────────────────────────────────────
   const filteredGrouped = useMemo(() => {
@@ -198,6 +217,18 @@ export default function ListScreen({
         )}
       </div>
 
+      {/* フィルターバー（検索中は非表示） */}
+      {!isSearching && (
+        <FilterBar
+          events={list}
+          activeCategory={activeCategory}
+          activeTag={activeTag}
+          onCategoryChange={handleCategoryChange}
+          onTagChange={handleTagChange}
+          primary={primary}
+        />
+      )}
+
       <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 8 }}>
         <ErrorBanner message={error} />
 
@@ -218,9 +249,14 @@ export default function ListScreen({
                 </div>
 
                 {evs.map(ev => {
-                  const { m, d } = splitDate(ev.date);
-                  const isWeekend = /[土日祝]/.test(ev.weekday);
-                  const dateColor = isWeekend ? accent : primary;
+                  const { m, d }   = splitDate(ev.date);
+                  const isWeekend  = /[土日祝]/.test(ev.weekday);
+                  const dateColor  = isWeekend ? accent : primary;
+                  const eventDays  = daysUntil(ev.date);
+                  const dlDays     = deadlineDaysUntil(ev.deadline);
+                  // 開催まで7日以内、または締切まで3日以内のときバッジ表示
+                  const showEvent  = eventDays  >= 0 && eventDays  <= 7;
+                  const showDl     = dlDays != null && dlDays >= 0 && dlDays <= 3;
                   return (
                     <div key={ev.id} onClick={() => onOpenDetail(ev)} role="button" tabIndex={0}
                       onKeyDown={e => e.key === 'Enter' && onOpenDetail(ev)}
@@ -228,7 +264,7 @@ export default function ListScreen({
                         background: 'var(--card)', margin: '0 16px 10px', borderRadius: 12, minHeight: 72,
                         cursor: 'pointer',
                         boxShadow: '0 1px 2px rgba(11,37,69,0.04),0 2px 8px rgba(11,37,69,0.05)',
-                        border: '1px solid var(--border)',
+                        border: `1px solid ${showDl ? '#f9731644' : showEvent ? `${primary}33` : 'var(--border)'}`,
                       }}>
                       <div style={{ display: 'flex', padding: '14px 16px', gap: 14 }}>
                         {/* 日付バッジ */}
@@ -242,12 +278,32 @@ export default function ListScreen({
                         </div>
                         {/* テキスト */}
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ display: 'flex', gap: 6, marginBottom: 5, flexWrap: 'wrap' }}>
+                          <div style={{ display: 'flex', gap: 6, marginBottom: 5, flexWrap: 'wrap', alignItems: 'center' }}>
                             <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 3, background: 'var(--tag-bg)', color: primary, letterSpacing: 0.5 }}>
-                              {/* 検索中はカテゴリをハイライト */}
                               {ev.category}
                             </span>
                             {ev.tag && <span style={{ fontSize: 11, color: 'var(--text-sub)' }}>{ev.tag}</span>}
+                            {/* 締切カウントダウン（3日以内） */}
+                            {showDl && (
+                              <span style={{
+                                fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3,
+                                background: '#f9731622', color: '#f97316',
+                                fontFamily: F.mono, letterSpacing: 0.5,
+                              }}>
+                                締切 {daysLabel(dlDays, 'deadline')}
+                              </span>
+                            )}
+                            {/* 開催カウントダウン（7日以内・締切バッジ非表示時） */}
+                            {showEvent && !showDl && (
+                              <span style={{
+                                fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3,
+                                background: `${daysColor(eventDays, primary, accent)}18`,
+                                color: daysColor(eventDays, primary, accent),
+                                fontFamily: F.mono, letterSpacing: 0.5,
+                              }}>
+                                {daysLabel(eventDays, 'event')}
+                              </span>
+                            )}
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 6 }}>
                             <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', lineHeight: 1.45, letterSpacing: 0.2, flex: 1, minWidth: 0 }}>

@@ -190,6 +190,7 @@ export default function App() {
         <NotificationScreen
           events={events}
           seenIds={seenIds}
+          favorites={favorites}
           theme={theme}
           onMarkAllRead={handleMarkAllRead}
           onOpenDetail={(ev) => openDetail(ev, 'notifications')}
