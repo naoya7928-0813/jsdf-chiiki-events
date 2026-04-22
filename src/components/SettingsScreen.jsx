@@ -14,7 +14,7 @@ export default function SettingsScreen({
 }) {
   const { primary, accent, schemeKey, darkMode } = theme;
 
-  // ── 通知設定 ────────────────────────────────────────────────
+  // ── 通知設定（アプリ内設定フラグ。端末通知はNotificationScreenで管理） ──
   const [notif, setNotif] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('jsdf-notif')) || { event: false, update: false, reminder: false };
@@ -22,38 +22,10 @@ export default function SettingsScreen({
       return { event: false, update: false, reminder: false };
     }
   });
-  // 権限拒否時に表示するエラーメッセージ
-  const [notifError, setNotifError] = useState(null);
 
-  // 通知トグル：ON にする前に権限チェック
-  const handleNotifToggle = async (key) => {
-    const next = !notif[key];
-
-    if (next) {
-      // 通知を ON にしようとした場合
-      if (!('Notification' in window)) {
-        setNotifError('このブラウザは通知に対応していません');
-        return;
-      }
-      if (Notification.permission === 'denied') {
-        setNotifError('ブラウザ設定で通知を許可してください');
-        return;
-      }
-      if (Notification.permission === 'default') {
-        const perm = await Notification.requestPermission();
-        if (perm !== 'granted') {
-          setNotifError('ブラウザ設定で通知を許可してください');
-          return;
-        }
-      }
-      setNotifError(null);
-    } else {
-      // 全て OFF になったらエラー表示をクリア
-      const updated = { ...notif, [key]: false };
-      if (!Object.values(updated).some(Boolean)) setNotifError(null);
-    }
-
-    const updated = { ...notif, [key]: next };
+  // ブラウザ通知API不要 — 設定値を localStorage に保存するだけ
+  const handleNotifToggle = (key) => {
+    const updated = { ...notif, [key]: !notif[key] };
     setNotif(updated);
     try { localStorage.setItem('jsdf-notif', JSON.stringify(updated)); } catch {}
   };
@@ -126,18 +98,16 @@ export default function SettingsScreen({
             last
           />
         </Card>
-        {/* 権限拒否時のインライン注記 */}
-        {notifError && (
-          <div style={{
-            margin: '6px 16px 0',
-            padding: '8px 12px',
-            background: '#fff3f3', border: '1px solid #fca5a5',
-            borderRadius: 8, fontSize: 12, color: '#b91c1c',
-            fontFamily: F.sans, lineHeight: 1.5,
-          }}>
-            ⚠ {notifError}
-          </div>
-        )}
+        {/* アプリ内通知の補足説明 */}
+        <div style={{
+          margin: '6px 16px 0',
+          padding: '8px 12px',
+          background: 'var(--tag-bg)',
+          borderRadius: 8, fontSize: 11, color: 'var(--text-muted)',
+          fontFamily: F.sans, lineHeight: 1.6,
+        }}>
+          プッシュ通知の設定は通知画面（ベルアイコン）から行ってください
+        </div>
 
         {/* ─ 3. テーマカラー ─ */}
         <GroupTitle>テーマカラー</GroupTitle>

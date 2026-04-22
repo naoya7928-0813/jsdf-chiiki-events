@@ -61,9 +61,13 @@ function parseTokyo($) {
 
     if (isPast(dateStr)) return;
 
-    // 日付以降の時刻部分 "10:00～12:00"
+    // 日付以降の時刻部分 "10:00～12:00"（rawDate に含まれる場合）
     const timeMatch = rawDate.match(/[）)]\s*(\d{1,2}:\d{2}.+)/);
-    const time = timeMatch ? timeMatch[1].trim() : '';
+    // rawDate にない場合は独立した時刻フィールドを探す
+    const rawTime = toHalfWidth(
+      fields['時間'] || fields['集合時間'] || fields['開催時間'] || fields['受付時間'] || ''
+    ).replace(/\s+/g, ' ').trim();
+    const time = timeMatch ? timeMatch[1].trim() : rawTime;
 
     // ── 場所 ──
     const place = (fields['場所'] || fields['開催場所'] || fields['会場'] || '')

@@ -28,19 +28,12 @@ export default function ListScreen({
   };
 
   // ── 更新ローディング ──────────────────────────────────────
-  // 更新ボタンを押してから loading が完了するまで回転アニメーション
+  // onRefresh() が返す Promise の完了でスピナーを止める
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const prevLoading = useRef(false);
-
-  useEffect(() => {
-    // loading が true → false に変わったとき（=取得完了）にリセット
-    if (prevLoading.current && !loading) setIsRefreshing(false);
-    prevLoading.current = loading;
-  }, [loading]);
 
   const handleRefresh = () => {
     setIsRefreshing(true);
-    onRefresh();
+    Promise.resolve(onRefresh()).finally(() => setIsRefreshing(false));
   };
 
   // ── イベントグループ化 ─────────────────────────────────────
