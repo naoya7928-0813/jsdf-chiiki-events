@@ -25,6 +25,18 @@ export const REGION_HQ = {
   tokyo:    { name: '東京地方協力本部',   tel: '03-3268-3111', emblem: '東' },
 };
 
+// ─── データ出典情報 ───────────────────────────────────────────
+export const REGION_SOURCE = {
+  kanagawa: {
+    name: '自衛隊神奈川地方協力本部ウェブサイト',
+    url:  'https://www.mod.go.jp/pco/kanagawa/',
+  },
+  tokyo: {
+    name: '自衛隊東京地方協力本部ホームページ',
+    url:  'https://www.mod.go.jp/pco/tokyo/event2/',
+  },
+};
+
 // ─── フォールバック用モックデータ ────────────────────────────
 // GAS URL 未設定時・オフライン時に表示する。
 export const MOCK_EVENTS = {

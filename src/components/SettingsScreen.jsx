@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ICO } from './Icons';
 import { Emblem, BottomTabBar, F } from './Shared';
-import { COLOR_SCHEMES } from '../config';
+import { COLOR_SCHEMES, REGION_SOURCE } from '../config';
 
 // package.json の version を vite.config.js の define で埋め込んだ定数
 /* global __APP_VERSION__ */
@@ -10,6 +10,7 @@ export default function SettingsScreen({
   theme, region, onRegionChange,
   onColorChange, onDarkModeChange,
   onOpenHome, onOpenList, onOpenFavorites,
+  onOpenLegal,
 }) {
   const { primary, accent, schemeKey, darkMode } = theme;
 
@@ -212,15 +213,46 @@ export default function SettingsScreen({
           </div>
         </Card>
 
-        {/* ─ 5. プライバシーポリシー / 利用規約（準備中） ─ */}
+        {/* ─ 5. 法的情報 ─ */}
         <GroupTitle>法的情報</GroupTitle>
         <Card>
-          <ComingSoonRow label="利用規約" />
-          <ComingSoonRow label="プライバシーポリシー" last />
+          <LegalLinkRow label="利用規約"             onTap={() => onOpenLegal('terms')}   />
+          <LegalLinkRow label="プライバシーポリシー" onTap={() => onOpenLegal('privacy')} last />
         </Card>
 
-        {/* ─ 6. バージョン ─ */}
-        <div style={{ textAlign: 'center', padding: '20px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 20px)', fontSize: 11, color: 'var(--text-muted)', fontFamily: F.mono }}>
+        {/* ─ 6. データ出典 ─ */}
+        <div style={{
+          margin: '20px 16px 0',
+          padding: '14px 16px',
+          background: 'var(--card)',
+          border: '1px solid var(--border)',
+          borderRadius: 12,
+        }}>
+          <div style={{
+            fontSize: 10, fontWeight: 700, letterSpacing: 2,
+            color: 'var(--text-muted)', marginBottom: 8,
+          }}>
+            データ出典
+          </div>
+          {[REGION_SOURCE.kanagawa, REGION_SOURCE.tokyo].map(src => (
+            <div key={src.url} style={{
+              fontSize: 11, color: 'var(--text-muted)',
+              lineHeight: 1.7, paddingLeft: 8,
+            }}>
+              {'・'}{src.name}
+            </div>
+          ))}
+          <div style={{
+            fontSize: 11, color: 'var(--text-muted)',
+            lineHeight: 1.7, marginTop: 8,
+            paddingTop: 8, borderTop: '1px solid var(--sep)',
+          }}>
+            本アプリは上記サイトの情報を加工して作成した非公式アプリです。防衛省・自衛隊とは一切関係ありません。
+          </div>
+        </div>
+
+        {/* ─ 7. バージョン ─ */}
+        <div style={{ textAlign: 'center', padding: '16px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 20px)', fontSize: 11, color: 'var(--text-muted)', fontFamily: F.mono }}>
           自衛隊地本イベント情報 {__APP_VERSION__}
         </div>
       </div>
@@ -289,6 +321,30 @@ function ToggleRow({ label, sub, on, onChange, primary, last }) {
         }} />
       </button>
     </div>
+  );
+}
+
+/** 法的情報リンク行（タップで画面遷移） */
+function LegalLinkRow({ label, onTap, last }) {
+  return (
+    <button
+      onClick={onTap}
+      style={{
+        width: '100%', display: 'flex', alignItems: 'center', minHeight: 50,
+        padding: '12px 14px', gap: 10,
+        borderBottom: last ? 'none' : '1px solid var(--sep)',
+        background: 'transparent', border: 'none',
+        borderBottomWidth: last ? 0 : 1,
+        borderBottomStyle: last ? 'none' : 'solid',
+        borderBottomColor: 'var(--sep)',
+        cursor: 'pointer', textAlign: 'left', fontFamily: F.sans,
+      }}
+    >
+      <div style={{ flex: 1, fontSize: 14, color: 'var(--text)', fontWeight: 500 }}>{label}</div>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+        <path d="M9 18l6-6-6-6" stroke="var(--icon-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    </button>
   );
 }
 

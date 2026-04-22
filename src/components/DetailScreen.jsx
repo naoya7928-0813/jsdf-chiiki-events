@@ -1,6 +1,6 @@
 import { ICO } from './Icons';
 import { Emblem, F, splitDate, SectionTitle, iconBtnStyle } from './Shared';
-import { REGION_HQ } from '../config';
+import { REGION_HQ, REGION_SOURCE } from '../config';
 
 export default function DetailScreen({ event, onBack, theme, favorites, onToggleFavorite }) {
   const ev = event;
@@ -13,6 +13,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, onToggle
   // 地域判定: id が "k-" で始まれば神奈川、それ以外は東京
   const regionKey = ev.id.startsWith('k-') ? 'kanagawa' : 'tokyo';
   const hq        = REGION_HQ[regionKey];
+  const source    = REGION_SOURCE[regionKey];
 
   // 地図クエリ: place + address があれば address 優先、なければ place
   const mapQuery = encodeURIComponent(ev.address ? `${ev.place} ${ev.address}` : ev.place);
@@ -195,6 +196,41 @@ export default function DetailScreen({ event, onBack, theme, favorites, onToggle
                   {hq.tel}
                 </a>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 出典注釈 */}
+        <div style={{ padding: '0 16px 20px' }}>
+          <div style={{
+            borderRadius: 10,
+            border: '1px solid var(--border)',
+            background: 'var(--card)',
+            padding: '12px 14px',
+          }}>
+            <div style={{
+              fontSize: 10, fontWeight: 700, letterSpacing: 2,
+              color: 'var(--text-muted)', marginBottom: 6,
+            }}>
+              データ出典
+            </div>
+            <a
+              href={source.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                fontSize: 12, color: primary,
+                textDecoration: 'none', display: 'block', lineHeight: 1.6,
+              }}
+            >
+              {source.name}
+            </a>
+            <div style={{
+              fontSize: 11, color: 'var(--text-muted)',
+              lineHeight: 1.7, marginTop: 6,
+              paddingTop: 6, borderTop: '1px solid var(--sep)',
+            }}>
+              本アプリは上記サイトの情報を加工して作成した非公式アプリです。最新情報・詳細は出典元をご確認ください。
             </div>
           </div>
         </div>

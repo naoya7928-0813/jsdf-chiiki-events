@@ -7,6 +7,7 @@ import DetailScreen      from './components/DetailScreen';
 import SettingsScreen    from './components/SettingsScreen';
 import NotificationScreen from './components/NotificationScreen';
 import FavoritesScreen   from './components/FavoritesScreen';
+import LegalScreen        from './components/LegalScreen';
 
 // ─── localStorage 復元ヘルパー ────────────────────────────────
 function loadScheme()   { try { return localStorage.getItem('jsdf-scheme') || DEFAULT_SCHEME; } catch { return DEFAULT_SCHEME; } }
@@ -36,6 +37,8 @@ export default function App() {
   const [detailEvent, setDetailEvent] = useState(null);
   // detail から戻る画面を動的に決定する
   const [detailBack,  setDetailBack]  = useState('list');
+  // 法的情報画面で表示するドキュメント種別 ('terms' | 'privacy')
+  const [legalDoc, setLegalDoc] = useState(null);
 
   const openDetail = useCallback((ev, backTo = 'list') => {
     setDetailEvent(ev);
@@ -179,6 +182,7 @@ export default function App() {
           onOpenHome={() => setScreen('home')}
           onOpenList={() => setScreen('list')}
           onOpenFavorites={() => setScreen('favorites')}
+          onOpenLegal={(doc) => { setLegalDoc(doc); setScreen('legal'); }}
         />
       )}
 
@@ -190,6 +194,14 @@ export default function App() {
           onMarkAllRead={handleMarkAllRead}
           onOpenDetail={(ev) => openDetail(ev, 'notifications')}
           onBack={() => setScreen('home')}
+        />
+      )}
+
+      {screen === 'legal' && (
+        <LegalScreen
+          doc={legalDoc}
+          theme={theme}
+          onBack={() => setScreen('settings')}
         />
       )}
 
