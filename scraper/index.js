@@ -123,6 +123,15 @@ async function ocrImage(imageUrl) {
 }
 
 /**
+ * OCR で生じやすい誤認識を修正する。
+ * 醍 → 第（画数が近く混同されやすい）
+ */
+function fixOcrTitle(title) {
+  if (!title) return title;
+  return title.replace(/醍/g, '第');
+}
+
+/**
  * OCR結果をイベントオブジェクトにマージする。
  * - title: OCR が取得できた場合のみ上書き
  * - ageRequirement / deadline: OCR 優先、元データが既にあれば保持
@@ -132,7 +141,7 @@ function mergeOcr(ev, ocr) {
   if (!ocr) return ev;
   return {
     ...ev,
-    title:          (ocr.title          && ocr.title.trim())          || ev.title,
+    title:          (ocr.title          && fixOcrTitle(ocr.title.trim())) || ev.title,
     time:           (ocr.time           && ocr.time.trim())           || ev.time  || '',
     ageRequirement: (ocr.ageRequirement && ocr.ageRequirement.trim()) || ev.ageRequirement || null,
     deadline:       (ocr.deadline       && ocr.deadline.trim())       || ev.deadline       || null,

@@ -75,7 +75,7 @@ function parseTokyo($) {
 
     // ── カテゴリ・タグ ──
     const rawCategory = fields['種目'] || fields['区分'] || fields['カテゴリ'] || '';
-    const category    = rawCategory || guessCategory(title);
+    const category    = rawCategory || guessCategory(toHalfWidth(title));
 
     // 応募終了スパンがあればタグに反映
     const isEnded = $sec.find('.aka1').text().includes('応募終了');
