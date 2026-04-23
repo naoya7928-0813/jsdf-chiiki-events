@@ -223,7 +223,7 @@ export default function App() {
           onColorChange={handleColorChange}
           onDarkModeChange={handleDarkModeChange}
           onOpenHome={() => setScreen('home')}
-          onOpenList={() => setScreen('list')}
+          onOpenRegion={openRegion}
           onOpenFavorites={() => setScreen('favorites')}
           onOpenLegal={(doc) => { setLegalDoc(doc); setScreen('legal'); }}
         />
@@ -257,7 +257,7 @@ export default function App() {
           onOpenDetail={(ev) => openDetail(ev, 'favorites')}
           onBack={() => setScreen('home')}
           onOpenHome={() => setScreen('home')}
-          onOpenList={() => setScreen('list')}
+          onOpenRegion={openRegion}
           onOpenSettings={() => setScreen('settings')}
         />
       )}

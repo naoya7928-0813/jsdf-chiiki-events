@@ -8,7 +8,7 @@ import { BottomTabBar, F, splitDate } from './Shared';
 export default function FavoritesScreen({
   events, favorites, theme,
   onOpenDetail, onBack,
-  onOpenHome, onOpenList, onOpenSettings,
+  onOpenHome, onOpenRegion, onOpenSettings,
 }) {
   const { primary, accent } = theme;
 
@@ -73,7 +73,7 @@ export default function FavoritesScreen({
         active="favorites"
         onChange={id => {
           if (id === 'home')     onOpenHome();
-          else if (id === 'list') onOpenList();
+          else if (id === 'list') onOpenRegion(null);
           else if (id === 'settings') onOpenSettings();
         }}
         primary={primary}

@@ -10,7 +10,7 @@ import NtfyGuideModal from './NtfyGuideModal';
 export default function SettingsScreen({
   theme, region, onRegionChange,
   onColorChange, onDarkModeChange,
-  onOpenHome, onOpenList, onOpenFavorites,
+  onOpenHome, onOpenRegion, onOpenFavorites,
   onOpenLegal,
 }) {
   const { primary, accent, schemeKey, darkMode } = theme;
@@ -244,7 +244,7 @@ export default function SettingsScreen({
         active="settings"
         onChange={id => {
           if (id === 'home')           onOpenHome();
-          else if (id === 'list')      onOpenList();
+          else if (id === 'list')      onOpenRegion(null);
           else if (id === 'favorites') onOpenFavorites();
         }}
         primary={primary}
