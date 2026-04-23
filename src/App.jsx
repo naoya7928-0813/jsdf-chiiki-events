@@ -8,11 +8,14 @@ import SettingsScreen    from './components/SettingsScreen';
 import NotificationScreen from './components/NotificationScreen';
 import FavoritesScreen   from './components/FavoritesScreen';
 import LegalScreen        from './components/LegalScreen';
+import RegionScreen       from './components/RegionScreen';
 
 // ─── localStorage 復元ヘルパー ────────────────────────────────
-function loadScheme()   { try { return localStorage.getItem('jsdf-scheme') || DEFAULT_SCHEME; } catch { return DEFAULT_SCHEME; } }
-function loadRegion()   { try { return localStorage.getItem('jsdf-region') || 'kanagawa';     } catch { return 'kanagawa';     } }
-function loadDarkMode() { try { return localStorage.getItem('jsdf-dark')   || 'system';       } catch { return 'system';       } }
+function loadScheme()       { try { return localStorage.getItem('jsdf-scheme') || DEFAULT_SCHEME; } catch { return DEFAULT_SCHEME; } }
+function loadRegion()       { try { return localStorage.getItem('jsdf-region') || 'kanagawa';     } catch { return 'kanagawa';     } }
+function loadDarkMode()     { try { return localStorage.getItem('jsdf-dark')   || 'system';       } catch { return 'system';       } }
+function loadLastMapRegion(){ try { return localStorage.getItem('jsdf-last-region') || null;       } catch { return null;           } }
+function loadLastPrefId()   { try { return localStorage.getItem('jsdf-last-pref')   || null;       } catch { return null;           } }
 
 // favorites: イベントIDの Set として管理
 function loadFavorites() {
@@ -33,18 +36,48 @@ function resolveIsDark(mode) {
 
 export default function App() {
   // ── ナビゲーション ────────────────────────────────────────
-  const [screen,     setScreen]     = useState('home');
+  const [screen,      setScreen]      = useState('home');
   const [detailEvent, setDetailEvent] = useState(null);
-  // detail から戻る画面を動的に決定する
-  const [detailBack,  setDetailBack]  = useState('list');
-  // 法的情報画面で表示するドキュメント種別 ('terms' | 'privacy')
-  const [legalDoc, setLegalDoc] = useState(null);
+  const [detailBack,  setDetailBack]  = useState('region');
+  const [legalDoc,    setLegalDoc]    = useState(null);
 
-  const openDetail = useCallback((ev, backTo = 'list') => {
+  // 地図で選択中の地域ID（null = 未選択）
+  const [mapRegionId,  setMapRegionId]  = useState(loadLastMapRegion);
+  // RegionScreen で選択中の都道府県ID
+  const [activePrefId, setActivePrefId] = useState(loadLastPrefId);
+
+  // 最後に開いた地域を保存して BottomTabBar「イベント」から復帰可能にする
+  const saveLastRegion = useCallback((regionId, prefId) => {
+    setMapRegionId(regionId);
+    setActivePrefId(prefId);
+    try {
+      if (regionId) localStorage.setItem('jsdf-last-region', regionId);
+      if (prefId)   localStorage.setItem('jsdf-last-pref',   prefId);
+    } catch {}
+  }, []);
+
+  const openDetail = useCallback((ev, backTo = 'region') => {
     setDetailEvent(ev);
     setDetailBack(backTo);
     setScreen('detail');
   }, []);
+
+  // 地図から地域画面へ遷移
+  const openRegion = useCallback((regionId) => {
+    if (regionId) {
+      saveLastRegion(regionId, activePrefId);
+      setScreen('region');
+    } else {
+      // regionId=null: 最後に開いた地域へ、未訪問なら地図画面へ
+      const last = loadLastMapRegion();
+      if (last) {
+        setMapRegionId(last);
+        setScreen('region');
+      } else {
+        setScreen('home');
+      }
+    }
+  }, [activePrefId, saveLastRegion]);
 
   // ── カラーテーマ ──────────────────────────────────────────
   const [schemeKey, setSchemeKey] = useState(loadScheme);
@@ -53,7 +86,7 @@ export default function App() {
     try { localStorage.setItem('jsdf-scheme', key); } catch {}
   }, []);
 
-  // ── 地本設定 ──────────────────────────────────────────────
+  // ── 地本設定（ListScreen 用） ─────────────────────────────
   const [region, setRegion] = useState(loadRegion);
   const handleRegionChange = useCallback((id) => {
     setRegion(id);
@@ -67,7 +100,7 @@ export default function App() {
     try { localStorage.setItem('jsdf-dark', mode); } catch {}
   }, []);
 
-  // data-theme 属性を documentElement に適用（CSS変数切替トリガー）
+  // data-theme 属性を documentElement に適用
   useEffect(() => {
     const apply = () => {
       document.documentElement.dataset.theme = resolveIsDark(darkMode) ? 'dark' : 'light';
@@ -93,7 +126,6 @@ export default function App() {
   const { events, loading, error, updatedAt, checkedAt, refresh } = useEvents();
 
   // ── お気に入り ────────────────────────────────────────────
-  // Set<string> でイベントIDを管理。変更のたびに localStorage を同期する。
   const [favorites, setFavorites] = useState(loadFavorites);
 
   const handleToggleFavorite = useCallback((id) => {
@@ -106,17 +138,14 @@ export default function App() {
   }, []);
 
   // ── 通知（既読管理） ──────────────────────────────────────
-  // seenIds: 通知画面で一度でも表示されたイベントIDの配列
   const [seenIds, setSeenIds] = useState(loadSeenIds);
 
-  // 全イベントIDの中で未読のものを数える
   const allEventIds = [
     ...(events.kanagawa ?? []),
     ...(events.tokyo    ?? []),
   ].map(e => e.id);
   const unreadCount = allEventIds.filter(id => !seenIds.includes(id)).length;
 
-  // 通知画面から呼ばれる：渡された ID を全て既読化
   const handleMarkAllRead = useCallback((ids) => {
     setSeenIds(prev => {
       const next = [...new Set([...prev, ...ids])];
@@ -141,11 +170,25 @@ export default function App() {
           theme={theme}
           favorites={favorites}
           unreadCount={unreadCount}
+          initialRegionId={mapRegionId}
           onOpenNotifications={() => setScreen('notifications')}
-          onOpenList={() => setScreen('list')}
-          onOpenDetail={(ev) => openDetail(ev, 'home')}
+          onOpenRegion={openRegion}
           onOpenSettings={() => setScreen('settings')}
           onOpenFavorites={() => setScreen('favorites')}
+        />
+      )}
+
+      {screen === 'region' && (
+        <RegionScreen
+          regionId={mapRegionId}
+          events={events}
+          theme={theme}
+          favorites={favorites}
+          onBack={() => setScreen('home')}
+          onOpenDetail={(ev) => openDetail(ev, 'region')}
+          onOpenHome={() => setScreen('home')}
+          onOpenFavorites={() => setScreen('favorites')}
+          onOpenSettings={() => setScreen('settings')}
         />
       )}
 
@@ -212,7 +255,7 @@ export default function App() {
           favorites={favorites}
           theme={theme}
           onOpenDetail={(ev) => openDetail(ev, 'favorites')}
-          onBack={() => setScreen('list')}
+          onBack={() => setScreen('home')}
           onOpenHome={() => setScreen('home')}
           onOpenList={() => setScreen('list')}
           onOpenSettings={() => setScreen('settings')}

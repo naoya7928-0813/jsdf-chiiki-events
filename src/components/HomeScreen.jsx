@@ -1,32 +1,49 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ICO } from './Icons';
-import { Emblem, BottomTabBar, F, splitDate, Spinner, ErrorBanner } from './Shared';
+import { BottomTabBar, F, Spinner, ErrorBanner } from './Shared';
+import JapanMap from './JapanMap';
+import { REGIONS, REGION_BY_ID, countEventsByRegion, getSupportedPrefsByRegion } from '../data/regionMap';
 
+// ─── 地図ホーム画面 ───────────────────────────────────────────
 export default function HomeScreen({
   events, loading, error, theme,
   favorites, unreadCount,
-  onOpenNotifications, onOpenList, onOpenDetail, onOpenSettings, onOpenFavorites,
+  onOpenNotifications, onOpenRegion, onOpenSettings, onOpenFavorites,
+  initialRegionId,
 }) {
-  const [region, setRegion] = useState('kanagawa');
-  const list     = events[region] ?? [];
-  const upcoming = list.slice(0, 3);
-  const featured = list[1] ?? list[0];
-
   const { primary, accent } = theme;
+
+  // 地図上で選択中の地域ID
+  const [selectedRegionId, setSelectedRegionId] = useState(initialRegionId ?? null);
+
+  // 地域ごとのイベント件数を集計
+  const eventCounts = useMemo(() => countEventsByRegion(events), [events]);
+
+  // 選択中地域の情報
+  const selectedRegion    = selectedRegionId ? REGION_BY_ID[selectedRegionId] : null;
+  const supportedPrefs    = selectedRegionId ? getSupportedPrefsByRegion(selectedRegionId, events) : [];
+  const totalEventCount   = supportedPrefs.reduce((s, p) => s + p.count, 0);
+  const hasEvents         = totalEventCount > 0;
+
+  // 地域タップ：同じ地域を再タップしたら選択解除
+  const handleRegionSelect = (id) => {
+    setSelectedRegionId(prev => prev === id ? null : id);
+  };
 
   return (
     <div style={{
       height: '100%', display: 'flex', flexDirection: 'column',
       background: 'var(--bg)', fontFamily: F.sans,
     }}>
-      {/* ヘッダー */}
+
+      {/* ─ ヘッダー ─ */}
       <div style={{
         paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)',
-        paddingBottom: 16, background: primary, color: '#fff',
+        paddingBottom: 14, background: primary, color: '#fff', flexShrink: 0,
       }}>
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 20px 14px',
+          padding: '0 20px',
         }}>
           <div>
             <div style={{ fontSize: 10, letterSpacing: 2, color: 'rgba(255,255,255,0.65)', fontWeight: 500 }}>
@@ -37,7 +54,7 @@ export default function HomeScreen({
             </div>
           </div>
 
-          {/* ベルボタン（未読バッジ付き） */}
+          {/* 通知ベルボタン */}
           <button
             onClick={onOpenNotifications}
             aria-label={`通知${unreadCount > 0 ? `（未読${unreadCount}件）` : ''}`}
@@ -49,7 +66,6 @@ export default function HomeScreen({
             }}
           >
             {ICO.bell('#fff', 17)}
-            {/* 未読件数バッジ */}
             {unreadCount > 0 && (
               <div style={{
                 position: 'absolute', top: -4, right: -4,
@@ -57,164 +73,163 @@ export default function HomeScreen({
                 background: '#ef4444', border: `2px solid ${primary}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 9, color: '#fff', fontFamily: F.mono, fontWeight: 700,
-                padding: '0 3px', letterSpacing: 0,
+                padding: '0 3px',
               }}>
                 {unreadCount > 9 ? '9+' : unreadCount}
               </div>
             )}
           </button>
         </div>
-
-        {/* 地本セレクタ */}
-        <div style={{
-          margin: '0 20px', padding: 10,
-          background: 'rgba(255,255,255,0.08)', borderRadius: 10, display: 'flex', gap: 4,
-        }}>
-          {[{ id: 'kanagawa', label: '神奈川地本', ch: '神' }, { id: 'tokyo', label: '東京地本', ch: '都' }].map(r => {
-            const isA = region === r.id;
-            return (
-              <button key={r.id} onClick={() => setRegion(r.id)} style={{
-                flex: 1, minHeight: 44, border: 'none', cursor: 'pointer', borderRadius: 7,
-                padding: '8px',
-                background: isA ? '#fff' : 'transparent',
-                color: isA ? primary : 'rgba(255,255,255,0.75)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                fontFamily: F.sans, fontSize: 13, fontWeight: 600, letterSpacing: 1,
-              }}>
-                <Emblem ch={r.ch} size={20} primary={isA ? primary : '#fff'} />
-                {r.label}
-              </button>
-            );
-          })}
-        </div>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+      {/* ─ コンテンツ ─ */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <ErrorBanner message={error} />
 
-        {loading ? <Spinner primary={primary} /> : (
+        {loading ? (
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Spinner primary={primary} />
+          </div>
+        ) : (
           <>
-            {/* 注目イベント */}
-            {featured && (
-              <div style={{ padding: '18px 20px 8px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <div style={{ fontFamily: F.serif, fontSize: 15, fontWeight: 600, color: 'var(--text)', letterSpacing: 1 }}>
-                    注目のイベント
-                  </div>
-                  <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: F.mono, letterSpacing: 1 }}>FEATURED</div>
-                </div>
-                <div onClick={() => onOpenDetail(featured)} role="button" tabIndex={0}
-                  onKeyDown={e => e.key === 'Enter' && onOpenDetail(featured)}
-                  style={{
-                    borderRadius: 14, overflow: 'hidden', cursor: 'pointer',
-                    background: primary, color: '#fff',
-                    position: 'relative', minHeight: 130,
-                    boxShadow: '0 4px 14px rgba(11,37,69,0.18)',
-                  }}>
-                  <div style={{ position: 'absolute', inset: 0, backgroundImage: 'repeating-linear-gradient(45deg,rgba(255,255,255,0.04) 0 12px,transparent 12px 24px)' }} />
-                  <div style={{ position: 'relative', padding: 18 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div style={{ display: 'inline-block', fontSize: 10, fontFamily: F.mono, padding: '3px 8px', borderRadius: 3, background: 'rgba(255,255,255,0.15)', letterSpacing: 1 }}>
-                        {featured.category.toUpperCase()}
-                      </div>
-                      {/* お気に入り済みスター */}
-                      {favorites.has(featured.id) && (
-                        <div style={{ opacity: 0.9 }}>{ICO.star('#fff', 14, '#fff')}</div>
-                      )}
-                    </div>
-                    <div style={{ fontFamily: F.serif, fontSize: 20, fontWeight: 600, marginTop: 10, lineHeight: 1.35 }}>
-                      {featured.title}
-                    </div>
-                    <div style={{ fontSize: 12, marginTop: 8, color: 'rgba(255,255,255,0.85)', fontFamily: F.mono }}>
-                      {featured.date} ({featured.weekday})
-                    </div>
-                    <div style={{ fontSize: 12, marginTop: 3, color: 'rgba(255,255,255,0.7)' }}>
-                      {featured.place}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* 今後の予定 */}
-            <div style={{ padding: '14px 20px 8px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                <div style={{ fontFamily: F.serif, fontSize: 15, fontWeight: 600, color: 'var(--text)', letterSpacing: 1 }}>
-                  今後の予定
-                </div>
-                <button onClick={onOpenList} style={{
-                  border: 'none', background: 'transparent',
-                  fontSize: 11, color: primary, cursor: 'pointer',
-                  fontFamily: F.sans, fontWeight: 500,
-                  display: 'flex', alignItems: 'center', gap: 2, padding: '4px 0',
-                }}>
-                  すべて見る {ICO.chev(primary, 10)}
-                </button>
-              </div>
-              <div style={{ background: 'var(--card)', borderRadius: 12, border: '1px solid var(--border)', boxShadow: '0 1px 2px rgba(11,37,69,0.04)', overflow: 'hidden' }}>
-                {upcoming.length === 0 ? (
-                  <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
-                    イベントがありません
-                  </div>
-                ) : upcoming.map((ev, i) => {
-                  const { m, d } = splitDate(ev.date);
-                  const isFav = favorites.has(ev.id);
-                  return (
-                    <div key={ev.id} onClick={() => onOpenDetail(ev)} role="button" tabIndex={0}
-                      onKeyDown={e => e.key === 'Enter' && onOpenDetail(ev)}
-                      style={{
-                        display: 'flex', alignItems: 'center', minHeight: 64,
-                        padding: '12px 14px', cursor: 'pointer',
-                        borderBottom: i < upcoming.length - 1 ? '1px solid var(--sep)' : 'none', gap: 12,
-                      }}>
-                      <div style={{ minWidth: 42, textAlign: 'center', borderRight: '1px solid var(--border)', paddingRight: 10 }}>
-                        <div style={{ fontSize: 9, color: 'var(--text-muted)', fontFamily: F.mono }}>{m}月</div>
-                        <div style={{ fontFamily: F.serif, fontSize: 22, fontWeight: 600, lineHeight: 1, color: primary, marginTop: 2 }}>{d}</div>
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        {/* タイトル行：お気に入りはスターアイコンを末尾に表示 */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-                          <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)', lineHeight: 1.4, letterSpacing: 0.2, flex: 1, minWidth: 0 }}>
-                            {ev.title}
-                          </div>
-                          {isFav && ICO.star(accent, 12, accent)}
-                        </div>
-                        <div style={{ fontSize: 12, color: 'var(--text-sub)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                          {ICO.pin('var(--text-sub)', 12)} {ev.place}
-                        </div>
-                      </div>
-                      {ICO.chev('var(--icon-muted)', 12)}
-                    </div>
-                  );
-                })}
-              </div>
+            {/* ─ 地図エリア ─ */}
+            <div style={{
+              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '8px 12px 4px',
+              overflow: 'hidden',
+            }}>
+              <JapanMap
+                eventCounts={eventCounts}
+                selectedRegionId={selectedRegionId}
+                onSelect={handleRegionSelect}
+                primary={primary}
+              />
             </div>
 
-            {/* サマリーカード */}
-            <div style={{ padding: '10px 20px 24px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                <SummaryCard value={list.length} label="今後の予定件数" color={primary} />
-                <SummaryCard value={list.filter(e => e.tag === '入場無料').length} label="入場無料イベント" color={accent} />
-              </div>
+            {/* ─ 凡例 ─ */}
+            <div style={{
+              display: 'flex', justifyContent: 'center', gap: 16,
+              padding: '0 16px 6px', flexShrink: 0,
+            }}>
+              <LegendItem color={primary} label="イベントあり" />
+              <LegendItem color="var(--map-gray, #d1d5db)" label="準備中" />
+            </div>
+
+            {/* ─ 下部カード ─ */}
+            <div style={{
+              flexShrink: 0,
+              margin: '0 16px 8px',
+              borderRadius: 14,
+              border: `1px solid ${selectedRegion ? `${primary}33` : 'var(--border)'}`,
+              background: selectedRegion ? `${primary}08` : 'var(--card)',
+              overflow: 'hidden',
+              transition: 'all 0.2s',
+            }}>
+              {selectedRegion ? (
+                <div style={{ padding: '14px 16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                    <div>
+                      <div style={{ fontFamily: F.serif, fontSize: 18, fontWeight: 600, color: 'var(--text)', letterSpacing: 0.5 }}>
+                        {selectedRegion.label}
+                      </div>
+                      <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>
+                        {hasEvents
+                          ? `${supportedPrefs.length} 地本対応 · ${totalEventCount} 件のイベント`
+                          : 'この地域は準備中です'}
+                      </div>
+                    </div>
+                    {/* 対応地本のバッジ列 */}
+                    {hasEvents && (
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        {supportedPrefs.map(p => (
+                          <div key={p.id} style={{
+                            width: 28, height: 28, borderRadius: '50%',
+                            background: `${primary}18`,
+                            border: `1px solid ${primary}33`,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: 11, fontWeight: 700, color: primary, fontFamily: F.serif,
+                          }}>
+                            {p.emblem}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* イベントを見るボタン */}
+                  <button
+                    onClick={() => hasEvents && onOpenRegion(selectedRegionId)}
+                    disabled={!hasEvents}
+                    style={{
+                      width: '100%', height: 40, borderRadius: 10, border: 'none',
+                      background: hasEvents ? primary : 'var(--border)',
+                      color: hasEvents ? '#fff' : 'var(--text-muted)',
+                      fontSize: 14, fontWeight: 600, fontFamily: F.sans,
+                      cursor: hasEvents ? 'pointer' : 'default',
+                      letterSpacing: 0.5,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                    }}
+                  >
+                    {hasEvents ? (
+                      <>{ICO.cal('#fff', 15)} イベントを見る</>
+                    ) : (
+                      '準備中'
+                    )}
+                  </button>
+                </div>
+              ) : (
+                /* 地域未選択時のガイド */
+                <div style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: '50%',
+                    background: `${primary}10`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0,
+                  }}>
+                    {ICO.map(primary, 18)}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+                      地域を選択
+                    </div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                      地図をタップしてイベントを確認
+                    </div>
+                  </div>
+
+                  {/* 全体サマリー */}
+                  <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
+                    <div style={{ fontFamily: F.serif, fontSize: 22, fontWeight: 600, color: primary, lineHeight: 1 }}>
+                      {Object.values(eventCounts).reduce((s, c) => s + c, 0)}
+                    </div>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>件</div>
+                  </div>
+                </div>
+              )}
             </div>
           </>
         )}
       </div>
 
-      <BottomTabBar active="home" onChange={id => {
-        if (id === 'list')      onOpenList();
-        else if (id === 'settings')  onOpenSettings();
-        else if (id === 'favorites') onOpenFavorites();
-      }} primary={primary} />
+      <BottomTabBar
+        active="home"
+        onChange={id => {
+          if (id === 'list')      onOpenRegion(null);
+          else if (id === 'favorites') onOpenFavorites();
+          else if (id === 'settings')  onOpenSettings();
+        }}
+        primary={primary}
+      />
     </div>
   );
 }
 
-function SummaryCard({ value, label, color }) {
+// ─── 凡例アイテム ────────────────────────────────────────────
+function LegendItem({ color, label }) {
   return (
-    <div style={{ background: 'var(--card)', borderRadius: 10, border: '1px solid var(--border)', padding: 14, minHeight: 60, boxShadow: '0 1px 2px rgba(11,37,69,0.03)' }}>
-      <div style={{ fontSize: 26, fontFamily: F.serif, fontWeight: 600, color, lineHeight: 1 }}>{value}</div>
-      <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>{label}</div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+      <div style={{ width: 10, height: 10, borderRadius: 2, background: color }} />
+      <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: F.sans }}>{label}</span>
     </div>
   );
 }

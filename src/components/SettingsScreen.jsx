@@ -221,6 +221,12 @@ export default function SettingsScreen({
           ))}
           <div style={{
             fontSize: 11, color: 'var(--text-muted)',
+            lineHeight: 1.7, paddingLeft: 8,
+          }}>
+            {'・'}日本地図: Geolonia Inc. / Wikipedia contributors (GFDL)
+          </div>
+          <div style={{
+            fontSize: 11, color: 'var(--text-muted)',
             lineHeight: 1.7, marginTop: 8,
             paddingTop: 8, borderTop: '1px solid var(--sep)',
           }}>

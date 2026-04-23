@@ -20,6 +20,8 @@ style.textContent = `
     --month-sep:  #d8dce3;
     --tag-bg:     #eef1f6;
     --badge-bg:   #eef1f6;
+    --map-gray:   #d1d5db;
+    --map-hover:  #c4c8d0;
   }
 
   /* ─── ダークモード ─── */
@@ -35,6 +37,8 @@ style.textContent = `
     --month-sep:  #30363d;
     --tag-bg:     #21262d;
     --badge-bg:   #21262d;
+    --map-gray:   #2d3748;
+    --map-hover:  #3d4a5e;
   }
 
   /* ─── OS設定がダーク かつ data-theme 未指定の場合 ─── */
@@ -51,6 +55,8 @@ style.textContent = `
       --month-sep:  #30363d;
       --tag-bg:     #21262d;
       --badge-bg:   #21262d;
+      --map-gray:   #2d3748;
+      --map-hover:  #3d4a5e;
     }
   }
 
