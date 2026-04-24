@@ -233,32 +233,53 @@ async function createStealthContext(browser) {
  * Shift_JIS ページのため、レスポンスバイト列を iconv-lite でデコードする。
  */
 async function fetchKanagawa(context) {
+  console.log(`[神奈川] アクセス: ${URLS.kanagawa}`);
+
+  // ── Playwright で試みる（Cloudflare チャレンジを通過させる）──
   const page = await context.newPage();
   try {
-    console.log(`[神奈川] アクセス: ${URLS.kanagawa}`);
-
-    // goto() の戻り値（Response）から生バイト列を取得
-    const response = await page.goto(URLS.kanagawa, {
-      waitUntil: 'domcontentloaded',
-      timeout:   30_000,
+    await page.goto(URLS.kanagawa, {
+      waitUntil: 'networkidle',   // Cloudflare JS チャレンジ完了まで待つ
+      timeout:   60_000,
     });
 
-    if (!response || !response.ok()) {
-      throw new Error(`HTTP ${response?.status() ?? 'no response'}`);
+    // チャレンジ後の追加待機
+    await page.waitForTimeout(3000);
+
+    // page.content() はブラウザが描画した UTF-8 HTML を返す（Shift_JIS 変換不要）
+    const html = await page.content();
+
+    // Cloudflare ブロックページか判定（H3 が存在するか確認）
+    const hasH3 = /<h3/i.test(html);
+    if (hasH3) {
+      const $ = cheerio.load(html, { decodeEntities: false });
+      const events = parseKanagawa($);
+      console.log(`[神奈川] ${events.length} 件取得 (Playwright)`);
+      return events;
     }
-
-    // Shift_JIS → UTF-8 デコード
-    const buffer = await response.body();
-    const html   = iconv.decode(buffer, 'Shift_JIS');
-
-    const $ = cheerio.load(html, { decodeEntities: false });
-    const events = parseKanagawa($);
-    console.log(`[神奈川] ${events.length} 件取得`);
-    return events;
-
+    console.warn('[神奈川] Playwright: コンテンツなし（Cloudflare ブロック？）→ fetch にフォールバック');
+  } catch (err) {
+    console.warn(`[神奈川] Playwright 失敗: ${err.message} → fetch にフォールバック`);
   } finally {
     await page.close();
   }
+
+  // ── native fetch + iconv フォールバック ──
+  const res = await fetch(URLS.kanagawa, {
+    headers: {
+      'User-Agent':      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+      'Accept':          'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
+      'Referer':         'https://www.mod.go.jp/',
+    },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const buffer = await res.arrayBuffer();
+  const html   = iconv.decode(Buffer.from(buffer), 'Shift_JIS');
+  const $ = cheerio.load(html, { decodeEntities: false });
+  const events = parseKanagawa($);
+  console.log(`[神奈川] ${events.length} 件取得 (fetch fallback)`);
+  return events;
 }
 
 /**
