@@ -8,6 +8,11 @@ on:
     - cron: '0 3 * * *'    # 日本時間 12:00
     - cron: '0 9 * * *'    # 日本時間 18:00
 
+  # scraper コードの変更時にも自動実行
+  push:
+    paths:
+      - 'scraper/**'
+
   # GitHub Actions の UI から手動実行も可能
   workflow_dispatch:
 
@@ -117,10 +122,9 @@ jobs:
           }
 
           // ② 新着IDのみカウント（前回に存在しなかったIDを抽出）
-          const prevIds  = new Set(
-            [...(prev.kanagawa || []), ...(prev.tokyo || [])].map(e => e.id)
-          );
-          const currAll  = [...(curr.kanagawa || []), ...(curr.tokyo || [])];
+          const PREFS = ['kanagawa','tokyo','saitama','gunma','tochigi','ibaraki','chiba'];
+          const prevIds  = new Set(PREFS.flatMap(p => (prev[p] || []).map(e => e.id)));
+          const currAll  = PREFS.flatMap(p => curr[p] || []);
           const newItems = currAll.filter(e => !prevIds.has(e.id));
 
           console.log('  全イベント数 :', currAll.length, '件');
