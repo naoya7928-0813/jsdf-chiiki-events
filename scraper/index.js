@@ -413,45 +413,7 @@ async function fetchTokyo(context) {
  * 埼玉地本ページを取得・パース
  */
 async function fetchSaitama(context) {
-  console.log(`[埼玉] アクセス: ${URLS.saitama}`);
-
-  const page = await context.newPage();
-  try {
-    const response = await page.goto(URLS.saitama, {
-      waitUntil: 'domcontentloaded',
-      timeout:   30_000,
-    });
-
-    if (response && response.ok()) {
-      await page.waitForTimeout(2000);
-      const html = await page.content();
-      const $ = cheerio.load(html, { decodeEntities: false });
-      const events = parseSaitama($);
-      console.log(`[埼玉] ${events.length} 件取得 (Playwright)`);
-      return events;
-    }
-    console.warn(`[埼玉] Playwright: HTTP ${response?.status()} → fetch にフォールバック`);
-  } catch (err) {
-    console.warn(`[埼玉] Playwright 失敗: ${err.message} → fetch にフォールバック`);
-  } finally {
-    await page.close();
-  }
-
-  // ── native fetch フォールバック ──
-  const res = await fetch(URLS.saitama, {
-    headers: {
-      'User-Agent':      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-      'Accept':          'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-      'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
-      'Referer':         'https://www.mod.go.jp/',
-    },
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const html = await res.text();
-  const $ = cheerio.load(html, { decodeEntities: false });
-  const events = parseSaitama($);
-  console.log(`[埼玉] ${events.length} 件取得 (fetch fallback)`);
-  return events;
+  return fetchHtmlPref(context, '埼玉', URLS.saitama, parseSaitama);
 }
 
 /** 共通: HTML ページを Playwright → fetch の順で取得してパーサーに渡す */
@@ -459,16 +421,14 @@ async function fetchHtmlPref(context, prefLabel, url, parserFn) {
   console.log(`[${prefLabel}] アクセス: ${url}`);
   const page = await context.newPage();
   try {
-    const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
-    if (response && response.ok()) {
-      await page.waitForTimeout(2000);
-      const html   = await page.content();
-      const $      = cheerio.load(html, { decodeEntities: false });
-      const events = parserFn($);
-      console.log(`[${prefLabel}] ${events.length} 件取得 (Playwright)`);
-      return events;
-    }
-    console.warn(`[${prefLabel}] Playwright: HTTP ${response?.status()} → fetch にフォールバック`);
+    await page.goto(url, { waitUntil: 'networkidle', timeout: 60_000 });
+    // Cloudflare チャレンジ完了後の追加待機
+    await page.waitForTimeout(3000);
+    const html   = await page.content();
+    const $      = cheerio.load(html, { decodeEntities: false });
+    const events = parserFn($);
+    console.log(`[${prefLabel}] ${events.length} 件取得 (Playwright)`);
+    return events;
   } catch (err) {
     console.warn(`[${prefLabel}] Playwright 失敗: ${err.message} → fetch にフォールバック`);
   } finally {
@@ -505,16 +465,12 @@ async function fetchTochigi(context) {
   const page = await context.newPage();
   let imageUrls = [];
   try {
-    const response = await page.goto(URLS.tochigi, { waitUntil: 'domcontentloaded', timeout: 30_000 });
-    if (response && response.ok()) {
-      await page.waitForTimeout(2000);
-      const html = await page.content();
-      const $    = cheerio.load(html, { decodeEntities: false });
-      imageUrls  = parseTochigiImages($);
-      console.log(`[栃木] ${imageUrls.length} 件の画像を検出`);
-    } else {
-      console.warn(`[栃木] Playwright: HTTP ${response?.status()}`);
-    }
+    await page.goto(URLS.tochigi, { waitUntil: 'networkidle', timeout: 60_000 });
+    await page.waitForTimeout(3000);
+    const html = await page.content();
+    const $    = cheerio.load(html, { decodeEntities: false });
+    imageUrls  = parseTochigiImages($);
+    console.log(`[栃木] ${imageUrls.length} 件の画像を検出`);
   } catch (err) {
     console.warn(`[栃木] Playwright 失敗: ${err.message}`);
   } finally {
