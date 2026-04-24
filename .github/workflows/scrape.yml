@@ -40,26 +40,26 @@ jobs:
       - name: scraper の依存パッケージをインストール
         working-directory: scraper
         run: npm ci
-        shell: pwsh
+        shell: powershell
 
       # ── Playwright 用 Chromium をインストール ────────────────
       - name: Playwright Chromium をインストール
         working-directory: scraper
         run: npx playwright install chromium
-        shell: pwsh
+        shell: powershell
 
       # ── スクレイピング実行 ────────────────────────────────────
       - name: イベントデータをスクレイピング
         working-directory: scraper
         run: node index.js
-        shell: pwsh
+        shell: powershell
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       # ── 変更があればコミット & プッシュ ──────────────────────
       - name: 変更をコミット & プッシュ
         id: commit
-        shell: pwsh
+        shell: powershell
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -82,7 +82,7 @@ jobs:
       - name: Vercel に本番デプロイ
         if: steps.commit.outputs.changed == 'true'
         run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
-        shell: pwsh
+        shell: powershell
         env:
           VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -90,7 +90,7 @@ jobs:
       # ── ntfy.sh でプッシュ通知送信 ────────────────────────
       - name: プッシュ通知を送信
         if: steps.commit.outputs.changed == 'true'
-        shell: pwsh
+        shell: powershell
         run: |
           $checkScript = @'
           'use strict';
