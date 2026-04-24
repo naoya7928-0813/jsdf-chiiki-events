@@ -364,49 +364,9 @@ async function fetchKanagawa(context) {
 
 /**
  * 東京地本ページを取得・パース
- * Playwright が 403 になった場合は native fetch にフォールバックする。
  */
 async function fetchTokyo(context) {
-  console.log(`[東京] アクセス: ${URLS.tokyo}`);
-
-  // ── Playwright で試みる ──
-  const page = await context.newPage();
-  try {
-    const response = await page.goto(URLS.tokyo, {
-      waitUntil: 'domcontentloaded',
-      timeout:   30_000,
-    });
-
-    if (response && response.ok()) {
-      await page.waitForTimeout(2000);
-      const html = await page.content();
-      const $ = cheerio.load(html, { decodeEntities: false });
-      const events = parseTokyo($);
-      console.log(`[東京] ${events.length} 件取得 (Playwright)`);
-      return events;
-    }
-    console.warn(`[東京] Playwright: HTTP ${response?.status()} → fetch にフォールバック`);
-  } catch (err) {
-    console.warn(`[東京] Playwright 失敗: ${err.message} → fetch にフォールバック`);
-  } finally {
-    await page.close();
-  }
-
-  // ── native fetch フォールバック ──
-  const res = await fetch(URLS.tokyo, {
-    headers: {
-      'User-Agent':      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-      'Accept':          'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-      'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
-      'Referer':         'https://www.mod.go.jp/',
-    },
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const html = await res.text();
-  const $ = cheerio.load(html, { decodeEntities: false });
-  const events = parseTokyo($);
-  console.log(`[東京] ${events.length} 件取得 (fetch fallback)`);
-  return events;
+  return fetchHtmlPref(context, '東京', URLS.tokyo, parseTokyo);
 }
 
 /**
@@ -425,11 +385,17 @@ async function fetchHtmlPref(context, prefLabel, url, parserFn) {
     // ブラウザとしてチャレンジを実行→実際のページへリダイレクトする。
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
 
-    // Cloudflare チャレンジのタイトル "Just a moment..." が消えるまで最大 15 秒待つ
+    // Cloudflare チャレンジページ（英語・日本語）のタイトルが消えるまで最大 30 秒待つ
     try {
       await page.waitForFunction(
-        () => !document.title.includes('Just a moment') && !document.title.includes('Attention Required'),
-        { timeout: 15_000 }
+        () => {
+          const t = document.title;
+          return t.length > 0
+            && !t.includes('Just a moment')
+            && !t.includes('Attention Required')
+            && !t.includes('しばらくお待ちください');
+        },
+        { timeout: 30_000 }
       );
     } catch { /* チャレンジなし or タイムアウト → そのまま続行 */ }
 
@@ -484,8 +450,14 @@ async function fetchTochigi(context) {
     await page.goto(URLS.tochigi, { waitUntil: 'domcontentloaded', timeout: 30_000 });
     try {
       await page.waitForFunction(
-        () => !document.title.includes('Just a moment') && !document.title.includes('Attention Required'),
-        { timeout: 15_000 }
+        () => {
+          const t = document.title;
+          return t.length > 0
+            && !t.includes('Just a moment')
+            && !t.includes('Attention Required')
+            && !t.includes('しばらくお待ちください');
+        },
+        { timeout: 30_000 }
       );
     } catch { /* チャレンジなし or タイムアウト */ }
     await page.waitForTimeout(2000);
