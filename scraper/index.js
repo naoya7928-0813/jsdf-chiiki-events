@@ -425,7 +425,12 @@ async function fetchHtmlPref(context, prefLabel, url, parserFn) {
     // Cloudflare チャレンジ完了後の追加待機
     await page.waitForTimeout(3000);
     const html   = await page.content();
+    const title  = (html.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1] || '(no title)';
+    console.log(`[${prefLabel}] page title: ${title.trim().substring(0, 70)}`);
     const $      = cheerio.load(html, { decodeEntities: false });
+    const subSec = $('section.subSec').length;
+    const postH3 = $('div.post h3').length;
+    console.log(`[${prefLabel}] selectors: section.subSec=${subSec} div.post-h3=${postH3}`);
     const events = parserFn($);
     console.log(`[${prefLabel}] ${events.length} 件取得 (Playwright)`);
     return events;
