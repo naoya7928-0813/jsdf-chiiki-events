@@ -421,9 +421,20 @@ async function fetchHtmlPref(context, prefLabel, url, parserFn) {
   console.log(`[${prefLabel}] アクセス: ${url}`);
   const page = await context.newPage();
   try {
-    await page.goto(url, { waitUntil: 'networkidle', timeout: 60_000 });
-    // Cloudflare チャレンジ完了後の追加待機
-    await page.waitForTimeout(3000);
+    // domcontentloaded: Cloudflare チャレンジが 403 で来ても Playwright は
+    // ブラウザとしてチャレンジを実行→実際のページへリダイレクトする。
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+
+    // Cloudflare チャレンジのタイトル "Just a moment..." が消えるまで最大 15 秒待つ
+    try {
+      await page.waitForFunction(
+        () => !document.title.includes('Just a moment') && !document.title.includes('Attention Required'),
+        { timeout: 15_000 }
+      );
+    } catch { /* チャレンジなし or タイムアウト → そのまま続行 */ }
+
+    await page.waitForTimeout(2000);
+
     const html   = await page.content();
     const title  = (html.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1] || '(no title)';
     console.log(`[${prefLabel}] page title: ${title.trim().substring(0, 70)}`);
@@ -470,8 +481,14 @@ async function fetchTochigi(context) {
   const page = await context.newPage();
   let imageUrls = [];
   try {
-    await page.goto(URLS.tochigi, { waitUntil: 'networkidle', timeout: 60_000 });
-    await page.waitForTimeout(3000);
+    await page.goto(URLS.tochigi, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+    try {
+      await page.waitForFunction(
+        () => !document.title.includes('Just a moment') && !document.title.includes('Attention Required'),
+        { timeout: 15_000 }
+      );
+    } catch { /* チャレンジなし or タイムアウト */ }
+    await page.waitForTimeout(2000);
     const html = await page.content();
     const $    = cheerio.load(html, { decodeEntities: false });
     imageUrls  = parseTochigiImages($);
