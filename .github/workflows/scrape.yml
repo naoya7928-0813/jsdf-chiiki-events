@@ -19,8 +19,12 @@ on:
 jobs:
   scrape:
     name: イベントデータ取得
-    runs-on: ubuntu-latest
+    runs-on: self-hosted      # 自宅 PC のセルフホストランナーで実行（住所IPでCloudflare通過）
     timeout-minutes: 15
+
+    defaults:
+      run:
+        shell: bash           # Windows 上でも Git Bash を使用
 
     permissions:
       contents: write   # events.json をコミット・プッシュするために必要
@@ -42,18 +46,17 @@ jobs:
         working-directory: scraper
         run: npm ci
 
-      # ── Playwright 用 Chromium とシステム依存ライブラリをインストール ──
-      # --with-deps でフォント・libglib等のLinux依存も自動解決
+      # ── Playwright 用 Chromium をインストール ────────────────
+      # Windows では --with-deps 不要（Linux システム依存ライブラリは不要）
       - name: Playwright Chromium をインストール
         working-directory: scraper
-        run: npx playwright install chromium --with-deps
+        run: npx playwright install chromium
 
       # ── スクレイピング実行 ────────────────────────────────────
       - name: イベントデータをスクレイピング
         working-directory: scraper
         run: node index.js
         env:
-          DISPLAY: ''
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       # ── 変更があればコミット & プッシュ ──────────────────────

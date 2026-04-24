@@ -565,14 +565,14 @@ async function main() {
   let ibarakiError   = false;
   let chibaError     = false;
 
+  const isLinux = process.platform === 'linux';
   const browser = await chromium.launch({
     headless: true,
     args: [
-      '--no-sandbox',                        // CI 環境（Linux コンテナ）で必要
-      '--disable-setuid-sandbox',
+      // Linux コンテナ（CI）環境でのみ必要なフラグ
+      ...(isLinux ? ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'] : []),
       '--disable-infobars',
-      '--disable-blink-features=AutomationControlled', // 自動化フラグを隠す
-      '--disable-dev-shm-usage',             // /dev/shm が小さい環境対策
+      '--disable-blink-features=AutomationControlled',
       '--lang=ja-JP',
     ],
   });
