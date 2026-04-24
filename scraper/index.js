@@ -739,3 +739,4 @@ main().catch(err => {
   console.error('[致命的エラー]', err);
   process.exit(1);
 });
+
