@@ -1,16 +1,22 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, padTwo } = require('./utils');
 
 const BASE_URL = 'https://www.mod.go.jp/pco/ibaraki/event.html';
 
-function resolveUrl(href) {
-  if (!href) return '';
-  if (href.startsWith('http')) return href;
-  try { return new URL(href, BASE_URL).href; } catch { return ''; }
+/** 令和年なしの「X月Y日」から西暦を推定する */
+function inferYear(month, day) {
+  const now  = new Date();
+  const year = now.getFullYear();
+  // その月日が今日より過去なら翌年
+  if (new Date(year, month - 1, day) < now) return year + 1;
+  return year;
 }
 
 /**
+ * 茨城: div.post 内に h3（タイトル）+ h4（日時）+ p（場所・詳細）の平坦構造
+ * 日付は「4月26日　日曜日　午前10時から午後3時」形式（令和年なし）
+ *
  * @param {import('cheerio').CheerioAPI} $
  * @returns {Array<Object>}
  */
@@ -18,45 +24,54 @@ function parseIbaraki($) {
   const events = [];
   let idx = 0;
 
-  $('section.subSec').each((_i, secEl) => {
-    const $sec = $(secEl);
+  // セクション見出しとして無視する h3 テキスト
+  const SKIP = ['自衛隊イベント情報', '広報官がイベント会場にいます', '自衛官の採用試験について'];
 
-    const title = ($sec.find('h3[id]').first().text()
-      || $sec.find('h3').first().text()
-    ).replace(/\s+/g, ' ').trim();
-    if (!title) return;
+  $('div.post h3').each((_i, h3El) => {
+    const title = $(h3El).text().replace(/\s+/g, ' ').trim();
+    if (!title || SKIP.some(s => title.includes(s))) return;
 
-    const rawDate = toHalfWidth(
-      ($sec.find('h4').first().text() || '').replace(/\s+/g, ' ').trim()
-    );
-    if (!rawDate) return;
+    // この h3 と次の h3 の間にある最初の h4 と p を収集
+    let h4Text = '';
+    let pText  = '';
+    let $el    = $(h3El).next();
 
-    const dtMatch = rawDate.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/);
+    while ($el.length && !$el.is('h3')) {
+      if ($el.is('h4') && !h4Text) {
+        h4Text = $el.text().replace(/\s+/g, ' ').trim();
+      }
+      if ($el.is('p') && !pText && !$el.find('img').length) {
+        const t = $el.text().replace(/\s+/g, ' ').trim();
+        if (t) pText = t;
+      }
+      $el = $el.next();
+    }
+
+    if (!h4Text) return;
+
+    // 全角→半角、「日時：」プレフィックスを除去
+    const raw = toHalfWidth(h4Text).replace(/^日時[：:]\s*/, '');
+
+    // 月・日・曜日を抽出（令和年なし）
+    const dtMatch = raw.match(/(\d+)月(\d+)日\s*([月火水木金土日])/);
     if (!dtMatch) return;
 
-    const year    = reiwaToAD(parseInt(dtMatch[1], 10));
-    const month   = parseInt(dtMatch[2], 10);
-    const day     = parseInt(dtMatch[3], 10);
-    const weekday = dtMatch[4];
+    const month   = parseInt(dtMatch[1], 10);
+    const day     = parseInt(dtMatch[2], 10);
+    const weekday = dtMatch[3];
+    const year    = inferYear(month, day);
     const dateStr = `${year}-${padTwo(month)}-${padTwo(day)}`;
     if (isPast(dateStr)) return;
 
-    const fields = {};
-    $sec.find('dl dt').each((_k, dtEl) => {
-      const key = toHalfWidth($(dtEl).text()).replace(/\s+/g, '').trim();
-      fields[key] = $(dtEl).next('dd').text().replace(/\s+/g, ' ').trim();
-    });
+    // 時間: 曜日 のあとの部分（「午前10時から午後3時」等）
+    const timeMatch = raw.match(/曜日\s*(.*)/);
+    const time = timeMatch ? timeMatch[1].trim() : '';
 
-    const place = (fields['見学先'] || fields['場所'] || fields['会場'] || '').trim();
-    const time  = toHalfWidth(fields['時間'] || fields['集合時間'] || fields['開催時間'] || fields['受付時間'] || '').trim();
-
-    const rawCategory = fields['種目'] || fields['区分'] || fields['カテゴリ'] || '';
-    const category    = rawCategory || guessCategory(toHalfWidth(title));
-    const tag         = fields['備考'] ? guessTag(fields['備考']) : guessTag(title);
-
-    const url      = resolveUrl($sec.find('a').first().attr('href') || '');
-    const $img     = $sec.find('.imgContents');
-    const imageUrl = resolveUrl($img.find('a').first().attr('href') || $img.find('img').first().attr('src') || '');
+    // 場所: p テキストから「場所：〇〇」または「場所は〇〇にて」を抽出
+    const placeMatch = pText.match(/場所[：:は]?\s*([^。。\n<]+)/);
+    const place = placeMatch
+      ? placeMatch[1].replace(/にて.*|まで.*|<br>.*/, '').trim()
+      : '';
 
     events.push({
       id:             `ib-${dateStr.replace(/-/g, '')}-${++idx}`,
@@ -67,13 +82,13 @@ function parseIbaraki($) {
       place,
       address:        '',
       time,
-      category,
-      tag,
-      url,
-      notes:          fields['実施内容'] || fields['内容'] || fields['備考'] || null,
-      ageRequirement: toHalfWidth(fields['応募資格'] || '').trim() || null,
-      deadline:       toHalfWidth(fields['応募締切'] || fields['締切'] || '').trim() || null,
-      imageUrl,
+      category:       guessCategory(toHalfWidth(title)),
+      tag:            guessTag(title),
+      url:            '',
+      notes:          pText || null,
+      ageRequirement: null,
+      deadline:       null,
+      imageUrl:       '',
     });
   });
 

@@ -25,7 +25,7 @@ export const REGION_HQ = {
   tokyo:    { name: '東京地方協力本部',   tel: '03-3268-3111', emblem: '東' },
   saitama:  { name: '埼玉地方協力本部',   tel: '048-831-6044', emblem: '埼' },
   gunma:    { name: '群馬地方協力本部',   tel: '027-251-0016', emblem: '群' },
-  tochigi:  { name: '栃木地方協力本部',   tel: '028-634-4055', emblem: '栃' },
+  tochigi:  { name: '栃木地方協力本部',   tel: '028-634-3385', emblem: '栃' },
   ibaraki:  { name: '茨城地方協力本部',   tel: '029-231-3315', emblem: '茨' },
   chiba:    { name: '千葉地方協力本部',   tel: '043-242-5501', emblem: '千' },
 };

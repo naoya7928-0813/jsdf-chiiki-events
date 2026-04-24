@@ -1,16 +1,21 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, padTwo } = require('./utils');
 
 const BASE_URL = 'https://www.mod.go.jp/pco/chiba/event.html';
 
-function resolveUrl(href) {
-  if (!href) return '';
-  if (href.startsWith('http')) return href;
-  try { return new URL(href, BASE_URL).href; } catch { return ''; }
+/** 令和年なしの「X月Y日」から西暦を推定する */
+function inferYear(month, day) {
+  const now  = new Date();
+  const year = now.getFullYear();
+  if (new Date(year, month - 1, day) < now) return year + 1;
+  return year;
 }
 
 /**
+ * 千葉: div.post 内に h3（タイトル）+ table（時期・場所等）の構造
+ * 日付は「１１月３日（水・祝日）」形式（令和年なし、全角数字）
+ *
  * @param {import('cheerio').CheerioAPI} $
  * @returns {Array<Object>}
  */
@@ -18,45 +23,54 @@ function parseChiba($) {
   const events = [];
   let idx = 0;
 
-  $('section.subSec').each((_i, secEl) => {
-    const $sec = $(secEl);
-
-    const title = ($sec.find('h3[id]').first().text()
-      || $sec.find('h3').first().text()
-    ).replace(/\s+/g, ' ').trim();
+  $('div.post h3').each((_i, h3El) => {
+    const title = $(h3El).text().replace(/\s+/g, ' ').trim();
     if (!title) return;
 
-    const rawDate = toHalfWidth(
-      ($sec.find('h4').first().text() || '').replace(/\s+/g, ' ').trim()
-    );
+    // h3 の次の兄弟要素から table を探す（次の h3 まで）
+    let $el    = $(h3El).next();
+    let $table = null;
+
+    while ($el.length && !$el.is('h3')) {
+      if ($el.is('table')) {
+        $table = $el;
+        break;
+      }
+      const inner = $el.find('table').first();
+      if (inner.length) {
+        $table = inner;
+        break;
+      }
+      $el = $el.next();
+    }
+
+    if (!$table) return;
+
+    // table の th/td ペアからフィールドを収集
+    const fields = {};
+    $table.find('tr').each((_k, trEl) => {
+      const th = $(trEl).find('th').first().text().replace(/\s+/g, '').trim();
+      const td = $(trEl).find('td').first().text().replace(/\s+/g, ' ').trim();
+      if (th) fields[th] = td;
+    });
+
+    // 日時: "時期" または "日時" フィールド（全角→半角変換）
+    const rawDate = toHalfWidth(fields['時期'] || fields['日時'] || fields['開催日'] || '');
     if (!rawDate) return;
 
-    const dtMatch = rawDate.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/);
+    // 月・日・曜日を抽出
+    const dtMatch = rawDate.match(/(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/);
     if (!dtMatch) return;
 
-    const year    = reiwaToAD(parseInt(dtMatch[1], 10));
-    const month   = parseInt(dtMatch[2], 10);
-    const day     = parseInt(dtMatch[3], 10);
-    const weekday = dtMatch[4];
+    const month   = parseInt(dtMatch[1], 10);
+    const day     = parseInt(dtMatch[2], 10);
+    const weekday = dtMatch[3];
+    const year    = inferYear(month, day);
     const dateStr = `${year}-${padTwo(month)}-${padTwo(day)}`;
     if (isPast(dateStr)) return;
 
-    const fields = {};
-    $sec.find('dl dt').each((_k, dtEl) => {
-      const key = toHalfWidth($(dtEl).text()).replace(/\s+/g, '').trim();
-      fields[key] = $(dtEl).next('dd').text().replace(/\s+/g, ' ').trim();
-    });
-
-    const place = (fields['見学先'] || fields['場所'] || fields['会場'] || '').trim();
-    const time  = toHalfWidth(fields['時間'] || fields['集合時間'] || fields['開催時間'] || fields['受付時間'] || '').trim();
-
-    const rawCategory = fields['種目'] || fields['区分'] || fields['カテゴリ'] || '';
-    const category    = rawCategory || guessCategory(toHalfWidth(title));
-    const tag         = fields['備考'] ? guessTag(fields['備考']) : guessTag(title);
-
-    const url      = resolveUrl($sec.find('a').first().attr('href') || '');
-    const $img     = $sec.find('.imgContents');
-    const imageUrl = resolveUrl($img.find('a').first().attr('href') || $img.find('img').first().attr('src') || '');
+    const place = (fields['場所'] || fields['会場'] || '').trim();
+    const time  = toHalfWidth(fields['時間'] || fields['開催時間'] || fields['受付時間'] || '').trim();
 
     events.push({
       id:             `cb-${dateStr.replace(/-/g, '')}-${++idx}`,
@@ -67,13 +81,13 @@ function parseChiba($) {
       place,
       address:        '',
       time,
-      category,
-      tag,
-      url,
-      notes:          fields['実施内容'] || fields['内容'] || fields['備考'] || null,
-      ageRequirement: toHalfWidth(fields['応募資格'] || '').trim() || null,
-      deadline:       toHalfWidth(fields['応募締切'] || fields['締切'] || '').trim() || null,
-      imageUrl,
+      category:       guessCategory(toHalfWidth(title)),
+      tag:            guessTag(title),
+      url:            '',
+      notes:          fields['内容'] || fields['実施内容'] || fields['備考'] || null,
+      ageRequirement: null,
+      deadline:       null,
+      imageUrl:       '',
     });
   });
 

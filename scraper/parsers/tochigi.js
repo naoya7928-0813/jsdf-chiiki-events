@@ -21,14 +21,20 @@ function parseTochigiImages($) {
 
   // <a href="...event/...jpg"> と <img src="...event/...jpg"> を両方探す
   $('a[href], img[src]').each((_i, el) => {
-    const raw = $('[href]').is(el)
-      ? $(el).attr('href')
-      : $(el).attr('src');
-    if (!raw) return;
-    if (!/\.jpe?g$/i.test(raw)) return;
-    if (!/event\//i.test(raw)) return;
-    const abs = resolveUrl(raw);
-    if (abs && !seen.has(abs)) { seen.add(abs); urls.push(abs); }
+    const href = $(el).attr('href');
+    const src  = $(el).attr('src');
+
+    for (const raw of [href, src]) {
+      if (!raw) continue;
+      if (!/\.jpe?g$/i.test(raw)) continue;
+      if (!/event\//i.test(raw)) continue;
+      // パス内に event/ があってもファイル名自体に "event" を含む場合のみ対象
+      // （例: event/LRT_banner.jpg は除外、event/8.4.16event.jpg は対象）
+      const filename = raw.split('/').pop() || '';
+      if (!/event/i.test(filename)) continue;
+      const abs = resolveUrl(raw);
+      if (abs && !seen.has(abs)) { seen.add(abs); urls.push(abs); }
+    }
   });
 
   return urls;
