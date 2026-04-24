@@ -4,13 +4,17 @@
 // events.json のキーは都道府県IDと一致する（kanagawa, tokyo, ...）
 
 /** 対応済み都道府県 — events.json に実データが存在するもの */
-export const SUPPORTED_PREFECTURES = new Set(['kanagawa', 'tokyo', 'saitama']);
+export const SUPPORTED_PREFECTURES = new Set(['kanagawa', 'tokyo', 'saitama', 'gunma', 'tochigi', 'ibaraki', 'chiba']);
 
 /** 都道府県個別情報 */
 export const PREFECTURE_INFO = {
   kanagawa: { label: '神奈川', emblem: '神', region: 'kanto' },
   tokyo:    { label: '東京',   emblem: '東', region: 'kanto' },
   saitama:  { label: '埼玉',   emblem: '埼', region: 'kanto' },
+  gunma:    { label: '群馬',   emblem: '群', region: 'kanto' },
+  tochigi:  { label: '栃木',   emblem: '栃', region: 'kanto' },
+  ibaraki:  { label: '茨城',   emblem: '茨', region: 'kanto' },
+  chiba:    { label: '千葉',   emblem: '千', region: 'kanto' },
 };
 
 /** 都道府県ID → 地域ID の逆引きマップ */

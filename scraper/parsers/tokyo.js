@@ -98,6 +98,7 @@ function parseTokyo($) {
 
     events.push({
       id:      `t-${dateStr.replace(/-/g, '')}-${++idx}`,
+      pref:    'tokyo',
       date:    dateStr,
       weekday,
       title,

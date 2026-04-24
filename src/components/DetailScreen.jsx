@@ -10,10 +10,11 @@ export default function DetailScreen({ event, onBack, theme, favorites, onToggle
   const { m, d } = splitDate(ev.date);
   const { primary, accent } = theme;
 
-  // 地域判定: id プレフィックスで判別（k-=神奈川、s-=埼玉、t-=東京）
-  const regionKey = ev.id.startsWith('k-') ? 'kanagawa'
-                  : ev.id.startsWith('s-') ? 'saitama'
-                  : 'tokyo';
+  // pref フィールド優先。旧イベント（pref なし）は ID プレフィックスで判別
+  const regionKey = ev.pref
+    ?? (ev.id.startsWith('k-') ? 'kanagawa'
+      : ev.id.startsWith('s-') ? 'saitama'
+      : 'tokyo');
   const hq        = REGION_HQ[regionKey];
   const source    = REGION_SOURCE[regionKey];
 

@@ -86,6 +86,7 @@ function parseSaitama($) {
 
     events.push({
       id:      `s-${dateStr.replace(/-/g, '')}-${++idx}`,
+      pref:    'saitama',
       date:    dateStr,
       weekday,
       title,

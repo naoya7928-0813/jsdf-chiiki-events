@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { ICO } from './Icons';
 import { BottomTabBar, F, splitDate } from './Shared';
+import { SUPPORTED_PREFECTURES, PREFECTURE_INFO } from '../data/regionMap';
 
 // ─── お気に入り一覧画面 ───────────────────────────────────────
 // DetailScreen でスター登録したイベントを一覧表示する。
@@ -14,10 +15,14 @@ export default function FavoritesScreen({
 
   // favorites は Set<string>（イベントID）
   const favEvents = useMemo(() => {
-    const all = [
-      ...(events.kanagawa ?? []).map(ev => ({ ...ev, regionLabel: '神奈川地本' })),
-      ...(events.tokyo    ?? []).map(ev => ({ ...ev, regionLabel: '東京地本'   })),
-    ];
+    const all = [];
+    for (const prefId of SUPPORTED_PREFECTURES) {
+      const info  = PREFECTURE_INFO[prefId];
+      const label = info ? `${info.label}地本` : prefId;
+      for (const ev of (events[prefId] ?? [])) {
+        all.push({ ...ev, regionLabel: label });
+      }
+    }
     return all
       .filter(ev => favorites.has(ev.id))
       .sort((a, b) => new Date(a.date) - new Date(b.date));

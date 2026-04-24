@@ -84,6 +84,7 @@ function parseKanagawa($) {
 
       events.push({
         id:       `k-${dateStr.replace(/-/g, '')}-${++idx}`,
+        pref:     'kanagawa',
         date:     dateStr,
         weekday:  '',
         title,

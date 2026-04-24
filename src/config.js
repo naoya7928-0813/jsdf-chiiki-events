@@ -24,22 +24,21 @@ export const REGION_HQ = {
   kanagawa: { name: '神奈川地方協力本部', tel: '045-662-9476', emblem: '神' },
   tokyo:    { name: '東京地方協力本部',   tel: '03-3268-3111', emblem: '東' },
   saitama:  { name: '埼玉地方協力本部',   tel: '048-831-6044', emblem: '埼' },
+  gunma:    { name: '群馬地方協力本部',   tel: '027-251-0016', emblem: '群' },
+  tochigi:  { name: '栃木地方協力本部',   tel: '028-634-4055', emblem: '栃' },
+  ibaraki:  { name: '茨城地方協力本部',   tel: '029-231-3315', emblem: '茨' },
+  chiba:    { name: '千葉地方協力本部',   tel: '043-242-5501', emblem: '千' },
 };
 
 // ─── データ出典情報 ───────────────────────────────────────────
 export const REGION_SOURCE = {
-  kanagawa: {
-    name: '自衛隊神奈川地方協力本部ウェブサイト',
-    url:  'https://www.mod.go.jp/pco/kanagawa/',
-  },
-  tokyo: {
-    name: '自衛隊東京地方協力本部ホームページ',
-    url:  'https://www.mod.go.jp/pco/tokyo/event2/',
-  },
-  saitama: {
-    name: '自衛隊埼玉地方協力本部ウェブサイト',
-    url:  'https://www.mod.go.jp/pco/saitama/event/',
-  },
+  kanagawa: { name: '自衛隊神奈川地方協力本部ウェブサイト', url: 'https://www.mod.go.jp/pco/kanagawa/' },
+  tokyo:    { name: '自衛隊東京地方協力本部ホームページ',   url: 'https://www.mod.go.jp/pco/tokyo/event2/' },
+  saitama:  { name: '自衛隊埼玉地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/saitama/event/' },
+  gunma:    { name: '自衛隊群馬地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/gunma/event.html' },
+  tochigi:  { name: '自衛隊栃木地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/tochigi/' },
+  ibaraki:  { name: '自衛隊茨城地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/ibaraki/event.html' },
+  chiba:    { name: '自衛隊千葉地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/chiba/event.html' },
 };
 
 // ─── フォールバック用モックデータ ────────────────────────────
