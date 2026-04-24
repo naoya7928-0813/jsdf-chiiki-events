@@ -23,6 +23,7 @@ export const DEFAULT_SCHEME = 'jgsdf';
 export const REGION_HQ = {
   kanagawa: { name: '神奈川地方協力本部', tel: '045-662-9476', emblem: '神' },
   tokyo:    { name: '東京地方協力本部',   tel: '03-3268-3111', emblem: '東' },
+  saitama:  { name: '埼玉地方協力本部',   tel: '048-831-6044', emblem: '埼' },
 };
 
 // ─── データ出典情報 ───────────────────────────────────────────
@@ -34,6 +35,10 @@ export const REGION_SOURCE = {
   tokyo: {
     name: '自衛隊東京地方協力本部ホームページ',
     url:  'https://www.mod.go.jp/pco/tokyo/event2/',
+  },
+  saitama: {
+    name: '自衛隊埼玉地方協力本部ウェブサイト',
+    url:  'https://www.mod.go.jp/pco/saitama/event/',
   },
 };
 

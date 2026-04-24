@@ -20,6 +20,7 @@ const { chromium } = require('playwright');
 
 const { parseKanagawa } = require('./parsers/kanagawa');
 const { parseTokyo }    = require('./parsers/tokyo');
+const { parseSaitama }  = require('./parsers/saitama');
 
 // ── 設定 ─────────────────────────────────────────────────────
 const OUTPUT_PATH = path.join(__dirname, '../public/data/events.json');
@@ -27,6 +28,7 @@ const OUTPUT_PATH = path.join(__dirname, '../public/data/events.json');
 const URLS = {
   kanagawa: 'https://www.mod.go.jp/pco/kanagawa/kouho/event/event.html',
   tokyo:    'https://www.mod.go.jp/pco/tokyo/event2/index.html',
+  saitama:  'https://www.mod.go.jp/pco/saitama/event/',
 };
 
 // ページ間の待機時間（Cloudflare/レートリミット対策）
@@ -42,6 +44,10 @@ const MOCK_DATA = {
   tokyo: [
     { id: 't-20260426-1', date: '2026-04-26', weekday: '日', title: '自衛官候補生 採用試験説明会', place: '市ヶ谷駐屯地 厚生センター', address: '新宿区市谷本村町5-1', time: '10:00～12:00', category: '説明会', tag: '要予約', url: '', notes: null },
     { id: 't-20260502-1', date: '2026-05-02', weekday: '土', title: '練馬駐屯地 創立記念行事', place: '陸上自衛隊 練馬駐屯地', address: '練馬区北町4-1-1', time: '09:00～15:00', category: '記念行事', tag: '入場無料', url: '', notes: null },
+  ],
+  saitama: [
+    { id: 's-20260519-1', date: '2026-05-19', weekday: '火', title: '陸上自衛隊 朝霞駐屯地 見学会', place: '陸上自衛隊 朝霞駐屯地', address: '', time: '10:00～12:00', category: '見学', tag: '要予約', url: '', notes: null },
+    { id: 's-20260607-1', date: '2026-06-07', weekday: '日', title: '自衛官候補生 募集説明会', place: 'さいたま市民会館おおみや', address: '', time: '13:00～15:00', category: '説明会', tag: null, url: '', notes: null },
   ],
 };
 
@@ -329,6 +335,51 @@ async function fetchTokyo(context) {
   return events;
 }
 
+/**
+ * 埼玉地本ページを取得・パース
+ */
+async function fetchSaitama(context) {
+  console.log(`[埼玉] アクセス: ${URLS.saitama}`);
+
+  const page = await context.newPage();
+  try {
+    const response = await page.goto(URLS.saitama, {
+      waitUntil: 'domcontentloaded',
+      timeout:   30_000,
+    });
+
+    if (response && response.ok()) {
+      await page.waitForTimeout(2000);
+      const html = await page.content();
+      const $ = cheerio.load(html, { decodeEntities: false });
+      const events = parseSaitama($);
+      console.log(`[埼玉] ${events.length} 件取得 (Playwright)`);
+      return events;
+    }
+    console.warn(`[埼玉] Playwright: HTTP ${response?.status()} → fetch にフォールバック`);
+  } catch (err) {
+    console.warn(`[埼玉] Playwright 失敗: ${err.message} → fetch にフォールバック`);
+  } finally {
+    await page.close();
+  }
+
+  // ── native fetch フォールバック ──
+  const res = await fetch(URLS.saitama, {
+    headers: {
+      'User-Agent':      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+      'Accept':          'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
+      'Referer':         'https://www.mod.go.jp/',
+    },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const html = await res.text();
+  const $ = cheerio.load(html, { decodeEntities: false });
+  const events = parseSaitama($);
+  console.log(`[埼玉] ${events.length} 件取得 (fetch fallback)`);
+  return events;
+}
+
 // ── メイン処理 ───────────────────────────────────────────────
 
 async function main() {
@@ -346,8 +397,10 @@ async function main() {
   // ── 実スクレイピングモード ──
   let kanagawaEvents = [];
   let tokyoEvents    = [];
+  let saitamaEvents  = [];
   let kanagawaError  = false;
   let tokyoError     = false;
+  let saitamaError   = false;
 
   const browser = await chromium.launch({
     headless: true,
@@ -381,19 +434,30 @@ async function main() {
       tokyoError = true;
     }
 
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      saitamaEvents = await fetchSaitama(context);
+    } catch (err) {
+      console.error(`[埼玉] 取得失敗: ${err.message}`);
+      saitamaError = true;
+    }
+
     await context.close();
   } finally {
     await browser.close();
   }
 
-  // 両方ともエラーで取得できなかった場合のみ終了（0件は正常の場合もある）
-  if (kanagawaError && tokyoError) {
-    console.warn('[警告] 両地本ともに取得エラーが発生しました。ファイルを更新しません。');
+  // 全地本エラーの場合のみ終了（0件は正常の場合もある）
+  if (kanagawaError && tokyoError && saitamaError) {
+    console.warn('[警告] 全地本ともに取得エラーが発生しました。ファイルを更新しません。');
     process.exit(1);
   }
 
   // ── OCR でイベント内容を補完 ──
-  tokyoEvents = await enrichWithOcr(tokyoEvents);
+  tokyoEvents   = await enrichWithOcr(tokyoEvents);
+  saitamaEvents = await enrichWithOcr(saitamaEvents);
 
   // imageUrl は最終出力に含めない（内部用フィールド）
   const strip = ev => { const { imageUrl: _, ...rest } = ev; return rest; };
@@ -401,6 +465,7 @@ async function main() {
   const output = {
     kanagawa:  kanagawaEvents.map(strip),
     tokyo:     tokyoEvents.map(strip),
+    saitama:   saitamaEvents.map(strip),
     updatedAt: nowJST(),
   };
   writeOutput(output);
@@ -416,6 +481,7 @@ function writeOutput(data) {
   console.log(`[出力] ${OUTPUT_PATH}`);
   console.log(`  神奈川: ${data.kanagawa.length} 件`);
   console.log(`  東京:   ${data.tokyo.length} 件`);
+  console.log(`  埼玉:   ${(data.saitama ?? []).length} 件`);
   console.log(`  更新時刻: ${data.updatedAt}`);
 }
 
