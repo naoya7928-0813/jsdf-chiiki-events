@@ -274,6 +274,13 @@ function nowJST() {
 /** 指定ミリ秒待機 */
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+/** Cloudflare チャレンジページかどうかを判定 */
+function isChallengeTitle(title) {
+  return title.includes('しばらくお待ちください')
+    || title.includes('Just a moment')
+    || title.includes('Attention Required');
+}
+
 // ── Playwright ブラウザ設定 ──────────────────────────────────
 
 /**
@@ -326,18 +333,16 @@ async function fetchKanagawa(context) {
     // チャレンジ後の追加待機
     await page.waitForTimeout(3000);
 
-    // page.content() はブラウザが描画した UTF-8 HTML を返す（Shift_JIS 変換不要）
-    const html = await page.content();
+    const html  = await page.content();
+    const title = (html.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1] || '';
+    console.log(`[神奈川] page title: ${title.trim().substring(0, 70)}`);
 
-    // Cloudflare ブロックページか判定（H3 が存在するか確認）
-    const hasH3 = /<h3/i.test(html);
-    if (hasH3) {
-      const $ = cheerio.load(html, { decodeEntities: false });
-      const events = parseKanagawa($);
-      console.log(`[神奈川] ${events.length} 件取得 (Playwright)`);
-      return events;
-    }
-    console.warn('[神奈川] Playwright: コンテンツなし（Cloudflare ブロック？）→ fetch にフォールバック');
+    if (isChallengeTitle(title)) throw new Error(`Cloudflare challenge: ${title.trim()}`);
+
+    const $ = cheerio.load(html, { decodeEntities: false });
+    const events = parseKanagawa($);
+    console.log(`[神奈川] ${events.length} 件取得 (Playwright)`);
+    return events;
   } catch (err) {
     console.warn(`[神奈川] Playwright 失敗: ${err.message} → fetch にフォールバック`);
   } finally {
@@ -401,9 +406,13 @@ async function fetchHtmlPref(context, prefLabel, url, parserFn) {
 
     await page.waitForTimeout(2000);
 
-    const html   = await page.content();
-    const title  = (html.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1] || '(no title)';
+    const html  = await page.content();
+    const title = (html.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1] || '(no title)';
     console.log(`[${prefLabel}] page title: ${title.trim().substring(0, 70)}`);
+
+    // チャレンジページのままなら前回データ保持のためエラーを投げる
+    if (isChallengeTitle(title)) throw new Error(`Cloudflare challenge: ${title.trim()}`);
+
     const $      = cheerio.load(html, { decodeEntities: false });
     const subSec = $('section.subSec').length;
     const postH3 = $('div.post h3').length;
@@ -461,7 +470,10 @@ async function fetchTochigi(context) {
       );
     } catch { /* チャレンジなし or タイムアウト */ }
     await page.waitForTimeout(2000);
-    const html = await page.content();
+    const html  = await page.content();
+    const title = (html.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1] || '';
+    console.log(`[栃木] page title: ${title.trim().substring(0, 70)}`);
+    if (isChallengeTitle(title)) throw new Error(`Cloudflare challenge: ${title.trim()}`);
     const $    = cheerio.load(html, { decodeEntities: false });
     imageUrls  = parseTochigiImages($);
     console.log(`[栃木] ${imageUrls.length} 件の画像を検出`);
