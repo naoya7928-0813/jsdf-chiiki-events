@@ -455,6 +455,25 @@ async function main() {
     process.exit(1);
   }
 
+  // エラーになった地本は既存 events.json のデータを引き継ぐ（空配列で上書きしない）
+  let prev = { kanagawa: [], tokyo: [], saitama: [] };
+  try {
+    prev = JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8'));
+  } catch { /* ファイル未存在は無視 */ }
+
+  if (kanagawaError) {
+    console.warn('[神奈川] エラーのため前回データを維持します');
+    kanagawaEvents = prev.kanagawa ?? [];
+  }
+  if (tokyoError) {
+    console.warn('[東京] エラーのため前回データを維持します');
+    tokyoEvents = prev.tokyo ?? [];
+  }
+  if (saitamaError) {
+    console.warn('[埼玉] エラーのため前回データを維持します');
+    saitamaEvents = prev.saitama ?? [];
+  }
+
   // ── OCR でイベント内容を補完 ──
   tokyoEvents   = await enrichWithOcr(tokyoEvents);
   saitamaEvents = await enrichWithOcr(saitamaEvents);
