@@ -19,15 +19,11 @@ on:
 jobs:
   scrape:
     name: イベントデータ取得
-    runs-on: self-hosted      # 自宅 PC のセルフホストランナーで実行（住所IPでCloudflare通過）
+    runs-on: self-hosted      # 自宅 PC のセルフホストランナー（住所IPでCloudflare通過）
     timeout-minutes: 15
 
-    defaults:
-      run:
-        shell: bash           # Windows 上でも Git Bash を使用
-
     permissions:
-      contents: write   # events.json をコミット・プッシュするために必要
+      contents: write
 
     steps:
       # ── リポジトリをチェックアウト ──────────────────────────
@@ -41,72 +37,69 @@ jobs:
           node-version: '20'
 
       # ── scraper の依存パッケージをインストール ───────────────
-      # scraper/package.json は本体の package.json とは独立
       - name: scraper の依存パッケージをインストール
         working-directory: scraper
         run: npm ci
+        shell: pwsh
 
       # ── Playwright 用 Chromium をインストール ────────────────
-      # Windows では --with-deps 不要（Linux システム依存ライブラリは不要）
       - name: Playwright Chromium をインストール
         working-directory: scraper
         run: npx playwright install chromium
+        shell: pwsh
 
       # ── スクレイピング実行 ────────────────────────────────────
       - name: イベントデータをスクレイピング
         working-directory: scraper
         run: node index.js
+        shell: pwsh
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       # ── 変更があればコミット & プッシュ ──────────────────────
       - name: 変更をコミット & プッシュ
         id: commit
+        shell: pwsh
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           git add public/data/events.json
 
-          if git diff --staged --quiet; then
-            echo "データに変更がありませんでした。コミットをスキップします。"
-            echo "changed=false" >> $GITHUB_OUTPUT
-          else
+          git diff --staged --quiet
+          if ($LASTEXITCODE -eq 0) {
+            Write-Output "データに変更がありませんでした。コミットをスキップします。"
+            "changed=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          } else {
             git commit -m "chore: update events data [skip ci]"
             git pull --rebase
             git push
-            echo "events.json を更新しました。"
-            echo "changed=true" >> $GITHUB_OUTPUT
-          fi
+            Write-Output "events.json を更新しました。"
+            "changed=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          }
 
       # ── Vercel に本番デプロイ ─────────────────────────────
       - name: Vercel に本番デプロイ
         if: steps.commit.outputs.changed == 'true'
         run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
+        shell: pwsh
         env:
           VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       # ── ntfy.sh でプッシュ通知送信 ────────────────────────
-      # 判定ロジック:
-      #   1. updatedAt が前回コミットと異なることを確認
-      #   2. 前回コミットに存在しなかった新着IDのみをカウント
-      #   3. JST 0800 / 1200 / 1800 の ±30 分以内のみ発火
-      #   4. 新着0件 or ウィンドウ外 は静かにスキップ
       - name: プッシュ通知を送信
         if: steps.commit.outputs.changed == 'true'
+        shell: pwsh
         run: |
-          # 判定ロジックを一時ファイルに書き出して実行（YAML内のクォート問題を回避）
-          cat > /tmp/check_notify.js << 'JSEOF'
+          $checkScript = @'
           'use strict';
           const { execSync } = require('child_process');
           const fs            = require('fs');
 
-          // ── 現在のデータ ──────────────────────────────────────
           const curr = JSON.parse(fs.readFileSync('./public/data/events.json', 'utf8'));
 
-          // ── 前回コミットのデータ（HEAD~1） ───────────────────
-          let prev = { kanagawa: [], tokyo: [], updatedAt: null };
+          let prev = { updatedAt: null };
           try {
             const raw = execSync('git show HEAD~1:public/data/events.json').toString();
             prev = JSON.parse(raw);
@@ -114,18 +107,15 @@ jobs:
             console.log('[通知] 前回データなし（初回コミット）');
           }
 
-          // ── デバッグログ ─────────────────────────────────────
           console.log('[通知判定]');
           console.log('  前回 updatedAt :', prev.updatedAt ?? '(なし)');
           console.log('  今回 updatedAt :', curr.updatedAt);
 
-          // ① updatedAt が変わっていない場合はスキップ
           if (prev.updatedAt && prev.updatedAt === curr.updatedAt) {
             console.log('  → スキップ: updatedAt 変化なし');
             process.exit(0);
           }
 
-          // ② 新着IDのみカウント（前回に存在しなかったIDを抽出）
           const PREFS = ['kanagawa','tokyo','saitama','gunma','tochigi','ibaraki','chiba'];
           const prevIds  = new Set(PREFS.flatMap(p => (prev[p] || []).map(e => e.id)));
           const currAll  = PREFS.flatMap(p => curr[p] || []);
@@ -136,45 +126,38 @@ jobs:
           newItems.forEach(e => console.log('    新着:', e.id, e.title));
 
           if (newItems.length === 0) {
-            console.log('  → スキップ: 新着イベントなし（既存データの更新のみ）');
+            console.log('  → スキップ: 新着イベントなし');
             process.exit(0);
           }
 
-          // ③ 通知ウィンドウチェック（JST 0800 / 1200 / 1800 ±30分）
-          // UTC+9 を直接計算
-          const jstNow  = new Date(Date.now() + 9 * 3600 * 1000);
-          const h       = jstNow.getUTCHours();
-          const m       = jstNow.getUTCMinutes();
-          const total   = h * 60 + m;
+          const jstNow = new Date(Date.now() + 9 * 3600 * 1000);
+          const h = jstNow.getUTCHours();
+          const m = jstNow.getUTCMinutes();
+          const total = h * 60 + m;
           const windows = [8 * 60, 12 * 60, 18 * 60];
-          const inWin   = windows.some(w => Math.abs(total - w) <= 30);
-          const jstStr  = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
-
-          console.log('  現在時刻 (JST):', jstStr);
-          console.log('  ウィンドウ内  :', inWin);
+          const inWin = windows.some(w => Math.abs(total - w) <= 30);
 
           if (!inWin) {
-            console.log('  → スキップ: 通知ウィンドウ外（サイレント更新）');
+            console.log('  → スキップ: 通知ウィンドウ外');
             process.exit(0);
           }
 
-          // ④ 全条件クリア → 通知ファイルに件数を書き出す
-          console.log('  → 通知発火: 新着', newItems.length, '件');
-          fs.writeFileSync('/tmp/notify_count.txt', String(newItems.length));
-          JSEOF
+          fs.writeFileSync(process.env.TEMP + '\\notify_count.txt', String(newItems.length));
+          '@
 
-          node /tmp/check_notify.js
+          $tempJs = "$env:TEMP\check_notify.js"
+          $checkScript | Out-File -FilePath $tempJs -Encoding utf8
+          node $tempJs
 
-          # 通知が必要な場合のみ curl 実行
-          if [ -f /tmp/notify_count.txt ]; then
-            COUNT=$(cat /tmp/notify_count.txt)
-            curl -s \
-              -H "Title: 自衛隊地本イベント情報 新着" \
-              -H "Tags: mega,jp" \
-              -H "Priority: default" \
-              -d "新着イベントが${COUNT}件追加されました。アプリを開いて確認してください。" \
-              https://ntfy.sh/jsdf-chiiki-events-7928
-            echo "[通知] ntfy 送信完了（新着 ${COUNT}件）"
-          else
-            echo "[通知] 送信スキップ"
-          fi
+          $notifyFile = "$env:TEMP\notify_count.txt"
+          if (Test-Path $notifyFile) {
+            $count = Get-Content $notifyFile
+            Invoke-RestMethod `
+              -Uri "https://ntfy.sh/jsdf-chiiki-events-7928" `
+              -Method Post `
+              -Body "新着イベントが${count}件追加されました。アプリを開いて確認してください。" `
+              -Headers @{ Title = "自衛隊地本イベント情報 新着"; Tags = "mega,jp"; Priority = "default" }
+            Write-Output "[通知] ntfy 送信完了（新着 ${count}件）"
+          } else {
+            Write-Output "[通知] 送信スキップ"
+          }
