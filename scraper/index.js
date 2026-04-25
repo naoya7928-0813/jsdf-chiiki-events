@@ -573,7 +573,6 @@ async function main() {
   const browser = await chromium.launch({
     headless: true,
     args: [
-      // Linux コンテナ（CI）環境でのみ必要なフラグ
       ...(isLinux ? ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'] : []),
       '--disable-infobars',
       '--disable-blink-features=AutomationControlled',
@@ -581,11 +580,16 @@ async function main() {
     ],
   });
 
-  try {
-    const context = await createStealthContext(browser);
+  // 地本ごとに新規コンテキストを生成する（共有セッションだと Cloudflare に検知される）
+  async function withFreshContext(fn) {
+    const ctx = await createStealthContext(browser);
+    try { return await fn(ctx); }
+    finally { await ctx.close(); }
+  }
 
+  try {
     try {
-      kanagawaEvents = await fetchKanagawa(context);
+      kanagawaEvents = await withFreshContext(ctx => fetchKanagawa(ctx));
     } catch (err) {
       console.error(`[神奈川] 取得失敗: ${err.message}`);
       kanagawaError = true;
@@ -595,7 +599,7 @@ async function main() {
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      tokyoEvents = await fetchTokyo(context);
+      tokyoEvents = await withFreshContext(ctx => fetchTokyo(ctx));
     } catch (err) {
       console.error(`[東京] 取得失敗: ${err.message}`);
       tokyoError = true;
@@ -605,7 +609,7 @@ async function main() {
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      saitamaEvents = await fetchSaitama(context);
+      saitamaEvents = await withFreshContext(ctx => fetchSaitama(ctx));
     } catch (err) {
       console.error(`[埼玉] 取得失敗: ${err.message}`);
       saitamaError = true;
@@ -615,7 +619,7 @@ async function main() {
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      gunmaEvents = await fetchGunma(context);
+      gunmaEvents = await withFreshContext(ctx => fetchGunma(ctx));
     } catch (err) {
       console.error(`[群馬] 取得失敗: ${err.message}`);
       gunmaError = true;
@@ -625,7 +629,7 @@ async function main() {
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      ibarakiEvents = await fetchIbaraki(context);
+      ibarakiEvents = await withFreshContext(ctx => fetchIbaraki(ctx));
     } catch (err) {
       console.error(`[茨城] 取得失敗: ${err.message}`);
       ibarakiError = true;
@@ -635,7 +639,7 @@ async function main() {
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      chibaEvents = await fetchChiba(context);
+      chibaEvents = await withFreshContext(ctx => fetchChiba(ctx));
     } catch (err) {
       console.error(`[千葉] 取得失敗: ${err.message}`);
       chibaError = true;
@@ -645,13 +649,11 @@ async function main() {
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      tochigiEvents = await fetchTochigi(context);
+      tochigiEvents = await withFreshContext(ctx => fetchTochigi(ctx));
     } catch (err) {
       console.error(`[栃木] 取得失敗: ${err.message}`);
       tochigiError = true;
     }
-
-    await context.close();
   } finally {
     await browser.close();
   }
