@@ -2,15 +2,16 @@
 
 const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
 
-const BASE_URL = 'https://www.mod.go.jp/pco/gunma/event.html';
-
-function resolveUrl(href) {
-  if (!href) return '';
-  if (href.startsWith('http')) return href;
-  try { return new URL(href, BASE_URL).href; } catch { return ''; }
-}
-
 /**
+ * 群馬地本イベントページのパーサー
+ *
+ * 構造: section[id] ごとに1イベント
+ *   .event_ttl  → タイトル
+ *   div.event_detail_list ul li[0] → 日付
+ *   div.event_detail_list ul li[1] → 時間
+ *   div.event_detail_list ul li[2] → 場所（<br> で住所と分割）
+ *   h4 → 説明・備考
+ *
  * @param {import('cheerio').CheerioAPI} $
  * @returns {Array<Object>}
  */
@@ -18,47 +19,51 @@ function parseGunma($) {
   const events = [];
   let idx = 0;
 
-  $('section.subSec').each((_i, secEl) => {
+  $('section[id]').each((_i, secEl) => {
     const $sec = $(secEl);
 
-    const title = ($sec.find('h3[id]').first().text()
-      || $sec.find('h3').first().text()
-    ).replace(/\s+/g, ' ').trim();
+    const title = $sec.find('.event_ttl').first().text().replace(/\s+/g, ' ').trim();
     if (!title) return;
 
-    // 日付: h4 優先、次に h3 の別テキスト
-    const rawDate = toHalfWidth(
-      ($sec.find('h4').first().text() || $sec.find('h3').eq(1).text() || '')
-        .replace(/\s+/g, ' ').trim()
-    );
+    const $lis = $sec.find('div.event_detail_list ul li');
+    if ($lis.length < 1) return;
+
+    const rawDate = toHalfWidth($lis.eq(0).text().replace(/\s+/g, ' ').trim());
     if (!rawDate) return;
 
-    const dtMatch = rawDate.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/);
-    if (!dtMatch) return;
+    // Gregorian: 2026/4/25（土） or 2026/5/5(火) or 2026/5/16(土)～17(日)
+    const gregMatch = rawDate.match(/(\d{4})\/(\d{1,2})\/(\d{1,2})[（(]([月火水木金土日祝・]+)[）)]/);
+    // Reiwa: 令和8年5月14日（木）
+    const reiwaMatch = rawDate.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/);
 
-    const year    = reiwaToAD(parseInt(dtMatch[1], 10));
-    const month   = parseInt(dtMatch[2], 10);
-    const day     = parseInt(dtMatch[3], 10);
-    const weekday = dtMatch[4];
-    const dateStr = `${year}-${padTwo(month)}-${padTwo(day)}`;
+    let dateStr, weekday;
+    if (gregMatch) {
+      dateStr  = `${gregMatch[1]}-${padTwo(parseInt(gregMatch[2], 10))}-${padTwo(parseInt(gregMatch[3], 10))}`;
+      weekday  = gregMatch[4];
+    } else if (reiwaMatch) {
+      const year = reiwaToAD(parseInt(reiwaMatch[1], 10));
+      dateStr  = `${year}-${padTwo(parseInt(reiwaMatch[2], 10))}-${padTwo(parseInt(reiwaMatch[3], 10))}`;
+      weekday  = reiwaMatch[4];
+    } else {
+      return; // 固定日付のないイベントはスキップ
+    }
     if (isPast(dateStr)) return;
 
-    const fields = {};
-    $sec.find('dl dt').each((_k, dtEl) => {
-      const key = toHalfWidth($(dtEl).text()).replace(/\s+/g, '').trim();
-      fields[key] = $(dtEl).next('dd').text().replace(/\s+/g, ' ').trim();
-    });
+    const time     = toHalfWidth($lis.eq(1).text().replace(/\s+/g, ' ').trim());
 
-    const place = (fields['見学先'] || fields['場所'] || fields['会場'] || '').trim();
-    const time  = toHalfWidth(fields['時間'] || fields['集合時間'] || fields['開催時間'] || fields['受付時間'] || '').trim();
+    // li[2]: 場所 <br> 住所 の形式を分割（HTMLコメントを先に除去）
+    const placeHtml   = $lis.eq(2).html() || '';
+    const placeParts  = placeHtml
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<[^>]+>/g, '')
+      .split('\n')
+      .map(s => s.replace(/\s+/g, ' ').trim())
+      .filter(Boolean);
+    const place   = placeParts[0] || '';
+    const address = placeParts[1] || '';
 
-    const rawCategory = fields['種目'] || fields['区分'] || fields['カテゴリ'] || '';
-    const category    = rawCategory || guessCategory(toHalfWidth(title));
-    const tag         = fields['備考'] ? guessTag(fields['備考']) : guessTag(title);
-
-    const url      = resolveUrl($sec.find('a').first().attr('href') || '');
-    const $img     = $sec.find('.imgContents');
-    const imageUrl = resolveUrl($img.find('a').first().attr('href') || $img.find('img').first().attr('src') || '');
+    const notes = $sec.find('h4').first().text().replace(/\s+/g, ' ').trim() || null;
 
     events.push({
       id:             `gu-${dateStr.replace(/-/g, '')}-${++idx}`,
@@ -67,15 +72,15 @@ function parseGunma($) {
       weekday,
       title,
       place,
-      address:        '',
+      address,
       time,
-      category,
-      tag,
-      url,
-      notes:          fields['実施内容'] || fields['内容'] || fields['備考'] || null,
-      ageRequirement: toHalfWidth(fields['応募資格'] || '').trim() || null,
-      deadline:       toHalfWidth(fields['応募締切'] || fields['締切'] || '').trim() || null,
-      imageUrl,
+      category:       guessCategory(toHalfWidth(title)),
+      tag:            guessTag(title),
+      url:            '',
+      notes,
+      ageRequirement: null,
+      deadline:       null,
+      imageUrl:       '',
     });
   });
 
