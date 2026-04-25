@@ -49,6 +49,14 @@ export const PREFECTURE_INFO = {
   gifu:      { label: '岐阜',   emblem: '岐', region: 'chubu' },
   shizuoka:  { label: '静岡',   emblem: '静', region: 'chubu' },
   aichi:     { label: '愛知',   emblem: '愛', region: 'chubu' },
+  // 近畿
+  mie:       { label: '三重',   emblem: '三', region: 'kinki' },
+  shiga:     { label: '滋賀',   emblem: '滋', region: 'kinki' },
+  kyoto:     { label: '京都',   emblem: '京', region: 'kinki' },
+  osaka:     { label: '大阪',   emblem: '大', region: 'kinki' },
+  hyogo:     { label: '兵庫',   emblem: '兵', region: 'kinki' },
+  nara:      { label: '奈良',   emblem: '奈', region: 'kinki' },
+  wakayama:  { label: '和歌山', emblem: '和', region: 'kinki' },
 };
 
 /** 都道府県ID → 地域ID の逆引きマップ */
