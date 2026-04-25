@@ -47,10 +47,14 @@ function parseMiePost($, url, counter) {
   if (!dateStr || isPast(dateStr)) return [];
 
   // ── タイトル ─────────────────────────────────────────────────
-  const rawTitle = ($('h1.entry-title, h1.page-title, .entry-title, h1').first().text().trim()
-    || $('title').text().replace(/\s*[–—-]\s*.*$/, '').trim())
+  // 三重の投稿は h1 が常に「お知らせ」のため、本文先頭（YYYY.MM.DD の前）からイベント名を取る
+  const bodyTitleM = halfBody.match(/^(.+?)\s+\d{4}\.\d{2}\.\d{2}/);
+  const rawTitle = (bodyTitleM
+    ? bodyTitleM[1].trim()
+    : ($('h1.entry-title, h1.page-title, .entry-title, h1').first().text().trim()
+       || $('title').text().replace(/\s*[–—-]\s*.*$/, '').trim()))
     .replace(/「|」/g, '').trim();
-  if (!rawTitle) return [];
+  if (!rawTitle || rawTitle === 'お知らせ') return [];
 
   // ── 場所 ─────────────────────────────────────────────────────
   const placeM = halfBody.match(/[●■]?場所\s+(.{2,60?})(?:\s+[●■]|イベント内容|日時|$)/);
