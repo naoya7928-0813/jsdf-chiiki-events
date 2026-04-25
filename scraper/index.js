@@ -817,7 +817,7 @@ async function fetchWpPosts(ctx, pref, listUrl, urlsFn, postFn, maxPosts = 5) {
           { timeout: 30_000 }
         );
       } catch {}
-      await postPage.waitForTimeout(1000);
+      await postPage.waitForTimeout(2000);
       const html = await postPage.content();
       const $    = cheerio.load(html, { decodeEntities: false });
       const evs  = postFn($, postUrl, ++counter);

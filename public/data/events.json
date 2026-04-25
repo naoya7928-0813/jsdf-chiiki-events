@@ -1690,7 +1690,42 @@
       "deadline": null
     }
   ],
-  "mie": [],
+  "mie": [
+    {
+      "id": "mi-20260524-1",
+      "pref": "mie",
+      "date": "2026-05-24",
+      "weekday": "土",
+      "title": "お知らせ",
+      "place": "",
+      "address": "",
+      "time": "11:00～12:00",
+      "category": "イベント",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/mie/post-9077/",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "imageUrl": ""
+    },
+    {
+      "id": "mi-20260531-2",
+      "pref": "mie",
+      "date": "2026-05-31",
+      "weekday": "日",
+      "title": "お知らせ",
+      "place": "",
+      "address": "",
+      "time": "10:30～17:00",
+      "category": "イベント",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/mie/post-9066/",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "imageUrl": ""
+    }
+  ],
   "shiga": [],
   "kyoto": [
     {
@@ -1707,12 +1742,100 @@
       "url": "https://www.mod.go.jp/pco/kyoto/kouhoushitsu/index.html",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "imageUrl": ""
     }
   ],
   "osaka": [],
   "hyogo": [],
-  "nara": [],
+  "nara": [
+    {
+      "id": "na-20260511-1",
+      "pref": "nara",
+      "date": "2026-05-11",
+      "weekday": "月",
+      "title": "大久保駐屯地 創立記念行事",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "記念行事",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/nara/post-16131/",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "imageUrl": ""
+    },
+    {
+      "id": "na-20260724-2",
+      "pref": "nara",
+      "date": "2026-07-24",
+      "weekday": "金",
+      "title": "公務員合同職業説明会 in 大和西大寺",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/nara/post-16137/",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "imageUrl": ""
+    },
+    {
+      "id": "na-20260717-3",
+      "pref": "nara",
+      "date": "2026-07-17",
+      "weekday": "金",
+      "title": "公務員合同職業説明会 in 大和八木",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/nara/post-16121/",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "imageUrl": ""
+    },
+    {
+      "id": "na-20260507-4",
+      "pref": "nara",
+      "date": "2026-05-07",
+      "weekday": "木",
+      "title": "海上自衛隊 航空機 フライト体験",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "体験",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/nara/post-16044/",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "imageUrl": ""
+    },
+    {
+      "id": "na-20260607-5",
+      "pref": "nara",
+      "date": "2026-06-07",
+      "weekday": "日",
+      "title": "第41回自衛隊奈良定期演奏会",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "演奏会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/nara/post-16022/",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "imageUrl": ""
+    }
+  ],
   "wakayama": [],
-  "updatedAt": "2026/04/26 03:15"
+  "updatedAt": "2026/04/26 03:15",
+  "_updatedAt": "2026/4/26 3:26:52"
 }

@@ -115,7 +115,7 @@ function parseNaraPostUrls($) {
   const urls = [];
   $('a[href*="mod.go.jp/pco/nara/post-"]').each((_, a) => {
     const href = $(a).attr('href') || '';
-    if (href && !urls.includes(href)) urls.push(href);
+    if (href && /\/nara\/post-\d+/.test(href) && !urls.includes(href)) urls.push(href);
   });
   return urls;
 }
