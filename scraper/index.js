@@ -16,7 +16,9 @@ const fs      = require('fs');
 const iconv   = require('iconv-lite');
 const cheerio = require('cheerio');
 
-const { chromium } = require('playwright');
+const { chromium } = require('playwright-extra');
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+chromium.use(StealthPlugin());
 
 const { parseKanagawa }      = require('./parsers/kanagawa');
 const { parseTokyo }         = require('./parsers/tokyo');
@@ -41,7 +43,7 @@ const URLS = {
 };
 
 // ページ間の待機時間（Cloudflare/レートリミット対策）
-const BETWEEN_PAGES_MS = 3000;
+const BETWEEN_PAGES_MS = 10_000;
 
 // ── モックデータ（--mock 時に使用） ───────────────────────────
 const MOCK_DATA = {
@@ -390,7 +392,9 @@ async function fetchHtmlPref(context, prefLabel, url, parserFn) {
     // → 解決できなければ 30 秒でタイムアウトしてフォールバックに移行（素早い失敗）
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
 
-    // Cloudflare チャレンジページ（英語・日本語）のタイトルが消えるまで最大 30 秒待つ
+    // Cloudflare チャレンジページ（英語・日本語）のタイトルが消えるまで最大 90 秒待つ
+    // 神奈川の cf_clearance クッキーが同一コンテキストで引き継がれるため
+    // 後続ページのチャレンジも 90 秒以内に突破できる
     try {
       await page.waitForFunction(
         () => {
@@ -400,7 +404,7 @@ async function fetchHtmlPref(context, prefLabel, url, parserFn) {
             && !t.includes('Attention Required')
             && !t.includes('しばらくお待ちください');
         },
-        { timeout: 30_000 }
+        { timeout: 90_000 }
       );
     } catch { /* チャレンジなし or タイムアウト → そのまま続行 */ }
 
@@ -466,7 +470,7 @@ async function fetchTochigi(context) {
             && !t.includes('Attention Required')
             && !t.includes('しばらくお待ちください');
         },
-        { timeout: 30_000 }
+        { timeout: 90_000 }
       );
     } catch { /* チャレンジなし or タイムアウト */ }
     await page.waitForTimeout(2000);

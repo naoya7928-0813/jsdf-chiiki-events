@@ -8,11 +8,6 @@ on:
     - cron: '0 3 * * *'    # 日本時間 12:00
     - cron: '0 9 * * *'    # 日本時間 18:00
 
-  # scraper コードの変更時にも自動実行
-  push:
-    paths:
-      - 'scraper/**'
-
   # GitHub Actions の UI から手動実行も可能
   workflow_dispatch:
 
@@ -20,7 +15,7 @@ jobs:
   scrape:
     name: イベントデータ取得
     runs-on: self-hosted      # 自宅 PC のセルフホストランナー（住所IPでCloudflare通過）
-    timeout-minutes: 15
+    timeout-minutes: 30
 
     permissions:
       contents: write
