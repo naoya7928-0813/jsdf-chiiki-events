@@ -21,24 +21,70 @@ export const DEFAULT_SCHEME = 'jgsdf';
 
 // ─── 地方協力本部 連絡先 ──────────────────────────────────────
 export const REGION_HQ = {
-  kanagawa: { name: '神奈川地方協力本部', tel: '045-662-9476', emblem: '神' },
-  tokyo:    { name: '東京地方協力本部',   tel: '03-3268-3111', emblem: '東' },
-  saitama:  { name: '埼玉地方協力本部',   tel: '048-831-6044', emblem: '埼' },
-  gunma:    { name: '群馬地方協力本部',   tel: '027-251-0016', emblem: '群' },
-  tochigi:  { name: '栃木地方協力本部',   tel: '028-634-3385', emblem: '栃' },
-  ibaraki:  { name: '茨城地方協力本部',   tel: '029-231-3315', emblem: '茨' },
-  chiba:    { name: '千葉地方協力本部',   tel: '043-242-5501', emblem: '千' },
+  // 北海道
+  sapporo:   { name: '自衛隊札幌地方協力本部',   tel: '011-631-5471', emblem: '札' },
+  asahikawa: { name: '自衛隊旭川地方協力本部',   tel: '0166-51-7330', emblem: '旭' },
+  obihiro:   { name: '自衛隊帯広地方協力本部',   tel: '0155-23-2485', emblem: '帯' },
+  hakodate:  { name: '自衛隊函館地方協力本部',   tel: '0138-53-6241', emblem: '函' },
+  // 東北
+  miyagi:    { name: '自衛隊宮城地方協力本部',   tel: '022-295-2612', emblem: '宮' },
+  aomori:    { name: '自衛隊青森地方協力本部',   tel: '017-777-7917', emblem: '青' },
+  iwate:     { name: '自衛隊岩手地方協力本部',   tel: '019-651-3351', emblem: '岩' },
+  akita:     { name: '自衛隊秋田地方協力本部',   tel: '018-823-1451', emblem: '秋' },
+  yamagata:  { name: '自衛隊山形地方協力本部',   tel: '023-622-7314', emblem: '形' },
+  fukushima: { name: '自衛隊福島地方協力本部',   tel: '024-531-2351', emblem: '福' },
+  // 関東
+  kanagawa:  { name: '神奈川地方協力本部', tel: '045-662-9476', emblem: '神' },
+  tokyo:     { name: '東京地方協力本部',   tel: '03-3268-3111', emblem: '東' },
+  saitama:   { name: '埼玉地方協力本部',   tel: '048-831-6044', emblem: '埼' },
+  gunma:     { name: '群馬地方協力本部',   tel: '027-251-0016', emblem: '群' },
+  tochigi:   { name: '栃木地方協力本部',   tel: '028-634-3385', emblem: '栃' },
+  ibaraki:   { name: '茨城地方協力本部',   tel: '029-231-3315', emblem: '茨' },
+  chiba:     { name: '千葉地方協力本部',   tel: '043-242-5501', emblem: '千' },
+  // 中部
+  niigata:   { name: '新潟地方協力本部',   tel: '025-285-0513', emblem: '潟' },
+  toyama:    { name: '富山地方協力本部',   tel: '076-432-3730', emblem: '富' },
+  ishikawa:  { name: '石川地方協力本部',   tel: '076-291-6214', emblem: '石' },
+  fukui:     { name: '福井地方協力本部',   tel: '0776-22-3070', emblem: '福' },
+  yamanashi: { name: '山梨地方協力本部',   tel: '055-252-3838', emblem: '梨' },
+  nagano:    { name: '長野地方協力本部',   tel: '026-232-3831', emblem: '野' },
+  gifu:      { name: '岐阜地方協力本部',   tel: '058-262-1818', emblem: '岐' },
+  shizuoka:  { name: '静岡地方協力本部',   tel: '054-252-4000', emblem: '静' },
+  aichi:     { name: '愛知地方協力本部',   tel: '052-961-4366', emblem: '愛' },
 };
 
 // ─── データ出典情報 ───────────────────────────────────────────
 export const REGION_SOURCE = {
-  kanagawa: { name: '自衛隊神奈川地方協力本部ウェブサイト', url: 'https://www.mod.go.jp/pco/kanagawa/' },
-  tokyo:    { name: '自衛隊東京地方協力本部ホームページ',   url: 'https://www.mod.go.jp/pco/tokyo/event2/' },
-  saitama:  { name: '自衛隊埼玉地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/saitama/event/' },
-  gunma:    { name: '自衛隊群馬地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/gunma/event.html' },
-  tochigi:  { name: '自衛隊栃木地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/tochigi/' },
-  ibaraki:  { name: '自衛隊茨城地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/ibaraki/event.html' },
-  chiba:    { name: '自衛隊千葉地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/chiba/event.html' },
+  // 北海道
+  sapporo:   { name: '自衛隊札幌地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/sapporo/event.html' },
+  asahikawa: { name: '自衛隊旭川地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/asahikawa/event.html' },
+  obihiro:   { name: '自衛隊帯広地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/obihiro/topics_event.html' },
+  hakodate:  { name: '自衛隊函館地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/hakodate/publicity/' },
+  // 東北
+  miyagi:    { name: '自衛隊宮城地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/miyagi/' },
+  aomori:    { name: '自衛隊青森地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/aomori/' },
+  iwate:     { name: '自衛隊岩手地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/iwate/event/index.html' },
+  akita:     { name: '自衛隊秋田地方協力本部（Googleカレンダー）', url: 'https://www.mod.go.jp/pco/akita/asset/event/index.html' },
+  yamagata:  { name: '自衛隊山形地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/yamagata/event/event.html' },
+  fukushima: { name: '自衛隊福島地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/fukushima/pr/event.html' },
+  // 関東
+  kanagawa:  { name: '自衛隊神奈川地方協力本部ウェブサイト', url: 'https://www.mod.go.jp/pco/kanagawa/' },
+  tokyo:     { name: '自衛隊東京地方協力本部ホームページ',   url: 'https://www.mod.go.jp/pco/tokyo/event2/' },
+  saitama:   { name: '自衛隊埼玉地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/saitama/event/' },
+  gunma:     { name: '自衛隊群馬地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/gunma/event.html' },
+  tochigi:   { name: '自衛隊栃木地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/tochigi/' },
+  ibaraki:   { name: '自衛隊茨城地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/ibaraki/event.html' },
+  chiba:     { name: '自衛隊千葉地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/chiba/event.html' },
+  // 中部
+  niigata:   { name: '自衛隊新潟地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/niigata/HP/event-schedule.html' },
+  toyama:    { name: '自衛隊富山地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/toyama/content/04-event/04-event.html' },
+  ishikawa:  { name: '自衛隊石川地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/ishikawa/event29/index.html' },
+  fukui:     { name: '自衛隊福井地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/fukui/contents/9-event/9-event.html' },
+  yamanashi: { name: '自衛隊山梨地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/yamanashi/event.html' },
+  nagano:    { name: '自衛隊長野地方協力本部（Googleカレンダー）', url: 'https://www.mod.go.jp/pco/nagano/' },
+  gifu:      { name: '自衛隊岐阜地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/gifu/event/event.html' },
+  shizuoka:  { name: '自衛隊静岡地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/sizuoka/event/index.html' },
+  aichi:     { name: '自衛隊愛知地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/aichi/calendar.html' },
 };
 
 // ─── フォールバック用モックデータ ────────────────────────────

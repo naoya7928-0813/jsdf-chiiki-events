@@ -4,17 +4,49 @@
 // events.json のキーは都道府県IDと一致する（kanagawa, tokyo, ...）
 
 /** 対応済み都道府県 — events.json に実データが存在するもの */
-export const SUPPORTED_PREFECTURES = new Set(['kanagawa', 'tokyo', 'saitama', 'gunma', 'tochigi', 'ibaraki', 'chiba']);
+export const SUPPORTED_PREFECTURES = new Set([
+  // 北海道
+  'sapporo', 'asahikawa', 'obihiro', 'hakodate',
+  // 東北
+  'miyagi', 'aomori', 'iwate', 'yamagata', 'fukushima', 'akita',
+  // 関東
+  'kanagawa', 'tokyo', 'saitama', 'gunma', 'tochigi', 'ibaraki', 'chiba',
+  // 中部
+  'niigata', 'toyama', 'ishikawa', 'fukui', 'yamanashi', 'nagano', 'gifu', 'shizuoka', 'aichi',
+]);
 
 /** 都道府県個別情報 */
 export const PREFECTURE_INFO = {
-  kanagawa: { label: '神奈川', emblem: '神', region: 'kanto' },
-  tokyo:    { label: '東京',   emblem: '東', region: 'kanto' },
-  saitama:  { label: '埼玉',   emblem: '埼', region: 'kanto' },
-  gunma:    { label: '群馬',   emblem: '群', region: 'kanto' },
-  tochigi:  { label: '栃木',   emblem: '栃', region: 'kanto' },
-  ibaraki:  { label: '茨城',   emblem: '茨', region: 'kanto' },
-  chiba:    { label: '千葉',   emblem: '千', region: 'kanto' },
+  // 北海道
+  sapporo:   { label: '札幌',   emblem: '札', region: 'hokkaido' },
+  asahikawa: { label: '旭川',   emblem: '旭', region: 'hokkaido' },
+  obihiro:   { label: '帯広',   emblem: '帯', region: 'hokkaido' },
+  hakodate:  { label: '函館',   emblem: '函', region: 'hokkaido' },
+  // 東北
+  aomori:    { label: '青森',   emblem: '青', region: 'tohoku' },
+  iwate:     { label: '岩手',   emblem: '岩', region: 'tohoku' },
+  miyagi:    { label: '宮城',   emblem: '宮', region: 'tohoku' },
+  akita:     { label: '秋田',   emblem: '秋', region: 'tohoku' },
+  yamagata:  { label: '山形',   emblem: '形', region: 'tohoku' },
+  fukushima: { label: '福島',   emblem: '福', region: 'tohoku' },
+  // 関東
+  kanagawa:  { label: '神奈川', emblem: '神', region: 'kanto' },
+  tokyo:     { label: '東京',   emblem: '東', region: 'kanto' },
+  saitama:   { label: '埼玉',   emblem: '埼', region: 'kanto' },
+  gunma:     { label: '群馬',   emblem: '群', region: 'kanto' },
+  tochigi:   { label: '栃木',   emblem: '栃', region: 'kanto' },
+  ibaraki:   { label: '茨城',   emblem: '茨', region: 'kanto' },
+  chiba:     { label: '千葉',   emblem: '千', region: 'kanto' },
+  // 中部
+  niigata:   { label: '新潟',   emblem: '潟', region: 'chubu' },
+  toyama:    { label: '富山',   emblem: '富', region: 'chubu' },
+  ishikawa:  { label: '石川',   emblem: '石', region: 'chubu' },
+  fukui:     { label: '福井',   emblem: '福', region: 'chubu' },
+  yamanashi: { label: '山梨',   emblem: '梨', region: 'chubu' },
+  nagano:    { label: '長野',   emblem: '長', region: 'chubu' },
+  gifu:      { label: '岐阜',   emblem: '岐', region: 'chubu' },
+  shizuoka:  { label: '静岡',   emblem: '静', region: 'chubu' },
+  aichi:     { label: '愛知',   emblem: '愛', region: 'chubu' },
 };
 
 /** 都道府県ID → 地域ID の逆引きマップ */
@@ -28,7 +60,10 @@ export const REGIONS = [
     id: 'hokkaido',
     label: '北海道',
     prefectures: [
-      { id: 'hokkaido', label: '北海道', emblem: '道' },
+      { id: 'sapporo',   label: '札幌', emblem: '札' },
+      { id: 'asahikawa', label: '旭川', emblem: '旭' },
+      { id: 'obihiro',   label: '帯広', emblem: '帯' },
+      { id: 'hakodate',  label: '函館', emblem: '函' },
     ],
   },
   {

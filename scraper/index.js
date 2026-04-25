@@ -27,19 +27,68 @@ const { parseGunma }         = require('./parsers/gunma');
 const { parseIbaraki }       = require('./parsers/ibaraki');
 const { parseChiba }         = require('./parsers/chiba');
 const { parseTochigiImages } = require('./parsers/tochigi');
+// 北海道地本
+const { parseSapporoPage }   = require('./parsers/sapporo');
+const { parseAsahikawa }     = require('./parsers/asahikawa');
+const { parseObihiro }       = require('./parsers/obihiro');
+const { parseHakodate }      = require('./parsers/hakodate');
+// 東北地本
+const { parseMiyagi }        = require('./parsers/miyagi');
+const { parseAomori }        = require('./parsers/aomori');
+const { parseIwate }         = require('./parsers/iwate');
+const { parseYamagata }      = require('./parsers/yamagata');
+const { parseFukushima }     = require('./parsers/fukushima');
+const { parseAkita }         = require('./parsers/akita');
+// 中部地本
+const { parseNiigata }       = require('./parsers/niigata');
+const { parseIshikawa }      = require('./parsers/ishikawa');
+const { parseFukui }         = require('./parsers/fukui');
+const { parseYamanashi }     = require('./parsers/yamanashi');
+const { parseGifu }          = require('./parsers/gifu');
+const { parseAichi }         = require('./parsers/aichi');
+const { parseShizuoka }      = require('./parsers/shizuoka');
+const { parseToyamaImages }  = require('./parsers/toyama');
+const { parseNagano }        = require('./parsers/nagano');
 const { toHalfWidth, reiwaToAD, padTwo, isPast, guessCategory, guessTag } = require('./parsers/utils');
 
 // ── 設定 ─────────────────────────────────────────────────────
 const OUTPUT_PATH = path.join(__dirname, '../public/data/events.json');
 
 const URLS = {
-  kanagawa: 'https://www.mod.go.jp/pco/kanagawa/kouho/event/event.html',
-  tokyo:    'https://www.mod.go.jp/pco/tokyo/event2/index.html',
-  saitama:  'https://www.mod.go.jp/pco/saitama/event/',
-  gunma:    'https://www.mod.go.jp/pco/gunma/event.html',
-  tochigi:  'https://www.mod.go.jp/pco/tochigi/',
-  ibaraki:  'https://www.mod.go.jp/pco/ibaraki/event.html',
-  chiba:    'https://www.mod.go.jp/pco/chiba/event.html',
+  // 北海道地本（札幌は複数サブページ）
+  sapporo_station:  'https://www.mod.go.jp/pco/sapporo/event_station.html',
+  sapporo_naval:    'https://www.mod.go.jp/pco/sapporo/event_naval.html',
+  sapporo_concert:  'https://www.mod.go.jp/pco/sapporo/event_concert.html',
+  sapporo_other:    'https://www.mod.go.jp/pco/sapporo/event_other.html',
+  asahikawa:        'https://www.mod.go.jp/pco/asahikawa/event.html',
+  obihiro:          'https://www.mod.go.jp/pco/obihiro/topics_event.html',
+  hakodate:         'https://www.mod.go.jp/pco/hakodate/publicity/',
+  // 東北地本
+  miyagi:           'https://www.mod.go.jp/pco/miyagi/',
+  aomori:           'https://www.mod.go.jp/pco/aomori/',
+  iwate:            'https://www.mod.go.jp/pco/iwate/event/index.html',
+  yamagata:         'https://www.mod.go.jp/pco/yamagata/event/event.html',
+  fukushima:        'https://www.mod.go.jp/pco/fukushima/pr/event.html',
+  akita_ical1:      'https://calendar.google.com/calendar/ical/3n2esbei0vm8qte2chsohavldc%40group.calendar.google.com/public/basic.ics',
+  akita_ical2:      'https://calendar.google.com/calendar/ical/fnqjg3qoglr6iorbinvgjban7k%40group.calendar.google.com/public/basic.ics',
+  // 関東地本
+  kanagawa:  'https://www.mod.go.jp/pco/kanagawa/kouho/event/event.html',
+  tokyo:     'https://www.mod.go.jp/pco/tokyo/event2/index.html',
+  saitama:   'https://www.mod.go.jp/pco/saitama/event/',
+  gunma:     'https://www.mod.go.jp/pco/gunma/event.html',
+  tochigi:   'https://www.mod.go.jp/pco/tochigi/',
+  ibaraki:   'https://www.mod.go.jp/pco/ibaraki/event.html',
+  chiba:     'https://www.mod.go.jp/pco/chiba/event.html',
+  // 中部地本
+  niigata:   'https://www.mod.go.jp/pco/niigata/HP/event-schedule.html',
+  toyama:    'https://www.mod.go.jp/pco/toyama/content/04-event/04-event.html',
+  ishikawa:  'https://www.mod.go.jp/pco/ishikawa/event29/index.html',
+  fukui:     'https://www.mod.go.jp/pco/fukui/contents/9-event/9-event.html',
+  yamanashi: 'https://www.mod.go.jp/pco/yamanashi/event.html',
+  nagano:    'https://calendar.google.com/calendar/ical/naganopcohp%40gmail.com/public/basic.ics',
+  gifu:      'https://www.mod.go.jp/pco/gifu/event/event.html',
+  shizuoka:  'https://www.mod.go.jp/pco/sizuoka/event/index.html',
+  aichi:     'https://www.mod.go.jp/pco/aichi/calendar.html',
 };
 
 // ページ間の待機時間（Cloudflare/レートリミット対策）
@@ -62,13 +111,32 @@ const MOCK_DATA = {
   gunma: [
     { id: 'gu-20260601-1', pref: 'gunma', date: '2026-06-01', weekday: '月', title: '陸上自衛隊 相馬原駐屯地 見学会', place: '相馬原駐屯地', address: '', time: '10:00～12:00', category: '見学', tag: '要予約', url: '', notes: null },
   ],
-  tochigi: [],
+  tochigi:   [],
   ibaraki: [
     { id: 'ib-20260601-1', pref: 'ibaraki', date: '2026-06-01', weekday: '月', title: '土浦駐屯地 見学会', place: '陸上自衛隊 土浦駐屯地', address: '', time: '10:00～12:00', category: '見学', tag: '要予約', url: '', notes: null },
   ],
   chiba: [
     { id: 'cb-20260601-1', pref: 'chiba', date: '2026-06-01', weekday: '月', title: '習志野駐屯地 見学会', place: '陸上自衛隊 習志野駐屯地', address: '', time: '10:00～12:00', category: '見学', tag: '要予約', url: '', notes: null },
   ],
+  sapporo:   [],
+  asahikawa: [],
+  obihiro:   [],
+  hakodate:  [],
+  miyagi:    [],
+  aomori:    [],
+  iwate:     [],
+  yamagata:  [],
+  fukushima: [],
+  akita:     [],
+  niigata:   [],
+  toyama:    [],
+  ishikawa:  [],
+  fukui:     [],
+  yamanashi: [],
+  nagano:    [],
+  gifu:      [],
+  shizuoka:  [],
+  aichi:     [],
 };
 
 // ── OCR（Claude Haiku による画像解析） ─────────────────────────
@@ -155,6 +223,127 @@ async function ocrImage(imageUrl) {
 function fixOcrTitle(title) {
   if (!title) return title;
   return title.replace(/醍/g, '第');
+}
+
+// ── PDF OCR（PDF 系地本の標準パターン） ────────────────────────
+// PDF 運営地本（岩手・青森など）に使用。ev.url が .pdf のイベントを対象にする。
+
+const PDF_OCR_PROMPT = `この自衛隊イベントのPDFから情報を抽出してください。
+以下のJSONのみを返してください（説明文不要）。該当情報がない項目はnullにしてください。
+{
+  "title": "PDFに書かれた正確なイベント名",
+  "place": "開催場所・会場名（施設名・住所など）",
+  "time": "開催時間（例: 10:00～16:00）",
+  "ageRequirement": "参加対象年齢や応募資格（例: 18歳〜32歳未満）",
+  "deadline": "応募締切日（例: 4月24日（金））",
+  "notes": "実施内容・参加条件・注意事項など"
+}`;
+
+/**
+ * PDF URL を受け取り、Claude Haiku で OCR して JSON を返す。
+ * ANTHROPIC_API_KEY が未設定の場合は null を返す（OCR スキップ）。
+ */
+async function ocrPdf(pdfUrl) {
+  if (!process.env.ANTHROPIC_API_KEY || !pdfUrl) return null;
+
+  try {
+    const pdfRes = await fetch(pdfUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Referer':    'https://www.mod.go.jp/',
+      },
+    });
+    if (!pdfRes.ok) {
+      console.warn(`[PDF-OCR] PDF取得失敗 (${pdfRes.status}): ${pdfUrl}`);
+      return null;
+    }
+
+    const buf    = await pdfRes.arrayBuffer();
+    const base64 = Buffer.from(buf).toString('base64');
+
+    const apiRes = await fetch('https://api.anthropic.com/v1/messages', {
+      method:  'POST',
+      headers: {
+        'x-api-key':         process.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-beta':    'pdfs-2024-09-25',
+        'content-type':      'application/json',
+      },
+      body: JSON.stringify({
+        model:      'claude-haiku-4-5-20251001',
+        max_tokens: 512,
+        messages: [{
+          role:    'user',
+          content: [
+            {
+              type:   'document',
+              source: { type: 'base64', media_type: 'application/pdf', data: base64 },
+            },
+            { type: 'text', text: PDF_OCR_PROMPT },
+          ],
+        }],
+      }),
+    });
+
+    if (!apiRes.ok) {
+      const errText = await apiRes.text();
+      console.warn(`[PDF-OCR] API エラー (${apiRes.status}): ${errText.slice(0, 100)}`);
+      return null;
+    }
+
+    const apiJson   = await apiRes.json();
+    const text      = apiJson.content?.[0]?.text ?? '';
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return null;
+    return JSON.parse(jsonMatch[0]);
+
+  } catch (err) {
+    console.warn(`[PDF-OCR] ${pdfUrl} → ${err.message}`);
+    return null;
+  }
+}
+
+/**
+ * ev.url が .pdf で終わるイベントに対して PDF OCR を実行し
+ * タイトル・場所・時間等を補完して返す。
+ *
+ * PDF 運営地本（岩手・青森など）の標準 OCR パターン。
+ * 新たに PDF 系地本を追加する際はこの関数を main() から呼ぶこと。
+ */
+async function enrichWithPdfOcr(events) {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.log('[PDF-OCR] ANTHROPIC_API_KEY 未設定のためスキップ');
+    return events;
+  }
+
+  const targets = events.filter(e => e.url && e.url.endsWith('.pdf'));
+  console.log(`[PDF-OCR] ${targets.length} 件の PDF を処理します`);
+  const results = [];
+
+  for (const ev of events) {
+    if (!ev.url || !ev.url.endsWith('.pdf')) {
+      results.push(ev);
+      continue;
+    }
+
+    console.log(`[PDF-OCR] ${ev.title} (${ev.date})`);
+    const ocr = await ocrPdf(ev.url);
+    if (ocr) console.log(`  → title: ${ocr.title ?? '(変更なし)'}, place: ${ocr.place ?? '(変更なし)'}`);
+
+    results.push(ocr ? {
+      ...ev,
+      title:          (ocr.title          && fixOcrTitle(ocr.title.trim()))  || ev.title,
+      place:          (ocr.place          && ocr.place.trim())               || ev.place || '',
+      time:           (ocr.time           && ocr.time.trim())                || ev.time  || '',
+      ageRequirement: (ocr.ageRequirement && ocr.ageRequirement.trim())      || ev.ageRequirement || null,
+      deadline:       (ocr.deadline       && ocr.deadline.trim())            || ev.deadline       || null,
+      notes:          [ev.notes, ocr.notes].filter(Boolean).join('\n')       || null,
+    } : ev);
+
+    await sleep(500);
+  }
+
+  return results;
 }
 
 // 栃木専用: 全イベント情報（日付・場所含む）を画像から抽出するプロンプト
@@ -446,9 +635,109 @@ async function fetchHtmlPref(context, prefLabel, url, parserFn) {
   return events;
 }
 
-const fetchGunma   = (ctx) => fetchHtmlPref(ctx, '群馬', URLS.gunma,   parseGunma);
-const fetchIbaraki = (ctx) => fetchHtmlPref(ctx, '茨城', URLS.ibaraki, parseIbaraki);
-const fetchChiba   = (ctx) => fetchHtmlPref(ctx, '千葉', URLS.chiba,   parseChiba);
+const fetchGunma     = (ctx) => fetchHtmlPref(ctx, '群馬', URLS.gunma,     parseGunma);
+const fetchIbaraki   = (ctx) => fetchHtmlPref(ctx, '茨城', URLS.ibaraki,   parseIbaraki);
+const fetchChiba     = (ctx) => fetchHtmlPref(ctx, '千葉', URLS.chiba,     parseChiba);
+// 東北地本（HTML スクレイピング）
+const fetchMiyagi    = (ctx) => fetchHtmlPref(ctx, '宮城', URLS.miyagi,    parseMiyagi);
+const fetchAomori    = (ctx) => fetchHtmlPref(ctx, '青森', URLS.aomori,    parseAomori);
+const fetchIwate     = (ctx) => fetchHtmlPref(ctx, '岩手', URLS.iwate,     parseIwate);
+const fetchYamagata  = (ctx) => fetchHtmlPref(ctx, '山形', URLS.yamagata,  parseYamagata);
+const fetchFukushima = (ctx) => fetchHtmlPref(ctx, '福島', URLS.fukushima, parseFukushima);
+// 中部地本（HTML スクレイピング）
+const fetchNiigata   = (ctx) => fetchHtmlPref(ctx, '新潟', URLS.niigata,   parseNiigata);
+const fetchIshikawa  = (ctx) => fetchHtmlPref(ctx, '石川', URLS.ishikawa,  parseIshikawa);
+const fetchFukui     = (ctx) => fetchHtmlPref(ctx, '福井', URLS.fukui,     parseFukui);
+const fetchYamanashi = (ctx) => fetchHtmlPref(ctx, '山梨', URLS.yamanashi, parseYamanashi);
+const fetchGifu      = (ctx) => fetchHtmlPref(ctx, '岐阜', URLS.gifu,      parseGifu);
+const fetchAichi     = (ctx) => fetchHtmlPref(ctx, '愛知', URLS.aichi,     parseAichi);
+const fetchShizuoka  = (ctx) => fetchHtmlPref(ctx, '静岡', URLS.shizuoka,  parseShizuoka);
+
+/**
+ * 札幌地本: 4 つのサブページを順番に取得し、イベントを統合して返す。
+ */
+async function fetchSapporo(context) {
+  console.log('[札幌] 4 サブページを取得中...');
+  const subPages = [
+    { url: URLS.sapporo_station, cat: '一般公開', id: 'st' },
+    { url: URLS.sapporo_naval,   cat: '一般公開', id: 'nv' },
+    { url: URLS.sapporo_concert, cat: '演奏会',   id: 'co' },
+    { url: URLS.sapporo_other,   cat: 'イベント', id: 'ot' },
+  ];
+  const state  = { counter: 0 };
+  const allEvs = [];
+
+  for (const sp of subPages) {
+    const page = await context.newPage();
+    try {
+      await page.goto(sp.url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+      try {
+        await page.waitForFunction(
+          () => { const t = document.title; return t.length > 0 && !t.includes('Just a moment') && !t.includes('しばらくお待ちください'); },
+          { timeout: 60_000 }
+        );
+      } catch { /* ok */ }
+      await page.waitForTimeout(2000);
+      const html  = await page.content();
+      const $     = cheerio.load(html, { decodeEntities: false });
+      const evs   = parseSapporoPage($, sp.cat, sp.id, state, sp.url);
+      console.log(`[札幌] ${sp.url.split('/').pop()} → ${evs.length} 件`);
+      allEvs.push(...evs);
+    } catch (err) {
+      console.warn(`[札幌] ${sp.url} 失敗: ${err.message.substring(0, 60)}`);
+    } finally {
+      await page.close();
+    }
+    await sleep(3000);
+  }
+
+  const seen = new Set();
+  const result = allEvs
+    .filter(e => { const k = `${e.date}-${e.title}`; if (seen.has(k)) return false; seen.add(k); return true; })
+    .sort((a, b) => a.date.localeCompare(b.date));
+  console.log(`[札幌] 合計 ${result.length} 件`);
+  return result;
+}
+
+/**
+ * 秋田地本: Google カレンダー iCal 2 本を fetch して統合する。
+ */
+async function fetchAkita() {
+  console.log('[秋田] Google Calendar iCal 取得...');
+  const fetchIcal = async (url) => {
+    const res = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'text/calendar, */*' },
+    });
+    if (!res.ok) { console.warn(`[秋田] iCal ${res.status}: ${url}`); return ''; }
+    return res.text();
+  };
+  const [ics1, ics2] = await Promise.all([
+    fetchIcal(URLS.akita_ical1),
+    fetchIcal(URLS.akita_ical2),
+  ]);
+  const events = parseAkita(ics1, ics2);
+  console.log(`[秋田] ${events.length} 件取得 (iCal)`);
+  return events;
+}
+
+/**
+ * 長野地本: Google カレンダー iCal フィードを直接 fetch して解析する。
+ * Playwright 不要（Google カレンダー URL は Cloudflare 対象外）。
+ */
+async function fetchNagano() {
+  console.log(`[長野] iCal フィード取得: ${URLS.nagano}`);
+  const res = await fetch(URLS.nagano, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+      'Accept':     'text/calendar, */*',
+    },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const icsText = await res.text();
+  const events  = parseNagano(icsText);
+  console.log(`[長野] ${events.length} 件取得 (iCal)`);
+  return events;
+}
 
 /**
  * 栃木地本ページを取得し、JPG ポスターを OCR してイベント一覧を返す。
@@ -539,6 +828,92 @@ async function fetchTochigi(context) {
   return events.sort((a, b) => a.date.localeCompare(b.date));
 }
 
+/**
+ * 富山地本ページを取得し、JPG ポスターを OCR してイベント一覧を返す。
+ * ANTHROPIC_API_KEY 未設定の場合は空配列を返す（OCR スキップ）。
+ */
+async function fetchToyama(context) {
+  console.log(`[富山] アクセス: ${URLS.toyama}`);
+
+  const page = await context.newPage();
+  let imageUrls = [];
+  try {
+    await page.goto(URLS.toyama, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+    try {
+      await page.waitForFunction(
+        () => {
+          const t = document.title;
+          return t.length > 0
+            && !t.includes('Just a moment')
+            && !t.includes('Attention Required')
+            && !t.includes('しばらくお待ちください');
+        },
+        { timeout: 90_000 }
+      );
+    } catch { /* チャレンジなし or タイムアウト */ }
+    await page.waitForTimeout(2000);
+    const html  = await page.content();
+    const title = (html.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1] || '';
+    console.log(`[富山] page title: ${title.trim().substring(0, 70)}`);
+    if (isChallengeTitle(title)) throw new Error(`Cloudflare challenge: ${title.trim()}`);
+    const $   = cheerio.load(html, { decodeEntities: false });
+    imageUrls = parseToyamaImages($);
+    console.log(`[富山] ${imageUrls.length} 件の画像を検出`);
+  } catch (err) {
+    console.warn(`[富山] Playwright 失敗: ${err.message}`);
+  } finally {
+    await page.close();
+  }
+
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.log('[富山] ANTHROPIC_API_KEY 未設定のため OCR スキップ');
+    return [];
+  }
+  if (imageUrls.length === 0) return [];
+
+  const events = [];
+  let idx = 0;
+  for (const imgUrl of imageUrls) {
+    console.log(`[富山 OCR] ${imgUrl}`);
+    const ocr = await ocrImageFull(imgUrl);
+    if (!ocr) continue;
+
+    const rawDate = toHalfWidth((ocr.date || '').replace(/\s+/g, ' ').trim());
+    const dtMatch = rawDate.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/);
+    if (!dtMatch) { console.warn(`[富山 OCR] 日付パース失敗: "${ocr.date}"`); continue; }
+
+    const year    = reiwaToAD(parseInt(dtMatch[1], 10));
+    const dateStr = `${year}-${padTwo(parseInt(dtMatch[2], 10))}-${padTwo(parseInt(dtMatch[3], 10))}`;
+    if (isPast(dateStr)) continue;
+
+    const title = ocr.title ? fixOcrTitle(ocr.title.trim()) : '';
+    if (!title) continue;
+
+    events.push({
+      id:             `to-${dateStr.replace(/-/g, '')}-${++idx}`,
+      pref:           'toyama',
+      date:           dateStr,
+      weekday:        dtMatch[4],
+      title,
+      place:          (ocr.place          || '').trim(),
+      address:        '',
+      time:           (ocr.time           || '').trim(),
+      category:       guessCategory(toHalfWidth(title)),
+      tag:            guessTag(title),
+      url:            '',
+      notes:          ocr.notes          || null,
+      ageRequirement: ocr.ageRequirement || null,
+      deadline:       ocr.deadline       || null,
+      imageUrl:       '',
+    });
+
+    await sleep(500);
+  }
+
+  console.log(`[富山] ${events.length} 件取得 (OCR)`);
+  return events.sort((a, b) => a.date.localeCompare(b.date));
+}
+
 // ── メイン処理 ───────────────────────────────────────────────
 
 async function main() {
@@ -554,20 +929,58 @@ async function main() {
   }
 
   // ── 実スクレイピングモード ──
-  let kanagawaEvents = [];
-  let tokyoEvents    = [];
-  let saitamaEvents  = [];
-  let gunmaEvents    = [];
-  let tochigiEvents  = [];
-  let ibarakiEvents  = [];
-  let chibaEvents    = [];
-  let kanagawaError  = false;
-  let tokyoError     = false;
-  let saitamaError   = false;
-  let gunmaError     = false;
-  let tochigiError   = false;
-  let ibarakiError   = false;
-  let chibaError     = false;
+  let sapporoEvents   = [];
+  let asahikawaEvents = [];
+  let obihiroEvents   = [];
+  let hakodateEvents  = [];
+  let miyagiEvents    = [];
+  let aomoriEvents    = [];
+  let iwateEvents     = [];
+  let yamagataEvents  = [];
+  let fukushimaEvents = [];
+  let akitaEvents     = [];
+  let kanagawaEvents  = [];
+  let tokyoEvents     = [];
+  let saitamaEvents   = [];
+  let gunmaEvents     = [];
+  let tochigiEvents   = [];
+  let ibarakiEvents   = [];
+  let chibaEvents     = [];
+  let niigataEvents   = [];
+  let toyamaEvents    = [];
+  let ishikawaEvents  = [];
+  let fukuiEvents     = [];
+  let yamanashiEvents = [];
+  let naganoEvents    = [];
+  let gifuEvents      = [];
+  let shizuokaEvents  = [];
+  let aichiEvents     = [];
+  let sapporoError   = false;
+  let asahikawaError = false;
+  let obihiroError   = false;
+  let hakodateError  = false;
+  let miyagiError    = false;
+  let aomoriError    = false;
+  let iwateError     = false;
+  let yamagataError  = false;
+  let fukushimaError = false;
+  let akitaError     = false;
+  let kanagawaError   = false;
+  let tokyoError      = false;
+  let saitamaError    = false;
+  let gunmaError      = false;
+  let tochigiError    = false;
+  let ibarakiError    = false;
+  let chibaError      = false;
+  let niigataError    = false;
+  let toyamaError     = false;
+  let ishikawaError   = false;
+  let fukuiError      = false;
+  let yamanashiError  = false;
+  let naganoError     = false;
+  let gifuError       = false;
+  let shizuokaError   = false;
+  let aichiError      = false;
 
   const isLinux = process.platform === 'linux';
   const browser = await chromium.launch({
@@ -588,6 +1001,108 @@ async function main() {
   }
 
   try {
+    // ── 北海道地本 ──
+    try {
+      sapporoEvents = await withFreshContext(ctx => fetchSapporo(ctx));
+    } catch (err) {
+      console.error(`[札幌] 取得失敗: ${err.message}`);
+      sapporoError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      asahikawaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '旭川', URLS.asahikawa, parseAsahikawa));
+    } catch (err) {
+      console.error(`[旭川] 取得失敗: ${err.message}`);
+      asahikawaError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      obihiroEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '帯広', URLS.obihiro, parseObihiro));
+    } catch (err) {
+      console.error(`[帯広] 取得失敗: ${err.message}`);
+      obihiroError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    // 函館はInstagram移行のため空配列（パーサーが [] を返す）
+    try {
+      hakodateEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '函館', URLS.hakodate, parseHakodate));
+    } catch (err) {
+      console.error(`[函館] 取得失敗: ${err.message}`);
+      hakodateError = true;
+    }
+
+    // ── 東北地本 ──
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      miyagiEvents = await withFreshContext(ctx => fetchMiyagi(ctx));
+    } catch (err) {
+      console.error(`[宮城] 取得失敗: ${err.message}`);
+      miyagiError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      aomoriEvents = await withFreshContext(ctx => fetchAomori(ctx));
+    } catch (err) {
+      console.error(`[青森] 取得失敗: ${err.message}`);
+      aomoriError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      iwateEvents = await withFreshContext(ctx => fetchIwate(ctx));
+    } catch (err) {
+      console.error(`[岩手] 取得失敗: ${err.message}`);
+      iwateError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      yamagataEvents = await withFreshContext(ctx => fetchYamagata(ctx));
+    } catch (err) {
+      console.error(`[山形] 取得失敗: ${err.message}`);
+      yamagataError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      fukushimaEvents = await withFreshContext(ctx => fetchFukushima(ctx));
+    } catch (err) {
+      console.error(`[福島] 取得失敗: ${err.message}`);
+      fukushimaError = true;
+    }
+
+    // 秋田は iCal fetch（Playwright 不要）
+    try {
+      akitaEvents = await fetchAkita();
+    } catch (err) {
+      console.error(`[秋田] 取得失敗: ${err.message}`);
+      akitaError = true;
+    }
+
+    // ── 関東地本 ──
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
     try {
       kanagawaEvents = await withFreshContext(ctx => fetchKanagawa(ctx));
     } catch (err) {
@@ -654,12 +1169,108 @@ async function main() {
       console.error(`[栃木] 取得失敗: ${err.message}`);
       tochigiError = true;
     }
+
+    // ── 中部地本 ──
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      niigataEvents = await withFreshContext(ctx => fetchNiigata(ctx));
+    } catch (err) {
+      console.error(`[新潟] 取得失敗: ${err.message}`);
+      niigataError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      toyamaEvents = await withFreshContext(ctx => fetchToyama(ctx));
+    } catch (err) {
+      console.error(`[富山] 取得失敗: ${err.message}`);
+      toyamaError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      ishikawaEvents = await withFreshContext(ctx => fetchIshikawa(ctx));
+    } catch (err) {
+      console.error(`[石川] 取得失敗: ${err.message}`);
+      ishikawaError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      fukuiEvents = await withFreshContext(ctx => fetchFukui(ctx));
+    } catch (err) {
+      console.error(`[福井] 取得失敗: ${err.message}`);
+      fukuiError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      yamanashiEvents = await withFreshContext(ctx => fetchYamanashi(ctx));
+    } catch (err) {
+      console.error(`[山梨] 取得失敗: ${err.message}`);
+      yamanashiError = true;
+    }
+
+    // 長野は iCal fetch（Playwright 不要）
+    try {
+      naganoEvents = await fetchNagano();
+    } catch (err) {
+      console.error(`[長野] 取得失敗: ${err.message}`);
+      naganoError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      gifuEvents = await withFreshContext(ctx => fetchGifu(ctx));
+    } catch (err) {
+      console.error(`[岐阜] 取得失敗: ${err.message}`);
+      gifuError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      shizuokaEvents = await withFreshContext(ctx => fetchShizuoka(ctx));
+    } catch (err) {
+      console.error(`[静岡] 取得失敗: ${err.message}`);
+      shizuokaError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      aichiEvents = await withFreshContext(ctx => fetchAichi(ctx));
+    } catch (err) {
+      console.error(`[愛知] 取得失敗: ${err.message}`);
+      aichiError = true;
+    }
   } finally {
     await browser.close();
   }
 
   // 全地本エラーの場合のみ終了
-  if (kanagawaError && tokyoError && saitamaError && gunmaError && ibarakiError && chibaError && tochigiError) {
+  const allErrors = [
+    sapporoError, asahikawaError, obihiroError, hakodateError,
+    miyagiError, aomoriError, iwateError, yamagataError, fukushimaError, akitaError,
+    kanagawaError, tokyoError, saitamaError, gunmaError, ibarakiError, chibaError, tochigiError,
+    niigataError, toyamaError, ishikawaError, fukuiError, yamanashiError, naganoError,
+    gifuError, shizuokaError, aichiError,
+  ];
+  if (allErrors.every(Boolean)) {
     console.warn('[警告] 全地本ともに取得エラーが発生しました。ファイルを更新しません。');
     process.exit(1);
   }
@@ -674,33 +1285,76 @@ async function main() {
     return prev[key] ?? [];
   };
 
-  kanagawaEvents = fallback(kanagawaError, '神奈川', kanagawaEvents, 'kanagawa');
-  tokyoEvents    = fallback(tokyoError,    '東京',   tokyoEvents,    'tokyo');
-  saitamaEvents  = fallback(saitamaError,  '埼玉',   saitamaEvents,  'saitama');
-  gunmaEvents    = fallback(gunmaError,    '群馬',   gunmaEvents,    'gunma');
-  ibarakiEvents  = fallback(ibarakiError,  '茨城',   ibarakiEvents,  'ibaraki');
-  chibaEvents    = fallback(chibaError,    '千葉',   chibaEvents,    'chiba');
-  tochigiEvents  = fallback(tochigiError,  '栃木',   tochigiEvents,  'tochigi');
+  sapporoEvents   = fallback(sapporoError,   '札幌',   sapporoEvents,   'sapporo');
+  asahikawaEvents = fallback(asahikawaError, '旭川',   asahikawaEvents, 'asahikawa');
+  obihiroEvents   = fallback(obihiroError,   '帯広',   obihiroEvents,   'obihiro');
+  hakodateEvents  = fallback(hakodateError,  '函館',   hakodateEvents,  'hakodate');
+  miyagiEvents    = fallback(miyagiError,    '宮城',   miyagiEvents,    'miyagi');
+  aomoriEvents    = fallback(aomoriError,    '青森',   aomoriEvents,    'aomori');
+  iwateEvents     = fallback(iwateError,     '岩手',   iwateEvents,     'iwate');
+  yamagataEvents  = fallback(yamagataError,  '山形',   yamagataEvents,  'yamagata');
+  fukushimaEvents = fallback(fukushimaError, '福島',   fukushimaEvents, 'fukushima');
+  akitaEvents     = fallback(akitaError,     '秋田',   akitaEvents,     'akita');
+  kanagawaEvents  = fallback(kanagawaError,  '神奈川', kanagawaEvents,  'kanagawa');
+  tokyoEvents     = fallback(tokyoError,     '東京',   tokyoEvents,     'tokyo');
+  saitamaEvents   = fallback(saitamaError,   '埼玉',   saitamaEvents,   'saitama');
+  gunmaEvents     = fallback(gunmaError,     '群馬',   gunmaEvents,     'gunma');
+  ibarakiEvents   = fallback(ibarakiError,   '茨城',   ibarakiEvents,   'ibaraki');
+  chibaEvents     = fallback(chibaError,     '千葉',   chibaEvents,     'chiba');
+  tochigiEvents   = fallback(tochigiError,   '栃木',   tochigiEvents,   'tochigi');
+  niigataEvents   = fallback(niigataError,   '新潟',   niigataEvents,   'niigata');
+  toyamaEvents    = fallback(toyamaError,    '富山',   toyamaEvents,    'toyama');
+  ishikawaEvents  = fallback(ishikawaError,  '石川',   ishikawaEvents,  'ishikawa');
+  fukuiEvents     = fallback(fukuiError,     '福井',   fukuiEvents,     'fukui');
+  yamanashiEvents = fallback(yamanashiError, '山梨',   yamanashiEvents, 'yamanashi');
+  naganoEvents    = fallback(naganoError,    '長野',   naganoEvents,    'nagano');
+  gifuEvents      = fallback(gifuError,      '岐阜',   gifuEvents,      'gifu');
+  shizuokaEvents  = fallback(shizuokaError,  '静岡',   shizuokaEvents,  'shizuoka');
+  aichiEvents     = fallback(aichiError,     '愛知',   aichiEvents,     'aichi');
 
-  // ── OCR でイベント内容を補完（imageUrl がある HTML パーサー結果のみ対象） ──
+  // ── PDF OCR（PDF 系地本：ev.url が .pdf のイベントを対象） ──
+  // 新規 PDF 系地本を追加する際はここに同様の行を追加する
+  iwateEvents  = await enrichWithPdfOcr(iwateEvents);
+  aomoriEvents = await enrichWithPdfOcr(aomoriEvents);
+
+  // ── 画像 OCR（imageUrl がある HTML パーサー結果のみ対象） ──
   tokyoEvents    = await enrichWithOcr(tokyoEvents);
   saitamaEvents  = await enrichWithOcr(saitamaEvents);
   gunmaEvents    = await enrichWithOcr(gunmaEvents);
   ibarakiEvents  = await enrichWithOcr(ibarakiEvents);
   chibaEvents    = await enrichWithOcr(chibaEvents);
-  // tochigiEvents は fetchTochigi 内で OCR 済み（imageUrl が空なので enrichWithOcr は無害）
+  // tochigi/toyama は fetch 内で OCR 済み（imageUrl が空なので enrichWithOcr は無害）
 
   // imageUrl は最終出力に含めない（内部用フィールド）
   const strip = ev => { const { imageUrl: _, ...rest } = ev; return rest; };
 
   const output = {
-    kanagawa: kanagawaEvents.map(strip),
-    tokyo:    tokyoEvents.map(strip),
-    saitama:  saitamaEvents.map(strip),
-    gunma:    gunmaEvents.map(strip),
-    tochigi:  tochigiEvents.map(strip),
-    ibaraki:  ibarakiEvents.map(strip),
-    chiba:    chibaEvents.map(strip),
+    sapporo:   sapporoEvents.map(strip),
+    asahikawa: asahikawaEvents.map(strip),
+    obihiro:   obihiroEvents.map(strip),
+    hakodate:  hakodateEvents.map(strip),
+    miyagi:    miyagiEvents.map(strip),
+    aomori:    aomoriEvents.map(strip),
+    iwate:     iwateEvents.map(strip),
+    yamagata:  yamagataEvents.map(strip),
+    fukushima: fukushimaEvents.map(strip),
+    akita:     akitaEvents.map(strip),
+    kanagawa:  kanagawaEvents.map(strip),
+    tokyo:     tokyoEvents.map(strip),
+    saitama:   saitamaEvents.map(strip),
+    gunma:     gunmaEvents.map(strip),
+    tochigi:   tochigiEvents.map(strip),
+    ibaraki:   ibarakiEvents.map(strip),
+    chiba:     chibaEvents.map(strip),
+    niigata:   niigataEvents.map(strip),
+    toyama:    toyamaEvents.map(strip),
+    ishikawa:  ishikawaEvents.map(strip),
+    fukui:     fukuiEvents.map(strip),
+    yamanashi: yamanashiEvents.map(strip),
+    nagano:    naganoEvents.map(strip),
+    gifu:      gifuEvents.map(strip),
+    shizuoka:  shizuokaEvents.map(strip),
+    aichi:     aichiEvents.map(strip),
     updatedAt: nowJST(),
   };
   writeOutput(output);
@@ -714,13 +1368,32 @@ function writeOutput(data) {
 
   fs.writeFileSync(OUTPUT_PATH, JSON.stringify(data, null, 2), 'utf8');
   console.log(`[出力] ${OUTPUT_PATH}`);
-  console.log(`  神奈川: ${(data.kanagawa ?? []).length} 件`);
-  console.log(`  東京:   ${(data.tokyo    ?? []).length} 件`);
-  console.log(`  埼玉:   ${(data.saitama  ?? []).length} 件`);
-  console.log(`  群馬:   ${(data.gunma    ?? []).length} 件`);
-  console.log(`  栃木:   ${(data.tochigi  ?? []).length} 件`);
-  console.log(`  茨城:   ${(data.ibaraki  ?? []).length} 件`);
-  console.log(`  千葉:   ${(data.chiba    ?? []).length} 件`);
+  console.log(`  札幌:   ${(data.sapporo   ?? []).length} 件`);
+  console.log(`  旭川:   ${(data.asahikawa ?? []).length} 件`);
+  console.log(`  帯広:   ${(data.obihiro   ?? []).length} 件`);
+  console.log(`  函館:   ${(data.hakodate  ?? []).length} 件`);
+  console.log(`  宮城:   ${(data.miyagi    ?? []).length} 件`);
+  console.log(`  青森:   ${(data.aomori   ?? []).length} 件`);
+  console.log(`  岩手:   ${(data.iwate    ?? []).length} 件`);
+  console.log(`  山形:   ${(data.yamagata  ?? []).length} 件`);
+  console.log(`  福島:   ${(data.fukushima ?? []).length} 件`);
+  console.log(`  秋田:   ${(data.akita     ?? []).length} 件`);
+  console.log(`  神奈川: ${(data.kanagawa  ?? []).length} 件`);
+  console.log(`  東京:   ${(data.tokyo     ?? []).length} 件`);
+  console.log(`  埼玉:   ${(data.saitama   ?? []).length} 件`);
+  console.log(`  群馬:   ${(data.gunma     ?? []).length} 件`);
+  console.log(`  栃木:   ${(data.tochigi   ?? []).length} 件`);
+  console.log(`  茨城:   ${(data.ibaraki   ?? []).length} 件`);
+  console.log(`  千葉:   ${(data.chiba     ?? []).length} 件`);
+  console.log(`  新潟:   ${(data.niigata   ?? []).length} 件`);
+  console.log(`  富山:   ${(data.toyama    ?? []).length} 件`);
+  console.log(`  石川:   ${(data.ishikawa  ?? []).length} 件`);
+  console.log(`  福井:   ${(data.fukui     ?? []).length} 件`);
+  console.log(`  山梨:   ${(data.yamanashi ?? []).length} 件`);
+  console.log(`  長野:   ${(data.nagano    ?? []).length} 件`);
+  console.log(`  岐阜:   ${(data.gifu      ?? []).length} 件`);
+  console.log(`  静岡:   ${(data.shizuoka  ?? []).length} 件`);
+  console.log(`  愛知:   ${(data.aichi     ?? []).length} 件`);
   console.log(`  更新時刻: ${data.updatedAt}`);
 }
 

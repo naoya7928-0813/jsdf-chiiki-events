@@ -22,8 +22,10 @@ export default function DetailScreen({ event, onBack, theme, favorites, onToggle
   const mapQuery = encodeURIComponent(ev.address ? `${ev.place} ${ev.address}` : ev.place);
   const mapSrc   = `https://maps.google.com/maps?q=${mapQuery}&output=embed&hl=ja&z=15`;
 
+  // 個別URL → なければ地本公式サイト にフォールバック
+  const targetUrl = ev.url || source?.url || '';
   const openUrl = () => {
-    if (ev.url) window.open(ev.url, '_blank', 'noopener');
+    if (targetUrl) window.open(targetUrl, '_blank', 'noopener');
   };
 
   return (
@@ -246,16 +248,16 @@ export default function DetailScreen({ event, onBack, theme, favorites, onToggle
         background: 'var(--card)', borderTop: '1px solid var(--border)',
         display: 'flex', gap: 10, flexShrink: 0,
       }}>
-        <button onClick={openUrl} disabled={!ev.url} style={{
+        <button onClick={openUrl} disabled={!targetUrl} style={{
           flex: 1, minHeight: 48, border: 'none',
-          background: ev.url ? primary : 'var(--tag-bg)',
-          color: ev.url ? '#fff' : 'var(--text-muted)',
-          borderRadius: 8, cursor: ev.url ? 'pointer' : 'default',
+          background: targetUrl ? primary : 'var(--tag-bg)',
+          color: targetUrl ? '#fff' : 'var(--text-muted)',
+          borderRadius: 8, cursor: targetUrl ? 'pointer' : 'default',
           fontWeight: 600, fontFamily: F.sans, fontSize: 14, letterSpacing: 0.5,
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
         }}>
-          <span>{ev.url ? '公式ページを開く' : '公式ページなし'}</span>
-          {ev.url && ICO.extLink('#fff', 14)}
+          <span>{targetUrl ? (ev.url ? '公式ページを開く' : '地本サイトを開く') : '公式ページなし'}</span>
+          {targetUrl && ICO.extLink('#fff', 14)}
         </button>
       </div>
     </div>

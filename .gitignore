@@ -10,3 +10,5 @@ Thumbs.db
 
 # スクレイパーの依存パッケージ（本体の node_modules とは独立）
 scraper/node_modules/
+
+.env*.local
