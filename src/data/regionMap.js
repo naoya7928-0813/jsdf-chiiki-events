@@ -13,6 +13,8 @@ export const SUPPORTED_PREFECTURES = new Set([
   'kanagawa', 'tokyo', 'saitama', 'gunma', 'tochigi', 'ibaraki', 'chiba',
   // 中部
   'niigata', 'toyama', 'ishikawa', 'fukui', 'yamanashi', 'nagano', 'gifu', 'shizuoka', 'aichi',
+  // 近畿
+  'mie', 'shiga', 'kyoto', 'osaka', 'hyogo', 'nara', 'wakayama',
 ]);
 
 /** 都道府県個別情報 */

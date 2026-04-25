@@ -51,6 +51,14 @@ export const REGION_HQ = {
   gifu:      { name: '岐阜地方協力本部',   tel: '058-262-1818', emblem: '岐' },
   shizuoka:  { name: '静岡地方協力本部',   tel: '054-252-4000', emblem: '静' },
   aichi:     { name: '愛知地方協力本部',   tel: '052-961-4366', emblem: '愛' },
+  // 近畿
+  mie:       { name: '三重地方協力本部',   tel: '059-213-2007', emblem: '三' },
+  shiga:     { name: '滋賀地方協力本部',   tel: '077-524-6130', emblem: '滋' },
+  kyoto:     { name: '京都地方協力本部',   tel: '075-641-0501', emblem: '京' },
+  osaka:     { name: '大阪地方協力本部',   tel: '06-6942-0744', emblem: '大' },
+  hyogo:     { name: '兵庫地方協力本部',   tel: '078-261-9777', emblem: '兵' },
+  nara:      { name: '奈良地方協力本部',   tel: '0742-23-7001', emblem: '奈' },
+  wakayama:  { name: '和歌山地方協力本部', tel: '073-422-5116', emblem: '和' },
 };
 
 // ─── データ出典情報 ───────────────────────────────────────────
@@ -85,6 +93,14 @@ export const REGION_SOURCE = {
   gifu:      { name: '自衛隊岐阜地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/gifu/event/event.html' },
   shizuoka:  { name: '自衛隊静岡地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/sizuoka/event/index.html' },
   aichi:     { name: '自衛隊愛知地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/aichi/calendar.html' },
+  // 近畿
+  mie:       { name: '自衛隊三重地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/mie/events-page/' },
+  shiga:     { name: '自衛隊滋賀地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/shiga/event-briefing/' },
+  kyoto:     { name: '自衛隊京都地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/kyoto/kouhoushitsu/index.html' },
+  osaka:     { name: '自衛隊大阪地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/osaka/experience/event.html' },
+  hyogo:     { name: '自衛隊兵庫地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/hyogo/' },
+  nara:      { name: '自衛隊奈良地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/nara/events/' },
+  wakayama:  { name: '自衛隊和歌山地方協力本部ウェブサイト', url: 'https://www.mod.go.jp/pco/wakayama/category/event/' },
 };
 
 // ─── フォールバック用モックデータ ────────────────────────────
