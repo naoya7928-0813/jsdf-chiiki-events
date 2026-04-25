@@ -386,8 +386,8 @@ async function fetchHtmlPref(context, prefLabel, url, parserFn) {
   console.log(`[${prefLabel}] アクセス: ${url}`);
   const page = await context.newPage();
   try {
-    // domcontentloaded: Cloudflare チャレンジが 403 で来ても Playwright は
-    // ブラウザとしてチャレンジを実行→実際のページへリダイレクトする。
+    // domcontentloaded: HTML 取得後すぐに waitForFunction でチャレンジ解決を待つ
+    // → 解決できなければ 30 秒でタイムアウトしてフォールバックに移行（素早い失敗）
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
 
     // Cloudflare チャレンジページ（英語・日本語）のタイトルが消えるまで最大 30 秒待つ
