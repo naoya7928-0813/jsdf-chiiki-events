@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ICO } from './Icons';
-import { Emblem, BottomTabBar, F } from './Shared';
+import { BottomTabBar, F } from './Shared';
 import { COLOR_SCHEMES, REGION_SOURCE } from '../config';
 import NtfyGuideModal from './NtfyGuideModal';
 
@@ -8,7 +8,7 @@ import NtfyGuideModal from './NtfyGuideModal';
 /* global __APP_VERSION__ */
 
 export default function SettingsScreen({
-  theme, region, onRegionChange,
+  theme,
   onColorChange, onDarkModeChange,
   onOpenHome, onOpenRegion, onOpenFavorites,
   onOpenLegal,
@@ -52,34 +52,7 @@ export default function SettingsScreen({
 
       <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '16px 0 8px' }}>
 
-        {/* ─ 1. 地本切替 ─ */}
-        <GroupTitle>地本</GroupTitle>
-        <Card>
-          <div style={{ padding: '12px 14px' }}>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8 }}>表示する地方協力本部</div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {[{ id: 'kanagawa', label: '神奈川地本', ch: '神' }, { id: 'tokyo', label: '東京地本', ch: '都' }].map(v => {
-                const isA = region === v.id;
-                return (
-                  <button key={v.id} onClick={() => onRegionChange(v.id)} style={{
-                    flex: 1, minHeight: 44, padding: '8px',
-                    border: `1px solid ${isA ? primary : 'var(--border)'}`,
-                    background: isA ? primary : 'var(--card)',
-                    color: isA ? '#fff' : 'var(--text)',
-                    borderRadius: 8, cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                    fontFamily: F.sans, fontSize: 13, fontWeight: 600, letterSpacing: 0.5,
-                  }}>
-                    <Emblem ch={v.ch} size={18} primary={isA ? '#fff' : primary} />
-                    {v.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </Card>
-
-        {/* ─ 2. 通知設定 ─ */}
+        {/* ─ 1. 通知設定 ─ */}
         <GroupTitle>通知設定</GroupTitle>
         <Card>
           <ToggleRow
@@ -211,7 +184,7 @@ export default function SettingsScreen({
           }}>
             データ出典
           </div>
-          {[REGION_SOURCE.kanagawa, REGION_SOURCE.tokyo].map(src => (
+          {Object.values(REGION_SOURCE).map(src => (
             <div key={src.url} style={{
               fontSize: 11, color: 'var(--text-muted)',
               lineHeight: 1.7, paddingLeft: 8,

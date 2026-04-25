@@ -219,7 +219,6 @@ export default function App() {
       {screen === 'settings' && (
         <SettingsScreen
           theme={theme}
-          region={region} onRegionChange={handleRegionChange}
           onColorChange={handleColorChange}
           onDarkModeChange={handleDarkModeChange}
           onOpenHome={() => setScreen('home')}
