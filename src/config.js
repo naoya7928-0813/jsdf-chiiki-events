@@ -70,6 +70,15 @@ export const REGION_HQ = {
   okayama:   { name: '岡山地方協力本部',   tel: '086-224-3302', emblem: '岡' },
   hiroshima: { name: '広島地方協力本部',   tel: '082-221-5891', emblem: '広' },
   yamaguchi: { name: '山口地方協力本部',   tel: '083-922-5101', emblem: '口' },
+  // 九州・沖縄
+  fukuoka:   { name: '福岡地方協力本部',   tel: '092-781-9321', emblem: '岡' },
+  saga:      { name: '佐賀地方協力本部',   tel: '0952-32-4431', emblem: '佐' },
+  nagasaki:  { name: '長崎地方協力本部',   tel: '095-823-7196', emblem: '崎' },
+  kumamoto:  { name: '熊本地方協力本部',   tel: '096-297-2051', emblem: '熊' },
+  oita:      { name: '大分地方協力本部',   tel: '097-536-6271', emblem: '分' },
+  miyazaki:  { name: '宮崎地方協力本部',   tel: '0985-27-7191', emblem: '崎' },
+  kagoshima: { name: '鹿児島地方協力本部', tel: '099-253-8920', emblem: '鹿' },
+  okinawa:   { name: '沖縄地方協力本部',   tel: '098-863-3146', emblem: '沖' },
 };
 
 // ─── データ出典情報 ───────────────────────────────────────────
@@ -123,6 +132,15 @@ export const REGION_SOURCE = {
   okayama:   { name: '自衛隊岡山地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html' },
   hiroshima: { name: '自衛隊広島地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/hiroshima/events/' },
   yamaguchi: { name: '自衛隊山口地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/yamaguchi/event.html' },
+  // 九州・沖縄
+  fukuoka:   { name: '自衛隊福岡地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/fukuoka/event/index.html' },
+  saga:      { name: '自衛隊佐賀地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/saga/event/index.html' },
+  nagasaki:  { name: '自衛隊長崎地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/nagasaki/event/index.html' },
+  kumamoto:  { name: '自衛隊熊本地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/kumamoto/event/index.html' },
+  oita:      { name: '自衛隊大分地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/oita/03_event.html' },
+  miyazaki:  { name: '自衛隊宮崎地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/miyazaki/event.html' },
+  kagoshima: { name: '自衛隊鹿児島地方協力本部ウェブサイト', url: 'https://www.mod.go.jp/pco/kagoshima/event/index.html' },
+  okinawa:   { name: '自衛隊沖縄地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/okinawa/event.html' },
 };
 
 // ─── フォールバック用モックデータ ────────────────────────────

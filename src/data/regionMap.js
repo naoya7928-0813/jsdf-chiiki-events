@@ -19,6 +19,8 @@ export const SUPPORTED_PREFECTURES = new Set([
   'tokushima', 'kagawa', 'ehime', 'kochi',
   // 中国
   'tottori', 'shimane', 'okayama', 'hiroshima', 'yamaguchi',
+  // 九州・沖縄
+  'fukuoka', 'saga', 'nagasaki', 'kumamoto', 'oita', 'miyazaki', 'kagoshima', 'okinawa',
 ]);
 
 /** 都道府県個別情報 */
@@ -72,6 +74,15 @@ export const PREFECTURE_INFO = {
   okayama:   { label: '岡山',   emblem: '岡', region: 'chugoku' },
   hiroshima: { label: '広島',   emblem: '広', region: 'chugoku' },
   yamaguchi: { label: '山口',   emblem: '口', region: 'chugoku' },
+  // 九州・沖縄
+  fukuoka:   { label: '福岡',   emblem: '岡', region: 'kyushu' },
+  saga:      { label: '佐賀',   emblem: '佐', region: 'kyushu' },
+  nagasaki:  { label: '長崎',   emblem: '崎', region: 'kyushu' },
+  kumamoto:  { label: '熊本',   emblem: '熊', region: 'kyushu' },
+  oita:      { label: '大分',   emblem: '分', region: 'kyushu' },
+  miyazaki:  { label: '宮崎',   emblem: '崎', region: 'kyushu' },
+  kagoshima: { label: '鹿児島', emblem: '鹿', region: 'kyushu' },
+  okinawa:   { label: '沖縄',   emblem: '沖', region: 'kyushu' },
 };
 
 /** 都道府県ID → 地域ID の逆引きマップ */

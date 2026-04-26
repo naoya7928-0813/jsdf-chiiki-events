@@ -1837,7 +1837,7 @@
   ],
   "wakayama": [],
   "updatedAt": "2026/04/26 03:15",
-  "_updatedAt": "2026/4/26 13:14:54",
+  "_updatedAt": "2026/4/26 13:39:35",
   "ehime": [
     {
       "id": "em-20260517-1",
@@ -2481,5 +2481,136 @@
       "deadline": null,
       "imageUrl": ""
     }
-  ]
+  ],
+  "fukuoka": [],
+  "saga": [
+    {
+      "id": "sg-20260607-1",
+      "pref": "saga",
+      "date": "2026-06-07",
+      "weekday": "日",
+      "title": "陸上自衛隊第4音楽隊 巡回演奏会in佐賀",
+      "place": "ミズウェルビーホール",
+      "address": "",
+      "time": "",
+      "category": "演奏会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/saga/event/index.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "imageUrl": ""
+    },
+    {
+      "id": "sg-20260509-2",
+      "pref": "saga",
+      "date": "2026-05-09",
+      "weekday": "土",
+      "title": "護衛艦「のしろ」一般公開in唐津",
+      "place": "唐津東港",
+      "address": "",
+      "time": "10:00～15:00",
+      "category": "一般公開",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/saga/event/index.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "imageUrl": ""
+    }
+  ],
+  "nagasaki": [],
+  "kumamoto": [
+    {
+      "id": "km-20260607-1",
+      "pref": "kumamoto",
+      "date": "2026-06-07",
+      "weekday": "日",
+      "title": "ガールズトーク＆ランチ会",
+      "place": "熊本地方合同庁舎A棟",
+      "address": "",
+      "time": "11時00分～13時00分",
+      "category": "イベント",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kumamoto/event/index.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "imageUrl": ""
+    }
+  ],
+  "oita": [
+    {
+      "id": "oi-20260509-1",
+      "pref": "oita",
+      "date": "2026-05-09",
+      "weekday": "土",
+      "title": "護衛艦あぶくま一般公開",
+      "place": "別府国際観光港　第4埠頭",
+      "address": "",
+      "time": "9:00～15:00",
+      "category": "一般公開",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/oita/03_event.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "imageUrl": ""
+    }
+  ],
+  "miyazaki": [],
+  "kagoshima": [
+    {
+      "id": "ks-20260426-1",
+      "pref": "kagoshima",
+      "date": "2026-04-26",
+      "weekday": "日",
+      "title": "ミサイル艇「おおたか」一般公開",
+      "place": "下甑長浜港",
+      "address": "",
+      "time": "9:30～15:30",
+      "category": "一般公開",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kagoshima/event/index.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "imageUrl": ""
+    },
+    {
+      "id": "ks-20260503-2",
+      "pref": "kagoshima",
+      "date": "2026-05-03",
+      "weekday": "日",
+      "title": "グリーンフェスタ in 吉野公園",
+      "place": "オアシスケア吉野公園",
+      "address": "",
+      "time": "10:00～15:00",
+      "category": "記念行事",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kagoshima/event/index.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "imageUrl": ""
+    },
+    {
+      "id": "ks-20260506-3",
+      "pref": "kagoshima",
+      "date": "2026-05-06",
+      "weekday": "日",
+      "title": "フレスポGWマルシェ",
+      "place": "フレッシュ青果スポーツランド",
+      "address": "",
+      "time": "10:00～17:00",
+      "category": "イベント",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kagoshima/event/index.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "imageUrl": ""
+    }
+  ],
+  "okinawa": []
 }

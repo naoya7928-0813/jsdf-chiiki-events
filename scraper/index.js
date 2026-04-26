@@ -68,6 +68,15 @@ const { parseShimane }   = require('./parsers/shimane');
 const { parseOkayama }   = require('./parsers/okayama');
 const { parseHiroshima } = require('./parsers/hiroshima');
 const { parseYamaguchi } = require('./parsers/yamaguchi');
+// 九州・沖縄地本
+const { parseFukuoka }   = require('./parsers/fukuoka');
+const { parseSaga }      = require('./parsers/saga');
+const { parseNagasaki }  = require('./parsers/nagasaki');
+const { parseKumamoto }  = require('./parsers/kumamoto');
+const { parseOita }      = require('./parsers/oita');
+const { parseMiyazaki }  = require('./parsers/miyazaki');
+const { parseKagoshima } = require('./parsers/kagoshima');
+const { parseOkinawa }   = require('./parsers/okinawa');
 const { toHalfWidth, reiwaToAD, padTwo, isPast, guessCategory, guessTag } = require('./parsers/utils');
 
 // ── 設定 ─────────────────────────────────────────────────────
@@ -127,6 +136,15 @@ const URLS = {
   okayama:   'https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html',
   hiroshima: 'https://www.mod.go.jp/pco/hiroshima/events/',
   yamaguchi: 'https://www.mod.go.jp/pco/yamaguchi/event.html',
+  // 九州・沖縄地本
+  fukuoka:   'https://www.mod.go.jp/pco/fukuoka/event/index.html',
+  saga:      'https://www.mod.go.jp/pco/saga/event/index.html',
+  nagasaki:  'https://www.mod.go.jp/pco/nagasaki/event/index.html',
+  kumamoto:  'https://www.mod.go.jp/pco/kumamoto/event/index.html',
+  oita:      'https://www.mod.go.jp/pco/oita/03_event.html',
+  miyazaki:  'https://www.mod.go.jp/pco/miyazaki/event.html',
+  kagoshima: 'https://www.mod.go.jp/pco/kagoshima/event/index.html',
+  okinawa:   'https://www.mod.go.jp/pco/okinawa/event.html',
 };
 
 // ページ間の待機時間（Cloudflare/レートリミット対策）
@@ -194,6 +212,15 @@ const MOCK_DATA = {
   okayama:   [],
   hiroshima: [],
   yamaguchi: [],
+  // 九州・沖縄地本
+  fukuoka:   [],
+  saga:      [],
+  nagasaki:  [],
+  kumamoto:  [],
+  oita:      [],
+  miyazaki:  [],
+  kagoshima: [],
+  okinawa:   [],
 };
 
 // ── OCR（Claude Haiku による画像解析） ─────────────────────────
@@ -1202,6 +1229,15 @@ async function main() {
   let okayamaEvents   = [];
   let hiroshimaEvents = [];
   let yamaguchiEvents = [];
+  // 九州・沖縄地本
+  let fukuokaEvents   = [];
+  let sagaEvents      = [];
+  let nagasakiEvents  = [];
+  let kumamotoEvents  = [];
+  let oitaEvents      = [];
+  let miyazakiEvents  = [];
+  let kagoshimaEvents = [];
+  let okinawaEvents   = [];
   let sapporoError   = false;
   let asahikawaError = false;
   let obihiroError   = false;
@@ -1247,6 +1283,15 @@ async function main() {
   let okayamaError    = false;
   let hiroshimaError  = false;
   let yamaguchiError  = false;
+  // 九州・沖縄地本
+  let fukuokaError    = false;
+  let sagaError       = false;
+  let nagasakiError   = false;
+  let kumamotoError   = false;
+  let oitaError       = false;
+  let miyazakiError   = false;
+  let kagoshimaError  = false;
+  let okinawaError    = false;
 
   const isLinux = process.platform === 'linux';
   const browser = await chromium.launch({
@@ -1687,6 +1732,87 @@ async function main() {
       console.error(`[山口] 取得失敗: ${err.message}`);
       yamaguchiError = true;
     }
+
+    // ── 九州・沖縄地本 ──
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      fukuokaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '福岡', URLS.fukuoka, parseFukuoka));
+    } catch (err) {
+      console.error(`[福岡] 取得失敗: ${err.message}`);
+      fukuokaError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      sagaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '佐賀', URLS.saga, parseSaga));
+    } catch (err) {
+      console.error(`[佐賀] 取得失敗: ${err.message}`);
+      sagaError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      nagasakiEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '長崎', URLS.nagasaki, parseNagasaki));
+    } catch (err) {
+      console.error(`[長崎] 取得失敗: ${err.message}`);
+      nagasakiError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      kumamotoEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '熊本', URLS.kumamoto, parseKumamoto));
+    } catch (err) {
+      console.error(`[熊本] 取得失敗: ${err.message}`);
+      kumamotoError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      oitaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '大分', URLS.oita, parseOita));
+    } catch (err) {
+      console.error(`[大分] 取得失敗: ${err.message}`);
+      oitaError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      miyazakiEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '宮崎', URLS.miyazaki, parseMiyazaki));
+    } catch (err) {
+      console.error(`[宮崎] 取得失敗: ${err.message}`);
+      miyazakiError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      kagoshimaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '鹿児島', URLS.kagoshima, parseKagoshima));
+    } catch (err) {
+      console.error(`[鹿児島] 取得失敗: ${err.message}`);
+      kagoshimaError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      okinawaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '沖縄', URLS.okinawa, parseOkinawa));
+    } catch (err) {
+      console.error(`[沖縄] 取得失敗: ${err.message}`);
+      okinawaError = true;
+    }
   } finally {
     await browser.close();
   }
@@ -1701,6 +1827,8 @@ async function main() {
     mieError, shigaError, kyotoError, osakaError, hyogoError, naraError, wakayamaError,
     ehimeError, kagawaError, kochiError, tokushimaError,
     tottoriError, shimaneError, okayamaError, hiroshimaError, yamaguchiError,
+    fukuokaError, sagaError, nagasakiError, kumamotoError, oitaError,
+    miyazakiError, kagoshimaError, okinawaError,
   ];
   if (allErrors.every(Boolean)) {
     console.warn('[警告] 全地本ともに取得エラーが発生しました。ファイルを更新しません。');
@@ -1759,6 +1887,14 @@ async function main() {
   okayamaEvents   = fallback(okayamaError,   '岡山',   okayamaEvents,   'okayama');
   hiroshimaEvents = fallback(hiroshimaError, '広島',   hiroshimaEvents, 'hiroshima');
   yamaguchiEvents = fallback(yamaguchiError, '山口',   yamaguchiEvents, 'yamaguchi');
+  fukuokaEvents   = fallback(fukuokaError,   '福岡',   fukuokaEvents,   'fukuoka');
+  sagaEvents      = fallback(sagaError,      '佐賀',   sagaEvents,      'saga');
+  nagasakiEvents  = fallback(nagasakiError,  '長崎',   nagasakiEvents,  'nagasaki');
+  kumamotoEvents  = fallback(kumamotoError,  '熊本',   kumamotoEvents,  'kumamoto');
+  oitaEvents      = fallback(oitaError,      '大分',   oitaEvents,      'oita');
+  miyazakiEvents  = fallback(miyazakiError,  '宮崎',   miyazakiEvents,  'miyazaki');
+  kagoshimaEvents = fallback(kagoshimaError, '鹿児島', kagoshimaEvents, 'kagoshima');
+  okinawaEvents   = fallback(okinawaError,   '沖縄',   okinawaEvents,   'okinawa');
 
   // ── PDF OCR（PDF 系地本：ev.url が .pdf のイベントを対象） ──
   // 新規 PDF 系地本を追加する際はここに同様の行を追加する
@@ -1819,6 +1955,14 @@ async function main() {
     okayama:   okayamaEvents.map(strip),
     hiroshima: hiroshimaEvents.map(strip),
     yamaguchi: yamaguchiEvents.map(strip),
+    fukuoka:   fukuokaEvents.map(strip),
+    saga:      sagaEvents.map(strip),
+    nagasaki:  nagasakiEvents.map(strip),
+    kumamoto:  kumamotoEvents.map(strip),
+    oita:      oitaEvents.map(strip),
+    miyazaki:  miyazakiEvents.map(strip),
+    kagoshima: kagoshimaEvents.map(strip),
+    okinawa:   okinawaEvents.map(strip),
     updatedAt: nowJST(),
   };
   writeOutput(output);
@@ -1874,6 +2018,14 @@ function writeOutput(data) {
   console.log(`  岡山:   ${(data.okayama   ?? []).length} 件`);
   console.log(`  広島:   ${(data.hiroshima ?? []).length} 件`);
   console.log(`  山口:   ${(data.yamaguchi ?? []).length} 件`);
+  console.log(`  福岡:   ${(data.fukuoka   ?? []).length} 件`);
+  console.log(`  佐賀:   ${(data.saga      ?? []).length} 件`);
+  console.log(`  長崎:   ${(data.nagasaki  ?? []).length} 件`);
+  console.log(`  熊本:   ${(data.kumamoto  ?? []).length} 件`);
+  console.log(`  大分:   ${(data.oita      ?? []).length} 件`);
+  console.log(`  宮崎:   ${(data.miyazaki  ?? []).length} 件`);
+  console.log(`  鹿児島: ${(data.kagoshima ?? []).length} 件`);
+  console.log(`  沖縄:   ${(data.okinawa   ?? []).length} 件`);
   console.log(`  更新時刻: ${data.updatedAt}`);
 }
 
