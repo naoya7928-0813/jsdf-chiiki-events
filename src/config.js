@@ -59,6 +59,11 @@ export const REGION_HQ = {
   hyogo:     { name: '兵庫地方協力本部',   tel: '078-261-9777', emblem: '兵' },
   nara:      { name: '奈良地方協力本部',   tel: '0742-23-7001', emblem: '奈' },
   wakayama:  { name: '和歌山地方協力本部', tel: '073-422-5116', emblem: '和' },
+  // 四国
+  tokushima: { name: '徳島地方協力本部',   tel: '088-623-2220', emblem: '徳' },
+  kagawa:    { name: '香川地方協力本部',   tel: '087-823-9207', emblem: '香' },
+  ehime:     { name: '愛媛地方協力本部',   tel: '089-941-8381', emblem: '媛' },
+  kochi:     { name: '高知地方協力本部',   tel: '088-822-6128', emblem: '知' },
 };
 
 // ─── データ出典情報 ───────────────────────────────────────────
@@ -101,6 +106,11 @@ export const REGION_SOURCE = {
   hyogo:     { name: '自衛隊兵庫地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/hyogo/' },
   nara:      { name: '自衛隊奈良地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/nara/events/' },
   wakayama:  { name: '自衛隊和歌山地方協力本部ウェブサイト', url: 'https://www.mod.go.jp/pco/wakayama/category/event/' },
+  // 四国
+  tokushima: { name: '自衛隊徳島地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/tokushima/event.html' },
+  kagawa:    { name: '自衛隊香川地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/kagawa/event.html' },
+  ehime:     { name: '自衛隊愛媛地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/ehime/event.html' },
+  kochi:     { name: '自衛隊高知地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/kochi/event_info.html' },
 };
 
 // ─── フォールバック用モックデータ ────────────────────────────
