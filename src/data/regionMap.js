@@ -17,6 +17,8 @@ export const SUPPORTED_PREFECTURES = new Set([
   'mie', 'shiga', 'kyoto', 'osaka', 'hyogo', 'nara', 'wakayama',
   // 四国
   'tokushima', 'kagawa', 'ehime', 'kochi',
+  // 中国
+  'tottori', 'shimane', 'okayama', 'hiroshima', 'yamaguchi',
 ]);
 
 /** 都道府県個別情報 */
@@ -64,6 +66,12 @@ export const PREFECTURE_INFO = {
   kagawa:    { label: '香川',   emblem: '香', region: 'shikoku' },
   ehime:     { label: '愛媛',   emblem: '媛', region: 'shikoku' },
   kochi:     { label: '高知',   emblem: '知', region: 'shikoku' },
+  // 中国
+  tottori:   { label: '鳥取',   emblem: '鳥', region: 'chugoku' },
+  shimane:   { label: '島根',   emblem: '島', region: 'chugoku' },
+  okayama:   { label: '岡山',   emblem: '岡', region: 'chugoku' },
+  hiroshima: { label: '広島',   emblem: '広', region: 'chugoku' },
+  yamaguchi: { label: '山口',   emblem: '口', region: 'chugoku' },
 };
 
 /** 都道府県ID → 地域ID の逆引きマップ */

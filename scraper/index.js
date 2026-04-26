@@ -62,6 +62,12 @@ const { parseEhime }     = require('./parsers/ehime');
 const { parseKagawa }    = require('./parsers/kagawa');
 const { parseKochi }     = require('./parsers/kochi');
 const { parseTokushima } = require('./parsers/tokushima');
+// 中国地本
+const { parseTottori }   = require('./parsers/tottori');
+const { parseShimane }   = require('./parsers/shimane');
+const { parseOkayama }   = require('./parsers/okayama');
+const { parseHiroshima } = require('./parsers/hiroshima');
+const { parseYamaguchi } = require('./parsers/yamaguchi');
 const { toHalfWidth, reiwaToAD, padTwo, isPast, guessCategory, guessTag } = require('./parsers/utils');
 
 // ── 設定 ─────────────────────────────────────────────────────
@@ -115,6 +121,12 @@ const URLS = {
   kagawa:    'https://www.mod.go.jp/pco/kagawa/event.html',
   kochi:     'https://www.mod.go.jp/pco/kochi/event_info.html',
   tokushima: 'https://www.mod.go.jp/pco/tokushima/event.html',
+  // 中国地本
+  tottori:   'https://www.mod.go.jp/pco/tottori/content/02-event/event.html',
+  shimane:   'https://www.mod.go.jp/pco/shimane/event/event.html',
+  okayama:   'https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html',
+  hiroshima: 'https://www.mod.go.jp/pco/hiroshima/events/',
+  yamaguchi: 'https://www.mod.go.jp/pco/yamaguchi/event.html',
 };
 
 // ページ間の待機時間（Cloudflare/レートリミット対策）
@@ -176,6 +188,12 @@ const MOCK_DATA = {
   kagawa:    [],
   kochi:     [],
   tokushima: [],
+  // 中国地本
+  tottori:   [],
+  shimane:   [],
+  okayama:   [],
+  hiroshima: [],
+  yamaguchi: [],
 };
 
 // ── OCR（Claude Haiku による画像解析） ─────────────────────────
@@ -1178,6 +1196,12 @@ async function main() {
   let kagawaEvents    = [];
   let kochiEvents     = [];
   let tokushimaEvents = [];
+  // 中国地本
+  let tottoriEvents   = [];
+  let shimaneEvents   = [];
+  let okayamaEvents   = [];
+  let hiroshimaEvents = [];
+  let yamaguchiEvents = [];
   let sapporoError   = false;
   let asahikawaError = false;
   let obihiroError   = false;
@@ -1217,6 +1241,12 @@ async function main() {
   let kagawaError     = false;
   let kochiError      = false;
   let tokushimaError  = false;
+  // 中国地本
+  let tottoriError    = false;
+  let shimaneError    = false;
+  let okayamaError    = false;
+  let hiroshimaError  = false;
+  let yamaguchiError  = false;
 
   const isLinux = process.platform === 'linux';
   const browser = await chromium.launch({
@@ -1606,6 +1636,57 @@ async function main() {
       console.error(`[徳島] 取得失敗: ${err.message}`);
       tokushimaError = true;
     }
+
+    // ── 中国地本 ──
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      tottoriEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '鳥取', URLS.tottori, parseTottori));
+    } catch (err) {
+      console.error(`[鳥取] 取得失敗: ${err.message}`);
+      tottoriError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      shimaneEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '島根', URLS.shimane, parseShimane));
+    } catch (err) {
+      console.error(`[島根] 取得失敗: ${err.message}`);
+      shimaneError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      okayamaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '岡山', URLS.okayama, parseOkayama));
+    } catch (err) {
+      console.error(`[岡山] 取得失敗: ${err.message}`);
+      okayamaError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      hiroshimaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '広島', URLS.hiroshima, parseHiroshima));
+    } catch (err) {
+      console.error(`[広島] 取得失敗: ${err.message}`);
+      hiroshimaError = true;
+    }
+
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+    await sleep(BETWEEN_PAGES_MS);
+
+    try {
+      yamaguchiEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '山口', URLS.yamaguchi, parseYamaguchi));
+    } catch (err) {
+      console.error(`[山口] 取得失敗: ${err.message}`);
+      yamaguchiError = true;
+    }
   } finally {
     await browser.close();
   }
@@ -1619,6 +1700,7 @@ async function main() {
     gifuError, shizuokaError, aichiError,
     mieError, shigaError, kyotoError, osakaError, hyogoError, naraError, wakayamaError,
     ehimeError, kagawaError, kochiError, tokushimaError,
+    tottoriError, shimaneError, okayamaError, hiroshimaError, yamaguchiError,
   ];
   if (allErrors.every(Boolean)) {
     console.warn('[警告] 全地本ともに取得エラーが発生しました。ファイルを更新しません。');
@@ -1672,6 +1754,11 @@ async function main() {
   kagawaEvents    = fallback(kagawaError,    '香川',   kagawaEvents,    'kagawa');
   kochiEvents     = fallback(kochiError,     '高知',   kochiEvents,     'kochi');
   tokushimaEvents = fallback(tokushimaError, '徳島',   tokushimaEvents, 'tokushima');
+  tottoriEvents   = fallback(tottoriError,   '鳥取',   tottoriEvents,   'tottori');
+  shimaneEvents   = fallback(shimaneError,   '島根',   shimaneEvents,   'shimane');
+  okayamaEvents   = fallback(okayamaError,   '岡山',   okayamaEvents,   'okayama');
+  hiroshimaEvents = fallback(hiroshimaError, '広島',   hiroshimaEvents, 'hiroshima');
+  yamaguchiEvents = fallback(yamaguchiError, '山口',   yamaguchiEvents, 'yamaguchi');
 
   // ── PDF OCR（PDF 系地本：ev.url が .pdf のイベントを対象） ──
   // 新規 PDF 系地本を追加する際はここに同様の行を追加する
@@ -1727,6 +1814,11 @@ async function main() {
     kagawa:    kagawaEvents.map(strip),
     kochi:     kochiEvents.map(strip),
     tokushima: tokushimaEvents.map(strip),
+    tottori:   tottoriEvents.map(strip),
+    shimane:   shimaneEvents.map(strip),
+    okayama:   okayamaEvents.map(strip),
+    hiroshima: hiroshimaEvents.map(strip),
+    yamaguchi: yamaguchiEvents.map(strip),
     updatedAt: nowJST(),
   };
   writeOutput(output);
@@ -1777,6 +1869,11 @@ function writeOutput(data) {
   console.log(`  香川:   ${(data.kagawa    ?? []).length} 件`);
   console.log(`  高知:   ${(data.kochi     ?? []).length} 件`);
   console.log(`  徳島:   ${(data.tokushima ?? []).length} 件`);
+  console.log(`  鳥取:   ${(data.tottori   ?? []).length} 件`);
+  console.log(`  島根:   ${(data.shimane   ?? []).length} 件`);
+  console.log(`  岡山:   ${(data.okayama   ?? []).length} 件`);
+  console.log(`  広島:   ${(data.hiroshima ?? []).length} 件`);
+  console.log(`  山口:   ${(data.yamaguchi ?? []).length} 件`);
   console.log(`  更新時刻: ${data.updatedAt}`);
 }
 

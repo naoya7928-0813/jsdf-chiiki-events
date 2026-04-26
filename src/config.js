@@ -64,6 +64,12 @@ export const REGION_HQ = {
   kagawa:    { name: '香川地方協力本部',   tel: '087-823-9207', emblem: '香' },
   ehime:     { name: '愛媛地方協力本部',   tel: '089-941-8381', emblem: '媛' },
   kochi:     { name: '高知地方協力本部',   tel: '088-822-6128', emblem: '知' },
+  // 中国
+  tottori:   { name: '鳥取地方協力本部',   tel: '0857-22-3468', emblem: '鳥' },
+  shimane:   { name: '島根地方協力本部',   tel: '0852-21-0935', emblem: '島' },
+  okayama:   { name: '岡山地方協力本部',   tel: '086-224-3302', emblem: '岡' },
+  hiroshima: { name: '広島地方協力本部',   tel: '082-221-5891', emblem: '広' },
+  yamaguchi: { name: '山口地方協力本部',   tel: '083-922-5101', emblem: '口' },
 };
 
 // ─── データ出典情報 ───────────────────────────────────────────
@@ -111,6 +117,12 @@ export const REGION_SOURCE = {
   kagawa:    { name: '自衛隊香川地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/kagawa/event.html' },
   ehime:     { name: '自衛隊愛媛地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/ehime/event.html' },
   kochi:     { name: '自衛隊高知地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/kochi/event_info.html' },
+  // 中国
+  tottori:   { name: '自衛隊鳥取地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/tottori/content/02-event/event.html' },
+  shimane:   { name: '自衛隊島根地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/shimane/event/event.html' },
+  okayama:   { name: '自衛隊岡山地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html' },
+  hiroshima: { name: '自衛隊広島地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/hiroshima/events/' },
+  yamaguchi: { name: '自衛隊山口地方協力本部ウェブサイト',   url: 'https://www.mod.go.jp/pco/yamaguchi/event.html' },
 };
 
 // ─── フォールバック用モックデータ ────────────────────────────
