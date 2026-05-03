@@ -3,6 +3,11 @@ import { ICO } from './Icons';
 import { BottomTabBar, F } from './Shared';
 import { COLOR_SCHEMES, REGION_SOURCE } from '../config';
 import NtfyGuideModal from './NtfyGuideModal';
+import { REGIONS } from '../data/regionMap';
+
+function loadNotifRegion() {
+  try { return localStorage.getItem('jsdf-notif-region') || 'all'; } catch { return 'all'; }
+}
 
 // package.json の version を vite.config.js の define で埋め込んだ定数
 /* global __APP_VERSION__ */
@@ -10,7 +15,7 @@ import NtfyGuideModal from './NtfyGuideModal';
 export default function SettingsScreen({
   theme,
   onColorChange, onDarkModeChange,
-  onOpenHome, onOpenRegion, onOpenFavorites,
+  onOpenHome, onOpenRegion, onOpenList, onOpenFavorites,
   onOpenLegal,
 }) {
   const { primary, accent, schemeKey, darkMode } = theme;
@@ -25,6 +30,13 @@ export default function SettingsScreen({
   });
   // ntfy ガイドモーダルの表示状態
   const [showNtfyGuide, setShowNtfyGuide] = useState(false);
+
+  // ── 通知地区 ────────────────────────────────────────────────
+  const [notifRegion, setNotifRegion] = useState(loadNotifRegion);
+  const handleNotifRegion = (id) => {
+    setNotifRegion(id);
+    try { localStorage.setItem('jsdf-notif-region', id); } catch {}
+  };
 
   const handleNotifToggle = (key) => {
     const next = !notif[key];
@@ -71,12 +83,43 @@ export default function SettingsScreen({
           />
           <ToggleRow
             label="リマインダー"
-            sub="申込イベントの前日に通知"
+            sub="申込イベントの締切が近づいたとき"
             on={notif.reminder}
             onChange={() => handleNotifToggle('reminder')}
             primary={primary}
-            last
           />
+          {/* 通知する地区 */}
+          <div style={{ padding: '12px 14px', borderTop: '1px solid var(--sep)' }}>
+            <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', marginBottom: 8 }}>
+              通知する地区
+            </div>
+            <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginBottom: 10, lineHeight: 1.4 }}>
+              選択した地区のイベントのみ通知画面に表示されます
+            </div>
+            <div style={{
+              display: 'flex', flexWrap: 'wrap', gap: 6,
+            }}>
+              {[{ id: 'all', label: '全地区' }, ...REGIONS].map(r => {
+                const isA = notifRegion === r.id;
+                return (
+                  <button
+                    key={r.id}
+                    onClick={() => handleNotifRegion(r.id)}
+                    style={{
+                      border: `1px solid ${isA ? primary : 'var(--border)'}`,
+                      borderRadius: 20, padding: '4px 12px',
+                      background: isA ? primary : 'var(--card)',
+                      color: isA ? '#fff' : 'var(--text-muted)',
+                      fontSize: 12, fontWeight: isA ? 700 : 400,
+                      cursor: 'pointer', fontFamily: F.sans,
+                    }}
+                  >
+                    {r.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </Card>
         {/* 通知のヒント */}
         <div style={{
@@ -217,7 +260,7 @@ export default function SettingsScreen({
         active="settings"
         onChange={id => {
           if (id === 'home')           onOpenHome();
-          else if (id === 'list')      onOpenRegion(null);
+          else if (id === 'list')      onOpenList();
           else if (id === 'favorites') onOpenFavorites();
         }}
         primary={primary}

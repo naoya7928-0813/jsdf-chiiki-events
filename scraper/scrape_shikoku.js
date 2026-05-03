@@ -86,7 +86,19 @@ async function fetchPref(browser, pref, url, parseFn) {
       console.log(`[${pref}] → ${evs.length} 件書き込み`);
     }
   }
-  eventsJson._updatedAt = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
+  eventsJson.updatedAt = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
+
+  // 今日（JST）より前の日付のイベントを削除
+  const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+  let removedCount = 0;
+  for (const key of Object.keys(eventsJson)) {
+    if (!Array.isArray(eventsJson[key])) continue;
+    const before = eventsJson[key].length;
+    eventsJson[key] = eventsJson[key].filter(ev => !ev.date || ev.date >= today);
+    removedCount += before - eventsJson[key].length;
+  }
+  if (removedCount > 0) console.log(`[フィルタ] 過去イベント ${removedCount} 件を削除`);
+
   fs.writeFileSync(OUTPUT, JSON.stringify(eventsJson, null, 2), 'utf8');
   console.log('\n✓ events.json 更新完了');
 })();

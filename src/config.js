@@ -47,7 +47,7 @@ export const REGION_HQ = {
   ishikawa:  { name: '石川地方協力本部',   tel: '076-291-6214', emblem: '石' },
   fukui:     { name: '福井地方協力本部',   tel: '0776-22-3070', emblem: '福' },
   yamanashi: { name: '山梨地方協力本部',   tel: '055-252-3838', emblem: '梨' },
-  nagano:    { name: '長野地方協力本部',   tel: '026-232-3831', emblem: '野' },
+  nagano:    { name: '長野地方協力本部',   tel: '026-232-3831', emblem: '長' },
   gifu:      { name: '岐阜地方協力本部',   tel: '058-262-1818', emblem: '岐' },
   shizuoka:  { name: '静岡地方協力本部',   tel: '054-252-4000', emblem: '静' },
   aichi:     { name: '愛知地方協力本部',   tel: '052-961-4366', emblem: '愛' },
@@ -71,12 +71,12 @@ export const REGION_HQ = {
   hiroshima: { name: '広島地方協力本部',   tel: '082-221-5891', emblem: '広' },
   yamaguchi: { name: '山口地方協力本部',   tel: '083-922-5101', emblem: '口' },
   // 九州・沖縄
-  fukuoka:   { name: '福岡地方協力本部',   tel: '092-781-9321', emblem: '岡' },
+  fukuoka:   { name: '福岡地方協力本部',   tel: '092-781-9321', emblem: '福' },
   saga:      { name: '佐賀地方協力本部',   tel: '0952-32-4431', emblem: '佐' },
   nagasaki:  { name: '長崎地方協力本部',   tel: '095-823-7196', emblem: '崎' },
   kumamoto:  { name: '熊本地方協力本部',   tel: '096-297-2051', emblem: '熊' },
   oita:      { name: '大分地方協力本部',   tel: '097-536-6271', emblem: '分' },
-  miyazaki:  { name: '宮崎地方協力本部',   tel: '0985-27-7191', emblem: '崎' },
+  miyazaki:  { name: '宮崎地方協力本部',   tel: '0985-27-7191', emblem: '宮' },
   kagoshima: { name: '鹿児島地方協力本部', tel: '099-253-8920', emblem: '鹿' },
   okinawa:   { name: '沖縄地方協力本部',   tel: '098-863-3146', emblem: '沖' },
 };

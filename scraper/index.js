@@ -1974,6 +1974,18 @@ function writeOutput(data) {
   const dir = path.dirname(OUTPUT_PATH);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
+  // 今日（JST）より前の日付のイベントを削除
+  const jstNow = new Date(Date.now() + 9 * 3600 * 1000);
+  const today = jstNow.toISOString().slice(0, 10); // "YYYY-MM-DD"
+  let removedCount = 0;
+  for (const key of Object.keys(data)) {
+    if (!Array.isArray(data[key])) continue;
+    const before = data[key].length;
+    data[key] = data[key].filter(ev => !ev.date || ev.date >= today);
+    removedCount += before - data[key].length;
+  }
+  if (removedCount > 0) console.log(`[フィルタ] 過去イベント ${removedCount} 件を削除`);
+
   fs.writeFileSync(OUTPUT_PATH, JSON.stringify(data, null, 2), 'utf8');
   console.log(`[出力] ${OUTPUT_PATH}`);
   console.log(`  札幌:   ${(data.sapporo   ?? []).length} 件`);

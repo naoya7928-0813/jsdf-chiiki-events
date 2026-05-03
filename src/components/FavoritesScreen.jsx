@@ -9,7 +9,7 @@ import { SUPPORTED_PREFECTURES, PREFECTURE_INFO } from '../data/regionMap';
 export default function FavoritesScreen({
   events, favorites, theme,
   onOpenDetail, onBack,
-  onOpenHome, onOpenRegion, onOpenSettings,
+  onOpenHome, onOpenList, onOpenRegion, onOpenSettings,
 }) {
   const { primary, accent } = theme;
 
@@ -56,7 +56,7 @@ export default function FavoritesScreen({
         </div>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 8 }}>
+      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 60px)' }}>
         {favEvents.length === 0 ? (
           <EmptyState primary={primary} accent={accent} />
         ) : (
@@ -78,7 +78,7 @@ export default function FavoritesScreen({
         active="favorites"
         onChange={id => {
           if (id === 'home')     onOpenHome();
-          else if (id === 'list') onOpenRegion(null);
+          else if (id === 'list') onOpenList();
           else if (id === 'settings') onOpenSettings();
         }}
         primary={primary}
@@ -112,7 +112,7 @@ function FavCard({ ev, primary, accent, onTap }) {
         }}>
           <div style={{ fontSize: 9, color: 'var(--text-muted)', fontFamily: F.mono, letterSpacing: 1 }}>{m}月</div>
           <div style={{ fontFamily: F.serif, fontSize: 26, fontWeight: 600, lineHeight: 1, color: dateColor, marginTop: 2 }}>{d}</div>
-          <div style={{ fontSize: 9, marginTop: 3, color: dateColor, fontWeight: 500 }}>({ev.weekday})</div>
+          {ev.weekday && <div style={{ fontSize: 9, marginTop: 3, color: dateColor, fontWeight: 500 }}>({ev.weekday})</div>}
         </div>
 
         {/* テキスト */}

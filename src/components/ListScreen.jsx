@@ -3,6 +3,11 @@ import { ICO } from './Icons';
 import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle } from './Shared';
 import FilterBar from './FilterBar';
 import { daysUntil, deadlineDaysUntil, daysLabel, daysColor } from '../utils/date';
+import { REGIONS, SUPPORTED_PREFECTURES } from '../data/regionMap';
+
+const ALL_PREF_TABS = REGIONS.flatMap(r =>
+  r.prefectures.filter(p => SUPPORTED_PREFECTURES.has(p.id))
+);
 
 export default function ListScreen({
   events, loading, error, updatedAt, checkedAt, onRefresh,
@@ -12,6 +17,17 @@ export default function ListScreen({
   theme,
 }) {
   const list = events[region] ?? [];
+
+  // アクティブなタブを横スクロールでセンタリング（垂直方向には影響させない）
+  const tabScrollRef = useRef(null);
+  const activeTabRef = useRef(null);
+  useEffect(() => {
+    const container = tabScrollRef.current;
+    const btn       = activeTabRef.current;
+    if (!container || !btn) return;
+    const target = btn.offsetLeft - container.clientWidth / 2 + btn.offsetWidth / 2;
+    container.scrollLeft = Math.max(0, target);
+  }, [region]);
 
   // ── 検索 ─────────────────────────────────────────────────
   const [isSearching, setIsSearching] = useState(false);
@@ -46,13 +62,15 @@ export default function ListScreen({
   const handleCategoryChange = (cat) => { setActiveCategory(cat); closeSearch(); };
   const handleTagChange      = (tag) => { setActiveTag(tag);      closeSearch(); };
 
-  // ── フィルター適用済みリスト ──────────────────────────────
+  // ── フィルター適用済みリスト（開催日昇順） ───────────────
   const filteredList = useMemo(() => {
-    return list.filter(ev => {
-      const catOk = activeCategory === 'all' || ev.category === activeCategory;
-      const tagOk = activeTag      === 'all' || ev.tag      === activeTag;
-      return catOk && tagOk;
-    });
+    return list
+      .filter(ev => {
+        const catOk = activeCategory === 'all' || ev.category === activeCategory;
+        const tagOk = activeTag      === 'all' || ev.tag      === activeTag;
+        return catOk && tagOk;
+      })
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
   }, [list, activeCategory, activeTag]);
 
   // ── イベントグループ化 ─────────────────────────────────────
@@ -72,7 +90,7 @@ export default function ListScreen({
     const result = {};
     for (const [month, evs] of Object.entries(grouped)) {
       const matched = evs.filter(ev =>
-        [ev.title, ev.place, ev.address ?? '', ev.category, ev.tag ?? ''].some(f =>
+        [ev.title, ev.place, ev.address, ev.category, ev.tag].filter(Boolean).some(f =>
           f.toLowerCase().includes(q)
         )
       );
@@ -138,35 +156,35 @@ export default function ListScreen({
           </div>
         </div>
 
-        {/* 地本タブ */}
-        <div style={{ padding: '0 16px' }}>
-          <div style={{ display: 'flex', background: 'rgba(255,255,255,0.08)', borderRadius: 10, padding: 4, gap: 4 }}>
-            {[
-              { id: 'kanagawa', label: '神奈川', ch: '神', sub: 'KANAGAWA' },
-              { id: 'tokyo',    label: '東京',   ch: '都', sub: 'TOKYO'    },
-            ].map(t => {
-              const isA = region === t.id;
-              const count = (events[t.id] ?? []).length;
-              return (
-                <button key={t.id} onClick={() => { onRegionChange(t.id); closeSearch(); }} style={{
-                  flex: 1, border: 'none', cursor: 'pointer', borderRadius: 7,
-                  background: isA ? '#fff' : 'transparent',
+        {/* 地本タブ（全地本・横スクロール） */}
+        <div ref={tabScrollRef} style={{
+          display: 'flex', overflowX: 'auto', gap: 4, padding: '0 16px',
+          scrollbarWidth: 'none', msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch',
+        }}>
+          {ALL_PREF_TABS.map(t => {
+            const isA = region === t.id;
+            const count = (events[t.id] ?? []).length;
+            return (
+              <button
+                key={t.id}
+                ref={isA ? activeTabRef : null}
+                onClick={() => { onRegionChange(t.id); closeSearch(); }}
+                style={{
+                  flexShrink: 0, border: 'none', cursor: 'pointer', borderRadius: 8,
+                  background: isA ? '#fff' : 'rgba(255,255,255,0.08)',
                   color: isA ? primary : 'rgba(255,255,255,0.75)',
-                  padding: '10px 8px',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center',
+                  padding: '8px 10px', minWidth: 56,
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
                   boxShadow: isA ? '0 1px 3px rgba(0,0,0,0.12)' : 'none',
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Emblem ch={t.ch} size={18} primary={isA ? primary : '#fff'} />
-                    <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: 1 }}>{t.label}地本</span>
-                  </div>
-                  <span style={{ fontSize: 9, letterSpacing: 2, marginTop: 2, opacity: 0.65, fontFamily: F.mono }}>
-                    {t.sub} · {count}件
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                }}
+              >
+                <Emblem ch={t.emblem} size={16} primary={isA ? primary : '#fff'} />
+                <span style={{ fontSize: 11, fontWeight: isA ? 700 : 500, letterSpacing: 0.5 }}>{t.label}</span>
+                <span style={{ fontSize: 9, fontFamily: F.mono, opacity: 0.8 }}>{count}件</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* 検索バー（isSearching のときのみ表示） */}
@@ -229,7 +247,7 @@ export default function ListScreen({
         />
       )}
 
-      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 8 }}>
+      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 60px)' }}>
         <ErrorBanner message={error} />
 
         {/* 初回ローディング中はスピナー（既にデータがある場合は出さない） */}
@@ -274,7 +292,7 @@ export default function ListScreen({
                         }}>
                           <div style={{ fontSize: 9, color: 'var(--text-muted)', fontFamily: F.mono, letterSpacing: 1 }}>{m}月</div>
                           <div style={{ fontFamily: F.serif, fontSize: 26, fontWeight: 600, lineHeight: 1, color: dateColor, marginTop: 2 }}>{d}</div>
-                          <div style={{ fontSize: 9, marginTop: 3, color: dateColor, fontWeight: 500 }}>({ev.weekday})</div>
+                          {ev.weekday && <div style={{ fontSize: 9, marginTop: 3, color: dateColor, fontWeight: 500 }}>({ev.weekday})</div>}
                         </div>
                         {/* テキスト */}
                         <div style={{ flex: 1, minWidth: 0 }}>

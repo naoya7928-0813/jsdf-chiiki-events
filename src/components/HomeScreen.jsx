@@ -8,7 +8,7 @@ import { REGIONS, REGION_BY_ID, countEventsByRegion, getSupportedPrefsByRegion }
 export default function HomeScreen({
   events, loading, error, theme,
   favorites, unreadCount,
-  onOpenNotifications, onOpenRegion, onOpenSettings, onOpenFavorites,
+  onOpenNotifications, onOpenRegion, onOpenList, onOpenSettings, onOpenFavorites,
   initialRegionId,
 }) {
   const { primary, accent } = theme;
@@ -214,7 +214,7 @@ export default function HomeScreen({
       <BottomTabBar
         active="home"
         onChange={id => {
-          if (id === 'list')      onOpenRegion(null);
+          if (id === 'list')      onOpenList();
           else if (id === 'favorites') onOpenFavorites();
           else if (id === 'settings')  onOpenSettings();
         }}

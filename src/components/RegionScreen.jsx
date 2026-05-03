@@ -19,7 +19,10 @@ export default function RegionScreen({
   const [activePrefId, setActivePrefId] = useState(defaultPrefId);
 
   const activeList = useMemo(
-    () => (SUPPORTED_PREFECTURES.has(activePrefId) ? (events[activePrefId] ?? []) : []),
+    () => {
+      const evs = SUPPORTED_PREFECTURES.has(activePrefId) ? (events[activePrefId] ?? []) : [];
+      return [...evs].sort((a, b) => new Date(a.date) - new Date(b.date));
+    },
     [activePrefId, events]
   );
 

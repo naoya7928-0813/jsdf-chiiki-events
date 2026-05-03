@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useEvents } from './hooks/useEvents';
 import { COLOR_SCHEMES, DEFAULT_SCHEME } from './config';
 import HomeScreen        from './components/HomeScreen';
@@ -12,7 +12,7 @@ import RegionScreen       from './components/RegionScreen';
 
 // ─── localStorage 復元ヘルパー ────────────────────────────────
 function loadScheme()       { try { return localStorage.getItem('jsdf-scheme') || DEFAULT_SCHEME; } catch { return DEFAULT_SCHEME; } }
-function loadRegion()       { try { return localStorage.getItem('jsdf-region') || 'kanagawa';     } catch { return 'kanagawa';     } }
+function loadRegion()       { try { return localStorage.getItem('jsdf-region') || 'tokyo';        } catch { return 'tokyo';        } }
 function loadDarkMode()     { try { return localStorage.getItem('jsdf-dark')   || 'system';       } catch { return 'system';       } }
 function loadLastMapRegion(){ try { return localStorage.getItem('jsdf-last-region') || null;       } catch { return null;           } }
 function loadLastPrefId()   { try { return localStorage.getItem('jsdf-last-pref')   || null;       } catch { return null;           } }
@@ -140,10 +140,10 @@ export default function App() {
   // ── 通知（既読管理） ──────────────────────────────────────
   const [seenIds, setSeenIds] = useState(loadSeenIds);
 
-  const allEventIds = [
-    ...(events.kanagawa ?? []),
-    ...(events.tokyo    ?? []),
-  ].map(e => e.id);
+  const allEventIds = useMemo(
+    () => Object.values(events).filter(Array.isArray).flatMap(evs => evs.map(e => e.id)),
+    [events]
+  );
   const unreadCount = allEventIds.filter(id => !seenIds.includes(id)).length;
 
   const handleMarkAllRead = useCallback((ids) => {
@@ -172,6 +172,7 @@ export default function App() {
           unreadCount={unreadCount}
           initialRegionId={mapRegionId}
           onOpenNotifications={() => setScreen('notifications')}
+          onOpenList={() => setScreen('list')}
           onOpenRegion={openRegion}
           onOpenSettings={() => setScreen('settings')}
           onOpenFavorites={() => setScreen('favorites')}
@@ -222,6 +223,7 @@ export default function App() {
           onColorChange={handleColorChange}
           onDarkModeChange={handleDarkModeChange}
           onOpenHome={() => setScreen('home')}
+          onOpenList={() => setScreen('list')}
           onOpenRegion={openRegion}
           onOpenFavorites={() => setScreen('favorites')}
           onOpenLegal={(doc) => { setLegalDoc(doc); setScreen('legal'); }}
@@ -256,6 +258,7 @@ export default function App() {
           onOpenDetail={(ev) => openDetail(ev, 'favorites')}
           onBack={() => setScreen('home')}
           onOpenHome={() => setScreen('home')}
+          onOpenList={() => setScreen('list')}
           onOpenRegion={openRegion}
           onOpenSettings={() => setScreen('settings')}
         />

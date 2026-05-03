@@ -4,6 +4,11 @@ import { F, ScreenHeader, splitDate } from './Shared';
 import { NTFY_URL } from '../config';
 import NtfyGuideModal from './NtfyGuideModal';
 import { deadlineDaysUntil, daysLabel } from '../utils/date';
+import { PREFECTURE_INFO, REGIONS } from '../data/regionMap';
+
+function loadNotifRegion() {
+  try { return localStorage.getItem('jsdf-notif-region') || 'all'; } catch { return 'all'; }
+}
 
 // ─── 通知一覧画面 ─────────────────────────────────────────────
 export default function NotificationScreen({
@@ -11,12 +16,14 @@ export default function NotificationScreen({
 }) {
   const { primary, accent } = theme;
 
-  // ── 通知アイテム生成（両地本合算 → 日付昇順 → 未読を先頭へ）──
+  // ── 通知アイテム生成（全地本合算 → 日付昇順 → 未読を先頭へ）──
   const items = useMemo(() => {
-    const all = [
-      ...(events.kanagawa ?? []).map(ev => ({ ...ev, regionLabel: '神奈川地本' })),
-      ...(events.tokyo    ?? []).map(ev => ({ ...ev, regionLabel: '東京地本'   })),
-    ];
+    const all = Object.entries(events)
+      .filter(([, evs]) => Array.isArray(evs))
+      .flatMap(([prefId, evs]) => {
+        const label = (PREFECTURE_INFO[prefId]?.label ?? prefId) + '地本';
+        return evs.map(ev => ({ ...ev, regionLabel: label }));
+      });
     return all
       .map(ev => ({ ...ev, isNew: !seenIds.includes(ev.id) }))
       .sort((a, b) => {
@@ -27,23 +34,20 @@ export default function NotificationScreen({
 
   // 画面を開いたとき全IDを既読化
   useEffect(() => {
-    const ids = [
-      ...(events.kanagawa ?? []),
-      ...(events.tokyo    ?? []),
-    ].map(e => e.id);
+    const ids = Object.values(events)
+      .filter(Array.isArray)
+      .flatMap(evs => evs.map(e => e.id));
     onMarkAllRead(ids);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // unreadItems は全地区の未読数（ヘッダーバッジ用）
   const unreadItems = items.filter(i => i.isNew);
 
   // ── 締切リマインダー（お気に入り × 締切7日以内） ────────────
   const reminders = useMemo(() => {
     if (!favorites || favorites.size === 0) return [];
-    const all = [
-      ...(events.kanagawa ?? []),
-      ...(events.tokyo    ?? []),
-    ];
+    const all = Object.values(events).filter(Array.isArray).flat();
     return all
       .filter(ev => {
         if (!favorites.has(ev.id) || !ev.deadline) return false;
@@ -56,6 +60,24 @@ export default function NotificationScreen({
         return da - db;
       });
   }, [events, favorites]);
+
+  // ── 地区フィルター ────────────────────────────────────────
+  const [notifRegion, setNotifRegion] = useState(loadNotifRegion);
+  const handleNotifRegion = (id) => {
+    setNotifRegion(id);
+    try { localStorage.setItem('jsdf-notif-region', id); } catch {}
+  };
+
+  // フィルター済みアイテム
+  const filteredItems = useMemo(() => {
+    if (notifRegion === 'all') return items;
+    const region = REGIONS.find(r => r.id === notifRegion);
+    if (!region) return items;
+    const prefIds = new Set(region.prefectures.map(p => p.id));
+    return items.filter(ev => prefIds.has(ev.pref));
+  }, [items, notifRegion]);
+
+  const unreadFiltered = filteredItems.filter(i => i.isNew);
 
   // ── プッシュ通知購読状態 ──────────────────────────────────
   const [pushEnabled, setPushEnabled] = useState(() => {
@@ -96,6 +118,41 @@ export default function NotificationScreen({
           ) : null
         }
       />
+
+      {/* ── 地区フィルター（ヘッダー直下・常に表示） ── */}
+      <div style={{
+        background: primary,
+        paddingBottom: 10,
+        flexShrink: 0,
+      }}>
+        <div style={{
+          display: 'flex', overflowX: 'auto', gap: 6, padding: '0 16px',
+          scrollbarWidth: 'none', msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch',
+        }}>
+          {[{ id: 'all', label: '全地区' }, ...REGIONS].map(r => {
+            const isA = notifRegion === r.id;
+            return (
+              <button
+                key={r.id}
+                onClick={() => handleNotifRegion(r.id)}
+                style={{
+                  flexShrink: 0,
+                  border: 'none',
+                  borderRadius: 20,
+                  padding: '5px 12px',
+                  background: isA ? '#fff' : 'rgba(255,255,255,0.15)',
+                  color: isA ? primary : 'rgba(255,255,255,0.85)',
+                  fontSize: 12, fontWeight: isA ? 700 : 400,
+                  cursor: 'pointer', fontFamily: F.sans, letterSpacing: 0.3,
+                }}
+              >
+                {r.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '12px 0 8px' }}>
 
@@ -210,15 +267,15 @@ export default function NotificationScreen({
         )}
 
         {/* ── イベント通知一覧 ── */}
-        {items.length === 0 ? (
+        {filteredItems.length === 0 ? (
           <EmptyState />
         ) : (
           <>
-            {unreadItems.length > 0 && <SectionLabel>新着</SectionLabel>}
+            {unreadFiltered.length > 0 && <SectionLabel>新着</SectionLabel>}
 
-            {items.map((ev, idx) => {
-              const prevIsNew   = idx > 0 ? items[idx - 1].isNew : ev.isNew;
-              const showReadLabel = !ev.isNew && prevIsNew && items.some(i => !i.isNew);
+            {filteredItems.map((ev, idx) => {
+              const prevIsNew   = idx > 0 ? filteredItems[idx - 1].isNew : ev.isNew;
+              const showReadLabel = !ev.isNew && prevIsNew && filteredItems.some(i => !i.isNew);
               return (
                 <div key={ev.id}>
                   {showReadLabel && <SectionLabel>既読</SectionLabel>}

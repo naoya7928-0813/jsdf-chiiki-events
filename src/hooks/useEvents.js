@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { API_URL, REFRESH_INTERVAL_MS } from '../config';
 
-const EMPTY = { kanagawa: [], tokyo: [], updatedAt: null };
+const EMPTY = { updatedAt: null };
 
 /** 現在時刻を "YYYY/MM/DD HH:mm" 形式で返す */
 function fmtNow() {
@@ -24,7 +24,7 @@ export function useEvents() {
       const res = await fetch(`${API_URL}?t=${Date.now()}`, { cache: 'no-cache' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
-      if (!json.kanagawa || !json.tokyo) throw new Error('invalid response shape');
+      if (typeof json !== 'object' || json === null) throw new Error('invalid response shape');
       setData(json);
       hasData.current = true;
       setError(null);

@@ -15,8 +15,8 @@ export default function DetailScreen({ event, onBack, theme, favorites, onToggle
     ?? (ev.id.startsWith('k-') ? 'kanagawa'
       : ev.id.startsWith('s-') ? 'saitama'
       : 'tokyo');
-  const hq        = REGION_HQ[regionKey];
-  const source    = REGION_SOURCE[regionKey];
+  const hq        = REGION_HQ[regionKey]    ?? REGION_HQ['tokyo'];
+  const source    = REGION_SOURCE[regionKey] ?? REGION_SOURCE['tokyo'];
 
   // 地図クエリ: place + address があれば address 優先、なければ place
   const mapQuery = encodeURIComponent(ev.address ? `${ev.place} ${ev.address}` : ev.place);
