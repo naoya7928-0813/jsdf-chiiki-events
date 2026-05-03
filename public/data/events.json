@@ -225,9 +225,28 @@
   "kanagawa": [],
   "tokyo": [
     {
-      "id": "t-20260522-1",
+      "id": "t-20260503-1",
+      "pref": "tokyo",
+      "date": "2026-05-03",
+      "endDate": "2026-05-06",
+      "weekday": "日・祝",
+      "title": "ＦＡＭＩＬＹ ＤＡＹ",
+      "place": "渋谷募集案内所",
+      "address": "",
+      "time": "",
+      "category": "体験",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tokyo/shibuya/index.html#gw",
+      "notes": "・ＶＲ体験 ・制服試着体験 ・動画放映",
+      "ageRequirement": null,
+      "deadline": null,
+      "endWeekday": "水・祝"
+    },
+    {
+      "id": "t-20260522-2",
       "pref": "tokyo",
       "date": "2026-05-22",
+      "endDate": null,
       "weekday": "金",
       "title": "横須賀基地見学",
       "place": "横須賀基地",
@@ -241,9 +260,10 @@
       "deadline": "4月24日（金）"
     },
     {
-      "id": "t-20260523-2",
+      "id": "t-20260523-3",
       "pref": "tokyo",
       "date": "2026-05-23",
+      "endDate": null,
       "weekday": "土",
       "title": "厚木基地見学",
       "place": "厚木基地",
@@ -257,9 +277,10 @@
       "deadline": "5月1日（金）"
     },
     {
-      "id": "t-20260529-3",
+      "id": "t-20260529-4",
       "pref": "tokyo",
       "date": "2026-05-29",
+      "endDate": null,
       "weekday": "金",
       "title": "潜水艦×醍２術科学校",
       "place": "横須賀基地",
@@ -273,9 +294,10 @@
       "deadline": "5月7日（金）"
     },
     {
-      "id": "t-20260529-4",
+      "id": "t-20260529-5",
       "pref": "tokyo",
       "date": "2026-05-29",
+      "endDate": null,
       "weekday": "金",
       "title": "百里基地見学",
       "place": "百里基地",
@@ -289,9 +311,10 @@
       "deadline": "5月6日（水）"
     },
     {
-      "id": "t-20260619-5",
+      "id": "t-20260619-6",
       "pref": "tokyo",
       "date": "2026-06-19",
+      "endDate": null,
       "weekday": "金",
       "title": "横須賀基地見学",
       "place": "横須賀基地",
@@ -1884,5 +1907,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/05/04 06:03"
+  "updatedAt": "2026/05/04 07:10"
 }

@@ -59,9 +59,9 @@ function parseTokyo($) {
     const weekday = dtMatch[4];
     const dateStr = `${year}-${padTwo(month)}-${padTwo(day)}`;
 
-    // 終了日を解析（「〜X月Y日」または「〜Y日」形式）
+    // 終了日を解析（「〜X月Y日」または「〜Y日」形式、toHalfWidthで～(U+FF5E)に統一済み）
     let endDate = null;
-    const endMatch = rawDate.match(/[〜~](?:(\d+)月)?(\d+)日/);
+    const endMatch = rawDate.match(/[〜～~](?:(\d+)月)?(\d+)日/);
     if (endMatch) {
       const endMonth = endMatch[1] ? parseInt(endMatch[1], 10) : month;
       const endDay   = parseInt(endMatch[2], 10);
