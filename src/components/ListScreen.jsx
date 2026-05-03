@@ -268,12 +268,15 @@ export default function ListScreen({
 
                 {evs.map(ev => {
                   const { m, d }   = splitDate(ev.date);
+                  const endSplit   = ev.endDate ? splitDate(ev.endDate) : null;
                   const isWeekend  = /[土日祝]/.test(ev.weekday);
                   const dateColor  = isWeekend ? accent : primary;
-                  const eventDays  = daysUntil(ev.date);
+                  const todayStr   = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
+                  const isOngoing  = !!(ev.endDate && ev.date < todayStr);
+                  const eventDays  = daysUntil(ev.endDate || ev.date);
                   const dlDays     = deadlineDaysUntil(ev.deadline);
                   // 開催まで7日以内、または締切まで3日以内のときバッジ表示
-                  const showEvent  = eventDays  >= 0 && eventDays  <= 7;
+                  const showEvent  = !isOngoing && eventDays >= 0 && eventDays <= 7;
                   const showDl     = dlDays != null && dlDays >= 0 && dlDays <= 3;
                   return (
                     <div key={ev.id} onClick={() => onOpenDetail(ev)} role="button" tabIndex={0}
@@ -290,9 +293,17 @@ export default function ListScreen({
                           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                           minWidth: 48, borderRight: '1px solid var(--border)', paddingRight: 12,
                         }}>
-                          <div style={{ fontSize: 9, color: 'var(--text-muted)', fontFamily: F.mono, letterSpacing: 1 }}>{m}月</div>
-                          <div style={{ fontFamily: F.serif, fontSize: 26, fontWeight: 600, lineHeight: 1, color: dateColor, marginTop: 2 }}>{d}</div>
-                          {ev.weekday && <div style={{ fontSize: 9, marginTop: 3, color: dateColor, fontWeight: 500 }}>({ev.weekday})</div>}
+                          <div style={{ fontSize: 9, color: 'var(--text-muted)', fontFamily: F.mono, letterSpacing: 1 }}>
+                            {endSplit && endSplit.m !== m ? `${m}〜${endSplit.m}月` : `${m}月`}
+                          </div>
+                          <div style={{ fontFamily: F.serif, fontSize: endSplit ? 16 : 26, fontWeight: 600, lineHeight: 1, color: dateColor, marginTop: 2 }}>
+                            {endSplit ? `${d}〜${endSplit.d}日` : d}
+                          </div>
+                          {ev.weekday && (
+                            <div style={{ fontSize: 9, marginTop: 3, color: dateColor, fontWeight: 500 }}>
+                              ({ev.endWeekday ? `${ev.weekday}〜${ev.endWeekday}` : ev.weekday})
+                            </div>
+                          )}
                         </div>
                         {/* テキスト */}
                         <div style={{ flex: 1, minWidth: 0 }}>
@@ -301,6 +312,11 @@ export default function ListScreen({
                               {ev.category}
                             </span>
                             {ev.tag && <span style={{ fontSize: 11, color: 'var(--text-sub)' }}>{ev.tag}</span>}
+                            {isOngoing && (
+                              <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3, background: '#22c55e22', color: '#15803d', fontFamily: F.mono }}>
+                                開催中
+                              </span>
+                            )}
                             {/* 締切カウントダウン（3日以内） */}
                             {showDl && (
                               <span style={{

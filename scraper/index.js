@@ -77,7 +77,7 @@ const { parseOita }      = require('./parsers/oita');
 const { parseMiyazaki }  = require('./parsers/miyazaki');
 const { parseKagoshima } = require('./parsers/kagoshima');
 const { parseOkinawa }   = require('./parsers/okinawa');
-const { toHalfWidth, reiwaToAD, padTwo, isPast, guessCategory, guessTag } = require('./parsers/utils');
+const { toHalfWidth, reiwaToAD, padTwo, isPast, guessCategory, guessTag, calcWeekday } = require('./parsers/utils');
 
 // ── 設定 ─────────────────────────────────────────────────────
 const OUTPUT_PATH = path.join(__dirname, '../public/data/events.json');
@@ -1981,8 +1981,13 @@ function writeOutput(data) {
   for (const key of Object.keys(data)) {
     if (!Array.isArray(data[key])) continue;
     const before = data[key].length;
-    data[key] = data[key].filter(ev => !ev.date || ev.date >= today);
+    data[key] = data[key].filter(ev => !ev.date || (ev.endDate || ev.date) >= today);
     removedCount += before - data[key].length;
+    // 曜日をカレンダーデータで上書き
+    data[key].forEach(ev => {
+      if (ev.date)    ev.weekday    = calcWeekday(ev.date);
+      if (ev.endDate) ev.endWeekday = calcWeekday(ev.endDate);
+    });
   }
   if (removedCount > 0) console.log(`[フィルタ] 過去イベント ${removedCount} 件を削除`);
 

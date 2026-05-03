@@ -19,6 +19,7 @@ const { parseKumamoto }  = require('./parsers/kumamoto');
 const { parseOita }      = require('./parsers/oita');
 const { parseMiyazaki }  = require('./parsers/miyazaki');
 const { parseKagoshima } = require('./parsers/kagoshima');
+const { calcWeekday } = require('./parsers/utils');
 const { parseOkinawa }   = require('./parsers/okinawa');
 
 const URLS = {
@@ -110,8 +111,12 @@ async function fetchPref(browser, pref, url, parseFn) {
   for (const key of Object.keys(eventsJson)) {
     if (!Array.isArray(eventsJson[key])) continue;
     const before = eventsJson[key].length;
-    eventsJson[key] = eventsJson[key].filter(ev => !ev.date || ev.date >= today);
+    eventsJson[key] = eventsJson[key].filter(ev => !ev.date || (ev.endDate || ev.date) >= today);
     removedCount += before - eventsJson[key].length;
+    eventsJson[key].forEach(ev => {
+      if (ev.date)    ev.weekday    = calcWeekday(ev.date);
+      if (ev.endDate) ev.endWeekday = calcWeekday(ev.endDate);
+    });
   }
   if (removedCount > 0) console.log(`[フィルタ] 過去イベント ${removedCount} 件を削除`);
 

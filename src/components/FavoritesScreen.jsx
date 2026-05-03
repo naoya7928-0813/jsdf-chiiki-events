@@ -89,9 +89,12 @@ export default function FavoritesScreen({
 
 // ─── お気に入りカード（ListScreen と同形式） ─────────────────
 function FavCard({ ev, primary, accent, onTap }) {
-  const { m, d } = splitDate(ev.date);
-  const isWeekend  = /[土日祝]/.test(ev.weekday);
-  const dateColor  = isWeekend ? accent : primary;
+  const { m, d }  = splitDate(ev.date);
+  const endSplit  = ev.endDate ? splitDate(ev.endDate) : null;
+  const isWeekend = /[土日祝]/.test(ev.weekday);
+  const dateColor = isWeekend ? accent : primary;
+  const todayStr  = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
+  const isOngoing = !!(ev.endDate && ev.date < todayStr);
 
   return (
     <div
@@ -110,9 +113,17 @@ function FavCard({ ev, primary, accent, onTap }) {
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
           minWidth: 48, borderRight: '1px solid var(--border)', paddingRight: 12,
         }}>
-          <div style={{ fontSize: 9, color: 'var(--text-muted)', fontFamily: F.mono, letterSpacing: 1 }}>{m}月</div>
-          <div style={{ fontFamily: F.serif, fontSize: 26, fontWeight: 600, lineHeight: 1, color: dateColor, marginTop: 2 }}>{d}</div>
-          {ev.weekday && <div style={{ fontSize: 9, marginTop: 3, color: dateColor, fontWeight: 500 }}>({ev.weekday})</div>}
+          <div style={{ fontSize: 9, color: 'var(--text-muted)', fontFamily: F.mono, letterSpacing: 1 }}>
+            {endSplit && endSplit.m !== m ? `${m}〜${endSplit.m}月` : `${m}月`}
+          </div>
+          <div style={{ fontFamily: F.serif, fontSize: endSplit ? 16 : 26, fontWeight: 600, lineHeight: 1, color: dateColor, marginTop: 2 }}>
+            {endSplit ? `${d}〜${endSplit.d}日` : d}
+          </div>
+          {ev.weekday && (
+            <div style={{ fontSize: 9, marginTop: 3, color: dateColor, fontWeight: 500 }}>
+              ({ev.endWeekday ? `${ev.weekday}〜${ev.endWeekday}` : ev.weekday})
+            </div>
+          )}
         </div>
 
         {/* テキスト */}
@@ -123,6 +134,11 @@ function FavCard({ ev, primary, accent, onTap }) {
               borderRadius: 3, background: 'var(--tag-bg)', color: primary, letterSpacing: 0.5,
             }}>{ev.category}</span>
             {ev.tag && <span style={{ fontSize: 11, color: 'var(--text-sub)' }}>{ev.tag}</span>}
+            {isOngoing && (
+              <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3, background: '#22c55e22', color: '#15803d', fontFamily: F.mono }}>
+                開催中
+              </span>
+            )}
             {/* 地本ラベル */}
             <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: F.mono, marginLeft: 'auto' }}>
               {ev.regionLabel}

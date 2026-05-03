@@ -17,6 +17,7 @@ const { parseShimane }  = require('./parsers/shimane');
 const { parseOkayama }  = require('./parsers/okayama');
 const { parseHiroshima} = require('./parsers/hiroshima');
 const { parseYamaguchi} = require('./parsers/yamaguchi');
+const { calcWeekday } = require('./parsers/utils');
 
 const URLS = {
   tottori:   'https://www.mod.go.jp/pco/tottori/content/02-event/event.html',
@@ -98,8 +99,12 @@ async function fetchPref(browser, pref, url, parseFn) {
   for (const key of Object.keys(eventsJson)) {
     if (!Array.isArray(eventsJson[key])) continue;
     const before = eventsJson[key].length;
-    eventsJson[key] = eventsJson[key].filter(ev => !ev.date || ev.date >= today);
+    eventsJson[key] = eventsJson[key].filter(ev => !ev.date || (ev.endDate || ev.date) >= today);
     removedCount += before - eventsJson[key].length;
+    eventsJson[key].forEach(ev => {
+      if (ev.date)    ev.weekday    = calcWeekday(ev.date);
+      if (ev.endDate) ev.endWeekday = calcWeekday(ev.endDate);
+    });
   }
   if (removedCount > 0) console.log(`[フィルタ] 過去イベント ${removedCount} 件を削除`);
 

@@ -59,7 +59,19 @@ function parseTokyo($) {
     const weekday = dtMatch[4];
     const dateStr = `${year}-${padTwo(month)}-${padTwo(day)}`;
 
-    if (isPast(dateStr)) return;
+    // 終了日を解析（「〜X月Y日」または「〜Y日」形式）
+    let endDate = null;
+    const endMatch = rawDate.match(/[〜~](?:(\d+)月)?(\d+)日/);
+    if (endMatch) {
+      const endMonth = endMatch[1] ? parseInt(endMatch[1], 10) : month;
+      const endDay   = parseInt(endMatch[2], 10);
+      // 終了月が開始月より小さければ翌月（例：4月28日〜5月10日の 5 > 4 なので問題なし）
+      const endYear  = (endMonth < month) ? year + 1 : year;
+      endDate = `${endYear}-${padTwo(endMonth)}-${padTwo(endDay)}`;
+    }
+
+    // 終了日があれば終了日、なければ開始日で過去判定
+    if (isPast(endDate || dateStr)) return;
 
     // 日付以降の時刻部分 "10:00～12:00"（rawDate に含まれる場合）
     const timeMatch = rawDate.match(/[）)]\s*(\d{1,2}:\d{2}.+)/);
@@ -100,6 +112,7 @@ function parseTokyo($) {
       id:      `t-${dateStr.replace(/-/g, '')}-${++idx}`,
       pref:    'tokyo',
       date:    dateStr,
+      endDate: endDate || null,
       weekday,
       title,
       place,

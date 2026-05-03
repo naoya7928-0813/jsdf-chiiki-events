@@ -16,6 +16,7 @@ const { parseEhime }     = require('./parsers/ehime');
 const { parseKagawa }    = require('./parsers/kagawa');
 const { parseKochi }     = require('./parsers/kochi');
 const { parseTokushima } = require('./parsers/tokushima');
+const { calcWeekday } = require('./parsers/utils');
 
 const URLS = {
   ehime:     'https://www.mod.go.jp/pco/ehime/event.html',
@@ -94,8 +95,12 @@ async function fetchPref(browser, pref, url, parseFn) {
   for (const key of Object.keys(eventsJson)) {
     if (!Array.isArray(eventsJson[key])) continue;
     const before = eventsJson[key].length;
-    eventsJson[key] = eventsJson[key].filter(ev => !ev.date || ev.date >= today);
+    eventsJson[key] = eventsJson[key].filter(ev => !ev.date || (ev.endDate || ev.date) >= today);
     removedCount += before - eventsJson[key].length;
+    eventsJson[key].forEach(ev => {
+      if (ev.date)    ev.weekday    = calcWeekday(ev.date);
+      if (ev.endDate) ev.endWeekday = calcWeekday(ev.endDate);
+    });
   }
   if (removedCount > 0) console.log(`[フィルタ] 過去イベント ${removedCount} 件を削除`);
 

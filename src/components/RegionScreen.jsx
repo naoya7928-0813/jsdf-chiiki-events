@@ -154,9 +154,12 @@ export default function RegionScreen({
 
 // ─── イベントカード ───────────────────────────────────────────
 function EventCard({ ev, isFav, primary, accent, onTap }) {
-  const { m, d } = splitDate(ev.date);
-  const isWeekend  = /[土日祝]/.test(ev.weekday);
-  const dayColor   = isWeekend ? accent : primary;
+  const { m, d }  = splitDate(ev.date);
+  const endSplit  = ev.endDate ? splitDate(ev.endDate) : null;
+  const isWeekend = /[土日祝]/.test(ev.weekday);
+  const dayColor  = isWeekend ? accent : primary;
+  const todayStr  = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
+  const isOngoing = !!(ev.endDate && ev.date < todayStr);
   const dlDays     = deadlineDaysUntil(ev.deadline);
   const showUrgent   = dlDays != null && dlDays >= 0 && dlDays <= 3;
   const showDeadline = dlDays != null && dlDays >= 0 && dlDays <= 7;
@@ -180,9 +183,15 @@ function EventCard({ ev, isFav, primary, accent, onTap }) {
       <div style={{ display: 'flex', padding: '12px 14px', gap: 12, alignItems: 'center' }}>
         {/* 日付列 */}
         <div style={{ minWidth: 46, textAlign: 'center', flexShrink: 0 }}>
-          <div style={{ fontSize: 9, color: dayColor, fontFamily: F.mono }}>{m}月</div>
-          <div style={{ fontFamily: F.serif, fontSize: 22, fontWeight: 600, lineHeight: 1, color: dayColor, marginTop: 2 }}>{d}</div>
-          <div style={{ fontSize: 9, color: dayColor, marginTop: 2 }}>{ev.weekday}</div>
+          <div style={{ fontSize: 9, color: dayColor, fontFamily: F.mono }}>
+            {endSplit && endSplit.m !== m ? `${m}〜${endSplit.m}月` : `${m}月`}
+          </div>
+          <div style={{ fontFamily: F.serif, fontSize: endSplit ? 14 : 22, fontWeight: 600, lineHeight: 1, color: dayColor, marginTop: 2 }}>
+            {endSplit ? `${d}〜${endSplit.d}日` : d}
+          </div>
+          <div style={{ fontSize: 9, color: dayColor, marginTop: 2 }}>
+            {ev.endWeekday ? `${ev.weekday}〜${ev.endWeekday}` : ev.weekday}
+          </div>
         </div>
 
         <div style={{ width: 1, alignSelf: 'stretch', background: 'var(--border)', flexShrink: 0 }} />
@@ -205,6 +214,11 @@ function EventCard({ ev, isFav, primary, accent, onTap }) {
                 fontWeight: 500,
               }}>
                 {ev.tag}
+              </span>
+            )}
+            {isOngoing && (
+              <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3, background: '#22c55e22', color: '#15803d', fontFamily: F.mono }}>
+                開催中
               </span>
             )}
           </div>

@@ -8,9 +8,11 @@ const BASE_URL = 'https://www.mod.go.jp/pco/ibaraki/event.html';
 function inferYear(month, day) {
   const now  = new Date();
   const year = now.getFullYear();
-  // その月日が今日より過去なら翌年
-  if (new Date(year, month - 1, day) < now) return year + 1;
-  return year;
+  const candidate = new Date(year, month - 1, day);
+  if (candidate >= now) return year;
+  // 年末(10月以降)で翌年1〜3月のイベントのみ翌年扱い
+  if (now.getMonth() >= 9 && month <= 3) return year + 1;
+  return year; // 過去日付は今年のまま（isPastでフィルタ）
 }
 
 /**
