@@ -2039,6 +2039,14 @@ function writeOutput(data) {
   console.log(`  鹿児島: ${(data.kagoshima ?? []).length} 件`);
   console.log(`  沖縄:   ${(data.okinawa   ?? []).length} 件`);
   console.log(`  更新時刻: ${data.updatedAt}`);
+
+  // AIクローラー向け静的 HTML を再生成
+  try {
+    const { execSync } = require('child_process');
+    execSync('node ../scripts/generate-events-html.mjs', { cwd: __dirname, stdio: 'inherit' });
+  } catch (e) {
+    console.warn('[警告] events.html 生成に失敗しました:', e.message);
+  }
 }
 
 // ── エントリーポイント ────────────────────────────────────────

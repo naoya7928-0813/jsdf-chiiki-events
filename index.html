@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>地本イベント情報</title>
+    <title>自衛隊地本イベント情報</title>
+    <meta name="description" content="全国の自衛隊地方協力本部（地本）が開催する説明会・記念行事・体験イベントなどの情報をまとめて確認できるアプリです。" />
+    <meta name="robots" content="index, follow" />
 
     <!-- PWA: Apple -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -15,9 +17,11 @@
     <meta name="theme-color" content="#0b2545" />
 
     <!-- OGP -->
-    <meta property="og:title" content="地本イベント情報" />
-    <meta property="og:description" content="自衛隊地方協力本部のイベント情報" />
+    <meta property="og:title" content="自衛隊地本イベント情報" />
+    <meta property="og:description" content="全国の自衛隊地方協力本部（地本）のイベント情報を一覧表示。説明会・記念行事・体験イベントなど。" />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://jsdf-chiiki-events.vercel.app/" />
+    <meta property="og:locale" content="ja_JP" />
 
     <!-- フォント -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -29,6 +33,11 @@
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <p>このアプリはJavaScriptが必要です。</p>
+      <p>イベント一覧（テキスト版）：<a href="/events.html">自衛隊地本イベント一覧</a></p>
+      <p>データ（JSON）：<a href="/data/events.json">events.json</a></p>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
