@@ -8,6 +8,8 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
+const SITE_URL = 'https://jsdf-chiiki-events.vercel.app';
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const EVENTS_JSON = join(__dirname, '../public/data/events.json');
 const OUTPUT_HTML = join(__dirname, '../public/events.html');
@@ -71,9 +73,12 @@ function esc(s) {
 
 const sections = Object.entries(byPref).map(([label, events]) => {
   const rows = events.map(ev => {
+    const dateDisplay = ev.endDate
+      ? `${esc(ev.date)}（${esc(ev.weekday)}）〜${esc(ev.endDate)}（${esc(ev.endWeekday||'')}）`
+      : `${esc(ev.date)}（${esc(ev.weekday)}）`;
     const parts = [
       `<li>`,
-      `<time datetime="${esc(ev.date)}">${esc(ev.date)}（${esc(ev.weekday)}）</time>`,
+      `<time datetime="${esc(ev.date)}">${dateDisplay}</time>`,
       ` ／ <strong>${esc(ev.title)}</strong>`,
       ev.category ? ` ／ カテゴリ：${esc(ev.category)}` : '',
       ev.place    ? ` ／ 会場：${esc(ev.place)}`    : '',
@@ -136,3 +141,31 @@ ${sections}
 
 writeFileSync(OUTPUT_HTML, html, 'utf8');
 console.log(`[generate-events-html] ${OUTPUT_HTML} を生成しました（${total} 件）`);
+
+// sitemap.xml の lastmod を現在日時で更新
+const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+const sitemapPath = join(__dirname, '../public/sitemap.xml');
+const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${SITE_URL}/</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>${SITE_URL}/events.html</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>${SITE_URL}/data/events.json</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+</urlset>
+`;
+writeFileSync(sitemapPath, sitemap, 'utf8');
+console.log(`[generate-events-html] ${sitemapPath} を更新しました（lastmod: ${today}）`);

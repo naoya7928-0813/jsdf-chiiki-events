@@ -107,44 +107,12 @@
   ],
   "yamagata": [
     {
-      "id": "ya-20260504-1",
-      "pref": "yamagata",
-      "date": "2026-05-04",
-      "weekday": "月・祝",
-      "title": "熊野神社「働く車展」",
-      "place": "場所 ：南陽市立宮内小学校駐車場",
-      "address": "",
-      "time": "",
-      "category": "装備展示",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "ya-20260504-2",
-      "pref": "yamagata",
-      "date": "2026-05-04",
-      "weekday": "月・祝",
-      "title": "はたらくくるま大集合",
-      "place": "場所 ：さくらんぼこどもキャンパス CLAAPIN SAGAE 多目的駐車場",
-      "address": "",
-      "time": "",
-      "category": "装備展示",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "ya-20260505-3",
+      "id": "ya-20260505-1",
       "pref": "yamagata",
       "date": "2026-05-05",
       "weekday": "火・祝",
       "title": "がんばる車大集合",
-      "place": "場所 ：ほっとなる通り（山形市本町十字路～十日町十字路）",
+      "place": "ほっとなる通り（山形市本町十字路～十日町十字路）",
       "address": "",
       "time": "",
       "category": "装備展示",
@@ -155,12 +123,12 @@
       "deadline": null
     },
     {
-      "id": "ya-20260505-4",
+      "id": "ya-20260505-2",
       "pref": "yamagata",
       "date": "2026-05-05",
       "weekday": "火・祝",
       "title": "酒田市子どもまつり",
-      "place": "場所 ：酒田市日和山公園",
+      "place": "酒田市日和山公園",
       "address": "",
       "time": "",
       "category": "地域参加",
@@ -171,12 +139,12 @@
       "deadline": null
     },
     {
-      "id": "ya-20260614-5",
+      "id": "ya-20260614-3",
       "pref": "yamagata",
       "date": "2026-06-14",
       "weekday": "日",
       "title": "サマーコンサート２０２６",
-      "place": "場所 ：山形市民会館",
+      "place": "山形市民会館",
       "address": "",
       "time": "",
       "category": "演奏会",
@@ -188,22 +156,6 @@
     }
   ],
   "fukushima": [
-    {
-      "id": "fs-20260530-1",
-      "pref": "fukushima",
-      "date": "2026-05-30",
-      "weekday": "土",
-      "title": "お知らせ",
-      "place": "福島県警察機動センター (福島市荒井下笊森)",
-      "address": "",
-      "time": "10:30～15:30",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
     {
       "id": "fs-20260530-2",
       "pref": "fukushima",
@@ -253,11 +205,11 @@
       "address": "",
       "time": "",
       "category": "体験",
-      "tag": "",
+      "tag": "応募終了",
       "url": "https://www.mod.go.jp/pco/tokyo/kita/index.html#0522",
       "notes": "・港湾クルーズ ・停泊護衛艦乗艦見学 ・体験喫食（海上自衛隊カレー）",
       "ageRequirement": "17歳～32歳",
-      "deadline": "4月24日（金）"
+      "deadline": null
     },
     {
       "id": "t-20260523-3",
@@ -270,11 +222,11 @@
       "address": "",
       "time": "",
       "category": "体験",
-      "tag": "",
+      "tag": "応募終了",
       "url": "https://www.mod.go.jp/pco/tokyo/event2/0523_atugi.html",
       "notes": "・航空機見学 ・隊員との懇談",
       "ageRequirement": "18歳～32歳",
-      "deadline": "5月1日（金）"
+      "deadline": null
     },
     {
       "id": "t-20260529-4",
@@ -354,7 +306,7 @@
       "place": "ボートレース戸田 イベントホール",
       "address": "",
       "time": "10:00～16:00",
-      "category": "広報活動",
+      "category": "地域参加",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/saitama/event/img/8.5.23toda.jpg%20target=",
       "notes": null,
@@ -505,7 +457,7 @@
       "place": "イオン六日町店",
       "address": "",
       "time": "10:00～15:00",
-      "category": "広報活動",
+      "category": "地域参加",
       "tag": "",
       "url": "",
       "notes": null,
@@ -537,7 +489,7 @@
       "place": "イオン県央店",
       "address": "",
       "time": "10:00～15:00",
-      "category": "広報活動",
+      "category": "地域参加",
       "tag": "",
       "url": "",
       "notes": null,
@@ -553,7 +505,7 @@
       "place": "フォッサマグナミュージアム",
       "address": "",
       "time": "08:00～15:00",
-      "category": "広報活動",
+      "category": "地域参加",
       "tag": "",
       "url": "",
       "notes": null,
@@ -649,7 +601,7 @@
   "yamanashi": [],
   "nagano": [
     {
-      "id": "na-20260514-3",
+      "id": "na-20260514-1",
       "pref": "nagano",
       "date": "2026-05-14",
       "weekday": "木",
@@ -665,7 +617,7 @@
       "deadline": null
     },
     {
-      "id": "na-20260523-1",
+      "id": "na-20260523-3",
       "pref": "nagano",
       "date": "2026-05-23",
       "weekday": "土",
@@ -1459,7 +1411,7 @@
       "place": "ゆめタウン高松東館2階フードコート特設会場＆1階中央入り口外芝生テラス",
       "address": "",
       "time": "",
-      "category": "広報活動",
+      "category": "地域参加",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/kagawa/event.html",
       "notes": null,
@@ -1627,7 +1579,7 @@
       "place": "イコットニコット",
       "address": "",
       "time": "",
-      "category": "広報活動",
+      "category": "地域参加",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html",
       "notes": null,
@@ -1807,7 +1759,7 @@
       "place": "楠こもれびの郷",
       "address": "",
       "time": "10:00～14:30",
-      "category": "広報活動",
+      "category": "地域参加",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/yamaguchi/event.html",
       "notes": null,
@@ -1907,5 +1859,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/05/04 07:10"
+  "updatedAt": "2026/05/05 20:53"
 }

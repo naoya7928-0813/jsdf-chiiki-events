@@ -1981,7 +1981,13 @@ function writeOutput(data) {
   for (const key of Object.keys(data)) {
     if (!Array.isArray(data[key])) continue;
     const before = data[key].length;
-    data[key] = data[key].filter(ev => !ev.date || (ev.endDate || ev.date) >= today);
+    data[key] = data[key].filter(ev => {
+      if (!ev.date) return false;
+      if ((ev.endDate || ev.date) < today) return false;
+      // タイトルが「お知らせ」のみ等、内容のないゴミデータを除外
+      if (!ev.title || /^お知らせ$/.test(ev.title.trim())) return false;
+      return true;
+    });
     removedCount += before - data[key].length;
     // 曜日をカレンダーデータで上書き
     data[key].forEach(ev => {

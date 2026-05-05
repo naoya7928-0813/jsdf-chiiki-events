@@ -59,7 +59,7 @@ function parseYamagata($) {
     if (!title || title === '　' || title === '') return;
 
     const placeRaw = placeParts.join(' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-    const place = placeRaw.replace(/^(?:<b>)?場所(?:<\/b>)?[：:]\s*/i, '').trim();
+    const place = placeRaw.replace(/^(?:<b>)?場所\s*(?:<\/b>)?\s*[：:]\s*/i, '').trim();
 
     events.push({
       id:             `ya-${dateStr.replace(/-/g, '')}-${++idx}`,

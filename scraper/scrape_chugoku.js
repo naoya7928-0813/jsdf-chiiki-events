@@ -99,7 +99,12 @@ async function fetchPref(browser, pref, url, parseFn) {
   for (const key of Object.keys(eventsJson)) {
     if (!Array.isArray(eventsJson[key])) continue;
     const before = eventsJson[key].length;
-    eventsJson[key] = eventsJson[key].filter(ev => !ev.date || (ev.endDate || ev.date) >= today);
+    eventsJson[key] = eventsJson[key].filter(ev => {
+      if (!ev.date) return false;
+      if ((ev.endDate || ev.date) < today) return false;
+      if (!ev.title || /^お知らせ$/.test(ev.title.trim())) return false;
+      return true;
+    });
     removedCount += before - eventsJson[key].length;
     eventsJson[key].forEach(ev => {
       if (ev.date)    ev.weekday    = calcWeekday(ev.date);
