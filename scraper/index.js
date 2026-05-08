@@ -230,9 +230,9 @@ const OCR_PROMPT = `この自衛隊イベントのポスター画像から情報
 {
   "title": "ポスターに書かれた正確なイベント名",
   "time": "開催時間（例: 10:00～16:00）",
-  "ageRequirement": "参加対象年齢（例: 18歳〜32歳未満）",
+  "ageRequirement": "参加資格・対象者を簡潔に（例: 中学生以上33歳未満、日本国籍を有する方）",
   "deadline": "応募締切日（例: 4月24日（金））",
-  "notes": "実施内容・参加条件・注意事項など（箇条書きをそのまま）"
+  "notes": "定員・抽選有無・注意事項など重要事項のみ50文字以内で簡潔に"
 }`;
 
 /**
@@ -318,9 +318,9 @@ const PDF_OCR_PROMPT = `この自衛隊イベントのPDFから情報を抽出�
   "title": "PDFに書かれた正確なイベント名",
   "place": "開催場所・会場名（施設名・住所など）",
   "time": "開催時間（例: 10:00～16:00）",
-  "ageRequirement": "参加対象年齢や応募資格（例: 18歳〜32歳未満）",
+  "ageRequirement": "参加資格・対象者を簡潔に（例: 18歳〜32歳未満、日本国籍を有する方）",
   "deadline": "応募締切日（例: 4月24日（金））",
-  "notes": "実施内容・参加条件・注意事項など"
+  "notes": "定員・抽選有無・注意事項など重要事項のみ50文字以内で簡潔に"
 }`;
 
 /**
@@ -438,9 +438,9 @@ const OCR_PROMPT_FULL = `この自衛隊イベントのポスター画像から�
   "date": "開催日（「令和X年Y月Z日（曜日）」の形式で。例: 令和8年5月19日（火））",
   "place": "開催場所・見学先の名称",
   "time": "開催時間（例: 10:00～16:00）",
-  "ageRequirement": "参加対象・応募資格（例: 18歳～32歳未満）",
+  "ageRequirement": "参加資格・対象者を簡潔に（例: 中学生以上33歳未満、日本国籍を有する方）",
   "deadline": "応募締切日（例: 4月24日（金））",
-  "notes": "実施内容・参加条件・注意事項"
+  "notes": "定員・抽選有無・注意事項など重要事項のみ50文字以内で簡潔に"
 }`;
 
 /**
@@ -504,8 +504,16 @@ function mergeOcr(ev, ocr) {
   };
 }
 
+/** URL が画像ファイル（jpg/jpeg/png/gif/webp）を指しているか判定 */
+function isImageUrl(url) {
+  if (!url) return false;
+  return /\.(jpe?g|png|gif|webp)\s*$/i.test(url.split('?')[0].trimEnd());
+}
+
 /**
  * イベント配列に対して順番に OCR を実行し、結果をマージして返す。
+ * - ev.imageUrl が設定されている場合: imageUrl を使用（url はそのまま保持）
+ * - ev.imageUrl が未設定で ev.url が画像ファイルの場合: url を画像として使用し、url は null に
  * 失敗したイベントは元データのまま保持する。
  */
 async function enrichWithOcr(events) {
@@ -514,21 +522,27 @@ async function enrichWithOcr(events) {
     return events;
   }
 
-  console.log(`[OCR] ${events.filter(e => e.imageUrl).length} 件の画像を処理します`);
+  const targets = events.filter(e => e.imageUrl || isImageUrl(e.url));
+  if (targets.length === 0) return events;
+  console.log(`[OCR] ${targets.length} 件の画像を処理します`);
   const results = [];
 
   for (const ev of events) {
-    if (!ev.imageUrl) {
+    // imageUrl 優先。なければ url が画像ファイルの場合に使用
+    const imgUrl = ev.imageUrl || (isImageUrl(ev.url) ? ev.url : null);
+    if (!imgUrl) {
       results.push(ev);
       continue;
     }
 
     console.log(`[OCR] ${ev.title} (${ev.date})`);
-    const ocr = await ocrImage(ev.imageUrl);
-    if (ocr) console.log(`  → title: ${ocr.title ?? '(変更なし)'}`);
-    results.push(mergeOcr(ev, ocr));
+    const ocr = await ocrImage(imgUrl);
+    if (ocr) console.log(`  → deadline: ${ocr.deadline ?? 'なし'}, age: ${ocr.ageRequirement ?? 'なし'}`);
 
-    // API レートリミット対策
+    // url が画像ファイル直リンクだった場合は null にして公式ページとして開かれないようにする
+    const cleanUrl = ev.imageUrl ? ev.url : null;
+    results.push({ ...mergeOcr(ev, ocr), url: cleanUrl });
+
     await sleep(500);
   }
 
@@ -1896,18 +1910,60 @@ async function main() {
   kagoshimaEvents = fallback(kagoshimaError, '鹿児島', kagoshimaEvents, 'kagoshima');
   okinawaEvents   = fallback(okinawaError,   '沖縄',   okinawaEvents,   'okinawa');
 
-  // ── PDF OCR（PDF 系地本：ev.url が .pdf のイベントを対象） ──
-  // 新規 PDF 系地本を追加する際はここに同様の行を追加する
+  // ── PDF OCR（ev.url が .pdf のイベントを対象） ──
   iwateEvents  = await enrichWithPdfOcr(iwateEvents);
   aomoriEvents = await enrichWithPdfOcr(aomoriEvents);
 
-  // ── 画像 OCR（imageUrl がある HTML パーサー結果のみ対象） ──
-  tokyoEvents    = await enrichWithOcr(tokyoEvents);
-  saitamaEvents  = await enrichWithOcr(saitamaEvents);
-  gunmaEvents    = await enrichWithOcr(gunmaEvents);
-  ibarakiEvents  = await enrichWithOcr(ibarakiEvents);
-  chibaEvents    = await enrichWithOcr(chibaEvents);
-  // tochigi/toyama は fetch 内で OCR 済み（imageUrl が空なので enrichWithOcr は無害）
+  // ── 画像 OCR（全地本対象）──
+  // imageUrl または url が画像ファイルのイベントのみ実行。それ以外はパススルーで無害。
+  sapporoEvents   = await enrichWithOcr(sapporoEvents);
+  asahikawaEvents = await enrichWithOcr(asahikawaEvents);
+  obihiroEvents   = await enrichWithOcr(obihiroEvents);
+  hakodateEvents  = await enrichWithOcr(hakodateEvents);
+  miyagiEvents    = await enrichWithOcr(miyagiEvents);
+  yamagataEvents  = await enrichWithOcr(yamagataEvents);
+  fukushimaEvents = await enrichWithOcr(fukushimaEvents);
+  akitaEvents     = await enrichWithOcr(akitaEvents);
+  kanagawaEvents  = await enrichWithOcr(kanagawaEvents);
+  tokyoEvents     = await enrichWithOcr(tokyoEvents);
+  saitamaEvents   = await enrichWithOcr(saitamaEvents);
+  gunmaEvents     = await enrichWithOcr(gunmaEvents);
+  tochigiEvents   = await enrichWithOcr(tochigiEvents);
+  ibarakiEvents   = await enrichWithOcr(ibarakiEvents);
+  chibaEvents     = await enrichWithOcr(chibaEvents);
+  niigataEvents   = await enrichWithOcr(niigataEvents);
+  toyamaEvents    = await enrichWithOcr(toyamaEvents);
+  ishikawaEvents  = await enrichWithOcr(ishikawaEvents);
+  fukuiEvents     = await enrichWithOcr(fukuiEvents);
+  yamanashiEvents = await enrichWithOcr(yamanashiEvents);
+  naganoEvents    = await enrichWithOcr(naganoEvents);
+  gifuEvents      = await enrichWithOcr(gifuEvents);
+  shizuokaEvents  = await enrichWithOcr(shizuokaEvents);
+  aichiEvents     = await enrichWithOcr(aichiEvents);
+  mieEvents       = await enrichWithOcr(mieEvents);
+  shigaEvents     = await enrichWithOcr(shigaEvents);
+  kyotoEvents     = await enrichWithOcr(kyotoEvents);
+  osakaEvents     = await enrichWithOcr(osakaEvents);
+  hyogoEvents     = await enrichWithOcr(hyogoEvents);
+  naraEvents      = await enrichWithOcr(naraEvents);
+  wakayamaEvents  = await enrichWithOcr(wakayamaEvents);
+  ehimeEvents     = await enrichWithOcr(ehimeEvents);
+  kagawaEvents    = await enrichWithOcr(kagawaEvents);
+  kochiEvents     = await enrichWithOcr(kochiEvents);
+  tokushimaEvents = await enrichWithOcr(tokushimaEvents);
+  tottoriEvents   = await enrichWithOcr(tottoriEvents);
+  shimaneEvents   = await enrichWithOcr(shimaneEvents);
+  okayamaEvents   = await enrichWithOcr(okayamaEvents);
+  hiroshimaEvents = await enrichWithOcr(hiroshimaEvents);
+  yamaguchiEvents = await enrichWithOcr(yamaguchiEvents);
+  fukuokaEvents   = await enrichWithOcr(fukuokaEvents);
+  sagaEvents      = await enrichWithOcr(sagaEvents);
+  nagasakiEvents  = await enrichWithOcr(nagasakiEvents);
+  kumamotoEvents  = await enrichWithOcr(kumamotoEvents);
+  oitaEvents      = await enrichWithOcr(oitaEvents);
+  miyazakiEvents  = await enrichWithOcr(miyazakiEvents);
+  kagoshimaEvents = await enrichWithOcr(kagoshimaEvents);
+  okinawaEvents   = await enrichWithOcr(okinawaEvents);
 
   // imageUrl は最終出力に含めない（内部用フィールド）
   const strip = ev => { const { imageUrl: _, ...rest } = ev; return rest; };
