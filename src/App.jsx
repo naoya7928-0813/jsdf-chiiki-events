@@ -241,6 +241,7 @@ export default function App() {
           onBack={() => setScreen('home')}
           onOpenDetail={(ev) => openDetail(ev, 'region')}
           onOpenHome={() => setScreen('home')}
+          onOpenList={() => setScreen('list')}
           onOpenFavorites={() => setScreen('favorites')}
           onOpenSettings={() => setScreen('settings')}
         />

@@ -7,7 +7,7 @@ import { deadlineDaysUntil, daysUntil, daysLabel, daysColor } from '../utils/dat
 // ─── 地域画面（都道府県タブ + イベント一覧） ─────────────────────
 export default function RegionScreen({
   regionId, events, theme, favorites,
-  onBack, onOpenDetail, onOpenHome, onOpenFavorites, onOpenSettings,
+  onBack, onOpenDetail, onOpenHome, onOpenList, onOpenFavorites, onOpenSettings,
 }) {
   const { primary, accent } = theme;
   const region = REGION_BY_ID[regionId];
@@ -143,6 +143,7 @@ export default function RegionScreen({
         active="list"
         onChange={id => {
           if (id === 'home')           onOpenHome();
+          else if (id === 'list')      onOpenList?.();
           else if (id === 'favorites') onOpenFavorites?.();
           else if (id === 'settings')  onOpenSettings?.();
         }}
@@ -153,9 +154,8 @@ export default function RegionScreen({
 }
 
 // ─── イベントカード ───────────────────────────────────────────
-const TODAY_STR = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
-
 function EventCard({ ev, isFav, primary, accent, onTap }) {
+  const TODAY_STR = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
   const { m, d }  = splitDate(ev.date);
   const endSplit  = ev.endDate ? splitDate(ev.endDate) : null;
   const isWeekend = /[土日祝]/.test(ev.weekday);

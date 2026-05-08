@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ICO } from './Icons';
 import { F, ScreenHeader, splitDate } from './Shared';
-import { NTFY_URL } from '../config';
 import NtfyGuideModal from './NtfyGuideModal';
 import { deadlineDaysUntil, daysLabel } from '../utils/date';
 import { PREFECTURE_INFO, REGIONS } from '../data/regionMap';
