@@ -14,7 +14,7 @@ on:
 jobs:
   scrape:
     name: イベントデータ取得
-    runs-on: self-hosted      # 自宅 PC のセルフホストランナー（住所IPでCloudflare通過）
+    runs-on: ubuntu-latest
     timeout-minutes: 30
 
     permissions:
@@ -35,58 +35,45 @@ jobs:
       - name: scraper の依存パッケージをインストール
         working-directory: scraper
         run: npm ci
-        shell: powershell
 
       # ── Playwright 用 Chromium をインストール ────────────────
       - name: Playwright Chromium をインストール
         working-directory: scraper
-        run: npx playwright install chromium
-        shell: powershell
+        run: npx playwright install chromium --with-deps
 
       # ── スクレイピング実行 ────────────────────────────────────
       - name: イベントデータをスクレイピング
         working-directory: scraper
         run: node index.js
-        shell: powershell
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       # ── 変更があればコミット & プッシュ ──────────────────────
       - name: 変更をコミット & プッシュ
         id: commit
-        shell: powershell
         run: |
-          $ErrorActionPreference = 'Continue'
-
           git config core.autocrlf false
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           git add public/data/events.json public/events.html public/sitemap.xml
 
-          $status = git status --porcelain public/data/events.json public/events.html public/sitemap.xml
-          if (-not $status) {
-            Write-Output "データに変更がありませんでした。コミットをスキップします。"
-            Add-Content -Path $env:GITHUB_OUTPUT -Value "changed=false"
-          } else {
+          STATUS=$(git status --porcelain public/data/events.json public/events.html public/sitemap.xml)
+          if [ -z "$STATUS" ]; then
+            echo "データに変更がありませんでした。コミットをスキップします。"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
             git commit -m "chore: update events data [skip ci]"
             git pull --rebase
-            git push
-            if ($LASTEXITCODE -ne 0) {
-              Write-Output "push 失敗（exit $LASTEXITCODE）。再試行します..."
-              git pull --rebase
-              git push
-            }
-            Write-Output "events.json を更新しました。"
-            Add-Content -Path $env:GITHUB_OUTPUT -Value "changed=true"
-          }
-          exit 0
+            git push || (git pull --rebase && git push)
+            echo "events.json を更新しました。"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
 
       # ── Vercel に本番デプロイ ─────────────────────────────
       - name: Vercel に本番デプロイ
         if: steps.commit.outputs.changed == 'true'
         run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
-        shell: powershell
         env:
           VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -94,9 +81,8 @@ jobs:
       # ── ntfy.sh でプッシュ通知送信 ────────────────────────
       - name: プッシュ通知を送信
         if: steps.commit.outputs.changed == 'true'
-        shell: powershell
         run: |
-          $checkScript = @'
+          cat > /tmp/check_notify.js << 'JSEOF'
           'use strict';
           const { execSync } = require('child_process');
           const fs            = require('fs');
@@ -120,7 +106,6 @@ jobs:
             process.exit(0);
           }
 
-          // 全都道府県を対象にする
           const ALL_PREFS = Object.keys(curr).filter(k => Array.isArray(curr[k]));
           const prevIds  = new Set(ALL_PREFS.flatMap(p => (prev[p] || []).map(e => e.id)));
           const currAll  = ALL_PREFS.flatMap(p => curr[p] || []);
@@ -135,22 +120,20 @@ jobs:
             process.exit(0);
           }
 
-          fs.writeFileSync(process.env.TEMP + '\\notify_count.txt', String(newItems.length));
-          '@
+          fs.writeFileSync('/tmp/notify_count.txt', String(newItems.length));
+          JSEOF
 
-          $tempJs = "$env:TEMP\check_notify.js"
-          $checkScript | Out-File -FilePath $tempJs -Encoding utf8
-          node $tempJs
+          node /tmp/check_notify.js
 
-          $notifyFile = "$env:TEMP\notify_count.txt"
-          if (Test-Path $notifyFile) {
-            $count = Get-Content $notifyFile
-            Invoke-RestMethod `
-              -Uri "https://ntfy.sh/jsdf-chiiki-events-7928" `
-              -Method Post `
-              -Body "新着イベントが${count}件追加されました。アプリを開いて確認してください。" `
-              -Headers @{ Title = "自衛隊地本イベント情報 新着"; Tags = "mega,jp"; Priority = "default" }
-            Write-Output "[通知] ntfy 送信完了（新着 ${count}件）"
-          } else {
-            Write-Output "[通知] 送信スキップ"
-          }
+          if [ -f /tmp/notify_count.txt ]; then
+            COUNT=$(cat /tmp/notify_count.txt)
+            curl -s \
+              -H "Title: 自衛隊地本イベント情報 新着" \
+              -H "Tags: mega,jp" \
+              -H "Priority: default" \
+              -d "新着イベントが${COUNT}件追加されました。アプリを開いて確認してください。" \
+              https://ntfy.sh/jsdf-chiiki-events-7928
+            echo "[通知] ntfy 送信完了（新着 ${COUNT}件）"
+          else
+            echo "[通知] 送信スキップ"
+          fi
