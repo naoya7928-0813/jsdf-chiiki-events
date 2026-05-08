@@ -11,6 +11,9 @@ export default function FilterBar({
   primary,
 }) {
   const categories = ['すべて', ...new Set(events.map(e => e.category).filter(Boolean))];
+  const categoryCounts = Object.fromEntries(
+    categories.map(cat => [cat, cat === 'すべて' ? events.length : events.filter(e => e.category === cat).length])
+  );
   const tags       = [...new Set(events.map(e => e.tag).filter(t => t && t !== '応募終了'))];
 
   return (
@@ -38,10 +41,18 @@ export default function FilterBar({
                 color: isOn ? '#fff' : 'var(--text-muted)',
                 fontSize: 12, fontWeight: isOn ? 600 : 400,
                 cursor: 'pointer', whiteSpace: 'nowrap',
-                fontFamily: F.sans,
+                fontFamily: F.sans, display: 'flex', alignItems: 'center', gap: 5,
               }}
             >
               {cat}
+              <span style={{
+                fontSize: 10, fontFamily: F.mono, fontWeight: 600,
+                background: isOn ? 'rgba(255,255,255,0.25)' : 'var(--tag-bg)',
+                color: isOn ? '#fff' : 'var(--text-muted)',
+                borderRadius: 8, padding: '0 5px', lineHeight: '16px',
+              }}>
+                {categoryCounts[cat]}
+              </span>
             </button>
           );
         })}

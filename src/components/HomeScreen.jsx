@@ -179,31 +179,46 @@ export default function HomeScreen({
                 </div>
               ) : (
                 /* 地域未選択時のガイド */
-                <div style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{
-                    width: 36, height: 36, borderRadius: '50%',
-                    background: `${primary}10`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    flexShrink: 0,
-                  }}>
-                    {ICO.map(primary, 18)}
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
-                      地域を選択
+                <div style={{ padding: '12px 16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                    <div style={{
+                      width: 36, height: 36, borderRadius: '50%',
+                      background: `${primary}10`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      flexShrink: 0,
+                    }}>
+                      {ICO.map(primary, 18)}
                     </div>
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
-                      地図をタップしてイベントを確認
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+                        地域を選択
+                      </div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                        地図をタップしてイベントを確認
+                      </div>
                     </div>
-                  </div>
 
-                  {/* 全体サマリー */}
-                  <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-                    <div style={{ fontFamily: F.serif, fontSize: 22, fontWeight: 600, color: primary, lineHeight: 1 }}>
-                      {Object.values(eventCounts).reduce((s, c) => s + c, 0)}
+                    {/* 全体サマリー */}
+                    <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
+                      <div style={{ fontFamily: F.serif, fontSize: 22, fontWeight: 600, color: primary, lineHeight: 1 }}>
+                        {Object.values(eventCounts).reduce((s, c) => s + c, 0)}
+                      </div>
+                      <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>件</div>
                     </div>
-                    <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>件</div>
                   </div>
+                  {/* 全イベント一覧へのショートカット */}
+                  <button
+                    onClick={onOpenList}
+                    style={{
+                      width: '100%', height: 36, borderRadius: 8, border: `1px solid ${primary}44`,
+                      background: `${primary}08`, color: primary,
+                      fontSize: 13, fontWeight: 600, fontFamily: F.sans,
+                      cursor: 'pointer', letterSpacing: 0.5,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                    }}
+                  >
+                    {ICO.cal(primary, 14)} 全イベント一覧を見る
+                  </button>
                 </div>
               )}
             </div>

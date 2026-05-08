@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { ICO } from './Icons';
 import { F, ScreenHeader, BottomTabBar, splitDate } from './Shared';
 import { REGION_BY_ID, SUPPORTED_PREFECTURES } from '../data/regionMap';
-import { deadlineDaysUntil, daysLabel, daysColor } from '../utils/date';
+import { deadlineDaysUntil, daysUntil, daysLabel, daysColor } from '../utils/date';
 
 // ─── 地域画面（都道府県タブ + イベント一覧） ─────────────────────
 export default function RegionScreen({
@@ -153,16 +153,19 @@ export default function RegionScreen({
 }
 
 // ─── イベントカード ───────────────────────────────────────────
+const TODAY_STR = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
+
 function EventCard({ ev, isFav, primary, accent, onTap }) {
   const { m, d }  = splitDate(ev.date);
   const endSplit  = ev.endDate ? splitDate(ev.endDate) : null;
   const isWeekend = /[土日祝]/.test(ev.weekday);
   const dayColor  = isWeekend ? accent : primary;
-  const todayStr  = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
-  const isOngoing = !!(ev.endDate && ev.date < todayStr);
-  const dlDays     = deadlineDaysUntil(ev.deadline);
+  const isOngoing = !!(ev.endDate && ev.date < TODAY_STR);
+  const dlDays       = deadlineDaysUntil(ev.deadline);
   const showUrgent   = dlDays != null && dlDays >= 0 && dlDays <= 3;
   const showDeadline = dlDays != null && dlDays >= 0 && dlDays <= 7;
+  const eventDays    = daysUntil(ev.endDate || ev.date);
+  const showEvent    = !isOngoing && eventDays >= 0 && eventDays <= 7;
 
   return (
     <div
@@ -248,6 +251,20 @@ function EventCard({ ev, isFav, primary, accent, onTap }) {
             }}>
               {ICO.clock(daysColor(dlDays, primary, accent), 11)}
               締切 {daysLabel(dlDays, 'deadline')} — {ev.deadline}
+            </div>
+          )}
+          {/* 開催カウントダウン（7日以内・締切バッジ非表示時） */}
+          {showEvent && !showDeadline && (
+            <div style={{
+              marginTop: 6,
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              fontSize: 11, fontWeight: 600,
+              color: daysColor(eventDays, primary, accent),
+              background: `${daysColor(eventDays, primary, accent)}14`,
+              padding: '2px 8px', borderRadius: 4,
+            }}>
+              {ICO.clock(daysColor(eventDays, primary, accent), 11)}
+              {daysLabel(eventDays, 'event')}
             </div>
           )}
         </div>

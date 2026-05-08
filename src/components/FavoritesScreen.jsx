@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { ICO } from './Icons';
 import { BottomTabBar, F, splitDate } from './Shared';
 import { SUPPORTED_PREFECTURES, PREFECTURE_INFO } from '../data/regionMap';
+import { deadlineDaysUntil, daysUntil, daysLabel, daysColor } from '../utils/date';
 
 // ─── お気に入り一覧画面 ───────────────────────────────────────
 // DetailScreen でスター登録したイベントを一覧表示する。
@@ -95,6 +96,10 @@ function FavCard({ ev, primary, accent, onTap }) {
   const dateColor = isWeekend ? accent : primary;
   const todayStr  = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
   const isOngoing = !!(ev.endDate && ev.date < todayStr);
+  const dlDays    = deadlineDaysUntil(ev.deadline);
+  const showDl    = dlDays != null && dlDays >= 0 && dlDays <= 3;
+  const eventDays = daysUntil(ev.endDate || ev.date);
+  const showEvent = !isOngoing && eventDays >= 0 && eventDays <= 7;
 
   return (
     <div
@@ -137,6 +142,23 @@ function FavCard({ ev, primary, accent, onTap }) {
             {isOngoing && (
               <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3, background: '#22c55e22', color: '#15803d', fontFamily: F.mono }}>
                 開催中
+              </span>
+            )}
+            {showDl && (
+              <span style={{
+                fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3,
+                background: '#f9731622', color: '#f97316', fontFamily: F.mono, letterSpacing: 0.5,
+              }}>
+                締切 {daysLabel(dlDays, 'deadline')}
+              </span>
+            )}
+            {showEvent && !showDl && (
+              <span style={{
+                fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3,
+                background: `${daysColor(eventDays, primary, accent)}18`,
+                color: daysColor(eventDays, primary, accent), fontFamily: F.mono, letterSpacing: 0.5,
+              }}>
+                {daysLabel(eventDays, 'event')}
               </span>
             )}
             {/* 地本ラベル */}

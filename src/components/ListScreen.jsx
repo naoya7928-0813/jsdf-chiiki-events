@@ -100,6 +100,7 @@ export default function ListScreen({
   }, [grouped, searchQuery]);
 
   const { primary, accent } = theme;
+  const todayStr = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
   // checkedAt: 更新ボタンを押した（または自動フェッチした）時刻（ローカル）
   // updatedAt: スクレイパーがデータを書いた時刻（JSON内）
   const checkedLabel = checkedAt ?? updatedAt ?? new Date().toLocaleString('ja-JP', {
@@ -271,7 +272,6 @@ export default function ListScreen({
                   const endSplit   = ev.endDate ? splitDate(ev.endDate) : null;
                   const isWeekend  = /[土日祝]/.test(ev.weekday);
                   const dateColor  = isWeekend ? accent : primary;
-                  const todayStr   = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
                   const isOngoing  = !!(ev.endDate && ev.date < todayStr);
                   const eventDays  = daysUntil(ev.endDate || ev.date);
                   const dlDays     = deadlineDaysUntil(ev.deadline);

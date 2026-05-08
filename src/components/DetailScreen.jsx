@@ -52,13 +52,15 @@ export default function DetailScreen({ event, onBack, theme, favorites, onToggle
               }}>
                 {ICO.star(starred ? accent : '#fff', 16, starred ? accent : 'none')}
               </button>
-              <button
-                onClick={() => navigator.share?.({ title: ev.title, text: `${ev.date} ${ev.place}`, url: location.href })}
-                aria-label="シェア"
-                style={iconBtnStyle}
-              >
-                {ICO.share('#fff', 16)}
-              </button>
+              {typeof navigator.share === 'function' && (
+                <button
+                  onClick={() => navigator.share({ title: ev.title, text: `${ev.date} ${ev.place}`, url: location.href })}
+                  aria-label="シェア"
+                  style={iconBtnStyle}
+                >
+                  {ICO.share('#fff', 16)}
+                </button>
+              )}
             </div>
           </div>
 
