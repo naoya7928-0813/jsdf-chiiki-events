@@ -62,9 +62,9 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add public/data/events.json
+          git add public/data/events.json public/events.html public/sitemap.xml
 
-          $status = git status --porcelain public/data/events.json
+          $status = git status --porcelain public/data/events.json public/events.html public/sitemap.xml
           if (-not $status) {
             Write-Output "データに変更がありませんでした。コミットをスキップします。"
             Add-Content -Path $env:GITHUB_OUTPUT -Value "changed=false"
@@ -120,9 +120,10 @@ jobs:
             process.exit(0);
           }
 
-          const PREFS = ['kanagawa','tokyo','saitama','gunma','tochigi','ibaraki','chiba'];
-          const prevIds  = new Set(PREFS.flatMap(p => (prev[p] || []).map(e => e.id)));
-          const currAll  = PREFS.flatMap(p => curr[p] || []);
+          // 全都道府県を対象にする
+          const ALL_PREFS = Object.keys(curr).filter(k => Array.isArray(curr[k]));
+          const prevIds  = new Set(ALL_PREFS.flatMap(p => (prev[p] || []).map(e => e.id)));
+          const currAll  = ALL_PREFS.flatMap(p => curr[p] || []);
           const newItems = currAll.filter(e => !prevIds.has(e.id));
 
           console.log('  全イベント数 :', currAll.length, '件');
@@ -131,18 +132,6 @@ jobs:
 
           if (newItems.length === 0) {
             console.log('  → スキップ: 新着イベントなし');
-            process.exit(0);
-          }
-
-          const jstNow = new Date(Date.now() + 9 * 3600 * 1000);
-          const h = jstNow.getUTCHours();
-          const m = jstNow.getUTCMinutes();
-          const total = h * 60 + m;
-          const windows = [8 * 60, 12 * 60, 18 * 60];
-          const inWin = windows.some(w => Math.abs(total - w) <= 30);
-
-          if (!inWin) {
-            console.log('  → スキップ: 通知ウィンドウ外');
             process.exit(0);
           }
 
