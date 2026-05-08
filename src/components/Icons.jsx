@@ -14,4 +14,6 @@ export const ICO = {
   refresh:(c = '#fff',    s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 0115-6.7L21 8M21 4v4h-4M21 12a9 9 0 01-15 6.7L3 16M3 20v-4h4" stroke={c} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>,
   extLink:(c = '#fff',    s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M14 4h6v6M20 4L10 14M6 6h4M6 6v12h12v-4" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>,
   map:    (c = '#0b2545', s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" stroke={c} strokeWidth="1.6" strokeLinejoin="round"/><path d="M8 2v16M16 6v16" stroke={c} strokeWidth="1.6" strokeLinecap="round"/></svg>,
+  close:  (c = '#6b7280', s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke={c} strokeWidth="2" strokeLinecap="round"/></svg>,
+  trash:  (c = '#6b7280', s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke={c} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>,
 };

@@ -1,6 +1,7 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useEvents } from './hooks/useEvents';
 import { COLOR_SCHEMES, DEFAULT_SCHEME } from './config';
+import { PREFECTURE_INFO } from './data/regionMap';
 import HomeScreen        from './components/HomeScreen';
 import ListScreen        from './components/ListScreen';
 import DetailScreen      from './components/DetailScreen';
@@ -22,9 +23,13 @@ function loadFavorites() {
   try { return new Set(JSON.parse(localStorage.getItem('jsdf-favorites') || '[]')); } catch { return new Set(); }
 }
 
-// seenIds: 通知画面で確認済みのイベントID配列
-function loadSeenIds() {
-  try { return JSON.parse(localStorage.getItem('jsdf-seen-ids') || '[]'); } catch { return []; }
+// 既知イベントID（新着検出用）
+function loadKnownIds() {
+  try { return new Set(JSON.parse(localStorage.getItem('jsdf-known-ids') || '[]')); } catch { return new Set(); }
+}
+// 通知履歴
+function loadNotifHistory() {
+  try { return JSON.parse(localStorage.getItem('jsdf-notif-history') || '[]'); } catch { return []; }
 }
 
 // OS のカラースキームを考慮してダークモードを解決する
@@ -137,21 +142,69 @@ export default function App() {
     });
   }, []);
 
-  // ── 通知（既読管理） ──────────────────────────────────────
-  const [seenIds, setSeenIds] = useState(loadSeenIds);
+  // ── 通知履歴 ──────────────────────────────────────────────
+  const [notifHistory, setNotifHistory] = useState(loadNotifHistory);
+  const lastProcessedAt = useRef(null);
 
-  const allEventIds = useMemo(
-    () => Object.values(events).filter(Array.isArray).flatMap(evs => evs.map(e => e.id)),
-    [events]
-  );
-  const unreadCount = allEventIds.filter(id => !seenIds.includes(id)).length;
+  // updatedAt が変わったとき（新しいスクレイプ結果）に新着イベントを検出
+  useEffect(() => {
+    if (loading || !updatedAt) return;
+    if (lastProcessedAt.current === updatedAt) return;
+    lastProcessedAt.current = updatedAt;
 
-  const handleMarkAllRead = useCallback((ids) => {
-    setSeenIds(prev => {
-      const next = [...new Set([...prev, ...ids])];
-      try { localStorage.setItem('jsdf-seen-ids', JSON.stringify(next)); } catch {}
-      return next;
+    const allCurrentEvents = Object.entries(events)
+      .filter(([, v]) => Array.isArray(v))
+      .flatMap(([, evs]) => evs);
+    const allCurrentIds = allCurrentEvents.map(e => e.id);
+
+    const knownIds = loadKnownIds();
+    if (knownIds.size === 0) {
+      // 初回インストール：全イベントを既知として登録するだけ（通知なし）
+      try { localStorage.setItem('jsdf-known-ids', JSON.stringify(allCurrentIds)); } catch {}
+      return;
+    }
+
+    const newEvents = allCurrentEvents.filter(e => !knownIds.has(e.id));
+    if (newEvents.length > 0) {
+      const addedAt = new Date().toISOString();
+      const newNotifs = newEvents.map(ev => ({
+        ...ev,
+        addedAt,
+        read: false,
+        regionLabel: (PREFECTURE_INFO[ev.pref]?.label ?? ev.pref) + '地本',
+      }));
+      setNotifHistory(prev => {
+        const updated = [...newNotifs, ...prev].slice(0, 200);
+        try { localStorage.setItem('jsdf-notif-history', JSON.stringify(updated)); } catch {}
+        return updated;
+      });
+    }
+
+    const nextKnownIds = [...new Set([...knownIds, ...allCurrentIds])];
+    try { localStorage.setItem('jsdf-known-ids', JSON.stringify(nextKnownIds)); } catch {}
+  }, [updatedAt, loading, events]);
+
+  const unreadCount = notifHistory.filter(n => !n.read).length;
+
+  const handleMarkAllRead = useCallback(() => {
+    setNotifHistory(prev => {
+      const updated = prev.map(n => ({ ...n, read: true }));
+      try { localStorage.setItem('jsdf-notif-history', JSON.stringify(updated)); } catch {}
+      return updated;
     });
+  }, []);
+
+  const handleDeleteNotif = useCallback((id) => {
+    setNotifHistory(prev => {
+      const updated = prev.filter(n => n.id !== id);
+      try { localStorage.setItem('jsdf-notif-history', JSON.stringify(updated)); } catch {}
+      return updated;
+    });
+  }, []);
+
+  const handleClearNotifHistory = useCallback(() => {
+    setNotifHistory([]);
+    try { localStorage.removeItem('jsdf-notif-history'); } catch {}
   }, []);
 
   return (
@@ -233,10 +286,12 @@ export default function App() {
       {screen === 'notifications' && (
         <NotificationScreen
           events={events}
-          seenIds={seenIds}
+          notifHistory={notifHistory}
           favorites={favorites}
           theme={theme}
           onMarkAllRead={handleMarkAllRead}
+          onDeleteNotif={handleDeleteNotif}
+          onClearAll={handleClearNotifHistory}
           onOpenDetail={(ev) => openDetail(ev, 'notifications')}
           onBack={() => setScreen('home')}
         />
