@@ -115,7 +115,7 @@ export default function HomeScreen({
               <LegendItem color="var(--map-gray, #d1d5db)" label="準備中" />
             </div>
 
-            {/* ─ 下部カード ─ */}
+            {/* ─ 下部カード（高さ固定でマップリサイズを防ぐ） ─ */}
             <div style={{
               flexShrink: 0,
               margin: '0 16px 8px',
@@ -123,36 +123,25 @@ export default function HomeScreen({
               border: `1px solid ${selectedRegion ? `${primary}33` : 'var(--border)'}`,
               background: selectedRegion ? `${primary}08` : 'var(--card)',
               overflow: 'hidden',
-              transition: 'all 0.2s',
             }}>
               {selectedRegion ? (
-                <div style={{ padding: '14px 16px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                    <div>
-                      <div style={{ fontFamily: F.serif, fontSize: 18, fontWeight: 600, color: 'var(--text)', letterSpacing: 0.5 }}>
-                        {selectedRegion.label}
-                      </div>
-                      <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>
-                        {hasEvents
-                          ? `${supportedPrefs.length} 地本対応 · ${totalEventCount} 件のイベント`
-                          : 'この地域は準備中です'}
-                      </div>
+                <div style={{ padding: '12px 16px', minHeight: 104, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  {/* 地域名 + 2段数値 */}
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                    <div style={{ fontFamily: F.serif, fontSize: 18, fontWeight: 600, color: 'var(--text)', letterSpacing: 0.5 }}>
+                      {selectedRegion.label}
                     </div>
-                    {/* 対応地本のバッジ列 */}
-                    {hasEvents && (
-                      <div style={{ display: 'flex', gap: 4 }}>
-                        {supportedPrefs.map(p => (
-                          <div key={p.id} style={{
-                            width: 28, height: 28, borderRadius: '50%',
-                            background: `${primary}18`,
-                            border: `1px solid ${primary}33`,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 11, fontWeight: 700, color: primary, fontFamily: F.serif,
-                          }}>
-                            {p.emblem}
-                          </div>
-                        ))}
+                    {hasEvents ? (
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                          {supportedPrefs.length} 地本対応
+                        </div>
+                        <div style={{ fontSize: 16, fontWeight: 700, color: primary, lineHeight: 1.3 }}>
+                          {totalEventCount} 件のイベント
+                        </div>
                       </div>
+                    ) : (
+                      <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>準備中</div>
                     )}
                   </div>
 
@@ -161,12 +150,12 @@ export default function HomeScreen({
                     onClick={() => hasEvents && onOpenRegion(selectedRegionId)}
                     disabled={!hasEvents}
                     style={{
-                      width: '100%', height: 40, borderRadius: 10, border: 'none',
+                      width: '100%', height: 38, borderRadius: 10, border: 'none',
                       background: hasEvents ? primary : 'var(--border)',
                       color: hasEvents ? '#fff' : 'var(--text-muted)',
                       fontSize: 14, fontWeight: 600, fontFamily: F.sans,
                       cursor: hasEvents ? 'pointer' : 'default',
-                      letterSpacing: 0.5,
+                      letterSpacing: 0.5, marginTop: 10,
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                     }}
                   >
@@ -179,8 +168,8 @@ export default function HomeScreen({
                 </div>
               ) : (
                 /* 地域未選択時のガイド */
-                <div style={{ padding: '12px 16px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                <div style={{ padding: '12px 16px', minHeight: 104, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{
                       width: 36, height: 36, borderRadius: '50%',
                       background: `${primary}10`,
@@ -197,7 +186,6 @@ export default function HomeScreen({
                         地図をタップしてイベントを確認
                       </div>
                     </div>
-
                     {/* 全体サマリー */}
                     <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
                       <div style={{ fontFamily: F.serif, fontSize: 22, fontWeight: 600, color: primary, lineHeight: 1 }}>
@@ -210,10 +198,10 @@ export default function HomeScreen({
                   <button
                     onClick={onOpenList}
                     style={{
-                      width: '100%', height: 36, borderRadius: 8, border: `1px solid ${primary}44`,
+                      width: '100%', height: 38, borderRadius: 8, border: `1px solid ${primary}44`,
                       background: `${primary}08`, color: primary,
                       fontSize: 13, fontWeight: 600, fontFamily: F.sans,
-                      cursor: 'pointer', letterSpacing: 0.5,
+                      cursor: 'pointer', letterSpacing: 0.5, marginTop: 10,
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                     }}
                   >
