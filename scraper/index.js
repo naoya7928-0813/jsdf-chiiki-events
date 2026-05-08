@@ -236,14 +236,13 @@ const OCR_PROMPT = `この自衛隊イベントのポスター画像から情報
 }`;
 
 /**
- * ポスター画像URLを受け取り、Claude Haiku でOCRしてJSON を返す。
- * ANTHROPIC_API_KEY が未設定の場合は null を返す（OCRスキップ）。
+ * ポスター画像URLを受け取り、Gemini Flash でOCRしてJSON を返す。
+ * GEMINI_API_KEY が未設定の場合は null を返す（OCRスキップ）。
  */
 async function ocrImage(imageUrl) {
-  if (!process.env.ANTHROPIC_API_KEY || !imageUrl) return null;
+  if (!process.env.GEMINI_API_KEY || !imageUrl) return null;
 
   try {
-    // 画像をダウンロード
     const imgRes = await fetch(imageUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -255,30 +254,24 @@ async function ocrImage(imageUrl) {
       return null;
     }
 
-    const buf       = await imgRes.arrayBuffer();
-    const base64    = Buffer.from(buf).toString('base64');
-    const mimeType  = (imgRes.headers.get('content-type') || 'image/png').split(';')[0].trim();
+    const buf      = await imgRes.arrayBuffer();
+    const base64   = Buffer.from(buf).toString('base64');
+    const mimeType = (imgRes.headers.get('content-type') || 'image/jpeg').split(';')[0].trim();
 
-    // Claude Haiku API 呼び出し（SDK不要・native fetch）
-    const apiRes = await fetch('https://api.anthropic.com/v1/messages', {
-      method:  'POST',
-      headers: {
-        'x-api-key':         process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-        'content-type':      'application/json',
-      },
-      body: JSON.stringify({
-        model:      'claude-haiku-4-5-20251001',
-        max_tokens: 512,
-        messages: [{
-          role:    'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: mimeType, data: base64 } },
-            { type: 'text',  text: OCR_PROMPT },
-          ],
-        }],
-      }),
-    });
+    const apiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      {
+        method:  'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [
+            { inline_data: { mime_type: mimeType, data: base64 } },
+            { text: OCR_PROMPT },
+          ] }],
+          generationConfig: { maxOutputTokens: 512, temperature: 0 },
+        }),
+      }
+    );
 
     if (!apiRes.ok) {
       const errText = await apiRes.text();
@@ -286,10 +279,8 @@ async function ocrImage(imageUrl) {
       return null;
     }
 
-    const apiJson = await apiRes.json();
-    const text    = apiJson.content?.[0]?.text ?? '';
-
-    // レスポンスからJSON部分を抽出
+    const apiJson   = await apiRes.json();
+    const text      = apiJson.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return null;
     return JSON.parse(jsonMatch[0]);
@@ -324,11 +315,11 @@ const PDF_OCR_PROMPT = `この自衛隊イベントのPDFから情報を抽出�
 }`;
 
 /**
- * PDF URL を受け取り、Claude Haiku で OCR して JSON を返す。
- * ANTHROPIC_API_KEY が未設定の場合は null を返す（OCR スキップ）。
+ * PDF URL を受け取り、Gemini Flash で OCR して JSON を返す。
+ * GEMINI_API_KEY が未設定の場合は null を返す（OCR スキップ）。
  */
 async function ocrPdf(pdfUrl) {
-  if (!process.env.ANTHROPIC_API_KEY || !pdfUrl) return null;
+  if (!process.env.GEMINI_API_KEY || !pdfUrl) return null;
 
   try {
     const pdfRes = await fetch(pdfUrl, {
@@ -345,29 +336,20 @@ async function ocrPdf(pdfUrl) {
     const buf    = await pdfRes.arrayBuffer();
     const base64 = Buffer.from(buf).toString('base64');
 
-    const apiRes = await fetch('https://api.anthropic.com/v1/messages', {
-      method:  'POST',
-      headers: {
-        'x-api-key':         process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-        'anthropic-beta':    'pdfs-2024-09-25',
-        'content-type':      'application/json',
-      },
-      body: JSON.stringify({
-        model:      'claude-haiku-4-5-20251001',
-        max_tokens: 512,
-        messages: [{
-          role:    'user',
-          content: [
-            {
-              type:   'document',
-              source: { type: 'base64', media_type: 'application/pdf', data: base64 },
-            },
-            { type: 'text', text: PDF_OCR_PROMPT },
-          ],
-        }],
-      }),
-    });
+    const apiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      {
+        method:  'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [
+            { inline_data: { mime_type: 'application/pdf', data: base64 } },
+            { text: PDF_OCR_PROMPT },
+          ] }],
+          generationConfig: { maxOutputTokens: 512, temperature: 0 },
+        }),
+      }
+    );
 
     if (!apiRes.ok) {
       const errText = await apiRes.text();
@@ -376,7 +358,7 @@ async function ocrPdf(pdfUrl) {
     }
 
     const apiJson   = await apiRes.json();
-    const text      = apiJson.content?.[0]?.text ?? '';
+    const text      = apiJson.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return null;
     return JSON.parse(jsonMatch[0]);
@@ -395,8 +377,8 @@ async function ocrPdf(pdfUrl) {
  * 新たに PDF 系地本を追加する際はこの関数を main() から呼ぶこと。
  */
 async function enrichWithPdfOcr(events) {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.log('[PDF-OCR] ANTHROPIC_API_KEY 未設定のためスキップ');
+  if (!process.env.GEMINI_API_KEY) {
+    console.log('[PDF-OCR] GEMINI_API_KEY 未設定のためスキップ');
     return events;
   }
 
@@ -447,7 +429,7 @@ const OCR_PROMPT_FULL = `この自衛隊イベントのポスター画像から�
  * 画像 1 枚から全イベント情報（日付・場所含む）を OCR する（栃木専用）。
  */
 async function ocrImageFull(imageUrl) {
-  if (!process.env.ANTHROPIC_API_KEY || !imageUrl) return null;
+  if (!process.env.GEMINI_API_KEY || !imageUrl) return null;
   try {
     const imgRes = await fetch(imageUrl, {
       headers: {
@@ -459,24 +441,23 @@ async function ocrImageFull(imageUrl) {
     const buf      = await imgRes.arrayBuffer();
     const base64   = Buffer.from(buf).toString('base64');
     const mimeType = (imgRes.headers.get('content-type') || 'image/jpeg').split(';')[0].trim();
-    const apiRes   = await fetch('https://api.anthropic.com/v1/messages', {
-      method:  'POST',
-      headers: {
-        'x-api-key':         process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-        'content-type':      'application/json',
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001', max_tokens: 512,
-        messages: [{ role: 'user', content: [
-          { type: 'image', source: { type: 'base64', media_type: mimeType, data: base64 } },
-          { type: 'text',  text: OCR_PROMPT_FULL },
-        ] }],
-      }),
-    });
+    const apiRes   = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      {
+        method:  'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [
+            { inline_data: { mime_type: mimeType, data: base64 } },
+            { text: OCR_PROMPT_FULL },
+          ] }],
+          generationConfig: { maxOutputTokens: 512, temperature: 0 },
+        }),
+      }
+    );
     if (!apiRes.ok) { console.warn(`[OCR-FULL] API エラー (${apiRes.status})`); return null; }
     const apiJson   = await apiRes.json();
-    const text      = apiJson.content?.[0]?.text ?? '';
+    const text      = apiJson.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return null;
     return JSON.parse(jsonMatch[0]);
@@ -517,8 +498,8 @@ function isImageUrl(url) {
  * 失敗したイベントは元データのまま保持する。
  */
 async function enrichWithOcr(events) {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.log('[OCR] ANTHROPIC_API_KEY 未設定のためスキップ');
+  if (!process.env.GEMINI_API_KEY) {
+    console.log('[OCR] GEMINI_API_KEY 未設定のためスキップ');
     return events;
   }
 
@@ -916,7 +897,7 @@ const fetchWakayama = (ctx) => fetchWpPosts(ctx, '和歌山', URLS.wakayama, par
 
 /**
  * 兵庫地本: TOP ページからイベントバナー画像を取得し OCR でイベントを抽出する。
- * ANTHROPIC_API_KEY 未設定の場合は空配列を返す。
+ * GEMINI_API_KEY 未設定の場合は空配列を返す。
  */
 async function fetchHyogo(context) {
   console.log(`[兵庫] アクセス: ${URLS.hyogo}`);
@@ -942,8 +923,8 @@ async function fetchHyogo(context) {
     await page.close();
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.log('[兵庫] ANTHROPIC_API_KEY 未設定のため OCR スキップ');
+  if (!process.env.GEMINI_API_KEY) {
+    console.log('[兵庫] GEMINI_API_KEY 未設定のため OCR スキップ');
     return [];
   }
   if (imageUrls.length === 0) return [];
@@ -1010,7 +991,7 @@ async function fetchHyogo(context) {
 
 /**
  * 栃木地本ページを取得し、JPG ポスターを OCR してイベント一覧を返す。
- * ANTHROPIC_API_KEY 未設定の場合は空配列を返す（OCR スキップ）。
+ * GEMINI_API_KEY 未設定の場合は空配列を返す（OCR スキップ）。
  */
 async function fetchTochigi(context) {
   console.log(`[栃木] アクセス: ${URLS.tochigi}`);
@@ -1045,8 +1026,8 @@ async function fetchTochigi(context) {
     await page.close();
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.log('[栃木] ANTHROPIC_API_KEY 未設定のため OCR スキップ');
+  if (!process.env.GEMINI_API_KEY) {
+    console.log('[栃木] GEMINI_API_KEY 未設定のため OCR スキップ');
     return [];
   }
   if (imageUrls.length === 0) return [];
@@ -1099,7 +1080,7 @@ async function fetchTochigi(context) {
 
 /**
  * 富山地本ページを取得し、JPG ポスターを OCR してイベント一覧を返す。
- * ANTHROPIC_API_KEY 未設定の場合は空配列を返す（OCR スキップ）。
+ * GEMINI_API_KEY 未設定の場合は空配列を返す（OCR スキップ）。
  */
 async function fetchToyama(context) {
   console.log(`[富山] アクセス: ${URLS.toyama}`);
@@ -1134,8 +1115,8 @@ async function fetchToyama(context) {
     await page.close();
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.log('[富山] ANTHROPIC_API_KEY 未設定のため OCR スキップ');
+  if (!process.env.GEMINI_API_KEY) {
+    console.log('[富山] GEMINI_API_KEY 未設定のため OCR スキップ');
     return [];
   }
   if (imageUrls.length === 0) return [];
