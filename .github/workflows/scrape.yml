@@ -26,10 +26,10 @@ jobs:
         uses: actions/checkout@v4
 
       # ── Node.js のセットアップ ───────────────────────────────
-      - name: Node.js 20 をセットアップ
+      - name: Node.js 22 をセットアップ
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       # ── scraper の依存パッケージをインストール ───────────────
       - name: scraper の依存パッケージをインストール
@@ -137,3 +137,14 @@ jobs:
           else
             echo "[通知] 送信スキップ"
           fi
+
+      # ── スクレイプ失敗を管理者に通知 ──────────────────────
+      - name: スクレイプ失敗を管理者に通知
+        if: failure()
+        run: |
+          curl -s \
+            -H "Title: ⚠️ スクレイピング失敗" \
+            -H "Tags: warning" \
+            -H "Priority: high" \
+            -d "スクレイピングジョブが失敗しました。GitHub Actions のログを確認してください。 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            https://ntfy.sh/${{ secrets.NTFY_ADMIN_TOPIC }}
