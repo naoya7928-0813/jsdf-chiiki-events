@@ -1,0 +1,23 @@
+name: 失敗通知テスト（削除予定）
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-fail:
+    name: 失敗通知テスト
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 意図的に失敗させる
+        run: exit 1
+
+      - name: スクレイプ失敗を管理者に通知
+        if: failure()
+        run: |
+          curl -s \
+            -H "Title: [TEST] Scraping Failed" \
+            -H "Tags: warning" \
+            -H "Priority: high" \
+            -d "This is a test. The failure notification from GitHub Actions is working correctly. Run ID: ${{ github.run_id }}" \
+            https://ntfy.sh/${{ secrets.NTFY_ADMIN_TOPIC }}
