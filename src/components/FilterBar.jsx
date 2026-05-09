@@ -1,7 +1,12 @@
 import { F } from './Shared';
 
+// メインカテゴリとして個別チップを表示するカテゴリ一覧
+export const STANDARD_CATEGORIES = [
+  '説明会', '地域参加', '広報活動', '体験', '採用イベント',
+  '艦艇公開', '演奏会', '記念行事', '一般公開',
+];
+
 // ─── カテゴリ・タグ フィルターバー ───────────────────────────
-// ListScreen の一覧上部に表示する横スクロール可能なチップ群。
 export default function FilterBar({
   events,
   activeCategory,
@@ -10,11 +15,15 @@ export default function FilterBar({
   onTagChange,
   primary,
 }) {
-  const categories = ['すべて', ...new Set(events.map(e => e.category).filter(Boolean))];
-  const categoryCounts = Object.fromEntries(
-    categories.map(cat => [cat, cat === 'すべて' ? events.length : events.filter(e => e.category === cat).length])
-  );
-  const tags       = [...new Set(events.map(e => e.tag).filter(t => t && t !== '応募終了'))];
+  const categories = ['すべて', ...STANDARD_CATEGORIES, 'その他'];
+  const categoryCounts = {
+    'すべて': events.length,
+    ...Object.fromEntries(
+      STANDARD_CATEGORIES.map(cat => [cat, events.filter(e => e.category === cat).length])
+    ),
+    'その他': events.filter(e => !STANDARD_CATEGORIES.includes(e.category)).length,
+  };
+  const tags = [...new Set(events.map(e => e.tag).filter(t => t && t !== '応募終了'))];
 
   return (
     <div style={{ background: 'var(--card)', borderBottom: '1px solid var(--border)', paddingBottom: 8 }}>

@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { ICO } from './Icons';
 import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle } from './Shared';
-import FilterBar from './FilterBar';
+import FilterBar, { STANDARD_CATEGORIES } from './FilterBar';
 import { daysUntil, deadlineDaysUntil, daysLabel, daysColor } from '../utils/date';
 import { REGIONS, SUPPORTED_PREFECTURES } from '../data/regionMap';
 
@@ -75,7 +75,8 @@ export default function ListScreen({
   const filteredList = useMemo(() => {
     return list
       .filter(ev => {
-        const catOk = activeCategory === 'all' || ev.category === activeCategory;
+        const catOk = activeCategory === 'all'
+          || (activeCategory === 'その他' ? !STANDARD_CATEGORIES.includes(ev.category) : ev.category === activeCategory);
         const tagOk = activeTag      === 'all' || ev.tag      === activeTag;
         return catOk && tagOk;
       })
