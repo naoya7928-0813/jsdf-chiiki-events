@@ -190,7 +190,7 @@ export default function SettingsScreen({
                 const isA = darkMode === m.id;
                 return (
                   <button key={m.id} onClick={() => onDarkModeChange(m.id)} style={{
-                    flex: 1, height: 32, borderRadius: 6, border: 'none', cursor: 'pointer',
+                    flex: 1, height: 40, borderRadius: 6, border: 'none', cursor: 'pointer',
                     background: isA ? 'var(--card)' : 'transparent',
                     color: isA ? primary : 'var(--text-muted)',
                     fontFamily: F.sans, fontSize: 13,

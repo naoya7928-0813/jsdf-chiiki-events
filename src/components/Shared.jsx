@@ -113,7 +113,7 @@ export function BottomTabBar({ active, onChange, primary }) {
 
 // ─── ヘッダーアイコンボタンのベーススタイル ──────────────────
 export const iconBtnStyle = {
-  width: 34, height: 34, borderRadius: 8, minHeight: 34,
+  width: 44, height: 44, borderRadius: 8, minHeight: 44,
   background: 'rgba(255,255,255,0.1)',
   border: '1px solid rgba(255,255,255,0.18)',
   display: 'flex', alignItems: 'center', justifyContent: 'center',

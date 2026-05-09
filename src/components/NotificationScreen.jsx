@@ -16,9 +16,10 @@ export default function NotificationScreen({
 }) {
   const { primary, accent } = theme;
 
-  // 画面を開いたとき全件既読化
+  // 画面を閉じるとき（アンマウント時）に全件既読化
+  // ※ マウント時に即座に既読化すると NEW インジケーターが見えなくなるため
   useEffect(() => {
-    onMarkAllRead();
+    return () => onMarkAllRead();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -101,7 +102,7 @@ export default function NotificationScreen({
                 onClick={onClearAll}
                 aria-label="通知履歴を全削除"
                 style={{
-                  width: 32, height: 32, borderRadius: 8,
+                  width: 44, height: 44, borderRadius: 8,
                   background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.18)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   cursor: 'pointer', padding: 0,
@@ -174,7 +175,7 @@ export default function NotificationScreen({
                 <button
                   onClick={() => setShowNtfyGuide(true)}
                   style={{
-                    flex: 1, height: 36, borderRadius: 8,
+                    flex: 1, height: 44, borderRadius: 8,
                     background: `${primary}18`, border: 'none',
                     color: primary, fontSize: 12, fontWeight: 600,
                     cursor: 'pointer', fontFamily: F.sans,
@@ -185,7 +186,7 @@ export default function NotificationScreen({
                 <button
                   onClick={handleUnsubscribe}
                   style={{
-                    height: 36, padding: '0 14px', borderRadius: 8,
+                    height: 44, padding: '0 14px', borderRadius: 8,
                     border: '1px solid var(--border)',
                     background: 'var(--card)', color: 'var(--text-muted)', fontSize: 12,
                     cursor: 'pointer', fontFamily: F.sans,
@@ -343,7 +344,7 @@ function NotifCard({ item, primary, accent, onTap, onDelete }) {
             onClick={e => { e.stopPropagation(); onDelete(item.id); }}
             aria-label="この通知を削除"
             style={{
-              flexShrink: 0, width: 28, height: 28, borderRadius: 6,
+              flexShrink: 0, width: 36, height: 36, borderRadius: 6,
               border: 'none', background: 'var(--tag-bg)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer', padding: 0,

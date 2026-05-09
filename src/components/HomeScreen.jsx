@@ -59,7 +59,7 @@ export default function HomeScreen({
             onClick={onOpenNotifications}
             aria-label={`通知${unreadCount > 0 ? `（未読${unreadCount}件）` : ''}`}
             style={{
-              width: 36, height: 36, borderRadius: 10,
+              width: 44, height: 44, borderRadius: 10,
               background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.18)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer', padding: 0, position: 'relative',

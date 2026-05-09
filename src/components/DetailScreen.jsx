@@ -117,17 +117,41 @@ export default function DetailScreen({ event, onBack, theme, favorites, onToggle
               <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>{ev.address}</div>
             )}
             {/* インライン地図 */}
-            <div style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid var(--border)', height: 200 }}>
+            <div style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid var(--border)', height: 200, position: 'relative', background: 'var(--card)' }}>
+              {/* オフライン・読み込み失敗時のフォールバック */}
+              <div style={{
+                position: 'absolute', inset: 0,
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                gap: 6, pointerEvents: 'none',
+              }}>
+                {ICO.pin('var(--text-muted)', 26)}
+                <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: F.sans }}>地図を読み込んでいます…</span>
+              </div>
               <iframe
                 src={mapSrc}
                 width="100%"
                 height="200"
-                style={{ border: 0, display: 'block' }}
+                style={{ border: 0, display: 'block', position: 'relative', zIndex: 1 }}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 title={`${ev.place}の地図`}
               />
             </div>
+            {/* Google Maps で開くリンク（オフライン・iframe 失敗時の確実な代替手段） */}
+            <a
+              href={`https://maps.google.com/maps?q=${mapQuery}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                marginTop: 8, padding: '10px 12px', borderRadius: 8,
+                border: `1px solid ${primary}33`, color: primary,
+                fontSize: 13, textDecoration: 'none', fontFamily: F.sans,
+                background: `${primary}06`,
+              }}
+            >
+              {ICO.extLink(primary, 13)} Google Maps で開く
+            </a>
           </div>
         </div>
 
