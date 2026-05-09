@@ -5,9 +5,11 @@ import FilterBar from './FilterBar';
 import { daysUntil, deadlineDaysUntil, daysLabel, daysColor } from '../utils/date';
 import { REGIONS, SUPPORTED_PREFECTURES } from '../data/regionMap';
 
-const ALL_PREF_TABS = REGIONS.flatMap(r =>
-  r.prefectures.filter(p => SUPPORTED_PREFECTURES.has(p.id))
-);
+const ALL_TAB = { id: 'all', label: '全国', emblem: '全' };
+const ALL_PREF_TABS = [
+  ALL_TAB,
+  ...REGIONS.flatMap(r => r.prefectures.filter(p => SUPPORTED_PREFECTURES.has(p.id))),
+];
 
 export default function ListScreen({
   events, loading, error, updatedAt, checkedAt, onRefresh,
@@ -16,7 +18,14 @@ export default function ListScreen({
   onOpenHome, onOpenDetail, onOpenSettings, onOpenFavorites,
   theme,
 }) {
-  const list = events[region] ?? [];
+  const list = useMemo(() => {
+    if (region === 'all') {
+      return Object.entries(events)
+        .filter(([key]) => SUPPORTED_PREFECTURES.has(key))
+        .flatMap(([, evs]) => Array.isArray(evs) ? evs : []);
+    }
+    return events[region] ?? [];
+  }, [region, events]);
 
   // アクティブなタブを横スクロールでセンタリング（垂直方向には影響させない）
   const tabScrollRef = useRef(null);
@@ -165,7 +174,9 @@ export default function ListScreen({
         }}>
           {ALL_PREF_TABS.map(t => {
             const isA = region === t.id;
-            const count = (events[t.id] ?? []).length;
+            const count = t.id === 'all'
+              ? Object.entries(events).filter(([key]) => SUPPORTED_PREFECTURES.has(key)).reduce((s, [, evs]) => s + (Array.isArray(evs) ? evs.length : 0), 0)
+              : (events[t.id] ?? []).length;
             return (
               <button
                 key={t.id}

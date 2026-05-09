@@ -187,12 +187,20 @@ export default function HomeScreen({
                       </div>
                     </div>
                     {/* 全体サマリー */}
-                    <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-                      <div style={{ fontFamily: F.serif, fontSize: 22, fontWeight: 600, color: primary, lineHeight: 1 }}>
-                        {Object.values(eventCounts).reduce((s, c) => s + c, 0)}
-                      </div>
-                      <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>件</div>
-                    </div>
+                    {(() => {
+                      const total = Object.values(eventCounts).reduce((s, c) => s + c, 0);
+                      const over100 = total >= 100;
+                      return (
+                        <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
+                          <div style={{ fontFamily: F.serif, fontSize: 22, fontWeight: 600, color: primary, lineHeight: 1 }}>
+                            {over100 ? '100+' : total}
+                          </div>
+                          <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+                            {over100 ? '件以上' : '件'}
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                   {/* 全イベント一覧へのショートカット */}
                   <button

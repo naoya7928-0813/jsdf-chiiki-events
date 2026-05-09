@@ -13,7 +13,7 @@ import RegionScreen       from './components/RegionScreen';
 
 // ─── localStorage 復元ヘルパー ────────────────────────────────
 function loadScheme()       { try { return localStorage.getItem('jsdf-scheme') || DEFAULT_SCHEME; } catch { return DEFAULT_SCHEME; } }
-function loadRegion()       { try { return localStorage.getItem('jsdf-region') || 'tokyo';        } catch { return 'tokyo';        } }
+function loadRegion()       { try { return localStorage.getItem('jsdf-region') || 'all';          } catch { return 'all';          } }
 function loadDarkMode()     { try { return localStorage.getItem('jsdf-dark')   || 'system';       } catch { return 'system';       } }
 function loadLastMapRegion(){ try { return localStorage.getItem('jsdf-last-region') || null;       } catch { return null;           } }
 function loadLastPrefId()   { try { return localStorage.getItem('jsdf-last-pref')   || null;       } catch { return null;           } }
