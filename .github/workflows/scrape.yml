@@ -146,5 +146,6 @@ jobs:
             -H "Title: ⚠️ スクレイピング失敗" \
             -H "Tags: warning" \
             -H "Priority: high" \
+            -H "Content-Type: text/plain; charset=utf-8" \
             -d "スクレイピングジョブが失敗しました。GitHub Actions のログを確認してください。 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
             https://ntfy.sh/${{ secrets.NTFY_ADMIN_TOPIC }}
