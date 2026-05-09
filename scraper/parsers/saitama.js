@@ -6,9 +6,11 @@ const BASE_URL = 'https://www.mod.go.jp/pco/saitama/event/';
 
 function resolveUrl(href) {
   if (!href) return '';
-  if (href.startsWith('http')) return href;
+  // HTMLの属性が誤ってhref値に混入したケース（例: "file.jpg target=_blank"）を除去
+  const clean = href.split(/\s/)[0].split('%20')[0];
+  if (clean.startsWith('http')) return clean;
   try {
-    return new URL(href, BASE_URL).href;
+    return new URL(clean, BASE_URL).href;
   } catch {
     return '';
   }

@@ -109,7 +109,14 @@ function parseICalEvents(icsText, prefId) {
     if (!title) continue;
 
     const place = toHalfWidth(ve.location || '').replace(/\s+/g, ' ').trim();
-    const notes = ve.description ? ve.description.replace(/\s+/g, ' ').trim() : null;
+    const rawDesc = ve.description
+      ? ve.description
+          .replace(/<br\s*\/?>/gi, ' ')
+          .replace(/<[^>]*>/g, '')
+          .replace(/\s+/g, ' ')
+          .trim()
+      : null;
+    const notes = rawDesc || null;
     const shortId = prefId.slice(0, 2);
 
     events.push({
