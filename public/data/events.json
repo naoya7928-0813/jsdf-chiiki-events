@@ -535,7 +535,7 @@
   "yamanashi": [],
   "nagano": [
     {
-      "id": "na-20260514-1",
+      "id": "na-20260514-3",
       "pref": "nagano",
       "date": "2026-05-14",
       "weekday": "木",
@@ -551,7 +551,7 @@
       "deadline": null
     },
     {
-      "id": "na-20260523-3",
+      "id": "na-20260523-2",
       "pref": "nagano",
       "date": "2026-05-23",
       "weekday": "土",
@@ -567,7 +567,7 @@
       "deadline": null
     },
     {
-      "id": "na-20260530-2",
+      "id": "na-20260530-1",
       "pref": "nagano",
       "date": "2026-05-30",
       "weekday": "土",
@@ -733,23 +733,7 @@
   ],
   "aichi": [
     {
-      "id": "ai-20260509-1",
-      "pref": "aichi",
-      "date": "2026-05-09",
-      "weekday": "土",
-      "title": "名古屋所説明会",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "自衛隊制度",
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "ai-20260510-2",
+      "id": "ai-20260510-1",
       "pref": "aichi",
       "date": "2026-05-10",
       "weekday": "日",
@@ -765,7 +749,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260513-3",
+      "id": "ai-20260513-2",
       "pref": "aichi",
       "date": "2026-05-13",
       "weekday": "水",
@@ -781,7 +765,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260517-4",
+      "id": "ai-20260517-3",
       "pref": "aichi",
       "date": "2026-05-17",
       "weekday": "日",
@@ -797,7 +781,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260518-5",
+      "id": "ai-20260518-4",
       "pref": "aichi",
       "date": "2026-05-18",
       "weekday": "月",
@@ -813,7 +797,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260522-6",
+      "id": "ai-20260522-5",
       "pref": "aichi",
       "date": "2026-05-22",
       "weekday": "金",
@@ -829,7 +813,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260523-7",
+      "id": "ai-20260523-6",
       "pref": "aichi",
       "date": "2026-05-23",
       "weekday": "土",
@@ -845,7 +829,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260523-8",
+      "id": "ai-20260523-7",
       "pref": "aichi",
       "date": "2026-05-23",
       "weekday": "土",
@@ -861,7 +845,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260530-9",
+      "id": "ai-20260530-8",
       "pref": "aichi",
       "date": "2026-05-30",
       "weekday": "土",
@@ -877,7 +861,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260531-10",
+      "id": "ai-20260531-9",
       "pref": "aichi",
       "date": "2026-05-31",
       "weekday": "日",
@@ -893,7 +877,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260607-11",
+      "id": "ai-20260607-10",
       "pref": "aichi",
       "date": "2026-06-07",
       "weekday": "日",
@@ -909,7 +893,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260613-12",
+      "id": "ai-20260613-11",
       "pref": "aichi",
       "date": "2026-06-13",
       "weekday": "土",
@@ -925,7 +909,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260615-13",
+      "id": "ai-20260615-12",
       "pref": "aichi",
       "date": "2026-06-15",
       "weekday": "月",
@@ -941,11 +925,27 @@
       "deadline": null
     },
     {
-      "id": "ai-20260620-14",
+      "id": "ai-20260620-13",
       "pref": "aichi",
       "date": "2026-06-20",
       "weekday": "土",
       "title": "豊田所説明会",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "自衛隊制度",
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "ai-20260620-14",
+      "pref": "aichi",
+      "date": "2026-06-20",
+      "weekday": "土",
+      "title": "高等工科学校説明会",
       "place": "",
       "address": "",
       "time": "",
@@ -961,22 +961,6 @@
       "pref": "aichi",
       "date": "2026-06-20",
       "weekday": "土",
-      "title": "高等工科学校説明会",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "自衛隊制度",
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "ai-20260620-16",
-      "pref": "aichi",
-      "date": "2026-06-20",
-      "weekday": "土",
       "title": "名古屋所説明会",
       "place": "",
       "address": "",
@@ -989,7 +973,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260621-17",
+      "id": "ai-20260621-16",
       "pref": "aichi",
       "date": "2026-06-21",
       "weekday": "日",
@@ -1005,7 +989,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260623-18",
+      "id": "ai-20260623-17",
       "pref": "aichi",
       "date": "2026-06-23",
       "weekday": "火",
@@ -1021,7 +1005,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260627-19",
+      "id": "ai-20260627-18",
       "pref": "aichi",
       "date": "2026-06-27",
       "weekday": "土",
@@ -1037,7 +1021,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260628-20",
+      "id": "ai-20260628-19",
       "pref": "aichi",
       "date": "2026-06-28",
       "weekday": "日",
@@ -1053,7 +1037,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260705-21",
+      "id": "ai-20260705-20",
       "pref": "aichi",
       "date": "2026-07-05",
       "weekday": "日",
@@ -1069,7 +1053,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260708-22",
+      "id": "ai-20260708-21",
       "pref": "aichi",
       "date": "2026-07-08",
       "weekday": "水",
@@ -1085,7 +1069,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260711-23",
+      "id": "ai-20260711-22",
       "pref": "aichi",
       "date": "2026-07-11",
       "weekday": "土",
@@ -1101,7 +1085,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260725-24",
+      "id": "ai-20260725-23",
       "pref": "aichi",
       "date": "2026-07-25",
       "weekday": "土",
@@ -1117,7 +1101,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260802-25",
+      "id": "ai-20260802-24",
       "pref": "aichi",
       "date": "2026-08-02",
       "weekday": "日",
@@ -1133,7 +1117,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20261114-26",
+      "id": "ai-20261114-25",
       "pref": "aichi",
       "date": "2026-11-14",
       "weekday": "土",
@@ -1149,7 +1133,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20261205-27",
+      "id": "ai-20261205-26",
       "pref": "aichi",
       "date": "2026-12-05",
       "weekday": "土",
@@ -1165,7 +1149,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20270220-28",
+      "id": "ai-20270220-27",
       "pref": "aichi",
       "date": "2027-02-20",
       "weekday": "土",
@@ -1273,39 +1257,7 @@
       "deadline": null
     },
     {
-      "id": "kg-20260509-2",
-      "pref": "kagawa",
-      "date": "2026-05-09",
-      "weekday": "土",
-      "title": "金蔵寺こどもまつり",
-      "place": "金蔵寺境内",
-      "address": "",
-      "time": "",
-      "category": "地域参加",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/kagawa/event.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "kg-20260509-3",
-      "pref": "kagawa",
-      "date": "2026-05-09",
-      "weekday": "土",
-      "title": "ヒカリグループ感謝祭",
-      "place": "ヒカリ本社周辺駐車場",
-      "address": "",
-      "time": "",
-      "category": "地域参加",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/kagawa/event.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "kg-20260515-4",
+      "id": "kg-20260515-2",
       "pref": "kagawa",
       "date": "2026-05-15",
       "weekday": "金",
@@ -1321,7 +1273,7 @@
       "deadline": null
     },
     {
-      "id": "kg-20260606-5",
+      "id": "kg-20260606-3",
       "pref": "kagawa",
       "date": "2026-06-06",
       "weekday": "土",
@@ -1337,7 +1289,7 @@
       "deadline": null
     },
     {
-      "id": "kg-20260711-6",
+      "id": "kg-20260711-4",
       "pref": "kagawa",
       "date": "2026-07-11",
       "weekday": "土",
@@ -1353,7 +1305,7 @@
       "deadline": null
     },
     {
-      "id": "kg-20260712-7",
+      "id": "kg-20260712-5",
       "pref": "kagawa",
       "date": "2026-07-12",
       "weekday": "日",
@@ -1540,23 +1492,7 @@
   ],
   "yamaguchi": [
     {
-      "id": "ym-20260509-1",
-      "pref": "yamaguchi",
-      "date": "2026-05-09",
-      "weekday": "土",
-      "title": "レノファ山口FCのホームゲーム戦",
-      "place": "維新みらいふスタジアム ビジターゴール裏周辺",
-      "address": "",
-      "time": "10:00～14:00",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/yamaguchi/event.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "ym-20260514-2",
+      "id": "ym-20260514-1",
       "pref": "yamaguchi",
       "date": "2026-05-14",
       "weekday": "木",
@@ -1572,7 +1508,7 @@
       "deadline": null
     },
     {
-      "id": "ym-20260517-3",
+      "id": "ym-20260517-2",
       "pref": "yamaguchi",
       "date": "2026-05-17",
       "weekday": "日",
@@ -1588,7 +1524,7 @@
       "deadline": null
     },
     {
-      "id": "ym-20260517-4",
+      "id": "ym-20260517-3",
       "pref": "yamaguchi",
       "date": "2026-05-17",
       "weekday": "日",
@@ -1621,22 +1557,6 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null
-    },
-    {
-      "id": "sg-20260509-2",
-      "pref": "saga",
-      "date": "2026-05-09",
-      "weekday": "土",
-      "title": "護衛艦「のしろ」一般公開in唐津",
-      "place": "唐津東港",
-      "address": "",
-      "time": "10:00～15:00",
-      "category": "一般公開",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/saga/event/index.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
     }
   ],
   "nagasaki": [],
@@ -1658,26 +1578,9 @@
       "deadline": null
     }
   ],
-  "oita": [
-    {
-      "id": "oi-20260509-1",
-      "pref": "oita",
-      "date": "2026-05-09",
-      "weekday": "土",
-      "title": "護衛艦あぶくま一般公開",
-      "place": "別府国際観光港　第4埠頭",
-      "address": "",
-      "time": "9:00～15:00",
-      "category": "一般公開",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/oita/03_event.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    }
-  ],
+  "oita": [],
   "miyazaki": [],
   "kagoshima": [],
   "okinawa": [],
-  "updatedAt": "2026/05/09 19:21"
+  "updatedAt": "2026/05/10 09:16"
 }
