@@ -41,23 +41,7 @@
   ],
   "iwate": [
     {
-      "id": "iw-20260510-1",
-      "pref": "iwate",
-      "date": "2026-05-10",
-      "weekday": "日",
-      "title": "自衛隊岩手地本イベント（一関）",
-      "place": "一関",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/iwate/assets/img/event/until20260510/ichinoseki.pdf",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "iw-20260620-2",
+      "id": "iw-20260620-1",
       "pref": "iwate",
       "date": "2026-06-20",
       "weekday": "土",
@@ -73,7 +57,7 @@
       "deadline": null
     },
     {
-      "id": "iw-20260621-3",
+      "id": "iw-20260621-2",
       "pref": "iwate",
       "date": "2026-06-21",
       "weekday": "日",
@@ -89,7 +73,7 @@
       "deadline": null
     },
     {
-      "id": "iw-20260627-4",
+      "id": "iw-20260627-3",
       "pref": "iwate",
       "date": "2026-06-27",
       "weekday": "土",
@@ -319,22 +303,6 @@
   "chiba": [],
   "niigata": [
     {
-      "id": "ni-20260510-8",
-      "pref": "niigata",
-      "date": "2026-05-10",
-      "weekday": "日",
-      "title": "海上自衛隊 ミサイル艇うみたか",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "艦艇公開",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
       "id": "ni-20260516-1",
       "pref": "niigata",
       "date": "2026-05-16",
@@ -461,6 +429,22 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null
+    },
+    {
+      "id": "ni-20270510-8",
+      "pref": "niigata",
+      "date": "2027-05-10",
+      "weekday": "月",
+      "title": "海上自衛隊 ミサイル艇うみたか",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "艦艇公開",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
     }
   ],
   "toyama": [],
@@ -484,39 +468,7 @@
   ],
   "fukui": [
     {
-      "id": "fu-20260510-1",
-      "pref": "fukui",
-      "date": "2026-05-10",
-      "weekday": "日",
-      "title": "親子のフェスティバル",
-      "place": "敦賀港桜岸壁（敦賀市）",
-      "address": "",
-      "time": "",
-      "category": "地域参加",
-      "tag": "",
-      "url": "",
-      "notes": "艦艇（ミサイル艇）一般公開・自衛隊車両展示・広報ブース等",
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "fu-20260510-2",
-      "pref": "fukui",
-      "date": "2026-05-10",
-      "weekday": "日",
-      "title": "神明公民館まつり",
-      "place": "神明公民館（鯖江市）",
-      "address": "",
-      "time": "",
-      "category": "地域参加",
-      "tag": "",
-      "url": "",
-      "notes": "自衛隊車両展示・広報ブース等",
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "fu-20260523-3",
+      "id": "fu-20260523-1",
       "pref": "fukui",
       "date": "2026-05-23",
       "weekday": "土",
@@ -535,7 +487,7 @@
   "yamanashi": [],
   "nagano": [
     {
-      "id": "na-20260514-2",
+      "id": "na-20260514-1",
       "pref": "nagano",
       "date": "2026-05-14",
       "weekday": "木",
@@ -551,7 +503,7 @@
       "deadline": null
     },
     {
-      "id": "na-20260523-1",
+      "id": "na-20260523-3",
       "pref": "nagano",
       "date": "2026-05-23",
       "weekday": "土",
@@ -567,7 +519,7 @@
       "deadline": null
     },
     {
-      "id": "na-20260530-3",
+      "id": "na-20260530-2",
       "pref": "nagano",
       "date": "2026-05-30",
       "weekday": "土",
@@ -733,23 +685,7 @@
   ],
   "aichi": [
     {
-      "id": "ai-20260510-1",
-      "pref": "aichi",
-      "date": "2026-05-10",
-      "weekday": "日",
-      "title": "名古屋所説明会",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "自衛隊制度",
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "ai-20260513-2",
+      "id": "ai-20260513-1",
       "pref": "aichi",
       "date": "2026-05-13",
       "weekday": "水",
@@ -765,7 +701,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260517-3",
+      "id": "ai-20260517-2",
       "pref": "aichi",
       "date": "2026-05-17",
       "weekday": "日",
@@ -781,7 +717,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260518-4",
+      "id": "ai-20260518-3",
       "pref": "aichi",
       "date": "2026-05-18",
       "weekday": "月",
@@ -797,7 +733,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260522-5",
+      "id": "ai-20260522-4",
       "pref": "aichi",
       "date": "2026-05-22",
       "weekday": "金",
@@ -813,7 +749,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260523-6",
+      "id": "ai-20260523-5",
       "pref": "aichi",
       "date": "2026-05-23",
       "weekday": "土",
@@ -829,7 +765,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260523-7",
+      "id": "ai-20260523-6",
       "pref": "aichi",
       "date": "2026-05-23",
       "weekday": "土",
@@ -845,7 +781,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260530-8",
+      "id": "ai-20260530-7",
       "pref": "aichi",
       "date": "2026-05-30",
       "weekday": "土",
@@ -861,7 +797,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260531-9",
+      "id": "ai-20260531-8",
       "pref": "aichi",
       "date": "2026-05-31",
       "weekday": "日",
@@ -877,7 +813,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260607-10",
+      "id": "ai-20260607-9",
       "pref": "aichi",
       "date": "2026-06-07",
       "weekday": "日",
@@ -893,7 +829,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260613-11",
+      "id": "ai-20260613-10",
       "pref": "aichi",
       "date": "2026-06-13",
       "weekday": "土",
@@ -909,7 +845,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260615-12",
+      "id": "ai-20260615-11",
       "pref": "aichi",
       "date": "2026-06-15",
       "weekday": "月",
@@ -925,11 +861,27 @@
       "deadline": null
     },
     {
-      "id": "ai-20260620-13",
+      "id": "ai-20260620-12",
       "pref": "aichi",
       "date": "2026-06-20",
       "weekday": "土",
       "title": "豊田所説明会",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "自衛隊制度",
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "ai-20260620-13",
+      "pref": "aichi",
+      "date": "2026-06-20",
+      "weekday": "土",
+      "title": "高等工科学校説明会",
       "place": "",
       "address": "",
       "time": "",
@@ -945,22 +897,6 @@
       "pref": "aichi",
       "date": "2026-06-20",
       "weekday": "土",
-      "title": "高等工科学校説明会",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "自衛隊制度",
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "ai-20260620-15",
-      "pref": "aichi",
-      "date": "2026-06-20",
-      "weekday": "土",
       "title": "名古屋所説明会",
       "place": "",
       "address": "",
@@ -973,7 +909,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260621-16",
+      "id": "ai-20260621-15",
       "pref": "aichi",
       "date": "2026-06-21",
       "weekday": "日",
@@ -989,7 +925,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260623-17",
+      "id": "ai-20260623-16",
       "pref": "aichi",
       "date": "2026-06-23",
       "weekday": "火",
@@ -1005,7 +941,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260627-18",
+      "id": "ai-20260627-17",
       "pref": "aichi",
       "date": "2026-06-27",
       "weekday": "土",
@@ -1021,7 +957,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260628-19",
+      "id": "ai-20260628-18",
       "pref": "aichi",
       "date": "2026-06-28",
       "weekday": "日",
@@ -1037,7 +973,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260705-20",
+      "id": "ai-20260705-19",
       "pref": "aichi",
       "date": "2026-07-05",
       "weekday": "日",
@@ -1053,7 +989,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260708-21",
+      "id": "ai-20260708-20",
       "pref": "aichi",
       "date": "2026-07-08",
       "weekday": "水",
@@ -1069,7 +1005,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260711-22",
+      "id": "ai-20260711-21",
       "pref": "aichi",
       "date": "2026-07-11",
       "weekday": "土",
@@ -1085,7 +1021,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260725-23",
+      "id": "ai-20260725-22",
       "pref": "aichi",
       "date": "2026-07-25",
       "weekday": "土",
@@ -1101,7 +1037,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20260802-24",
+      "id": "ai-20260802-23",
       "pref": "aichi",
       "date": "2026-08-02",
       "weekday": "日",
@@ -1117,7 +1053,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20261114-25",
+      "id": "ai-20261114-24",
       "pref": "aichi",
       "date": "2026-11-14",
       "weekday": "土",
@@ -1133,7 +1069,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20261205-26",
+      "id": "ai-20261205-25",
       "pref": "aichi",
       "date": "2026-12-05",
       "weekday": "土",
@@ -1149,7 +1085,7 @@
       "deadline": null
     },
     {
-      "id": "ai-20270220-27",
+      "id": "ai-20270220-26",
       "pref": "aichi",
       "date": "2027-02-20",
       "weekday": "土",
@@ -1217,22 +1153,6 @@
       "time": "",
       "category": "地域参加",
       "tag": "家族向け",
-      "url": "https://www.mod.go.jp/pco/ehime/event.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "em-20260510-3",
-      "pref": "ehime",
-      "date": "2026-05-10",
-      "weekday": "日",
-      "title": "自衛隊展 in イオンモール",
-      "place": "イオンモール今治新都市",
-      "address": "",
-      "time": "",
-      "category": "装備展示",
-      "tag": "",
       "url": "https://www.mod.go.jp/pco/ehime/event.html",
       "notes": null,
       "ageRequirement": null,
@@ -1582,5 +1502,5 @@
   "miyazaki": [],
   "kagoshima": [],
   "okinawa": [],
-  "updatedAt": "2026/05/10 19:27"
+  "updatedAt": "2026/05/11 09:19"
 }
