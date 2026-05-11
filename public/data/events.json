@@ -20,7 +20,40 @@
   "asahikawa": [],
   "obihiro": [],
   "hakodate": [],
-  "miyagi": [],
+  "miyagi": [
+    {
+      "id": "mi-20260517-2",
+      "pref": "miyagi",
+      "date": "2026-05-17",
+      "weekday": "日",
+      "title": "利府町文化交流センター「リフノス」避難訓練コンサート",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "演奏会",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "mi-20260530-1",
+      "pref": "miyagi",
+      "date": "2026-05-30",
+      "weekday": "土",
+      "title": "マイナビ「インターンシップ＆キャリア発見EXPO」",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "採用イベント",
+      "tag": "",
+      "url": "https://job.mynavi.jp/conts/event/2028/10576/index.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    }
+  ],
   "aomori": [
     {
       "id": "ao-20260619-1",
@@ -487,7 +520,7 @@
   "yamanashi": [],
   "nagano": [
     {
-      "id": "na-20260514-1",
+      "id": "na-20260514-2",
       "pref": "nagano",
       "date": "2026-05-14",
       "weekday": "木",
@@ -503,7 +536,7 @@
       "deadline": null
     },
     {
-      "id": "na-20260523-3",
+      "id": "na-20260523-1",
       "pref": "nagano",
       "date": "2026-05-23",
       "weekday": "土",
@@ -519,7 +552,7 @@
       "deadline": null
     },
     {
-      "id": "na-20260530-2",
+      "id": "na-20260530-3",
       "pref": "nagano",
       "date": "2026-05-30",
       "weekday": "土",
@@ -1502,5 +1535,5 @@
   "miyazaki": [],
   "kagoshima": [],
   "okinawa": [],
-  "updatedAt": "2026/05/11 09:19"
+  "updatedAt": "2026/05/11 16:00"
 }
