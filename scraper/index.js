@@ -45,7 +45,7 @@ const { parseIshikawa }      = require('./parsers/ishikawa');
 const { parseFukui }         = require('./parsers/fukui');
 const { parseYamanashi }     = require('./parsers/yamanashi');
 const { parseGifu }          = require('./parsers/gifu');
-const { parseAichi }         = require('./parsers/aichi');
+const { parseAichi, parseAichiDetail } = require('./parsers/aichi');
 const { parseShizuoka }      = require('./parsers/shizuoka');
 const { parseToyamaImages }  = require('./parsers/toyama');
 const { parseNagano }        = require('./parsers/nagano');
@@ -732,7 +732,34 @@ const fetchIshikawa  = (ctx) => fetchHtmlPref(ctx, '石川', URLS.ishikawa,  par
 const fetchFukui     = (ctx) => fetchHtmlPref(ctx, '福井', URLS.fukui,     parseFukui);
 const fetchYamanashi = (ctx) => fetchHtmlPref(ctx, '山梨', URLS.yamanashi, parseYamanashi);
 const fetchGifu      = (ctx) => fetchHtmlPref(ctx, '岐阜', URLS.gifu,      parseGifu);
-const fetchAichi     = (ctx) => fetchHtmlPref(ctx, '愛知', URLS.aichi,     parseAichi);
+async function fetchAichi(ctx) {
+  // カレンダーページから基本情報を取得
+  const events = await fetchHtmlPref(ctx, '愛知', URLS.aichi, parseAichi);
+
+  // URL を持つイベントの詳細ページから place/time を補完
+  let enriched = 0;
+  for (const ev of events) {
+    if (!ev.url || ev.place) continue;
+    try {
+      const page = await ctx.newPage();
+      try {
+        await page.goto(ev.url, { waitUntil: 'domcontentloaded', timeout: 20_000 });
+        await page.waitForTimeout(1500);
+        const html = await page.content();
+        const $ = cheerio.load(html, { decodeEntities: false });
+        const detail = parseAichiDetail($);
+        if (detail.place) { ev.place = detail.place; enriched++; }
+        if (detail.time)  { ev.time  = detail.time; }
+      } finally {
+        await page.close();
+      }
+    } catch {
+      // 詳細取得失敗は無視（place は空文字のまま）
+    }
+  }
+  if (enriched > 0) console.log(`[愛知] 詳細ページから place 補完: ${enriched}件`);
+  return events;
+}
 const fetchShizuoka  = (ctx) => fetchHtmlPref(ctx, '静岡', URLS.shizuoka,  parseShizuoka);
 
 /**

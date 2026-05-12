@@ -44,14 +44,13 @@ function isPast(dateStr) {
  */
 function guessCategory(title) {
   // ── 採用・就職系 ──────────────────────────────────────────
-  if (/オープンキャンパス|Open.?Campus/.test(title))                              return 'オープンキャンパス';
-  if (/採用試験|試験/.test(title))                                                 return '採用試験';
+  if (/オープンキャンパス|Open.?Campus/.test(title))                              return '説明会';
+  if (/採用試験|試験/.test(title))                                                 return '採用イベント';
   if (/キャリア|就職|お仕事セミナー|仕事体験|職業体験|ガールズトーク|女性向け|学園祭|大学祭|レンサルティング/.test(title)) return '採用イベント';
   if (/説明会|ガイダンス|制度説明|募集案内|セミナー/.test(title))                  return '説明会';
   if (/募集/.test(title))                                                          return '説明会';
-  if (/相談会/.test(title))                                                        return '相談会';
-  if (/座談会/.test(title))                                                        return '座談会';
-  if (/交流会/.test(title))                                                        return '交流会';
+  if (/相談会|座談会/.test(title))                                                 return '説明会';
+  if (/交流会/.test(title))                                                        return '地域参加';
 
   // ── 基地・艦艇 公開 ──────────────────────────────────────
   if (/一般公開|基地公開|駐屯地公開|開放デー/.test(title))                         return '一般公開';
@@ -69,7 +68,7 @@ function guessCategory(title) {
   if (/記念|創立|周年/.test(title))                                                 return '記念行事';
 
   // ── 装備・車両展示 ──────────────────────────────────────
-  if (/はたらく車|働く車|はたらくくるま|はたらくクルマ|働くクルマ|がんばる車|はたらく乗り物|働く乗り物|車両展示|装備品|自衛隊展|自衛隊車両|特別展示/.test(title)) return '装備展示';
+  if (/はたらく車|働く車|はたらくくるま|はたらくクルマ|働くクルマ|がんばる車|はたらく乗り物|働く乗り物|車両展示|装備品|自衛隊展|自衛隊車両|特別展示/.test(title)) return '広報活動';
 
   // ── 地域まつり・マルシェ参加 ─────────────────────────────
   if (/まつり|祭り|マルシェ|フェスタ|フェスティバル|こどもまつり|子どもまつり|感謝祭|縁日|ウォーキング/.test(title)) return '地域参加';
