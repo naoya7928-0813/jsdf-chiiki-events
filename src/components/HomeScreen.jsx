@@ -109,13 +109,13 @@ export default function HomeScreen({
               />
             </div>
 
-            {/* ─ 凡例 ─ */}
+            {/* ─ 凡例（色のみ） ─ */}
             <div style={{
-              display: 'flex', justifyContent: 'center', gap: 16,
+              display: 'flex', justifyContent: 'center', gap: 10,
               padding: '0 16px 6px', flexShrink: 0,
             }}>
-              <LegendItem color={primary} label="イベントあり" />
-              <LegendItem color="var(--map-gray, #d1d5db)" label="準備中" />
+              <LegendItem color={primary} />
+              <LegendItem color="var(--map-gray, #d1d5db)" />
             </div>
 
             {/* ─ 下部カード（高さ固定でマップリサイズを防ぐ） ─ */}
@@ -232,12 +232,9 @@ export default function HomeScreen({
   );
 }
 
-// ─── 凡例アイテム ────────────────────────────────────────────
-function LegendItem({ color, label }) {
+// ─── 凡例アイテム（色スウォッチのみ） ───────────────────────
+function LegendItem({ color }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-      <div style={{ width: 10, height: 10, borderRadius: 2, background: color }} />
-      <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: F.sans }}>{label}</span>
-    </div>
+    <div style={{ width: 12, height: 12, borderRadius: 3, background: color }} />
   );
 }
