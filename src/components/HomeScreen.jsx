@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { ICO } from './Icons';
 import { BottomTabBar, F, Spinner, ErrorBanner } from './Shared';
 import JapanMap from './JapanMap';
-import { REGIONS, REGION_BY_ID, countEventsByRegion, getSupportedPrefsByRegion } from '../data/regionMap';
+import { REGION_BY_ID, countEventsByRegion, getSupportedPrefsByRegion } from '../data/regionMap';
 
 // ─── 地図ホーム画面 ───────────────────────────────────────────
 export default function HomeScreen({
@@ -11,7 +11,7 @@ export default function HomeScreen({
   onOpenNotifications, onOpenRegion, onOpenList, onOpenSettings, onOpenFavorites,
   initialRegionId,
 }) {
-  const { primary, accent } = theme;
+  const { primary } = theme;
 
   // 地図上で選択中の地域ID
   const [selectedRegionId, setSelectedRegionId] = useState(initialRegionId ?? null);
