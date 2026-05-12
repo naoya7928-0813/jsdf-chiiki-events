@@ -109,14 +109,6 @@ export default function HomeScreen({
               />
             </div>
 
-            {/* ─ 凡例（色のみ） ─ */}
-            <div style={{
-              display: 'flex', justifyContent: 'center', gap: 10,
-              padding: '0 16px 6px', flexShrink: 0,
-            }}>
-              <LegendItem color={primary} />
-              <LegendItem color="var(--map-gray, #d1d5db)" />
-            </div>
 
             {/* ─ 下部カード（高さ固定でマップリサイズを防ぐ） ─ */}
             <div style={{
@@ -232,9 +224,3 @@ export default function HomeScreen({
   );
 }
 
-// ─── 凡例アイテム（色スウォッチのみ） ───────────────────────
-function LegendItem({ color }) {
-  return (
-    <div style={{ width: 12, height: 12, borderRadius: 3, background: color }} />
-  );
-}

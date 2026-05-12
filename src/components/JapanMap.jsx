@@ -59,8 +59,8 @@ export default function JapanMap({ eventCounts, selectedRegionId, onSelect, prim
         const selected = regionId === selectedRegionId;
         const hovered  = regionId === hoveredId;
         const active   = selected || hovered;
-        const lColor   = selected ? '#fff' : count > 0 ? primary : '#9ca3af';
-        const bRadius  = label.length > 3 ? 22 : 18;
+        const lColor   = selected ? '#fff' : 'var(--text)';
+        const bRadius  = 18;
 
         return (
           <g
