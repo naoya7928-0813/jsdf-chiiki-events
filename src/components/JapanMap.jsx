@@ -35,7 +35,7 @@ export default function JapanMap({ eventCounts, selectedRegionId, onSelect, prim
               <g
                 key={code}
                 transform={t}
-                onClick={() => onSelect(regionId)}
+                onClick={() => { onSelect(regionId); setHoveredId(null); }}
                 onMouseEnter={() => setHoveredId(regionId)}
                 onMouseLeave={() => setHoveredId(null)}
                 style={{ cursor: 'pointer' }}
@@ -65,7 +65,7 @@ export default function JapanMap({ eventCounts, selectedRegionId, onSelect, prim
         return (
           <g
             key={regionId}
-            onClick={() => onSelect(regionId)}
+            onClick={() => { onSelect(regionId); setHoveredId(null); }}
             onMouseEnter={() => setHoveredId(regionId)}
             onMouseLeave={() => setHoveredId(null)}
             style={{ cursor: 'pointer' }}
