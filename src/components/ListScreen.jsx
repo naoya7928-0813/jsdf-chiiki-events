@@ -182,7 +182,7 @@ export default function ListScreen({
               <button
                 key={t.id}
                 ref={isA ? activeTabRef : null}
-                onClick={() => { onRegionChange(t.id); closeSearch(); }}
+                onClick={() => { onRegionChange(t.id); setActiveCategory('all'); setActiveTag('all'); closeSearch(); }}
                 style={{
                   flexShrink: 0, border: 'none', cursor: 'pointer', borderRadius: 8,
                   background: isA ? '#fff' : 'rgba(255,255,255,0.08)',

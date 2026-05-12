@@ -19,6 +19,9 @@ export default function HomeScreen({
   // 地域ごとのイベント件数を集計
   const eventCounts = useMemo(() => countEventsByRegion(events), [events]);
 
+  // 全国合計（ホーム画面サマリー表示用）
+  const totalEvents = Object.values(eventCounts).reduce((s, c) => s + c, 0);
+
   // 選択中地域の情報
   const selectedRegion    = selectedRegionId ? REGION_BY_ID[selectedRegionId] : null;
   const supportedPrefs    = selectedRegionId ? getSupportedPrefsByRegion(selectedRegionId, events) : [];
@@ -187,20 +190,14 @@ export default function HomeScreen({
                       </div>
                     </div>
                     {/* 全体サマリー */}
-                    {(() => {
-                      const total = Object.values(eventCounts).reduce((s, c) => s + c, 0);
-                      const over100 = total >= 100;
-                      return (
-                        <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-                          <div style={{ fontFamily: F.serif, fontSize: 22, fontWeight: 600, color: primary, lineHeight: 1 }}>
-                            {over100 ? '100+' : total}
-                          </div>
-                          <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
-                            {over100 ? '件以上' : '件'}
-                          </div>
-                        </div>
-                      );
-                    })()}
+                    <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
+                      <div style={{ fontFamily: F.serif, fontSize: 22, fontWeight: 600, color: primary, lineHeight: 1 }}>
+                        {totalEvents >= 100 ? '100+' : totalEvents}
+                      </div>
+                      <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+                        {totalEvents >= 100 ? '件以上' : '件'}
+                      </div>
+                    </div>
                   </div>
                   {/* 全イベント一覧へのショートカット */}
                   <button
