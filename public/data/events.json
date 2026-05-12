@@ -504,7 +504,7 @@
   "yamanashi": [],
   "nagano": [
     {
-      "id": "na-20260514-3",
+      "id": "na-20260514-2",
       "pref": "nagano",
       "date": "2026-05-14",
       "weekday": "木",
@@ -520,7 +520,7 @@
       "deadline": null
     },
     {
-      "id": "na-20260523-1",
+      "id": "na-20260523-3",
       "pref": "nagano",
       "date": "2026-05-23",
       "weekday": "土",
@@ -536,7 +536,7 @@
       "deadline": null
     },
     {
-      "id": "na-20260530-2",
+      "id": "na-20260530-1",
       "pref": "nagano",
       "date": "2026-05-30",
       "weekday": "土",
@@ -668,7 +668,23 @@
       "deadline": null
     },
     {
-      "id": "sz-20260523-2",
+      "id": "sz-20260516-2",
+      "pref": "shizuoka",
+      "date": "2026-05-16",
+      "weekday": "土",
+      "title": "第64回 静岡ホビーショー",
+      "place": "17日(日) 9:0016:00",
+      "address": "",
+      "time": "一般公開時間",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "sz-20260523-3",
       "pref": "shizuoka",
       "date": "2026-05-23",
       "weekday": "土",
@@ -684,7 +700,7 @@
       "deadline": null
     },
     {
-      "id": "sz-20260527-3",
+      "id": "sz-20260527-4",
       "pref": "shizuoka",
       "date": "2026-05-27",
       "weekday": "水",
@@ -1519,5 +1535,5 @@
   "miyazaki": [],
   "kagoshima": [],
   "okinawa": [],
-  "updatedAt": "2026/05/11 21:19"
+  "updatedAt": "2026/05/12 09:24"
 }
