@@ -74,7 +74,7 @@ export default function JapanMap({ eventCounts, selectedRegionId, onSelect, prim
             <text
               x={x} y={y}
               textAnchor="middle"
-              fontSize={label.length > 3 ? 24 : 28}
+              fontSize={label.length >= 3 ? 22 : label.length === 2 ? 26 : 30}
               fontWeight={active ? 700 : 500}
               fontFamily={F.sans}
               fill={lColor}

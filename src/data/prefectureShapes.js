@@ -250,12 +250,12 @@ export const PREFECTURE_SHAPES = [
 
 // Region label positions in 1000×1000 viewBox space (precomputed from prefecture transforms)
 export const REGION_LABEL_POSITIONS = {
-  hokkaido: { x: 284, y: 324, label: '北' },
-  tohoku:   { x: 875, y: 258, label: '東' },
-  kanto:    { x: 840, y: 495, label: '関' },
-  chubu:    { x: 718, y: 490, label: '中' },
-  kinki:    { x: 534, y: 596, label: '近' },
-  chugoku:  { x: 322, y: 572, label: '中' },
-  shikoku:  { x: 374, y: 698, label: '四' },
-  kyushu:   { x: 150, y: 724, label: '九' },
+  hokkaido: { x: 284, y: 324, label: '北海道' },
+  tohoku:   { x: 875, y: 258, label: '東北' },
+  kanto:    { x: 840, y: 495, label: '関東' },
+  chubu:    { x: 718, y: 490, label: '中部' },
+  kinki:    { x: 534, y: 596, label: '近畿' },
+  chugoku:  { x: 322, y: 572, label: '中国' },
+  shikoku:  { x: 374, y: 698, label: '四国' },
+  kyushu:   { x: 150, y: 724, label: '九州' },
 };
