@@ -1,11 +1,14 @@
 name: スクレイピング & データ更新
 
 on:
-  # 日本時間 8:00 / 12:00 / 18:00 に自動実行
-  # UTC 換算: 23:00(前日) / 03:00 / 09:00
+  # 日本時間 8:00 / 10:00 / 12:00 / 14:00 / 16:00 / 18:00 に自動実行
+  # UTC 換算: 23:00(前日) / 01:00 / 03:00 / 05:00 / 07:00 / 09:00
   schedule:
     - cron: '0 23 * * *'   # 日本時間 08:00
+    - cron: '0 1 * * *'    # 日本時間 10:00
     - cron: '0 3 * * *'    # 日本時間 12:00
+    - cron: '0 5 * * *'    # 日本時間 14:00
+    - cron: '0 7 * * *'    # 日本時間 16:00
     - cron: '0 9 * * *'    # 日本時間 18:00
 
   # GitHub Actions の UI から手動実行も可能
@@ -35,6 +38,14 @@ jobs:
       - name: scraper の依存パッケージをインストール
         working-directory: scraper
         run: npm ci
+
+      # ── Playwright Chromium バイナリをキャッシュ ─────────────
+      - name: Playwright Chromium キャッシュを復元
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('scraper/package-lock.json') }}
 
       # ── Playwright 用 Chromium をインストール ────────────────
       - name: Playwright Chromium をインストール
