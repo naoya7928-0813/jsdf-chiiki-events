@@ -616,7 +616,7 @@
   "yamanashi": [],
   "nagano": [
     {
-      "id": "na-20260514-2",
+      "id": "na-20260514-1",
       "pref": "nagano",
       "date": "2026-05-14",
       "weekday": "木",
@@ -632,7 +632,7 @@
       "deadline": null
     },
     {
-      "id": "na-20260523-1",
+      "id": "na-20260523-3",
       "pref": "nagano",
       "date": "2026-05-23",
       "weekday": "土",
@@ -648,7 +648,7 @@
       "deadline": null
     },
     {
-      "id": "na-20260530-3",
+      "id": "na-20260530-2",
       "pref": "nagano",
       "date": "2026-05-30",
       "weekday": "土",
@@ -1772,7 +1772,23 @@
   "nagasaki": [],
   "kumamoto": [
     {
-      "id": "km-20260607-1",
+      "id": "km-20260614-1",
+      "pref": "kumamoto",
+      "date": "2026-06-14",
+      "weekday": "日",
+      "title": "総合射撃訓練見学ツアー",
+      "place": "自衛隊日出生台演習場",
+      "address": "",
+      "time": "8時00分～20時00分",
+      "category": "体験",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kumamoto/event/index.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "km-20260607-2",
       "pref": "kumamoto",
       "date": "2026-06-07",
       "weekday": "日",
@@ -1792,5 +1808,5 @@
   "miyazaki": [],
   "kagoshima": [],
   "okinawa": [],
-  "updatedAt": "2026/05/13 17:12"
+  "updatedAt": "2026/05/13 19:12"
 }
