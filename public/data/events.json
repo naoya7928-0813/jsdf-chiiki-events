@@ -616,7 +616,7 @@
   "yamanashi": [],
   "nagano": [
     {
-      "id": "na-20260514-3",
+      "id": "na-20260514-2",
       "pref": "nagano",
       "date": "2026-05-14",
       "weekday": "木",
@@ -632,7 +632,7 @@
       "deadline": null
     },
     {
-      "id": "na-20260523-2",
+      "id": "na-20260523-1",
       "pref": "nagano",
       "date": "2026-05-23",
       "weekday": "土",
@@ -648,7 +648,7 @@
       "deadline": null
     },
     {
-      "id": "na-20260530-1",
+      "id": "na-20260530-3",
       "pref": "nagano",
       "date": "2026-05-30",
       "weekday": "土",
@@ -830,24 +830,7 @@
   ],
   "aichi": [
     {
-      "id": "ai-20260513-1",
-      "pref": "aichi",
-      "date": "2026-05-13",
-      "weekday": "水",
-      "title": "金山所ハローワーク名古屋南説明会",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "自衛隊制度",
-      "ageRequirement": null,
-      "deadline": null,
-      "endDate": null
-    },
-    {
-      "id": "ai-20260517-2",
+      "id": "ai-20260517-1",
       "pref": "aichi",
       "date": "2026-05-17",
       "weekday": "日",
@@ -864,7 +847,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260518-3",
+      "id": "ai-20260518-2",
       "pref": "aichi",
       "date": "2026-05-18",
       "weekday": "月",
@@ -881,7 +864,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260522-4",
+      "id": "ai-20260522-3",
       "pref": "aichi",
       "date": "2026-05-22",
       "weekday": "金",
@@ -898,7 +881,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260523-5",
+      "id": "ai-20260523-4",
       "pref": "aichi",
       "date": "2026-05-23",
       "weekday": "土",
@@ -915,7 +898,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260523-6",
+      "id": "ai-20260523-5",
       "pref": "aichi",
       "date": "2026-05-23",
       "weekday": "土",
@@ -932,7 +915,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260530-7",
+      "id": "ai-20260530-6",
       "pref": "aichi",
       "date": "2026-05-30",
       "weekday": "土",
@@ -949,7 +932,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260531-8",
+      "id": "ai-20260531-7",
       "pref": "aichi",
       "date": "2026-05-31",
       "weekday": "日",
@@ -966,7 +949,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260531-9",
+      "id": "ai-20260531-8",
       "pref": "aichi",
       "date": "2026-05-31",
       "weekday": "日",
@@ -983,7 +966,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260607-10",
+      "id": "ai-20260607-9",
       "pref": "aichi",
       "date": "2026-06-07",
       "weekday": "日",
@@ -1000,7 +983,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260613-11",
+      "id": "ai-20260613-10",
       "pref": "aichi",
       "date": "2026-06-13",
       "weekday": "土",
@@ -1017,7 +1000,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260615-12",
+      "id": "ai-20260615-11",
       "pref": "aichi",
       "date": "2026-06-15",
       "weekday": "月",
@@ -1034,11 +1017,28 @@
       "endDate": null
     },
     {
-      "id": "ai-20260620-13",
+      "id": "ai-20260620-12",
       "pref": "aichi",
       "date": "2026-06-20",
       "weekday": "土",
       "title": "豊田所説明会",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "自衛隊制度",
+      "ageRequirement": null,
+      "deadline": null,
+      "endDate": null
+    },
+    {
+      "id": "ai-20260620-13",
+      "pref": "aichi",
+      "date": "2026-06-20",
+      "weekday": "土",
+      "title": "高等工科学校説明会",
       "place": "",
       "address": "",
       "time": "",
@@ -1055,23 +1055,6 @@
       "pref": "aichi",
       "date": "2026-06-20",
       "weekday": "土",
-      "title": "高等工科学校説明会",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "自衛隊制度",
-      "ageRequirement": null,
-      "deadline": null,
-      "endDate": null
-    },
-    {
-      "id": "ai-20260620-15",
-      "pref": "aichi",
-      "date": "2026-06-20",
-      "weekday": "土",
       "title": "名古屋所説明会",
       "place": "",
       "address": "",
@@ -1085,7 +1068,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260621-16",
+      "id": "ai-20260621-15",
       "pref": "aichi",
       "date": "2026-06-21",
       "weekday": "日",
@@ -1102,7 +1085,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260623-17",
+      "id": "ai-20260623-16",
       "pref": "aichi",
       "date": "2026-06-23",
       "weekday": "火",
@@ -1119,7 +1102,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260627-18",
+      "id": "ai-20260627-17",
       "pref": "aichi",
       "date": "2026-06-27",
       "weekday": "土",
@@ -1136,7 +1119,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260628-19",
+      "id": "ai-20260628-18",
       "pref": "aichi",
       "date": "2026-06-28",
       "weekday": "日",
@@ -1153,7 +1136,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260705-20",
+      "id": "ai-20260705-19",
       "pref": "aichi",
       "date": "2026-07-05",
       "weekday": "日",
@@ -1170,7 +1153,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260708-21",
+      "id": "ai-20260708-20",
       "pref": "aichi",
       "date": "2026-07-08",
       "weekday": "水",
@@ -1187,7 +1170,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260711-22",
+      "id": "ai-20260711-21",
       "pref": "aichi",
       "date": "2026-07-11",
       "weekday": "土",
@@ -1204,7 +1187,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260711-23",
+      "id": "ai-20260711-22",
       "pref": "aichi",
       "date": "2026-07-11",
       "weekday": "土",
@@ -1221,7 +1204,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260712-24",
+      "id": "ai-20260712-23",
       "pref": "aichi",
       "date": "2026-07-12",
       "weekday": "日",
@@ -1238,7 +1221,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260718-25",
+      "id": "ai-20260718-24",
       "pref": "aichi",
       "date": "2026-07-18",
       "weekday": "土",
@@ -1255,7 +1238,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260725-26",
+      "id": "ai-20260725-25",
       "pref": "aichi",
       "date": "2026-07-25",
       "weekday": "土",
@@ -1272,7 +1255,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260730-27",
+      "id": "ai-20260730-26",
       "pref": "aichi",
       "date": "2026-07-30",
       "weekday": "木",
@@ -1289,7 +1272,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260802-28",
+      "id": "ai-20260802-27",
       "pref": "aichi",
       "date": "2026-08-02",
       "weekday": "日",
@@ -1306,7 +1289,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260826-29",
+      "id": "ai-20260826-28",
       "pref": "aichi",
       "date": "2026-08-26",
       "weekday": "水",
@@ -1323,7 +1306,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20260827-30",
+      "id": "ai-20260827-29",
       "pref": "aichi",
       "date": "2026-08-27",
       "weekday": "木",
@@ -1340,7 +1323,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20261114-31",
+      "id": "ai-20261114-30",
       "pref": "aichi",
       "date": "2026-11-14",
       "weekday": "土",
@@ -1357,7 +1340,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20261205-32",
+      "id": "ai-20261205-31",
       "pref": "aichi",
       "date": "2026-12-05",
       "weekday": "土",
@@ -1374,7 +1357,7 @@
       "endDate": null
     },
     {
-      "id": "ai-20270220-33",
+      "id": "ai-20270220-32",
       "pref": "aichi",
       "date": "2027-02-20",
       "weekday": "土",
@@ -1636,23 +1619,7 @@
   ],
   "hiroshima": [
     {
-      "id": "hi-20260513-1",
-      "pref": "hiroshima",
-      "date": "2026-05-13",
-      "weekday": "水",
-      "title": "自衛官採用説明会",
-      "place": "",
-      "address": "",
-      "time": "14:00",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/hiroshima/events/3478/",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "hi-20260522-2",
+      "id": "hi-20260522-1",
       "pref": "hiroshima",
       "date": "2026-05-22",
       "weekday": "金",
@@ -1668,7 +1635,7 @@
       "deadline": null
     },
     {
-      "id": "hi-20260525-3",
+      "id": "hi-20260525-2",
       "pref": "hiroshima",
       "date": "2026-05-25",
       "weekday": "月",
@@ -1684,7 +1651,7 @@
       "deadline": null
     },
     {
-      "id": "hi-20260531-4",
+      "id": "hi-20260531-3",
       "pref": "hiroshima",
       "date": "2026-05-31",
       "weekday": "日",
@@ -1808,5 +1775,5 @@
   "miyazaki": [],
   "kagoshima": [],
   "okinawa": [],
-  "updatedAt": "2026/05/13 20:46"
+  "updatedAt": "2026/05/14 09:30"
 }
