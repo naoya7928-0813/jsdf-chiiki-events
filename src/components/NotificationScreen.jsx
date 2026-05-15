@@ -145,110 +145,56 @@ export default function NotificationScreen({
 
       <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '12px 0 8px' }}>
 
-        {/* ── プッシュ通知カード ── */}
-        <div style={{ margin: '0 16px 12px' }}>
-          <div style={{
-            borderRadius: 12, border: `1px solid ${primary}33`,
-            background: `${primary}08`, padding: '14px 16px',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-              <div style={{
-                width: 36, height: 36, borderRadius: '50%',
-                background: `${primary}18`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-              }}>
-                {ICO.bell(primary, 18)}
-              </div>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
-                  プッシュ通知
-                </div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
-                  {pushEnabled
-                    ? 'ntfy アプリで購読中 — 更新時に通知が届きます'
-                    : 'イベント更新時にスマホへ通知を受け取る'}
-                </div>
-              </div>
-            </div>
-            {pushEnabled ? (
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button
-                  onClick={() => setShowNtfyGuide(true)}
-                  style={{
-                    flex: 1, height: 44, borderRadius: 8,
-                    background: `${primary}18`, border: 'none',
-                    color: primary, fontSize: 12, fontWeight: 600,
-                    cursor: 'pointer', fontFamily: F.sans,
-                  }}
-                >
-                  設定方法を確認
-                </button>
-                <button
-                  onClick={handleUnsubscribe}
-                  style={{
-                    height: 44, padding: '0 14px', borderRadius: 8,
-                    border: '1px solid var(--border)',
-                    background: 'var(--card)', color: 'var(--text-muted)', fontSize: 12,
-                    cursor: 'pointer', fontFamily: F.sans,
-                  }}
-                >
-                  解除
-                </button>
-              </div>
-            ) : (
+        {/* ── 更新時刻 + 通知設定 (コンパクト情報バー) ── */}
+        <div style={{
+          margin: '0 16px 12px', borderRadius: 10,
+          border: '1px solid var(--border)', background: 'var(--card)',
+          padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
+            {ICO.clock('var(--text-muted)', 13)}
+            <span style={{ fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+              毎日 8:00 / 12:00 / 16:00 / 20:00 頃に更新
+            </span>
+          </div>
+          {pushEnabled ? (
+            <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
               <button
-                onClick={handleSubscribe}
+                onClick={() => setShowNtfyGuide(true)}
                 style={{
-                  width: '100%', height: 38, borderRadius: 8, border: 'none',
-                  background: primary, color: '#fff', fontSize: 13, fontWeight: 600,
-                  cursor: 'pointer', fontFamily: F.sans, letterSpacing: 0.5,
+                  fontSize: 11, fontWeight: 600, color: primary, fontFamily: F.sans,
+                  background: `${primary}12`, border: 'none',
+                  padding: '5px 10px', borderRadius: 6, cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', gap: 4,
                 }}
               >
-                通知を受け取る
+                {ICO.bell(primary, 11)} 通知ON
               </button>
-            )}
-          </div>
-        </div>
-
-        {/* ── 更新スケジュールカード ── */}
-        <div style={{ margin: '0 16px 12px' }}>
-          <div style={{
-            borderRadius: 12, border: `1px solid ${primary}33`,
-            background: `${primary}08`, padding: '14px 16px',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-              <div style={{
-                width: 36, height: 36, borderRadius: '50%',
-                background: `${primary}18`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-              }}>
-                {ICO.clock(primary, 18)}
-              </div>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
-                  情報の更新タイミング
-                </div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
-                  毎日 4 回、全国の地本サイトから最新情報を自動取得
-                </div>
-              </div>
+              <button
+                onClick={handleUnsubscribe}
+                style={{
+                  fontSize: 11, color: 'var(--text-muted)', fontFamily: F.sans,
+                  background: 'none', border: '1px solid var(--border)',
+                  padding: '5px 8px', borderRadius: 6, cursor: 'pointer',
+                }}
+              >
+                解除
+              </button>
             </div>
-            <div style={{ display: 'flex', gap: 6 }}>
-              {['8:00', '12:00', '16:00', '20:00'].map(t => (
-                <div key={t} style={{
-                  flex: 1, textAlign: 'center',
-                  background: `${primary}14`, borderRadius: 8,
-                  padding: '8px 4px',
-                }}>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: primary, fontFamily: F.mono }}>{t}</div>
-                  <div style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 2 }}>頃</div>
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 10, lineHeight: 1.6 }}>
-              新着イベントが見つかった回のみ通知が届きます
-            </div>
-          </div>
+          ) : (
+            <button
+              onClick={handleSubscribe}
+              style={{
+                flexShrink: 0, fontSize: 11, fontWeight: 600,
+                color: primary, fontFamily: F.sans,
+                background: `${primary}12`, border: `1px solid ${primary}33`,
+                padding: '5px 10px', borderRadius: 6, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: 4,
+              }}
+            >
+              {ICO.bell(primary, 11)} 通知を受け取る
+            </button>
+          )}
         </div>
 
         {/* ── 締切リマインダー ── */}
