@@ -2,14 +2,15 @@
 
 const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
 
-/** MM月DD日 → ISO date（年は当日基準で推定）*/
+/** MM月DD日 → ISO date（過去の月日は null を返してスキップ）*/
 function inferDate(month, day) {
   const now  = new Date();
+  const nowM = now.getMonth() + 1;
+  const nowD = now.getDate();
   const year = now.getFullYear();
-  const ok   =
-    month > now.getMonth() + 1 ||
-    (month === now.getMonth() + 1 && day >= now.getDate());
-  return `${ok ? year : year + 1}-${padTwo(month)}-${padTwo(day)}`;
+  // 月が過去、または同月で日が過去 → 終了済みイベントとして除外
+  if (month < nowM || (month === nowM && day < nowD)) return null;
+  return `${year}-${padTwo(month)}-${padTwo(day)}`;
 }
 
 /**
@@ -67,7 +68,7 @@ function parseGifu($) {
       } else {
         return; // 日付なし（継続・ツアー行）はスキップ
       }
-      if (isPast(dateStr)) return;
+      if (!dateStr || isPast(dateStr)) return;
 
       // 時間
       const timeMatch = rawDate.match(/(\d+:\d+～\d+:\d+)/);
