@@ -254,7 +254,7 @@
   ],
   "fukushima": [
     {
-      "id": "fs-20260530-2",
+      "id": "fs-20260530-3",
       "pref": "fukushima",
       "date": "2026-05-30",
       "weekday": "土",
@@ -263,6 +263,22 @@
       "address": "",
       "time": "10:30～15:30",
       "category": "採用イベント",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "fs-20260613-2",
+      "pref": "fukushima",
+      "date": "2026-06-13",
+      "weekday": "土",
+      "title": "自衛隊女子会のご案内",
+      "place": "ホテルはまつ 郡山市虎丸3-18",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
       "tag": "",
       "url": "",
       "notes": null,
@@ -1727,5 +1743,5 @@
   "miyazaki": [],
   "kagoshima": [],
   "okinawa": [],
-  "updatedAt": "2026/05/15 15:54"
+  "updatedAt": "2026/05/15 17:16"
 }
