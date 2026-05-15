@@ -153,8 +153,8 @@ export default function NotificationScreen({
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
             {ICO.clock('var(--text-muted)', 13)}
-            <span style={{ fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
-              毎日 8:00 / 12:00 / 16:00 / 20:00 頃に更新
+            <span style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+              毎日 8:00 / 12:00<br />16:00 / 20:00 頃
             </span>
           </div>
           {pushEnabled ? (
