@@ -84,7 +84,40 @@
   "asahikawa": [],
   "obihiro": [],
   "hakodate": [],
-  "miyagi": [],
+  "miyagi": [
+    {
+      "id": "mi-20260517-2",
+      "pref": "miyagi",
+      "date": "2026-05-17",
+      "weekday": "日",
+      "title": "利府町文化交流センター「リフノス」避難訓練コンサート",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "演奏会",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "mi-20260530-1",
+      "pref": "miyagi",
+      "date": "2026-05-30",
+      "weekday": "土",
+      "title": "マイナビ「インターンシップ＆キャリア発見EXPO」",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "採用イベント",
+      "tag": "",
+      "url": "https://job.mynavi.jp/conts/event/2028/10576/index.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    }
+  ],
   "aomori": [
     {
       "id": "ao-20260619-1",
@@ -583,23 +616,7 @@
   "yamanashi": [],
   "nagano": [
     {
-      "id": "na-20260514-2",
-      "pref": "nagano",
-      "date": "2026-05-14",
-      "weekday": "木",
-      "title": "【千曲市】レンサルティングフェア2026in長野ちくま",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "採用イベント",
-      "tag": "",
-      "url": "",
-      "notes": "日時：5/14(木)11:00～16:00 5/15(金)10:00～16:00 場所：長野ちくまテクノパーク統括工場 （長野県千曲市八幡5579）",
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "na-20260523-3",
+      "id": "na-20260523-2",
       "pref": "nagano",
       "date": "2026-05-23",
       "weekday": "土",
@@ -731,23 +748,7 @@
   ],
   "shizuoka": [
     {
-      "id": "sz-20260514-1",
-      "pref": "shizuoka",
-      "date": "2026-05-14",
-      "weekday": "木",
-      "title": "掃海艦あわじ",
-      "place": "外ヶ岡岸壁（道の駅開国下田みなと大型車駐車場向かい）",
-      "address": "",
-      "time": "14:00～17:00",
-      "category": "艦艇公開",
-      "tag": "",
-      "url": "",
-      "notes": "最終受付各回30分前\n警備の都合上、乗艦前に手荷物検査をさせていただきます。\n乗艦の際は、乗員の指示に従ってください。\n艦は突起物が多いので、足元及び頭上に注意して下さい。\nスカート、サンダル、ハイヒール等での乗艦は安全管理上、危険ですのでご遠慮ください。\n酒類の持ち込み及びペット等を連れての乗船はお断りさせていただきます。\n天候及び任務により変更及び中止の場合があります。\n専用の駐車場はございません。公共交通機関又は近傍の駐車場をご利用ください。（路上駐車はご遠慮ください）",
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "sz-20260516-2",
+      "id": "sz-20260516-1",
       "pref": "shizuoka",
       "date": "2026-05-16",
       "weekday": "土",
@@ -763,7 +764,7 @@
       "deadline": null
     },
     {
-      "id": "sz-20260523-3",
+      "id": "sz-20260523-2",
       "pref": "shizuoka",
       "date": "2026-05-23",
       "weekday": "土",
@@ -779,7 +780,7 @@
       "deadline": null
     },
     {
-      "id": "sz-20260527-4",
+      "id": "sz-20260527-3",
       "pref": "shizuoka",
       "date": "2026-05-27",
       "weekday": "水",
@@ -1652,23 +1653,7 @@
   ],
   "yamaguchi": [
     {
-      "id": "ym-20260514-1",
-      "pref": "yamaguchi",
-      "date": "2026-05-14",
-      "weekday": "木",
-      "title": "普賢まつり",
-      "place": "普賢寺周辺",
-      "address": "",
-      "time": "13:00～21:00",
-      "category": "地域参加",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/yamaguchi/event.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "ym-20260517-2",
+      "id": "ym-20260517-1",
       "pref": "yamaguchi",
       "date": "2026-05-17",
       "weekday": "日",
@@ -1684,7 +1669,7 @@
       "deadline": null
     },
     {
-      "id": "ym-20260517-3",
+      "id": "ym-20260517-2",
       "pref": "yamaguchi",
       "date": "2026-05-17",
       "weekday": "日",
@@ -1758,5 +1743,5 @@
   "miyazaki": [],
   "kagoshima": [],
   "okinawa": [],
-  "updatedAt": "2026/05/14 20:30"
+  "updatedAt": "2026/05/15 09:22"
 }
