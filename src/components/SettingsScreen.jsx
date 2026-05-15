@@ -33,6 +33,7 @@ export default function SettingsScreen({
 
   // ── 通知地区 ────────────────────────────────────────────────
   const [notifRegion, setNotifRegion] = useState(loadNotifRegion);
+  const [sourceOpen, setSourceOpen] = useState(false);
   const handleNotifRegion = (id) => {
     setNotifRegion(id);
     try { localStorage.setItem('jsdf-notif-region', id); } catch {}
@@ -216,38 +217,51 @@ export default function SettingsScreen({
         {/* ─ 6. データ出典 ─ */}
         <div style={{
           margin: '20px 16px 0',
-          padding: '14px 16px',
           background: 'var(--card)',
           border: '1px solid var(--border)',
           borderRadius: 12,
+          overflow: 'hidden',
         }}>
-          <div style={{
-            fontSize: 10, fontWeight: 700, letterSpacing: 2,
-            color: 'var(--text-muted)', marginBottom: 8,
-          }}>
-            データ出典
-          </div>
-          {Object.values(REGION_SOURCE).map(src => (
-            <div key={src.url} style={{
-              fontSize: 11, color: 'var(--text-muted)',
-              lineHeight: 1.7, paddingLeft: 8,
+          <button
+            onClick={() => setSourceOpen(v => !v)}
+            style={{
+              width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '14px 16px', background: 'none', border: 'none', cursor: 'pointer',
+              fontFamily: F.sans,
+            }}
+          >
+            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, color: 'var(--text-muted)' }}>
+              データ出典
+            </span>
+            <span style={{
+              display: 'flex', transition: 'transform 0.2s',
+              transform: sourceOpen ? 'rotate(90deg)' : 'rotate(0deg)',
             }}>
-              {'・'}{src.name}
+              {ICO.chev('var(--text-muted)', 12)}
+            </span>
+          </button>
+          {sourceOpen && (
+            <div style={{ padding: '0 16px 14px', borderTop: '1px solid var(--border)' }}>
+              {Object.values(REGION_SOURCE).map(src => (
+                <div key={src.url} style={{
+                  fontSize: 11, color: 'var(--text-muted)',
+                  lineHeight: 1.7, paddingLeft: 8, marginTop: 8,
+                }}>
+                  {'・'}{src.name}
+                </div>
+              ))}
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7, paddingLeft: 8 }}>
+                {'・'}日本地図: Geolonia Inc. / Wikipedia contributors (GFDL)
+              </div>
+              <div style={{
+                fontSize: 11, color: 'var(--text-muted)',
+                lineHeight: 1.7, marginTop: 8,
+                paddingTop: 8, borderTop: '1px solid var(--sep)',
+              }}>
+                本アプリは上記サイトの情報を加工して作成した非公式アプリです。防衛省・自衛隊とは一切関係ありません。
+              </div>
             </div>
-          ))}
-          <div style={{
-            fontSize: 11, color: 'var(--text-muted)',
-            lineHeight: 1.7, paddingLeft: 8,
-          }}>
-            {'・'}日本地図: Geolonia Inc. / Wikipedia contributors (GFDL)
-          </div>
-          <div style={{
-            fontSize: 11, color: 'var(--text-muted)',
-            lineHeight: 1.7, marginTop: 8,
-            paddingTop: 8, borderTop: '1px solid var(--sep)',
-          }}>
-            本アプリは上記サイトの情報を加工して作成した非公式アプリです。防衛省・自衛隊とは一切関係ありません。
-          </div>
+          )}
         </div>
 
         {/* ─ 7. バージョン ─ */}

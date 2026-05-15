@@ -172,7 +172,9 @@ export default function ListScreen({
           display: 'flex', overflowX: 'auto', gap: 4, padding: '0 16px',
           scrollbarWidth: 'none', msOverflowStyle: 'none',
           WebkitOverflowScrolling: 'touch',
-        }}>
+        }}
+          onWheel={e => { if (e.deltaY !== 0) { e.preventDefault(); e.currentTarget.scrollLeft += e.deltaY; } }}
+        >
           {ALL_PREF_TABS.map(t => {
             const isA = region === t.id;
             const count = t.id === 'all'
@@ -357,8 +359,9 @@ export default function ListScreen({
                             </div>
                             {favorites && favorites.has(ev.id) && ICO.star(accent, 12, accent)}
                           </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'var(--text-sub)' }}>
-                            {ICO.pin('var(--text-sub)', 12)} {ev.place}
+                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 5, fontSize: 12, color: 'var(--text-sub)' }}>
+                            <span style={{ flexShrink: 0, display: 'flex', marginTop: 1 }}>{ICO.pin('var(--text-sub)', 12)}</span>
+                            {ev.place}
                           </div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center' }}>{ICO.chev('var(--icon-muted)', 12)}</div>

@@ -173,8 +173,9 @@ function FavCard({ ev, primary, accent, onTap }) {
             {/* 塗りつぶしスター（お気に入り済みを明示） */}
             {ICO.star(accent, 13, accent)}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'var(--text-sub)' }}>
-            {ICO.pin('var(--text-sub)', 12)} {ev.place}
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 5, fontSize: 12, color: 'var(--text-sub)' }}>
+            <span style={{ flexShrink: 0, display: 'flex', marginTop: 1 }}>{ICO.pin('var(--text-sub)', 12)}</span>
+            {ev.place}
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center' }}>{ICO.chev('var(--icon-muted)', 12)}</div>

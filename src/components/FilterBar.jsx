@@ -34,7 +34,9 @@ export default function FilterBar({
         overflowX: 'auto',
         scrollbarWidth: 'none',
         WebkitOverflowScrolling: 'touch',
-      }}>
+      }}
+        onWheel={e => { if (e.deltaY !== 0) { e.preventDefault(); e.currentTarget.scrollLeft += e.deltaY; } }}
+      >
         {categories.map(cat => {
           const key    = cat === 'すべて' ? 'all' : cat;
           const isOn   = activeCategory === key;
@@ -75,7 +77,9 @@ export default function FilterBar({
           overflowX: 'auto',
           scrollbarWidth: 'none',
           WebkitOverflowScrolling: 'touch',
-        }}>
+        }}
+          onWheel={e => { if (e.deltaY !== 0) { e.preventDefault(); e.currentTarget.scrollLeft += e.deltaY; } }}
+        >
           {tags.map(tag => {
             const isOn = activeTag === tag;
             return (

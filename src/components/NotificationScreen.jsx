@@ -321,8 +321,9 @@ function NotifCard({ item, primary, accent, onTap, onDelete }) {
             <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)', lineHeight: 1.4, marginBottom: 4 }}>
               {item.title}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--text-sub)' }}>
-              {ICO.pin('var(--text-sub)', 11)} {item.place}
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 4, fontSize: 12, color: 'var(--text-sub)' }}>
+              <span style={{ flexShrink: 0, display: 'flex', marginTop: 1 }}>{ICO.pin('var(--text-sub)', 11)}</span>
+              {item.place}
             </div>
           </div>
 
