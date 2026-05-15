@@ -210,6 +210,47 @@ export default function NotificationScreen({
           </div>
         </div>
 
+        {/* ── 更新スケジュールカード ── */}
+        <div style={{ margin: '0 16px 12px' }}>
+          <div style={{
+            borderRadius: 12, border: `1px solid ${primary}33`,
+            background: `${primary}08`, padding: '14px 16px',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: '50%',
+                background: `${primary}18`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              }}>
+                {ICO.clock(primary, 18)}
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+                  情報の更新タイミング
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
+                  毎日 4 回、全国の地本サイトから最新情報を自動取得
+                </div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              {['8:00', '12:00', '16:00', '20:00'].map(t => (
+                <div key={t} style={{
+                  flex: 1, textAlign: 'center',
+                  background: `${primary}14`, borderRadius: 8,
+                  padding: '8px 4px',
+                }}>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: primary, fontFamily: F.mono }}>{t}</div>
+                  <div style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 2 }}>頃</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 10, lineHeight: 1.6 }}>
+              新着イベントが見つかった回のみ通知が届きます
+            </div>
+          </div>
+        </div>
+
         {/* ── 締切リマインダー ── */}
         {reminders.length > 0 && (
           <div style={{ margin: '0 0 4px' }}>
