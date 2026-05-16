@@ -21,7 +21,7 @@ export function useEvents() {
 
   const fetchEvents = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}?t=${Date.now()}`, { cache: 'no-cache' });
+      const res = await fetch(API_URL, { cache: 'no-cache' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       if (typeof json !== 'object' || json === null) throw new Error('invalid response shape');
