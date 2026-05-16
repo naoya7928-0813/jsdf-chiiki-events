@@ -1,10 +1,15 @@
 /**
- * public/data/events.json から AIクローラー向け静的 HTML を生成する
+ * public/data/events.json から静的 HTML を生成する
  * 実行: node scripts/generate-events-html.mjs
  * ビルドおよびスクレイプ完了後に自動実行される
+ *
+ * 生成物:
+ *   public/events.html          — 全イベント一覧（検索エンジン向け）
+ *   public/events/<pref>.html   — 都道府県別ページ（ロングテール SEO）
+ *   public/sitemap.xml          — 全ページ URL リスト
  */
 
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -13,8 +18,9 @@ const SITE_URL = 'https://jsdf-chiiki-events.vercel.app';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const EVENTS_JSON = join(__dirname, '../public/data/events.json');
 const OUTPUT_HTML = join(__dirname, '../public/events.html');
+const EVENTS_DIR  = join(__dirname, '../public/events');
 
-// 地本名マッピング
+// 地本名マッピング（英字キー → 表示名）
 const PREF_LABELS = {
   sapporo:   '札幌',    asahikawa: '旭川',  obihiro:   '帯広',
   hakodate:  '函館',    miyagi:    '宮城',  aomori:    '青森',
@@ -40,7 +46,11 @@ if (!existsSync(EVENTS_JSON)) {
   process.exit(0);
 }
 
+mkdirSync(EVENTS_DIR, { recursive: true });
+
 const data = JSON.parse(readFileSync(EVENTS_JSON, 'utf8'));
+const updatedAt = data.updatedAt ?? '不明';
+const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
 
 // 全イベントをフラットに収集
 const allEvents = [];
@@ -48,19 +58,23 @@ for (const [pref, events] of Object.entries(data)) {
   if (!Array.isArray(events)) continue;
   const label = PREF_LABELS[pref] ?? pref;
   for (const ev of events) {
-    allEvents.push({ ...ev, prefLabel: label });
+    allEvents.push({ ...ev, prefKey: pref, prefLabel: label });
   }
 }
 allEvents.sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''));
-
-const total = allEvents.length;
-const updatedAt = data.updatedAt ?? '不明';
 
 // 都道府県ごとにグループ化
 const byPref = {};
 for (const ev of allEvents) {
   if (!byPref[ev.prefLabel]) byPref[ev.prefLabel] = [];
   byPref[ev.prefLabel].push(ev);
+}
+
+// prefKey でグループ化（ファイル名生成用）
+const byPrefKey = {};
+for (const ev of allEvents) {
+  if (!byPrefKey[ev.prefKey]) byPrefKey[ev.prefKey] = [];
+  byPrefKey[ev.prefKey].push(ev);
 }
 
 function esc(s) {
@@ -71,12 +85,41 @@ function esc(s) {
     .replace(/"/g, '&quot;');
 }
 
-const sections = Object.entries(byPref).map(([label, events]) => {
-  const rows = events.map(ev => {
+/** Schema.org Event オブジェクトを生成 */
+function toEventSchema(ev, prefLabel) {
+  const obj = {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    name: ev.title,
+    startDate: ev.date,
+    eventStatus: 'https://schema.org/EventScheduled',
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    organizer: {
+      '@type': 'Organization',
+      name: `${prefLabel}地方協力本部`,
+    },
+    url: ev.url || SITE_URL,
+  };
+  if (ev.endDate) obj.endDate = ev.endDate;
+  if (ev.place) {
+    obj.location = {
+      '@type': 'Place',
+      name: ev.place,
+      address: { '@type': 'PostalAddress', addressCountry: 'JP' },
+    };
+  }
+  const desc = [ev.category, ev.ageRequirement, ev.notes].filter(Boolean).join('。');
+  if (desc) obj.description = desc;
+  return obj;
+}
+
+/** イベントリスト HTML（<li> 要素）を生成 */
+function renderRows(events) {
+  return events.map(ev => {
     const dateDisplay = ev.endDate
-      ? `${esc(ev.date)}（${esc(ev.weekday)}）〜${esc(ev.endDate)}（${esc(ev.endWeekday||'')}）`
+      ? `${esc(ev.date)}（${esc(ev.weekday)}）〜${esc(ev.endDate)}（${esc(ev.endWeekday || '')}）`
       : `${esc(ev.date)}（${esc(ev.weekday)}）`;
-    const parts = [
+    return [
       `<li>`,
       `<time datetime="${esc(ev.date)}">${dateDisplay}</time>`,
       ` ／ <strong>${esc(ev.title)}</strong>`,
@@ -84,30 +127,51 @@ const sections = Object.entries(byPref).map(([label, events]) => {
       ev.place    ? ` ／ 会場：${esc(ev.place)}`    : '',
       ev.deadline ? ` ／ 締切：${esc(ev.deadline)}`  : '',
       ev.tag && ev.tag !== '応募終了' ? ` ／ ${esc(ev.tag)}` : '',
+      ev.url ? ` ／ <a href="${esc(ev.url)}" rel="noopener">詳細</a>` : '',
       `</li>`,
     ].join('');
-    return parts;
   }).join('\n      ');
+}
 
+// ── 全イベント一覧 events.html を生成 ───────────────────────────
+
+const sections = Object.entries(byPref).map(([label, events]) => {
+  const prefKey = events[0]?.prefKey ?? '';
+  const prefLink = prefKey ? ` <a href="/events/${prefKey}.html">（${label}のみ表示）</a>` : '';
   return `  <section>
-    <h2>${esc(label)}地方協力本部（${events.length}件）</h2>
+    <h2>${esc(label)}地方協力本部（${events.length}件）${prefLink}</h2>
     <ul>
-      ${rows}
+      ${renderRows(events)}
     </ul>
   </section>`;
 }).join('\n\n');
 
-const html = `<!DOCTYPE html>
+const allJsonLd = JSON.stringify(
+  allEvents.map(ev => toEventSchema(ev, ev.prefLabel)),
+  null, 2
+);
+
+const mainHtml = `<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>自衛隊地本イベント一覧</title>
-  <meta name="description" content="全国の自衛隊地方協力本部（地本）が開催する予定のイベント情報一覧です。説明会・記念行事・体験イベントなど。" />
+  <title>自衛隊地本イベント一覧 | 全国の自衛隊地方協力本部イベント情報</title>
+  <meta name="description" content="全国の自衛隊地方協力本部（地本）が開催する予定のイベント情報一覧です。説明会・記念行事・体験イベントなど ${allEvents.length} 件を掲載。" />
   <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="${SITE_URL}/events.html" />
   <meta property="og:title" content="自衛隊地本イベント一覧" />
   <meta property="og:description" content="全国の自衛隊地方協力本部のイベント情報。開催日・会場・カテゴリを掲載。" />
-  <meta property="og:url" content="https://jsdf-chiiki-events.vercel.app/events.html" />
+  <meta property="og:url" content="${SITE_URL}/events.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="${SITE_URL}/icons/icon-512.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="自衛隊地本イベント一覧" />
+  <meta name="twitter:description" content="全国の自衛隊地方協力本部のイベント情報。開催日・会場・カテゴリを掲載。" />
+  <meta name="twitter:image" content="${SITE_URL}/icons/icon-512.png" />
+  <script type="application/ld+json">
+${allJsonLd}
+  </script>
   <style>
     body { font-family: sans-serif; max-width: 900px; margin: 0 auto; padding: 16px; line-height: 1.7; }
     h1 { font-size: 1.4em; }
@@ -122,9 +186,9 @@ const html = `<!DOCTYPE html>
 <body>
   <h1>自衛隊地方協力本部 イベント一覧</h1>
   <p class="meta">
-    データ更新日時：${esc(updatedAt)}　／　合計 ${total} 件<br />
-    アプリ版：<a href="https://jsdf-chiiki-events.vercel.app/">https://jsdf-chiiki-events.vercel.app/</a><br />
-    JSONデータ：<a href="https://jsdf-chiiki-events.vercel.app/data/events.json">/data/events.json</a>
+    データ更新日時：${esc(updatedAt)}　／　合計 ${allEvents.length} 件<br />
+    アプリ版：<a href="${SITE_URL}/">${SITE_URL}/</a><br />
+    JSONデータ：<a href="${SITE_URL}/data/events.json">/data/events.json</a>
   </p>
 
 ${sections}
@@ -139,12 +203,86 @@ ${sections}
 </html>
 `;
 
-writeFileSync(OUTPUT_HTML, html, 'utf8');
-console.log(`[generate-events-html] ${OUTPUT_HTML} を生成しました（${total} 件）`);
+writeFileSync(OUTPUT_HTML, mainHtml, 'utf8');
+console.log(`[generate-events-html] events.html を生成（${allEvents.length} 件）`);
 
-// sitemap.xml の lastmod を現在日時で更新
-const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
-const sitemapPath = join(__dirname, '../public/sitemap.xml');
+// ── 都道府県別ページ events/<pref>.html を生成 ──────────────────
+
+for (const [prefKey, prefLabel] of Object.entries(PREF_LABELS)) {
+  const events = byPrefKey[prefKey];
+  if (!events || events.length === 0) continue;
+
+  const prefJsonLd = JSON.stringify(
+    events.map(ev => toEventSchema(ev, prefLabel)),
+    null, 2
+  );
+
+  const prefHtml = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${esc(prefLabel)}地方協力本部 イベント一覧 | 自衛隊地本イベント情報</title>
+  <meta name="description" content="${esc(prefLabel)}地方協力本部が開催する自衛隊イベント情報。説明会・体験イベント・一般公開など ${events.length} 件を掲載（${esc(updatedAt)} 更新）。" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="${SITE_URL}/events/${prefKey}.html" />
+  <meta property="og:title" content="${esc(prefLabel)}地方協力本部 イベント一覧" />
+  <meta property="og:description" content="${esc(prefLabel)}地方協力本部の自衛隊イベント情報。開催日・会場・カテゴリを掲載。" />
+  <meta property="og:url" content="${SITE_URL}/events/${prefKey}.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="${SITE_URL}/icons/icon-512.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="${esc(prefLabel)}地方協力本部 イベント一覧" />
+  <meta name="twitter:description" content="${esc(prefLabel)}地方協力本部の自衛隊イベント情報。${events.length} 件掲載。" />
+  <meta name="twitter:image" content="${SITE_URL}/icons/icon-512.png" />
+  <script type="application/ld+json">
+${prefJsonLd}
+  </script>
+  <style>
+    body { font-family: sans-serif; max-width: 900px; margin: 0 auto; padding: 16px; line-height: 1.7; }
+    h1 { font-size: 1.4em; }
+    ul { padding-left: 1.2em; }
+    li { margin: 6px 0; font-size: 0.95em; }
+    time { color: #555; }
+    .meta { color: #666; font-size: 0.85em; margin-bottom: 1.5em; }
+    a { color: #0b2545; }
+    nav { margin-bottom: 1.5em; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <nav><a href="/events.html">← 全国一覧に戻る</a>　／　<a href="/">アプリ版</a></nav>
+  <h1>${esc(prefLabel)}地方協力本部 イベント一覧</h1>
+  <p class="meta">
+    データ更新日時：${esc(updatedAt)}　／　${events.length} 件
+  </p>
+  <ul>
+    ${renderRows(events)}
+  </ul>
+  <footer>
+    <p class="meta" style="margin-top:3em">
+      本ページは${esc(prefLabel)}地方協力本部の公式サイトから取得した情報を自動集約したものです。<br />
+      最新・正確な情報は公式サイトでご確認ください。
+    </p>
+  </footer>
+</body>
+</html>
+`;
+
+  writeFileSync(join(EVENTS_DIR, `${prefKey}.html`), prefHtml, 'utf8');
+  console.log(`[generate-events-html] events/${prefKey}.html を生成（${events.length} 件）`);
+}
+
+// ── sitemap.xml を更新 ──────────────────────────────────────────
+
+const prefWithEvents = Object.keys(PREF_LABELS).filter(k => byPrefKey[k]?.length > 0);
+
+const prefUrls = prefWithEvents.map(k => `  <url>
+    <loc>${SITE_URL}/events/${k}.html</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>`).join('\n');
+
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -159,13 +297,16 @@ const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
+${prefUrls}
   <url>
     <loc>${SITE_URL}/data/events.json</loc>
     <lastmod>${today}</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.7</priority>
+    <priority>0.5</priority>
   </url>
 </urlset>
 `;
+
+const sitemapPath = join(__dirname, '../public/sitemap.xml');
 writeFileSync(sitemapPath, sitemap, 'utf8');
-console.log(`[generate-events-html] ${sitemapPath} を更新しました（lastmod: ${today}）`);
+console.log(`[generate-events-html] sitemap.xml を更新（${prefWithEvents.length + 3} URL）`);
