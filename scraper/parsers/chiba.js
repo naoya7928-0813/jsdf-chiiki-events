@@ -4,12 +4,9 @@ const { guessCategory, guessTag, isPast, toHalfWidth, padTwo } = require('./util
 
 const BASE_URL = 'https://www.mod.go.jp/pco/chiba/event.html';
 
-/** 令和年なしの「X月Y日」から西暦を推定する */
-function inferYear(month, day) {
-  const now  = new Date();
-  const year = now.getFullYear();
-  if (new Date(year, month - 1, day) < now) return year + 1;
-  return year;
+/** 令和年なしの「X月Y日」→ スクレイピング時の西暦を返す（過去日は isPast() で除外）*/
+function inferYear() {
+  return new Date().getFullYear();
 }
 
 /**

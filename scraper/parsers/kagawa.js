@@ -43,7 +43,8 @@ function parseKagawa($) {
     if (!month || month < 1 || month > 12) return;
 
     const month_num = month;
-    const year  = month_num >= now.getMonth() + 1 ? now.getFullYear() : now.getFullYear() + 1;
+    // 過去の月はスキップ（終了済みイベントを来年に誤割り当てしない）
+    if (month_num < now.getMonth() + 1) return;
 
     $(tbl).find('tr').slice(1).each((_, tr) => {
       const cells = $(tr).find('td,th')
@@ -61,7 +62,7 @@ function parseKagawa($) {
       const day = parseInt(dayM[1], 10);
       if (day < 1 || day > 31) return;
 
-      const dateStr   = `${year}-${padTwo(month_num)}-${padTwo(day)}`;
+      const dateStr   = `${now.getFullYear()}-${padTwo(month_num)}-${padTwo(day)}`;
       if (isPast(dateStr)) return;
 
       const weekdayM  = dayCell.match(/[（(]([月火水木金土日祝]+)[）)]/);

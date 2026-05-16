@@ -60,9 +60,7 @@ function parseSapporoPage($, categoryHint, prefixId, state, sourceUrl = '') {
         const month = parseInt(monthOnly[1], 10);
         const day   = parseInt(monthOnly[2], 10);
         const year  = now.getFullYear();
-        const inFuture = month > now.getMonth() + 1 ||
-          (month === now.getMonth() + 1 && day >= now.getDate());
-        dateStr = `${inFuture ? year : year + 1}-${padTwo(month)}-${padTwo(day)}`;
+        dateStr = `${year}-${padTwo(month)}-${padTwo(day)}`;
         weekday = monthOnly[3];
       } else {
         return; // 日付なし行スキップ

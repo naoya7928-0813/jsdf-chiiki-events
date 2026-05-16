@@ -2,14 +2,9 @@
 
 const { guessCategory, guessTag, isPast, toHalfWidth, padTwo } = require('./utils');
 
-/** MM月DD日 → ISO date（年は当日基準で推定）*/
+/** MM月DD日 → ISO date（年はスクレイピング時の西暦を使用、過去日は isPast() で除外）*/
 function inferDate(month, day) {
-  const now  = new Date();
-  const year = now.getFullYear();
-  const ok   =
-    month > now.getMonth() + 1 ||
-    (month === now.getMonth() + 1 && day >= now.getDate());
-  return `${ok ? year : year + 1}-${padTwo(month)}-${padTwo(day)}`;
+  return `${new Date().getFullYear()}-${padTwo(month)}-${padTwo(day)}`;
 }
 
 /**
