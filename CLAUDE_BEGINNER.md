@@ -48,14 +48,19 @@ jsdf-chiiki-events/
 │       └── utils.js        ← 全都道府県で共通して使う便利な関数
 │
 ├── public/
-│   └── data/events.json    ← 集めたイベントデータ（このファイルをサイトが読む）
+│   ├── data/events.json    ← 集めたイベントデータ（このファイルをサイトが読む）
+│   ├── events.html         ← Google検索向けの全イベント一覧ページ
+│   ├── events/             ← 都道府県別の検索向けページ（例: kagawa.html）
+│   ├── sitemap.xml         ← Google に「このサイトのページ一覧」を伝えるファイル
+│   └── robots.txt          ← Google に「このサイトは全部見ていいよ」と伝えるファイル
 │
 ├── scripts/                ← ビルド補助スクリプト
-│   ├── generate-events-html.mjs ← 検索エンジン向けのページを作る
+│   ├── generate-events-html.mjs ← 検索エンジン向けのページを自動生成する
 │   └── generate-icons.mjs       ← アプリアイコンを生成する
 │
 └── .github/workflows/
-    └── scrape.yml          ← 「毎日4回自動でデータ収集する」スケジュール設定
+    ├── scrape.yml          ← 「毎日4回自動でデータ収集する」スケジュール設定
+    └── deploy.yml          ← 「見た目ファイルを変更したら自動で公開する」設定
 ```
 
 **よく触るファイル:**
@@ -135,6 +140,24 @@ cd scraper && node index.js
 
 ### 手動でデータ収集を実行したい
 GitHub のページ → `Actions` タブ → 「スクレイピング & データ更新」→ `Run workflow` ボタン
+
+---
+
+## Google検索対策（SEO）の状況
+
+### 対応済みの内容
+
+| 対応内容 | 効果 |
+|---------|------|
+| **Google Search Console 登録済み** | Googleに「このサイトの管理者です」と証明できた |
+| **サイトマップ送信済み** | Googleが全ページを効率よく発見できる |
+| **都道府県別ページ自動生成** | 「香川 自衛隊 イベント」などの検索で引っかかりやすくなる |
+| **イベント構造化データ（JSON-LD）** | Googleが日付・会場を「イベント」として認識できる |
+| **canonical・Twitter Card** | SNSでのシェア見た目改善、重複ページ問題を防ぐ |
+
+### 今後の流れ（自動）
+- スクレイピングのたびに `events/` 内の都道府県別ページと `sitemap.xml` が自動更新される
+- 数週間〜1ヶ月後に検索結果への反映が期待できる
 
 ---
 

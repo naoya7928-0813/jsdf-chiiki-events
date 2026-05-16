@@ -22,11 +22,19 @@ jsdf-chiiki-events/
 │   └── parsers/                # 都道府県別パーサー（50 ファイル）
 │       └── utils.js            # guessCategory / guessTag / isPast など共通関数
 ├── public/
-│   └── data/events.json        # スクレイプ結果（全イベントデータ）
+│   ├── data/events.json        # スクレイプ結果（全イベントデータ）
+│   ├── events.html             # 全イベント一覧（SEO向け静的HTML）
+│   ├── events/                 # 都道府県別静的ページ（SEO向け・スクレイプ毎に生成）
+│   │   └── <pref>.html         # 例: kagawa.html, tokyo.html
+│   ├── sitemap.xml             # 全URL一覧（Google Search Console に送信済み）
+│   ├── robots.txt              # クローラー制御
+│   └── google3d6aa643f6d363c1.html # Google Search Console 所有権確認ファイル
 ├── scripts/
-│   ├── generate-events-html.mjs # events.html / sitemap.xml 生成
+│   ├── generate-events-html.mjs # events.html / events/<pref>.html / sitemap.xml 生成
 │   └── generate-icons.mjs       # PWA アイコン生成
-└── .github/workflows/scrape.yml # GitHub Actions スクレイプ自動化
+└── .github/workflows/
+    ├── scrape.yml              # スクレイプ自動化（1日4回 + Vercel デプロイ）
+    └── deploy.yml              # フロントエンド変更時の自動デプロイ（push トリガー）
 ```
 
 ## 主要コマンド
@@ -44,8 +52,9 @@ cd scraper && node index.js
 
 ## デプロイ
 
-- **Vercel** に自動デプロイ（GitHub Actions の scrape.yml で `changed=true` 時のみ）
-- 手動デプロイ: `npx vercel --prod --token $VERCEL_TOKEN`
+- **scrape.yml**: データ変更時のみ Vercel デプロイ（`changed=true` の場合）
+- **deploy.yml**: `src/`, `public/`, `scripts/`, `index.html`, `vite.config.js`, `vercel.json`, `package.json` の変更時に自動デプロイ
+- 手動デプロイ: `gh workflow run deploy.yml`
 - 必要シークレット: `GEMINI_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `NTFY_ADMIN_TOPIC`
 
 ## スクレイパー仕様
@@ -82,6 +91,24 @@ cd scraper && node index.js
 - JavaScript レンダリングが必要なページのスクレイプ調査
 - 新パーサー開発時の動的コンテンツ確認
 - ローカルでの E2E 動作検証
+
+## SEO 構成
+
+| 要素 | 内容 |
+|------|------|
+| **Google Search Console** | 登録済み・サイトマップ送信済み（2026/05/17）|
+| **sitemap.xml** | スクレイプ毎に自動更新（トップ・events.html・都道府県別ページ含む）|
+| **JSON-LD（Event スキーマ）** | events.html と都道府県別ページに埋め込み |
+| **canonical タグ** | index.html・events.html・各都道府県ページに設定済み |
+| **Twitter Card** | 全静的ページに設定済み |
+| **都道府県別ページ** | `/events/<pref>.html` 形式・スクレイプ毎に自動生成 |
+| **vercel.json rewrite** | `sitemap.xml`・`events/`・`data/`・`robots.txt`・`google*` を除外設定済み |
+
+### generate-events-html.mjs の出力物
+`node scripts/generate-events-html.mjs` を実行すると以下が生成される:
+- `public/events.html` — 全イベント一覧（JSON-LD・canonical・Twitter Card付き）
+- `public/events/<pref>.html` — イベントがある都道府県分（JSON-LD・canonical付き）
+- `public/sitemap.xml` — 全URLを含む更新済みサイトマップ
 
 ## よくある作業
 
