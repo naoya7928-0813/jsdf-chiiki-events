@@ -133,20 +133,26 @@ export default function ListScreen({
           <div>
             <div style={{ fontSize: 10, letterSpacing: 2, color: 'rgba(255,255,255,0.65)', fontWeight: 500 }}>EVENTS</div>
             <div style={{ fontFamily: F.serif, fontSize: 19, fontWeight: 600, letterSpacing: 1, marginTop: 2 }}>イベント一覧</div>
+            {/* ⑥ 更新時刻をヘッダーに表示 */}
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', marginTop: 3, fontFamily: F.mono }}>
+              確認 {checkedLabel}
+            </div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            {/* 検索ボタン（開いているときは × アイコン） */}
+            {/* ② 検索ボタン — アイコン＋ラベルで目立たせる */}
             <button
               aria-label={isSearching ? '検索を閉じる' : '検索'}
               onClick={() => isSearching ? closeSearch() : setIsSearching(true)}
               style={{
                 ...iconBtnStyle,
+                width: 'auto', padding: '0 12px', gap: 5,
+                fontFamily: F.sans, fontSize: 12, color: '#fff', fontWeight: 500,
                 background: isSearching ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.1)',
               }}
             >
               {isSearching
-                ? <span style={{ fontSize: 14, fontWeight: 700, color: '#fff', lineHeight: 1 }}>✕</span>
-                : ICO.search('#fff', 17)
+                ? <><span style={{ fontSize: 14, fontWeight: 700, lineHeight: 1 }}>✕</span><span>閉じる</span></>
+                : <>{ICO.search('#fff', 15)}<span>検索</span></>
               }
             </button>
 
@@ -363,6 +369,12 @@ export default function ListScreen({
                             <span style={{ flexShrink: 0, display: 'flex', marginTop: 1 }}>{ICO.pin('var(--text-sub)', 12)}</span>
                             {ev.place}
                           </div>
+                          {/* ④ URLあり → 応募リンクバッジ */}
+                          {ev.url && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 5, fontSize: 10, color: primary, fontWeight: 600 }}>
+                              {ICO.extLink(primary, 10)} 応募・詳細リンクあり
+                            </div>
+                          )}
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center' }}>{ICO.chev('var(--icon-muted)', 12)}</div>
                       </div>
@@ -374,10 +386,6 @@ export default function ListScreen({
           )
         )}
 
-        {/* 最終確認日時（更新ボタンを押すたびに現在時刻に更新） */}
-        <div style={{ textAlign: 'center', padding: '10px 20px 16px', fontSize: 10, color: 'var(--text-muted)' }}>
-          最終確認 <span style={{ fontFamily: F.mono, color: 'var(--text)' }}>{checkedLabel}</span>
-        </div>
       </div>
 
       <BottomTabBar active="list" onChange={id => {

@@ -200,13 +200,19 @@ function EmptyState({ primary, accent }) {
       </div>
       <div style={{
         fontSize: 12, color: 'var(--text-muted)',
-        marginTop: 8, lineHeight: 1.7,
+        marginTop: 12, lineHeight: 1.9, textAlign: 'left',
+        background: 'var(--card)', borderRadius: 10, padding: '12px 16px',
+        border: '1px solid var(--border)',
       }}>
-        イベント詳細画面の{' '}
-        <span style={{ display: 'inline-flex', verticalAlign: 'middle' }}>
-          {ICO.star(accent, 14, 'none')}
-        </span>
-        {' '}をタップすると<br />ここに保存されます
+        <div style={{ marginBottom: 4, fontWeight: 600, color: 'var(--text)', fontSize: 11 }}>登録方法</div>
+        <div>① 一覧からイベントをタップ</div>
+        <div>② 詳細画面の右上{' '}
+          <span style={{ display: 'inline-flex', verticalAlign: 'middle' }}>
+            {ICO.star(accent, 13, 'none')}
+          </span>
+          {' '}をタップして登録
+        </div>
+        <div>③ このページに保存されます</div>
       </div>
     </div>
   );

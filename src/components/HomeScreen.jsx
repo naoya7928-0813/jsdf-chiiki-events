@@ -136,7 +136,7 @@ export default function HomeScreen({
                         </div>
                       </div>
                     ) : (
-                      <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>準備中</div>
+                      <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>現在イベントなし</div>
                     )}
                   </div>
 
@@ -157,7 +157,7 @@ export default function HomeScreen({
                     {hasEvents ? (
                       <>{ICO.cal('#fff', 15)} イベントを見る</>
                     ) : (
-                      '準備中'
+                      '現在イベントなし'
                     )}
                   </button>
                 </div>
@@ -175,10 +175,10 @@ export default function HomeScreen({
                     </div>
                     <div>
                       <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
-                        地域を選択
+                        地域を選択してください
                       </div>
-                      <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
-                        地図をタップしてイベントを確認
+                      <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3, display: 'flex', alignItems: 'center', gap: 3 }}>
+                        ↑ 上の地図をタップ
                       </div>
                     </div>
                     {/* 全体サマリー */}
