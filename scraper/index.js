@@ -232,7 +232,8 @@ const OCR_PROMPT = `この自衛隊イベントのポスター画像から情報
   "time": "開催時間（例: 10:00～16:00）",
   "ageRequirement": "参加資格・対象者を簡潔に（例: 中学生以上33歳未満、日本国籍を有する方）",
   "deadline": "応募締切日（例: 4月24日（金））",
-  "notes": "定員・抽選有無・注意事項など重要事項のみ50文字以内で簡潔に"
+  "notes": "定員・抽選有無・注意事項など重要事項のみ50文字以内で簡潔に",
+  "url": "画像内のQRコードが指すURL（QRコードがなければnull）"
 }`;
 
 /**
@@ -475,6 +476,8 @@ async function ocrImageFull(imageUrl) {
  */
 function mergeOcr(ev, ocr) {
   if (!ocr) return ev;
+  // QRコードURLは既存URLが空の場合のみ採用
+  const ocrUrl = (!ev.url && ocr.url && ocr.url.startsWith('http')) ? ocr.url.trim() : ev.url;
   return {
     ...ev,
     title:          (ocr.title          && fixOcrTitle(ocr.title.trim())) || ev.title,
@@ -482,6 +485,7 @@ function mergeOcr(ev, ocr) {
     ageRequirement: (ocr.ageRequirement && ocr.ageRequirement.trim()) || ev.ageRequirement || null,
     deadline:       (ocr.deadline       && ocr.deadline.trim())       || ev.deadline       || null,
     notes: [ev.notes, ocr.notes].filter(Boolean).join('\n') || null,
+    url:            ocrUrl,
   };
 }
 

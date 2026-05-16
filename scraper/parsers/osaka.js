@@ -40,8 +40,7 @@ function parseOsaka($) {
           const now   = new Date();
           const m     = parseInt(monthM[1], 10);
           const d     = parseInt(monthM[2], 10);
-          const inFut = m > now.getMonth() + 1 || (m === now.getMonth() + 1 && d >= now.getDate());
-          dateStr = `${inFut ? now.getFullYear() : now.getFullYear() + 1}-${padTwo(m)}-${padTwo(d)}`;
+          dateStr = `${now.getFullYear()}-${padTwo(m)}-${padTwo(d)}`;
           weekday = monthM[3];
         }
         const timeM = value.match(/(\d+:\d+[～〜]\d+:\d+)/);

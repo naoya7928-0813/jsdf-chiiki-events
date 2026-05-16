@@ -47,8 +47,7 @@ function parseNaraPost($, url, counter) {
       } else if (mM) {
         const now = new Date();
         const m = parseInt(mM[1], 10), d = parseInt(mM[2], 10);
-        const inFut = m > now.getMonth() + 1 || (m === now.getMonth() + 1 && d >= now.getDate());
-        dateStr = `${inFut ? now.getFullYear() : now.getFullYear() + 1}-${padTwo(m)}-${padTwo(d)}`;
+        dateStr = `${now.getFullYear()}-${padTwo(m)}-${padTwo(d)}`;
         weekday = mM[3];
       }
       const tM = value.match(/(\d+:\d+[～〜]\d+:\d+)/);
@@ -75,8 +74,7 @@ function parseNaraPost($, url, counter) {
     } else if (mM) {
       const now = new Date();
       const m = parseInt(mM[1], 10), d = parseInt(mM[2], 10);
-      const inFut = m > now.getMonth() + 1 || (m === now.getMonth() + 1 && d >= now.getDate());
-      dateStr = `${inFut ? now.getFullYear() : now.getFullYear() + 1}-${padTwo(m)}-${padTwo(d)}`;
+      dateStr = `${now.getFullYear()}-${padTwo(m)}-${padTwo(d)}`;
       weekday = mM[3];
     }
   }

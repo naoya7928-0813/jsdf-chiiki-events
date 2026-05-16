@@ -4,15 +4,9 @@ const { guessCategory, guessTag, isPast, toHalfWidth, padTwo } = require('./util
 
 const BASE_URL = 'https://www.mod.go.jp/pco/ibaraki/event.html';
 
-/** 令和年なしの「X月Y日」から西暦を推定する */
-function inferYear(month, day) {
-  const now  = new Date();
-  const year = now.getFullYear();
-  const candidate = new Date(year, month - 1, day);
-  if (candidate >= now) return year;
-  // 年末(10月以降)で翌年1〜3月のイベントのみ翌年扱い
-  if (now.getMonth() >= 9 && month <= 3) return year + 1;
-  return year; // 過去日付は今年のまま（isPastでフィルタ）
+/** 令和年なしの「X月Y日」→ スクレイピング時の西暦を返す（過去日は isPast() で除外）*/
+function inferYear() {
+  return new Date().getFullYear();
 }
 
 /**

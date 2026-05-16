@@ -36,9 +36,7 @@ function parseKochi($) {
       const month = parseInt(gM[1], 10);
       const day   = parseInt(gM[2], 10);
       weekday     = gM[3];
-      const year  = month > now.getMonth() + 1 || (month === now.getMonth() + 1 && day >= now.getDate())
-        ? now.getFullYear() : now.getFullYear() + 1;
-      dateStr = `${year}-${padTwo(month)}-${padTwo(day)}`;
+      dateStr = `${now.getFullYear()}-${padTwo(month)}-${padTwo(day)}`;
     }
 
     if (!dateStr || isPast(dateStr)) return;
