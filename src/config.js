@@ -1,6 +1,7 @@
 // ─── プッシュ通知 (ntfy.sh) ──────────────────────────────────
-export const NTFY_TOPIC = 'jsdf-chiiki-events-7928';
-export const NTFY_URL   = `https://ntfy.sh/${NTFY_TOPIC}`;
+// トピック名は環境変数で管理（.env.local または Vercel 環境変数 VITE_NTFY_TOPIC）
+export const NTFY_TOPIC = import.meta.env.VITE_NTFY_TOPIC ?? '';
+export const NTFY_URL   = NTFY_TOPIC ? `https://ntfy.sh/${NTFY_TOPIC}` : '';
 
 // ─── データソース ─────────────────────────────────────────────
 // GitHub Actions が定期スクレイピングし public/data/events.json に書き出す。

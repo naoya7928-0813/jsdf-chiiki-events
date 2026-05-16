@@ -147,7 +147,7 @@ jobs:
               -H "Tags: mega,jp" \
               -H "Priority: default" \
               -d "新着イベントが${COUNT}件追加されました。アプリを開いて確認してください。" \
-              https://ntfy.sh/jsdf-chiiki-events-7928
+              https://ntfy.sh/${{ secrets.NTFY_TOPIC }}
             echo "[通知] ntfy 送信完了（新着 ${COUNT}件）"
           else
             echo "[通知] 送信スキップ"

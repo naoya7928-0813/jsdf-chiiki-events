@@ -1,6 +1,5 @@
 import { F } from './Shared';
-
-const TOPIC = 'jsdf-chiiki-events-7928';
+import { NTFY_TOPIC as TOPIC } from '../config';
 
 const isIOS     = /iPad|iPhone|iPod/.test(navigator.userAgent);
 const isAndroid = /Android/.test(navigator.userAgent);
