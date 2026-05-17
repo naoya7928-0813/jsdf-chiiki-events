@@ -58,7 +58,7 @@ function parseAichi($) {
 
         // カレンダーページに場所情報はないため空文字（詳細ページ取得は fetchAichiDetail で実施）
         events.push({
-          id:             `ai-${dateStr.replace(/-/g, '')}-${++idx}`,
+          id:             `ai-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
           pref:           'aichi',
           date:           dateStr,
           weekday,

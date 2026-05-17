@@ -47,7 +47,7 @@ function parseAomori($) {
       : `https://www.mod.go.jp/pco/aomori/${href}`;
 
     events.push({
-      id:             `ao-${dateStr.replace(/-/g, '')}-${++idx}`,
+      id:             `ao-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
       pref:           'aomori',
       date:           dateStr,
       weekday,

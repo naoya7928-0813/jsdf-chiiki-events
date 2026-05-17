@@ -38,7 +38,7 @@ function parseIshikawa($) {
     const placeRaw = $el.find('.event-place').text().replace(/\s+/g, ' ').trim();
 
     events.push({
-      id:             `ik-${dateStr.replace(/-/g, '')}-${++idx}`,
+      id:             `ik-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
       pref:           'ishikawa',
       date:           dateStr,
       weekday:        reiwaMatch[4],

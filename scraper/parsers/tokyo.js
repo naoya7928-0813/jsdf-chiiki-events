@@ -109,7 +109,7 @@ function parseTokyo($) {
     const notes          = (fields['実施内容'] || fields['備考'] || fields['注意事項'] || null);
 
     events.push({
-      id:      `t-${dateStr.replace(/-/g, '')}-${++idx}`,
+      id:      `t-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
       pref:    'tokyo',
       date:    dateStr,
       endDate: endDate || null,

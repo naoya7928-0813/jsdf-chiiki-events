@@ -71,7 +71,7 @@ function parseFukushima($) {
     const time = timeMatch ? timeMatch[1] : '';
 
     events.push({
-      id:             `fs-${dateStr.replace(/-/g, '')}-${++idx}`,
+      id:             `fs-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
       pref:           'fukushima',
       date:           dateStr,
       weekday,

@@ -55,7 +55,7 @@ function parseAsahikawa($) {
     if (!title) return;
 
     events.push({
-      id:             `ak-${dateStr.replace(/-/g, '')}-${++idx}`,
+      id:             `ak-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
       pref:           'asahikawa',
       date:           dateStr,
       weekday,

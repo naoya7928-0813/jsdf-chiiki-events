@@ -91,7 +91,7 @@ function parseGifu($) {
         .text().replace(/\s+/g, ' ').trim();
 
       events.push({
-        id:             `gi-${dateStr.replace(/-/g, '')}-${++idx}`,
+        id:             `gi-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
         pref:           'gifu',
         date:           dateStr,
         weekday,

@@ -87,7 +87,7 @@ function parseSaitama($) {
     const notes          = fields['実施内容'] || fields['内容'] || fields['備考'] || null;
 
     events.push({
-      id:      `s-${dateStr.replace(/-/g, '')}-${++idx}`,
+      id:      `s-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
       pref:    'saitama',
       date:    dateStr,
       weekday,

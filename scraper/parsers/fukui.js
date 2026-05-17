@@ -41,7 +41,7 @@ function parseFukui($) {
     const notes      = contentRaw.replace(/^内\s*容[：:]\s*/, '').trim() || null;
 
     events.push({
-      id:             `fu-${dateStr.replace(/-/g, '')}-${++idx}`,
+      id:             `fu-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
       pref:           'fukui',
       date:           dateStr,
       weekday:        dateMatch[4],

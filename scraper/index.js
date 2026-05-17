@@ -77,7 +77,7 @@ const { parseOita }      = require('./parsers/oita');
 const { parseMiyazaki }  = require('./parsers/miyazaki');
 const { parseKagoshima } = require('./parsers/kagoshima');
 const { parseOkinawa }   = require('./parsers/okinawa');
-const { toHalfWidth, reiwaToAD, padTwo, isPast, guessCategory, guessTag, calcWeekday } = require('./parsers/utils');
+const { toHalfWidth, reiwaToAD, padTwo, isPast, guessCategory, guessTag, calcWeekday, titleHash } = require('./parsers/utils');
 
 // ── 設定 ─────────────────────────────────────────────────────
 const OUTPUT_PATH = path.join(__dirname, '../public/data/events.json');
@@ -996,7 +996,7 @@ async function fetchHyogo(context) {
     if (!title) continue;
 
     events.push({
-      id:             `hy-${dateStr.replace(/-/g, '')}-${++idx}`,
+      id:             `hy-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
       pref:           'hyogo',
       date:           dateStr,
       weekday,
@@ -1085,7 +1085,7 @@ async function fetchTochigi(context) {
     if (!title) continue;
 
     events.push({
-      id:             `tc-${dateStr.replace(/-/g, '')}-${++idx}`,
+      id:             `tc-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
       pref:           'tochigi',
       date:           dateStr,
       weekday,
@@ -1171,7 +1171,7 @@ async function fetchToyama(context) {
     if (!title) continue;
 
     events.push({
-      id:             `to-${dateStr.replace(/-/g, '')}-${++idx}`,
+      id:             `to-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
       pref:           'toyama',
       date:           dateStr,
       weekday:        dtMatch[4],

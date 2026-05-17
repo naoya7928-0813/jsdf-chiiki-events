@@ -66,7 +66,7 @@ function parseGunma($) {
     const notes = $sec.find('h4').first().text().replace(/\s+/g, ' ').trim() || null;
 
     events.push({
-      id:             `gu-${dateStr.replace(/-/g, '')}-${++idx}`,
+      id:             `gu-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
       pref:           'gunma',
       date:           dateStr,
       weekday,

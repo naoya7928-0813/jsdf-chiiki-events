@@ -70,7 +70,7 @@ function parseChiba($) {
     const time  = toHalfWidth(fields['時間'] || fields['開催時間'] || fields['受付時間'] || '').trim();
 
     events.push({
-      id:             `cb-${dateStr.replace(/-/g, '')}-${++idx}`,
+      id:             `cb-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
       pref:           'chiba',
       date:           dateStr,
       weekday,

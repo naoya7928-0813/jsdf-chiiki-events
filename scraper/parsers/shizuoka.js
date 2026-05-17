@@ -104,7 +104,7 @@ function parseShizuoka($) {
     const notes = notesParts.join('\n') || null;
 
     events.push({
-      id:             `sz-${dateStr.replace(/-/g, '')}-${++idx}`,
+      id:             `sz-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
       pref:           'shizuoka',
       date:           dateStr,
       weekday,

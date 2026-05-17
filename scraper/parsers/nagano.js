@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, padTwo, titleHash } = require('./utils');
 
 /**
  * iCal テキストを行単位で解析して VEVENT ブロックを抽出する。
@@ -97,7 +97,6 @@ function parseDtstart(dtstart) {
 function parseICalEvents(icsText, prefId) {
   const vevents = parseIcal(icsText);
   const events  = [];
-  let idx = 0;
 
   for (const ve of vevents) {
     const parsed = parseDtstart(ve.dtstart);
@@ -120,7 +119,7 @@ function parseICalEvents(icsText, prefId) {
     const shortId = prefId.slice(0, 2);
 
     events.push({
-      id:             `${shortId}-${dateStr.replace(/-/g, '')}-${++idx}`,
+      id:             `${shortId}-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
       pref:           prefId,
       date:           dateStr,
       weekday,

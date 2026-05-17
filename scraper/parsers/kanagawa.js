@@ -83,7 +83,7 @@ function parseKanagawa($) {
         : '';
 
       events.push({
-        id:       `k-${dateStr.replace(/-/g, '')}-${++idx}`,
+        id:       `k-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
         pref:     'kanagawa',
         date:     dateStr,
         weekday:  '',

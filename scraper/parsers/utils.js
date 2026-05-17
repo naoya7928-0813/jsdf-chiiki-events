@@ -126,4 +126,15 @@ function calcWeekday(dateStr) {
   return HOLIDAYS_JP.has(dateStr.slice(0, 10)) ? `${w}・祝` : w;
 }
 
-module.exports = { reiwaToAD, padTwo, toHalfWidth, isPast, guessCategory, guessTag, calcWeekday };
+/**
+ * 日付 + タイトルから順番に依存しない安定した短いハッシュを生成。
+ * 同一スクレイプ実行内で処理順が変わってもIDが変わらないようにする。
+ */
+function titleHash(date, title) {
+  const key = `${date}|${title}`;
+  let h = 5381;
+  for (let i = 0; i < key.length; i++) h = ((h << 5) + h) ^ key.charCodeAt(i);
+  return (h >>> 0).toString(36).padStart(5, '0').slice(-5);
+}
+
+module.exports = { reiwaToAD, padTwo, toHalfWidth, isPast, guessCategory, guessTag, calcWeekday, titleHash };

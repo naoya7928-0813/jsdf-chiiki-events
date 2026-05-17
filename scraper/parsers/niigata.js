@@ -71,7 +71,7 @@ function parseNiigata($) {
             .text().replace(/\s+/g, ' ').trim();
 
           events.push({
-            id:             `ni-${dateStr.replace(/-/g, '')}-${++idx}`,
+            id:             `ni-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
             pref:           'niigata',
             date:           dateStr,
             weekday,

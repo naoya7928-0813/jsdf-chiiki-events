@@ -62,7 +62,7 @@ function parseYamagata($) {
     const place = placeRaw.replace(/^(?:<b>)?場所\s*(?:<\/b>)?\s*[：:]\s*/i, '').trim();
 
     events.push({
-      id:             `ya-${dateStr.replace(/-/g, '')}-${++idx}`,
+      id:             `ya-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
       pref:           'yamagata',
       date:           dateStr,
       weekday,

@@ -81,7 +81,7 @@ function parseObihiro($) {
         .text().replace(/\s+/g, ' ').trim();
 
       events.push({
-        id:             `ob-${dateStr.replace(/-/g, '')}-${++idx}`,
+        id:             `ob-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
         pref:           'obihiro',
         date:           dateStr,
         weekday,

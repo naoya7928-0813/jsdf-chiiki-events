@@ -52,7 +52,7 @@ function parseMiyagi($) {
     const weekday  = weekdays[d.getDay()] || '';
 
     events.push({
-      id:             `mi-${dateStr.replace(/-/g, '')}-${++idx}`,
+      id:             `mi-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
       pref:           'miyagi',
       date:           dateStr,
       weekday,

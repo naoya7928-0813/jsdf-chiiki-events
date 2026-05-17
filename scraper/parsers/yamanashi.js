@@ -68,7 +68,7 @@ function parseYamanashi($) {
     if (isPast(dateStr)) return;
 
     events.push({
-      id:             `ya-${dateStr.replace(/-/g, '')}-${++idx}`,
+      id:             `ya-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
       pref:           'yamanashi',
       date:           dateStr,
       weekday,

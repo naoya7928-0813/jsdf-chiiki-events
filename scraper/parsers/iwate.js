@@ -102,7 +102,7 @@ function parseIwate($) {
       const eventUrl = href.startsWith('http') ? href : pdfUrl;
 
       events.push({
-        id:             `iw-${dateStr.replace(/-/g, '')}-${++idx}`,
+        id:             `iw-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
         pref:           'iwate',
         date:           dateStr,
         weekday,

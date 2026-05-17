@@ -70,7 +70,7 @@ function parseIbaraki($) {
       : '';
 
     events.push({
-      id:             `ib-${dateStr.replace(/-/g, '')}-${++idx}`,
+      id:             `ib-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
       pref:           'ibaraki',
       date:           dateStr,
       weekday,
