@@ -268,7 +268,7 @@ export default function NotificationScreen({
       </div>
 
       {showNtfyGuide && (
-        <NtfyGuideModal primary={primary} onClose={() => setShowNtfyGuide(false)} />
+        <NtfyGuideModal primary={primary} onClose={() => setShowNtfyGuide(false)} notifRegion={notifRegion} />
       )}
     </div>
   );

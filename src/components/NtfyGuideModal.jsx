@@ -1,13 +1,22 @@
 import { F } from './Shared';
-import { NTFY_TOPIC as TOPIC } from '../config';
+import { NTFY_TOPIC } from '../config';
 
 const isIOS     = /iPad|iPhone|iPod/.test(navigator.userAgent);
 const isAndroid = /Android/.test(navigator.userAgent);
 
+const REGION_LABELS = {
+  hokkaido: '北海道', tohoku: '東北', kanto: '関東', chubu: '中部',
+  kinki: '近畿', chugoku: '中国', shikoku: '四国', kyushu: '九州・沖縄',
+};
+
 // ─── ntfy 購読ガイドモーダル ──────────────────────────────────
-// SettingsScreen / NotificationScreen から呼び出す。
-// 画面下部からスライドアップするボトムシート形式。
-export default function NtfyGuideModal({ primary, onClose }) {
+// notifRegion: 'all' | 地域ID（'kanto', 'chubu', ...）
+export default function NtfyGuideModal({ primary, onClose, notifRegion = 'all' }) {
+  const topic = notifRegion === 'all'
+    ? NTFY_TOPIC
+    : `${NTFY_TOPIC}-${notifRegion}`;
+  const regionLabel = REGION_LABELS[notifRegion];
+
   const steps = [
     isIOS
       ? 'App Store から「ntfy」アプリをインストール（無料）'
@@ -15,7 +24,7 @@ export default function NtfyGuideModal({ primary, onClose }) {
         ? 'Google Play から「ntfy」アプリをインストール（無料）'
         : 'ブラウザで https://ntfy.sh を開く',
     'アプリを起動し、右下の「＋」ボタンをタップ',
-    `トピック名に「${TOPIC}」と入力して購読`,
+    `トピック名に「${topic}」と入力して購読`,
     '以降、イベントが更新されるたびに通知が届きます',
   ];
 
@@ -64,7 +73,9 @@ export default function NtfyGuideModal({ primary, onClose }) {
             プッシュ通知の設定方法
           </div>
           <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.5 }}>
-            無料アプリ「ntfy」でイベント更新通知を受け取れます
+            {regionLabel
+              ? `「${regionLabel}」の新着イベントを通知で受け取れます`
+              : '無料アプリ「ntfy」でイベント更新通知を受け取れます'}
           </div>
         </div>
 
@@ -96,11 +107,11 @@ export default function NtfyGuideModal({ primary, onClose }) {
               トピック名
             </div>
             <div style={{ fontSize: 14, fontFamily: F.mono, color: primary, fontWeight: 600 }}>
-              {TOPIC}
+              {topic}
             </div>
           </div>
           <button
-            onClick={() => navigator.clipboard?.writeText(TOPIC)}
+            onClick={() => navigator.clipboard?.writeText(topic)}
             style={{
               padding: '6px 12px', borderRadius: 6, border: `1px solid ${primary}`,
               background: 'transparent', color: primary, fontSize: 12,

@@ -92,7 +92,7 @@ jobs:
       # ── ntfy.sh でプッシュ通知送信 ────────────────────────
       - name: CDN 伝播待機（Vercel エッジに反映されるまで）
         if: steps.commit.outputs.changed == 'true'
-        run: sleep 20
+        run: sleep 60
 
       - name: プッシュ通知を送信
         if: steps.commit.outputs.changed == 'true'
@@ -101,6 +101,21 @@ jobs:
           'use strict';
           const { execSync } = require('child_process');
           const fs            = require('fs');
+
+          const PREF_TO_REGION = {
+            sapporo:'hokkaido', asahikawa:'hokkaido', obihiro:'hokkaido', hakodate:'hokkaido',
+            aomori:'tohoku', iwate:'tohoku', miyagi:'tohoku', akita:'tohoku', yamagata:'tohoku', fukushima:'tohoku',
+            kanagawa:'kanto', tokyo:'kanto', saitama:'kanto', gunma:'kanto', tochigi:'kanto', ibaraki:'kanto', chiba:'kanto',
+            niigata:'chubu', toyama:'chubu', ishikawa:'chubu', fukui:'chubu', yamanashi:'chubu', nagano:'chubu', gifu:'chubu', shizuoka:'chubu', aichi:'chubu',
+            mie:'kinki', shiga:'kinki', kyoto:'kinki', osaka:'kinki', hyogo:'kinki', nara:'kinki', wakayama:'kinki',
+            tokushima:'shikoku', kagawa:'shikoku', ehime:'shikoku', kochi:'shikoku',
+            tottori:'chugoku', shimane:'chugoku', okayama:'chugoku', hiroshima:'chugoku', yamaguchi:'chugoku',
+            fukuoka:'kyushu', saga:'kyushu', nagasaki:'kyushu', kumamoto:'kyushu', oita:'kyushu', miyazaki:'kyushu', kagoshima:'kyushu', okinawa:'kyushu',
+          };
+          const REGION_LABELS = {
+            hokkaido:'北海道', tohoku:'東北', kanto:'関東', chubu:'中部',
+            kinki:'近畿', chugoku:'中国', shikoku:'四国', kyushu:'九州・沖縄',
+          };
 
           const curr = JSON.parse(fs.readFileSync('./public/data/events.json', 'utf8'));
 
@@ -122,33 +137,75 @@ jobs:
           }
 
           const ALL_PREFS = Object.keys(curr).filter(k => Array.isArray(curr[k]));
-          const prevIds  = new Set(ALL_PREFS.flatMap(p => (prev[p] || []).map(e => e.id)));
-          const currAll  = ALL_PREFS.flatMap(p => curr[p] || []);
-          const newItems = currAll.filter(e => !prevIds.has(e.id));
+          const prevIds   = new Set(ALL_PREFS.flatMap(p => (prev[p] || []).map(e => e.id)));
+          const newItems  = ALL_PREFS.flatMap(p =>
+            (curr[p] || []).filter(e => !prevIds.has(e.id)).map(e => ({ ...e, _pref: p }))
+          );
 
-          console.log('  全イベント数 :', currAll.length, '件');
+          console.log('  全イベント数 :', ALL_PREFS.flatMap(p => curr[p] || []).length, '件');
           console.log('  新着件数     :', newItems.length, '件');
-          newItems.forEach(e => console.log('    新着:', e.id, e.title));
+          newItems.forEach(e => console.log('    新着:', e._pref, e.id, e.title));
 
           if (newItems.length === 0) {
             console.log('  → スキップ: 新着イベントなし');
             process.exit(0);
           }
 
-          fs.writeFileSync('/tmp/notify_count.txt', String(newItems.length));
+          // 地区別にグループ化
+          const byRegion = {};
+          for (const e of newItems) {
+            const region = PREF_TO_REGION[e._pref] || 'other';
+            if (!byRegion[region]) byRegion[region] = [];
+            byRegion[region].push(e);
+          }
+
+          const regionNames = Object.keys(byRegion)
+            .map(r => REGION_LABELS[r] || r)
+            .join('・');
+
+          fs.writeFileSync('/tmp/notify_data.json', JSON.stringify({
+            total: newItems.length,
+            regionNames,
+            byRegion: Object.fromEntries(
+              Object.entries(byRegion).map(([r, evs]) => [r, {
+                label: REGION_LABELS[r] || r,
+                count: evs.length,
+                sample: evs[0].title,
+              }])
+            ),
+          }));
           JSEOF
 
           node /tmp/check_notify.js
 
-          if [ -f /tmp/notify_count.txt ]; then
-            COUNT=$(cat /tmp/notify_count.txt)
+          if [ -f /tmp/notify_data.json ]; then
+            TOTAL=$(node -p "require('/tmp/notify_data.json').total")
+            REGION_NAMES=$(node -p "require('/tmp/notify_data.json').regionNames")
+
+            # 全地区トピックへ送信
             curl -s \
               -H "Title: 自衛隊地本イベント情報 新着" \
               -H "Tags: mega,jp" \
               -H "Priority: default" \
-              -d "新着イベントが${COUNT}件追加されました。アプリを開いて確認してください。" \
+              -d "新着イベントが${TOTAL}件追加されました（${REGION_NAMES}）。アプリを確認してください。" \
               https://ntfy.sh/${{ secrets.NTFY_TOPIC }}
-            echo "[通知] ntfy 送信完了（新着 ${COUNT}件）"
+            echo "[通知] 全地区送信完了（新着 ${TOTAL}件 / ${REGION_NAMES}）"
+
+            # 地区別トピックへ送信
+            node -e "
+              const d = require('/tmp/notify_data.json');
+              for (const [id, r] of Object.entries(d.byRegion)) {
+                process.stdout.write(id + '\t' + r.label + '\t' + r.count + '\t' + r.sample + '\n');
+              }
+            " | while IFS=$'\t' read -r REGION_ID REGION_LABEL COUNT SAMPLE; do
+              curl -s \
+                -H "Title: 自衛隊地本イベント情報 新着（${REGION_LABEL}）" \
+                -H "Tags: mega,jp" \
+                -H "Priority: default" \
+                -d "${REGION_LABEL}に新着${COUNT}件（${SAMPLE}）追加されました。" \
+                https://ntfy.sh/${{ secrets.NTFY_TOPIC }}-${REGION_ID}
+              echo "[通知] ${REGION_LABEL}送信完了（${COUNT}件）"
+            done
           else
             echo "[通知] 送信スキップ"
           fi
