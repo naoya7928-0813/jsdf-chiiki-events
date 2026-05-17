@@ -12,4 +12,10 @@ Thumbs.db
 # スクレイパーの依存パッケージ（本体の node_modules とは独立）
 scraper/node_modules/
 
+# スクレイパー開発用一時ファイル
+scraper/debug_*.js
+scraper/research_*.js
+scraper/test_*.js
+scraper/verify_*.js
+
 .env*.local
