@@ -332,6 +332,13 @@ export default function ListScreen({
                               {ev.category}
                             </span>
                             {ev.tag && <span style={{ fontSize: 11, color: 'var(--text-sub)' }}>{ev.tag}</span>}
+                            {favorites?.has(ev.id) && (
+                              <span style={{
+                                fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 3,
+                                background: `${accent}22`, color: accent,
+                                letterSpacing: 0.5, flexShrink: 0,
+                              }}>★</span>
+                            )}
                             {isOngoing && (
                               <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3, background: '#22c55e22', color: '#15803d', fontFamily: F.mono }}>
                                 開催中
@@ -359,11 +366,10 @@ export default function ListScreen({
                               </span>
                             )}
                           </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 6 }}>
-                            <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', lineHeight: 1.45, letterSpacing: 0.2, flex: 1, minWidth: 0 }}>
+                          <div style={{ marginBottom: 6 }}>
+                            <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', lineHeight: 1.45, letterSpacing: 0.2 }}>
                               {ev.title}
                             </div>
-                            {favorites && favorites.has(ev.id) && ICO.star(accent, 12, accent)}
                           </div>
                           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 5, fontSize: 12, color: 'var(--text-sub)' }}>
                             <span style={{ flexShrink: 0, display: 'flex', marginTop: 1 }}>{ICO.pin('var(--text-sub)', 12)}</span>
