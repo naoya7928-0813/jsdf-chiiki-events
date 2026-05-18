@@ -1171,7 +1171,24 @@
   "hyogo": [],
   "nara": [],
   "wakayama": [],
-  "ehime": [],
+  "ehime": [
+    {
+      "id": "em-20260524-1",
+      "pref": "ehime",
+      "date": "2026-05-24",
+      "weekday": "日",
+      "title": "ふれあい健康祭",
+      "place": "宇和島徳洲会病院",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/ehime/event.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    }
+  ],
   "kagawa": [
     {
       "id": "kg-20260606-1",
@@ -1466,5 +1483,5 @@
   "miyazaki": [],
   "kagoshima": [],
   "okinawa": [],
-  "updatedAt": "2026/05/18 16:17"
+  "updatedAt": "2026/05/18 20:30"
 }
