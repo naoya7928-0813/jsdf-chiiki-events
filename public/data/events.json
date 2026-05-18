@@ -86,22 +86,6 @@
   "hakodate": [],
   "miyagi": [
     {
-      "id": "mi-20260517-2",
-      "pref": "miyagi",
-      "date": "2026-05-17",
-      "weekday": "日",
-      "title": "利府町文化交流センター「リフノス」避難訓練コンサート",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "演奏会",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
       "id": "mi-20260530-1",
       "pref": "miyagi",
       "date": "2026-05-30",
@@ -387,7 +371,7 @@
       "time": "",
       "category": "体験",
       "tag": "",
-      "url": "https://www.mod.go.jp/pco/saitama/event/img/8.5.19nerima.jpg",
+      "url": null,
       "notes": null,
       "ageRequirement": null,
       "deadline": null
@@ -403,46 +387,13 @@
       "time": "10:00～16:00",
       "category": "地域参加",
       "tag": "",
-      "url": "https://www.mod.go.jp/pco/saitama/event/img/8.5.23toda.jpg",
+      "url": null,
       "notes": null,
       "ageRequirement": null,
       "deadline": null
     }
   ],
-  "gunma": [
-    {
-      "id": "gu-20260517-1",
-      "pref": "gunma",
-      "date": "2026-05-17",
-      "weekday": "日",
-      "title": "ぐんま青空マルシェ",
-      "place": "高崎市役所群馬支所",
-      "address": "高崎市足門町1658",
-      "time": "9:00～12:00",
-      "category": "地域参加",
-      "tag": "",
-      "url": "",
-      "notes": "＜広報展示ブース設置します！＞ 小型トラック展示あります！！ 制服試着コーナーもあります！ 記念撮影ができますよ！！",
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "gu-20260517-2",
-      "pref": "gunma",
-      "date": "2026-05-17",
-      "weekday": "日",
-      "title": "いざ活フェスタ",
-      "place": "イオンモール太田みらいガーデン",
-      "address": "太田市石原町81",
-      "time": "10:00～15:00",
-      "category": "地域参加",
-      "tag": "",
-      "url": "",
-      "notes": "＜広報展示ブース設置します！＞ 小型トラック展示あります！！ 制服試着コーナーもあります！ 記念撮影ができますよ！！",
-      "ageRequirement": null,
-      "deadline": null
-    }
-  ],
+  "gunma": [],
   "tochigi": [],
   "ibaraki": [],
   "chiba": [],
@@ -584,7 +535,7 @@
   "yamanashi": [],
   "nagano": [
     {
-      "id": "na-20260523-2",
+      "id": "na-20260523-rs0j4",
       "pref": "nagano",
       "date": "2026-05-23",
       "weekday": "土",
@@ -600,7 +551,7 @@
       "deadline": null
     },
     {
-      "id": "na-20260530-1",
+      "id": "na-20260530-aky9s",
       "pref": "nagano",
       "date": "2026-05-30",
       "weekday": "土",
@@ -685,23 +636,6 @@
     }
   ],
   "aichi": [
-    {
-      "id": "ai-20260517-1",
-      "pref": "aichi",
-      "date": "2026-05-17",
-      "weekday": "日",
-      "title": "豊田所説明会",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "自衛隊制度",
-      "ageRequirement": null,
-      "deadline": null,
-      "endDate": null
-    },
     {
       "id": "ai-20260518-2",
       "pref": "aichi",
@@ -1232,46 +1166,12 @@
   ],
   "mie": [],
   "shiga": [],
-  "kyoto": [
-    {
-      "id": "ky-20260517-1",
-      "pref": "kyoto",
-      "date": "2026-05-17",
-      "weekday": "日",
-      "title": "幹部自衛官ガイダンス」幹部自衛官を知る 自衛隊を知る",
-      "place": "京都地方合同庁舎(京都市中京区西ノ京笠殿町38)",
-      "address": "",
-      "time": "13:30～16:00",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/kyoto/kouhoushitsu/index.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    }
-  ],
+  "kyoto": [],
   "osaka": [],
   "hyogo": [],
   "nara": [],
   "wakayama": [],
-  "ehime": [
-    {
-      "id": "em-20260517-1",
-      "pref": "ehime",
-      "date": "2026-05-17",
-      "weekday": "日",
-      "title": "バラ祭りよしうみ2026",
-      "place": "よしうみバラ公園",
-      "address": "",
-      "time": "",
-      "category": "地域参加",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/ehime/event.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    }
-  ],
+  "ehime": [],
   "kagawa": [
     {
       "id": "kg-20260606-1",
@@ -1490,40 +1390,7 @@
       "deadline": null
     }
   ],
-  "yamaguchi": [
-    {
-      "id": "ym-20260517-1",
-      "pref": "yamaguchi",
-      "date": "2026-05-17",
-      "weekday": "日",
-      "title": "第27回浜崎伝建お宝博物館",
-      "place": "萩市浜崎町本町筋周辺",
-      "address": "",
-      "time": "9:00～15:00",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/yamaguchi/event.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "ym-20260517-2",
-      "pref": "yamaguchi",
-      "date": "2026-05-17",
-      "weekday": "日",
-      "title": "JAFデー 四駆ミーティングin楠こもれびの郷",
-      "place": "楠こもれびの郷",
-      "address": "",
-      "time": "10:00～14:30",
-      "category": "地域参加",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/yamaguchi/event.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    }
-  ],
+  "yamaguchi": [],
   "fukuoka": [],
   "saga": [
     {
@@ -1582,5 +1449,5 @@
   "miyazaki": [],
   "kagoshima": [],
   "okinawa": [],
-  "updatedAt": "2026/05/17 21:13"
+  "updatedAt": "2026/05/18 09:22"
 }
