@@ -270,7 +270,24 @@
       "deadline": null
     }
   ],
-  "akita": [],
+  "akita": [
+    {
+      "id": "ak-20260523-0bjve",
+      "pref": "akita",
+      "date": "2026-05-23",
+      "weekday": "土",
+      "title": "［艦艇広報］ミサイル艇はやぶさ一般公開(秋田港)",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "一般公開",
+      "tag": "",
+      "url": "",
+      "notes": "詳細は秋田地本SNSにてご覧ください",
+      "ageRequirement": null,
+      "deadline": null
+    }
+  ],
   "kanagawa": [],
   "tokyo": [
     {
@@ -530,7 +547,7 @@
       "category": "地域参加",
       "tag": "",
       "url": "",
-      "notes": "場所：あんずホール(予定)",
+      "notes": "場所：あんずホール",
       "ageRequirement": null,
       "deadline": null
     },
@@ -1202,6 +1219,22 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null
+    },
+    {
+      "id": "em-20260521-2",
+      "pref": "ehime",
+      "date": "2026-05-21",
+      "weekday": "木",
+      "title": "帝京祭",
+      "place": "帝京第五高等学校",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/ehime/event.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
     }
   ],
   "kagawa": [
@@ -1498,5 +1531,5 @@
   "miyazaki": [],
   "kagoshima": [],
   "okinawa": [],
-  "updatedAt": "2026/05/20 09:33"
+  "updatedAt": "2026/05/20 16:09"
 }
