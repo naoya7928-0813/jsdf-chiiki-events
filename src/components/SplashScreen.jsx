@@ -10,17 +10,17 @@ function injectKeyframes() {
   const el = document.createElement('style');
   el.id = KF_ID;
   el.textContent = `
-    /* ── 空自：戦闘機が画面を横断（左→右、SVGはscaleX(-1)で右向き） ── */
+    /* ── 空自：戦闘機が左から中央へ飛来して停止（幅220px → 半分110px） ── */
     @keyframes spJetFly {
-      0%   { left: -250px; transform: scale(0.82); }
-      55%  { transform: scale(1); }
-      100% { left: calc(100% + 260px); transform: scale(1.04); }
+      0%        { left: -250px; transform: scale(0.82); }
+      60%       { transform: scale(1); }
+      72%, 100% { left: calc(50% - 110px); transform: scale(1); }
     }
     @keyframes spJetTrail {
-      0%   { width: 0; opacity: 0; }
+      0%   { width: 0; opacity: 0; left: 0; }
       15%  { opacity: 0.85; }
-      85%  { width: calc(100% + 80px); }
-      100% { width: calc(100% + 80px); opacity: 0; }
+      70%  { width: calc(50% - 110px); opacity: 0.5; }
+      100% { width: calc(50% - 110px); opacity: 0; }
     }
 
     /* ── 陸自：戦車が左から中央へ走り込む（幅220px → 半分110px） ── */
