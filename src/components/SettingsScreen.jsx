@@ -2,13 +2,7 @@ import { useState } from 'react';
 import { ICO } from './Icons';
 import { BottomTabBar, F } from './Shared';
 import { COLOR_SCHEMES, REGION_SOURCE } from '../config';
-import NtfyGuideModal from './NtfyGuideModal';
-import { REGIONS } from '../data/regionMap';
 import { usePushNotification } from '../hooks/usePushNotification';
-
-function loadNotifRegion() {
-  try { return localStorage.getItem('jsdf-notif-region') || 'all'; } catch { return 'all'; }
-}
 
 // package.json の version を vite.config.js の define で埋め込んだ定数
 /* global __APP_VERSION__ */
@@ -19,40 +13,12 @@ export default function SettingsScreen({
   onOpenHome, onOpenRegion, onOpenList, onOpenFavorites,
   onOpenLegal,
 }) {
-  const { primary, accent, schemeKey, darkMode } = theme;
-
-  // ── 通知設定 ────────────────────────────────────────────────
-  const [notif, setNotif] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('jsdf-notif')) || { event: false, update: false, reminder: false };
-    } catch {
-      return { event: false, update: false, reminder: false };
-    }
-  });
-  // ntfy ガイドモーダルの表示状態
-  const [showNtfyGuide, setShowNtfyGuide] = useState(false);
+  const { primary, schemeKey, darkMode } = theme;
 
   // ── Web Push ─────────────────────────────────────────────────
   const push = usePushNotification();
 
-  // ── 通知地区 ────────────────────────────────────────────────
-  const [notifRegion, setNotifRegion] = useState(loadNotifRegion);
   const [sourceOpen, setSourceOpen] = useState(false);
-  const handleNotifRegion = (id) => {
-    setNotifRegion(id);
-    try { localStorage.setItem('jsdf-notif-region', id); } catch {}
-  };
-
-  const handleNotifToggle = (key) => {
-    const next = !notif[key];
-    // イベント通知・更新通知を ON にするときは ntfy ガイドを表示
-    if (next && (key === 'event' || key === 'update')) {
-      setShowNtfyGuide(true);
-    }
-    const updated = { ...notif, [key]: next };
-    setNotif(updated);
-    try { localStorage.setItem('jsdf-notif', JSON.stringify(updated)); } catch {}
-  };
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)', fontFamily: F.sans }}>
@@ -109,75 +75,7 @@ export default function SettingsScreen({
           プッシュ通知をONにすると、スクレイパーが新しいイベントを検出した際に通知が届きます。通知の許可はブラウザからいつでも取り消せます。
         </div>
 
-        {/* ─ 2. その他の通知設定 ─ */}
-        <GroupTitle>通知設定</GroupTitle>
-        <Card>
-          <ToggleRow
-            label="イベント公開のお知らせ"
-            sub="新しいイベントが追加された時"
-            on={notif.event}
-            onChange={() => handleNotifToggle('event')}
-            primary={primary}
-          />
-          <ToggleRow
-            label="開催情報の変更"
-            sub="時間・場所・中止等の変更時"
-            on={notif.update}
-            onChange={() => handleNotifToggle('update')}
-            primary={primary}
-          />
-          <ToggleRow
-            label="リマインダー"
-            sub="申込イベントの締切が近づいたとき"
-            on={notif.reminder}
-            onChange={() => handleNotifToggle('reminder')}
-            primary={primary}
-          />
-          {/* 通知する地区 */}
-          <div style={{ padding: '12px 14px', borderTop: '1px solid var(--sep)' }}>
-            <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', marginBottom: 8 }}>
-              通知する地区
-            </div>
-            <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginBottom: 10, lineHeight: 1.4 }}>
-              選択した地区のイベントのみ通知画面に表示されます
-            </div>
-            <div style={{
-              display: 'flex', flexWrap: 'wrap', gap: 6,
-            }}>
-              {[{ id: 'all', label: '全地区' }, ...REGIONS].map(r => {
-                const isA = notifRegion === r.id;
-                return (
-                  <button
-                    key={r.id}
-                    onClick={() => handleNotifRegion(r.id)}
-                    style={{
-                      border: `1px solid ${isA ? primary : 'var(--border)'}`,
-                      borderRadius: 20, padding: '4px 12px',
-                      background: isA ? primary : 'var(--card)',
-                      color: isA ? '#fff' : 'var(--text-muted)',
-                      fontSize: 12, fontWeight: isA ? 700 : 400,
-                      cursor: 'pointer', fontFamily: F.sans,
-                    }}
-                  >
-                    {r.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </Card>
-        {/* 通知のヒント */}
-        <div style={{
-          margin: '6px 16px 0',
-          padding: '8px 12px',
-          background: 'var(--tag-bg)',
-          borderRadius: 8, fontSize: 11, color: 'var(--text-muted)',
-          fontFamily: F.sans, lineHeight: 1.6,
-        }}>
-          「イベント公開」「開催変更」をONにすると、ntfy アプリへの設定方法が表示されます。「リマインダー」はお気に入りイベントの締切が近づいたとき通知画面に表示されます。
-        </div>
-
-        {/* ─ 3. テーマカラー ─ */}
+        {/* ─ 2. テーマカラー ─ */}
         <GroupTitle>テーマカラー</GroupTitle>
         <Card>
           <div style={{ padding: '14px' }}>
@@ -324,10 +222,6 @@ export default function SettingsScreen({
         primary={primary}
       />
 
-      {/* ntfy ガイドモーダル */}
-      {showNtfyGuide && (
-        <NtfyGuideModal primary={primary} onClose={() => setShowNtfyGuide(false)} />
-      )}
     </div>
   );
 }

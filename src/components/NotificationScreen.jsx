@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ICO } from './Icons';
 import { F, ScreenHeader, splitDate } from './Shared';
-import NtfyGuideModal from './NtfyGuideModal';
 import { deadlineDaysUntil, daysLabel } from '../utils/date';
 import { PREFECTURE_INFO, REGIONS } from '../data/regionMap';
 
@@ -58,23 +57,6 @@ export default function NotificationScreen({
   }, [notifHistory, notifRegion]);
 
   const unreadFiltered = filteredItems.filter(i => !i.read);
-
-  // ── プッシュ通知購読状態 ──────────────────────────────────
-  const [pushEnabled, setPushEnabled] = useState(() => {
-    try { return localStorage.getItem('jsdf-push-enabled') === '1'; } catch { return false; }
-  });
-  const [showNtfyGuide, setShowNtfyGuide] = useState(false);
-
-  const handleSubscribe = () => {
-    setShowNtfyGuide(true);
-    setPushEnabled(true);
-    try { localStorage.setItem('jsdf-push-enabled', '1'); } catch {}
-  };
-
-  const handleUnsubscribe = () => {
-    setPushEnabled(false);
-    try { localStorage.removeItem('jsdf-push-enabled'); } catch {}
-  };
 
   return (
     <div style={{
@@ -145,56 +127,22 @@ export default function NotificationScreen({
 
       <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '12px 0 8px' }}>
 
-        {/* ── 更新時刻 + 通知設定 (コンパクト情報バー) ── */}
+        {/* ── 更新スケジュール情報バー ── */}
         <div style={{
           margin: '0 16px 12px', borderRadius: 10,
           border: '1px solid var(--border)', background: 'var(--card)',
           padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10,
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
-            {ICO.clock('var(--text-muted)', 13)}
-            <span style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-              毎日 8:00 / 12:00<br />16:00 / 20:00 頃
-            </span>
+          {ICO.clock('var(--text-muted)', 13)}
+          <span style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+            毎日 8:00 / 12:00 / 16:00 / 20:00 頃に更新
+          </span>
+          <div style={{
+            marginLeft: 'auto', flexShrink: 0,
+            fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.4, textAlign: 'right',
+          }}>
+            通知設定は<br />設定画面から
           </div>
-          {pushEnabled ? (
-            <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-              <button
-                onClick={() => setShowNtfyGuide(true)}
-                style={{
-                  fontSize: 11, fontWeight: 600, color: primary, fontFamily: F.sans,
-                  background: `${primary}12`, border: 'none',
-                  padding: '5px 10px', borderRadius: 6, cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', gap: 4,
-                }}
-              >
-                {ICO.bell(primary, 11)} 通知ON
-              </button>
-              <button
-                onClick={handleUnsubscribe}
-                style={{
-                  fontSize: 11, color: 'var(--text-muted)', fontFamily: F.sans,
-                  background: 'none', border: '1px solid var(--border)',
-                  padding: '5px 8px', borderRadius: 6, cursor: 'pointer',
-                }}
-              >
-                解除
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={handleSubscribe}
-              style={{
-                flexShrink: 0, fontSize: 11, fontWeight: 600,
-                color: primary, fontFamily: F.sans,
-                background: `${primary}12`, border: `1px solid ${primary}33`,
-                padding: '5px 10px', borderRadius: 6, cursor: 'pointer',
-                display: 'flex', alignItems: 'center', gap: 4,
-              }}
-            >
-              {ICO.bell(primary, 11)} 通知を受け取る
-            </button>
-          )}
         </div>
 
         {/* ── 締切リマインダー ── */}
@@ -267,9 +215,6 @@ export default function NotificationScreen({
         )}
       </div>
 
-      {showNtfyGuide && (
-        <NtfyGuideModal primary={primary} onClose={() => setShowNtfyGuide(false)} notifRegion={notifRegion} />
-      )}
     </div>
   );
 }
