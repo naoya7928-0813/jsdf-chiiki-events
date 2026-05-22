@@ -60,7 +60,7 @@ export default function JapanMap({ eventCounts, selectedRegionId, onSelect, prim
         const hovered  = regionId === hoveredId;
         const active   = selected || hovered;
         const lColor   = selected ? '#fff' : 'var(--text)';
-        const bRadius  = 18;
+        const bRadius  = 28;   // ラベルからバッジ中心までのオフセット
 
         return (
           <g
@@ -74,8 +74,8 @@ export default function JapanMap({ eventCounts, selectedRegionId, onSelect, prim
             <text
               x={x} y={y}
               textAnchor="middle"
-              fontSize={label.length >= 3 ? 22 : label.length === 2 ? 26 : 30}
-              fontWeight={active ? 700 : 500}
+              fontSize={label.length >= 3 ? 24 : label.length === 2 ? 28 : 32}
+              fontWeight={active ? 700 : 600}
               fontFamily={F.sans}
               fill={lColor}
               style={{ pointerEvents: 'none', userSelect: 'none', transition: 'fill 0.15s' }}
@@ -83,24 +83,33 @@ export default function JapanMap({ eventCounts, selectedRegionId, onSelect, prim
               {label}
             </text>
 
-            {/* 件数バッジ */}
+            {/* 件数バッジ（視認性向上：r 14→22, fontSize 13→20） */}
             {count > 0 && (
               <g style={{ pointerEvents: 'none' }}>
+                {/* 影 付与用の外側リング */}
                 <circle
                   cx={x} cy={y + bRadius}
-                  r={14}
+                  r={24}
+                  fill="none"
+                  stroke="rgba(0,0,0,0.18)"
+                  strokeWidth={3}
+                />
+                <circle
+                  cx={x} cy={y + bRadius}
+                  r={22}
                   fill={selected ? '#fff' : primary}
                 />
                 <text
-                  x={x} y={y + bRadius + 5}
+                  x={x} y={y + bRadius}
                   textAnchor="middle"
-                  fontSize={13}
+                  dominantBaseline="central"
+                  fontSize={20}
                   fontWeight={700}
                   fontFamily={F.mono}
                   fill={selected ? primary : '#fff'}
                   style={{ userSelect: 'none' }}
                 >
-                  {count}
+                  {count > 99 ? '99+' : count}
                 </text>
               </g>
             )}
