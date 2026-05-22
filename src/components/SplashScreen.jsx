@@ -219,7 +219,12 @@ function ShipSVG({ color }) {
   return (
     <svg
       viewBox="0 0 382 85" width={280}
-      style={{ fill: color, display: 'block', filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.65))' }}
+      style={{
+        fill: color,
+        display: 'block',
+        filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.65))',
+        transform: 'scaleX(-1)',
+      }}
     >
       <path d="M195.1 78H24.3L21 73.2a92.7 92.7 0 0 0-7.3-9l-4-4.2 43.3.5v.8c0 .4.7.7
         1.5.7H56v-2h7.8l.4 1 .3.8 4 .2h7l3-.2-2.5-1V57l-11.5-.3 13.1-1.2 3.5-3.5H87l2.4 8-3.8 3H94v-2h5.9l1.2 2h10.1l-2.4-3h7.6l-3.7 2.7 12.2 1.4 2-2c1.2-1.2 2.1-2.5
