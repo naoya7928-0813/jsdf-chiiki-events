@@ -10,6 +10,7 @@ import NotificationScreen from './components/NotificationScreen';
 import FavoritesScreen   from './components/FavoritesScreen';
 import LegalScreen        from './components/LegalScreen';
 import RegionScreen       from './components/RegionScreen';
+import SplashScreen       from './components/SplashScreen';
 
 // ─── localStorage 復元ヘルパー ────────────────────────────────
 function loadScheme()       { try { return localStorage.getItem('jsdf-scheme') || DEFAULT_SCHEME; } catch { return DEFAULT_SCHEME; } }
@@ -40,6 +41,24 @@ function resolveIsDark(mode) {
 }
 
 export default function App() {
+  // ── スプラッシュ ──────────────────────────────────────────
+  // 「前回スプラッシュを表示したときのテーマ」と現在のテーマを比較し、
+  // テーマが変わっていた場合のみ表示する。
+  //   - テーマ変更 → リロード → 表示 ✅
+  //   - テーマ変更なし → リロード → 表示しない ✅
+  const [showSplash, setShowSplash] = useState(() => {
+    try {
+      const current = localStorage.getItem('jsdf-scheme') || DEFAULT_SCHEME;
+      const lastShown = localStorage.getItem('jsdf-splash-scheme');
+      return lastShown !== current;   // テーマが変わっていれば true
+    } catch { return true; }
+  });
+  const handleSplashDone = useCallback(() => {
+    // 表示完了時に「今のテーマで表示した」と記録
+    try { localStorage.setItem('jsdf-splash-scheme', localStorage.getItem('jsdf-scheme') || DEFAULT_SCHEME); } catch {}
+    setShowSplash(false);
+  }, []);
+
   // ── ナビゲーション ────────────────────────────────────────
   const [screen,      setScreen]      = useState('home');
   const [detailEvent, setDetailEvent] = useState(null);
@@ -216,6 +235,11 @@ export default function App() {
       background: 'var(--bg)',
       boxShadow: '0 0 40px rgba(0,0,0,0.12)',
     }}>
+
+      {/* ── スプラッシュ画面（テーマに応じた乗り物アニメーション） ── */}
+      {showSplash && (
+        <SplashScreen schemeKey={schemeKey} onDone={handleSplashDone} />
+      )}
 
       {screen === 'home' && (
         <HomeScreen
