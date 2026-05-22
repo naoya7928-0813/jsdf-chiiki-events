@@ -74,7 +74,6 @@ function JetSVG({ color }) {
         fill: color,
         display: 'block',
         filter: 'drop-shadow(0 6px 20px rgba(0,0,0,0.55))',
-        transform: 'scaleX(-1)',
       }}
     >
       <path d="M778.792,152.996c-13.321-8.051-101.787-27.12-101.787-27.12s-19.96-26.304-56.251-30.838
