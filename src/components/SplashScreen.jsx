@@ -28,11 +28,6 @@ function injectKeyframes() {
       0%        { left: -250px; }
       62%, 100% { left: calc(50% - 110px); }
     }
-    @keyframes spDust {
-      0%   { width: 0;     opacity: 0; }
-      30%  { opacity: 0.45; }
-      100% { width: 220px; opacity: 0; }
-    }
 
     /* ── 海自：護衛艦が左から中央へ進入（幅280px → 半分140px） ── */
     @keyframes spShipSail {
@@ -44,33 +39,53 @@ function injectKeyframes() {
       50%       { transform: translateX(-7px); opacity: 0.48; }
     }
 
-    /* ── 陸自：砂煙パフ（個別軌跡） ── */
+    /* ── 陸自：後部砂煙パフ（上昇・膨張） ── */
     @keyframes spDust1 {
-      0%   { transform: translate(0,0) scale(0.30); opacity: 0; }
-      15%  { opacity: 0.52; }
-      100% { transform: translate(-12px,-54px) scale(2.1); opacity: 0; }
+      0%   { transform: translate(0,0) scale(0.28); opacity: 0; }
+      15%  { opacity: 0.60; }
+      100% { transform: translate(-18px,-56px) scale(2.2); opacity: 0; }
     }
     @keyframes spDust2 {
-      0%   { transform: translate(0,0) scale(0.22); opacity: 0; }
-      20%  { opacity: 0.44; }
-      100% { transform: translate(-26px,-40px) scale(2.7); opacity: 0; }
+      0%   { transform: translate(0,0) scale(0.20); opacity: 0; }
+      18%  { opacity: 0.52; }
+      100% { transform: translate(-30px,-42px) scale(2.8); opacity: 0; }
     }
     @keyframes spDust3 {
-      0%   { transform: translate(0,0) scale(0.18); opacity: 0; }
-      22%  { opacity: 0.38; }
-      100% { transform: translate(-6px,-68px) scale(1.8); opacity: 0; }
+      0%   { transform: translate(0,0) scale(0.16); opacity: 0; }
+      20%  { opacity: 0.45; }
+      100% { transform: translate(-10px,-70px) scale(1.9); opacity: 0; }
     }
     @keyframes spDust4 {
-      0%   { transform: translate(0,0) scale(0.32); opacity: 0; }
-      12%  { opacity: 0.46; }
-      100% { transform: translate(-18px,-36px) scale(2.5); opacity: 0; }
+      0%   { transform: translate(0,0) scale(0.30); opacity: 0; }
+      12%  { opacity: 0.55; }
+      100% { transform: translate(-22px,-38px) scale(2.6); opacity: 0; }
+    }
+    /* ── 陸自：側面砂埃（車体横・低くて横広がり） ── */
+    @keyframes spDustSide {
+      0%   { transform: scaleX(0.04); opacity: 0; }
+      18%  { opacity: 0.52; }
+      65%  { opacity: 0.30; }
+      100% { transform: scaleX(1); opacity: 0; }
     }
 
-    /* ── 海自：艦首白波スプレー ── */
+    /* ── 海自：艦首白波スプレー（縦） ── */
     @keyframes spBowSpray {
-      0%   { transform: scaleY(0.1); opacity: 0; }
-      20%  { transform: scaleY(1);   opacity: 0.82; }
-      100% { transform: scaleY(1.8); opacity: 0; }
+      0%   { transform: scaleY(0.08) scaleX(0.6); opacity: 0; }
+      18%  { transform: scaleY(1) scaleX(1);      opacity: 0.90; }
+      100% { transform: scaleY(1.9) scaleX(1.2);  opacity: 0; }
+    }
+    /* ── 海自：艦首横波ファン（横方向） ── */
+    @keyframes spBowFan {
+      0%   { transform: scaleX(0.1); opacity: 0; }
+      20%  { opacity: 0.80; }
+      100% { transform: scaleX(1); opacity: 0; }
+    }
+    /* ── 海自：艦尾スクリュー波 ── */
+    @keyframes spSternWash {
+      0%   { transform: scale(0.15) translateX(12px); opacity: 0; }
+      22%  { opacity: 0.75; }
+      75%  { opacity: 0.40; }
+      100% { transform: scale(1.7) translateX(-18px); opacity: 0; }
     }
     /* ── 海自：航跡（船の後ろに伸びる白波ライン） ── */
     @keyframes spWake {
@@ -475,15 +490,18 @@ function JetScene({ cfg }) {
   );
 }
 
-/** 陸自：戦車 + 地面 + 砂煙パフ群（左→中央） */
+/** 陸自：戦車 + 地面 + 砂煙（後部上昇パフ + 側面横広がり） */
 function TankScene({ cfg }) {
-  const dustPuffs = [
-    { left: 'calc(50% - 258px)', delay: '0.30s', anim: 'spDust1', size: 30 },
-    { left: 'calc(50% - 292px)', delay: '0.50s', anim: 'spDust2', size: 38 },
-    { left: 'calc(50% - 242px)', delay: '0.68s', anim: 'spDust3', size: 24 },
-    { left: 'calc(50% - 318px)', delay: '0.88s', anim: 'spDust4', size: 44 },
-    { left: 'calc(50% - 270px)', delay: '1.05s', anim: 'spDust1', size: 32 },
+  // scaleX(-1) 後の車体座標：左端 = 後部、右端 = 砲身
+  // 後部パフは left: -30〜10px あたり（コンテナ内）
+  const rearPuffs = [
+    { left: -22, bottom: 4,  size: 34, delay: '0.22s', anim: 'spDust1' },
+    { left: -36, bottom: 2,  size: 44, delay: '0.42s', anim: 'spDust2' },
+    { left:  -8, bottom: 8,  size: 26, delay: '0.60s', anim: 'spDust3' },
+    { left: -30, bottom: 0,  size: 50, delay: '0.78s', anim: 'spDust4' },
+    { left: -14, bottom: 6,  size: 36, delay: '0.96s', anim: 'spDust1' },
   ];
+
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
       {/* 地面グラデーション */}
@@ -496,40 +514,59 @@ function TankScene({ cfg }) {
         position: 'absolute', bottom: '35%', left: 0, right: 0, height: 2,
         background: `linear-gradient(90deg, transparent 5%, ${cfg.groundColor}cc 30%, ${cfg.groundColor}cc 70%, transparent 95%)`,
       }}/>
-      {/* 砂煙パフ（球状・ぼかし・上昇して消える） */}
-      {dustPuffs.map((p, i) => (
-        <div key={i} style={{
-          position: 'absolute',
-          bottom: 'calc(35% + 2px)',
-          left: p.left,
-          width: p.size, height: p.size,
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(165,148,92,0.70), transparent 62%)',
-          filter: 'blur(7px)',
-          animation: `${p.anim} 2.0s ease-out ${p.delay} both`,
-        }}/>
-      ))}
-      {/* 横長の砂埃スプレー */}
-      <div style={{
-        position: 'absolute', bottom: 'calc(35% + 4px)',
-        left: 'calc(50% - 330px)', height: 36,
-        background: 'linear-gradient(90deg, transparent, rgba(120,110,70,0.36))',
-        borderRadius: '0 60% 60% 0',
-        animation: 'spDust 2.0s ease-out 0.9s both',
-      }}/>
-      {/* 戦車本体 */}
+
+      {/* 戦車本体（砂煙もコンテナ内に入れて追従させる） */}
       <div style={{
         position: 'absolute', bottom: 'calc(35% + 2px)', left: -250,
         animation: 'spTankRoll 2.2s cubic-bezier(.22,.80,.22,1) forwards',
       }}>
         <cfg.Vehicle color={cfg.vehicleColor} />
+
+        {/* ── 後部排気砂煙（上昇パフ） ── */}
+        {rearPuffs.map((p, i) => (
+          <div key={i} style={{
+            position: 'absolute',
+            bottom: p.bottom,
+            left:   p.left,
+            width: p.size, height: p.size,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(165,148,92,0.72), transparent 62%)',
+            filter: 'blur(7px)',
+            animation: `${p.anim} 1.9s ease-out ${p.delay} both`,
+          }}/>
+        ))}
+
+        {/* ── 車体側面砂埃①（履帯上面・上側） ── */}
+        <div style={{
+          position: 'absolute',
+          bottom: -4, left: -10,
+          width: 190, height: 26,
+          borderRadius: '50%',
+          background: 'radial-gradient(ellipse 100% 100% at 8% 50%, rgba(155,138,82,0.58), transparent 72%)',
+          filter: 'blur(9px)',
+          transformOrigin: 'left center',
+          animation: 'spDustSide 1.9s ease-out 0.28s both',
+        }}/>
+        {/* ── 車体側面砂埃②（履帯下面・地面スレスレ） ── */}
+        <div style={{
+          position: 'absolute',
+          bottom: -9, left: 5,
+          width: 160, height: 18,
+          borderRadius: '50%',
+          background: 'radial-gradient(ellipse 100% 100% at 6% 50%, rgba(130,115,65,0.50), transparent 68%)',
+          filter: 'blur(7px)',
+          transformOrigin: 'left center',
+          animation: 'spDustSide 2.1s ease-out 0.62s both',
+        }}/>
       </div>
     </div>
   );
 }
 
-/** 海自：護衛艦 + 海面 + 波 + 艦首白波 + 航跡（左から進入・中央停止） */
+/** 海自：護衛艦 + 海面 + 波 + 艦首白波 + 艦尾スクリュー波 + 航跡 */
 function ShipScene({ cfg }) {
+  // ShipSVG は scaleX(-1) 済み → 艦首(bow)=右端、艦尾(stern)=左端
+  // コンテナ幅 280px : 艦首 ≈ right:12px / 艦尾 ≈ left:8px
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
       {/* 海面グラデーション */}
@@ -546,61 +583,76 @@ function ShipScene({ cfg }) {
           animationDelay: `${i * 0.22}s`,
         }}/>
       ))}
-      {/* 航跡ライン① 拡散グロー（船が通った白波） */}
+      {/* 航跡ライン① 拡散グロー */}
       <div style={{
-        position: 'absolute',
-        bottom: 'calc(30% + 2px)',
-        left: 0,
+        position: 'absolute', bottom: 'calc(30% + 2px)', left: 0,
         height: 14,
         background: 'linear-gradient(90deg, transparent 2%, rgba(190,220,255,0.18) 25%, rgba(220,240,255,0.50))',
-        filter: 'blur(4px)',
-        borderRadius: 7,
+        filter: 'blur(4px)', borderRadius: 7,
         animation: 'spWake 2.4s ease-out forwards',
       }}/>
-      {/* 航跡ライン② コアライン（白い引き波の芯） */}
+      {/* 航跡ライン② コアライン */}
       <div style={{
-        position: 'absolute',
-        bottom: 'calc(30% + 7px)',
-        left: 0,
+        position: 'absolute', bottom: 'calc(30% + 7px)', left: 0,
         height: 2,
         background: 'linear-gradient(90deg, transparent 5%, rgba(255,255,255,0.65))',
         borderRadius: 1,
         animation: 'spWake 2.4s ease-out 0.05s both',
       }}/>
-      {/* 水面反射 */}
-      <div style={{
-        position: 'absolute', bottom: 'calc(30% - 30px)', left: 'calc(50% - 140px)',
-        opacity: 0.1, transform: 'scaleY(-0.35)', transformOrigin: 'top',
-        filter: 'blur(3px)', pointerEvents: 'none',
-      }}>
-        <ShipSVG color={cfg.vehicleColor} />
-      </div>
-      {/* 護衛艦本体 + 艦首白波（船と一緒に動く） */}
+      {/* 護衛艦本体（水飛沫・反射もコンテナ内で追従） */}
       <div style={{
         position: 'absolute', bottom: 'calc(30% + 4px)', left: -320,
         animation: 'spShipSail 2.4s cubic-bezier(.22,.80,.22,1) forwards',
       }}>
+        {/* 水面反射（コンテナ内に配置 → 艦と一緒に動く） */}
+        <div style={{
+          position: 'absolute', top: 52, left: 0,
+          opacity: 0.10, transform: 'scaleY(-0.38)', transformOrigin: 'top left',
+          filter: 'blur(4px)', pointerEvents: 'none',
+        }}>
+          <ShipSVG color={cfg.vehicleColor} />
+        </div>
         <cfg.Vehicle color={cfg.vehicleColor} />
-        {/* 艦首白波スプレー（縦方向・艦首=右端付近） */}
+
+        {/* ── 艦首スプレー（縦・右端）：船首が水を切る柱状の飛沫 ── */}
         <div style={{
           position: 'absolute',
-          bottom: -4,
-          right: 8,
-          width: 20, height: 48,
+          bottom: -6, right: 10,
+          width: 26, height: 52,
           transformOrigin: 'bottom center',
-          background: 'radial-gradient(ellipse 55% 100% at 50% 100%, rgba(255,255,255,0.88), transparent 74%)',
+          background: 'radial-gradient(ellipse 60% 100% at 50% 100%, rgba(255,255,255,0.92), transparent 72%)',
           filter: 'blur(5px)',
-          animation: 'spBowSpray 2.0s ease-in-out 0.15s both',
+          animation: 'spBowSpray 2.0s ease-in-out 0.12s both',
         }}/>
-        {/* 艦首泡沫（横広がり・水面） */}
+        {/* ── 艦首横波ファン（右方向へ扇状に広がる白波） ── */}
         <div style={{
           position: 'absolute',
-          bottom: -9,
-          right: -4,
-          width: 52, height: 20,
-          background: 'radial-gradient(ellipse 100% 80% at 35% 50%, rgba(200,232,255,0.75), transparent 68%)',
+          bottom: -12, right: -8,
+          width: 68, height: 22,
+          transformOrigin: 'right center',
+          background: 'radial-gradient(ellipse 100% 80% at 85% 50%, rgba(210,238,255,0.82), transparent 70%)',
+          filter: 'blur(5px)',
+          animation: 'spBowFan 2.1s ease-out 0.18s both',
+        }}/>
+        {/* ── 艦尾スクリュー波①（大：楕円） ── */}
+        <div style={{
+          position: 'absolute',
+          bottom: -10, left: 4,
+          width: 52, height: 24,
+          borderRadius: '50%',
+          background: 'radial-gradient(ellipse 100% 80% at 30% 50%, rgba(200,232,255,0.78), transparent 68%)',
+          filter: 'blur(6px)',
+          animation: 'spSternWash 2.2s ease-out 0.20s both',
+        }}/>
+        {/* ── 艦尾スクリュー波②（小・細かい泡） ── */}
+        <div style={{
+          position: 'absolute',
+          bottom: -5, left: 18,
+          width: 34, height: 16,
+          borderRadius: '50%',
+          background: 'radial-gradient(ellipse 100% 80% at 35% 50%, rgba(230,245,255,0.70), transparent 65%)',
           filter: 'blur(4px)',
-          animation: 'spBowSpray 2.2s ease-in-out 0.22s both',
+          animation: 'spSternWash 1.8s ease-out 0.42s both',
         }}/>
       </div>
     </div>

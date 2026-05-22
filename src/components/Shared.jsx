@@ -1,5 +1,44 @@
 import { ICO } from './Icons';
 
+// ── タブバー用メディアクエリを<head>に注入（1回のみ） ──────────
+const _TB_CSS_ID = 'jsdf-tabbar-mq';
+if (typeof document !== 'undefined' && !document.getElementById(_TB_CSS_ID)) {
+  const _el = document.createElement('style');
+  _el.id = _TB_CSS_ID;
+  _el.textContent = `
+    /* デフォルト（tall phones / ホームインジケーター有り） */
+    .jsdf-tab-bar {
+      padding-top: 8px;
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+    }
+    /* 背の低い端末（≤700px）: 上下パディング縮小 */
+    @media (max-height: 700px) {
+      .jsdf-tab-bar {
+        padding-top: 4px;
+        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 3px);
+      }
+      .jsdf-tab-bar button {
+        min-height: 40px !important;
+        padding-top: 3px !important;
+        padding-bottom: 3px !important;
+      }
+    }
+    /* 極端に低い端末（≤600px）: さらに縮小 */
+    @media (max-height: 600px) {
+      .jsdf-tab-bar {
+        padding-top: 2px;
+        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 2px);
+      }
+      .jsdf-tab-bar button {
+        min-height: 36px !important;
+        padding-top: 2px !important;
+        padding-bottom: 2px !important;
+      }
+    }
+  `;
+  document.head.appendChild(_el);
+}
+
 // ─── ユーティリティ ──────────────────────────────────────────
 export function splitDate(d) {
   const [, m, dd] = d.split('-');
@@ -80,11 +119,9 @@ export function BottomTabBar({ active, onChange, primary }) {
     { id: 'settings',  label: '設定',       icon: (c, s)     => ICO.user(c, s) },
   ];
   return (
-    <div style={{
+    <div className="jsdf-tab-bar" style={{
       borderTop: '1px solid var(--border)',
       background: 'var(--card)',
-      paddingTop: 8,
-      paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
       display: 'flex', justifyContent: 'space-around',
       flexShrink: 0,
     }}>
