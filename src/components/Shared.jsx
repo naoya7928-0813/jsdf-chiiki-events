@@ -6,12 +6,28 @@ if (typeof document !== 'undefined' && !document.getElementById(_TB_CSS_ID)) {
   const _el = document.createElement('style');
   _el.id = _TB_CSS_ID;
   _el.textContent = `
-    /* デフォルト（tall phones / ホームインジケーター有り） */
+    /* ── ブラウザ表示（Safari 内）: デフォルト ── */
     .jsdf-tab-bar {
       padding-top: 8px;
       padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
     }
-    /* 背の低い端末（≤700px）: 上下パディング縮小 */
+
+    /* ── PWA スタンドアロン（ホーム画面から起動） ──────────────
+       safe-area-inset-bottom (~34px) がボタン下の余白になるため、
+       paddingTop を削ってボタンをやや下方にシフトし空欄を埋める  */
+    @media (display-mode: standalone) {
+      .jsdf-tab-bar {
+        padding-top: 2px;
+        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 2px);
+      }
+      .jsdf-tab-bar button {
+        min-height: 44px !important;
+        padding-top: 4px !important;
+        padding-bottom: 10px !important;
+      }
+    }
+
+    /* ── 背の低い端末（≤700px）: 上下パディング縮小 ── */
     @media (max-height: 700px) {
       .jsdf-tab-bar {
         padding-top: 4px;
@@ -23,7 +39,7 @@ if (typeof document !== 'undefined' && !document.getElementById(_TB_CSS_ID)) {
         padding-bottom: 3px !important;
       }
     }
-    /* 極端に低い端末（≤600px）: さらに縮小 */
+    /* ── 極端に低い端末（≤600px）: さらに縮小 ── */
     @media (max-height: 600px) {
       .jsdf-tab-bar {
         padding-top: 2px;
