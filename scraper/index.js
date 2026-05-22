@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 'use strict';
 
+// scraper/.env から環境変数を読み込む（SITE_URL, NOTIFY_SECRET）
+require('dotenv').config({ path: require('path').join(__dirname, '.env') });
+
 /**
  * 自衛隊地本イベント情報スクレイパー
  *
