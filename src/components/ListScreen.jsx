@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { ICO } from './Icons';
 import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle } from './Shared';
-import FilterBar, { STANDARD_CATEGORIES } from './FilterBar';
+import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts } from './FilterBar';
 import { daysUntil, deadlineDaysUntil, daysLabel, daysColor } from '../utils/date';
 import { REGIONS, SUPPORTED_PREFECTURES } from '../data/regionMap';
 
@@ -63,25 +63,44 @@ export default function ListScreen({
     Promise.resolve(onRefresh()).finally(() => setIsRefreshing(false));
   };
 
-  // ── カテゴリ・タグ フィルター ────────────────────────────
+  // ── カテゴリ・タグ・期間 フィルター ─────────────────────
   const [activeCategory, setActiveCategory] = useState('all');
   const [activeTag,      setActiveTag]      = useState('all');
+  const [activePeriod,   setActivePeriod]   = useState('all');
 
-  // カテゴリ or タグが変わったら検索をリセット
-  const handleCategoryChange = (cat) => { setActiveCategory(cat); closeSearch(); };
-  const handleTagChange      = (tag) => { setActiveTag(tag);      closeSearch(); };
+  // カテゴリ・タグ・期間を変更しても検索テキストはリセットしない（同時適用）
+  const handleCategoryChange = (cat)    => setActiveCategory(cat);
+  const handleTagChange      = (tag)    => setActiveTag(tag);
+  const handlePeriodChange   = (period) => setActivePeriod(period);
 
-  // ── フィルター適用済みリスト（開催日昇順） ───────────────
+  // ── フィルター適用済みリスト（期間×カテゴリ×タグ、開催日昇順） ──
   const filteredList = useMemo(() => {
+    const n    = new Date(Date.now() + 9 * 3600 * 1000);
+    const tStr = n.toISOString().slice(0, 10);
+    const wEnd = new Date(n); wEnd.setDate(n.getDate() + 6);
+    const wStr = wEnd.toISOString().slice(0, 10);
+    const mEnd = new Date(n.getFullYear(), n.getMonth() + 1, 0);
+    const mStr = mEnd.toISOString().slice(0, 10);
+    const nmS  = new Date(n.getFullYear(), n.getMonth() + 1, 1).toISOString().slice(0, 10);
+    const nmE  = new Date(n.getFullYear(), n.getMonth() + 2, 0).toISOString().slice(0, 10);
+
     return list
       .filter(ev => {
         const catOk = activeCategory === 'all'
           || (activeCategory === 'その他' ? !STANDARD_CATEGORIES.includes(ev.category) : ev.category === activeCategory);
-        const tagOk = activeTag      === 'all' || ev.tag      === activeTag;
-        return catOk && tagOk;
+        const tagOk = activeTag === 'all' || ev.tag === activeTag;
+
+        const ee = ev.endDate ?? ev.date;
+        let periodOk = true;
+        if (activePeriod === 'today')     periodOk = ev.date <= tStr && ee >= tStr;
+        if (activePeriod === 'thisWeek')  periodOk = ev.date <= wStr && ee >= tStr;
+        if (activePeriod === 'thisMonth') periodOk = ev.date <= mStr && ee >= tStr;
+        if (activePeriod === 'nextMonth') periodOk = ev.date <= nmE  && ee >= nmS;
+
+        return catOk && tagOk && periodOk;
       })
       .sort((a, b) => new Date(a.date) - new Date(b.date));
-  }, [list, activeCategory, activeTag]);
+  }, [list, activeCategory, activeTag, activePeriod]);
 
   // ── イベントグループ化 ─────────────────────────────────────
   const grouped = useMemo(() => {
@@ -190,7 +209,7 @@ export default function ListScreen({
               <button
                 key={t.id}
                 ref={isA ? activeTabRef : null}
-                onClick={() => { onRegionChange(t.id); setActiveCategory('all'); setActiveTag('all'); closeSearch(); }}
+                onClick={() => { onRegionChange(t.id); setActiveCategory('all'); setActiveTag('all'); setActivePeriod('all'); setSearchQuery(''); }}
                 style={{
                   flexShrink: 0, border: 'none', cursor: 'pointer', borderRadius: 8,
                   background: isA ? '#fff' : 'rgba(255,255,255,0.08)',
@@ -244,29 +263,37 @@ export default function ListScreen({
               )}
             </div>
             {/* 検索件数 */}
-            {searchQuery && (
-              <div style={{
-                fontSize: 11, color: 'rgba(255,255,255,0.65)', marginTop: 6,
-                paddingLeft: 2, fontFamily: F.mono,
-              }}>
-                {Object.values(filteredGrouped).flat().length} 件ヒット
-              </div>
-            )}
+            {/* 検索ヒット数 or アクティブフィルター状況 */}
+            <div style={{
+              fontSize: 11, color: 'rgba(255,255,255,0.65)', marginTop: 6,
+              paddingLeft: 2, fontFamily: F.mono,
+              display: 'flex', gap: 10, flexWrap: 'wrap',
+            }}>
+              {searchQuery && (
+                <span>🔍 {Object.values(filteredGrouped).flat().length} 件ヒット</span>
+              )}
+              {activePeriod !== 'all' && (
+                <span>📅 期間フィルター適用中</span>
+              )}
+              {(activeCategory !== 'all' || activeTag !== 'all') && (
+                <span>🏷 カテゴリ絞り込み中</span>
+              )}
+            </div>
           </div>
         )}
       </div>
 
-      {/* フィルターバー（検索中は非表示） */}
-      {!isSearching && (
-        <FilterBar
-          events={list}
-          activeCategory={activeCategory}
-          activeTag={activeTag}
-          onCategoryChange={handleCategoryChange}
-          onTagChange={handleTagChange}
-          primary={primary}
-        />
-      )}
+      {/* フィルターバー（期間 / カテゴリ / タグ） ── 検索と同時適用可 */}
+      <FilterBar
+        events={list}
+        activeCategory={activeCategory}
+        activeTag={activeTag}
+        activePeriod={activePeriod}
+        onCategoryChange={handleCategoryChange}
+        onTagChange={handleTagChange}
+        onPeriodChange={handlePeriodChange}
+        primary={primary}
+      />
 
       <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 60px)' }}>
         <ErrorBanner message={error} />
