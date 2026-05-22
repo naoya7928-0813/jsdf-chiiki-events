@@ -38,7 +38,50 @@ export default function SettingsScreen({
         {/* ─ 1. ブラウザ通知（Web Push） ─ */}
         <GroupTitle>ブラウザ通知</GroupTitle>
         <Card>
-          {push.supported ? (
+          {push.reason === 'ios-not-installed' ? (
+            /* iOS Safari でホーム画面未追加の場合 */
+            <div style={{ padding: '16px 14px' }}>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 14 }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                  background: `${primary}15`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  {/* ホーム画面追加アイコン */}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="3" width="18" height="18" rx="3" stroke={primary} strokeWidth="1.7"/>
+                    <path d="M12 8v8M8 12h8" stroke={primary} strokeWidth="1.7" strokeLinecap="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 4 }}>
+                    ホーム画面への追加が必要です
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                    iPhone / iPad でプッシュ通知を使うには、まずこのサイトをホーム画面に追加してください。
+                  </div>
+                </div>
+              </div>
+              <div style={{ borderTop: '1px solid var(--sep)', paddingTop: 12 }}>
+                {[
+                  'Safari 下部の共有ボタン（□↑）をタップ',
+                  '「ホーム画面に追加」を選択',
+                  'ホーム画面のアイコンからアプリを開く',
+                  'この設定画面でプッシュ通知をONにする',
+                ].map((step, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 8, alignItems: 'flex-start' }}>
+                    <div style={{
+                      width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
+                      background: primary, color: '#fff',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 11, fontWeight: 700, fontFamily: F.mono, marginTop: 1,
+                    }}>{i + 1}</div>
+                    <div style={{ fontSize: 12, color: 'var(--text)', lineHeight: 1.6 }}>{step}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : push.supported ? (
             <ToggleRow
               label="プッシュ通知"
               sub={
@@ -58,10 +101,10 @@ export default function SettingsScreen({
           )}
           {push.error && (
             <div style={{
-              padding: '8px 14px 12px',
+              padding: '8px 14px 12px', borderTop: '1px solid var(--sep)',
               fontSize: 12, color: '#e05252', lineHeight: 1.5,
             }}>
-              {push.error}
+              ⚠️ {push.error}
             </div>
           )}
         </Card>
@@ -72,7 +115,10 @@ export default function SettingsScreen({
           borderRadius: 8, fontSize: 11, color: 'var(--text-muted)',
           fontFamily: F.sans, lineHeight: 1.6,
         }}>
-          プッシュ通知をONにすると、スクレイパーが新しいイベントを検出した際に通知が届きます。通知の許可はブラウザからいつでも取り消せます。
+          {push.reason === 'ios-not-installed'
+            ? 'iOS 16.4以降 / ホーム画面から起動時のみ利用できます。Android・PCのChromeはそのまま使えます。'
+            : 'プッシュ通知をONにすると、新しいイベントが検出された際に通知が届きます。通知の許可はブラウザの設定からいつでも取り消せます。'
+          }
         </div>
 
         {/* ─ 2. テーマカラー ─ */}
