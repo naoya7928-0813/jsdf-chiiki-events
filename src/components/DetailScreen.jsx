@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react';
 import { ICO } from './Icons';
 import { Emblem, F, splitDate, SectionTitle, iconBtnStyle } from './Shared';
 import { REGION_HQ, REGION_SOURCE } from '../config';
@@ -12,6 +13,39 @@ export default function DetailScreen({ event, onBack, theme, favorites, onToggle
   const todayStr  = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
   const isOngoing = !!(ev.endDate && ev.date < todayStr);
   const { primary, accent } = theme;
+
+  // ── シェア ──────────────────────────────────────────────────
+  const [copied, setCopied] = useState(false);
+
+  // 共有URL: イベント個別ページ > アプリURL
+  const shareUrl = ev.url || window.location.origin;
+
+  // 共有テキスト（X の280字制限に配慮して簡潔に）
+  const dateStr   = ev.endDate ? `${ev.date}〜${ev.endDate}` : ev.date;
+  const shareText = `【自衛隊イベント情報】\n${ev.title}\n📅 ${dateStr}\n📍 ${ev.place}\n#自衛隊 #地本イベント`;
+
+  // X (Twitter) シェアURL
+  const xShareUrl   = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+  // LINE シェアURL
+  const lineShareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(`${shareText}\n${shareUrl}`)}`;
+
+  // ネイティブシェア（Web Share API）
+  const handleNativeShare = useCallback(() => {
+    navigator.share({
+      title: ev.title,
+      text: `${ev.title}\n📅 ${dateStr}　📍 ${ev.place}`,
+      url: shareUrl,
+    }).catch(() => {});
+  }, [ev, dateStr, shareUrl]);
+
+  // クリップボードコピー
+  const handleCopy = useCallback(() => {
+    const text = `${ev.title}\n📅 ${dateStr}\n📍 ${ev.place}\n${shareUrl}`;
+    navigator.clipboard?.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2200);
+    });
+  }, [ev, dateStr, shareUrl]);
 
   // pref フィールド優先。旧イベント（pref なし）は ID プレフィックスで判別
   const regionKey = ev.pref
@@ -54,7 +88,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, onToggle
               </button>
               {typeof navigator.share === 'function' && (
                 <button
-                  onClick={() => navigator.share({ title: ev.title, text: `${ev.date} ${ev.place}`, url: location.href })}
+                  onClick={handleNativeShare}
                   aria-label="シェア"
                   style={iconBtnStyle}
                 >
@@ -280,13 +314,14 @@ export default function DetailScreen({ event, onBack, theme, favorites, onToggle
 
       {/* 下部 CTA */}
       <div style={{
-        padding: '12px 16px',
-        paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 16px)',
+        padding: '10px 16px',
+        paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 12px)',
         background: 'var(--card)', borderTop: '1px solid var(--border)',
-        display: 'flex', gap: 10, flexShrink: 0,
+        display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0,
       }}>
+        {/* 公式ページボタン */}
         <button onClick={openUrl} disabled={!targetUrl} style={{
-          flex: 1, minHeight: 48, border: 'none',
+          width: '100%', minHeight: 46, border: 'none',
           background: targetUrl ? primary : 'var(--tag-bg)',
           color: targetUrl ? '#fff' : 'var(--text-muted)',
           borderRadius: 8, cursor: targetUrl ? 'pointer' : 'default',
@@ -296,6 +331,65 @@ export default function DetailScreen({ event, onBack, theme, favorites, onToggle
           <span>{targetUrl ? (ev.url ? '公式ページを開く' : '地本サイトを開く') : '公式ページなし'}</span>
           {targetUrl && ICO.extLink('#fff', 14)}
         </button>
+
+        {/* シェアボタン行 */}
+        <div style={{ display: 'flex', gap: 8 }}>
+          {/* X でシェア */}
+          <a
+            href={xShareUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="X でシェア"
+            style={{
+              flex: 1, height: 42, borderRadius: 8,
+              background: '#000', color: '#fff',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              textDecoration: 'none', fontSize: 12, fontWeight: 700, fontFamily: F.sans,
+              letterSpacing: 0.3,
+            }}
+          >
+            {ICO.twitterX('#fff', 14)}
+            <span>X</span>
+          </a>
+
+          {/* LINE でシェア */}
+          <a
+            href={lineShareUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LINE でシェア"
+            style={{
+              flex: 1, height: 42, borderRadius: 8,
+              background: '#06C755', color: '#fff',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              textDecoration: 'none', fontSize: 12, fontWeight: 700, fontFamily: F.sans,
+              letterSpacing: 0.3,
+            }}
+          >
+            {ICO.lineApp('#fff', 15)}
+            <span>LINE</span>
+          </a>
+
+          {/* リンクをコピー */}
+          <button
+            onClick={handleCopy}
+            aria-label="リンクをコピー"
+            style={{
+              flex: 1, height: 42, borderRadius: 8, border: '1px solid var(--border)',
+              background: copied ? `${primary}18` : 'var(--tag-bg)',
+              color: copied ? primary : 'var(--text-muted)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+              fontSize: 11, fontWeight: 600, fontFamily: F.sans,
+              cursor: 'pointer', transition: 'background 0.2s, color 0.2s',
+              letterSpacing: 0.2,
+            }}
+          >
+            {copied
+              ? <>{ICO.check(primary, 12)} コピー済</>
+              : <>{ICO.copy('var(--text-muted)', 13)} コピー</>
+            }
+          </button>
+        </div>
       </div>
     </div>
   );

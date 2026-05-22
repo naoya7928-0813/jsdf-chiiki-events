@@ -16,4 +16,8 @@ export const ICO = {
   map:    (c = '#0b2545', s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" stroke={c} strokeWidth="1.6" strokeLinejoin="round"/><path d="M8 2v16M16 6v16" stroke={c} strokeWidth="1.6" strokeLinecap="round"/></svg>,
   close:  (c = '#6b7280', s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke={c} strokeWidth="2" strokeLinecap="round"/></svg>,
   trash:  (c = '#6b7280', s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke={c} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  // ── SNS シェア ──────────────────────────────────────────────────
+  twitterX: (c = '#fff', s = 16) => <svg width={s} height={s} viewBox="0 0 24 24" fill={c}><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.259 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>,
+  lineApp: (c = '#fff', s = 16) => <svg width={s} height={s} viewBox="0 0 24 24" fill={c}><path d="M12 2C6.48 2 2 5.82 2 10.5c0 3.8 2.86 7.07 7 8.27l-.24 1.73c-.06.48.52.8.9.49L13 19.62C18.94 19.17 22 15.25 22 10.5 22 5.82 17.52 2 12 2z"/></svg>,
+  copy:    (c = '#6b7280', s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke={c} strokeWidth="1.6"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke={c} strokeWidth="1.6" strokeLinecap="round"/></svg>,
 };
