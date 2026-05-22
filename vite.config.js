@@ -13,6 +13,9 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.js',
       registerType: 'autoUpdate',
       includeAssets: ['icons/icon.svg', 'icons/apple-touch-icon.png'],
       manifest: {
@@ -31,42 +34,8 @@ export default defineConfig({
           { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
-      workbox: {
+      injectManifest: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
-        runtimeCaching: [
-          {
-            // クエリ文字列を無視してパスのみで一致させる（?t= によるキャッシュキー断片化を防ぐ）
-            urlPattern: ({ url }) => url.pathname === '/data/events.json',
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'events-data',
-              expiration: { maxAgeSeconds: 300 },
-              networkTimeoutSeconds: 5,
-            },
-          },
-          {
-            urlPattern: /^\/api\//,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-cache',
-              expiration: { maxAgeSeconds: 300 },
-              networkTimeoutSeconds: 10,
-            },
-          },
-          {
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\//,
-            handler: 'StaleWhileRevalidate',
-            options: { cacheName: 'google-fonts-stylesheets' },
-          },
-          {
-            urlPattern: /^https:\/\/fonts\.gstatic\.com\//,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-fonts-webfonts',
-              expiration: { maxAgeSeconds: 60 * 60 * 24 * 365 },
-            },
-          },
-        ],
       },
     }),
   ],

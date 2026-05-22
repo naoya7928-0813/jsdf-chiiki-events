@@ -2034,6 +2034,10 @@ async function main() {
     updatedAt: nowJST(),
   };
   writeOutput(output);
+  // 新規イベントを検出してプッシュ通知（非同期・失敗しても続行）
+  await notifyNewEvents(prev, output).catch(err =>
+    console.warn('[Push] notifyNewEvents エラー:', err.message)
+  );
 }
 
 /** public/data/events.json に書き出す */
@@ -2126,6 +2130,95 @@ function writeOutput(data) {
   } catch (e) {
     console.warn('[警告] events.html 生成に失敗しました:', e.message);
   }
+}
+
+// ── 新規イベント検出 → Web Push 通知 ─────────────────────────
+/**
+ * 前回データと新データを比較し、新しく追加されたイベントがあれば
+ * /api/notify に POST してプッシュ通知を送信する。
+ *
+ * 必要な環境変数:
+ *   SITE_URL       – デプロイ先 URL (例: https://jsdf-events.vercel.app)
+ *   NOTIFY_SECRET  – API 認証シークレット
+ *
+ * いずれかが未設定の場合は何もしない（ローカル開発時など）。
+ */
+async function notifyNewEvents(prevData, newData) {
+  const siteUrl     = process.env.SITE_URL;
+  const notifSecret = process.env.NOTIFY_SECRET;
+  if (!siteUrl || !notifSecret) {
+    console.log('[Push] SITE_URL / NOTIFY_SECRET 未設定のため通知をスキップします');
+    return;
+  }
+
+  // 前回の全イベント ID セットを構築
+  const prevIds = new Set();
+  for (const key of Object.keys(prevData)) {
+    if (!Array.isArray(prevData[key])) continue;
+    for (const ev of prevData[key]) {
+      if (ev.id) prevIds.add(ev.id);
+    }
+  }
+
+  // 新規イベントを収集
+  const newEvents = [];
+  for (const key of Object.keys(newData)) {
+    if (!Array.isArray(newData[key])) continue;
+    for (const ev of newData[key]) {
+      if (ev.id && !prevIds.has(ev.id)) newEvents.push(ev);
+    }
+  }
+
+  if (newEvents.length === 0) {
+    console.log('[Push] 新規イベントなし。通知をスキップします');
+    return;
+  }
+
+  console.log(`[Push] 新規イベント ${newEvents.length} 件を検出。通知を送信します`);
+
+  // 代表イベントで通知テキストを作成（最大3件）
+  const sample  = newEvents.slice(0, 3);
+  const title   = `自衛隊イベント情報 +${newEvents.length}件`;
+  const body    = sample.map(e => `・${e.title} (${e.date})`).join('\n')
+                + (newEvents.length > 3 ? `\n他 ${newEvents.length - 3} 件…` : '');
+  const url     = '/';
+
+  const payload = JSON.stringify({ title, body, url });
+  const apiUrl  = new URL('/api/notify', siteUrl);
+
+  const https = require('https');
+  const http  = require('http');
+  const lib   = apiUrl.protocol === 'https:' ? https : http;
+
+  await new Promise((resolve) => {
+    const req = lib.request(
+      {
+        hostname: apiUrl.hostname,
+        port:     apiUrl.port || (apiUrl.protocol === 'https:' ? 443 : 80),
+        path:     apiUrl.pathname,
+        method:   'POST',
+        headers: {
+          'Content-Type':     'application/json',
+          'Content-Length':   Buffer.byteLength(payload),
+          'x-notify-secret':  notifSecret,
+        },
+      },
+      res => {
+        let body = '';
+        res.on('data', c => { body += c; });
+        res.on('end', () => {
+          console.log(`[Push] API 応答 ${res.statusCode}: ${body}`);
+          resolve();
+        });
+      }
+    );
+    req.on('error', err => {
+      console.warn('[Push] API 呼び出しに失敗しました:', err.message);
+      resolve();
+    });
+    req.write(payload);
+    req.end();
+  });
 }
 
 // ── エントリーポイント ────────────────────────────────────────

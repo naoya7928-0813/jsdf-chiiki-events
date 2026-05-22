@@ -4,6 +4,7 @@ import { BottomTabBar, F } from './Shared';
 import { COLOR_SCHEMES, REGION_SOURCE } from '../config';
 import NtfyGuideModal from './NtfyGuideModal';
 import { REGIONS } from '../data/regionMap';
+import { usePushNotification } from '../hooks/usePushNotification';
 
 function loadNotifRegion() {
   try { return localStorage.getItem('jsdf-notif-region') || 'all'; } catch { return 'all'; }
@@ -30,6 +31,9 @@ export default function SettingsScreen({
   });
   // ntfy ガイドモーダルの表示状態
   const [showNtfyGuide, setShowNtfyGuide] = useState(false);
+
+  // ── Web Push ─────────────────────────────────────────────────
+  const push = usePushNotification();
 
   // ── 通知地区 ────────────────────────────────────────────────
   const [notifRegion, setNotifRegion] = useState(loadNotifRegion);
@@ -65,7 +69,47 @@ export default function SettingsScreen({
 
       <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '16px 0 8px' }}>
 
-        {/* ─ 1. 通知設定 ─ */}
+        {/* ─ 1. ブラウザ通知（Web Push） ─ */}
+        <GroupTitle>ブラウザ通知</GroupTitle>
+        <Card>
+          {push.supported ? (
+            <ToggleRow
+              label="プッシュ通知"
+              sub={
+                push.subscribed
+                  ? '通知が有効です。新しいイベントをお知らせします'
+                  : '新しいイベントが追加されたときに通知を受け取る'
+              }
+              on={push.subscribed}
+              loading={push.loading}
+              onChange={() => push.subscribed ? push.unsubscribe() : push.subscribe()}
+              primary={primary}
+            />
+          ) : (
+            <div style={{ padding: '14px', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+              このブラウザはプッシュ通知に対応していません。
+            </div>
+          )}
+          {push.error && (
+            <div style={{
+              padding: '8px 14px 12px',
+              fontSize: 12, color: '#e05252', lineHeight: 1.5,
+            }}>
+              {push.error}
+            </div>
+          )}
+        </Card>
+        <div style={{
+          margin: '6px 16px 0',
+          padding: '8px 12px',
+          background: 'var(--tag-bg)',
+          borderRadius: 8, fontSize: 11, color: 'var(--text-muted)',
+          fontFamily: F.sans, lineHeight: 1.6,
+        }}>
+          プッシュ通知をONにすると、スクレイパーが新しいイベントを検出した際に通知が届きます。通知の許可はブラウザからいつでも取り消せます。
+        </div>
+
+        {/* ─ 2. その他の通知設定 ─ */}
         <GroupTitle>通知設定</GroupTitle>
         <Card>
           <ToggleRow
@@ -309,7 +353,7 @@ function Card({ children }) {
   );
 }
 
-function ToggleRow({ label, sub, on, onChange, primary, last }) {
+function ToggleRow({ label, sub, on, onChange, primary, last, loading }) {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', minHeight: 60,
@@ -324,12 +368,14 @@ function ToggleRow({ label, sub, on, onChange, primary, last }) {
       </div>
       <button
         role="switch" aria-checked={on}
-        onClick={onChange}
+        onClick={loading ? undefined : onChange}
+        disabled={loading}
         style={{
           width: 44, height: 26, borderRadius: 26,
-          background: on ? primary : 'var(--border)',
-          position: 'relative', cursor: 'pointer', border: 'none',
+          background: loading ? 'var(--border)' : on ? primary : 'var(--border)',
+          position: 'relative', cursor: loading ? 'not-allowed' : 'pointer', border: 'none',
           transition: 'background 0.2s', padding: 0, flexShrink: 0,
+          opacity: loading ? 0.6 : 1,
         }}
       >
         <div style={{
