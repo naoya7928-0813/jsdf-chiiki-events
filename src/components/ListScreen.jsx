@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { ICO } from './Icons';
 import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle } from './Shared';
-import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, matchesTag } from './FilterBar';
+import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, matchesTag, APPLIED_TAG_ID } from './FilterBar';
 import { daysUntil, deadlineDaysUntil, daysLabel, daysColor } from '../utils/date';
 import { REGIONS, SUPPORTED_PREFECTURES } from '../data/regionMap';
 
@@ -14,7 +14,7 @@ const ALL_PREF_TABS = [
 export default function ListScreen({
   events, loading, error, updatedAt, checkedAt, onRefresh,
   region, onRegionChange,
-  favorites, applied,
+  favorites, applied, onToggleApplied,
   onOpenHome, onOpenDetail, onOpenSettings, onOpenFavorites,
   theme,
 }) {
@@ -88,7 +88,8 @@ export default function ListScreen({
       .filter(ev => {
         const catOk = activeCategory === 'all'
           || (activeCategory === 'その他' ? !STANDARD_CATEGORIES.includes(ev.category) : ev.category === activeCategory);
-        const tagOk = activeTag === 'all' || matchesTag(ev, activeTag);
+        const tagOk = activeTag === 'all'
+          || (activeTag === APPLIED_TAG_ID ? (applied?.has(ev.id) ?? false) : matchesTag(ev, activeTag));
 
         const ee = ev.endDate ?? ev.date;
         let periodOk = true;
@@ -286,6 +287,7 @@ export default function ListScreen({
       {/* フィルターバー（期間 / カテゴリ / タグ） ── 検索と同時適用可 */}
       <FilterBar
         events={list}
+        applied={applied}
         activeCategory={activeCategory}
         activeTag={activeTag}
         activePeriod={activePeriod}
@@ -416,7 +418,22 @@ export default function ListScreen({
                             </div>
                           )}
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>{ICO.chev('var(--icon-muted)', 12)}</div>
+                        {/* 申請済みトグルボタン */}
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, flexShrink: 0 }}>
+                          <button
+                            onClick={e => { e.stopPropagation(); onToggleApplied?.(ev.id); }}
+                            aria-label={applied?.has(ev.id) ? '申請済みを解除' : '申請済みにする'}
+                            style={{
+                              width: 34, height: 34, borderRadius: 8, border: 'none', padding: 0,
+                              background: applied?.has(ev.id) ? '#16a34a18' : 'var(--tag-bg)',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              cursor: 'pointer', flexShrink: 0,
+                            }}
+                          >
+                            {ICO.applied(applied?.has(ev.id) ? '#16a34a' : 'var(--icon-muted)', 17, applied?.has(ev.id))}
+                          </button>
+                          {ICO.chev('var(--icon-muted)', 12)}
+                        </div>
                       </div>
                     </div>
                   );

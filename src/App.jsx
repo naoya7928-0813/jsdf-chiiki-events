@@ -284,6 +284,7 @@ export default function App() {
           region={region} onRegionChange={handleRegionChange}
           favorites={favorites}
           applied={applied}
+          onToggleApplied={handleToggleApplied}
           onOpenHome={() => setScreen('home')}
           onOpenDetail={(ev) => openDetail(ev, 'list')}
           onOpenSettings={() => setScreen('settings')}

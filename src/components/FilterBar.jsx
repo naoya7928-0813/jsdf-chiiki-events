@@ -64,9 +64,12 @@ export function calcPeriodCounts(events) {
   };
 }
 
+// 申請済みフィルター用の特別タグ ID（TAG_DEFS には含めない）
+export const APPLIED_TAG_ID = '申請済み';
+
 // ─── フィルターバー（期間 / カテゴリ / タグ） ────────────────────
 export default function FilterBar({
-  events,
+  events, applied,
   activeCategory,
   activeTag,
   activePeriod,
@@ -89,6 +92,12 @@ export default function FilterBar({
   const tagCounts = useMemo(() =>
     Object.fromEntries(TAG_DEFS.map(d => [d.id, events.filter(ev => matchesTag(ev, d.id)).length])),
     [events]
+  );
+
+  // 申請済みの件数（applied Set から直接カウント）
+  const appliedCount = useMemo(
+    () => events.filter(ev => applied?.has(ev.id)).length,
+    [events, applied]
   );
 
   const scrollRow = {
@@ -168,6 +177,37 @@ export default function FilterBar({
 
       {/* ── タグ行（固定リスト・件数バッジ付き・カテゴリと同等の強度） ── */}
       <div style={{ ...scrollRow, padding: '6px 16px 0' }} onWheel={onWheel}>
+
+        {/* 申請済みチップ（先頭・緑系） */}
+        {(() => {
+          const isOn = activeTag === APPLIED_TAG_ID;
+          return (
+            <button
+              onClick={() => onTagChange(isOn ? 'all' : APPLIED_TAG_ID)}
+              style={{
+                flexShrink: 0, cursor: 'pointer', whiteSpace: 'nowrap',
+                fontFamily: F.sans, display: 'flex', alignItems: 'center', gap: 5,
+                padding: '5px 12px', borderRadius: 20,
+                border: `1.5px solid ${isOn ? '#16a34a' : appliedCount > 0 ? '#16a34a88' : 'var(--border)'}`,
+                background: isOn ? '#16a34a' : appliedCount > 0 ? '#16a34a0d' : 'var(--bg)',
+                color: isOn ? '#fff' : appliedCount > 0 ? '#16a34a' : 'var(--text-muted)',
+                fontSize: 12, fontWeight: isOn ? 600 : 400,
+                opacity: appliedCount === 0 ? 0.4 : 1,
+              }}
+            >
+              ✓ 申請済み
+              <span style={{
+                fontSize: 10, fontFamily: F.mono, fontWeight: 600,
+                background: isOn ? 'rgba(255,255,255,0.25)' : '#16a34a22',
+                color: isOn ? '#fff' : '#16a34a',
+                borderRadius: 8, padding: '0 5px', lineHeight: '16px',
+              }}>
+                {appliedCount}
+              </span>
+            </button>
+          );
+        })()}
+
         {TAG_DEFS.map(({ id, label }) => {
           const isOn = activeTag === id;
           const cnt  = tagCounts[id];
