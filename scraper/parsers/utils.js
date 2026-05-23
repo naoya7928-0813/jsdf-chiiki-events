@@ -79,18 +79,28 @@ function guessCategory(title) {
 }
 
 /**
- * タイトル・備考からタグを推定
+ * タイトル・備考からタグを配列で推定（複数マッチ対応）
+ * text は title + notes など複数フィールドを結合して渡すこと
+ */
+function guessTags(text) {
+  const tags = [];
+  if (/無料|入場無料/.test(text))                  tags.push('入場無料');
+  if (/予約|申込|申し込み|事前|事前登録/.test(text)) tags.push('要予約');
+  if (/オンライン|Zoom|zoom|ウェブ/.test(text))     tags.push('オンライン');
+  if (/家族|子ども|お子|ファミリー|親子/.test(text)) tags.push('家族向け');
+  if (/高校生|中学生|学生|大学生|学校/.test(text))  tags.push('学生向け');
+  if (/抽選/.test(text))                           tags.push('抽選');
+  if (/個別/.test(text))                           tags.push('個別');
+  if (/OB|OG|元自衛官/.test(text))                tags.push('OB・OG');
+  return tags;
+}
+
+/**
+ * 後方互換：先頭タグのみ返す（既存パーサーが tag: guessTag(...) で呼んでいる箇所用）
+ * 新規コードは guessTags を使うこと。
  */
 function guessTag(text) {
-  if (/無料|入場無料/.test(text))              return '入場無料';
-  if (/予約|申込|申し込み|事前/.test(text))    return '要予約';
-  if (/オンライン|Zoom|zoom/.test(text))       return 'オンライン';
-  if (/家族|子ども|お子|ファミリー/.test(text)) return '家族向け';
-  if (/高校生|学生|大学生/.test(text))          return '学生向け';
-  if (/抽選/.test(text))                       return '抽選';
-  if (/個別/.test(text))                       return '個別';
-  if (/OB|OG|元自衛官/.test(text))            return 'OB・OG';
-  return '';
+  return guessTags(text)[0] ?? '';
 }
 
 const WEEKDAY_JP = ['日', '月', '火', '水', '木', '金', '土'];
@@ -137,4 +147,4 @@ function titleHash(date, title) {
   return (h >>> 0).toString(36).padStart(5, '0').slice(-5);
 }
 
-module.exports = { reiwaToAD, padTwo, toHalfWidth, isPast, guessCategory, guessTag, calcWeekday, titleHash };
+module.exports = { reiwaToAD, padTwo, toHalfWidth, isPast, guessCategory, guessTag, guessTags, calcWeekday, titleHash };

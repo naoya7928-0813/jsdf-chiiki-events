@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { ICO } from './Icons';
 import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle } from './Shared';
-import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts } from './FilterBar';
+import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, matchesTag } from './FilterBar';
 import { daysUntil, deadlineDaysUntil, daysLabel, daysColor } from '../utils/date';
 import { REGIONS, SUPPORTED_PREFECTURES } from '../data/regionMap';
 
@@ -88,7 +88,7 @@ export default function ListScreen({
       .filter(ev => {
         const catOk = activeCategory === 'all'
           || (activeCategory === 'その他' ? !STANDARD_CATEGORIES.includes(ev.category) : ev.category === activeCategory);
-        const tagOk = activeTag === 'all' || ev.tag === activeTag;
+        const tagOk = activeTag === 'all' || matchesTag(ev, activeTag);
 
         const ee = ev.endDate ?? ev.date;
         let periodOk = true;

@@ -16,6 +16,27 @@ export const PERIODS = [
   { id: 'nextMonth', label: '来月'   },
 ];
 
+// ── タグ定義（固定リスト + 照合キーワード） ────────────────────
+// 各タグは title・notes・tag フィールドをまとめてキーワード検索する。
+// 単一値の ev.tag 完全一致より大幅に多くのイベントをヒットさせる。
+export const TAG_DEFS = [
+  { id: '要予約',   label: '要予約',   rx: /予約|申込|申し込み|事前|事前登録/ },
+  { id: '入場無料', label: '入場無料', rx: /無料|入場無料/                     },
+  { id: '家族向け', label: '家族向け', rx: /家族|子ども|お子|ファミリー|親子/   },
+  { id: '学生向け', label: '学生向け', rx: /高校生|中学生|学生|大学生|学校/    },
+  { id: '抽選',     label: '抽選',     rx: /抽選/                              },
+  { id: 'オンライン', label: 'オンライン', rx: /オンライン|Zoom|zoom|ウェブ/   },
+  { id: 'OB・OG',  label: 'OB・OG',  rx: /OB|OG|元自衛官/                   },
+];
+
+/** イベントがタグ定義にマッチするか（title + notes + tag を横断） */
+export function matchesTag(ev, tagId) {
+  const def = TAG_DEFS.find(d => d.id === tagId);
+  if (!def) return ev.tag === tagId;
+  const haystack = [ev.title, ev.notes, ev.tag].filter(Boolean).join(' ');
+  return def.rx.test(haystack);
+}
+
 // 期間ごとの件数を返すユーティリティ（ListScreen でも再利用）
 export function calcPeriodCounts(events) {
   const n    = new Date(Date.now() + 9 * 3600 * 1000);
@@ -63,7 +84,12 @@ export default function FilterBar({
     ),
     'その他': events.filter(e => !STANDARD_CATEGORIES.includes(e.category)).length,
   };
-  const tags = [...new Set(events.map(e => e.tag).filter(t => t && t !== '応募終了'))];
+
+  // タグごとのヒット件数（キーワード横断検索）
+  const tagCounts = useMemo(() =>
+    Object.fromEntries(TAG_DEFS.map(d => [d.id, events.filter(ev => matchesTag(ev, d.id)).length])),
+    [events]
+  );
 
   const scrollRow = {
     display: 'flex', gap: 6,
@@ -140,31 +166,39 @@ export default function FilterBar({
         })}
       </div>
 
-      {/* ── タグ行（タグがある場合のみ） ── */}
-      {tags.length > 0 && (
-        <div style={{ ...scrollRow, padding: '6px 16px 0' }} onWheel={onWheel}>
-          {tags.map(tag => {
-            const isOn = activeTag === tag;
-            return (
-              <button
-                key={tag}
-                onClick={() => onTagChange(isOn ? 'all' : tag)}
-                style={{
-                  flexShrink: 0, cursor: 'pointer', whiteSpace: 'nowrap',
-                  fontFamily: F.sans,
-                  padding: '3px 10px', borderRadius: 20,
-                  border: `1px solid ${isOn ? 'var(--text)' : 'var(--border)'}`,
-                  background: isOn ? 'var(--tag-bg)' : 'transparent',
-                  color: isOn ? 'var(--text)' : 'var(--text-muted)',
-                  fontSize: 11, fontWeight: isOn ? 600 : 400,
-                }}
-              >
-                {tag}
-              </button>
-            );
-          })}
-        </div>
-      )}
+      {/* ── タグ行（固定リスト・件数バッジ付き・カテゴリと同等の強度） ── */}
+      <div style={{ ...scrollRow, padding: '6px 16px 0' }} onWheel={onWheel}>
+        {TAG_DEFS.map(({ id, label }) => {
+          const isOn = activeTag === id;
+          const cnt  = tagCounts[id];
+          return (
+            <button
+              key={id}
+              onClick={() => onTagChange(isOn ? 'all' : id)}
+              style={{
+                flexShrink: 0, cursor: 'pointer', whiteSpace: 'nowrap',
+                fontFamily: F.sans, display: 'flex', alignItems: 'center', gap: 5,
+                padding: '5px 12px', borderRadius: 20,
+                border: `1.5px solid ${isOn ? primary : cnt > 0 ? 'var(--border)' : 'var(--border)'}`,
+                background: isOn ? primary : 'var(--bg)',
+                color: isOn ? '#fff' : cnt > 0 ? 'var(--text-muted)' : 'var(--text-muted)',
+                fontSize: 12, fontWeight: isOn ? 600 : 400,
+                opacity: cnt === 0 ? 0.35 : 1,
+              }}
+            >
+              {label}
+              <span style={{
+                fontSize: 10, fontFamily: F.mono, fontWeight: 600,
+                background: isOn ? 'rgba(255,255,255,0.25)' : 'var(--tag-bg)',
+                color: isOn ? '#fff' : 'var(--text-muted)',
+                borderRadius: 8, padding: '0 5px', lineHeight: '16px',
+              }}>
+                {cnt}
+              </span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
