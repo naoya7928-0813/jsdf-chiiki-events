@@ -291,23 +291,6 @@
   "kanagawa": [],
   "tokyo": [
     {
-      "id": "t-20260522-1",
-      "pref": "tokyo",
-      "date": "2026-05-22",
-      "endDate": null,
-      "weekday": "金",
-      "title": "横須賀基地見学",
-      "place": "横須賀基地",
-      "address": "",
-      "time": "",
-      "category": "体験",
-      "tag": "応募終了",
-      "url": "https://www.mod.go.jp/pco/tokyo/kita/index.html#0522",
-      "notes": "・港湾クルーズ ・停泊護衛艦乗艦見学 ・体験喫食（海上自衛隊カレー）",
-      "ageRequirement": "17歳～32歳",
-      "deadline": null
-    },
-    {
       "id": "t-20260523-2",
       "pref": "tokyo",
       "date": "2026-05-23",
@@ -685,23 +668,6 @@
     }
   ],
   "aichi": [
-    {
-      "id": "ai-20260522-3",
-      "pref": "aichi",
-      "date": "2026-05-22",
-      "weekday": "金",
-      "title": "豊田所説明会",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "自衛隊制度",
-      "ageRequirement": null,
-      "deadline": null,
-      "endDate": null
-    },
     {
       "id": "ai-20260523-4",
       "pref": "aichi",
@@ -1375,23 +1341,7 @@
   ],
   "hiroshima": [
     {
-      "id": "hi-20260522-1",
-      "pref": "hiroshima",
-      "date": "2026-05-22",
-      "weekday": "金",
-      "title": "安佐南区　就職個別相談会",
-      "place": "",
-      "address": "",
-      "time": "10:00",
-      "category": "採用イベント",
-      "tag": "個別",
-      "url": "https://www.mod.go.jp/pco/hiroshima/events/3437/",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "hi-20260525-2",
+      "id": "hi-20260525-1",
       "pref": "hiroshima",
       "date": "2026-05-25",
       "weekday": "月",
@@ -1407,7 +1357,7 @@
       "deadline": null
     },
     {
-      "id": "hi-20260531-3",
+      "id": "hi-20260531-2",
       "pref": "hiroshima",
       "date": "2026-05-31",
       "weekday": "日",
@@ -1423,7 +1373,7 @@
       "deadline": null
     },
     {
-      "id": "hi-20260531-4",
+      "id": "hi-20260531-3",
       "pref": "hiroshima",
       "date": "2026-05-31",
       "weekday": "日",
@@ -1439,7 +1389,7 @@
       "deadline": null
     },
     {
-      "id": "hi-20260618-5",
+      "id": "hi-20260618-4",
       "pref": "hiroshima",
       "date": "2026-06-18",
       "weekday": "木",
@@ -1644,5 +1594,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/05/22 19:47"
+  "updatedAt": "2026/05/23 21:13"
 }
