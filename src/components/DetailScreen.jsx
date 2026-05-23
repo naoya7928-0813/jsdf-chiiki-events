@@ -3,11 +3,12 @@ import { ICO } from './Icons';
 import { Emblem, F, splitDate, SectionTitle, iconBtnStyle } from './Shared';
 import { REGION_HQ, REGION_SOURCE } from '../config';
 
-export default function DetailScreen({ event, onBack, theme, favorites, onToggleFavorite }) {
+export default function DetailScreen({ event, onBack, theme, favorites, applied, onToggleFavorite, onToggleApplied }) {
   const ev = event;
   if (!ev) return null;
 
-  const starred   = favorites.has(ev.id);
+  const starred    = favorites.has(ev.id);
+  const isApplied  = applied?.has(ev.id) ?? false;
   const { m, d }  = splitDate(ev.date);
   const endSplit  = ev.endDate ? splitDate(ev.endDate) : null;
   const todayStr  = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
@@ -80,6 +81,18 @@ export default function DetailScreen({ event, onBack, theme, favorites, onToggle
               {ICO.back('#fff', 16)}
             </button>
             <div style={{ display: 'flex', gap: 8 }}>
+              {/* 申請済みトグル */}
+              <button
+                onClick={() => onToggleApplied?.(ev.id)}
+                aria-label={isApplied ? '申請済みを解除' : '申請済みにする'}
+                style={{
+                  ...iconBtnStyle,
+                  background: isApplied ? '#16a34a' : 'rgba(255,255,255,0.1)',
+                  border: isApplied ? 'none' : '1px solid rgba(255,255,255,0.18)',
+                }}
+              >
+                {ICO.applied(isApplied ? '#fff' : '#fff', 16, isApplied)}
+              </button>
               <button onClick={() => onToggleFavorite(ev.id)} aria-label={starred ? 'お気に入り解除' : 'お気に入り登録'} style={{
                 ...iconBtnStyle,
                 background: starred ? '#fff' : 'rgba(255,255,255,0.1)',
@@ -98,11 +111,23 @@ export default function DetailScreen({ event, onBack, theme, favorites, onToggle
             </div>
           </div>
 
-          <div style={{
-            display: 'inline-block', fontSize: 10, fontFamily: F.mono,
-            padding: '3px 8px', borderRadius: 3,
-            background: 'rgba(255,255,255,0.15)', letterSpacing: 1.5,
-          }}>{ev.category}{ev.tag ? ` · ${ev.tag}` : ''}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <div style={{
+              display: 'inline-block', fontSize: 10, fontFamily: F.mono,
+              padding: '3px 8px', borderRadius: 3,
+              background: 'rgba(255,255,255,0.15)', letterSpacing: 1.5,
+            }}>{ev.category}{ev.tag ? ` · ${ev.tag}` : ''}</div>
+            {isApplied && (
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                fontSize: 11, fontWeight: 700, fontFamily: F.mono,
+                padding: '3px 10px', borderRadius: 3,
+                background: '#16a34a', color: '#fff', letterSpacing: 1,
+              }}>
+                {ICO.applied('#fff', 12, true)} 申請済み
+              </div>
+            )}
+          </div>
 
           <div style={{ fontFamily: F.serif, fontSize: 21, fontWeight: 600, marginTop: 12, lineHeight: 1.35 }}>
             {ev.title}

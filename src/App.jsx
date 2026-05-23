@@ -24,6 +24,11 @@ function loadFavorites() {
   try { return new Set(JSON.parse(localStorage.getItem('jsdf-favorites') || '[]')); } catch { return new Set(); }
 }
 
+// applied: 申請済みイベントIDの Set として管理
+function loadApplied() {
+  try { return new Set(JSON.parse(localStorage.getItem('jsdf-applied') || '[]')); } catch { return new Set(); }
+}
+
 // 既知イベントID（新着検出用）
 function loadKnownIds() {
   try { return new Set(JSON.parse(localStorage.getItem('jsdf-known-ids') || '[]')); } catch { return new Set(); }
@@ -148,6 +153,18 @@ export default function App() {
     });
   }, []);
 
+  // ── 申請済み ──────────────────────────────────────────────
+  const [applied, setApplied] = useState(loadApplied);
+
+  const handleToggleApplied = useCallback((id) => {
+    setApplied(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      try { localStorage.setItem('jsdf-applied', JSON.stringify([...next])); } catch {}
+      return next;
+    });
+  }, []);
+
   // ── 通知履歴 ──────────────────────────────────────────────
   const [notifHistory, setNotifHistory] = useState(loadNotifHistory);
   const lastProcessedAt = useRef(null);
@@ -249,6 +266,7 @@ export default function App() {
           events={events}
           theme={theme}
           favorites={favorites}
+          applied={applied}
           onBack={() => setScreen('home')}
           onOpenDetail={(ev) => openDetail(ev, 'region')}
           onOpenHome={() => setScreen('home')}
@@ -265,6 +283,7 @@ export default function App() {
           theme={theme}
           region={region} onRegionChange={handleRegionChange}
           favorites={favorites}
+          applied={applied}
           onOpenHome={() => setScreen('home')}
           onOpenDetail={(ev) => openDetail(ev, 'list')}
           onOpenSettings={() => setScreen('settings')}
@@ -277,7 +296,9 @@ export default function App() {
           event={detailEvent}
           theme={theme}
           favorites={favorites}
+          applied={applied}
           onToggleFavorite={handleToggleFavorite}
+          onToggleApplied={handleToggleApplied}
           onBack={() => setScreen(detailBack)}
         />
       )}
@@ -321,6 +342,7 @@ export default function App() {
         <FavoritesScreen
           events={events}
           favorites={favorites}
+          applied={applied}
           theme={theme}
           onOpenDetail={(ev) => openDetail(ev, 'favorites')}
           onBack={() => setScreen('home')}

@@ -6,7 +6,7 @@ import { deadlineDaysUntil, daysUntil, daysLabel, daysColor } from '../utils/dat
 
 // ─── 地域画面（都道府県タブ + イベント一覧） ─────────────────────
 export default function RegionScreen({
-  regionId, events, theme, favorites,
+  regionId, events, theme, favorites, applied,
   onBack, onOpenDetail, onOpenHome, onOpenList, onOpenFavorites, onOpenSettings,
 }) {
   const { primary, accent } = theme;
@@ -233,6 +233,13 @@ function EventCard({ ev, isFav, primary, accent, onTap }) {
           }}>
             <span style={{ flex: 1 }}>{ev.title}</span>
             {isFav && ICO.star(accent, 12, accent)}
+            {applied?.has(ev.id) && (
+              <span style={{
+                fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3,
+                background: '#16a34a', color: '#fff',
+                fontFamily: F.mono, letterSpacing: 0.5, flexShrink: 0,
+              }}>✓ 申請済</span>
+            )}
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--text-sub)' }}>

@@ -8,7 +8,7 @@ import { deadlineDaysUntil, daysUntil, daysLabel, daysColor } from '../utils/dat
 // DetailScreen でスター登録したイベントを一覧表示する。
 // ListScreen と同じカード形式を使用。
 export default function FavoritesScreen({
-  events, favorites, theme,
+  events, favorites, applied, theme,
   onOpenDetail, onBack,
   onOpenHome, onOpenList, onOpenRegion, onOpenSettings,
 }) {
@@ -139,6 +139,13 @@ function FavCard({ ev, primary, accent, onTap }) {
               borderRadius: 3, background: 'var(--tag-bg)', color: primary, letterSpacing: 0.5,
             }}>{ev.category}</span>
             {ev.tag && <span style={{ fontSize: 11, color: 'var(--text-sub)' }}>{ev.tag}</span>}
+            {applied?.has(ev.id) && (
+              <span style={{
+                fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3,
+                background: '#16a34a', color: '#fff',
+                fontFamily: F.mono, letterSpacing: 0.5, flexShrink: 0,
+              }}>✓ 申請済</span>
+            )}
             {isOngoing && (
               <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3, background: '#22c55e22', color: '#15803d', fontFamily: F.mono }}>
                 開催中

@@ -14,7 +14,7 @@ const ALL_PREF_TABS = [
 export default function ListScreen({
   events, loading, error, updatedAt, checkedAt, onRefresh,
   region, onRegionChange,
-  favorites,
+  favorites, applied,
   onOpenHome, onOpenDetail, onOpenSettings, onOpenFavorites,
   theme,
 }) {
@@ -365,6 +365,13 @@ export default function ListScreen({
                                 background: `${accent}22`, color: accent,
                                 letterSpacing: 0.5, flexShrink: 0,
                               }}>★</span>
+                            )}
+                            {applied?.has(ev.id) && (
+                              <span style={{
+                                fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3,
+                                background: '#16a34a', color: '#fff',
+                                fontFamily: F.mono, letterSpacing: 0.5, flexShrink: 0,
+                              }}>✓ 申請済</span>
                             )}
                             {isOngoing && (
                               <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3, background: '#22c55e22', color: '#15803d', fontFamily: F.mono }}>

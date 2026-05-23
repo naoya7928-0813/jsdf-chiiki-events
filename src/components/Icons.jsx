@@ -20,4 +20,6 @@ export const ICO = {
   twitterX: (c = '#fff', s = 16) => <svg width={s} height={s} viewBox="0 0 24 24" fill={c}><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.259 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>,
   lineApp: (c = '#fff', s = 16) => <svg width={s} height={s} viewBox="0 0 24 24" fill={c}><path d="M12 2C6.48 2 2 5.82 2 10.5c0 3.8 2.86 7.07 7 8.27l-.24 1.73c-.06.48.52.8.9.49L13 19.62C18.94 19.17 22 15.25 22 10.5 22 5.82 17.52 2 12 2z"/></svg>,
   copy:    (c = '#6b7280', s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke={c} strokeWidth="1.6"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke={c} strokeWidth="1.6" strokeLinecap="round"/></svg>,
+  // 申請済みアイコン（クリップボード＋チェック）
+  applied: (c = '#16a34a', s = 18, filled = false) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" stroke={c} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/><rect x="9" y="3" width="6" height="4" rx="1" stroke={c} strokeWidth="1.6" fill={filled ? c : 'none'}/><path d="M8.5 12.5l2.5 2.5 4.5-4.5" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>,
 };
