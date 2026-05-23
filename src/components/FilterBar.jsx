@@ -48,6 +48,7 @@ export function calcPeriodCounts(events) {
   const mEnd = new Date(n.getFullYear(), n.getMonth() + 1, 0);
   const mStr = mEnd.toISOString().slice(0, 10);
 
+  // 来月：開始日が来月の範囲に入るイベントのみ（今月開始来月終了のイベントは除外）
   const nmStart = new Date(n.getFullYear(), n.getMonth() + 1, 1);
   const nmEnd   = new Date(n.getFullYear(), n.getMonth() + 2, 0);
   const nmSStr  = nmStart.toISOString().slice(0, 10);
@@ -60,12 +61,26 @@ export function calcPeriodCounts(events) {
     today:     events.filter(e => inRange(e, tStr,  tStr)).length,
     thisWeek:  events.filter(e => inRange(e, tStr,  wStr)).length,
     thisMonth: events.filter(e => inRange(e, tStr,  mStr)).length,
-    nextMonth: events.filter(e => inRange(e, nmSStr, nmEStr)).length,
+    // 来月：開始日ベースで判定
+    nextMonth: events.filter(e => e.date >= nmSStr && e.date <= nmEStr).length,
   };
 }
 
 // 申請済みフィルター用の特別タグ ID（TAG_DEFS には含めない）
 export const APPLIED_TAG_ID = '申請済み';
+
+// ─── 折り畳みトグルの山形アイコン ────────────────────────────
+function ChevUpDown({ up }) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+      <path
+        d={up ? 'M6 15l6-6 6 6' : 'M6 9l6 6 6-6'}
+        stroke="var(--text-muted)" strokeWidth="2"
+        strokeLinecap="round" strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 // ─── フィルターバー（期間 / カテゴリ / タグ） ────────────────────
 export default function FilterBar({
@@ -77,6 +92,9 @@ export default function FilterBar({
   onTagChange,
   onPeriodChange,
   primary,
+  // 折り畳み制御
+  collapsed = false,
+  onToggleCollapsed,
 }) {
   const periodCounts   = useMemo(() => calcPeriodCounts(events), [events]);
   const categories     = ['すべて', ...STANDARD_CATEGORIES, 'その他'];
@@ -100,6 +118,17 @@ export default function FilterBar({
     [events, applied]
   );
 
+  // アクティブなフィルター数（トグルヘッダーのバッジ用）
+  const activeCount =
+    (activePeriod !== 'all' ? 1 : 0) +
+    (activeCategory !== 'all' ? 1 : 0) +
+    (activeTag !== 'all' ? 1 : 0);
+
+  // 折り畳み時にサマリーとして表示するラベル
+  const activePeriodLabel    = PERIODS.find(p => p.id === activePeriod)?.label;
+  const activeCategoryLabel  = activeCategory === 'all' ? null : activeCategory;
+  const activeTagLabel       = activeTag === 'all' ? null : activeTag;
+
   const scrollRow = {
     display: 'flex', gap: 6,
     overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch',
@@ -107,138 +136,222 @@ export default function FilterBar({
   const onWheel = e => { if (e.deltaY !== 0) { e.preventDefault(); e.currentTarget.scrollLeft += e.deltaY; } };
 
   return (
-    <div style={{ background: 'var(--card)', borderBottom: '1px solid var(--border)', paddingBottom: 8 }}>
+    <div style={{ background: 'var(--card)', borderBottom: '1px solid var(--border)' }}>
 
-      {/* ── 期間チップ行 ── */}
-      <div style={{ ...scrollRow, padding: '8px 16px 0' }} onWheel={onWheel}>
-        {PERIODS.map(({ id, label }) => {
-          const isOn = activePeriod === id;
-          const cnt  = periodCounts[id];
-          return (
-            <button
-              key={id}
-              onClick={() => onPeriodChange(id)}
-              style={{
-                flexShrink: 0, cursor: 'pointer', whiteSpace: 'nowrap',
-                fontFamily: F.sans, display: 'flex', alignItems: 'center', gap: 5,
-                padding: '5px 12px', borderRadius: 20,
-                border: `1.5px solid ${isOn ? primary : 'var(--border)'}`,
-                background: isOn ? `${primary}18` : 'var(--bg)',
-                color: isOn ? primary : 'var(--text-muted)',
-                fontSize: 12, fontWeight: isOn ? 700 : 400,
-              }}
-            >
-              {label}
+      {/* ── トグルヘッダー（常時表示） ── */}
+      <button
+        onClick={onToggleCollapsed}
+        aria-label={collapsed ? 'フィルターを展開' : 'フィルターを収納'}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', gap: 6,
+          padding: '8px 16px', background: 'none', border: 'none',
+          cursor: 'pointer', fontFamily: F.sans, textAlign: 'left',
+        }}
+      >
+        {/* スライダーアイコン */}
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+          <path
+            d="M3 6h18M6 12h12M10 18h4"
+            stroke={activeCount > 0 ? primary : 'var(--text-muted)'}
+            strokeWidth="2" strokeLinecap="round"
+          />
+        </svg>
+
+        <span style={{
+          fontSize: 12, fontWeight: activeCount > 0 ? 600 : 400,
+          color: activeCount > 0 ? primary : 'var(--text-muted)',
+        }}>
+          絞り込み
+        </span>
+
+        {/* アクティブフィルター数バッジ */}
+        {activeCount > 0 && (
+          <span style={{
+            fontSize: 10, background: primary, color: '#fff',
+            borderRadius: 8, padding: '1px 6px',
+            fontFamily: F.mono, fontWeight: 700, flexShrink: 0,
+          }}>
+            {activeCount}
+          </span>
+        )}
+
+        {/* 折り畳み時：アクティブフィルターのサマリーチップ */}
+        {collapsed && activeCount > 0 && (
+          <div style={{ display: 'flex', gap: 4, flex: 1, overflow: 'hidden', alignItems: 'center' }}>
+            {activePeriod !== 'all' && (
               <span style={{
-                fontSize: 10, fontFamily: F.mono, fontWeight: 600,
-                background: isOn ? `${primary}28` : 'var(--tag-bg)',
-                color: isOn ? primary : 'var(--text-muted)',
-                borderRadius: 8, padding: '0 5px', lineHeight: '16px',
+                fontSize: 11, padding: '2px 9px', borderRadius: 10,
+                background: `${primary}18`, color: primary,
+                fontWeight: 600, flexShrink: 0, whiteSpace: 'nowrap',
               }}>
-                {cnt}
+                {activePeriodLabel}
               </span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* ── カテゴリチップ行 ── */}
-      <div style={{ ...scrollRow, padding: '6px 16px 0' }} onWheel={onWheel}>
-        {categories.map(cat => {
-          const key  = cat === 'すべて' ? 'all' : cat;
-          const isOn = activeCategory === key;
-          return (
-            <button
-              key={cat}
-              onClick={() => onCategoryChange(key)}
-              style={{
-                flexShrink: 0, cursor: 'pointer', whiteSpace: 'nowrap',
-                fontFamily: F.sans, display: 'flex', alignItems: 'center', gap: 5,
-                padding: '5px 13px', borderRadius: 20,
-                border: `1.5px solid ${isOn ? primary : 'var(--border)'}`,
-                background: isOn ? primary : 'var(--bg)',
-                color: isOn ? '#fff' : 'var(--text-muted)',
-                fontSize: 12, fontWeight: isOn ? 600 : 400,
-              }}
-            >
-              {cat}
+            )}
+            {activeCategory !== 'all' && (
               <span style={{
-                fontSize: 10, fontFamily: F.mono, fontWeight: 600,
-                background: isOn ? 'rgba(255,255,255,0.25)' : 'var(--tag-bg)',
-                color: isOn ? '#fff' : 'var(--text-muted)',
-                borderRadius: 8, padding: '0 5px', lineHeight: '16px',
+                fontSize: 11, padding: '2px 9px', borderRadius: 10,
+                background: primary, color: '#fff',
+                fontWeight: 600, flexShrink: 0, whiteSpace: 'nowrap',
+                maxWidth: 90, overflow: 'hidden', textOverflow: 'ellipsis',
               }}>
-                {categoryCounts[cat]}
+                {activeCategoryLabel}
               </span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* ── タグ行（固定リスト・件数バッジ付き・カテゴリと同等の強度） ── */}
-      <div style={{ ...scrollRow, padding: '6px 16px 0' }} onWheel={onWheel}>
-
-        {/* 申請済みチップ（先頭・緑系） */}
-        {(() => {
-          const isOn = activeTag === APPLIED_TAG_ID;
-          return (
-            <button
-              onClick={() => onTagChange(isOn ? 'all' : APPLIED_TAG_ID)}
-              style={{
-                flexShrink: 0, cursor: 'pointer', whiteSpace: 'nowrap',
-                fontFamily: F.sans, display: 'flex', alignItems: 'center', gap: 5,
-                padding: '5px 12px', borderRadius: 20,
-                border: `1.5px solid ${isOn ? '#16a34a' : appliedCount > 0 ? '#16a34a88' : 'var(--border)'}`,
-                background: isOn ? '#16a34a' : appliedCount > 0 ? '#16a34a0d' : 'var(--bg)',
-                color: isOn ? '#fff' : appliedCount > 0 ? '#16a34a' : 'var(--text-muted)',
-                fontSize: 12, fontWeight: isOn ? 600 : 400,
-                opacity: appliedCount === 0 ? 0.4 : 1,
-              }}
-            >
-              ✓ 申請済み
+            )}
+            {activeTag !== 'all' && (
               <span style={{
-                fontSize: 10, fontFamily: F.mono, fontWeight: 600,
-                background: isOn ? 'rgba(255,255,255,0.25)' : '#16a34a22',
-                color: isOn ? '#fff' : '#16a34a',
-                borderRadius: 8, padding: '0 5px', lineHeight: '16px',
+                fontSize: 11, padding: '2px 9px', borderRadius: 10,
+                background: `${primary}18`, color: primary,
+                fontWeight: 600, flexShrink: 0, whiteSpace: 'nowrap',
+                maxWidth: 90, overflow: 'hidden', textOverflow: 'ellipsis',
               }}>
-                {appliedCount}
+                {activeTagLabel}
               </span>
-            </button>
-          );
-        })()}
+            )}
+          </div>
+        )}
 
-        {TAG_DEFS.map(({ id, label }) => {
-          const isOn = activeTag === id;
-          const cnt  = tagCounts[id];
-          return (
-            <button
-              key={id}
-              onClick={() => onTagChange(isOn ? 'all' : id)}
-              style={{
-                flexShrink: 0, cursor: 'pointer', whiteSpace: 'nowrap',
-                fontFamily: F.sans, display: 'flex', alignItems: 'center', gap: 5,
-                padding: '5px 12px', borderRadius: 20,
-                border: `1.5px solid ${isOn ? primary : cnt > 0 ? 'var(--border)' : 'var(--border)'}`,
-                background: isOn ? primary : 'var(--bg)',
-                color: isOn ? '#fff' : cnt > 0 ? 'var(--text-muted)' : 'var(--text-muted)',
-                fontSize: 12, fontWeight: isOn ? 600 : 400,
-                opacity: cnt === 0 ? 0.35 : 1,
-              }}
-            >
-              {label}
-              <span style={{
-                fontSize: 10, fontFamily: F.mono, fontWeight: 600,
-                background: isOn ? 'rgba(255,255,255,0.25)' : 'var(--tag-bg)',
-                color: isOn ? '#fff' : 'var(--text-muted)',
-                borderRadius: 8, padding: '0 5px', lineHeight: '16px',
-              }}>
-                {cnt}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+        <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+          <ChevUpDown up={!collapsed} />
+        </span>
+      </button>
+
+      {/* ── 展開時のチップ行 ── */}
+      {!collapsed && (
+        <div style={{ paddingBottom: 8 }}>
+
+          {/* 期間チップ行 */}
+          <div style={{ ...scrollRow, padding: '2px 16px 0' }} onWheel={onWheel}>
+            {PERIODS.map(({ id, label }) => {
+              const isOn = activePeriod === id;
+              const cnt  = periodCounts[id];
+              return (
+                <button
+                  key={id}
+                  onClick={() => onPeriodChange(id)}
+                  style={{
+                    flexShrink: 0, cursor: 'pointer', whiteSpace: 'nowrap',
+                    fontFamily: F.sans, display: 'flex', alignItems: 'center', gap: 5,
+                    padding: '5px 12px', borderRadius: 20,
+                    border: `1.5px solid ${isOn ? primary : 'var(--border)'}`,
+                    background: isOn ? `${primary}18` : 'var(--bg)',
+                    color: isOn ? primary : 'var(--text-muted)',
+                    fontSize: 12, fontWeight: isOn ? 700 : 400,
+                  }}
+                >
+                  {label}
+                  <span style={{
+                    fontSize: 10, fontFamily: F.mono, fontWeight: 600,
+                    background: isOn ? `${primary}28` : 'var(--tag-bg)',
+                    color: isOn ? primary : 'var(--text-muted)',
+                    borderRadius: 8, padding: '0 5px', lineHeight: '16px',
+                  }}>
+                    {cnt}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* カテゴリチップ行 */}
+          <div style={{ ...scrollRow, padding: '6px 16px 0' }} onWheel={onWheel}>
+            {categories.map(cat => {
+              const key  = cat === 'すべて' ? 'all' : cat;
+              const isOn = activeCategory === key;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => onCategoryChange(key)}
+                  style={{
+                    flexShrink: 0, cursor: 'pointer', whiteSpace: 'nowrap',
+                    fontFamily: F.sans, display: 'flex', alignItems: 'center', gap: 5,
+                    padding: '5px 13px', borderRadius: 20,
+                    border: `1.5px solid ${isOn ? primary : 'var(--border)'}`,
+                    background: isOn ? primary : 'var(--bg)',
+                    color: isOn ? '#fff' : 'var(--text-muted)',
+                    fontSize: 12, fontWeight: isOn ? 600 : 400,
+                  }}
+                >
+                  {cat}
+                  <span style={{
+                    fontSize: 10, fontFamily: F.mono, fontWeight: 600,
+                    background: isOn ? 'rgba(255,255,255,0.25)' : 'var(--tag-bg)',
+                    color: isOn ? '#fff' : 'var(--text-muted)',
+                    borderRadius: 8, padding: '0 5px', lineHeight: '16px',
+                  }}>
+                    {categoryCounts[cat]}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* タグ行（固定リスト・件数バッジ付き） */}
+          <div style={{ ...scrollRow, padding: '6px 16px 0' }} onWheel={onWheel}>
+
+            {/* 申請済みチップ（先頭・緑系） */}
+            {(() => {
+              const isOn = activeTag === APPLIED_TAG_ID;
+              return (
+                <button
+                  onClick={() => onTagChange(isOn ? 'all' : APPLIED_TAG_ID)}
+                  style={{
+                    flexShrink: 0, cursor: 'pointer', whiteSpace: 'nowrap',
+                    fontFamily: F.sans, display: 'flex', alignItems: 'center', gap: 5,
+                    padding: '5px 12px', borderRadius: 20,
+                    border: `1.5px solid ${isOn ? '#16a34a' : appliedCount > 0 ? '#16a34a88' : 'var(--border)'}`,
+                    background: isOn ? '#16a34a' : appliedCount > 0 ? '#16a34a0d' : 'var(--bg)',
+                    color: isOn ? '#fff' : appliedCount > 0 ? '#16a34a' : 'var(--text-muted)',
+                    fontSize: 12, fontWeight: isOn ? 600 : 400,
+                    opacity: appliedCount === 0 ? 0.4 : 1,
+                  }}
+                >
+                  ✓ 申請済み
+                  <span style={{
+                    fontSize: 10, fontFamily: F.mono, fontWeight: 600,
+                    background: isOn ? 'rgba(255,255,255,0.25)' : '#16a34a22',
+                    color: isOn ? '#fff' : '#16a34a',
+                    borderRadius: 8, padding: '0 5px', lineHeight: '16px',
+                  }}>
+                    {appliedCount}
+                  </span>
+                </button>
+              );
+            })()}
+
+            {TAG_DEFS.map(({ id, label }) => {
+              const isOn = activeTag === id;
+              const cnt  = tagCounts[id];
+              return (
+                <button
+                  key={id}
+                  onClick={() => onTagChange(isOn ? 'all' : id)}
+                  style={{
+                    flexShrink: 0, cursor: 'pointer', whiteSpace: 'nowrap',
+                    fontFamily: F.sans, display: 'flex', alignItems: 'center', gap: 5,
+                    padding: '5px 12px', borderRadius: 20,
+                    border: `1.5px solid ${isOn ? primary : 'var(--border)'}`,
+                    background: isOn ? primary : 'var(--bg)',
+                    color: isOn ? '#fff' : 'var(--text-muted)',
+                    fontSize: 12, fontWeight: isOn ? 600 : 400,
+                    opacity: cnt === 0 ? 0.35 : 1,
+                  }}
+                >
+                  {label}
+                  <span style={{
+                    fontSize: 10, fontFamily: F.mono, fontWeight: 600,
+                    background: isOn ? 'rgba(255,255,255,0.25)' : 'var(--tag-bg)',
+                    color: isOn ? '#fff' : 'var(--text-muted)',
+                    borderRadius: 8, padding: '0 5px', lineHeight: '16px',
+                  }}>
+                    {cnt}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+        </div>
+      )}
     </div>
   );
 }

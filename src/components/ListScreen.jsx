@@ -63,6 +63,18 @@ export default function ListScreen({
     Promise.resolve(onRefresh()).finally(() => setIsRefreshing(false));
   };
 
+  // ── フィルターバー 折り畳み状態 ──────────────────────────
+  const [filterOpen, setFilterOpen] = useState(() => {
+    try { return localStorage.getItem('jsdf-filter-open') !== 'false'; } catch { return true; }
+  });
+  const handleToggleFilter = () => {
+    setFilterOpen(prev => {
+      const next = !prev;
+      try { localStorage.setItem('jsdf-filter-open', String(next)); } catch {}
+      return next;
+    });
+  };
+
   // ── カテゴリ・タグ・期間 フィルター ─────────────────────
   const [activeCategory, setActiveCategory] = useState('all');
   const [activeTag,      setActiveTag]      = useState('all');
@@ -96,7 +108,8 @@ export default function ListScreen({
         if (activePeriod === 'today')     periodOk = ev.date <= tStr && ee >= tStr;
         if (activePeriod === 'thisWeek')  periodOk = ev.date <= wStr && ee >= tStr;
         if (activePeriod === 'thisMonth') periodOk = ev.date <= mStr && ee >= tStr;
-        if (activePeriod === 'nextMonth') periodOk = ev.date <= nmE  && ee >= nmS;
+        // 来月：開始日が来月の範囲に入るイベントのみ（今月開始来月終了のイベントは除外）
+        if (activePeriod === 'nextMonth') periodOk = ev.date >= nmS && ev.date <= nmE;
 
         return catOk && tagOk && periodOk;
       })
@@ -295,6 +308,8 @@ export default function ListScreen({
         onTagChange={handleTagChange}
         onPeriodChange={handlePeriodChange}
         primary={primary}
+        collapsed={!filterOpen}
+        onToggleCollapsed={handleToggleFilter}
       />
 
       <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 60px)' }}>
