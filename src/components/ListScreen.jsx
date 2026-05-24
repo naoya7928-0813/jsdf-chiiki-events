@@ -334,7 +334,7 @@ export default function ListScreen({
         onToggleCollapsed={handleToggleFilter}
       />
 
-      {/* 情報精度の注意バナー */}
+      {/* 非公式サービス注意バナー */}
       <div style={{
         display: 'flex', alignItems: 'flex-start', gap: 6,
         padding: '7px 14px', background: 'var(--notice-bg, rgba(120,100,0,0.07))',
@@ -343,8 +343,7 @@ export default function ListScreen({
       }}>
         <span style={{ fontSize: 12, lineHeight: 1, marginTop: 1, flexShrink: 0 }}>⚠️</span>
         <span style={{ fontSize: 10.5, color: 'var(--text-muted)', lineHeight: 1.55 }}>
-          情報は公式サイトから自動取得のため、不完全・未掲載の場合があります。
-          詳細・最新情報は各地本の公式サイトを必ずご確認ください。
+          当サービスは非公式の情報まとめです。参加・申込・中止・変更などの最新情報は、各地方協力本部の公式ページで必ずご確認ください。
         </span>
       </div>
 
@@ -462,10 +461,10 @@ export default function ListScreen({
                             <span style={{ flexShrink: 0, display: 'flex', marginTop: 1 }}>{ICO.pin('var(--text-sub)', 12)}</span>
                             {ev.place}
                           </div>
-                          {/* ④ URLあり → 応募リンクバッジ */}
+                          {/* ④ URLあり → 公式ページ確認バッジ */}
                           {ev.url && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 5, fontSize: 10, color: primary, fontWeight: 600 }}>
-                              {ICO.extLink(primary, 10)} 応募・詳細リンクあり
+                              {ICO.extLink(primary, 10)} 公式ページで確認
                             </div>
                           )}
                         </div>

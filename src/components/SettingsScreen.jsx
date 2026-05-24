@@ -202,7 +202,7 @@ export default function SettingsScreen({
           <LegalLinkRow label="プライバシーポリシー" onTap={() => onOpenLegal('privacy')} last />
         </Card>
 
-        {/* ─ 6. データ出典 ─ */}
+        {/* ─ 6. 掲載元（参照元公式サイト） ─ */}
         <div style={{
           margin: '20px 16px 0',
           background: 'var(--card)',
@@ -219,7 +219,7 @@ export default function SettingsScreen({
             }}
           >
             <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, color: 'var(--text-muted)' }}>
-              データ出典
+              掲載元（参照元公式サイト）
             </span>
             <span style={{
               display: 'flex', transition: 'transform 0.2s',
@@ -243,10 +243,10 @@ export default function SettingsScreen({
               </div>
               <div style={{
                 fontSize: 11, color: 'var(--text-muted)',
-                lineHeight: 1.7, marginTop: 8,
+                lineHeight: 1.8, marginTop: 8,
                 paddingTop: 8, borderTop: '1px solid var(--sep)',
               }}>
-                本アプリは上記サイトの情報を加工して作成した非公式アプリです。防衛省・自衛隊とは一切関係ありません。
+                当サイトは有志による非公式サイトです。防衛省・自衛隊および各地方協力本部とは直接関係ありません。掲載情報は各地方協力本部等の公式公開情報をもとに整理しています。イベントの開催可否・申込方法・参加条件・内容変更などは、必ず公式ページで最新情報をご確認ください。
               </div>
             </div>
           )}

@@ -17,7 +17,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
     if (!ev) return;
     navigator.share({
       title: ev.title,
-      text: `${ev.title}\n📅 ${dateStr}　📍 ${ev.place}`,
+      text: `${ev.title}\n📅 ${dateStr}　📍 ${ev.place}\n\n自衛隊地本イベント情報で見つけたイベントです。最新情報は公式ページをご確認ください。`,
       url: shareUrl,
     }).catch(() => {});
   }, [ev, dateStr, shareUrl]);
@@ -25,7 +25,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
   // クリップボードコピー
   const handleCopy = useCallback(() => {
     if (!ev) return;
-    const text = `${ev.title}\n📅 ${dateStr}\n📍 ${ev.place}\n${shareUrl}`;
+    const text = `${ev.title}\n📅 ${dateStr}\n📍 ${ev.place}\n${shareUrl}\n\n※最新情報は各地方協力本部の公式ページをご確認ください`;
     navigator.clipboard?.writeText(text).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2200);
@@ -43,13 +43,15 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
   const isOngoing = !!(ev.endDate && ev.date < todayStr);
   const { primary, accent } = theme;
 
-  // 共有テキスト（X の280字制限に配慮して簡潔に）
-  const shareText = `【自衛隊イベント情報】\n${ev.title}\n📅 ${dateStr}\n📍 ${ev.place}\n#自衛隊 #地本イベント`;
+  // X 共有テキスト（280字制限配慮・非公式サイト注記あり）
+  const shareTextX = `${ev.title}\n📅 ${dateStr}　📍 ${ev.place}\n\n自衛隊地本イベント情報で見つけました。最新情報は公式ページをご確認ください。\n#自衛隊 #地本イベント`;
+  // LINE 共有テキスト（詳細注記付き）
+  const shareTextLine = `${ev.title}\n📅 ${dateStr}\n📍 ${ev.place}\n\n自衛隊地本イベント情報で見つけたイベントです。\n参加・申込・中止・変更などの最新情報は、必ず公式ページをご確認ください。`;
 
   // X (Twitter) シェアURL
-  const xShareUrl   = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+  const xShareUrl    = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTextX)}&url=${encodeURIComponent(shareUrl)}`;
   // LINE シェアURL
-  const lineShareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(`${shareText}\n${shareUrl}`)}`;
+  const lineShareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(`${shareTextLine}\n${shareUrl}`)}`;
 
   // pref フィールド優先。旧イベント（pref なし）は ID プレフィックスで判別
   const regionKey = ev.pref
@@ -70,7 +72,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
   // 個別URL → なければ地本公式サイト にフォールバック
   const targetUrl = ev.url || source?.url || '';
   const openUrl = () => {
-    if (targetUrl) window.open(targetUrl, '_blank', 'noopener');
+    if (targetUrl) window.open(targetUrl, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -109,7 +111,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
               {typeof navigator.share === 'function' && (
                 <button
                   onClick={handleNativeShare}
-                  aria-label="シェア"
+                  aria-label="このイベントを共有"
                   style={iconBtnStyle}
                 >
                   {ICO.share('#fff', 16)}
@@ -357,7 +359,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
           </div>
         </div>
 
-        {/* 出典注釈 */}
+        {/* 掲載元・公式確認 */}
         <div style={{ padding: '0 16px 20px' }}>
           <div style={{
             borderRadius: 10,
@@ -365,29 +367,41 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
             background: 'var(--card)',
             padding: '12px 14px',
           }}>
-            <div style={{
-              fontSize: 10, fontWeight: 700, letterSpacing: 2,
-              color: 'var(--text-muted)', marginBottom: 6,
-            }}>
-              データ出典
+            {/* 掲載元（どの地方協力本部が公開しているか） */}
+            <div style={{ marginBottom: 10 }}>
+              <div style={{
+                fontSize: 10, fontWeight: 700, letterSpacing: 1.5,
+                color: 'var(--text-muted)', marginBottom: 4,
+              }}>
+                掲載元
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--text)', fontWeight: 500, lineHeight: 1.5 }}>
+                {source.name}
+              </div>
             </div>
+            {/* 公式ページで確認（最新情報・申込方法・変更確認用の外部リンク） */}
             <a
               href={source.url}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={`${source.name}の公式ページで確認（外部サイトへ移動）`}
               style={{
-                fontSize: 12, color: primary,
-                textDecoration: 'none', display: 'block', lineHeight: 1.6,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                padding: '9px 12px', borderRadius: 8,
+                border: `1px solid ${primary}33`, color: primary,
+                fontSize: 12, textDecoration: 'none', fontFamily: F.sans,
+                background: `${primary}06`, fontWeight: 600,
+                marginBottom: 10,
               }}
             >
-              {source.name}
+              {ICO.extLink(primary, 12)} 公式ページで確認
             </a>
+            {/* 非公式サイトの注記 */}
             <div style={{
               fontSize: 11, color: 'var(--text-muted)',
-              lineHeight: 1.7, marginTop: 6,
-              paddingTop: 6, borderTop: '1px solid var(--sep)',
+              lineHeight: 1.75, paddingTop: 8, borderTop: '1px solid var(--sep)',
             }}>
-              本アプリは上記サイトの情報を加工して作成した非公式アプリです。最新情報・詳細は出典元をご確認ください。
+              当サイトは有志による非公式サイトです。防衛省・自衛隊および各地方協力本部とは直接関係ありません。イベントの開催可否・申込方法・変更などは、必ず公式ページで最新情報をご確認ください。
             </div>
           </div>
         </div>
@@ -409,7 +423,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
           fontWeight: 600, fontFamily: F.sans, fontSize: 14, letterSpacing: 0.5,
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
         }}>
-          <span>{targetUrl ? (ev.url ? '公式ページを開く' : '地本サイトを開く') : '公式ページなし'}</span>
+          <span>{targetUrl ? (ev.url ? 'イベント詳細・申込方法を見る' : '地本の公式ページを確認') : '公式ページなし'}</span>
           {targetUrl && ICO.extLink('#fff', 14)}
         </button>
 
