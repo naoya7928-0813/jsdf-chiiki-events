@@ -109,7 +109,7 @@ function FavCard({ ev, primary, accent, applied, onTap }) {
       onKeyDown={e => e.key === 'Enter' && onTap(ev)}
       style={{
         background: 'var(--card)', margin: '0 16px 10px', borderRadius: 12,
-        border: '1px solid var(--border)', cursor: 'pointer',
+        border: `1px solid ${accent}33`, cursor: 'pointer',
         boxShadow: '0 1px 2px rgba(11,37,69,0.04),0 2px 8px rgba(11,37,69,0.05)',
       }}
     >
@@ -117,44 +117,44 @@ function FavCard({ ev, primary, accent, applied, onTap }) {
         {/* 日付バッジ */}
         <div style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-          minWidth: 48, borderRight: '1px solid var(--border)', paddingRight: 12,
+          minWidth: 50, borderRight: '1px solid var(--border)', paddingRight: 12,
         }}>
-          <div style={{ fontSize: 9, color: 'var(--text-muted)', fontFamily: F.mono, letterSpacing: 1 }}>
+          <div style={{ fontSize: 11, color: dateColor, fontFamily: F.mono, letterSpacing: 0.5, fontWeight: 500 }}>
             {endSplit && endSplit.m !== m ? `${m}〜${endSplit.m}月` : `${m}月`}
           </div>
-          <div style={{ fontFamily: F.serif, fontSize: endSplit ? 16 : 26, fontWeight: 600, lineHeight: 1, color: dateColor, marginTop: 2 }}>
+          <div style={{ fontFamily: F.serif, fontSize: endSplit ? 18 : 28, fontWeight: 600, lineHeight: 1, color: dateColor, marginTop: 2 }}>
             {endSplit ? `${d}〜${endSplit.d}日` : d}
           </div>
           {ev.weekday && (
-            <div style={{ fontSize: 9, marginTop: 3, color: dateColor, fontWeight: 500 }}>
-              ({ev.endWeekday ? `${ev.weekday}〜${ev.endWeekday}` : ev.weekday})
+            <div style={{ fontSize: 11, marginTop: 3, color: dateColor, fontWeight: 600 }}>
+              {ev.endWeekday ? `${ev.weekday}〜${ev.endWeekday}` : ev.weekday}
             </div>
           )}
         </div>
 
         {/* テキスト */}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', gap: 6, marginBottom: 5, flexWrap: 'wrap', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 6, marginBottom: 6, flexWrap: 'wrap', alignItems: 'center' }}>
             <span style={{
-              fontSize: 11, fontWeight: 600, padding: '2px 8px',
+              fontSize: 12, fontWeight: 600, padding: '2px 8px',
               borderRadius: 3, background: 'var(--tag-bg)', color: primary, letterSpacing: 0.5,
             }}>{ev.category}</span>
-            {ev.tag && <span style={{ fontSize: 11, color: 'var(--text-sub)' }}>{ev.tag}</span>}
+            {ev.tag && <span style={{ fontSize: 12, color: 'var(--text-sub)' }}>{ev.tag}</span>}
             {applied?.has(ev.id) && (
               <span style={{
-                fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3,
+                fontSize: 11, fontWeight: 700, padding: '2px 7px', borderRadius: 3,
                 background: '#16a34a', color: '#fff',
                 fontFamily: F.mono, letterSpacing: 0.5, flexShrink: 0,
               }}>✓ 申請済</span>
             )}
             {isOngoing && (
-              <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3, background: '#22c55e22', color: '#15803d', fontFamily: F.mono }}>
+              <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 7px', borderRadius: 3, background: '#22c55e22', color: '#15803d', fontFamily: F.mono }}>
                 開催中
               </span>
             )}
             {showDl && (
               <span style={{
-                fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3,
+                fontSize: 11, fontWeight: 700, padding: '2px 7px', borderRadius: 3,
                 background: '#f9731622', color: '#f97316', fontFamily: F.mono, letterSpacing: 0.5,
               }}>
                 締切 {daysLabel(dlDays, 'deadline')}
@@ -162,7 +162,7 @@ function FavCard({ ev, primary, accent, applied, onTap }) {
             )}
             {showEvent && !showDl && (
               <span style={{
-                fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3,
+                fontSize: 11, fontWeight: 700, padding: '2px 7px', borderRadius: 3,
                 background: `${daysColor(eventDays, primary, accent)}18`,
                 color: daysColor(eventDays, primary, accent), fontFamily: F.mono, letterSpacing: 0.5,
               }}>
@@ -170,23 +170,31 @@ function FavCard({ ev, primary, accent, applied, onTap }) {
               </span>
             )}
             {/* 地本ラベル */}
-            <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: F.mono, marginLeft: 'auto' }}>
+            <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: F.mono, marginLeft: 'auto' }}>
               {ev.regionLabel}
             </span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 5 }}>
-            <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', lineHeight: 1.45, letterSpacing: 0.2 }}>
-              {ev.title}
-            </div>
-            {/* 塗りつぶしスター（お気に入り済みを明示） */}
-            {ICO.star(accent, 13, accent)}
+          <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)', lineHeight: 1.45, letterSpacing: 0.2, marginBottom: 6 }}>
+            {ev.title}
           </div>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 5, fontSize: 12, color: 'var(--text-sub)' }}>
-            <span style={{ flexShrink: 0, display: 'flex', marginTop: 1 }}>{ICO.pin('var(--text-sub)', 12)}</span>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 5, fontSize: 13, color: 'var(--text-sub)' }}>
+            <span style={{ flexShrink: 0, display: 'flex', marginTop: 1 }}>{ICO.pin('var(--text-sub)', 13)}</span>
             {ev.place}
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>{ICO.chev('var(--icon-muted)', 12)}</div>
+
+        {/* 右カラム：スター ＋ chevron */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, flexShrink: 0 }}>
+          {/* お気に入りスター（大きく・背景付き） */}
+          <div style={{
+            width: 36, height: 36, borderRadius: '50%',
+            background: `${accent}1a`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            {ICO.star(accent, 20, accent)}
+          </div>
+          {ICO.chev('var(--icon-muted)', 12)}
+        </div>
       </div>
     </div>
   );
