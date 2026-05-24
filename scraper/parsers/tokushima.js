@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, padTwo, jstYear, titleHash } = require('./utils');
 
 const URL_TOKUSHIMA = 'https://www.mod.go.jp/pco/tokushima/event.html';
 
@@ -12,7 +12,6 @@ const URL_TOKUSHIMA = 'https://www.mod.go.jp/pco/tokushima/event.html';
  */
 function parseTokushima($) {
   const events = [];
-  const now    = new Date();
 
   // main コンテンツを取得（ナビゲーションを除外するため main/section を優先）
   const mainEl = $('main, #main, .main').first();
@@ -32,7 +31,7 @@ function parseTokushima($) {
     if (/対象のイベントはございません/.test(section)) continue;
 
     // このページは当年1月〜の記録ページなので常に現在年を使い isPast に委ねる
-    const year = now.getFullYear();
+    const year = jstYear();
 
     // イベントの開始パターン: "DD （曜） or DD (曜)" を区切りとして分割
     const blocks = section.split(/(?=\d+\s*[（(][月火水木金土日祝]+[）)])/);
@@ -64,7 +63,7 @@ function parseTokushima($) {
       if (isPast(dateStr)) continue;
 
       events.push({
-        id:             `tk-${dateStr.replace(/-/g, '')}-${events.length + 1}`,
+        id:             `tk-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title.substring(0, 60))}`,
         pref:           'tokushima',
         date:           dateStr,
         weekday,

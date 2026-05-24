@@ -1,12 +1,12 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, padTwo , titleHash } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, padTwo, jstYear, titleHash } = require('./utils');
 
 const BASE_URL = 'https://www.mod.go.jp/pco/chiba/event.html';
 
 /** 令和年なしの「X月Y日」→ スクレイピング時の西暦を返す（過去日は isPast() で除外）*/
 function inferYear() {
-  return new Date().getFullYear();
+  return jstYear();
 }
 
 /**

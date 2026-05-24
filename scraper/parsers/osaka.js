@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo, jstYear, titleHash } = require('./utils');
 
 /**
  * 大阪地本イベントページ (experience/event.html) のパーサー
@@ -14,7 +14,6 @@ const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = requ
  */
 function parseOsaka($) {
   const events = [];
-  let counter = 0;
   const SOURCE_URL = 'https://www.mod.go.jp/pco/osaka/experience/event.html';
 
   $('table').each((_, tbl) => {
@@ -37,10 +36,9 @@ function parseOsaka($) {
           dateStr = `${y}-${padTwo(parseInt(reiwaM[2], 10))}-${padTwo(parseInt(reiwaM[3], 10))}`;
           weekday = reiwaM[4];
         } else if (monthM) {
-          const now   = new Date();
           const m     = parseInt(monthM[1], 10);
           const d     = parseInt(monthM[2], 10);
-          dateStr = `${now.getFullYear()}-${padTwo(m)}-${padTwo(d)}`;
+          dateStr = `${jstYear()}-${padTwo(m)}-${padTwo(d)}`;
           weekday = monthM[3];
         }
         const timeM = value.match(/(\d+:\d+[～〜]\d+:\d+)/);
@@ -64,7 +62,7 @@ function parseOsaka($) {
     if (!title) return;
 
     events.push({
-      id:             `os-${dateStr.replace(/-/g, '')}-${++counter}`,
+      id:             `os-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title.substring(0, 60))}`,
       pref:           'osaka',
       date:           dateStr,
       weekday,

@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, padTwo, titleHash } = require('./utils');
 
 const URL_FUKUOKA = 'https://www.mod.go.jp/pco/fukuoka/event/index.html';
 
@@ -41,7 +41,7 @@ function parseFukuoka($) {
     if (!dateStr || isPast(dateStr)) return;
 
     events.push({
-      id:             `fk-${dateStr.replace(/-/g, '')}-${events.length + 1}`,
+      id:             `fk-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, rawTitle.substring(0, 60))}`,
       pref:           'fukuoka',
       date:           dateStr,
       weekday,

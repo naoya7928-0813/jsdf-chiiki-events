@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo, titleHash } = require('./utils');
 
 const URL_SHIMANE = 'https://www.mod.go.jp/pco/shimane/event/event.html';
 
@@ -43,7 +43,7 @@ function parseShimane($) {
     if (!dateStr || isPast(dateStr)) return;
 
     events.push({
-      id:             `sm-${dateStr.replace(/-/g, '')}-${events.length + 1}`,
+      id:             `sm-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title.substring(0, 60))}`,
       pref:           'shimane',
       date:           dateStr,
       weekday,

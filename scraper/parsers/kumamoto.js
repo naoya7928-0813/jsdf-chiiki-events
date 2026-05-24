@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo, titleHash } = require('./utils');
 
 const URL_KUMAMOTO = 'https://www.mod.go.jp/pco/kumamoto/event/index.html';
 
@@ -45,7 +45,7 @@ function parseKumamoto($) {
     else if (tM2) time = `${tM2[1]}～${tM2[2]}`;
 
     events.push({
-      id:             `km-${dateStr.replace(/-/g, '')}-${events.length + 1}`,
+      id:             `km-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title.substring(0, 60))}`,
       pref:           'kumamoto',
       date:           dateStr,
       weekday,

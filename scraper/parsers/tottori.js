@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo, titleHash } = require('./utils');
 
 const URL_TOTTORI = 'https://www.mod.go.jp/pco/tottori/content/02-event/event.html';
 
@@ -53,7 +53,7 @@ function parseTottori($) {
     if (placeM) place = placeM[1].trim().substring(0, 60);
 
     events.push({
-      id:             `tt-${dateStr.replace(/-/g, '')}-${events.length + 1}`,
+      id:             `tt-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, rawTitle.substring(0, 60))}`,
       pref:           'tottori',
       date:           dateStr,
       weekday,

@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, padTwo, titleHash } = require('./utils');
 
 const URL_SAGA = 'https://www.mod.go.jp/pco/saga/event/index.html';
 
@@ -42,7 +42,7 @@ function parseSaga($) {
     if (!dateStr || isPast(dateStr)) return;
 
     events.push({
-      id:             `sg-${dateStr.replace(/-/g, '')}-${events.length + 1}`,
+      id:             `sg-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, rawTitle.substring(0, 60))}`,
       pref:           'saga',
       date:           dateStr,
       weekday,

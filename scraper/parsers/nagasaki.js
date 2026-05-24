@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo, titleHash } = require('./utils');
 
 const URL_NAGASAKI = 'https://www.mod.go.jp/pco/nagasaki/event/index.html';
 
@@ -61,7 +61,7 @@ function parseNagasaki($) {
       const place    = placeM ? placeM[1].trim().substring(0, 60) : '';
 
       events.push({
-        id:             `ng-${dateStr.replace(/-/g, '')}-${events.length + 1}`,
+        id:             `ng-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title.substring(0, 60))}`,
         pref:           'nagasaki',
         date:           dateStr,
         weekday,

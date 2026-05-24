@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo, titleHash } = require('./utils');
 
 /**
  * 京都地本イベントページ (kouhoushitsu/index.html) のパーサー
@@ -15,7 +15,6 @@ const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = requ
  */
 function parseKyoto($) {
   const events = [];
-  let counter = 0;
   const SOURCE_URL = 'https://www.mod.go.jp/pco/kyoto/kouhoushitsu/index.html';
 
   $('table').each((_, tbl) => {
@@ -70,7 +69,7 @@ function parseKyoto($) {
     const time  = timeM ? timeM[1] : '';
 
     events.push({
-      id:             `ky-${dateStr.replace(/-/g, '')}-${++counter}`,
+      id:             `ky-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title.substring(0, 60))}`,
       pref:           'kyoto',
       date:           dateStr,
       weekday,

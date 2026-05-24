@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, padTwo, titleHash } = require('./utils');
 
 const URL_YAMAGUCHI = 'https://www.mod.go.jp/pco/yamaguchi/event.html';
 
@@ -50,7 +50,7 @@ function parseYamaguchi($) {
     if (!dateStr || isPast(dateStr)) return;
 
     events.push({
-      id:             `ym-${dateStr.replace(/-/g, '')}-${events.length + 1}`,
+      id:             `ym-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, rawTitle.substring(0, 60))}`,
       pref:           'yamaguchi',
       date:           dateStr,
       weekday,

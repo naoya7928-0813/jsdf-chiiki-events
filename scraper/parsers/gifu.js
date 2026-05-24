@@ -1,13 +1,13 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo , titleHash } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo, jstYear, titleHash } = require('./utils');
 
 /** MM月DD日 → ISO date（過去の月日は null を返してスキップ）*/
 function inferDate(month, day) {
-  const now  = new Date();
-  const nowM = now.getMonth() + 1;
-  const nowD = now.getDate();
-  const year = now.getFullYear();
+  const nowJst = new Date(Date.now() + 9 * 3600 * 1000);
+  const nowM = nowJst.getUTCMonth() + 1;
+  const nowD = nowJst.getUTCDate();
+  const year = jstYear();
   // 月が過去、または同月で日が過去 → 終了済みイベントとして除外
   if (month < nowM || (month === nowM && day < nowD)) return null;
   return `${year}-${padTwo(month)}-${padTwo(day)}`;

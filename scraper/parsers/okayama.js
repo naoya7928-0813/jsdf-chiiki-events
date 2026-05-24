@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo, titleHash } = require('./utils');
 
 const URL_OKAYAMA = 'https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html';
 
@@ -60,7 +60,7 @@ function parseOkayama($) {
       if (isPast(dateStr)) return;
 
       events.push({
-        id:             `ok-${dateStr.replace(/-/g, '')}-${events.length + 1}`,
+        id:             `ok-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title.substring(0, 60))}`,
         pref:           'okayama',
         date:           dateStr,
         weekday:        '',

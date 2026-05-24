@@ -140,9 +140,9 @@ export default function HomeScreen({
                     )}
                   </div>
 
-                  {/* イベントを見るボタン */}
+                  {/* イベントを見るボタン → イベント一覧へ */}
                   <button
-                    onClick={() => hasEvents && onOpenRegion(selectedRegionId)}
+                    onClick={() => hasEvents && onOpenList()}
                     disabled={!hasEvents}
                     style={{
                       width: '100%', height: 38, borderRadius: 10, border: 'none',

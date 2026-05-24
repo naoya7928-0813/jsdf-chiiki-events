@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, padTwo, titleHash } = require('./utils');
 
 const URL_KAGAWA = 'https://www.mod.go.jp/pco/kagawa/event.html';
 
@@ -68,7 +68,7 @@ function parseKagawa($) {
       const weekdayM  = dayCell.match(/[（(]([月火水木金土日祝]+)[）)]/);
 
       events.push({
-        id:             `kg-${dateStr.replace(/-/g, '')}-${events.length + 1}`,
+        id:             `kg-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title.substring(0, 60))}`,
         pref:           'kagawa',
         date:           dateStr,
         weekday:        weekdayM ? weekdayM[1] : '',

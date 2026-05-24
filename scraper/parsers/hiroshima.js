@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast } = require('./utils');
+const { guessCategory, guessTag, isPast, titleHash } = require('./utils');
 
 const URL_HIROSHIMA = 'https://www.mod.go.jp/pco/hiroshima/events/';
 
@@ -36,7 +36,7 @@ function parseHiroshima($) {
     const time  = (timeM && timeM[1] !== '00:00') ? timeM[1] : '';
 
     events.push({
-      id:             `hi-${dateStr.replace(/-/g, '')}-${events.length + 1}`,
+      id:             `hi-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title.substring(0, 60))}`,
       pref:           'hiroshima',
       date:           dateStr,
       weekday:        '',

@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo, titleHash } = require('./utils');
 
 const URL_KOCHI = 'https://www.mod.go.jp/pco/kochi/event_info.html';
 
@@ -42,7 +42,7 @@ function parseKochi($) {
     if (!dateStr || isPast(dateStr)) return;
 
     events.push({
-      id:             `ko-${dateStr.replace(/-/g, '')}-${events.length + 1}`,
+      id:             `ko-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title.substring(0, 60))}`,
       pref:           'kochi',
       date:           dateStr,
       weekday,

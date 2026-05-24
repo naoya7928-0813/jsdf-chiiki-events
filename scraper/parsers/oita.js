@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo, titleHash } = require('./utils');
 
 const URL_OITA = 'https://www.mod.go.jp/pco/oita/03_event.html';
 
@@ -59,7 +59,7 @@ function parseOita($) {
     if (placeM) place = placeM[1].trim().substring(0, 60);
 
     events.push({
-      id:             `oi-${dateStr.replace(/-/g, '')}-${events.length + 1}`,
+      id:             `oi-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title.substring(0, 60))}`,
       pref:           'oita',
       date:           dateStr,
       weekday,

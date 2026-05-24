@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo, titleHash } = require('./utils');
 
 const URL_EHIME = 'https://www.mod.go.jp/pco/ehime/event.html';
 
@@ -48,7 +48,7 @@ function parseEhime($) {
     if (!dateStr || isPast(dateStr)) return;
 
     events.push({
-      id:             `em-${dateStr.replace(/-/g, '')}-${i + 1}`,
+      id:             `em-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, rawTitle.substring(0, 60))}`,
       pref:           'ehime',
       date:           dateStr,
       weekday,

@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo, jstYear } = require('./utils');
 
 /**
  * 札幌地本イベントページのパーサー
@@ -56,10 +56,9 @@ function parseSapporoPage($, categoryHint, prefixId, state, sourceUrl = '') {
         dateStr  = `${gregFull[1]}-${padTwo(parseInt(gregFull[2], 10))}-${padTwo(parseInt(gregFull[3], 10))}`;
         weekday  = gregFull[4];
       } else if (monthOnly) {
-        const now   = new Date();
         const month = parseInt(monthOnly[1], 10);
         const day   = parseInt(monthOnly[2], 10);
-        const year  = now.getFullYear();
+        const year  = jstYear();
         dateStr = `${year}-${padTwo(month)}-${padTwo(day)}`;
         weekday = monthOnly[3];
       } else {

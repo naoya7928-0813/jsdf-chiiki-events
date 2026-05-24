@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo, titleHash } = require('./utils');
 
 const URL_MIYAZAKI = 'https://www.mod.go.jp/pco/miyazaki/event.html';
 
@@ -35,7 +35,7 @@ function parseMiyazaki($) {
     if (!dateStr || isPast(dateStr)) return;
 
     events.push({
-      id:             `mz-${dateStr.replace(/-/g, '')}-${events.length + 1}`,
+      id:             `mz-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, rawTitle.substring(0, 60))}`,
       pref:           'miyazaki',
       date:           dateStr,
       weekday,

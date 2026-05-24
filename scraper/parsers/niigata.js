@@ -1,12 +1,12 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, padTwo , titleHash } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, padTwo, jstYear, titleHash } = require('./utils');
 
 const BASE_URL = 'https://www.mod.go.jp/pco/niigata/HP/';
 
 /** MM月DD日 → ISO date string（年はスクレイピング時の西暦を使用、過去日は isPast() で除外）*/
 function inferDate(month, day) {
-  return `${new Date().getFullYear()}-${padTwo(month)}-${padTwo(day)}`;
+  return `${jstYear()}-${padTwo(month)}-${padTwo(day)}`;
 }
 
 /**

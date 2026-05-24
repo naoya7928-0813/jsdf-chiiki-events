@@ -29,14 +29,18 @@ function toHalfWidth(str) {
     .replace(/〜|～/g, '～'); // 波ダッシュを統一
 }
 
+/** 現在の JST 年（西暦）を返す */
+function jstYear() {
+  return Number(new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 4));
+}
+
 /**
- * ISO8601日付文字列が今日より過去かどうか判定
+ * ISO8601日付文字列が今日より過去かどうか判定（JST 基準）
  * 当日のイベントは表示する（isPast = false）
  */
 function isPast(dateStr) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return new Date(dateStr) < today;
+  const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+  return dateStr < today;
 }
 
 /**
@@ -147,4 +151,4 @@ function titleHash(date, title) {
   return (h >>> 0).toString(36).padStart(5, '0').slice(-5);
 }
 
-module.exports = { reiwaToAD, padTwo, toHalfWidth, isPast, guessCategory, guessTag, guessTags, calcWeekday, titleHash };
+module.exports = { reiwaToAD, padTwo, toHalfWidth, jstYear, isPast, guessCategory, guessTag, guessTags, calcWeekday, titleHash };

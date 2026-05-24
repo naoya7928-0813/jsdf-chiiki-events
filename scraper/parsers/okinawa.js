@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, padTwo, titleHash } = require('./utils');
 
 const URL_OKINAWA = 'https://www.mod.go.jp/pco/okinawa/event.html';
 
@@ -29,7 +29,7 @@ function parseOkinawa($) {
     if (isPast(dateStr)) return;
 
     events.push({
-      id:             `on-${dateStr.replace(/-/g, '')}-${events.length + 1}`,
+      id:             `on-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, rawTitle.substring(0, 60))}`,
       pref:           'okinawa',
       date:           dateStr,
       weekday:        '',

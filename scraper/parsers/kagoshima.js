@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo, titleHash } = require('./utils');
 
 const URL_KAGOSHIMA = 'https://www.mod.go.jp/pco/kagoshima/event/index.html';
 
@@ -44,7 +44,7 @@ function parseKagoshima($) {
     if (!title || !dateStr || isPast(dateStr)) return;
 
     events.push({
-      id:             `ks-${dateStr.replace(/-/g, '')}-${events.length + 1}`,
+      id:             `ks-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
       pref:           'kagoshima',
       date:           dateStr,
       weekday,
