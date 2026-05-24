@@ -1,6 +1,6 @@
-'use strict';
+﻿'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, padTwo , titleHash } = require('./utils');
 
 /**
  * 宮城地本トップページパーサー

@@ -1,6 +1,6 @@
-'use strict';
+﻿'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo , titleHash } = require('./utils');
 
 const BASE_URL = 'https://www.mod.go.jp/pco/tokyo/event2/';
 

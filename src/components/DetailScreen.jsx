@@ -157,9 +157,20 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 11, opacity: 0.65, fontFamily: F.mono, letterSpacing: 1 }}>TIME</div>
-              <div style={{ fontSize: 15, fontFamily: F.mono, fontWeight: 500, marginTop: 2 }}>
-                {ev.time || '時間未定'}
-              </div>
+              {ev.time ? (
+                <div style={{ fontSize: 15, fontFamily: F.mono, fontWeight: 500, marginTop: 2 }}>
+                  {ev.time}
+                </div>
+              ) : (
+                <div style={{ marginTop: 2 }}>
+                  <div style={{ fontSize: 14, fontFamily: F.mono, fontWeight: 500, color: 'rgba(255,255,255,0.6)' }}>
+                    時間未定
+                  </div>
+                  <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', marginTop: 2, lineHeight: 1.5 }}>
+                    公式ページでご確認ください
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

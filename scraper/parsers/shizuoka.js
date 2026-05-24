@@ -1,6 +1,6 @@
-'use strict';
+﻿'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo , titleHash } = require('./utils');
 
 /**
  * 静岡地本イベントページのパーサー

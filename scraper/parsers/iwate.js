@@ -1,6 +1,6 @@
-'use strict';
+﻿'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, padTwo , titleHash } = require('./utils');
 
 // PDF・画像ファイル名から場所名へのマッピング
 const PLACE_MAP = {

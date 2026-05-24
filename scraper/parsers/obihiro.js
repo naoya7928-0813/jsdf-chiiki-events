@@ -1,6 +1,6 @@
-'use strict';
+﻿'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, padTwo , titleHash } = require('./utils');
 
 /** MM月DD日 → ISO date（年はスクレイピング時の西暦を使用、過去日は isPast() で除外）*/
 function inferDate(month, day) {
