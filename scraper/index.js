@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 'use strict';
 
 // scraper/.env から環境変数を読み込む（SITE_URL, NOTIFY_SECRET）
@@ -263,7 +263,7 @@ async function ocrImage(imageUrl) {
     const mimeType = (imgRes.headers.get('content-type') || 'image/jpeg').split(';')[0].trim();
 
     const apiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method:  'POST',
         headers: { 'content-type': 'application/json' },
@@ -341,7 +341,7 @@ async function ocrPdf(pdfUrl) {
     const base64 = Buffer.from(buf).toString('base64');
 
     const apiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method:  'POST',
         headers: { 'content-type': 'application/json' },
@@ -446,7 +446,7 @@ async function ocrImageFull(imageUrl) {
     const base64   = Buffer.from(buf).toString('base64');
     const mimeType = (imgRes.headers.get('content-type') || 'image/jpeg').split(';')[0].trim();
     const apiRes   = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method:  'POST',
         headers: { 'content-type': 'application/json' },
