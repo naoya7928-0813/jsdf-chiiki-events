@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 'use strict';
 
 // scraper/.env 縺九ｉ迺ｰ蠅・､画焚繧定ｪｭ縺ｿ霎ｼ繧・・ITE_URL, NOTIFY_SECRET・・require('dotenv').config({ path: require('path').join(__dirname, '.env') });
