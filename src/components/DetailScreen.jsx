@@ -5,7 +5,8 @@ import { REGION_HQ, REGION_SOURCE } from '../config';
 
 export default function DetailScreen({ event, onBack, theme, favorites, applied, onToggleFavorite, onToggleApplied }) {
   // ── フック（Rules of Hooks: 早期 return の前に宣言する） ─────────
-  const [copied, setCopied] = useState(false);
+  const [copied,    setCopied]    = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
 
   // ev が null のときは空文字で代替（実運用では null になることはない）
   const ev = event;
@@ -427,64 +428,98 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
           {targetUrl && ICO.extLink('#fff', 14)}
         </button>
 
-        {/* シェアボタン行 */}
-        <div style={{ display: 'flex', gap: 8 }}>
-          {/* X でシェア */}
-          <a
-            href={xShareUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="X でシェア"
-            style={{
-              flex: 1, height: 42, borderRadius: 8,
-              background: '#000', color: '#fff',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-              textDecoration: 'none', fontSize: 12, fontWeight: 700, fontFamily: F.sans,
-              letterSpacing: 0.3,
-            }}
-          >
-            {ICO.twitterX('#fff', 14)}
-            <span>X</span>
-          </a>
-
-          {/* LINE でシェア */}
-          <a
-            href={lineShareUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="LINE でシェア"
-            style={{
-              flex: 1, height: 42, borderRadius: 8,
-              background: '#06C755', color: '#fff',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-              textDecoration: 'none', fontSize: 12, fontWeight: 700, fontFamily: F.sans,
-              letterSpacing: 0.3,
-            }}
-          >
-            {ICO.lineApp('#fff', 15)}
-            <span>LINE</span>
-          </a>
-
-          {/* リンクをコピー */}
+        {/* 共有エリア：「このイベントを共有」ボタン → 展開して手段を選択 */}
+        {!shareOpen ? (
           <button
-            onClick={handleCopy}
-            aria-label="リンクをコピー"
+            onClick={() => setShareOpen(true)}
+            aria-label="このイベントを共有"
             style={{
-              flex: 1, height: 42, borderRadius: 8, border: '1px solid var(--border)',
-              background: copied ? `${primary}18` : 'var(--tag-bg)',
-              color: copied ? primary : 'var(--text-muted)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-              fontSize: 11, fontWeight: 600, fontFamily: F.sans,
-              cursor: 'pointer', transition: 'background 0.2s, color 0.2s',
-              letterSpacing: 0.2,
+              width: '100%', height: 42, borderRadius: 8,
+              border: `1px solid var(--border)`,
+              background: 'var(--tag-bg)', color: 'var(--text)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+              fontSize: 13, fontWeight: 600, fontFamily: F.sans, cursor: 'pointer',
             }}
           >
-            {copied
-              ? <>{ICO.check(primary, 12)} コピー済</>
-              : <>{ICO.copy('var(--text-muted)', 13)} コピー</>
-            }
+            {ICO.share('var(--text-muted)', 14)} このイベントを共有
           </button>
-        </div>
+        ) : (
+          <div>
+            {/* 共有方法の選択ラベル＋閉じるボタン */}
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              marginBottom: 7,
+            }}>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: F.sans }}>
+                共有方法を選択してください
+              </span>
+              <button
+                onClick={() => setShareOpen(false)}
+                aria-label="共有メニューを閉じる"
+                style={{
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  fontSize: 11, color: 'var(--text-muted)', fontFamily: F.sans, padding: '2px 4px',
+                }}
+              >
+                閉じる
+              </button>
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {/* X (旧Twitter) でシェア */}
+              <a
+                href={xShareUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="X (旧Twitter) でシェア"
+                style={{
+                  flex: 1, height: 42, borderRadius: 8,
+                  background: '#000', color: '#fff',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+                  textDecoration: 'none', fontSize: 11, fontWeight: 700, fontFamily: F.sans,
+                }}
+              >
+                {ICO.twitterX('#fff', 13)}
+                <span>X でシェア</span>
+              </a>
+
+              {/* LINE で送る */}
+              <a
+                href={lineShareUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LINE で送る"
+                style={{
+                  flex: 1, height: 42, borderRadius: 8,
+                  background: '#06C755', color: '#fff',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+                  textDecoration: 'none', fontSize: 11, fontWeight: 700, fontFamily: F.sans,
+                }}
+              >
+                {ICO.lineApp('#fff', 14)}
+                <span>LINE で送る</span>
+              </a>
+
+              {/* URLをコピー */}
+              <button
+                onClick={handleCopy}
+                aria-label="URLをコピー"
+                style={{
+                  flex: 1, height: 42, borderRadius: 8, border: '1px solid var(--border)',
+                  background: copied ? `${primary}18` : 'var(--tag-bg)',
+                  color: copied ? primary : 'var(--text-muted)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+                  fontSize: 11, fontWeight: 600, fontFamily: F.sans,
+                  cursor: 'pointer', transition: 'background 0.2s, color 0.2s',
+                }}
+              >
+                {copied
+                  ? <>{ICO.check(primary, 12)} コピー済</>
+                  : <>{ICO.copy('var(--text-muted)', 13)} URLをコピー</>
+                }
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
