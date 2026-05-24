@@ -4,7 +4,35 @@ import { Emblem, F, splitDate, SectionTitle, iconBtnStyle } from './Shared';
 import { REGION_HQ, REGION_SOURCE } from '../config';
 
 export default function DetailScreen({ event, onBack, theme, favorites, applied, onToggleFavorite, onToggleApplied }) {
+  // ── フック（Rules of Hooks: 早期 return の前に宣言する） ─────────
+  const [copied, setCopied] = useState(false);
+
+  // ev が null のときは空文字で代替（実運用では null になることはない）
   const ev = event;
+  const shareUrl  = ev?.url || window.location.origin;
+  const dateStr   = ev ? (ev.endDate ? `${ev.date}〜${ev.endDate}` : ev.date) : '';
+
+  // ネイティブシェア（Web Share API）
+  const handleNativeShare = useCallback(() => {
+    if (!ev) return;
+    navigator.share({
+      title: ev.title,
+      text: `${ev.title}\n📅 ${dateStr}　📍 ${ev.place}`,
+      url: shareUrl,
+    }).catch(() => {});
+  }, [ev, dateStr, shareUrl]);
+
+  // クリップボードコピー
+  const handleCopy = useCallback(() => {
+    if (!ev) return;
+    const text = `${ev.title}\n📅 ${dateStr}\n📍 ${ev.place}\n${shareUrl}`;
+    navigator.clipboard?.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2200);
+    });
+  }, [ev, dateStr, shareUrl]);
+
+  // ── 早期リターン（ev が null の場合：通常は発生しない） ──────────
   if (!ev) return null;
 
   const starred    = favorites.has(ev.id);
@@ -15,38 +43,13 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
   const isOngoing = !!(ev.endDate && ev.date < todayStr);
   const { primary, accent } = theme;
 
-  // ── シェア ──────────────────────────────────────────────────
-  const [copied, setCopied] = useState(false);
-
-  // 共有URL: イベント個別ページ > アプリURL
-  const shareUrl = ev.url || window.location.origin;
-
   // 共有テキスト（X の280字制限に配慮して簡潔に）
-  const dateStr   = ev.endDate ? `${ev.date}〜${ev.endDate}` : ev.date;
   const shareText = `【自衛隊イベント情報】\n${ev.title}\n📅 ${dateStr}\n📍 ${ev.place}\n#自衛隊 #地本イベント`;
 
   // X (Twitter) シェアURL
   const xShareUrl   = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
   // LINE シェアURL
   const lineShareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(`${shareText}\n${shareUrl}`)}`;
-
-  // ネイティブシェア（Web Share API）
-  const handleNativeShare = useCallback(() => {
-    navigator.share({
-      title: ev.title,
-      text: `${ev.title}\n📅 ${dateStr}　📍 ${ev.place}`,
-      url: shareUrl,
-    }).catch(() => {});
-  }, [ev, dateStr, shareUrl]);
-
-  // クリップボードコピー
-  const handleCopy = useCallback(() => {
-    const text = `${ev.title}\n📅 ${dateStr}\n📍 ${ev.place}\n${shareUrl}`;
-    navigator.clipboard?.writeText(text).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2200);
-    });
-  }, [ev, dateStr, shareUrl]);
 
   // pref フィールド優先。旧イベント（pref なし）は ID プレフィックスで判別
   const regionKey = ev.pref

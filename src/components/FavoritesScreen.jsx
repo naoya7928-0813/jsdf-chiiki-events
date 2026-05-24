@@ -68,6 +68,7 @@ export default function FavoritesScreen({
                 ev={ev}
                 primary={primary}
                 accent={accent}
+                applied={applied}
                 onTap={onOpenDetail}
               />
             ))}
@@ -89,7 +90,7 @@ export default function FavoritesScreen({
 }
 
 // ─── お気に入りカード（ListScreen と同形式） ─────────────────
-function FavCard({ ev, primary, accent, onTap }) {
+function FavCard({ ev, primary, accent, applied, onTap }) {
   const { m, d }  = splitDate(ev.date);
   const endSplit  = ev.endDate ? splitDate(ev.endDate) : null;
   const isWeekend = /[土日祝]/.test(ev.weekday);
