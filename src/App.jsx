@@ -81,6 +81,7 @@ export default function App() {
   // 地図から地域画面へ遷移
   const openRegion = useCallback((regionId) => {
     if (regionId) {
+      setMapRegionId(regionId);           // RegionScreen に正しい regionId を確実に渡す
       saveLastRegion(regionId, activePrefId);
       setScreen('region');
     } else {

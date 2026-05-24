@@ -28,8 +28,20 @@ export default function RegionScreen({
 
   if (!region) {
     return (
-      <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{
+        height: '100%', display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        background: 'var(--bg)',
+      }}>
         <div style={{ color: 'var(--text-muted)', fontSize: 14 }}>地域が見つかりません</div>
+        <button
+          onClick={onBack}
+          style={{
+            marginTop: 16, padding: '8px 20px', borderRadius: 8, border: 'none',
+            background: 'var(--border)', color: 'var(--text)', fontSize: 13,
+            cursor: 'pointer', fontFamily: F.sans,
+          }}
+        >ホームに戻る</button>
       </div>
     );
   }
