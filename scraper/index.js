@@ -968,6 +968,7 @@ async function fetchHyogo(context) {
   for (const imgUrl of imageUrls) {
     console.log(`[兵庫 OCR] ${imgUrl}`);
     const ocr = await ocrImageFull(imgUrl);
+    await sleep(4500);
     if (!ocr) continue;
 
     const rawDate = toHalfWidth((ocr.date || '').replace(/\s+/g, ' ').trim());
@@ -1015,8 +1016,6 @@ async function fetchHyogo(context) {
       deadline:       ocr.deadline       || null,
       imageUrl:       '',
     });
-
-    await sleep(4500);
   }
 
   console.log(`[兵庫] ${events.length} 件取得 (OCR)`);
@@ -1071,6 +1070,7 @@ async function fetchTochigi(context) {
   for (const imgUrl of imageUrls) {
     console.log(`[栃木 OCR] ${imgUrl}`);
     const ocr = await ocrImageFull(imgUrl);
+    await sleep(4500);
     if (!ocr) continue;
 
     const rawDate = toHalfWidth((ocr.date || '').replace(/\s+/g, ' ').trim());
@@ -1104,8 +1104,6 @@ async function fetchTochigi(context) {
       deadline:       ocr.deadline       || null,
       imageUrl:       '',  // OCR 済みのため再処理不要
     });
-
-    await sleep(4500);
   }
 
   console.log(`[栃木] ${events.length} 件取得 (OCR)`);
@@ -1160,6 +1158,7 @@ async function fetchToyama(context) {
   for (const imgUrl of imageUrls) {
     console.log(`[富山 OCR] ${imgUrl}`);
     const ocr = await ocrImageFull(imgUrl);
+    await sleep(4500);
     if (!ocr) continue;
 
     const rawDate = toHalfWidth((ocr.date || '').replace(/\s+/g, ' ').trim());
@@ -1190,8 +1189,6 @@ async function fetchToyama(context) {
       deadline:       ocr.deadline       || null,
       imageUrl:       '',
     });
-
-    await sleep(4500);
   }
 
   console.log(`[富山] ${events.length} 件取得 (OCR)`);
