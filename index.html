@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>自衛隊地本イベント情報</title>
-    <meta name="description" content="全国の自衛隊地方協力本部（地本）が開催する説明会・記念行事・体験イベントなどの情報をまとめて確認できるアプリです。" />
+    <title>自衛隊地方協力本部（地本）イベント情報 – 全国の説明会・記念行事・体験イベントまとめ【非公式】</title>
+    <meta name="description" content="全国の自衛隊地方協力本部（地本）が公開するイベントをまとめた非公式サービスです。陸・海・空自衛隊の説明会・記念行事・駐屯地一般公開・体験搭乗など都道府県別に掲載。参加・申込の最新情報は各地本の公式ページをご確認ください。" />
+    <meta name="keywords" content="自衛隊 イベント,地方協力本部,地本,自衛隊説明会,駐屯地 一般公開,自衛隊記念行事,体験搭乗,陸上自衛隊,海上自衛隊,航空自衛隊,自衛官募集,自衛隊 体験,記念行事,自衛隊 お祭り" />
     <meta name="robots" content="index, follow" />
 
     <!-- PWA: Apple -->
@@ -17,8 +18,8 @@
     <meta name="theme-color" content="#0b2545" />
 
     <!-- OGP -->
-    <meta property="og:title" content="自衛隊地本イベント情報" />
-    <meta property="og:description" content="全国の自衛隊地方協力本部（地本）のイベント情報を一覧表示。説明会・記念行事・体験イベントなど。" />
+    <meta property="og:title" content="自衛隊地方協力本部（地本）イベント情報【非公式まとめ】" />
+    <meta property="og:description" content="全国の自衛隊地方協力本部（地本）のイベントをまとめた非公式サービス。説明会・記念行事・駐屯地一般公開・体験搭乗など都道府県別に掲載。" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://jsdf-chiiki-events.vercel.app/" />
     <meta property="og:image" content="https://jsdf-chiiki-events.vercel.app/icons/icon-512.png" />
@@ -27,9 +28,39 @@
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="自衛隊地本イベント情報" />
-    <meta name="twitter:description" content="全国の自衛隊地方協力本部（地本）のイベント情報を一覧表示。説明会・記念行事・体験イベントなど。" />
+    <meta name="twitter:title" content="自衛隊地本イベント情報【非公式まとめ】" />
+    <meta name="twitter:description" content="全国の自衛隊地方協力本部（地本）のイベントをまとめた非公式サービス。説明会・記念行事・駐屯地一般公開・体験搭乗など。" />
     <meta name="twitter:image" content="https://jsdf-chiiki-events.vercel.app/icons/icon-512.png" />
+
+    <!-- JSON-LD 構造化データ（WebSite / WebApplication） -->
+    <script type="application/ld+json">
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "自衛隊地本イベント情報",
+        "alternateName": "自衛隊地方協力本部イベント情報",
+        "url": "https://jsdf-chiiki-events.vercel.app/",
+        "description": "全国の自衛隊地方協力本部（地本）が公開するイベントをまとめた非公式サービス",
+        "inLanguage": "ja",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://jsdf-chiiki-events.vercel.app/"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "自衛隊地本イベント情報",
+        "url": "https://jsdf-chiiki-events.vercel.app/",
+        "description": "全国の自衛隊地方協力本部（地本）が公開するイベントをまとめた非公式PWAアプリ。説明会・記念行事・駐屯地一般公開・体験搭乗など都道府県別に掲載。",
+        "applicationCategory": "NewsApplication",
+        "operatingSystem": "Web",
+        "inLanguage": "ja",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" }
+      }
+    ]
+    </script>
 
     <!-- フォント -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -42,9 +73,19 @@
   <body>
     <div id="root"></div>
     <noscript>
-      <p>このアプリはJavaScriptが必要です。</p>
-      <p>イベント一覧（テキスト版）：<a href="/events.html">自衛隊地本イベント一覧</a></p>
-      <p>データ（JSON）：<a href="/data/events.json">events.json</a></p>
+      <div style="font-family:sans-serif;max-width:600px;margin:20px auto;padding:16px;line-height:1.7">
+        <h1 style="font-size:1.3em">自衛隊地方協力本部（地本）イベント情報</h1>
+        <p>全国の自衛隊地方協力本部が公開するイベントをまとめた非公式サービスです。<br>このページの表示にはJavaScriptが必要です。</p>
+        <p><strong>以下のリンクからイベント情報をご覧いただけます：</strong></p>
+        <ul>
+          <li><a href="/events.html">全国イベント一覧（静的HTML版）</a></li>
+          <li><a href="/events/tokyo.html">東京地方協力本部 イベント一覧</a></li>
+          <li><a href="/events/sapporo.html">札幌地方協力本部 イベント一覧</a></li>
+          <li><a href="/events/miyagi.html">宮城地方協力本部 イベント一覧</a></li>
+          <li><a href="/data/events.json">開発者向けJSONデータ</a></li>
+        </ul>
+        <p style="font-size:0.85em;color:#666">当サイトは有志による非公式サイトです。防衛省・自衛隊および各地方協力本部とは直接関係ありません。</p>
+      </div>
     </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>

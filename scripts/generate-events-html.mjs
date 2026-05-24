@@ -127,7 +127,7 @@ function renderRows(events) {
       ev.place    ? ` ／ 会場：${esc(ev.place)}`    : '',
       ev.deadline ? ` ／ 締切：${esc(ev.deadline)}`  : '',
       ev.tag && ev.tag !== '応募終了' ? ` ／ ${esc(ev.tag)}` : '',
-      ev.url ? ` ／ <a href="${esc(ev.url)}" rel="noopener">詳細</a>` : '',
+      ev.url ? ` ／ <a href="${esc(ev.url)}" target="_blank" rel="noopener noreferrer">公式ページで確認</a>` : '',
       `</li>`,
     ].join('');
   }).join('\n      ');
@@ -156,8 +156,9 @@ const mainHtml = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>自衛隊地本イベント一覧 | 全国の自衛隊地方協力本部イベント情報</title>
-  <meta name="description" content="全国の自衛隊地方協力本部（地本）が開催する予定のイベント情報一覧です。説明会・記念行事・体験イベントなど ${allEvents.length} 件を掲載。" />
+  <title>自衛隊地方協力本部（地本）イベント一覧 | 全国の説明会・記念行事・体験イベント【非公式まとめ】</title>
+  <meta name="description" content="全国の自衛隊地方協力本部（地本）が公開するイベントをまとめた非公式サービスです。陸・海・空自衛隊の説明会・記念行事・駐屯地一般公開・体験搭乗など ${allEvents.length} 件を掲載（${esc(updatedAt)} 更新）。" />
+  <meta name="keywords" content="自衛隊 イベント,地方協力本部,地本,自衛隊説明会,駐屯地 一般公開,自衛隊記念行事,体験搭乗,陸上自衛隊,海上自衛隊,航空自衛隊,自衛官募集,自衛隊 体験,記念行事" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="${SITE_URL}/events.html" />
   <meta property="og:title" content="自衛隊地本イベント一覧" />
@@ -184,11 +185,17 @@ ${allJsonLd}
   </style>
 </head>
 <body>
-  <h1>自衛隊地方協力本部 イベント一覧</h1>
+  <h1>自衛隊地方協力本部（地本）イベント一覧</h1>
+  <p>全国の自衛隊地方協力本部が公開するイベントをまとめた非公式サービスです。
+  陸上・海上・航空自衛隊の説明会、記念行事、駐屯地・基地の一般公開、体験搭乗など各種イベントを都道府県別に掲載しています。</p>
   <p class="meta">
-    データ更新日時：${esc(updatedAt)}　／　合計 ${allEvents.length} 件<br />
-    アプリ版：<a href="${SITE_URL}/">${SITE_URL}/</a><br />
-    JSONデータ：<a href="${SITE_URL}/data/events.json">/data/events.json</a>
+    最終更新：${esc(updatedAt)}　／　全 ${allEvents.length} 件掲載<br />
+    アプリ版（PWA）：<a href="${SITE_URL}/">${SITE_URL}/</a><br />
+    開発者向けJSONデータ：<a href="${SITE_URL}/data/events.json">/data/events.json</a>
+  </p>
+  <p class="meta" style="border:1px solid #ccc;border-radius:4px;padding:8px 12px;background:#fffbe6">
+    ⚠️ 当サイトは有志による非公式サイトです。防衛省・自衛隊および各地方協力本部とは直接関係ありません。<br />
+    参加・申込・中止・変更などの最新情報は、必ず各地方協力本部の公式ページでご確認ください。
   </p>
 
 ${sections}
@@ -222,8 +229,9 @@ for (const [prefKey, prefLabel] of Object.entries(PREF_LABELS)) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${esc(prefLabel)}地方協力本部 イベント一覧 | 自衛隊地本イベント情報</title>
-  <meta name="description" content="${esc(prefLabel)}地方協力本部が開催する自衛隊イベント情報。説明会・体験イベント・一般公開など ${events.length} 件を掲載（${esc(updatedAt)} 更新）。" />
+  <title>${esc(prefLabel)}地方協力本部 イベント一覧 | 自衛隊地本イベント情報【非公式まとめ】</title>
+  <meta name="description" content="${esc(prefLabel)}地方協力本部が公開する自衛隊イベント情報。説明会・体験イベント・駐屯地一般公開・記念行事など ${events.length} 件を掲載（${esc(updatedAt)} 更新）。" />
+  <meta name="keywords" content="${esc(prefLabel)},${esc(prefLabel)}地方協力本部,自衛隊 ${esc(prefLabel)},自衛隊イベント ${esc(prefLabel)},地本,説明会,記念行事,駐屯地 一般公開,体験搭乗,自衛官募集" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="${SITE_URL}/events/${prefKey}.html" />
   <meta property="og:title" content="${esc(prefLabel)}地方協力本部 イベント一覧" />
@@ -250,11 +258,10 @@ ${prefJsonLd}
   </style>
 </head>
 <body>
-  <nav><a href="/events.html">← 全国一覧に戻る</a>　／　<a href="/">アプリ版</a></nav>
+  <nav><a href="/events.html">← 全国一覧に戻る</a>　／　<a href="/">アプリ版（PWA）</a></nav>
   <h1>${esc(prefLabel)}地方協力本部 イベント一覧</h1>
-  <p class="meta">
-    データ更新日時：${esc(updatedAt)}　／　${events.length} 件
-  </p>
+  <p>${esc(prefLabel)}地方協力本部が公開する自衛隊イベント情報のまとめです（非公式サービス）。</p>
+  <p class="meta">最終更新：${esc(updatedAt)}　／　${events.length} 件掲載</p>
   <ul>
     ${renderRows(events)}
   </ul>
