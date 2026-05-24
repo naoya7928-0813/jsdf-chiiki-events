@@ -59,11 +59,13 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
   const hq        = REGION_HQ[regionKey]    ?? REGION_HQ['tokyo'];
   const source    = REGION_SOURCE[regionKey] ?? REGION_SOURCE['tokyo'];
 
-  // 地図クエリ: address がある場合のみ地図表示する
-  // address なしで place だけだと Google Maps がズームアウトして全世界表示になるため
-  const hasAddress = !!(ev.address && ev.address.trim());
-  const mapQuery   = encodeURIComponent(`${ev.place} ${ev.address ?? ''}`);
-  const mapSrc     = `https://maps.google.com/maps?q=${mapQuery}&output=embed&hl=ja&z=15`;
+  // 地図クエリ: place が取れていれば表示（address があれば精度向上）
+  // place だけでも固有名詞（基地名・会場名）は Google Maps で正確に特定できる
+  const hasLocation = !!(ev.place && ev.place.trim());
+  const mapQuery    = encodeURIComponent(
+    [ev.place, ev.address].filter(Boolean).join(' ')
+  );
+  const mapSrc      = `https://maps.google.com/maps?q=${mapQuery}&output=embed&hl=ja&z=15`;
 
   // 個別URL → なければ地本公式サイト にフォールバック
   const targetUrl = ev.url || source?.url || '';
@@ -191,8 +193,8 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
             {ev.address && (
               <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>{ev.address}</div>
             )}
-            {/* インライン地図 — address がある場合のみ表示 */}
-            {hasAddress ? (
+            {/* インライン地図 — place が取れていれば表示 */}
+            {hasLocation ? (
               <>
                 <div style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid var(--border)', height: 200, position: 'relative', background: 'var(--card)' }}>
                   {/* 読み込み中フォールバック */}
@@ -231,7 +233,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
                 </a>
               </>
             ) : (
-              /* address なし：プレースホルダーを表示 */
+              /* place も空：プレースホルダーを表示 */
               <div style={{
                 borderRadius: 8, border: '1px solid var(--border)',
                 background: 'var(--bg)',
@@ -241,7 +243,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
                 {ICO.pin('var(--text-muted)', 28)}
                 <div>
                   <div style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>
-                    住所情報がありません
+                    場所情報がありません
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.7 }}>
                     詳細な開催場所は公式ページをご確認ください
