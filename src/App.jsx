@@ -58,7 +58,8 @@ export default function App() {
   const [legalDoc,    setLegalDoc]    = useState(null);
 
   // 地図で選択中の地域ID（null = 未選択）
-  const [mapRegionId,  setMapRegionId]  = useState(loadLastMapRegion);
+  // 起動時は常に未選択（前回セッションの選択を引き継がない）
+  const [mapRegionId,  setMapRegionId]  = useState(null);
   // RegionScreen で選択中の都道府県ID
   const [activePrefId, setActivePrefId] = useState(loadLastPrefId);
 
