@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 
 const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo , titleHash } = require('./utils');
 
