@@ -24,11 +24,12 @@ function filterPastEvents(rawData, today) {
   return out;
 }
 
-/** 現在時刻を "YYYY/MM/DD HH:mm" 形式で返す */
+/** 現在時刻を "YYYY/MM/DD HH:mm" 形式で返す（JST 固定） */
 function fmtNow() {
   return new Date().toLocaleString('ja-JP', {
     year: 'numeric', month: '2-digit', day: '2-digit',
     hour: '2-digit', minute: '2-digit',
+    timeZone: 'Asia/Tokyo',
   }).replace(',', '');
 }
 

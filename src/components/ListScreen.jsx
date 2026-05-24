@@ -163,6 +163,7 @@ export default function ListScreen({
   // updatedAt: スクレイパーがデータを書いた時刻（JSON内）
   const checkedLabel = checkedAt ?? updatedAt ?? new Date().toLocaleString('ja-JP', {
     year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit',
+    timeZone: 'Asia/Tokyo',
   }).replace(',', '');
 
   // 更新ボタンの回転アニメーション（spin は main.jsx で定義済み）
