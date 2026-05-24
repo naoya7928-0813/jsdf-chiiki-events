@@ -1,15 +1,17 @@
 #!/usr/bin/env node
 'use strict';
 
-// scraper/.env 縺九ｉ迺ｰ蠅・､画焚繧定ｪｭ縺ｿ霎ｼ繧・・ITE_URL, NOTIFY_SECRET・・require('dotenv').config({ path: require('path').join(__dirname, '.env') });
+// scraper/.env から環境変数を読み込む（SITE_URL, NOTIFY_SECRET）
+require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 
 /**
- * 閾ｪ陦幃嚏蝨ｰ譛ｬ繧､繝吶Φ繝域ュ蝣ｱ繧ｹ繧ｯ繝ｬ繧､繝代・
+ * 自衛隊地本イベント情報スクレイパー
  *
- * 菴ｿ縺・婿:
- *   node scraper/index.js          # 螳滄圀縺ｮ繧ｵ繧､繝医°繧峨せ繧ｯ繝ｬ繧､繝斐Φ繧ｰ
- *   node scraper/index.js --mock   # 繝｢繝・け繝・・繧ｿ繧貞・蜉幢ｼ・TTP繧｢繧ｯ繧ｻ繧ｹ縺ｪ縺暦ｼ・ *
- * 蜃ｺ蜉・ public/data/events.json
+ * 使い方:
+ *   node scraper/index.js          # 実際のサイトからスクレイピング
+ *   node scraper/index.js --mock   # モックデータを出力（HTTPアクセスなし）
+ *
+ * 出力: public/data/events.json
  */
 
 const path    = require('path');
@@ -28,19 +30,19 @@ const { parseGunma }         = require('./parsers/gunma');
 const { parseIbaraki }       = require('./parsers/ibaraki');
 const { parseChiba }         = require('./parsers/chiba');
 const { parseTochigiImages } = require('./parsers/tochigi');
-// 蛹玲ｵｷ驕灘慍譛ｬ
+// 北海道地本
 const { parseSapporoPage }   = require('./parsers/sapporo');
 const { parseAsahikawa }     = require('./parsers/asahikawa');
 const { parseObihiro }       = require('./parsers/obihiro');
 const { parseHakodate }      = require('./parsers/hakodate');
-// 譚ｱ蛹怜慍譛ｬ
+// 東北地本
 const { parseMiyagi }        = require('./parsers/miyagi');
 const { parseAomori }        = require('./parsers/aomori');
 const { parseIwate }         = require('./parsers/iwate');
 const { parseYamagata }      = require('./parsers/yamagata');
 const { parseFukushima }     = require('./parsers/fukushima');
 const { parseAkita }         = require('./parsers/akita');
-// 荳ｭ驛ｨ蝨ｰ譛ｬ
+// 中部地本
 const { parseNiigata }       = require('./parsers/niigata');
 const { parseIshikawa }      = require('./parsers/ishikawa');
 const { parseFukui }         = require('./parsers/fukui');
@@ -50,7 +52,7 @@ const { parseAichi, parseAichiDetail } = require('./parsers/aichi');
 const { parseShizuoka }      = require('./parsers/shizuoka');
 const { parseToyamaImages }  = require('./parsers/toyama');
 const { parseNagano }        = require('./parsers/nagano');
-// 霑醍柄蝨ｰ譛ｬ
+// 近畿地本
 const { parseKyoto }                          = require('./parsers/kyoto');
 const { parseOsaka }                          = require('./parsers/osaka');
 const { parseHyogoImages }                    = require('./parsers/hyogo');
@@ -58,18 +60,18 @@ const { parseMiePost,      parseMiePostUrls }      = require('./parsers/mie');
 const { parseShigaPost,    parseShigaPostUrls }    = require('./parsers/shiga');
 const { parseNaraPost,     parseNaraPostUrls }     = require('./parsers/nara');
 const { parseWakayamaPost, parseWakayamaPostUrls } = require('./parsers/wakayama');
-// 蝗帛嵜蝨ｰ譛ｬ
+// 四国地本
 const { parseEhime }     = require('./parsers/ehime');
 const { parseKagawa }    = require('./parsers/kagawa');
 const { parseKochi }     = require('./parsers/kochi');
 const { parseTokushima } = require('./parsers/tokushima');
-// 荳ｭ蝗ｽ蝨ｰ譛ｬ
+// 中国地本
 const { parseTottori }   = require('./parsers/tottori');
 const { parseShimane }   = require('./parsers/shimane');
 const { parseOkayama }   = require('./parsers/okayama');
 const { parseHiroshima } = require('./parsers/hiroshima');
 const { parseYamaguchi } = require('./parsers/yamaguchi');
-// 荵晏ｷ槭・豐也ｸ・慍譛ｬ
+// 九州・沖縄地本
 const { parseFukuoka }   = require('./parsers/fukuoka');
 const { parseSaga }      = require('./parsers/saga');
 const { parseNagasaki }  = require('./parsers/nagasaki');
@@ -80,18 +82,19 @@ const { parseKagoshima } = require('./parsers/kagoshima');
 const { parseOkinawa }   = require('./parsers/okinawa');
 const { toHalfWidth, reiwaToAD, padTwo, isPast, guessCategory, guessTag, calcWeekday, titleHash } = require('./parsers/utils');
 
-// 笏笏 險ｭ螳・笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+// ── 設定 ─────────────────────────────────────────────────────
 const OUTPUT_PATH = path.join(__dirname, '../public/data/events.json');
 
 const URLS = {
-  // 蛹玲ｵｷ驕灘慍譛ｬ・域惆蟷後・隍・焚繧ｵ繝悶・繝ｼ繧ｸ・・  sapporo_station:  'https://www.mod.go.jp/pco/sapporo/event_station.html',
+  // 北海道地本（札幌は複数サブページ）
+  sapporo_station:  'https://www.mod.go.jp/pco/sapporo/event_station.html',
   sapporo_naval:    'https://www.mod.go.jp/pco/sapporo/event_naval.html',
   sapporo_concert:  'https://www.mod.go.jp/pco/sapporo/event_concert.html',
   sapporo_other:    'https://www.mod.go.jp/pco/sapporo/event_other.html',
   asahikawa:        'https://www.mod.go.jp/pco/asahikawa/event.html',
   obihiro:          'https://www.mod.go.jp/pco/obihiro/topics_event.html',
   hakodate:         'https://www.mod.go.jp/pco/hakodate/publicity/',
-  // 譚ｱ蛹怜慍譛ｬ
+  // 東北地本
   miyagi:           'https://www.mod.go.jp/pco/miyagi/',
   aomori:           'https://www.mod.go.jp/pco/aomori/',
   iwate:            'https://www.mod.go.jp/pco/iwate/event/index.html',
@@ -99,7 +102,7 @@ const URLS = {
   fukushima:        'https://www.mod.go.jp/pco/fukushima/pr/event.html',
   akita_ical1:      'https://calendar.google.com/calendar/ical/3n2esbei0vm8qte2chsohavldc%40group.calendar.google.com/public/basic.ics',
   akita_ical2:      'https://calendar.google.com/calendar/ical/fnqjg3qoglr6iorbinvgjban7k%40group.calendar.google.com/public/basic.ics',
-  // 髢｢譚ｱ蝨ｰ譛ｬ
+  // 関東地本
   kanagawa:  'https://www.mod.go.jp/pco/kanagawa/kouho/event/event.html',
   tokyo:     'https://www.mod.go.jp/pco/tokyo/event2/index.html',
   saitama:   'https://www.mod.go.jp/pco/saitama/event/',
@@ -107,7 +110,7 @@ const URLS = {
   tochigi:   'https://www.mod.go.jp/pco/tochigi/',
   ibaraki:   'https://www.mod.go.jp/pco/ibaraki/event.html',
   chiba:     'https://www.mod.go.jp/pco/chiba/event.html',
-  // 荳ｭ驛ｨ蝨ｰ譛ｬ
+  // 中部地本
   niigata:   'https://www.mod.go.jp/pco/niigata/HP/event-schedule.html',
   toyama:    'https://www.mod.go.jp/pco/toyama/content/04-event/04-event.html',
   ishikawa:  'https://www.mod.go.jp/pco/ishikawa/event29/index.html',
@@ -117,7 +120,7 @@ const URLS = {
   gifu:      'https://www.mod.go.jp/pco/gifu/event/event.html',
   shizuoka:  'https://www.mod.go.jp/pco/sizuoka/event/index.html',
   aichi:     'https://www.mod.go.jp/pco/aichi/calendar.html',
-  // 霑醍柄蝨ｰ譛ｬ
+  // 近畿地本
   mie:       'https://www.mod.go.jp/pco/mie/events-page/',
   shiga:     'https://www.mod.go.jp/pco/shiga/event-briefing/',
   kyoto:     'https://www.mod.go.jp/pco/kyoto/kouhoushitsu/index.html',
@@ -125,18 +128,18 @@ const URLS = {
   hyogo:     'https://www.mod.go.jp/pco/hyogo/',
   nara:      'https://www.mod.go.jp/pco/nara/events/',
   wakayama:  'https://www.mod.go.jp/pco/wakayama/category/event/',
-  // 蝗帛嵜蝨ｰ譛ｬ
+  // 四国地本
   ehime:     'https://www.mod.go.jp/pco/ehime/event.html',
   kagawa:    'https://www.mod.go.jp/pco/kagawa/event.html',
   kochi:     'https://www.mod.go.jp/pco/kochi/event_info.html',
   tokushima: 'https://www.mod.go.jp/pco/tokushima/event.html',
-  // 荳ｭ蝗ｽ蝨ｰ譛ｬ
+  // 中国地本
   tottori:   'https://www.mod.go.jp/pco/tottori/content/02-event/event.html',
   shimane:   'https://www.mod.go.jp/pco/shimane/event/event.html',
   okayama:   'https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html',
   hiroshima: 'https://www.mod.go.jp/pco/hiroshima/events/',
   yamaguchi: 'https://www.mod.go.jp/pco/yamaguchi/event.html',
-  // 荵晏ｷ槭・豐也ｸ・慍譛ｬ
+  // 九州・沖縄地本
   fukuoka:   'https://www.mod.go.jp/pco/fukuoka/event/index.html',
   saga:      'https://www.mod.go.jp/pco/saga/event/index.html',
   nagasaki:  'https://www.mod.go.jp/pco/nagasaki/event/index.html',
@@ -147,31 +150,32 @@ const URLS = {
   okinawa:   'https://www.mod.go.jp/pco/okinawa/event.html',
 };
 
-// 繝壹・繧ｸ髢薙・蠕・ｩ滓凾髢難ｼ・loudflare/繝ｬ繝ｼ繝医Μ繝溘ャ繝亥ｯｾ遲厄ｼ・const BETWEEN_PAGES_MS = 10_000;
+// ページ間の待機時間（Cloudflare/レートリミット対策）
+const BETWEEN_PAGES_MS = 10_000;
 
-// 笏笏 繝｢繝・け繝・・繧ｿ・・-mock 譎ゅ↓菴ｿ逕ｨ・・笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+// ── モックデータ（--mock 時に使用） ───────────────────────────
 const MOCK_DATA = {
   kanagawa: [
-    { id: 'k-20260425-1', date: '2026-04-25', weekday: '蝨・, title: '閾ｪ陦帛ｮ伜呵｣懃函 蜍滄寔隱ｬ譏惹ｼ・, place: '讓ｪ豬懷慍蝓滉ｺ句漁謇', address: '讓ｪ豬懷ｸゆｸｭ蛹ｺ螻ｱ荳狗伴1-2', time: '13:30・・5:30', category: '隱ｬ譏惹ｼ・, tag: '隕∽ｺ育ｴ・, url: '', notes: '蜿ょ刈縺ｫ縺ｯ莠句燕莠育ｴ・′蠢・ｦ√〒縺吶・ },
-    { id: 'k-20260429-1', date: '2026-04-29', weekday: '豌ｴ繝ｻ逾・, title: '讓ｪ鬆郁ｳ蝨ｰ譁ｹ邱冗屮驛ｨ 荳闊ｬ蜈ｬ髢・, place: '豬ｷ荳願・陦幃嚏 讓ｪ鬆郁ｳ蝓ｺ蝨ｰ', address: '讓ｪ鬆郁ｳ蟶り･ｿ騾ｸ隕狗伴1荳∫岼', time: '09:00・・6:00', category: '荳闊ｬ蜈ｬ髢・, tag: '蜈･蝣ｴ辟｡譁・, url: '', notes: null },
-    { id: 'k-20260505-1', date: '2026-05-05', weekday: '轣ｫ繝ｻ逾・, title: '蟄舌←繧り・陦幃嚏菴馴ｨ薙ョ繝ｼ', place: '髯ｸ荳願・陦幃嚏 豁ｦ螻ｱ鬧仙ｱｯ蝨ｰ', address: '讓ｪ鬆郁ｳ蟶ょｾ｡蟷ｸ豬・-1', time: '10:00・・5:00', category: '菴馴ｨ・, tag: '螳ｶ譌丞髄縺・, url: '', notes: null },
+    { id: 'k-20260425-1', date: '2026-04-25', weekday: '土', title: '自衛官候補生 募集説明会', place: '横浜地域事務所', address: '横浜市中区山下町1-2', time: '13:30～15:30', category: '説明会', tag: '要予約', url: '', notes: '参加には事前予約が必要です。' },
+    { id: 'k-20260429-1', date: '2026-04-29', weekday: '水・祝', title: '横須賀地方総監部 一般公開', place: '海上自衛隊 横須賀基地', address: '横須賀市西逸見町1丁目', time: '09:00～16:00', category: '一般公開', tag: '入場無料', url: '', notes: null },
+    { id: 'k-20260505-1', date: '2026-05-05', weekday: '火・祝', title: '子ども自衛隊体験デー', place: '陸上自衛隊 武山駐屯地', address: '横須賀市御幸浜1-1', time: '10:00～15:00', category: '体験', tag: '家族向け', url: '', notes: null },
   ],
   tokyo: [
-    { id: 't-20260426-1', date: '2026-04-26', weekday: '譌･', title: '閾ｪ陦帛ｮ伜呵｣懃函 謗｡逕ｨ隧ｦ鬨楢ｪｬ譏惹ｼ・, place: '蟶ゅΩ隹ｷ鬧仙ｱｯ蝨ｰ 蜴夂函繧ｻ繝ｳ繧ｿ繝ｼ', address: '譁ｰ螳ｿ蛹ｺ蟶りｰｷ譛ｬ譚醍伴5-1', time: '10:00・・2:00', category: '隱ｬ譏惹ｼ・, tag: '隕∽ｺ育ｴ・, url: '', notes: null },
-    { id: 't-20260502-1', date: '2026-05-02', weekday: '蝨・, title: '邱ｴ鬥ｬ鬧仙ｱｯ蝨ｰ 蜑ｵ遶玖ｨ伜ｿｵ陦御ｺ・, place: '髯ｸ荳願・陦幃嚏 邱ｴ鬥ｬ鬧仙ｱｯ蝨ｰ', address: '邱ｴ鬥ｬ蛹ｺ蛹礼伴4-1-1', time: '09:00・・5:00', category: '險伜ｿｵ陦御ｺ・, tag: '蜈･蝣ｴ辟｡譁・, url: '', notes: null },
+    { id: 't-20260426-1', date: '2026-04-26', weekday: '日', title: '自衛官候補生 採用試験説明会', place: '市ヶ谷駐屯地 厚生センター', address: '新宿区市谷本村町5-1', time: '10:00～12:00', category: '説明会', tag: '要予約', url: '', notes: null },
+    { id: 't-20260502-1', date: '2026-05-02', weekday: '土', title: '練馬駐屯地 創立記念行事', place: '陸上自衛隊 練馬駐屯地', address: '練馬区北町4-1-1', time: '09:00～15:00', category: '記念行事', tag: '入場無料', url: '', notes: null },
   ],
   saitama: [
-    { id: 's-20260519-1', pref: 'saitama', date: '2026-05-19', weekday: '轣ｫ', title: '髯ｸ荳願・陦幃嚏 譛晞悚鬧仙ｱｯ蝨ｰ 隕句ｭｦ莨・, place: '髯ｸ荳願・陦幃嚏 譛晞悚鬧仙ｱｯ蝨ｰ', address: '', time: '10:00・・2:00', category: '隕句ｭｦ', tag: '隕∽ｺ育ｴ・, url: '', notes: null },
+    { id: 's-20260519-1', pref: 'saitama', date: '2026-05-19', weekday: '火', title: '陸上自衛隊 朝霞駐屯地 見学会', place: '陸上自衛隊 朝霞駐屯地', address: '', time: '10:00～12:00', category: '見学', tag: '要予約', url: '', notes: null },
   ],
   gunma: [
-    { id: 'gu-20260601-1', pref: 'gunma', date: '2026-06-01', weekday: '譛・, title: '髯ｸ荳願・陦幃嚏 逶ｸ鬥ｬ蜴滄ｧ仙ｱｯ蝨ｰ 隕句ｭｦ莨・, place: '逶ｸ鬥ｬ蜴滄ｧ仙ｱｯ蝨ｰ', address: '', time: '10:00・・2:00', category: '隕句ｭｦ', tag: '隕∽ｺ育ｴ・, url: '', notes: null },
+    { id: 'gu-20260601-1', pref: 'gunma', date: '2026-06-01', weekday: '月', title: '陸上自衛隊 相馬原駐屯地 見学会', place: '相馬原駐屯地', address: '', time: '10:00～12:00', category: '見学', tag: '要予約', url: '', notes: null },
   ],
   tochigi:   [],
   ibaraki: [
-    { id: 'ib-20260601-1', pref: 'ibaraki', date: '2026-06-01', weekday: '譛・, title: '蝨滓ｵｦ鬧仙ｱｯ蝨ｰ 隕句ｭｦ莨・, place: '髯ｸ荳願・陦幃嚏 蝨滓ｵｦ鬧仙ｱｯ蝨ｰ', address: '', time: '10:00・・2:00', category: '隕句ｭｦ', tag: '隕∽ｺ育ｴ・, url: '', notes: null },
+    { id: 'ib-20260601-1', pref: 'ibaraki', date: '2026-06-01', weekday: '月', title: '土浦駐屯地 見学会', place: '陸上自衛隊 土浦駐屯地', address: '', time: '10:00～12:00', category: '見学', tag: '要予約', url: '', notes: null },
   ],
   chiba: [
-    { id: 'cb-20260601-1', pref: 'chiba', date: '2026-06-01', weekday: '譛・, title: '鄙貞ｿ鈴㍽鬧仙ｱｯ蝨ｰ 隕句ｭｦ莨・, place: '髯ｸ荳願・陦幃嚏 鄙貞ｿ鈴㍽鬧仙ｱｯ蝨ｰ', address: '', time: '10:00・・2:00', category: '隕句ｭｦ', tag: '隕∽ｺ育ｴ・, url: '', notes: null },
+    { id: 'cb-20260601-1', pref: 'chiba', date: '2026-06-01', weekday: '月', title: '習志野駐屯地 見学会', place: '陸上自衛隊 習志野駐屯地', address: '', time: '10:00～12:00', category: '見学', tag: '要予約', url: '', notes: null },
   ],
   sapporo:   [],
   asahikawa: [],
@@ -192,7 +196,7 @@ const MOCK_DATA = {
   gifu:      [],
   shizuoka:  [],
   aichi:     [],
-  // 霑醍柄蝨ｰ譛ｬ
+  // 近畿地本
   mie:       [],
   shiga:     [],
   kyoto:     [],
@@ -200,18 +204,18 @@ const MOCK_DATA = {
   hyogo:     [],
   nara:      [],
   wakayama:  [],
-  // 蝗帛嵜蝨ｰ譛ｬ
+  // 四国地本
   ehime:     [],
   kagawa:    [],
   kochi:     [],
   tokushima: [],
-  // 荳ｭ蝗ｽ蝨ｰ譛ｬ
+  // 中国地本
   tottori:   [],
   shimane:   [],
   okayama:   [],
   hiroshima: [],
   yamaguchi: [],
-  // 荵晏ｷ槭・豐也ｸ・慍譛ｬ
+  // 九州・沖縄地本
   fukuoka:   [],
   saga:      [],
   nagasaki:  [],
@@ -222,19 +226,23 @@ const MOCK_DATA = {
   okinawa:   [],
 };
 
-// 笏笏 OCR・・laude Haiku 縺ｫ繧医ｋ逕ｻ蜒剰ｧ｣譫撰ｼ・笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+// ── OCR（Claude Haiku による画像解析） ─────────────────────────
 
-const OCR_PROMPT = `縺薙・閾ｪ陦幃嚏繧､繝吶Φ繝医・繝昴せ繧ｿ繝ｼ逕ｻ蜒上°繧画ュ蝣ｱ繧呈歓蜃ｺ縺励※縺上□縺輔＞縲・莉･荳九・JSON縺ｮ縺ｿ繧定ｿ斐＠縺ｦ縺上□縺輔＞・郁ｪｬ譏取枚荳崎ｦ・ｼ峨りｩｲ蠖捺ュ蝣ｱ縺後↑縺・・岼縺ｯnull縺ｫ縺励※縺上□縺輔＞縲・{
-  "title": "繝昴せ繧ｿ繝ｼ縺ｫ譖ｸ縺九ｌ縺滓ｭ｣遒ｺ縺ｪ繧､繝吶Φ繝亥錐",
-  "time": "髢句ぎ譎る俣・井ｾ・ 10:00・・6:00・・,
-  "ageRequirement": "蜿ょ刈雉・ｼ繝ｻ蟇ｾ雎｡閠・ｒ邁｡貎斐↓・井ｾ・ 荳ｭ蟄ｦ逕滉ｻ･荳・3豁ｳ譛ｪ貅縲∵律譛ｬ蝗ｽ邀阪ｒ譛峨☆繧区婿・・,
-  "deadline": "蠢懷供邱蛻・律・井ｾ・ 4譛・4譌･・磯≡・会ｼ・,
-  "notes": "螳壼藤繝ｻ謚ｽ驕ｸ譛臥┌繝ｻ豕ｨ諢丈ｺ矩・↑縺ｩ驥崎ｦ∽ｺ矩・・縺ｿ50譁・ｭ嶺ｻ･蜀・〒邁｡貎斐↓",
-  "url": "逕ｻ蜒丞・縺ｮQR繧ｳ繝ｼ繝峨′謖・☆URL・・R繧ｳ繝ｼ繝峨′縺ｪ縺代ｌ縺ｰnull・・
+const OCR_PROMPT = `この自衛隊イベントのポスター画像から情報を抽出してください。
+以下のJSONのみを返してください（説明文不要）。該当情報がない項目はnullにしてください。
+{
+  "title": "ポスターに書かれた正確なイベント名",
+  "time": "開催時間（例: 10:00～16:00）",
+  "ageRequirement": "参加資格・対象者を簡潔に（例: 中学生以上33歳未満、日本国籍を有する方）",
+  "deadline": "応募締切日（例: 4月24日（金））",
+  "notes": "定員・抽選有無・注意事項など重要事項のみ50文字以内で簡潔に",
+  "url": "画像内のQRコードが指すURL（QRコードがなければnull）"
 }`;
 
 /**
- * 繝昴せ繧ｿ繝ｼ逕ｻ蜒酋RL繧貞女縺大叙繧翫；emini Flash 縺ｧOCR縺励※JSON 繧定ｿ斐☆縲・ * GEMINI_API_KEY 縺梧悴險ｭ螳壹・蝣ｴ蜷医・ null 繧定ｿ斐☆・・CR繧ｹ繧ｭ繝・・・峨・ */
+ * ポスター画像URLを受け取り、Gemini Flash でOCRしてJSON を返す。
+ * GEMINI_API_KEY が未設定の場合は null を返す（OCRスキップ）。
+ */
 async function ocrImage(imageUrl) {
   if (!process.env.GEMINI_API_KEY || !imageUrl) return null;
 
@@ -246,7 +254,7 @@ async function ocrImage(imageUrl) {
       },
     });
     if (!imgRes.ok) {
-      console.warn(`[OCR] 逕ｻ蜒丞叙蠕怜､ｱ謨・(${imgRes.status}): ${imageUrl}`);
+      console.warn(`[OCR] 画像取得失敗 (${imgRes.status}): ${imageUrl}`);
       return null;
     }
 
@@ -271,7 +279,7 @@ async function ocrImage(imageUrl) {
 
     if (!apiRes.ok) {
       const errText = await apiRes.text();
-      console.warn(`[OCR] API 繧ｨ繝ｩ繝ｼ (${apiRes.status}): ${errText.slice(0, 100)}`);
+      console.warn(`[OCR] API エラー (${apiRes.status}): ${errText.slice(0, 100)}`);
       return null;
     }
 
@@ -282,31 +290,38 @@ async function ocrImage(imageUrl) {
     return JSON.parse(jsonMatch[0]);
 
   } catch (err) {
-    console.warn(`[OCR] ${imageUrl} 竊・${err.message}`);
+    console.warn(`[OCR] ${imageUrl} → ${err.message}`);
     return null;
   }
 }
 
 /**
- * OCR 縺ｧ逕溘§繧・☆縺・ｪ､隱崎ｭ倥ｒ菫ｮ豁｣縺吶ｋ縲・ * 驢・竊・隨ｬ・育判謨ｰ縺瑚ｿ代￥豺ｷ蜷後＆繧後ｄ縺吶＞・・ */
+ * OCR で生じやすい誤認識を修正する。
+ * 醍 → 第（画数が近く混同されやすい）
+ */
 function fixOcrTitle(title) {
   if (!title) return title;
-  return title.replace(/驢・g, '隨ｬ');
+  return title.replace(/醍/g, '第');
 }
 
-// 笏笏 PDF OCR・・DF 邉ｻ蝨ｰ譛ｬ縺ｮ讓呎ｺ悶ヱ繧ｿ繝ｼ繝ｳ・・笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
-// PDF 驕句霧蝨ｰ譛ｬ・亥ｲｩ謇九・髱呈｣ｮ縺ｪ縺ｩ・峨↓菴ｿ逕ｨ縲Ｆv.url 縺・.pdf 縺ｮ繧､繝吶Φ繝医ｒ蟇ｾ雎｡縺ｫ縺吶ｋ縲・
-const PDF_OCR_PROMPT = `縺薙・閾ｪ陦幃嚏繧､繝吶Φ繝医・PDF縺九ｉ諠・ｱ繧呈歓蜃ｺ縺励※縺上□縺輔＞縲・莉･荳九・JSON縺ｮ縺ｿ繧定ｿ斐＠縺ｦ縺上□縺輔＞・郁ｪｬ譏取枚荳崎ｦ・ｼ峨りｩｲ蠖捺ュ蝣ｱ縺後↑縺・・岼縺ｯnull縺ｫ縺励※縺上□縺輔＞縲・{
-  "title": "PDF縺ｫ譖ｸ縺九ｌ縺滓ｭ｣遒ｺ縺ｪ繧､繝吶Φ繝亥錐",
-  "place": "髢句ぎ蝣ｴ謇繝ｻ莨壼ｴ蜷搾ｼ域命險ｭ蜷阪・菴乗園縺ｪ縺ｩ・・,
-  "time": "髢句ぎ譎る俣・井ｾ・ 10:00・・6:00・・,
-  "ageRequirement": "蜿ょ刈雉・ｼ繝ｻ蟇ｾ雎｡閠・ｒ邁｡貎斐↓・井ｾ・ 18豁ｳ縲・2豁ｳ譛ｪ貅縲∵律譛ｬ蝗ｽ邀阪ｒ譛峨☆繧区婿・・,
-  "deadline": "蠢懷供邱蛻・律・井ｾ・ 4譛・4譌･・磯≡・会ｼ・,
-  "notes": "螳壼藤繝ｻ謚ｽ驕ｸ譛臥┌繝ｻ豕ｨ諢丈ｺ矩・↑縺ｩ驥崎ｦ∽ｺ矩・・縺ｿ50譁・ｭ嶺ｻ･蜀・〒邁｡貎斐↓"
+// ── PDF OCR（PDF 系地本の標準パターン） ────────────────────────
+// PDF 運営地本（岩手・青森など）に使用。ev.url が .pdf のイベントを対象にする。
+
+const PDF_OCR_PROMPT = `この自衛隊イベントのPDFから情報を抽出してください。
+以下のJSONのみを返してください（説明文不要）。該当情報がない項目はnullにしてください。
+{
+  "title": "PDFに書かれた正確なイベント名",
+  "place": "開催場所・会場名（施設名・住所など）",
+  "time": "開催時間（例: 10:00～16:00）",
+  "ageRequirement": "参加資格・対象者を簡潔に（例: 18歳〜32歳未満、日本国籍を有する方）",
+  "deadline": "応募締切日（例: 4月24日（金））",
+  "notes": "定員・抽選有無・注意事項など重要事項のみ50文字以内で簡潔に"
 }`;
 
 /**
- * PDF URL 繧貞女縺大叙繧翫；emini Flash 縺ｧ OCR 縺励※ JSON 繧定ｿ斐☆縲・ * GEMINI_API_KEY 縺梧悴險ｭ螳壹・蝣ｴ蜷医・ null 繧定ｿ斐☆・・CR 繧ｹ繧ｭ繝・・・峨・ */
+ * PDF URL を受け取り、Gemini Flash で OCR して JSON を返す。
+ * GEMINI_API_KEY が未設定の場合は null を返す（OCR スキップ）。
+ */
 async function ocrPdf(pdfUrl) {
   if (!process.env.GEMINI_API_KEY || !pdfUrl) return null;
 
@@ -318,7 +333,7 @@ async function ocrPdf(pdfUrl) {
       },
     });
     if (!pdfRes.ok) {
-      console.warn(`[PDF-OCR] PDF蜿門ｾ怜､ｱ謨・(${pdfRes.status}): ${pdfUrl}`);
+      console.warn(`[PDF-OCR] PDF取得失敗 (${pdfRes.status}): ${pdfUrl}`);
       return null;
     }
 
@@ -342,7 +357,7 @@ async function ocrPdf(pdfUrl) {
 
     if (!apiRes.ok) {
       const errText = await apiRes.text();
-      console.warn(`[PDF-OCR] API 繧ｨ繝ｩ繝ｼ (${apiRes.status}): ${errText.slice(0, 100)}`);
+      console.warn(`[PDF-OCR] API エラー (${apiRes.status}): ${errText.slice(0, 100)}`);
       return null;
     }
 
@@ -353,23 +368,26 @@ async function ocrPdf(pdfUrl) {
     return JSON.parse(jsonMatch[0]);
 
   } catch (err) {
-    console.warn(`[PDF-OCR] ${pdfUrl} 竊・${err.message}`);
+    console.warn(`[PDF-OCR] ${pdfUrl} → ${err.message}`);
     return null;
   }
 }
 
 /**
- * ev.url 縺・.pdf 縺ｧ邨ゅｏ繧九う繝吶Φ繝医↓蟇ｾ縺励※ PDF OCR 繧貞ｮ溯｡後＠
- * 繧ｿ繧､繝医Ν繝ｻ蝣ｴ謇繝ｻ譎る俣遲峨ｒ陬懷ｮ後＠縺ｦ霑斐☆縲・ *
- * PDF 驕句霧蝨ｰ譛ｬ・亥ｲｩ謇九・髱呈｣ｮ縺ｪ縺ｩ・峨・讓呎ｺ・OCR 繝代ち繝ｼ繝ｳ縲・ * 譁ｰ縺溘↓ PDF 邉ｻ蝨ｰ譛ｬ繧定ｿｽ蜉縺吶ｋ髫帙・縺薙・髢｢謨ｰ繧・main() 縺九ｉ蜻ｼ縺ｶ縺薙→縲・ */
+ * ev.url が .pdf で終わるイベントに対して PDF OCR を実行し
+ * タイトル・場所・時間等を補完して返す。
+ *
+ * PDF 運営地本（岩手・青森など）の標準 OCR パターン。
+ * 新たに PDF 系地本を追加する際はこの関数を main() から呼ぶこと。
+ */
 async function enrichWithPdfOcr(events) {
   if (!process.env.GEMINI_API_KEY) {
-    console.log('[PDF-OCR] GEMINI_API_KEY 譛ｪ險ｭ螳壹・縺溘ａ繧ｹ繧ｭ繝・・');
+    console.log('[PDF-OCR] GEMINI_API_KEY 未設定のためスキップ');
     return events;
   }
 
   const targets = events.filter(e => e.url && e.url.endsWith('.pdf'));
-  console.log(`[PDF-OCR] ${targets.length} 莉ｶ縺ｮ PDF 繧貞・逅・＠縺ｾ縺兪);
+  console.log(`[PDF-OCR] ${targets.length} 件の PDF を処理します`);
   const results = [];
 
   for (const ev of events) {
@@ -380,7 +398,7 @@ async function enrichWithPdfOcr(events) {
 
     console.log(`[PDF-OCR] ${ev.title} (${ev.date})`);
     const ocr = await ocrPdf(ev.url);
-    if (ocr) console.log(`  竊・title: ${ocr.title ?? '(螟画峩縺ｪ縺・'}, place: ${ocr.place ?? '(螟画峩縺ｪ縺・'}`);
+    if (ocr) console.log(`  → title: ${ocr.title ?? '(変更なし)'}, place: ${ocr.place ?? '(変更なし)'}`);
 
     results.push(ocr ? {
       ...ev,
@@ -398,19 +416,22 @@ async function enrichWithPdfOcr(events) {
   return results;
 }
 
-// 譬・惠蟆ら畑: 蜈ｨ繧､繝吶Φ繝域ュ蝣ｱ・域律莉倥・蝣ｴ謇蜷ｫ繧・峨ｒ逕ｻ蜒上°繧画歓蜃ｺ縺吶ｋ繝励Ο繝ｳ繝励ヨ
-const OCR_PROMPT_FULL = `縺薙・閾ｪ陦幃嚏繧､繝吶Φ繝医・繝昴せ繧ｿ繝ｼ逕ｻ蜒上°繧画ュ蝣ｱ繧呈歓蜃ｺ縺励※縺上□縺輔＞縲・莉･荳九・JSON縺ｮ縺ｿ繧定ｿ斐＠縺ｦ縺上□縺輔＞・郁ｪｬ譏取枚荳崎ｦ・ｼ峨りｩｲ蠖捺ュ蝣ｱ縺後↑縺・・岼縺ｯnull縺ｫ縺励※縺上□縺輔＞縲・{
-  "title": "繝昴せ繧ｿ繝ｼ縺ｫ譖ｸ縺九ｌ縺滓ｭ｣遒ｺ縺ｪ繧､繝吶Φ繝亥錐",
-  "date": "髢句ぎ譌･・医御ｻ､蜥傾蟷ｴY譛・譌･・域屆譌･・峨阪・蠖｢蠑上〒縲ゆｾ・ 莉､蜥・蟷ｴ5譛・9譌･・育↓・会ｼ・,
-  "place": "髢句ぎ蝣ｴ謇繝ｻ隕句ｭｦ蜈医・蜷咲ｧｰ",
-  "time": "髢句ぎ譎る俣・井ｾ・ 10:00・・6:00・・,
-  "ageRequirement": "蜿ょ刈雉・ｼ繝ｻ蟇ｾ雎｡閠・ｒ邁｡貎斐↓・井ｾ・ 荳ｭ蟄ｦ逕滉ｻ･荳・3豁ｳ譛ｪ貅縲∵律譛ｬ蝗ｽ邀阪ｒ譛峨☆繧区婿・・,
-  "deadline": "蠢懷供邱蛻・律・井ｾ・ 4譛・4譌･・磯≡・会ｼ・,
-  "notes": "螳壼藤繝ｻ謚ｽ驕ｸ譛臥┌繝ｻ豕ｨ諢丈ｺ矩・↑縺ｩ驥崎ｦ∽ｺ矩・・縺ｿ50譁・ｭ嶺ｻ･蜀・〒邁｡貎斐↓"
+// 栃木専用: 全イベント情報（日付・場所含む）を画像から抽出するプロンプト
+const OCR_PROMPT_FULL = `この自衛隊イベントのポスター画像から情報を抽出してください。
+以下のJSONのみを返してください（説明文不要）。該当情報がない項目はnullにしてください。
+{
+  "title": "ポスターに書かれた正確なイベント名",
+  "date": "開催日（「令和X年Y月Z日（曜日）」の形式で。例: 令和8年5月19日（火））",
+  "place": "開催場所・見学先の名称",
+  "time": "開催時間（例: 10:00～16:00）",
+  "ageRequirement": "参加資格・対象者を簡潔に（例: 中学生以上33歳未満、日本国籍を有する方）",
+  "deadline": "応募締切日（例: 4月24日（金））",
+  "notes": "定員・抽選有無・注意事項など重要事項のみ50文字以内で簡潔に"
 }`;
 
 /**
- * 逕ｻ蜒・1 譫壹°繧牙・繧､繝吶Φ繝域ュ蝣ｱ・域律莉倥・蝣ｴ謇蜷ｫ繧・峨ｒ OCR 縺吶ｋ・域・惠蟆ら畑・峨・ */
+ * 画像 1 枚から全イベント情報（日付・場所含む）を OCR する（栃木専用）。
+ */
 async function ocrImageFull(imageUrl) {
   if (!process.env.GEMINI_API_KEY || !imageUrl) return null;
   try {
@@ -420,7 +441,7 @@ async function ocrImageFull(imageUrl) {
         'Referer':    'https://www.mod.go.jp/',
       },
     });
-    if (!imgRes.ok) { console.warn(`[OCR-FULL] 逕ｻ蜒丞叙蠕怜､ｱ謨・(${imgRes.status}): ${imageUrl}`); return null; }
+    if (!imgRes.ok) { console.warn(`[OCR-FULL] 画像取得失敗 (${imgRes.status}): ${imageUrl}`); return null; }
     const buf      = await imgRes.arrayBuffer();
     const base64   = Buffer.from(buf).toString('base64');
     const mimeType = (imgRes.headers.get('content-type') || 'image/jpeg').split(';')[0].trim();
@@ -438,25 +459,27 @@ async function ocrImageFull(imageUrl) {
         }),
       }
     );
-    if (!apiRes.ok) { console.warn(`[OCR-FULL] API 繧ｨ繝ｩ繝ｼ (${apiRes.status})`); return null; }
+    if (!apiRes.ok) { console.warn(`[OCR-FULL] API エラー (${apiRes.status})`); return null; }
     const apiJson   = await apiRes.json();
     const text      = apiJson.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return null;
     return JSON.parse(jsonMatch[0]);
   } catch (err) {
-    console.warn(`[OCR-FULL] ${imageUrl} 竊・${err.message}`);
+    console.warn(`[OCR-FULL] ${imageUrl} → ${err.message}`);
     return null;
   }
 }
 
 /**
- * OCR邨先棡繧偵う繝吶Φ繝医が繝悶ず繧ｧ繧ｯ繝医↓繝槭・繧ｸ縺吶ｋ縲・ * - title: OCR 縺悟叙蠕励〒縺阪◆蝣ｴ蜷医・縺ｿ荳頑嶌縺・ * - ageRequirement / deadline: OCR 蜆ｪ蜈医∝・繝・・繧ｿ縺梧里縺ｫ縺ゅｌ縺ｰ菫晄戟
- * - notes: OCR 縺ｨ蜈・ョ繝ｼ繧ｿ繧堤ｵ仙粋
+ * OCR結果をイベントオブジェクトにマージする。
+ * - title: OCR が取得できた場合のみ上書き
+ * - ageRequirement / deadline: OCR 優先、元データが既にあれば保持
+ * - notes: OCR と元データを結合
  */
 function mergeOcr(ev, ocr) {
   if (!ocr) return ev;
-  // QR繧ｳ繝ｼ繝蔚RL縺ｯ譌｢蟄篭RL縺檎ｩｺ縺ｮ蝣ｴ蜷医・縺ｿ謗｡逕ｨ
+  // QRコードURLは既存URLが空の場合のみ採用
   const ocrUrl = (!ev.url && ocr.url && ocr.url.startsWith('http')) ? ocr.url.trim() : ev.url;
   return {
     ...ev,
@@ -469,28 +492,31 @@ function mergeOcr(ev, ocr) {
   };
 }
 
-/** URL 縺檎判蜒上ヵ繧｡繧､繝ｫ・・pg/jpeg/png/gif/webp・峨ｒ謖・＠縺ｦ縺・ｋ縺句愛螳・*/
+/** URL が画像ファイル（jpg/jpeg/png/gif/webp）を指しているか判定 */
 function isImageUrl(url) {
   if (!url) return false;
   return /\.(jpe?g|png|gif|webp)\s*$/i.test(url.split('?')[0].trimEnd());
 }
 
 /**
- * 繧､繝吶Φ繝磯・蛻励↓蟇ｾ縺励※鬆・分縺ｫ OCR 繧貞ｮ溯｡後＠縲∫ｵ先棡繧偵・繝ｼ繧ｸ縺励※霑斐☆縲・ * - ev.imageUrl 縺瑚ｨｭ螳壹＆繧後※縺・ｋ蝣ｴ蜷・ imageUrl 繧剃ｽｿ逕ｨ・・rl 縺ｯ縺昴・縺ｾ縺ｾ菫晄戟・・ * - ev.imageUrl 縺梧悴險ｭ螳壹〒 ev.url 縺檎判蜒上ヵ繧｡繧､繝ｫ縺ｮ蝣ｴ蜷・ url 繧堤判蜒上→縺励※菴ｿ逕ｨ縺励「rl 縺ｯ null 縺ｫ
- * 螟ｱ謨励＠縺溘う繝吶Φ繝医・蜈・ョ繝ｼ繧ｿ縺ｮ縺ｾ縺ｾ菫晄戟縺吶ｋ縲・ */
+ * イベント配列に対して順番に OCR を実行し、結果をマージして返す。
+ * - ev.imageUrl が設定されている場合: imageUrl を使用（url はそのまま保持）
+ * - ev.imageUrl が未設定で ev.url が画像ファイルの場合: url を画像として使用し、url は null に
+ * 失敗したイベントは元データのまま保持する。
+ */
 async function enrichWithOcr(events) {
   if (!process.env.GEMINI_API_KEY) {
-    console.log('[OCR] GEMINI_API_KEY 譛ｪ險ｭ螳壹・縺溘ａ繧ｹ繧ｭ繝・・');
+    console.log('[OCR] GEMINI_API_KEY 未設定のためスキップ');
     return events;
   }
 
   const targets = events.filter(e => e.imageUrl || isImageUrl(e.url));
   if (targets.length === 0) return events;
-  console.log(`[OCR] ${targets.length} 莉ｶ縺ｮ逕ｻ蜒上ｒ蜃ｦ逅・＠縺ｾ縺兪);
+  console.log(`[OCR] ${targets.length} 件の画像を処理します`);
   const results = [];
 
   for (const ev of events) {
-    // imageUrl 蜆ｪ蜈医ゅ↑縺代ｌ縺ｰ url 縺檎判蜒上ヵ繧｡繧､繝ｫ縺ｮ蝣ｴ蜷医↓菴ｿ逕ｨ
+    // imageUrl 優先。なければ url が画像ファイルの場合に使用
     const imgUrl = ev.imageUrl || (isImageUrl(ev.url) ? ev.url : null);
     if (!imgUrl) {
       results.push(ev);
@@ -499,9 +525,9 @@ async function enrichWithOcr(events) {
 
     console.log(`[OCR] ${ev.title} (${ev.date})`);
     const ocr = await ocrImage(imgUrl);
-    if (ocr) console.log(`  竊・deadline: ${ocr.deadline ?? '縺ｪ縺・}, age: ${ocr.ageRequirement ?? '縺ｪ縺・}`);
+    if (ocr) console.log(`  → deadline: ${ocr.deadline ?? 'なし'}, age: ${ocr.ageRequirement ?? 'なし'}`);
 
-    // url 縺檎判蜒上ヵ繧｡繧､繝ｫ逶ｴ繝ｪ繝ｳ繧ｯ縺縺｣縺溷ｴ蜷医・ null 縺ｫ縺励※蜈ｬ蠑上・繝ｼ繧ｸ縺ｨ縺励※髢九°繧後↑縺・ｈ縺・↓縺吶ｋ
+    // url が画像ファイル直リンクだった場合は null にして公式ページとして開かれないようにする
     const cleanUrl = ev.imageUrl ? ev.url : null;
     results.push({ ...mergeOcr(ev, ocr), url: cleanUrl });
 
@@ -511,9 +537,9 @@ async function enrichWithOcr(events) {
   return results;
 }
 
-// 笏笏 繝ｦ繝ｼ繝・ぅ繝ｪ繝・ぅ 笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+// ── ユーティリティ ────────────────────────────────────────────
 
-/** 迴ｾ蝨ｨ縺ｮ譌･譛ｬ譎る俣繧・"YYYY/MM/DD HH:mm" 蠖｢蠑上〒霑斐☆ */
+/** 現在の日本時間を "YYYY/MM/DD HH:mm" 形式で返す */
 function nowJST() {
   return new Date().toLocaleString('ja-JP', {
     timeZone: 'Asia/Tokyo',
@@ -522,21 +548,22 @@ function nowJST() {
   }).replace(/\//g, '/').replace(',', '');
 }
 
-/** 謖・ｮ壹Α繝ｪ遘貞ｾ・ｩ・*/
+/** 指定ミリ秒待機 */
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-/** Cloudflare 繝√Ε繝ｬ繝ｳ繧ｸ繝壹・繧ｸ縺九←縺・°繧貞愛螳・*/
+/** Cloudflare チャレンジページかどうかを判定 */
 function isChallengeTitle(title) {
-  return title.includes('縺励・繧峨￥縺雁ｾ・■縺上□縺輔＞')
+  return title.includes('しばらくお待ちください')
     || title.includes('Just a moment')
     || title.includes('Attention Required');
 }
 
-// 笏笏 Playwright 繝悶Λ繧ｦ繧ｶ險ｭ螳・笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+// ── Playwright ブラウザ設定 ──────────────────────────────────
 
 /**
- * Cloudflare 繝懊ャ繝域､懃衍繧貞屓驕ｿ縺吶ｋ縺溘ａ縺ｮ繧ｹ繝・Ν繧ｹ險ｭ螳壹ｒ譁ｽ縺励◆
- * Playwright 繝悶Λ繧ｦ繧ｶ繧ｳ繝ｳ繝・く繧ｹ繝医ｒ霑斐☆縲・ */
+ * Cloudflare ボット検知を回避するためのステルス設定を施した
+ * Playwright ブラウザコンテキストを返す。
+ */
 async function createStealthContext(browser) {
   const context = await browser.newContext({
     userAgent:  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
@@ -563,41 +590,43 @@ async function createStealthContext(browser) {
   return context;
 }
 
-// 笏笏 繧ｹ繧ｯ繝ｬ繧､繝斐Φ繧ｰ譛ｬ菴・笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+// ── スクレイピング本体 ───────────────────────────────────────
 
 /**
- * 逾槫･亥ｷ晏慍譛ｬ繝壹・繧ｸ繧貞叙蠕励・繝代・繧ｹ
- * Shift_JIS 繝壹・繧ｸ縺ｮ縺溘ａ縲√Ξ繧ｹ繝昴Φ繧ｹ繝舌う繝亥・繧・iconv-lite 縺ｧ繝・さ繝ｼ繝峨☆繧九・ */
+ * 神奈川地本ページを取得・パース
+ * Shift_JIS ページのため、レスポンスバイト列を iconv-lite でデコードする。
+ */
 async function fetchKanagawa(context) {
-  console.log(`[逾槫･亥ｷ拆 繧｢繧ｯ繧ｻ繧ｹ: ${URLS.kanagawa}`);
+  console.log(`[神奈川] アクセス: ${URLS.kanagawa}`);
 
-  // 笏笏 Playwright 縺ｧ隧ｦ縺ｿ繧具ｼ・loudflare 繝√Ε繝ｬ繝ｳ繧ｸ繧帝夐℃縺輔○繧具ｼ俄楳笏
+  // ── Playwright で試みる（Cloudflare チャレンジを通過させる）──
   const page = await context.newPage();
   try {
     await page.goto(URLS.kanagawa, {
-      waitUntil: 'networkidle',   // Cloudflare JS 繝√Ε繝ｬ繝ｳ繧ｸ螳御ｺ・∪縺ｧ蠕・▽
+      waitUntil: 'networkidle',   // Cloudflare JS チャレンジ完了まで待つ
       timeout:   60_000,
     });
 
-    // 繝√Ε繝ｬ繝ｳ繧ｸ蠕後・霑ｽ蜉蠕・ｩ・    await page.waitForTimeout(3000);
+    // チャレンジ後の追加待機
+    await page.waitForTimeout(3000);
 
     const html  = await page.content();
     const title = (html.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1] || '';
-    console.log(`[逾槫･亥ｷ拆 page title: ${title.trim().substring(0, 70)}`);
+    console.log(`[神奈川] page title: ${title.trim().substring(0, 70)}`);
 
     if (isChallengeTitle(title)) throw new Error(`Cloudflare challenge: ${title.trim()}`);
 
     const $ = cheerio.load(html, { decodeEntities: false });
     const events = parseKanagawa($);
-    console.log(`[逾槫･亥ｷ拆 ${events.length} 莉ｶ蜿門ｾ・(Playwright)`);
+    console.log(`[神奈川] ${events.length} 件取得 (Playwright)`);
     return events;
   } catch (err) {
-    console.warn(`[逾槫･亥ｷ拆 Playwright 螟ｱ謨・ ${err.message} 竊・fetch 縺ｫ繝輔か繝ｼ繝ｫ繝舌ャ繧ｯ`);
+    console.warn(`[神奈川] Playwright 失敗: ${err.message} → fetch にフォールバック`);
   } finally {
     await page.close();
   }
 
-  // 笏笏 native fetch + iconv 繝輔か繝ｼ繝ｫ繝舌ャ繧ｯ 笏笏
+  // ── native fetch + iconv フォールバック ──
   const res = await fetch(URLS.kanagawa, {
     headers: {
       'User-Agent':      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
@@ -611,35 +640,36 @@ async function fetchKanagawa(context) {
   const html   = iconv.decode(Buffer.from(buffer), 'Shift_JIS');
   const $ = cheerio.load(html, { decodeEntities: false });
   const events = parseKanagawa($);
-  console.log(`[逾槫･亥ｷ拆 ${events.length} 莉ｶ蜿門ｾ・(fetch fallback)`);
+  console.log(`[神奈川] ${events.length} 件取得 (fetch fallback)`);
   return events;
 }
 
 /**
- * 譚ｱ莠ｬ蝨ｰ譛ｬ繝壹・繧ｸ繧貞叙蠕励・繝代・繧ｹ
+ * 東京地本ページを取得・パース
  */
 async function fetchTokyo(context) {
-  return fetchHtmlPref(context, '譚ｱ莠ｬ', URLS.tokyo, parseTokyo);
+  return fetchHtmlPref(context, '東京', URLS.tokyo, parseTokyo);
 }
 
 /**
- * 蝓ｼ邇牙慍譛ｬ繝壹・繧ｸ繧貞叙蠕励・繝代・繧ｹ
+ * 埼玉地本ページを取得・パース
  */
 async function fetchSaitama(context) {
-  return fetchHtmlPref(context, '蝓ｼ邇・, URLS.saitama, parseSaitama);
+  return fetchHtmlPref(context, '埼玉', URLS.saitama, parseSaitama);
 }
 
-/** 蜈ｱ騾・ HTML 繝壹・繧ｸ繧・Playwright 竊・fetch 縺ｮ鬆・〒蜿門ｾ励＠縺ｦ繝代・繧ｵ繝ｼ縺ｫ貂｡縺・*/
+/** 共通: HTML ページを Playwright → fetch の順で取得してパーサーに渡す */
 async function fetchHtmlPref(context, prefLabel, url, parserFn) {
-  console.log(`[${prefLabel}] 繧｢繧ｯ繧ｻ繧ｹ: ${url}`);
+  console.log(`[${prefLabel}] アクセス: ${url}`);
   const page = await context.newPage();
   try {
-    // domcontentloaded: HTML 蜿門ｾ怜ｾ後☆縺舌↓ waitForFunction 縺ｧ繝√Ε繝ｬ繝ｳ繧ｸ隗｣豎ｺ繧貞ｾ・▽
-    // 竊・隗｣豎ｺ縺ｧ縺阪↑縺代ｌ縺ｰ 30 遘偵〒繧ｿ繧､繝繧｢繧ｦ繝医＠縺ｦ繝輔か繝ｼ繝ｫ繝舌ャ繧ｯ縺ｫ遘ｻ陦鯉ｼ育ｴ譌ｩ縺・､ｱ謨暦ｼ・    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+    // domcontentloaded: HTML 取得後すぐに waitForFunction でチャレンジ解決を待つ
+    // → 解決できなければ 30 秒でタイムアウトしてフォールバックに移行（素早い失敗）
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
 
-    // Cloudflare 繝√Ε繝ｬ繝ｳ繧ｸ繝壹・繧ｸ・郁恭隱槭・譌･譛ｬ隱橸ｼ峨・繧ｿ繧､繝医Ν縺梧ｶ医∴繧九∪縺ｧ譛螟ｧ 90 遘貞ｾ・▽
-    // 逾槫･亥ｷ昴・ cf_clearance 繧ｯ繝・く繝ｼ縺悟酔荳繧ｳ繝ｳ繝・く繧ｹ繝医〒蠑輔″邯吶′繧後ｋ縺溘ａ
-    // 蠕檎ｶ壹・繝ｼ繧ｸ縺ｮ繝√Ε繝ｬ繝ｳ繧ｸ繧・90 遘剃ｻ･蜀・↓遯∫ｴ縺ｧ縺阪ｋ
+    // Cloudflare チャレンジページ（英語・日本語）のタイトルが消えるまで最大 90 秒待つ
+    // 神奈川の cf_clearance クッキーが同一コンテキストで引き継がれるため
+    // 後続ページのチャレンジも 90 秒以内に突破できる
     try {
       await page.waitForFunction(
         () => {
@@ -647,11 +677,11 @@ async function fetchHtmlPref(context, prefLabel, url, parserFn) {
           return t.length > 0
             && !t.includes('Just a moment')
             && !t.includes('Attention Required')
-            && !t.includes('縺励・繧峨￥縺雁ｾ・■縺上□縺輔＞');
+            && !t.includes('しばらくお待ちください');
         },
         { timeout: 90_000 }
       );
-    } catch { /* 繝√Ε繝ｬ繝ｳ繧ｸ縺ｪ縺・or 繧ｿ繧､繝繧｢繧ｦ繝・竊・縺昴・縺ｾ縺ｾ邯夊｡・*/ }
+    } catch { /* チャレンジなし or タイムアウト → そのまま続行 */ }
 
     await page.waitForTimeout(2000);
 
@@ -659,7 +689,7 @@ async function fetchHtmlPref(context, prefLabel, url, parserFn) {
     const title = (html.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1] || '(no title)';
     console.log(`[${prefLabel}] page title: ${title.trim().substring(0, 70)}`);
 
-    // 繝√Ε繝ｬ繝ｳ繧ｸ繝壹・繧ｸ縺ｮ縺ｾ縺ｾ縺ｪ繧牙燕蝗槭ョ繝ｼ繧ｿ菫晄戟縺ｮ縺溘ａ繧ｨ繝ｩ繝ｼ繧呈兜縺偵ｋ
+    // チャレンジページのままなら前回データ保持のためエラーを投げる
     if (isChallengeTitle(title)) throw new Error(`Cloudflare challenge: ${title.trim()}`);
 
     const $      = cheerio.load(html, { decodeEntities: false });
@@ -667,10 +697,10 @@ async function fetchHtmlPref(context, prefLabel, url, parserFn) {
     const postH3 = $('div.post h3').length;
     console.log(`[${prefLabel}] selectors: section.subSec=${subSec} div.post-h3=${postH3}`);
     const events = parserFn($);
-    console.log(`[${prefLabel}] ${events.length} 莉ｶ蜿門ｾ・(Playwright)`);
+    console.log(`[${prefLabel}] ${events.length} 件取得 (Playwright)`);
     return events;
   } catch (err) {
-    console.warn(`[${prefLabel}] Playwright 螟ｱ謨・ ${err.message} 竊・fetch 縺ｫ繝輔か繝ｼ繝ｫ繝舌ャ繧ｯ`);
+    console.warn(`[${prefLabel}] Playwright 失敗: ${err.message} → fetch にフォールバック`);
   } finally {
     await page.close();
   }
@@ -687,29 +717,34 @@ async function fetchHtmlPref(context, prefLabel, url, parserFn) {
   const html   = await res.text();
   const $      = cheerio.load(html, { decodeEntities: false });
   const events = parserFn($);
-  console.log(`[${prefLabel}] ${events.length} 莉ｶ蜿門ｾ・(fetch fallback)`);
+  console.log(`[${prefLabel}] ${events.length} 件取得 (fetch fallback)`);
   return events;
 }
 
-const fetchGunma     = (ctx) => fetchHtmlPref(ctx, '鄒､鬥ｬ', URLS.gunma,     parseGunma);
-const fetchIbaraki   = (ctx) => fetchHtmlPref(ctx, '闌ｨ蝓・, URLS.ibaraki,   parseIbaraki);
-const fetchChiba     = (ctx) => fetchHtmlPref(ctx, '蜊・痩', URLS.chiba,     parseChiba);
-// 霑醍柄蝨ｰ譛ｬ・・TML 繧ｹ繧ｯ繝ｬ繧､繝斐Φ繧ｰ・・const fetchKyoto     = (ctx) => fetchHtmlPref(ctx, '莠ｬ驛ｽ', URLS.kyoto,     parseKyoto);
-const fetchOsaka     = (ctx) => fetchHtmlPref(ctx, '螟ｧ髦ｪ', URLS.osaka,     parseOsaka);
-// 譚ｱ蛹怜慍譛ｬ・・TML 繧ｹ繧ｯ繝ｬ繧､繝斐Φ繧ｰ・・const fetchMiyagi    = (ctx) => fetchHtmlPref(ctx, '螳ｮ蝓・, URLS.miyagi,    parseMiyagi);
-const fetchAomori    = (ctx) => fetchHtmlPref(ctx, '髱呈｣ｮ', URLS.aomori,    parseAomori);
-const fetchIwate     = (ctx) => fetchHtmlPref(ctx, '蟯ｩ謇・, URLS.iwate,     parseIwate);
-const fetchYamagata  = (ctx) => fetchHtmlPref(ctx, '螻ｱ蠖｢', URLS.yamagata,  parseYamagata);
-const fetchFukushima = (ctx) => fetchHtmlPref(ctx, '遖丞ｳｶ', URLS.fukushima, parseFukushima);
-// 荳ｭ驛ｨ蝨ｰ譛ｬ・・TML 繧ｹ繧ｯ繝ｬ繧､繝斐Φ繧ｰ・・const fetchNiigata   = (ctx) => fetchHtmlPref(ctx, '譁ｰ貎・, URLS.niigata,   parseNiigata);
-const fetchIshikawa  = (ctx) => fetchHtmlPref(ctx, '遏ｳ蟾・, URLS.ishikawa,  parseIshikawa);
-const fetchFukui     = (ctx) => fetchHtmlPref(ctx, '遖丈ｺ・, URLS.fukui,     parseFukui);
-const fetchYamanashi = (ctx) => fetchHtmlPref(ctx, '螻ｱ譴ｨ', URLS.yamanashi, parseYamanashi);
-const fetchGifu      = (ctx) => fetchHtmlPref(ctx, '蟯宣・', URLS.gifu,      parseGifu);
+const fetchGunma     = (ctx) => fetchHtmlPref(ctx, '群馬', URLS.gunma,     parseGunma);
+const fetchIbaraki   = (ctx) => fetchHtmlPref(ctx, '茨城', URLS.ibaraki,   parseIbaraki);
+const fetchChiba     = (ctx) => fetchHtmlPref(ctx, '千葉', URLS.chiba,     parseChiba);
+// 近畿地本（HTML スクレイピング）
+const fetchKyoto     = (ctx) => fetchHtmlPref(ctx, '京都', URLS.kyoto,     parseKyoto);
+const fetchOsaka     = (ctx) => fetchHtmlPref(ctx, '大阪', URLS.osaka,     parseOsaka);
+// 東北地本（HTML スクレイピング）
+const fetchMiyagi    = (ctx) => fetchHtmlPref(ctx, '宮城', URLS.miyagi,    parseMiyagi);
+const fetchAomori    = (ctx) => fetchHtmlPref(ctx, '青森', URLS.aomori,    parseAomori);
+const fetchIwate     = (ctx) => fetchHtmlPref(ctx, '岩手', URLS.iwate,     parseIwate);
+const fetchYamagata  = (ctx) => fetchHtmlPref(ctx, '山形', URLS.yamagata,  parseYamagata);
+const fetchFukushima = (ctx) => fetchHtmlPref(ctx, '福島', URLS.fukushima, parseFukushima);
+// 中部地本（HTML スクレイピング）
+const fetchNiigata   = (ctx) => fetchHtmlPref(ctx, '新潟', URLS.niigata,   parseNiigata);
+const fetchIshikawa  = (ctx) => fetchHtmlPref(ctx, '石川', URLS.ishikawa,  parseIshikawa);
+const fetchFukui     = (ctx) => fetchHtmlPref(ctx, '福井', URLS.fukui,     parseFukui);
+const fetchYamanashi = (ctx) => fetchHtmlPref(ctx, '山梨', URLS.yamanashi, parseYamanashi);
+const fetchGifu      = (ctx) => fetchHtmlPref(ctx, '岐阜', URLS.gifu,      parseGifu);
 async function fetchAichi(ctx) {
-  // 繧ｫ繝ｬ繝ｳ繝繝ｼ繝壹・繧ｸ縺九ｉ蝓ｺ譛ｬ諠・ｱ繧貞叙蠕・  const events = await fetchHtmlPref(ctx, '諢帷衍', URLS.aichi, parseAichi);
+  // カレンダーページから基本情報を取得
+  const events = await fetchHtmlPref(ctx, '愛知', URLS.aichi, parseAichi);
 
-  // URL 繧呈戟縺､繧､繝吶Φ繝医・隧ｳ邏ｰ繝壹・繧ｸ縺九ｉ place/time 繧定｣懷ｮ・  let enriched = 0;
+  // URL を持つイベントの詳細ページから place/time を補完
+  let enriched = 0;
   for (const ev of events) {
     if (!ev.url || ev.place) continue;
     try {
@@ -726,22 +761,24 @@ async function fetchAichi(ctx) {
         await page.close();
       }
     } catch {
-      // 隧ｳ邏ｰ蜿門ｾ怜､ｱ謨励・辟｡隕厄ｼ・lace 縺ｯ遨ｺ譁・ｭ励・縺ｾ縺ｾ・・    }
+      // 詳細取得失敗は無視（place は空文字のまま）
+    }
   }
-  if (enriched > 0) console.log(`[諢帷衍] 隧ｳ邏ｰ繝壹・繧ｸ縺九ｉ place 陬懷ｮ・ ${enriched}莉ｶ`);
+  if (enriched > 0) console.log(`[愛知] 詳細ページから place 補完: ${enriched}件`);
   return events;
 }
-const fetchShizuoka  = (ctx) => fetchHtmlPref(ctx, '髱吝ｲ｡', URLS.shizuoka,  parseShizuoka);
+const fetchShizuoka  = (ctx) => fetchHtmlPref(ctx, '静岡', URLS.shizuoka,  parseShizuoka);
 
 /**
- * 譛ｭ蟷悟慍譛ｬ: 4 縺､縺ｮ繧ｵ繝悶・繝ｼ繧ｸ繧帝・分縺ｫ蜿門ｾ励＠縲√う繝吶Φ繝医ｒ邨ｱ蜷医＠縺ｦ霑斐☆縲・ */
+ * 札幌地本: 4 つのサブページを順番に取得し、イベントを統合して返す。
+ */
 async function fetchSapporo(context) {
-  console.log('[譛ｭ蟷珪 4 繧ｵ繝悶・繝ｼ繧ｸ繧貞叙蠕嶺ｸｭ...');
+  console.log('[札幌] 4 サブページを取得中...');
   const subPages = [
-    { url: URLS.sapporo_station, cat: '荳闊ｬ蜈ｬ髢・, id: 'st' },
-    { url: URLS.sapporo_naval,   cat: '荳闊ｬ蜈ｬ髢・, id: 'nv' },
-    { url: URLS.sapporo_concert, cat: '貍泌･丈ｼ・,   id: 'co' },
-    { url: URLS.sapporo_other,   cat: '繧､繝吶Φ繝・, id: 'ot' },
+    { url: URLS.sapporo_station, cat: '一般公開', id: 'st' },
+    { url: URLS.sapporo_naval,   cat: '一般公開', id: 'nv' },
+    { url: URLS.sapporo_concert, cat: '演奏会',   id: 'co' },
+    { url: URLS.sapporo_other,   cat: 'イベント', id: 'ot' },
   ];
   const state  = { counter: 0 };
   const allEvs = [];
@@ -752,7 +789,7 @@ async function fetchSapporo(context) {
       await page.goto(sp.url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
       try {
         await page.waitForFunction(
-          () => { const t = document.title; return t.length > 0 && !t.includes('Just a moment') && !t.includes('縺励・繧峨￥縺雁ｾ・■縺上□縺輔＞'); },
+          () => { const t = document.title; return t.length > 0 && !t.includes('Just a moment') && !t.includes('しばらくお待ちください'); },
           { timeout: 60_000 }
         );
       } catch { /* ok */ }
@@ -760,10 +797,10 @@ async function fetchSapporo(context) {
       const html  = await page.content();
       const $     = cheerio.load(html, { decodeEntities: false });
       const evs   = parseSapporoPage($, sp.cat, sp.id, state, sp.url);
-      console.log(`[譛ｭ蟷珪 ${sp.url.split('/').pop()} 竊・${evs.length} 莉ｶ`);
+      console.log(`[札幌] ${sp.url.split('/').pop()} → ${evs.length} 件`);
       allEvs.push(...evs);
     } catch (err) {
-      console.warn(`[譛ｭ蟷珪 ${sp.url} 螟ｱ謨・ ${err.message.substring(0, 60)}`);
+      console.warn(`[札幌] ${sp.url} 失敗: ${err.message.substring(0, 60)}`);
     } finally {
       await page.close();
     }
@@ -774,19 +811,20 @@ async function fetchSapporo(context) {
   const result = allEvs
     .filter(e => { const k = `${e.date}-${e.title}`; if (seen.has(k)) return false; seen.add(k); return true; })
     .sort((a, b) => a.date.localeCompare(b.date));
-  console.log(`[譛ｭ蟷珪 蜷郁ｨ・${result.length} 莉ｶ`);
+  console.log(`[札幌] 合計 ${result.length} 件`);
   return result;
 }
 
 /**
- * 遘狗伐蝨ｰ譛ｬ: Google 繧ｫ繝ｬ繝ｳ繝繝ｼ iCal 2 譛ｬ繧・fetch 縺励※邨ｱ蜷医☆繧九・ */
+ * 秋田地本: Google カレンダー iCal 2 本を fetch して統合する。
+ */
 async function fetchAkita() {
-  console.log('[遘狗伐] Google Calendar iCal 蜿門ｾ・..');
+  console.log('[秋田] Google Calendar iCal 取得...');
   const fetchIcal = async (url) => {
     const res = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'text/calendar, */*' },
     });
-    if (!res.ok) { console.warn(`[遘狗伐] iCal ${res.status}: ${url}`); return ''; }
+    if (!res.ok) { console.warn(`[秋田] iCal ${res.status}: ${url}`); return ''; }
     return res.text();
   };
   const [ics1, ics2] = await Promise.all([
@@ -794,14 +832,16 @@ async function fetchAkita() {
     fetchIcal(URLS.akita_ical2),
   ]);
   const events = parseAkita(ics1, ics2);
-  console.log(`[遘狗伐] ${events.length} 莉ｶ蜿門ｾ・(iCal)`);
+  console.log(`[秋田] ${events.length} 件取得 (iCal)`);
   return events;
 }
 
 /**
- * 髟ｷ驥主慍譛ｬ: Google 繧ｫ繝ｬ繝ｳ繝繝ｼ iCal 繝輔ぅ繝ｼ繝峨ｒ逶ｴ謗･ fetch 縺励※隗｣譫舌☆繧九・ * Playwright 荳崎ｦ・ｼ・oogle 繧ｫ繝ｬ繝ｳ繝繝ｼ URL 縺ｯ Cloudflare 蟇ｾ雎｡螟厄ｼ峨・ */
+ * 長野地本: Google カレンダー iCal フィードを直接 fetch して解析する。
+ * Playwright 不要（Google カレンダー URL は Cloudflare 対象外）。
+ */
 async function fetchNagano() {
-  console.log(`[髟ｷ驥讃 iCal 繝輔ぅ繝ｼ繝牙叙蠕・ ${URLS.nagano}`);
+  console.log(`[長野] iCal フィード取得: ${URLS.nagano}`);
   const res = await fetch(URLS.nagano, {
     headers: {
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -811,31 +851,32 @@ async function fetchNagano() {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const icsText = await res.text();
   const events  = parseNagano(icsText);
-  console.log(`[髟ｷ驥讃 ${events.length} 莉ｶ蜿門ｾ・(iCal)`);
+  console.log(`[長野] ${events.length} 件取得 (iCal)`);
   return events;
 }
 
 /**
- * WordPress 邉ｻ蝨ｰ譛ｬ: 荳隕ｧ繝壹・繧ｸ縺九ｉ謚慕ｨｿ URL 繧貞叙蠕励＠縲∝推謚慕ｨｿ繝壹・繧ｸ繧帝・ｬ｡繝輔ぉ繝・メ縺励※
- * parserFn 縺ｧ繧､繝吶Φ繝医ｒ謚ｽ蜃ｺ縺吶ｋ蜈ｱ騾夐未謨ｰ縲・ *
+ * WordPress 系地本: 一覧ページから投稿 URL を取得し、各投稿ページを順次フェッチして
+ * parserFn でイベントを抽出する共通関数。
+ *
  * @param {BrowserContext} ctx
- * @param {string}         pref     - 繝ｭ繧ｰ逕ｨ繝ｩ繝吶Ν
- * @param {string}         listUrl  - 荳隕ｧ繝壹・繧ｸ URL
- * @param {Function}       urlsFn   - 荳隕ｧ繝壹・繧ｸ HTML 縺九ｉ繝昴せ繝・URL 驟榊・繧定ｿ斐☆髢｢謨ｰ
- * @param {Function}       postFn   - 蛟句挨謚慕ｨｿ HTML 縺九ｉ events 驟榊・繧定ｿ斐☆髢｢謨ｰ(($, url, counter) => [])
- * @param {number}         maxPosts - 譛螟ｧ蜿門ｾ玲兜遞ｿ謨ｰ
+ * @param {string}         pref     - ログ用ラベル
+ * @param {string}         listUrl  - 一覧ページ URL
+ * @param {Function}       urlsFn   - 一覧ページ HTML からポスト URL 配列を返す関数
+ * @param {Function}       postFn   - 個別投稿 HTML から events 配列を返す関数(($, url, counter) => [])
+ * @param {number}         maxPosts - 最大取得投稿数
  */
 async function fetchWpPosts(ctx, pref, listUrl, urlsFn, postFn, maxPosts = 5) {
-  console.log(`[${pref}] 荳隕ｧ繝壹・繧ｸ蜿門ｾ・ ${listUrl}`);
+  console.log(`[${pref}] 一覧ページ取得: ${listUrl}`);
   let postUrls = [];
 
-  // 笏笏 荳隕ｧ繝壹・繧ｸ 笏笏
+  // ── 一覧ページ ──
   const listPage = await ctx.newPage();
   try {
     await listPage.goto(listUrl, { waitUntil: 'domcontentloaded', timeout: 30_000 });
     try {
       await listPage.waitForFunction(
-        () => { const t = document.title; return t.length > 0 && !t.includes('Just a moment') && !t.includes('縺励・繧峨￥縺雁ｾ・■縺上□縺輔＞'); },
+        () => { const t = document.title; return t.length > 0 && !t.includes('Just a moment') && !t.includes('しばらくお待ちください'); },
         { timeout: 60_000 }
       );
     } catch {}
@@ -843,16 +884,16 @@ async function fetchWpPosts(ctx, pref, listUrl, urlsFn, postFn, maxPosts = 5) {
     const html = await listPage.content();
     const $    = cheerio.load(html, { decodeEntities: false });
     postUrls   = [...new Set(urlsFn($))].slice(0, maxPosts);
-    console.log(`[${pref}] 謚慕ｨｿ URL ${postUrls.length} 莉ｶ蜿門ｾ輿);
+    console.log(`[${pref}] 投稿 URL ${postUrls.length} 件取得`);
   } catch (err) {
-    console.warn(`[${pref}] 荳隕ｧ繝壹・繧ｸ螟ｱ謨・ ${err.message.substring(0, 60)}`);
+    console.warn(`[${pref}] 一覧ページ失敗: ${err.message.substring(0, 60)}`);
   } finally {
     await listPage.close();
   }
 
   if (postUrls.length === 0) return [];
 
-  // 笏笏 蜷・兜遞ｿ繝壹・繧ｸ 笏笏
+  // ── 各投稿ページ ──
   const events = [];
   let counter  = 0;
   for (const postUrl of postUrls) {
@@ -861,7 +902,7 @@ async function fetchWpPosts(ctx, pref, listUrl, urlsFn, postFn, maxPosts = 5) {
       await postPage.goto(postUrl, { waitUntil: 'domcontentloaded', timeout: 30_000 });
       try {
         await postPage.waitForFunction(
-          () => { const t = document.title; return t.length > 0 && !t.includes('Just a moment') && !t.includes('縺励・繧峨￥縺雁ｾ・■縺上□縺輔＞'); },
+          () => { const t = document.title; return t.length > 0 && !t.includes('Just a moment') && !t.includes('しばらくお待ちください'); },
           { timeout: 30_000 }
         );
       } catch {}
@@ -869,29 +910,31 @@ async function fetchWpPosts(ctx, pref, listUrl, urlsFn, postFn, maxPosts = 5) {
       const html = await postPage.content();
       const $    = cheerio.load(html, { decodeEntities: false });
       const evs  = postFn($, postUrl, ++counter);
-      if (evs.length) console.log(`[${pref}] ${postUrl.split('/').slice(-2,-1)[0]} 竊・${evs[0].date} ${evs[0].title.substring(0,30)}`);
+      if (evs.length) console.log(`[${pref}] ${postUrl.split('/').slice(-2,-1)[0]} → ${evs[0].date} ${evs[0].title.substring(0,30)}`);
       events.push(...evs);
     } catch (err) {
-      console.warn(`[${pref}] 謚慕ｨｿ蜿門ｾ怜､ｱ謨・ ${err.message.substring(0, 60)}`);
+      console.warn(`[${pref}] 投稿取得失敗: ${err.message.substring(0, 60)}`);
     } finally {
       await postPage.close();
     }
     await sleep(1500);
   }
 
-  console.log(`[${pref}] ${events.length} 莉ｶ蜿門ｾ輿);
+  console.log(`[${pref}] ${events.length} 件取得`);
   return events;
 }
 
-const fetchMie      = (ctx) => fetchWpPosts(ctx, '荳蛾㍾',   URLS.mie,      parseMiePostUrls,      parseMiePost,      5);
-const fetchShiga    = (ctx) => fetchWpPosts(ctx, '貊玖ｳ',   URLS.shiga,    parseShigaPostUrls,    parseShigaPost,    5);
-const fetchNara     = (ctx) => fetchWpPosts(ctx, '螂郁憶',   URLS.nara,     parseNaraPostUrls,     parseNaraPost,     5);
-const fetchWakayama = (ctx) => fetchWpPosts(ctx, '蜥梧ｭ悟ｱｱ', URLS.wakayama, parseWakayamaPostUrls, parseWakayamaPost, 5);
+const fetchMie      = (ctx) => fetchWpPosts(ctx, '三重',   URLS.mie,      parseMiePostUrls,      parseMiePost,      5);
+const fetchShiga    = (ctx) => fetchWpPosts(ctx, '滋賀',   URLS.shiga,    parseShigaPostUrls,    parseShigaPost,    5);
+const fetchNara     = (ctx) => fetchWpPosts(ctx, '奈良',   URLS.nara,     parseNaraPostUrls,     parseNaraPost,     5);
+const fetchWakayama = (ctx) => fetchWpPosts(ctx, '和歌山', URLS.wakayama, parseWakayamaPostUrls, parseWakayamaPost, 5);
 
 /**
- * 蜈ｵ蠎ｫ蝨ｰ譛ｬ: TOP 繝壹・繧ｸ縺九ｉ繧､繝吶Φ繝医ヰ繝翫・逕ｻ蜒上ｒ蜿門ｾ励＠ OCR 縺ｧ繧､繝吶Φ繝医ｒ謚ｽ蜃ｺ縺吶ｋ縲・ * GEMINI_API_KEY 譛ｪ險ｭ螳壹・蝣ｴ蜷医・遨ｺ驟榊・繧定ｿ斐☆縲・ */
+ * 兵庫地本: TOP ページからイベントバナー画像を取得し OCR でイベントを抽出する。
+ * GEMINI_API_KEY 未設定の場合は空配列を返す。
+ */
 async function fetchHyogo(context) {
-  console.log(`[蜈ｵ蠎ｫ] 繧｢繧ｯ繧ｻ繧ｹ: ${URLS.hyogo}`);
+  console.log(`[兵庫] アクセス: ${URLS.hyogo}`);
 
   const page = await context.newPage();
   let imageUrls = [];
@@ -899,7 +942,7 @@ async function fetchHyogo(context) {
     await page.goto(URLS.hyogo, { waitUntil: 'domcontentloaded', timeout: 30_000 });
     try {
       await page.waitForFunction(
-        () => { const t = document.title; return t.length > 0 && !t.includes('Just a moment') && !t.includes('縺励・繧峨￥縺雁ｾ・■縺上□縺輔＞'); },
+        () => { const t = document.title; return t.length > 0 && !t.includes('Just a moment') && !t.includes('しばらくお待ちください'); },
         { timeout: 90_000 }
       );
     } catch {}
@@ -907,15 +950,15 @@ async function fetchHyogo(context) {
     const html = await page.content();
     const $    = cheerio.load(html, { decodeEntities: false });
     imageUrls  = parseHyogoImages($);
-    console.log(`[蜈ｵ蠎ｫ] ${imageUrls.length} 莉ｶ縺ｮ逕ｻ蜒上ｒ讀懷・`);
+    console.log(`[兵庫] ${imageUrls.length} 件の画像を検出`);
   } catch (err) {
-    console.warn(`[蜈ｵ蠎ｫ] Playwright 螟ｱ謨・ ${err.message}`);
+    console.warn(`[兵庫] Playwright 失敗: ${err.message}`);
   } finally {
     await page.close();
   }
 
   if (!process.env.GEMINI_API_KEY) {
-    console.log('[蜈ｵ蠎ｫ] GEMINI_API_KEY 譛ｪ險ｭ螳壹・縺溘ａ OCR 繧ｹ繧ｭ繝・・');
+    console.log('[兵庫] GEMINI_API_KEY 未設定のため OCR スキップ');
     return [];
   }
   if (imageUrls.length === 0) return [];
@@ -923,16 +966,16 @@ async function fetchHyogo(context) {
   const events = [];
   let idx = 0;
   for (const imgUrl of imageUrls) {
-    console.log(`[蜈ｵ蠎ｫ OCR] ${imgUrl}`);
+    console.log(`[兵庫 OCR] ${imgUrl}`);
     const ocr = await ocrImageFull(imgUrl);
     if (!ocr) continue;
 
     const rawDate = toHalfWidth((ocr.date || '').replace(/\s+/g, ' ').trim());
-    const dtMatch = rawDate.match(/莉､蜥・\d+)蟷ｴ(\d+)譛・\d+)譌･[・・]([譛育↓豌ｴ譛ｨ驥大悄譌･逾昴・]+)[・・]/)
-      || rawDate.match(/(\d{4})蟷ｴ(\d+)譛・\d+)譌･[・・]([譛育↓豌ｴ譛ｨ驥大悄譌･逾昴・]+)[・・]/);
+    const dtMatch = rawDate.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/)
+      || rawDate.match(/(\d{4})年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/);
 
     let dateStr = '', weekday = '';
-    if (dtMatch && dtMatch[0].startsWith('莉､蜥・)) {
+    if (dtMatch && dtMatch[0].startsWith('令和')) {
       const year = reiwaToAD(parseInt(dtMatch[1], 10));
       dateStr  = `${year}-${padTwo(parseInt(dtMatch[2], 10))}-${padTwo(parseInt(dtMatch[3], 10))}`;
       weekday  = dtMatch[4];
@@ -940,7 +983,8 @@ async function fetchHyogo(context) {
       dateStr  = `${dtMatch[1]}-${padTwo(parseInt(dtMatch[2], 10))}-${padTwo(parseInt(dtMatch[3], 10))}`;
       weekday  = dtMatch[4];
     } else {
-      // 繝輔ぃ繧､繝ｫ蜷阪°繧画律莉倥ｒ謗ｨ螳夲ｼ井ｾ・ 0530aono_banner.png 竊・5譛・0譌･・・      const fnMatch = imgUrl.match(/(\d{2})(\d{2})[a-z]/i);
+      // ファイル名から日付を推定（例: 0530aono_banner.png → 5月30日）
+      const fnMatch = imgUrl.match(/(\d{2})(\d{2})[a-z]/i);
       if (fnMatch) {
         const now = new Date();
         const m = parseInt(fnMatch[1], 10), d = parseInt(fnMatch[2], 10);
@@ -975,14 +1019,16 @@ async function fetchHyogo(context) {
     await sleep(4500);
   }
 
-  console.log(`[蜈ｵ蠎ｫ] ${events.length} 莉ｶ蜿門ｾ・(OCR)`);
+  console.log(`[兵庫] ${events.length} 件取得 (OCR)`);
   return events.sort((a, b) => a.date.localeCompare(b.date));
 }
 
 /**
- * 譬・惠蝨ｰ譛ｬ繝壹・繧ｸ繧貞叙蠕励＠縲゛PG 繝昴せ繧ｿ繝ｼ繧・OCR 縺励※繧､繝吶Φ繝井ｸ隕ｧ繧定ｿ斐☆縲・ * GEMINI_API_KEY 譛ｪ險ｭ螳壹・蝣ｴ蜷医・遨ｺ驟榊・繧定ｿ斐☆・・CR 繧ｹ繧ｭ繝・・・峨・ */
+ * 栃木地本ページを取得し、JPG ポスターを OCR してイベント一覧を返す。
+ * GEMINI_API_KEY 未設定の場合は空配列を返す（OCR スキップ）。
+ */
 async function fetchTochigi(context) {
-  console.log(`[譬・惠] 繧｢繧ｯ繧ｻ繧ｹ: ${URLS.tochigi}`);
+  console.log(`[栃木] アクセス: ${URLS.tochigi}`);
 
   const page = await context.newPage();
   let imageUrls = [];
@@ -995,27 +1041,27 @@ async function fetchTochigi(context) {
           return t.length > 0
             && !t.includes('Just a moment')
             && !t.includes('Attention Required')
-            && !t.includes('縺励・繧峨￥縺雁ｾ・■縺上□縺輔＞');
+            && !t.includes('しばらくお待ちください');
         },
         { timeout: 90_000 }
       );
-    } catch { /* 繝√Ε繝ｬ繝ｳ繧ｸ縺ｪ縺・or 繧ｿ繧､繝繧｢繧ｦ繝・*/ }
+    } catch { /* チャレンジなし or タイムアウト */ }
     await page.waitForTimeout(2000);
     const html  = await page.content();
     const title = (html.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1] || '';
-    console.log(`[譬・惠] page title: ${title.trim().substring(0, 70)}`);
+    console.log(`[栃木] page title: ${title.trim().substring(0, 70)}`);
     if (isChallengeTitle(title)) throw new Error(`Cloudflare challenge: ${title.trim()}`);
     const $    = cheerio.load(html, { decodeEntities: false });
     imageUrls  = parseTochigiImages($);
-    console.log(`[譬・惠] ${imageUrls.length} 莉ｶ縺ｮ逕ｻ蜒上ｒ讀懷・`);
+    console.log(`[栃木] ${imageUrls.length} 件の画像を検出`);
   } catch (err) {
-    console.warn(`[譬・惠] Playwright 螟ｱ謨・ ${err.message}`);
+    console.warn(`[栃木] Playwright 失敗: ${err.message}`);
   } finally {
     await page.close();
   }
 
   if (!process.env.GEMINI_API_KEY) {
-    console.log('[譬・惠] GEMINI_API_KEY 譛ｪ險ｭ螳壹・縺溘ａ OCR 繧ｹ繧ｭ繝・・');
+    console.log('[栃木] GEMINI_API_KEY 未設定のため OCR スキップ');
     return [];
   }
   if (imageUrls.length === 0) return [];
@@ -1023,13 +1069,13 @@ async function fetchTochigi(context) {
   const events = [];
   let idx = 0;
   for (const imgUrl of imageUrls) {
-    console.log(`[譬・惠 OCR] ${imgUrl}`);
+    console.log(`[栃木 OCR] ${imgUrl}`);
     const ocr = await ocrImageFull(imgUrl);
     if (!ocr) continue;
 
     const rawDate = toHalfWidth((ocr.date || '').replace(/\s+/g, ' ').trim());
-    const dtMatch = rawDate.match(/莉､蜥・\d+)蟷ｴ(\d+)譛・\d+)譌･[・・]([譛育↓豌ｴ譛ｨ驥大悄譌･逾昴・]+)[・・]/);
-    if (!dtMatch) { console.warn(`[譬・惠 OCR] 譌･莉倥ヱ繝ｼ繧ｹ螟ｱ謨・ "${ocr.date}"`); continue; }
+    const dtMatch = rawDate.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/);
+    if (!dtMatch) { console.warn(`[栃木 OCR] 日付パース失敗: "${ocr.date}"`); continue; }
 
     const year    = reiwaToAD(parseInt(dtMatch[1], 10));
     const month   = parseInt(dtMatch[2], 10);
@@ -1056,19 +1102,22 @@ async function fetchTochigi(context) {
       notes:          ocr.notes          || null,
       ageRequirement: ocr.ageRequirement || null,
       deadline:       ocr.deadline       || null,
-      imageUrl:       '',  // OCR 貂医∩縺ｮ縺溘ａ蜀榊・逅・ｸ崎ｦ・    });
+      imageUrl:       '',  // OCR 済みのため再処理不要
+    });
 
     await sleep(4500);
   }
 
-  console.log(`[譬・惠] ${events.length} 莉ｶ蜿門ｾ・(OCR)`);
+  console.log(`[栃木] ${events.length} 件取得 (OCR)`);
   return events.sort((a, b) => a.date.localeCompare(b.date));
 }
 
 /**
- * 蟇悟ｱｱ蝨ｰ譛ｬ繝壹・繧ｸ繧貞叙蠕励＠縲゛PG 繝昴せ繧ｿ繝ｼ繧・OCR 縺励※繧､繝吶Φ繝井ｸ隕ｧ繧定ｿ斐☆縲・ * GEMINI_API_KEY 譛ｪ險ｭ螳壹・蝣ｴ蜷医・遨ｺ驟榊・繧定ｿ斐☆・・CR 繧ｹ繧ｭ繝・・・峨・ */
+ * 富山地本ページを取得し、JPG ポスターを OCR してイベント一覧を返す。
+ * GEMINI_API_KEY 未設定の場合は空配列を返す（OCR スキップ）。
+ */
 async function fetchToyama(context) {
-  console.log(`[蟇悟ｱｱ] 繧｢繧ｯ繧ｻ繧ｹ: ${URLS.toyama}`);
+  console.log(`[富山] アクセス: ${URLS.toyama}`);
 
   const page = await context.newPage();
   let imageUrls = [];
@@ -1081,27 +1130,27 @@ async function fetchToyama(context) {
           return t.length > 0
             && !t.includes('Just a moment')
             && !t.includes('Attention Required')
-            && !t.includes('縺励・繧峨￥縺雁ｾ・■縺上□縺輔＞');
+            && !t.includes('しばらくお待ちください');
         },
         { timeout: 90_000 }
       );
-    } catch { /* 繝√Ε繝ｬ繝ｳ繧ｸ縺ｪ縺・or 繧ｿ繧､繝繧｢繧ｦ繝・*/ }
+    } catch { /* チャレンジなし or タイムアウト */ }
     await page.waitForTimeout(2000);
     const html  = await page.content();
     const title = (html.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1] || '';
-    console.log(`[蟇悟ｱｱ] page title: ${title.trim().substring(0, 70)}`);
+    console.log(`[富山] page title: ${title.trim().substring(0, 70)}`);
     if (isChallengeTitle(title)) throw new Error(`Cloudflare challenge: ${title.trim()}`);
     const $   = cheerio.load(html, { decodeEntities: false });
     imageUrls = parseToyamaImages($);
-    console.log(`[蟇悟ｱｱ] ${imageUrls.length} 莉ｶ縺ｮ逕ｻ蜒上ｒ讀懷・`);
+    console.log(`[富山] ${imageUrls.length} 件の画像を検出`);
   } catch (err) {
-    console.warn(`[蟇悟ｱｱ] Playwright 螟ｱ謨・ ${err.message}`);
+    console.warn(`[富山] Playwright 失敗: ${err.message}`);
   } finally {
     await page.close();
   }
 
   if (!process.env.GEMINI_API_KEY) {
-    console.log('[蟇悟ｱｱ] GEMINI_API_KEY 譛ｪ險ｭ螳壹・縺溘ａ OCR 繧ｹ繧ｭ繝・・');
+    console.log('[富山] GEMINI_API_KEY 未設定のため OCR スキップ');
     return [];
   }
   if (imageUrls.length === 0) return [];
@@ -1109,13 +1158,13 @@ async function fetchToyama(context) {
   const events = [];
   let idx = 0;
   for (const imgUrl of imageUrls) {
-    console.log(`[蟇悟ｱｱ OCR] ${imgUrl}`);
+    console.log(`[富山 OCR] ${imgUrl}`);
     const ocr = await ocrImageFull(imgUrl);
     if (!ocr) continue;
 
     const rawDate = toHalfWidth((ocr.date || '').replace(/\s+/g, ' ').trim());
-    const dtMatch = rawDate.match(/莉､蜥・\d+)蟷ｴ(\d+)譛・\d+)譌･[・・]([譛育↓豌ｴ譛ｨ驥大悄譌･逾昴・]+)[・・]/);
-    if (!dtMatch) { console.warn(`[蟇悟ｱｱ OCR] 譌･莉倥ヱ繝ｼ繧ｹ螟ｱ謨・ "${ocr.date}"`); continue; }
+    const dtMatch = rawDate.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/);
+    if (!dtMatch) { console.warn(`[富山 OCR] 日付パース失敗: "${ocr.date}"`); continue; }
 
     const year    = reiwaToAD(parseInt(dtMatch[1], 10));
     const dateStr = `${year}-${padTwo(parseInt(dtMatch[2], 10))}-${padTwo(parseInt(dtMatch[3], 10))}`;
@@ -1145,25 +1194,25 @@ async function fetchToyama(context) {
     await sleep(4500);
   }
 
-  console.log(`[蟇悟ｱｱ] ${events.length} 莉ｶ蜿門ｾ・(OCR)`);
+  console.log(`[富山] ${events.length} 件取得 (OCR)`);
   return events.sort((a, b) => a.date.localeCompare(b.date));
 }
 
-// 笏笏 繝｡繧､繝ｳ蜃ｦ逅・笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+// ── メイン処理 ───────────────────────────────────────────────
 
 async function main() {
   const isMock = process.argv.includes('--mock');
 
-  // 笏笏 繝｢繝・け繝｢繝ｼ繝・笏笏
+  // ── モックモード ──
   if (isMock) {
-    console.log('[mock] HTTP 繧｢繧ｯ繧ｻ繧ｹ縺ｪ縺励〒繧ｵ繝ｳ繝励Ν繝・・繧ｿ繧貞・蜉帙＠縺ｾ縺・);
+    console.log('[mock] HTTP アクセスなしでサンプルデータを出力します');
     const output = { ...MOCK_DATA, updatedAt: nowJST() };
     writeOutput(output);
-    console.log('[mock] 螳御ｺ・);
+    console.log('[mock] 完了');
     return;
   }
 
-  // 笏笏 螳溘せ繧ｯ繝ｬ繧､繝斐Φ繧ｰ繝｢繝ｼ繝・笏笏
+  // ── 実スクレイピングモード ──
   let sapporoEvents   = [];
   let asahikawaEvents = [];
   let obihiroEvents   = [];
@@ -1190,7 +1239,7 @@ async function main() {
   let gifuEvents      = [];
   let shizuokaEvents  = [];
   let aichiEvents     = [];
-  // 霑醍柄蝨ｰ譛ｬ
+  // 近畿地本
   let mieEvents       = [];
   let shigaEvents     = [];
   let kyotoEvents     = [];
@@ -1198,18 +1247,18 @@ async function main() {
   let hyogoEvents     = [];
   let naraEvents      = [];
   let wakayamaEvents  = [];
-  // 蝗帛嵜蝨ｰ譛ｬ
+  // 四国地本
   let ehimeEvents     = [];
   let kagawaEvents    = [];
   let kochiEvents     = [];
   let tokushimaEvents = [];
-  // 荳ｭ蝗ｽ蝨ｰ譛ｬ
+  // 中国地本
   let tottoriEvents   = [];
   let shimaneEvents   = [];
   let okayamaEvents   = [];
   let hiroshimaEvents = [];
   let yamaguchiEvents = [];
-  // 荵晏ｷ槭・豐也ｸ・慍譛ｬ
+  // 九州・沖縄地本
   let fukuokaEvents   = [];
   let sagaEvents      = [];
   let nagasakiEvents  = [];
@@ -1244,7 +1293,7 @@ async function main() {
   let gifuError       = false;
   let shizuokaError   = false;
   let aichiError      = false;
-  // 霑醍柄蝨ｰ譛ｬ
+  // 近畿地本
   let mieError        = false;
   let shigaError      = false;
   let kyotoError      = false;
@@ -1252,18 +1301,18 @@ async function main() {
   let hyogoError      = false;
   let naraError       = false;
   let wakayamaError   = false;
-  // 蝗帛嵜蝨ｰ譛ｬ
+  // 四国地本
   let ehimeError      = false;
   let kagawaError     = false;
   let kochiError      = false;
   let tokushimaError  = false;
-  // 荳ｭ蝗ｽ蝨ｰ譛ｬ
+  // 中国地本
   let tottoriError    = false;
   let shimaneError    = false;
   let okayamaError    = false;
   let hiroshimaError  = false;
   let yamaguchiError  = false;
-  // 荵晏ｷ槭・豐也ｸ・慍譛ｬ
+  // 九州・沖縄地本
   let fukuokaError    = false;
   let sagaError       = false;
   let nagasakiError   = false;
@@ -1284,516 +1333,521 @@ async function main() {
     ],
   });
 
-  // 蝨ｰ譛ｬ縺斐→縺ｫ譁ｰ隕上さ繝ｳ繝・く繧ｹ繝医ｒ逕滓・縺吶ｋ・亥・譛峨そ繝・す繝ｧ繝ｳ縺縺ｨ Cloudflare 縺ｫ讀懃衍縺輔ｌ繧具ｼ・  async function withFreshContext(fn) {
+  // 地本ごとに新規コンテキストを生成する（共有セッションだと Cloudflare に検知される）
+  async function withFreshContext(fn) {
     const ctx = await createStealthContext(browser);
     try { return await fn(ctx); }
     finally { await ctx.close(); }
   }
 
   try {
-    // 笏笏 蛹玲ｵｷ驕灘慍譛ｬ 笏笏
+    // ── 北海道地本 ──
     try {
       sapporoEvents = await withFreshContext(ctx => fetchSapporo(ctx));
     } catch (err) {
-      console.error(`[譛ｭ蟷珪 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[札幌] 取得失敗: ${err.message}`);
       sapporoError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      asahikawaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '譌ｭ蟾・, URLS.asahikawa, parseAsahikawa));
+      asahikawaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '旭川', URLS.asahikawa, parseAsahikawa));
     } catch (err) {
-      console.error(`[譌ｭ蟾拆 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[旭川] 取得失敗: ${err.message}`);
       asahikawaError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      obihiroEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '蟶ｯ蠎・, URLS.obihiro, parseObihiro));
+      obihiroEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '帯広', URLS.obihiro, parseObihiro));
     } catch (err) {
-      console.error(`[蟶ｯ蠎ゾ 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[帯広] 取得失敗: ${err.message}`);
       obihiroError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
-    // 蜃ｽ鬢ｨ縺ｯInstagram遘ｻ陦後・縺溘ａ遨ｺ驟榊・・医ヱ繝ｼ繧ｵ繝ｼ縺・[] 繧定ｿ斐☆・・    try {
-      hakodateEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '蜃ｽ鬢ｨ', URLS.hakodate, parseHakodate));
+    // 函館はInstagram移行のため空配列（パーサーが [] を返す）
+    try {
+      hakodateEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '函館', URLS.hakodate, parseHakodate));
     } catch (err) {
-      console.error(`[蜃ｽ鬢ｨ] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[函館] 取得失敗: ${err.message}`);
       hakodateError = true;
     }
 
-    // 笏笏 譚ｱ蛹怜慍譛ｬ 笏笏
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    // ── 東北地本 ──
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       miyagiEvents = await withFreshContext(ctx => fetchMiyagi(ctx));
     } catch (err) {
-      console.error(`[螳ｮ蝓讃 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[宮城] 取得失敗: ${err.message}`);
       miyagiError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       aomoriEvents = await withFreshContext(ctx => fetchAomori(ctx));
     } catch (err) {
-      console.error(`[髱呈｣ｮ] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[青森] 取得失敗: ${err.message}`);
       aomoriError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       iwateEvents = await withFreshContext(ctx => fetchIwate(ctx));
     } catch (err) {
-      console.error(`[蟯ｩ謇犠 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[岩手] 取得失敗: ${err.message}`);
       iwateError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       yamagataEvents = await withFreshContext(ctx => fetchYamagata(ctx));
     } catch (err) {
-      console.error(`[螻ｱ蠖｢] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[山形] 取得失敗: ${err.message}`);
       yamagataError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       fukushimaEvents = await withFreshContext(ctx => fetchFukushima(ctx));
     } catch (err) {
-      console.error(`[遖丞ｳｶ] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[福島] 取得失敗: ${err.message}`);
       fukushimaError = true;
     }
 
-    // 遘狗伐縺ｯ iCal fetch・・laywright 荳崎ｦ・ｼ・    try {
+    // 秋田は iCal fetch（Playwright 不要）
+    try {
       akitaEvents = await fetchAkita();
     } catch (err) {
-      console.error(`[遘狗伐] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[秋田] 取得失敗: ${err.message}`);
       akitaError = true;
     }
 
-    // 笏笏 髢｢譚ｱ蝨ｰ譛ｬ 笏笏
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    // ── 関東地本 ──
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       kanagawaEvents = await withFreshContext(ctx => fetchKanagawa(ctx));
     } catch (err) {
-      console.error(`[逾槫･亥ｷ拆 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[神奈川] 取得失敗: ${err.message}`);
       kanagawaError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       tokyoEvents = await withFreshContext(ctx => fetchTokyo(ctx));
     } catch (err) {
-      console.error(`[譚ｱ莠ｬ] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[東京] 取得失敗: ${err.message}`);
       tokyoError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       saitamaEvents = await withFreshContext(ctx => fetchSaitama(ctx));
     } catch (err) {
-      console.error(`[蝓ｼ邇云 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[埼玉] 取得失敗: ${err.message}`);
       saitamaError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       gunmaEvents = await withFreshContext(ctx => fetchGunma(ctx));
     } catch (err) {
-      console.error(`[鄒､鬥ｬ] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[群馬] 取得失敗: ${err.message}`);
       gunmaError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       ibarakiEvents = await withFreshContext(ctx => fetchIbaraki(ctx));
     } catch (err) {
-      console.error(`[闌ｨ蝓讃 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[茨城] 取得失敗: ${err.message}`);
       ibarakiError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       chibaEvents = await withFreshContext(ctx => fetchChiba(ctx));
     } catch (err) {
-      console.error(`[蜊・痩] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[千葉] 取得失敗: ${err.message}`);
       chibaError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       tochigiEvents = await withFreshContext(ctx => fetchTochigi(ctx));
     } catch (err) {
-      console.error(`[譬・惠] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[栃木] 取得失敗: ${err.message}`);
       tochigiError = true;
     }
 
-    // 笏笏 荳ｭ驛ｨ蝨ｰ譛ｬ 笏笏
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    // ── 中部地本 ──
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       niigataEvents = await withFreshContext(ctx => fetchNiigata(ctx));
     } catch (err) {
-      console.error(`[譁ｰ貎歉 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[新潟] 取得失敗: ${err.message}`);
       niigataError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       toyamaEvents = await withFreshContext(ctx => fetchToyama(ctx));
     } catch (err) {
-      console.error(`[蟇悟ｱｱ] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[富山] 取得失敗: ${err.message}`);
       toyamaError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       ishikawaEvents = await withFreshContext(ctx => fetchIshikawa(ctx));
     } catch (err) {
-      console.error(`[遏ｳ蟾拆 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[石川] 取得失敗: ${err.message}`);
       ishikawaError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       fukuiEvents = await withFreshContext(ctx => fetchFukui(ctx));
     } catch (err) {
-      console.error(`[遖丈ｺ評 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[福井] 取得失敗: ${err.message}`);
       fukuiError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       yamanashiEvents = await withFreshContext(ctx => fetchYamanashi(ctx));
     } catch (err) {
-      console.error(`[螻ｱ譴ｨ] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[山梨] 取得失敗: ${err.message}`);
       yamanashiError = true;
     }
 
-    // 髟ｷ驥弱・ iCal fetch・・laywright 荳崎ｦ・ｼ・    try {
+    // 長野は iCal fetch（Playwright 不要）
+    try {
       naganoEvents = await fetchNagano();
     } catch (err) {
-      console.error(`[髟ｷ驥讃 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[長野] 取得失敗: ${err.message}`);
       naganoError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       gifuEvents = await withFreshContext(ctx => fetchGifu(ctx));
     } catch (err) {
-      console.error(`[蟯宣・] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[岐阜] 取得失敗: ${err.message}`);
       gifuError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       shizuokaEvents = await withFreshContext(ctx => fetchShizuoka(ctx));
     } catch (err) {
-      console.error(`[髱吝ｲ｡] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[静岡] 取得失敗: ${err.message}`);
       shizuokaError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       aichiEvents = await withFreshContext(ctx => fetchAichi(ctx));
     } catch (err) {
-      console.error(`[諢帷衍] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[愛知] 取得失敗: ${err.message}`);
       aichiError = true;
     }
 
-    // 笏笏 霑醍柄蝨ｰ譛ｬ 笏笏
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    // ── 近畿地本 ──
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       mieEvents = await withFreshContext(ctx => fetchMie(ctx));
     } catch (err) {
-      console.error(`[荳蛾㍾] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[三重] 取得失敗: ${err.message}`);
       mieError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       shigaEvents = await withFreshContext(ctx => fetchShiga(ctx));
     } catch (err) {
-      console.error(`[貊玖ｳ] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[滋賀] 取得失敗: ${err.message}`);
       shigaError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       kyotoEvents = await withFreshContext(ctx => fetchKyoto(ctx));
     } catch (err) {
-      console.error(`[莠ｬ驛ｽ] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[京都] 取得失敗: ${err.message}`);
       kyotoError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       osakaEvents = await withFreshContext(ctx => fetchOsaka(ctx));
     } catch (err) {
-      console.error(`[螟ｧ髦ｪ] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[大阪] 取得失敗: ${err.message}`);
       osakaError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       hyogoEvents = await withFreshContext(ctx => fetchHyogo(ctx));
     } catch (err) {
-      console.error(`[蜈ｵ蠎ｫ] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[兵庫] 取得失敗: ${err.message}`);
       hyogoError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       naraEvents = await withFreshContext(ctx => fetchNara(ctx));
     } catch (err) {
-      console.error(`[螂郁憶] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[奈良] 取得失敗: ${err.message}`);
       naraError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
       wakayamaEvents = await withFreshContext(ctx => fetchWakayama(ctx));
     } catch (err) {
-      console.error(`[蜥梧ｭ悟ｱｱ] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[和歌山] 取得失敗: ${err.message}`);
       wakayamaError = true;
     }
 
-    // 笏笏 蝗帛嵜蝨ｰ譛ｬ 笏笏
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    // ── 四国地本 ──
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      ehimeEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '諢帛ｪ・, URLS.ehime, parseEhime));
+      ehimeEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '愛媛', URLS.ehime, parseEhime));
     } catch (err) {
-      console.error(`[諢帛ｪ嫋 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[愛媛] 取得失敗: ${err.message}`);
       ehimeError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      kagawaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '鬥吝ｷ・, URLS.kagawa, parseKagawa));
+      kagawaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '香川', URLS.kagawa, parseKagawa));
     } catch (err) {
-      console.error(`[鬥吝ｷ拆 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[香川] 取得失敗: ${err.message}`);
       kagawaError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      kochiEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '鬮倡衍', URLS.kochi, parseKochi));
+      kochiEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '高知', URLS.kochi, parseKochi));
     } catch (err) {
-      console.error(`[鬮倡衍] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[高知] 取得失敗: ${err.message}`);
       kochiError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      tokushimaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '蠕ｳ蟲ｶ', URLS.tokushima, parseTokushima));
+      tokushimaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '徳島', URLS.tokushima, parseTokushima));
     } catch (err) {
-      console.error(`[蠕ｳ蟲ｶ] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[徳島] 取得失敗: ${err.message}`);
       tokushimaError = true;
     }
 
-    // 笏笏 荳ｭ蝗ｽ蝨ｰ譛ｬ 笏笏
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    // ── 中国地本 ──
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      tottoriEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '魑･蜿・, URLS.tottori, parseTottori));
+      tottoriEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '鳥取', URLS.tottori, parseTottori));
     } catch (err) {
-      console.error(`[魑･蜿望 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[鳥取] 取得失敗: ${err.message}`);
       tottoriError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      shimaneEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '蟲ｶ譬ｹ', URLS.shimane, parseShimane));
+      shimaneEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '島根', URLS.shimane, parseShimane));
     } catch (err) {
-      console.error(`[蟲ｶ譬ｹ] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[島根] 取得失敗: ${err.message}`);
       shimaneError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      okayamaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '蟯｡螻ｱ', URLS.okayama, parseOkayama));
+      okayamaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '岡山', URLS.okayama, parseOkayama));
     } catch (err) {
-      console.error(`[蟯｡螻ｱ] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[岡山] 取得失敗: ${err.message}`);
       okayamaError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      hiroshimaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '蠎・ｳｶ', URLS.hiroshima, parseHiroshima));
+      hiroshimaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '広島', URLS.hiroshima, parseHiroshima));
     } catch (err) {
-      console.error(`[蠎・ｳｶ] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[広島] 取得失敗: ${err.message}`);
       hiroshimaError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      yamaguchiEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '螻ｱ蜿｣', URLS.yamaguchi, parseYamaguchi));
+      yamaguchiEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '山口', URLS.yamaguchi, parseYamaguchi));
     } catch (err) {
-      console.error(`[螻ｱ蜿｣] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[山口] 取得失敗: ${err.message}`);
       yamaguchiError = true;
     }
 
-    // 笏笏 荵晏ｷ槭・豐也ｸ・慍譛ｬ 笏笏
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    // ── 九州・沖縄地本 ──
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      fukuokaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '遖丞ｲ｡', URLS.fukuoka, parseFukuoka));
+      fukuokaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '福岡', URLS.fukuoka, parseFukuoka));
     } catch (err) {
-      console.error(`[遖丞ｲ｡] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[福岡] 取得失敗: ${err.message}`);
       fukuokaError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      sagaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '菴占ｳ', URLS.saga, parseSaga));
+      sagaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '佐賀', URLS.saga, parseSaga));
     } catch (err) {
-      console.error(`[菴占ｳ] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[佐賀] 取得失敗: ${err.message}`);
       sagaError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      nagasakiEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '髟ｷ蟠・, URLS.nagasaki, parseNagasaki));
+      nagasakiEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '長崎', URLS.nagasaki, parseNagasaki));
     } catch (err) {
-      console.error(`[髟ｷ蟠讃 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[長崎] 取得失敗: ${err.message}`);
       nagasakiError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      kumamotoEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '辭頑悽', URLS.kumamoto, parseKumamoto));
+      kumamotoEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '熊本', URLS.kumamoto, parseKumamoto));
     } catch (err) {
-      console.error(`[辭頑悽] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[熊本] 取得失敗: ${err.message}`);
       kumamotoError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      oitaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '螟ｧ蛻・, URLS.oita, parseOita));
+      oitaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '大分', URLS.oita, parseOita));
     } catch (err) {
-      console.error(`[螟ｧ蛻・ 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[大分] 取得失敗: ${err.message}`);
       oitaError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      miyazakiEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '螳ｮ蟠・, URLS.miyazaki, parseMiyazaki));
+      miyazakiEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '宮崎', URLS.miyazaki, parseMiyazaki));
     } catch (err) {
-      console.error(`[螳ｮ蟠讃 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[宮崎] 取得失敗: ${err.message}`);
       miyazakiError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      kagoshimaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '鮖ｿ蜈仙ｳｶ', URLS.kagoshima, parseKagoshima));
+      kagoshimaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '鹿児島', URLS.kagoshima, parseKagoshima));
     } catch (err) {
-      console.error(`[鮖ｿ蜈仙ｳｶ] 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[鹿児島] 取得失敗: ${err.message}`);
       kagoshimaError = true;
     }
 
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 遘貞ｾ・ｩ・..`);
+    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      okinawaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '豐也ｸ・, URLS.okinawa, parseOkinawa));
+      okinawaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '沖縄', URLS.okinawa, parseOkinawa));
     } catch (err) {
-      console.error(`[豐也ｸЬ 蜿門ｾ怜､ｱ謨・ ${err.message}`);
+      console.error(`[沖縄] 取得失敗: ${err.message}`);
       okinawaError = true;
     }
   } finally {
     await browser.close();
   }
 
-  // 蜈ｨ蝨ｰ譛ｬ繧ｨ繝ｩ繝ｼ縺ｮ蝣ｴ蜷医・縺ｿ邨ゆｺ・  const allErrors = [
+  // 全地本エラーの場合のみ終了
+  const allErrors = [
     sapporoError, asahikawaError, obihiroError, hakodateError,
     miyagiError, aomoriError, iwateError, yamagataError, fukushimaError, akitaError,
     kanagawaError, tokyoError, saitamaError, gunmaError, ibarakiError, chibaError, tochigiError,
@@ -1806,76 +1860,78 @@ async function main() {
     miyazakiError, kagoshimaError, okinawaError,
   ];
   if (allErrors.every(Boolean)) {
-    console.warn('[隴ｦ蜻馨 蜈ｨ蝨ｰ譛ｬ縺ｨ繧ゅ↓蜿門ｾ励お繝ｩ繝ｼ縺檎匱逕溘＠縺ｾ縺励◆縲ゅヵ繧｡繧､繝ｫ繧呈峩譁ｰ縺励∪縺帙ｓ縲・);
+    console.warn('[警告] 全地本ともに取得エラーが発生しました。ファイルを更新しません。');
     process.exit(1);
   }
 
-  // 繧ｨ繝ｩ繝ｼ縺ｫ縺ｪ縺｣縺溷慍譛ｬ縺ｯ譌｢蟄・events.json 縺ｮ繝・・繧ｿ繧貞ｼ輔″邯吶＄・育ｩｺ驟榊・縺ｧ荳頑嶌縺阪＠縺ｪ縺・ｼ・  let prev = {};
-  try { prev = JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8')); } catch { /* 繝輔ぃ繧､繝ｫ譛ｪ蟄伜惠縺ｯ辟｡隕・*/ }
+  // エラーになった地本は既存 events.json のデータを引き継ぐ（空配列で上書きしない）
+  let prev = {};
+  try { prev = JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8')); } catch { /* ファイル未存在は無視 */ }
 
   const fallback = (flag, label, events, key) => {
     if (!flag) return events;
-    console.warn(`[${label}] 繧ｨ繝ｩ繝ｼ縺ｮ縺溘ａ蜑榊屓繝・・繧ｿ繧堤ｶｭ謖√＠縺ｾ縺兪);
+    console.warn(`[${label}] エラーのため前回データを維持します`);
     return prev[key] ?? [];
   };
 
-  sapporoEvents   = fallback(sapporoError,   '譛ｭ蟷・,   sapporoEvents,   'sapporo');
-  asahikawaEvents = fallback(asahikawaError, '譌ｭ蟾・,   asahikawaEvents, 'asahikawa');
-  obihiroEvents   = fallback(obihiroError,   '蟶ｯ蠎・,   obihiroEvents,   'obihiro');
-  hakodateEvents  = fallback(hakodateError,  '蜃ｽ鬢ｨ',   hakodateEvents,  'hakodate');
-  miyagiEvents    = fallback(miyagiError,    '螳ｮ蝓・,   miyagiEvents,    'miyagi');
-  aomoriEvents    = fallback(aomoriError,    '髱呈｣ｮ',   aomoriEvents,    'aomori');
-  iwateEvents     = fallback(iwateError,     '蟯ｩ謇・,   iwateEvents,     'iwate');
-  yamagataEvents  = fallback(yamagataError,  '螻ｱ蠖｢',   yamagataEvents,  'yamagata');
-  fukushimaEvents = fallback(fukushimaError, '遖丞ｳｶ',   fukushimaEvents, 'fukushima');
-  akitaEvents     = fallback(akitaError,     '遘狗伐',   akitaEvents,     'akita');
-  kanagawaEvents  = fallback(kanagawaError,  '逾槫･亥ｷ・, kanagawaEvents,  'kanagawa');
-  tokyoEvents     = fallback(tokyoError,     '譚ｱ莠ｬ',   tokyoEvents,     'tokyo');
-  saitamaEvents   = fallback(saitamaError,   '蝓ｼ邇・,   saitamaEvents,   'saitama');
-  gunmaEvents     = fallback(gunmaError,     '鄒､鬥ｬ',   gunmaEvents,     'gunma');
-  ibarakiEvents   = fallback(ibarakiError,   '闌ｨ蝓・,   ibarakiEvents,   'ibaraki');
-  chibaEvents     = fallback(chibaError,     '蜊・痩',   chibaEvents,     'chiba');
-  tochigiEvents   = fallback(tochigiError,   '譬・惠',   tochigiEvents,   'tochigi');
-  niigataEvents   = fallback(niigataError,   '譁ｰ貎・,   niigataEvents,   'niigata');
-  toyamaEvents    = fallback(toyamaError,    '蟇悟ｱｱ',   toyamaEvents,    'toyama');
-  ishikawaEvents  = fallback(ishikawaError,  '遏ｳ蟾・,   ishikawaEvents,  'ishikawa');
-  fukuiEvents     = fallback(fukuiError,     '遖丈ｺ・,   fukuiEvents,     'fukui');
-  yamanashiEvents = fallback(yamanashiError, '螻ｱ譴ｨ',   yamanashiEvents, 'yamanashi');
-  naganoEvents    = fallback(naganoError,    '髟ｷ驥・,   naganoEvents,    'nagano');
-  gifuEvents      = fallback(gifuError,      '蟯宣・',   gifuEvents,      'gifu');
-  shizuokaEvents  = fallback(shizuokaError,  '髱吝ｲ｡',   shizuokaEvents,  'shizuoka');
-  aichiEvents     = fallback(aichiError,     '諢帷衍',   aichiEvents,     'aichi');
-  mieEvents       = fallback(mieError,       '荳蛾㍾',   mieEvents,       'mie');
-  shigaEvents     = fallback(shigaError,     '貊玖ｳ',   shigaEvents,     'shiga');
-  kyotoEvents     = fallback(kyotoError,     '莠ｬ驛ｽ',   kyotoEvents,     'kyoto');
-  osakaEvents     = fallback(osakaError,     '螟ｧ髦ｪ',   osakaEvents,     'osaka');
-  hyogoEvents     = fallback(hyogoError,     '蜈ｵ蠎ｫ',   hyogoEvents,     'hyogo');
-  naraEvents      = fallback(naraError,      '螂郁憶',   naraEvents,      'nara');
-  wakayamaEvents  = fallback(wakayamaError,  '蜥梧ｭ悟ｱｱ', wakayamaEvents,  'wakayama');
-  ehimeEvents     = fallback(ehimeError,     '諢帛ｪ・,   ehimeEvents,     'ehime');
-  kagawaEvents    = fallback(kagawaError,    '鬥吝ｷ・,   kagawaEvents,    'kagawa');
-  kochiEvents     = fallback(kochiError,     '鬮倡衍',   kochiEvents,     'kochi');
-  tokushimaEvents = fallback(tokushimaError, '蠕ｳ蟲ｶ',   tokushimaEvents, 'tokushima');
-  tottoriEvents   = fallback(tottoriError,   '魑･蜿・,   tottoriEvents,   'tottori');
-  shimaneEvents   = fallback(shimaneError,   '蟲ｶ譬ｹ',   shimaneEvents,   'shimane');
-  okayamaEvents   = fallback(okayamaError,   '蟯｡螻ｱ',   okayamaEvents,   'okayama');
-  hiroshimaEvents = fallback(hiroshimaError, '蠎・ｳｶ',   hiroshimaEvents, 'hiroshima');
-  yamaguchiEvents = fallback(yamaguchiError, '螻ｱ蜿｣',   yamaguchiEvents, 'yamaguchi');
-  fukuokaEvents   = fallback(fukuokaError,   '遖丞ｲ｡',   fukuokaEvents,   'fukuoka');
-  sagaEvents      = fallback(sagaError,      '菴占ｳ',   sagaEvents,      'saga');
-  nagasakiEvents  = fallback(nagasakiError,  '髟ｷ蟠・,   nagasakiEvents,  'nagasaki');
-  kumamotoEvents  = fallback(kumamotoError,  '辭頑悽',   kumamotoEvents,  'kumamoto');
-  oitaEvents      = fallback(oitaError,      '螟ｧ蛻・,   oitaEvents,      'oita');
-  miyazakiEvents  = fallback(miyazakiError,  '螳ｮ蟠・,   miyazakiEvents,  'miyazaki');
-  kagoshimaEvents = fallback(kagoshimaError, '鮖ｿ蜈仙ｳｶ', kagoshimaEvents, 'kagoshima');
-  okinawaEvents   = fallback(okinawaError,   '豐也ｸ・,   okinawaEvents,   'okinawa');
+  sapporoEvents   = fallback(sapporoError,   '札幌',   sapporoEvents,   'sapporo');
+  asahikawaEvents = fallback(asahikawaError, '旭川',   asahikawaEvents, 'asahikawa');
+  obihiroEvents   = fallback(obihiroError,   '帯広',   obihiroEvents,   'obihiro');
+  hakodateEvents  = fallback(hakodateError,  '函館',   hakodateEvents,  'hakodate');
+  miyagiEvents    = fallback(miyagiError,    '宮城',   miyagiEvents,    'miyagi');
+  aomoriEvents    = fallback(aomoriError,    '青森',   aomoriEvents,    'aomori');
+  iwateEvents     = fallback(iwateError,     '岩手',   iwateEvents,     'iwate');
+  yamagataEvents  = fallback(yamagataError,  '山形',   yamagataEvents,  'yamagata');
+  fukushimaEvents = fallback(fukushimaError, '福島',   fukushimaEvents, 'fukushima');
+  akitaEvents     = fallback(akitaError,     '秋田',   akitaEvents,     'akita');
+  kanagawaEvents  = fallback(kanagawaError,  '神奈川', kanagawaEvents,  'kanagawa');
+  tokyoEvents     = fallback(tokyoError,     '東京',   tokyoEvents,     'tokyo');
+  saitamaEvents   = fallback(saitamaError,   '埼玉',   saitamaEvents,   'saitama');
+  gunmaEvents     = fallback(gunmaError,     '群馬',   gunmaEvents,     'gunma');
+  ibarakiEvents   = fallback(ibarakiError,   '茨城',   ibarakiEvents,   'ibaraki');
+  chibaEvents     = fallback(chibaError,     '千葉',   chibaEvents,     'chiba');
+  tochigiEvents   = fallback(tochigiError,   '栃木',   tochigiEvents,   'tochigi');
+  niigataEvents   = fallback(niigataError,   '新潟',   niigataEvents,   'niigata');
+  toyamaEvents    = fallback(toyamaError,    '富山',   toyamaEvents,    'toyama');
+  ishikawaEvents  = fallback(ishikawaError,  '石川',   ishikawaEvents,  'ishikawa');
+  fukuiEvents     = fallback(fukuiError,     '福井',   fukuiEvents,     'fukui');
+  yamanashiEvents = fallback(yamanashiError, '山梨',   yamanashiEvents, 'yamanashi');
+  naganoEvents    = fallback(naganoError,    '長野',   naganoEvents,    'nagano');
+  gifuEvents      = fallback(gifuError,      '岐阜',   gifuEvents,      'gifu');
+  shizuokaEvents  = fallback(shizuokaError,  '静岡',   shizuokaEvents,  'shizuoka');
+  aichiEvents     = fallback(aichiError,     '愛知',   aichiEvents,     'aichi');
+  mieEvents       = fallback(mieError,       '三重',   mieEvents,       'mie');
+  shigaEvents     = fallback(shigaError,     '滋賀',   shigaEvents,     'shiga');
+  kyotoEvents     = fallback(kyotoError,     '京都',   kyotoEvents,     'kyoto');
+  osakaEvents     = fallback(osakaError,     '大阪',   osakaEvents,     'osaka');
+  hyogoEvents     = fallback(hyogoError,     '兵庫',   hyogoEvents,     'hyogo');
+  naraEvents      = fallback(naraError,      '奈良',   naraEvents,      'nara');
+  wakayamaEvents  = fallback(wakayamaError,  '和歌山', wakayamaEvents,  'wakayama');
+  ehimeEvents     = fallback(ehimeError,     '愛媛',   ehimeEvents,     'ehime');
+  kagawaEvents    = fallback(kagawaError,    '香川',   kagawaEvents,    'kagawa');
+  kochiEvents     = fallback(kochiError,     '高知',   kochiEvents,     'kochi');
+  tokushimaEvents = fallback(tokushimaError, '徳島',   tokushimaEvents, 'tokushima');
+  tottoriEvents   = fallback(tottoriError,   '鳥取',   tottoriEvents,   'tottori');
+  shimaneEvents   = fallback(shimaneError,   '島根',   shimaneEvents,   'shimane');
+  okayamaEvents   = fallback(okayamaError,   '岡山',   okayamaEvents,   'okayama');
+  hiroshimaEvents = fallback(hiroshimaError, '広島',   hiroshimaEvents, 'hiroshima');
+  yamaguchiEvents = fallback(yamaguchiError, '山口',   yamaguchiEvents, 'yamaguchi');
+  fukuokaEvents   = fallback(fukuokaError,   '福岡',   fukuokaEvents,   'fukuoka');
+  sagaEvents      = fallback(sagaError,      '佐賀',   sagaEvents,      'saga');
+  nagasakiEvents  = fallback(nagasakiError,  '長崎',   nagasakiEvents,  'nagasaki');
+  kumamotoEvents  = fallback(kumamotoError,  '熊本',   kumamotoEvents,  'kumamoto');
+  oitaEvents      = fallback(oitaError,      '大分',   oitaEvents,      'oita');
+  miyazakiEvents  = fallback(miyazakiError,  '宮崎',   miyazakiEvents,  'miyazaki');
+  kagoshimaEvents = fallback(kagoshimaError, '鹿児島', kagoshimaEvents, 'kagoshima');
+  okinawaEvents   = fallback(okinawaError,   '沖縄',   okinawaEvents,   'okinawa');
 
-  // 笏笏 PDF OCR・・v.url 縺・.pdf 縺ｮ繧､繝吶Φ繝医ｒ蟇ｾ雎｡・・笏笏
+  // ── PDF OCR（ev.url が .pdf のイベントを対象） ──
   iwateEvents  = await enrichWithPdfOcr(iwateEvents);
   aomoriEvents = await enrichWithPdfOcr(aomoriEvents);
 
-  // 笏笏 逕ｻ蜒・OCR・亥・蝨ｰ譛ｬ蟇ｾ雎｡・俄楳笏
-  // imageUrl 縺ｾ縺溘・ url 縺檎判蜒上ヵ繧｡繧､繝ｫ縺ｮ繧､繝吶Φ繝医・縺ｿ螳溯｡後ゅ◎繧御ｻ･螟悶・繝代せ繧ｹ繝ｫ繝ｼ縺ｧ辟｡螳ｳ縲・  sapporoEvents   = await enrichWithOcr(sapporoEvents);
+  // ── 画像 OCR（全地本対象）──
+  // imageUrl または url が画像ファイルのイベントのみ実行。それ以外はパススルーで無害。
+  sapporoEvents   = await enrichWithOcr(sapporoEvents);
   asahikawaEvents = await enrichWithOcr(asahikawaEvents);
   obihiroEvents   = await enrichWithOcr(obihiroEvents);
   hakodateEvents  = await enrichWithOcr(hakodateEvents);
@@ -1924,7 +1980,8 @@ async function main() {
   kagoshimaEvents = await enrichWithOcr(kagoshimaEvents);
   okinawaEvents   = await enrichWithOcr(okinawaEvents);
 
-  // imageUrl 縺ｯ譛邨ょ・蜉帙↓蜷ｫ繧√↑縺・ｼ亥・驛ｨ逕ｨ繝輔ぅ繝ｼ繝ｫ繝会ｼ・  const strip = ev => { const { imageUrl: _, ...rest } = ev; return rest; };
+  // imageUrl は最終出力に含めない（内部用フィールド）
+  const strip = ev => { const { imageUrl: _, ...rest } = ev; return rest; };
 
   const output = {
     sapporo:   sapporoEvents.map(strip),
@@ -1980,18 +2037,19 @@ async function main() {
     updatedAt: nowJST(),
   };
   writeOutput(output);
-  // 譁ｰ隕上う繝吶Φ繝医ｒ讀懷・縺励※繝励ャ繧ｷ繝･騾夂衍・磯撼蜷梧悄繝ｻ螟ｱ謨励＠縺ｦ繧らｶ夊｡鯉ｼ・  await notifyNewEvents(prev, output).catch(err =>
-    console.warn('[Push] notifyNewEvents 繧ｨ繝ｩ繝ｼ:', err.message)
+  // 新規イベントを検出してプッシュ通知（非同期・失敗しても続行）
+  await notifyNewEvents(prev, output).catch(err =>
+    console.warn('[Push] notifyNewEvents エラー:', err.message)
   );
 }
 
-/** public/data/events.json 縺ｫ譖ｸ縺榊・縺・*/
+/** public/data/events.json に書き出す */
 function writeOutput(data) {
-  // 繝・ぅ繝ｬ繧ｯ繝医Μ縺檎┌縺代ｌ縺ｰ菴懈・
+  // ディレクトリが無ければ作成
   const dir = path.dirname(OUTPUT_PATH);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
-  // 莉頑律・・ST・峨ｈ繧雁燕縺ｮ譌･莉倥・繧､繝吶Φ繝医ｒ蜑企勁
+  // 今日（JST）より前の日付のイベントを削除
   const jstNow = new Date(Date.now() + 9 * 3600 * 1000);
   const today = jstNow.toISOString().slice(0, 10); // "YYYY-MM-DD"
   let removedCount = 0;
@@ -2001,98 +2059,103 @@ function writeOutput(data) {
     data[key] = data[key].filter(ev => {
       if (!ev.date) return false;
       if ((ev.endDate || ev.date) < today) return false;
-      // 繧ｿ繧､繝医Ν縺後後♀遏･繧峨○縲阪・縺ｿ遲峨∝・螳ｹ縺ｮ縺ｪ縺・ざ繝溘ョ繝ｼ繧ｿ繧帝勁螟・      if (!ev.title || /^縺顔衍繧峨○$/.test(ev.title.trim())) return false;
+      // タイトルが「お知らせ」のみ等、内容のないゴミデータを除外
+      if (!ev.title || /^お知らせ$/.test(ev.title.trim())) return false;
       return true;
     });
     removedCount += before - data[key].length;
-    // 譖懈律繧偵き繝ｬ繝ｳ繝繝ｼ繝・・繧ｿ縺ｧ荳頑嶌縺・    data[key].forEach(ev => {
+    // 曜日をカレンダーデータで上書き
+    data[key].forEach(ev => {
       if (ev.date)    ev.weekday    = calcWeekday(ev.date);
       if (ev.endDate) ev.endWeekday = calcWeekday(ev.endDate);
     });
   }
-  if (removedCount > 0) console.log(`[繝輔ぅ繝ｫ繧ｿ] 驕主悉繧､繝吶Φ繝・${removedCount} 莉ｶ繧貞炎髯､`);
+  if (removedCount > 0) console.log(`[フィルタ] 過去イベント ${removedCount} 件を削除`);
 
   fs.writeFileSync(OUTPUT_PATH, JSON.stringify(data, null, 2), 'utf8');
-  console.log(`[蜃ｺ蜉嫋 ${OUTPUT_PATH}`);
-  console.log(`  譛ｭ蟷・   ${(data.sapporo   ?? []).length} 莉ｶ`);
-  console.log(`  譌ｭ蟾・   ${(data.asahikawa ?? []).length} 莉ｶ`);
-  console.log(`  蟶ｯ蠎・   ${(data.obihiro   ?? []).length} 莉ｶ`);
-  console.log(`  蜃ｽ鬢ｨ:   ${(data.hakodate  ?? []).length} 莉ｶ`);
-  console.log(`  螳ｮ蝓・   ${(data.miyagi    ?? []).length} 莉ｶ`);
-  console.log(`  髱呈｣ｮ:   ${(data.aomori   ?? []).length} 莉ｶ`);
-  console.log(`  蟯ｩ謇・   ${(data.iwate    ?? []).length} 莉ｶ`);
-  console.log(`  螻ｱ蠖｢:   ${(data.yamagata  ?? []).length} 莉ｶ`);
-  console.log(`  遖丞ｳｶ:   ${(data.fukushima ?? []).length} 莉ｶ`);
-  console.log(`  遘狗伐:   ${(data.akita     ?? []).length} 莉ｶ`);
-  console.log(`  逾槫･亥ｷ・ ${(data.kanagawa  ?? []).length} 莉ｶ`);
-  console.log(`  譚ｱ莠ｬ:   ${(data.tokyo     ?? []).length} 莉ｶ`);
-  console.log(`  蝓ｼ邇・   ${(data.saitama   ?? []).length} 莉ｶ`);
-  console.log(`  鄒､鬥ｬ:   ${(data.gunma     ?? []).length} 莉ｶ`);
-  console.log(`  譬・惠:   ${(data.tochigi   ?? []).length} 莉ｶ`);
-  console.log(`  闌ｨ蝓・   ${(data.ibaraki   ?? []).length} 莉ｶ`);
-  console.log(`  蜊・痩:   ${(data.chiba     ?? []).length} 莉ｶ`);
-  console.log(`  譁ｰ貎・   ${(data.niigata   ?? []).length} 莉ｶ`);
-  console.log(`  蟇悟ｱｱ:   ${(data.toyama    ?? []).length} 莉ｶ`);
-  console.log(`  遏ｳ蟾・   ${(data.ishikawa  ?? []).length} 莉ｶ`);
-  console.log(`  遖丈ｺ・   ${(data.fukui     ?? []).length} 莉ｶ`);
-  console.log(`  螻ｱ譴ｨ:   ${(data.yamanashi ?? []).length} 莉ｶ`);
-  console.log(`  髟ｷ驥・   ${(data.nagano    ?? []).length} 莉ｶ`);
-  console.log(`  蟯宣・:   ${(data.gifu      ?? []).length} 莉ｶ`);
-  console.log(`  髱吝ｲ｡:   ${(data.shizuoka  ?? []).length} 莉ｶ`);
-  console.log(`  諢帷衍:   ${(data.aichi     ?? []).length} 莉ｶ`);
-  console.log(`  荳蛾㍾:   ${(data.mie       ?? []).length} 莉ｶ`);
-  console.log(`  貊玖ｳ:   ${(data.shiga     ?? []).length} 莉ｶ`);
-  console.log(`  莠ｬ驛ｽ:   ${(data.kyoto     ?? []).length} 莉ｶ`);
-  console.log(`  螟ｧ髦ｪ:   ${(data.osaka     ?? []).length} 莉ｶ`);
-  console.log(`  蜈ｵ蠎ｫ:   ${(data.hyogo     ?? []).length} 莉ｶ`);
-  console.log(`  螂郁憶:   ${(data.nara      ?? []).length} 莉ｶ`);
-  console.log(`  蜥梧ｭ悟ｱｱ: ${(data.wakayama  ?? []).length} 莉ｶ`);
-  console.log(`  諢帛ｪ・   ${(data.ehime     ?? []).length} 莉ｶ`);
-  console.log(`  鬥吝ｷ・   ${(data.kagawa    ?? []).length} 莉ｶ`);
-  console.log(`  鬮倡衍:   ${(data.kochi     ?? []).length} 莉ｶ`);
-  console.log(`  蠕ｳ蟲ｶ:   ${(data.tokushima ?? []).length} 莉ｶ`);
-  console.log(`  魑･蜿・   ${(data.tottori   ?? []).length} 莉ｶ`);
-  console.log(`  蟲ｶ譬ｹ:   ${(data.shimane   ?? []).length} 莉ｶ`);
-  console.log(`  蟯｡螻ｱ:   ${(data.okayama   ?? []).length} 莉ｶ`);
-  console.log(`  蠎・ｳｶ:   ${(data.hiroshima ?? []).length} 莉ｶ`);
-  console.log(`  螻ｱ蜿｣:   ${(data.yamaguchi ?? []).length} 莉ｶ`);
-  console.log(`  遖丞ｲ｡:   ${(data.fukuoka   ?? []).length} 莉ｶ`);
-  console.log(`  菴占ｳ:   ${(data.saga      ?? []).length} 莉ｶ`);
-  console.log(`  髟ｷ蟠・   ${(data.nagasaki  ?? []).length} 莉ｶ`);
-  console.log(`  辭頑悽:   ${(data.kumamoto  ?? []).length} 莉ｶ`);
-  console.log(`  螟ｧ蛻・   ${(data.oita      ?? []).length} 莉ｶ`);
-  console.log(`  螳ｮ蟠・   ${(data.miyazaki  ?? []).length} 莉ｶ`);
-  console.log(`  鮖ｿ蜈仙ｳｶ: ${(data.kagoshima ?? []).length} 莉ｶ`);
-  console.log(`  豐也ｸ・   ${(data.okinawa   ?? []).length} 莉ｶ`);
-  console.log(`  譖ｴ譁ｰ譎ょ綾: ${data.updatedAt}`);
+  console.log(`[出力] ${OUTPUT_PATH}`);
+  console.log(`  札幌:   ${(data.sapporo   ?? []).length} 件`);
+  console.log(`  旭川:   ${(data.asahikawa ?? []).length} 件`);
+  console.log(`  帯広:   ${(data.obihiro   ?? []).length} 件`);
+  console.log(`  函館:   ${(data.hakodate  ?? []).length} 件`);
+  console.log(`  宮城:   ${(data.miyagi    ?? []).length} 件`);
+  console.log(`  青森:   ${(data.aomori   ?? []).length} 件`);
+  console.log(`  岩手:   ${(data.iwate    ?? []).length} 件`);
+  console.log(`  山形:   ${(data.yamagata  ?? []).length} 件`);
+  console.log(`  福島:   ${(data.fukushima ?? []).length} 件`);
+  console.log(`  秋田:   ${(data.akita     ?? []).length} 件`);
+  console.log(`  神奈川: ${(data.kanagawa  ?? []).length} 件`);
+  console.log(`  東京:   ${(data.tokyo     ?? []).length} 件`);
+  console.log(`  埼玉:   ${(data.saitama   ?? []).length} 件`);
+  console.log(`  群馬:   ${(data.gunma     ?? []).length} 件`);
+  console.log(`  栃木:   ${(data.tochigi   ?? []).length} 件`);
+  console.log(`  茨城:   ${(data.ibaraki   ?? []).length} 件`);
+  console.log(`  千葉:   ${(data.chiba     ?? []).length} 件`);
+  console.log(`  新潟:   ${(data.niigata   ?? []).length} 件`);
+  console.log(`  富山:   ${(data.toyama    ?? []).length} 件`);
+  console.log(`  石川:   ${(data.ishikawa  ?? []).length} 件`);
+  console.log(`  福井:   ${(data.fukui     ?? []).length} 件`);
+  console.log(`  山梨:   ${(data.yamanashi ?? []).length} 件`);
+  console.log(`  長野:   ${(data.nagano    ?? []).length} 件`);
+  console.log(`  岐阜:   ${(data.gifu      ?? []).length} 件`);
+  console.log(`  静岡:   ${(data.shizuoka  ?? []).length} 件`);
+  console.log(`  愛知:   ${(data.aichi     ?? []).length} 件`);
+  console.log(`  三重:   ${(data.mie       ?? []).length} 件`);
+  console.log(`  滋賀:   ${(data.shiga     ?? []).length} 件`);
+  console.log(`  京都:   ${(data.kyoto     ?? []).length} 件`);
+  console.log(`  大阪:   ${(data.osaka     ?? []).length} 件`);
+  console.log(`  兵庫:   ${(data.hyogo     ?? []).length} 件`);
+  console.log(`  奈良:   ${(data.nara      ?? []).length} 件`);
+  console.log(`  和歌山: ${(data.wakayama  ?? []).length} 件`);
+  console.log(`  愛媛:   ${(data.ehime     ?? []).length} 件`);
+  console.log(`  香川:   ${(data.kagawa    ?? []).length} 件`);
+  console.log(`  高知:   ${(data.kochi     ?? []).length} 件`);
+  console.log(`  徳島:   ${(data.tokushima ?? []).length} 件`);
+  console.log(`  鳥取:   ${(data.tottori   ?? []).length} 件`);
+  console.log(`  島根:   ${(data.shimane   ?? []).length} 件`);
+  console.log(`  岡山:   ${(data.okayama   ?? []).length} 件`);
+  console.log(`  広島:   ${(data.hiroshima ?? []).length} 件`);
+  console.log(`  山口:   ${(data.yamaguchi ?? []).length} 件`);
+  console.log(`  福岡:   ${(data.fukuoka   ?? []).length} 件`);
+  console.log(`  佐賀:   ${(data.saga      ?? []).length} 件`);
+  console.log(`  長崎:   ${(data.nagasaki  ?? []).length} 件`);
+  console.log(`  熊本:   ${(data.kumamoto  ?? []).length} 件`);
+  console.log(`  大分:   ${(data.oita      ?? []).length} 件`);
+  console.log(`  宮崎:   ${(data.miyazaki  ?? []).length} 件`);
+  console.log(`  鹿児島: ${(data.kagoshima ?? []).length} 件`);
+  console.log(`  沖縄:   ${(data.okinawa   ?? []).length} 件`);
+  console.log(`  更新時刻: ${data.updatedAt}`);
 
-  // AI繧ｯ繝ｭ繝ｼ繝ｩ繝ｼ蜷代￠髱咏噪 HTML 繧貞・逕滓・
+  // AIクローラー向け静的 HTML を再生成
   try {
     const { execSync } = require('child_process');
     execSync('node ../scripts/generate-events-html.mjs', { cwd: __dirname, stdio: 'inherit' });
   } catch (e) {
-    console.warn('[隴ｦ蜻馨 events.html 逕滓・縺ｫ螟ｱ謨励＠縺ｾ縺励◆:', e.message);
+    console.warn('[警告] events.html 生成に失敗しました:', e.message);
   }
 }
 
-// 笏笏 譁ｰ隕上う繝吶Φ繝域､懷・ 竊・Web Push 騾夂衍 笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+// ── 新規イベント検出 → Web Push 通知 ─────────────────────────
 /**
- * 蜑榊屓繝・・繧ｿ縺ｨ譁ｰ繝・・繧ｿ繧呈ｯ碑ｼ・＠縲∵眠縺励￥霑ｽ蜉縺輔ｌ縺溘う繝吶Φ繝医′縺ゅｌ縺ｰ
- * /api/notify 縺ｫ POST 縺励※繝励ャ繧ｷ繝･騾夂衍繧帝∽ｿ｡縺吶ｋ縲・ *
- * 蠢・ｦ√↑迺ｰ蠅・､画焚:
- *   SITE_URL       窶・繝・・繝ｭ繧､蜈・URL (萓・ https://jsdf-events.vercel.app)
- *   NOTIFY_SECRET  窶・API 隱崎ｨｼ繧ｷ繝ｼ繧ｯ繝ｬ繝・ヨ
+ * 前回データと新データを比較し、新しく追加されたイベントがあれば
+ * /api/notify に POST してプッシュ通知を送信する。
  *
- * 縺・★繧後°縺梧悴險ｭ螳壹・蝣ｴ蜷医・菴輔ｂ縺励↑縺・ｼ医Ο繝ｼ繧ｫ繝ｫ髢狗匱譎ゅ↑縺ｩ・峨・ */
+ * 必要な環境変数:
+ *   SITE_URL       – デプロイ先 URL (例: https://jsdf-events.vercel.app)
+ *   NOTIFY_SECRET  – API 認証シークレット
+ *
+ * いずれかが未設定の場合は何もしない（ローカル開発時など）。
+ */
 async function notifyNewEvents(prevData, newData) {
   const siteUrl     = process.env.SITE_URL;
   const notifSecret = process.env.NOTIFY_SECRET;
   if (!siteUrl || !notifSecret) {
-    console.log('[Push] SITE_URL / NOTIFY_SECRET 譛ｪ險ｭ螳壹・縺溘ａ騾夂衍繧偵せ繧ｭ繝・・縺励∪縺・);
+    console.log('[Push] SITE_URL / NOTIFY_SECRET 未設定のため通知をスキップします');
     return;
   }
 
-  // 蜑榊屓縺ｮ蜈ｨ繧､繝吶Φ繝・ID 繧ｻ繝・ヨ繧呈ｧ狗ｯ・  const prevIds = new Set();
+  // 前回の全イベント ID セットを構築
+  const prevIds = new Set();
   for (const key of Object.keys(prevData)) {
     if (!Array.isArray(prevData[key])) continue;
     for (const ev of prevData[key]) {
@@ -2100,7 +2163,7 @@ async function notifyNewEvents(prevData, newData) {
     }
   }
 
-  // 譁ｰ隕上う繝吶Φ繝医ｒ蜿朱寔
+  // 新規イベントを収集
   const newEvents = [];
   for (const key of Object.keys(newData)) {
     if (!Array.isArray(newData[key])) continue;
@@ -2110,16 +2173,17 @@ async function notifyNewEvents(prevData, newData) {
   }
 
   if (newEvents.length === 0) {
-    console.log('[Push] 譁ｰ隕上う繝吶Φ繝医↑縺励る夂衍繧偵せ繧ｭ繝・・縺励∪縺・);
+    console.log('[Push] 新規イベントなし。通知をスキップします');
     return;
   }
 
-  console.log(`[Push] 譁ｰ隕上う繝吶Φ繝・${newEvents.length} 莉ｶ繧呈､懷・縲る夂衍繧帝∽ｿ｡縺励∪縺兪);
+  console.log(`[Push] 新規イベント ${newEvents.length} 件を検出。通知を送信します`);
 
-  // 莉｣陦ｨ繧､繝吶Φ繝医〒騾夂衍繝・く繧ｹ繝医ｒ菴懈・・域怙螟ｧ3莉ｶ・・  const sample  = newEvents.slice(0, 3);
-  const title   = `閾ｪ陦幃嚏繧､繝吶Φ繝域ュ蝣ｱ +${newEvents.length}莉ｶ`;
-  const body    = sample.map(e => `繝ｻ${e.title} (${e.date})`).join('\n')
-                + (newEvents.length > 3 ? `\n莉・${newEvents.length - 3} 莉ｶ窶ｦ` : '');
+  // 代表イベントで通知テキストを作成（最大3件）
+  const sample  = newEvents.slice(0, 3);
+  const title   = `自衛隊イベント情報 +${newEvents.length}件`;
+  const body    = sample.map(e => `・${e.title} (${e.date})`).join('\n')
+                + (newEvents.length > 3 ? `\n他 ${newEvents.length - 3} 件…` : '');
   const url     = '/';
 
   const payload = JSON.stringify({ title, body, url });
@@ -2146,13 +2210,13 @@ async function notifyNewEvents(prevData, newData) {
         let body = '';
         res.on('data', c => { body += c; });
         res.on('end', () => {
-          console.log(`[Push] API 蠢懃ｭ・${res.statusCode}: ${body}`);
+          console.log(`[Push] API 応答 ${res.statusCode}: ${body}`);
           resolve();
         });
       }
     );
     req.on('error', err => {
-      console.warn('[Push] API 蜻ｼ縺ｳ蜃ｺ縺励↓螟ｱ謨励＠縺ｾ縺励◆:', err.message);
+      console.warn('[Push] API 呼び出しに失敗しました:', err.message);
       resolve();
     });
     req.write(payload);
@@ -2160,9 +2224,9 @@ async function notifyNewEvents(prevData, newData) {
   });
 }
 
-// 笏笏 繧ｨ繝ｳ繝医Μ繝ｼ繝昴う繝ｳ繝・笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+// ── エントリーポイント ────────────────────────────────────────
 main().catch(err => {
-  console.error('[閾ｴ蜻ｽ逧・お繝ｩ繝ｼ]', err);
+  console.error('[致命的エラー]', err);
   process.exit(1);
 });
 
