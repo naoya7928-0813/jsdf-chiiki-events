@@ -20,8 +20,10 @@ style.textContent = `
     --month-sep:  #d8dce3;
     --tag-bg:     #eef1f6;
     --badge-bg:   #eef1f6;
-    --map-gray:   #d1d5db;
-    --map-hover:  #c4c8d0;
+    --map-gray:        #d1d5db;
+    --map-hover:       #c4c8d0;
+    --notice-bg:       rgba(133,107,0,0.07);
+    --notice-border:   rgba(133,107,0,0.15);
   }
 
   /* ─── ダークモード ─── */
@@ -37,8 +39,10 @@ style.textContent = `
     --month-sep:  #30363d;
     --tag-bg:     #21262d;
     --badge-bg:   #21262d;
-    --map-gray:   #2d3748;
-    --map-hover:  #3d4a5e;
+    --map-gray:        #2d3748;
+    --map-hover:       #3d4a5e;
+    --notice-bg:       rgba(255,200,0,0.06);
+    --notice-border:   rgba(255,200,0,0.12);
   }
 
   /* ─── OS設定がダーク かつ data-theme 未指定の場合 ─── */
@@ -55,8 +59,10 @@ style.textContent = `
       --month-sep:  #30363d;
       --tag-bg:     #21262d;
       --badge-bg:   #21262d;
-      --map-gray:   #2d3748;
-      --map-hover:  #3d4a5e;
+      --map-gray:        #2d3748;
+      --map-hover:       #3d4a5e;
+      --notice-bg:       rgba(255,200,0,0.06);
+      --notice-border:   rgba(255,200,0,0.12);
     }
   }
 
