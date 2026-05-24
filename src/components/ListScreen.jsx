@@ -3,7 +3,7 @@ import { ICO } from './Icons';
 import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle } from './Shared';
 import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, matchesTag, APPLIED_TAG_ID } from './FilterBar';
 import { daysUntil, deadlineDaysUntil, daysLabel, daysColor } from '../utils/date';
-import { REGIONS, SUPPORTED_PREFECTURES } from '../data/regionMap';
+import { REGIONS, SUPPORTED_PREFECTURES, PREFECTURE_INFO } from '../data/regionMap';
 
 const ALL_TAB = { id: 'all', label: '全国', emblem: '全' };
 const ALL_PREF_TABS = [
@@ -449,6 +449,15 @@ export default function ListScreen({
                                 fontFamily: F.mono, letterSpacing: 0.5,
                               }}>
                                 {daysLabel(eventDays, 'event')}
+                              </span>
+                            )}
+                            {/* 全国タブのみ：掲載元の地本名を小さく表示（住所・電話番号等の詳細は詳細画面に集約） */}
+                            {region === 'all' && ev.pref && (
+                              <span style={{
+                                fontSize: 10, color: 'var(--text-muted)', fontFamily: F.mono,
+                                marginLeft: 'auto', flexShrink: 0,
+                              }}>
+                                {(PREFECTURE_INFO[ev.pref]?.label ?? ev.pref)}地本
                               </span>
                             )}
                           </div>

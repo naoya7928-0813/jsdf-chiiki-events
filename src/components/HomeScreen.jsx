@@ -60,7 +60,7 @@ export default function HomeScreen({
             <div style={{ fontFamily: F.serif, fontSize: 22, fontWeight: 600, letterSpacing: 1, marginTop: 4 }}>
               地本イベント情報
             </div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', marginTop: 3, lineHeight: 1.55, maxWidth: 230 }}>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 3, lineHeight: 1.55, maxWidth: 240 }}>
               全国の地方協力本部（地本）が公開するイベントをまとめた非公式サービスです
             </div>
           </div>
