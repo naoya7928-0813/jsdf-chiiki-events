@@ -105,10 +105,10 @@ export default function App() {
   }, []);
 
   // ── 地本設定（ListScreen 用） ─────────────────────────────
-  const [region, setRegion] = useState(loadRegion);
+  // 起動時・画面遷移時は常に「全国」から開始（前回選択した都道府県を引き継がない）
+  const [region, setRegion] = useState('all');
   const handleRegionChange = useCallback((id) => {
     setRegion(id);
-    try { localStorage.setItem('jsdf-region', id); } catch {}
   }, []);
 
   // ── ダークモード ──────────────────────────────────────────
@@ -276,7 +276,7 @@ export default function App() {
           onBack={() => setScreen('home')}
           onOpenDetail={(ev) => openDetail(ev, 'region')}
           onOpenHome={() => setScreen('home')}
-          onOpenList={() => setScreen('list')}
+          onOpenList={() => { handleRegionChange('all'); setScreen('list'); }}
           onOpenFavorites={() => setScreen('favorites')}
           onOpenSettings={() => setScreen('settings')}
         />
@@ -316,7 +316,7 @@ export default function App() {
           onColorChange={handleColorChange}
           onDarkModeChange={handleDarkModeChange}
           onOpenHome={() => setScreen('home')}
-          onOpenList={() => setScreen('list')}
+          onOpenList={() => { handleRegionChange('all'); setScreen('list'); }}
           onOpenRegion={openRegion}
           onOpenFavorites={() => setScreen('favorites')}
           onOpenLegal={(doc) => { setLegalDoc(doc); setScreen('legal'); }}
@@ -354,7 +354,7 @@ export default function App() {
           onOpenDetail={(ev) => openDetail(ev, 'favorites')}
           onBack={() => setScreen('home')}
           onOpenHome={() => setScreen('home')}
-          onOpenList={() => setScreen('list')}
+          onOpenList={() => { handleRegionChange('all'); setScreen('list'); }}
           onOpenRegion={openRegion}
           onOpenSettings={() => setScreen('settings')}
         />

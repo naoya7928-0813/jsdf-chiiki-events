@@ -38,6 +38,12 @@ export default function ListScreen({
     container.scrollLeft = Math.max(0, target);
   }, [region]);
 
+  // タブ切り替え時にイベントリストを先頭へスクロール
+  const listScrollRef = useRef(null);
+  useEffect(() => {
+    if (listScrollRef.current) listScrollRef.current.scrollTop = 0;
+  }, [region]);
+
   // ── 検索 ─────────────────────────────────────────────────
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -342,7 +348,7 @@ export default function ListScreen({
         </span>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 60px)' }}>
+      <div ref={listScrollRef} style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 60px)' }}>
         <ErrorBanner message={error} />
 
         {/* 初回ローディング中はスピナー（既にデータがある場合は出さない） */}
