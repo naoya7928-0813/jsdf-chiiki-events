@@ -199,9 +199,9 @@ export default function HomeScreen({
                       </div>
                     </div>
                   </div>
-                  {/* 全イベント一覧へのショートカット */}
+                  {/* 全イベント一覧へのショートカット：引数なしで呼ぶことで全国（all）を確実に設定 */}
                   <button
-                    onClick={onOpenList}
+                    onClick={() => onOpenList()}
                     style={{
                       width: '100%', height: 38, borderRadius: 8, border: `1px solid ${primary}44`,
                       background: `${primary}08`, color: primary,
