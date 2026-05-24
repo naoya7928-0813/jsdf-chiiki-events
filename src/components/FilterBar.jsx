@@ -39,20 +39,29 @@ export function matchesTag(ev, tagId) {
 
 // 期間ごとの件数を返すユーティリティ（ListScreen でも再利用）
 export function calcPeriodCounts(events) {
-  const n    = new Date(Date.now() + 9 * 3600 * 1000);
-  const tStr = n.toISOString().slice(0, 10);
+  // JST の今日を YYYY-MM-DD 文字列で取得（UTC+9 をオフセットして ISO 変換）
+  const tStr = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+  const Y  = Number(tStr.slice(0, 4));
+  const Mo = Number(tStr.slice(5, 7)); // 1-indexed
 
-  const wEnd = new Date(n); wEnd.setDate(n.getDate() + 6);
-  const wStr = wEnd.toISOString().slice(0, 10);
+  // ヘルパー: n 日後の YYYY-MM-DD（UTC 基準で計算→ TZ 影響なし）
+  const addDays = (s, n) => {
+    const d = new Date(s + 'T00:00:00Z');
+    d.setUTCDate(d.getUTCDate() + n);
+    return d.toISOString().slice(0, 10);
+  };
+  // ヘルパー: 月の末日（1-indexed month）
+  const lastDay = (y, m) => new Date(Date.UTC(y, m, 0)).getUTCDate();
+  const pad = n => String(n).padStart(2, '0');
 
-  const mEnd = new Date(n.getFullYear(), n.getMonth() + 1, 0);
-  const mStr = mEnd.toISOString().slice(0, 10);
+  const wStr = addDays(tStr, 6);
+  const mStr = `${Y}-${pad(Mo)}-${pad(lastDay(Y, Mo))}`;
 
-  // 来月：開始日が来月の範囲に入るイベントのみ（今月開始来月終了のイベントは除外）
-  const nmStart = new Date(n.getFullYear(), n.getMonth() + 1, 1);
-  const nmEnd   = new Date(n.getFullYear(), n.getMonth() + 2, 0);
-  const nmSStr  = nmStart.toISOString().slice(0, 10);
-  const nmEStr  = nmEnd.toISOString().slice(0, 10);
+  // 来月（年またぎ対応）
+  const nmY    = Mo === 12 ? Y + 1 : Y;
+  const nmM    = Mo === 12 ? 1 : Mo + 1;
+  const nmSStr = `${nmY}-${pad(nmM)}-01`;
+  const nmEStr = `${nmY}-${pad(nmM)}-${pad(lastDay(nmY, nmM))}`;
 
   const inRange = (e, s, f) => { const ee = e.endDate ?? e.date; return e.date <= f && ee >= s; };
 

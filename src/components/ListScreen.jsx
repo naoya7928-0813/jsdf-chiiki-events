@@ -87,14 +87,29 @@ export default function ListScreen({
 
   // ── フィルター適用済みリスト（期間×カテゴリ×タグ、開催日昇順） ──
   const filteredList = useMemo(() => {
-    const n    = new Date(Date.now() + 9 * 3600 * 1000);
-    const tStr = n.toISOString().slice(0, 10);
-    const wEnd = new Date(n); wEnd.setDate(n.getDate() + 6);
-    const wStr = wEnd.toISOString().slice(0, 10);
-    const mEnd = new Date(n.getFullYear(), n.getMonth() + 1, 0);
-    const mStr = mEnd.toISOString().slice(0, 10);
-    const nmS  = new Date(n.getFullYear(), n.getMonth() + 1, 1).toISOString().slice(0, 10);
-    const nmE  = new Date(n.getFullYear(), n.getMonth() + 2, 0).toISOString().slice(0, 10);
+    // JST の今日を YYYY-MM-DD 文字列で取得
+    const tStr = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+    const Y  = Number(tStr.slice(0, 4));
+    const Mo = Number(tStr.slice(5, 7)); // 1-indexed
+
+    // n 日後の YYYY-MM-DD（UTC 基準で計算→ TZ 影響なし）
+    const addDays = (s, n) => {
+      const d = new Date(s + 'T00:00:00Z');
+      d.setUTCDate(d.getUTCDate() + n);
+      return d.toISOString().slice(0, 10);
+    };
+    // 月の末日（1-indexed month）
+    const lastDay = (y, m) => new Date(Date.UTC(y, m, 0)).getUTCDate();
+    const pad = n => String(n).padStart(2, '0');
+
+    const wStr = addDays(tStr, 6);
+    const mStr = `${Y}-${pad(Mo)}-${pad(lastDay(Y, Mo))}`;
+
+    // 来月（年またぎ対応）
+    const nmY = Mo === 12 ? Y + 1 : Y;
+    const nmM = Mo === 12 ? 1 : Mo + 1;
+    const nmS = `${nmY}-${pad(nmM)}-01`;
+    const nmE = `${nmY}-${pad(nmM)}-${pad(lastDay(nmY, nmM))}`;
 
     return list
       .filter(ev => {
