@@ -254,7 +254,11 @@ export default function App() {
           unreadCount={unreadCount}
           initialRegionId={mapRegionId}
           onOpenNotifications={() => setScreen('notifications')}
-          onOpenList={() => setScreen('list')}
+          onOpenList={(prefId) => {
+            // prefId あり → その都道府県タブを選択、なし → 全国（all）にリセット
+            handleRegionChange(prefId || 'all');
+            setScreen('list');
+          }}
           onOpenRegion={openRegion}
           onOpenSettings={() => setScreen('settings')}
           onOpenFavorites={() => setScreen('favorites')}

@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { ICO } from './Icons';
 import { BottomTabBar, F, Spinner, ErrorBanner } from './Shared';
 import JapanMap from './JapanMap';
-import { REGION_BY_ID, countEventsByRegion, getSupportedPrefsByRegion } from '../data/regionMap';
+import { REGION_BY_ID, SUPPORTED_PREFECTURES, countEventsByRegion, getSupportedPrefsByRegion } from '../data/regionMap';
 
 // ─── 地図ホーム画面 ───────────────────────────────────────────
 export default function HomeScreen({
@@ -27,6 +27,11 @@ export default function HomeScreen({
   const supportedPrefs    = selectedRegionId ? getSupportedPrefsByRegion(selectedRegionId, events) : [];
   const totalEventCount   = supportedPrefs.reduce((s, p) => s + p.count, 0);
   const hasEvents         = totalEventCount > 0;
+
+  // 選択中地域の「最初の対応都道府県ID」（イベントを見るボタン用）
+  const firstSupportedPref = selectedRegionId
+    ? (REGION_BY_ID[selectedRegionId]?.prefectures.find(p => SUPPORTED_PREFECTURES.has(p.id))?.id ?? null)
+    : null;
 
   // 地域タップ：同じ地域を再タップしたら選択解除
   const handleRegionSelect = (id) => {
@@ -140,9 +145,9 @@ export default function HomeScreen({
                     )}
                   </div>
 
-                  {/* イベントを見るボタン → イベント一覧へ */}
+                  {/* イベントを見るボタン → 地域の最初の都道府県でイベント一覧へ */}
                   <button
-                    onClick={() => hasEvents && onOpenList()}
+                    onClick={() => hasEvents && onOpenList(firstSupportedPref)}
                     disabled={!hasEvents}
                     style={{
                       width: '100%', height: 38, borderRadius: 10, border: 'none',
