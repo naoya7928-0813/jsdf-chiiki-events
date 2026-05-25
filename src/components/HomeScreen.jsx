@@ -4,17 +4,6 @@ import { BottomTabBar, F, Spinner, ErrorBanner } from './Shared';
 import JapanMap from './JapanMap';
 import { REGION_BY_ID, SUPPORTED_PREFECTURES, countEventsByRegion, getSupportedPrefsByRegion } from '../data/regionMap';
 
-// ─── 自衛隊制服迷彩パレット（ホーム画面ヘッダー用） ──────────
-const CAMO_PALETTES = {
-  jgsdf: { bg: '#566838', d1: '#1c2c0c', d2: '#3a5218', d3: '#5c3018', d4: '#0c0e06' },
-  jmsdf: { bg: '#1c3050', d1: '#0c1828', d2: '#142440', d3: '#203a60', d4: '#070e1a' },
-  jasdf: { bg: '#3c4a58', d1: '#1c2228', d2: '#2c3840', d3: '#343c30', d4: '#0e1014' },
-};
-function getCamoPalette(primary) {
-  if (primary === '#0b2545') return CAMO_PALETTES.jmsdf;
-  if (primary === '#2a4a6b') return CAMO_PALETTES.jasdf;
-  return CAMO_PALETTES.jgsdf;
-}
 
 // ─── 地図ホーム画面 ───────────────────────────────────────────
 export default function HomeScreen({
@@ -24,7 +13,6 @@ export default function HomeScreen({
   initialRegionId,
 }) {
   const { primary } = theme;
-  const c = getCamoPalette(primary);
 
   // 地図上で選択中の地域ID
   const [selectedRegionId, setSelectedRegionId] = useState(initialRegionId ?? null);
@@ -57,51 +45,20 @@ export default function HomeScreen({
       background: 'var(--bg)', fontFamily: F.sans,
     }}>
 
-      {/* ─ ヘッダー（陸海空 迷彩パターン） ─ */}
+      {/* ─ ヘッダー ─ */}
       <div style={{
         paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)',
         paddingBottom: 14, color: '#fff', flexShrink: 0,
-        position: 'relative', overflow: 'hidden',
+        background: primary,
       }}>
-        {/* ── 制服迷彩タイルパターン（有機形状ブロブ） ── */}
-        <svg aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }}>
-          <defs>
-            <pattern id="hdr-camo" x="0" y="0" width="240" height="100" patternUnits="userSpaceOnUse">
-              <rect width="240" height="100" fill={c.bg}/>
-              {/* 上半分 */}
-              <path d="M 2,12 L 32,4 L 58,10 L 64,30 L 52,52 L 22,56 L 2,42 Z"          fill={c.d1}/>
-              <path d="M 68,0 L 96,0 L 110,16 L 100,38 L 78,44 L 64,30 Z"                 fill={c.d3}/>
-              <path d="M 112,18 L 134,12 L 142,28 L 132,42 L 110,36 Z"                    fill={c.d4}/>
-              <path d="M 144,2 L 178,0 L 194,14 L 186,38 L 162,46 L 140,30 Z"             fill={c.d2}/>
-              <path d="M 196,14 L 222,8 L 234,24 L 226,44 L 202,46 L 192,30 Z"            fill={c.d3}/>
-              <path d="M 234,0 L 240,0 L 240,22 L 228,24 Z"                               fill={c.d1}/>
-              {/* 下半分 */}
-              <path d="M 4,65 L 28,56 L 50,62 L 56,82 L 38,98 L 8,96 Z"                  fill={c.d2}/>
-              <path d="M 58,70 L 84,62 L 94,78 L 84,96 L 58,100 L 50,82 Z"               fill={c.d4}/>
-              <path d="M 98,58 L 138,52 L 154,66 L 144,92 L 108,98 L 92,76 Z"            fill={c.d1}/>
-              <path d="M 160,70 L 186,62 L 200,78 L 190,96 L 162,100 L 154,82 Z"         fill={c.d3}/>
-              <path d="M 206,56 L 238,52 L 240,70 L 240,94 L 208,100 L 198,76 Z"         fill={c.d2}/>
-              <path d="M 0,96 L 10,92 L 16,100 L 0,100 Z"                                 fill={c.d4}/>
-            </pattern>
-            <linearGradient id="hdr-fade" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="60%" stopColor="transparent"/>
-              <stop offset="100%" stopColor="#000" stopOpacity="0.22"/>
-            </linearGradient>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#hdr-camo)"/>
-          <rect width="100%" height="100%" fill={primary} fillOpacity="0.10"/>
-          <rect width="100%" height="100%" fill="url(#hdr-fade)"/>
-        </svg>
-
-        {/* ── コンテンツ（前面） ── */}
+        {/* ── コンテンツ ── */}
         <div style={{
-          position: 'relative', zIndex: 1,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '0 20px',
         }}>
           <div>
             <div style={{ fontSize: 10, letterSpacing: 1.5, color: 'rgba(255,255,255,0.65)', fontWeight: 500 }}>
-              有志による非公式情報まとめ
+              Main Page
             </div>
             <div style={{ fontFamily: F.serif, fontSize: 22, fontWeight: 600, letterSpacing: 1, marginTop: 4 }}>
               地本イベント情報
