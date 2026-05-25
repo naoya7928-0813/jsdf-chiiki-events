@@ -1,39 +1,7 @@
 {
   "sapporo": [
     {
-      "id": "sp-st-20260524-1",
-      "pref": "sapporo",
-      "date": "2026-05-24",
-      "weekday": "日",
-      "title": "第７師団創隊７１周年・東千歳駐屯地創立７２周年記念行事",
-      "place": "東千歳駐屯地 北海道千歳市祝梅１０１６番地",
-      "address": "",
-      "time": "",
-      "category": "記念行事",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/sapporo/event_station.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "sp-st-20260524-2",
-      "pref": "sapporo",
-      "date": "2026-05-24",
-      "weekday": "日",
-      "title": "陸上自衛隊美唄駐屯地創立４９周年・第２地対艦ミサイル連隊創隊３４周年記念行事",
-      "place": "美唄駐屯地 北海道美唄市南美唄町上１条４丁目",
-      "address": "",
-      "time": "",
-      "category": "記念行事",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/sapporo/event_station.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "sp-st-20260606-3",
+      "id": "sp-st-20260606-1",
       "pref": "sapporo",
       "date": "2026-06-06",
       "weekday": "土",
@@ -49,7 +17,7 @@
       "deadline": null
     },
     {
-      "id": "sp-st-20260607-4",
+      "id": "sp-st-20260607-2",
       "pref": "sapporo",
       "date": "2026-06-07",
       "weekday": "日",
@@ -65,7 +33,7 @@
       "deadline": null
     },
     {
-      "id": "sp-st-20260614-5",
+      "id": "sp-st-20260614-3",
       "pref": "sapporo",
       "date": "2026-06-14",
       "weekday": "日",
@@ -493,38 +461,6 @@
   "tochigi": [],
   "ibaraki": [
     {
-      "id": "ib-20260524-4wv26",
-      "pref": "ibaraki",
-      "date": "2026-05-24",
-      "weekday": "日",
-      "title": "千波湖ちびっこ広場",
-      "place": "",
-      "address": "",
-      "time": "午前9時半から午後4時",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "お問い合わせは水戸募集案内所まで",
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "ib-20260524-3so81",
-      "pref": "ibaraki",
-      "date": "2026-05-24",
-      "weekday": "日",
-      "title": "石岡ふれあいまつり",
-      "place": "",
-      "address": "",
-      "time": "午前10時から午後3時",
-      "category": "地域参加",
-      "tag": "",
-      "url": "",
-      "notes": "お問い合わせは土浦地域事務所まで",
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
       "id": "ib-20260531-shep6",
       "pref": "ibaraki",
       "date": "2026-05-31",
@@ -575,22 +511,6 @@
   ],
   "chiba": [],
   "niigata": [
-    {
-      "id": "ni-20260524-3sgw4",
-      "pref": "niigata",
-      "date": "2026-05-24",
-      "weekday": "日",
-      "title": "JBCF第5回弥彦ロードレース",
-      "place": "弥彦競輪会館",
-      "address": "",
-      "time": "08:00～16:15",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
     {
       "id": "ni-20260530-eheus",
       "pref": "niigata",
@@ -1313,24 +1233,7 @@
   "hyogo": [],
   "nara": [],
   "wakayama": [],
-  "ehime": [
-    {
-      "id": "em-20260524-wc7bw",
-      "pref": "ehime",
-      "date": "2026-05-24",
-      "weekday": "日",
-      "title": "ふれあい健康祭",
-      "place": "宇和島徳洲会病院",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/ehime/event.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    }
-  ],
+  "ehime": [],
   "kagawa": [
     {
       "id": "kg-20260606-gx21o",
@@ -1551,22 +1454,6 @@
   ],
   "yamaguchi": [
     {
-      "id": "ym-20260524-kwx29",
-      "pref": "yamaguchi",
-      "date": "2026-05-24",
-      "weekday": "日",
-      "title": "そうごうフェスタ",
-      "place": "山口そうごう自動車学校",
-      "address": "",
-      "time": "10:00～16:00",
-      "category": "地域参加",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/yamaguchi/event.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
       "id": "ym-20260531-pidzz",
       "pref": "yamaguchi",
       "date": "2026-05-31",
@@ -1738,5 +1625,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/05/24 21:19"
+  "updatedAt": "2026/05/25 09:28"
 }
