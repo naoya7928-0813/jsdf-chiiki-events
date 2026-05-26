@@ -121,6 +121,7 @@ function JetSVG({ color }) {
       style={{
         width: 220, color, display: 'block',
         filter: 'drop-shadow(0 6px 20px rgba(0,0,0,0.55))',
+        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: jetRaw }}
     />
