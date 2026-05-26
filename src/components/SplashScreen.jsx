@@ -137,7 +137,6 @@ function JetSVG({ color }) {
       style={{
         width: 220, color, display: 'block',
         filter: 'drop-shadow(0 6px 20px rgba(0,0,0,0.55))',
-        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: jetRaw }}
     />
@@ -151,7 +150,6 @@ function TankSVG({ color }) {
       style={{
         width: 220, color, display: 'block',
         filter: 'drop-shadow(0 4px 14px rgba(0,0,0,0.6))',
-        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: tankRaw }}
     />
@@ -165,7 +163,6 @@ function Tank16SVG({ color }) {
       style={{
         width: 220, color, display: 'block',
         filter: 'drop-shadow(0 4px 14px rgba(0,0,0,0.6))',
-        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: tank16Raw }}
     />
@@ -182,7 +179,6 @@ function SPG19SVG({ color }) {
       style={{
         width: 220, color, display: 'block',
         filter: 'drop-shadow(0 4px 14px rgba(0,0,0,0.6))',
-        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: spg19Raw }}
     />
@@ -196,7 +192,6 @@ function SPG99SVG({ color }) {
       style={{
         width: 220, color, display: 'block',
         filter: 'drop-shadow(0 4px 14px rgba(0,0,0,0.6))',
-        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: spg99Raw }}
     />
@@ -210,7 +205,6 @@ function UH1SVG({ color }) {
       style={{
         width: 220, color, display: 'block',
         filter: 'drop-shadow(0 4px 14px rgba(0,0,0,0.6))',
-        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: uh1Raw }}
     />
@@ -226,7 +220,6 @@ function IzumoSVG({ color }) {
       style={{
         width: 280, color, display: 'block',
         filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.65))',
-        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: izumoRaw }}
     />
@@ -240,7 +233,6 @@ function MayaSVG({ color }) {
       style={{
         width: 280, color, display: 'block',
         filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.65))',
-        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: mayaRaw }}
     />
@@ -254,7 +246,6 @@ function MogamiSVG({ color }) {
       style={{
         width: 280, color, display: 'block',
         filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.65))',
-        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: mogamiRaw }}
     />
@@ -268,7 +259,6 @@ function SoryuSVG({ color }) {
       style={{
         width: 280, color, display: 'block',
         filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.65))',
-        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: soryuRaw }}
     />
@@ -282,7 +272,6 @@ function US2SVG({ color }) {
       style={{
         width: 260, color, display: 'block',
         filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.60))',
-        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: us2Raw }}
     />
@@ -296,7 +285,6 @@ function P1SVG({ color }) {
       style={{
         width: 240, color, display: 'block',
         filter: 'drop-shadow(0 6px 20px rgba(0,0,0,0.55))',
-        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: p1Raw }}
     />
@@ -312,7 +300,6 @@ function F2SVG({ color }) {
       style={{
         width: 220, color, display: 'block',
         filter: 'drop-shadow(0 6px 20px rgba(0,0,0,0.55))',
-        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: f2Raw }}
     />
@@ -326,7 +313,6 @@ function C2SVG({ color }) {
       style={{
         width: 240, color, display: 'block',
         filter: 'drop-shadow(0 6px 20px rgba(0,0,0,0.55))',
-        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: c2Raw }}
     />
@@ -340,7 +326,6 @@ function BlueImpSVG({ color }) {
       style={{
         width: 220, color, display: 'block',
         filter: 'drop-shadow(0 6px 20px rgba(0,0,0,0.55))',
-        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: blueimpRaw }}
     />
@@ -354,7 +339,6 @@ function PAC3SVG({ color }) {
       style={{
         width: 220, color, display: 'block',
         filter: 'drop-shadow(0 4px 14px rgba(0,0,0,0.6))',
-        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: pac3Raw }}
     />
@@ -552,7 +536,7 @@ function JetScene({ cfg, Vehicle }) {
 
 /** 陸自：戦車 + 地面 + 砂煙（後部上昇パフ + 側面横広がり） */
 function TankScene({ cfg, Vehicle }) {
-  // scaleX(-1) 後の車体座標：左端 = 後部、右端 = 砲身
+  // 右向き：左端 = 砲身、右端 = 後部（排気側）
   // 後部パフは left: -30〜10px あたり（コンテナ内）
   const rearPuffs = [
     { left: -22, bottom: 4,  size: 34, delay: '0.22s', anim: 'spDust1' },
@@ -625,7 +609,7 @@ function TankScene({ cfg, Vehicle }) {
 
 /** 海自：護衛艦 + 海面 + 波 + 艦首白波 + 艦尾スクリュー波 + 航跡 */
 function ShipScene({ cfg, Vehicle }) {
-  // ShipSVG は scaleX(-1) 済み → 艦首(bow)=右端、艦尾(stern)=左端
+  // 右向き：艦首(bow)=右端、艦尾(stern)=左端
   // コンテナ幅 280px : 艦首 ≈ right:12px / 艦尾 ≈ left:8px
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
