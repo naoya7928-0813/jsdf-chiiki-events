@@ -2,9 +2,11 @@
 // 起動時に陸/海/空テーマに合わせた乗り物アニメーションを表示
 
 import { useEffect, useState } from 'react';
-import tankRaw from '../assets/vehicles/tank.svg?raw';
-import shipRaw from '../assets/vehicles/ship.svg?raw';
-import jetRaw  from '../assets/vehicles/jet.svg?raw';
+import tankRaw   from '../assets/vehicles/tank.svg?raw';
+import tank16Raw from '../assets/vehicles/tank16.svg?raw';
+import pac3Raw   from '../assets/vehicles/pac3.svg?raw';
+import shipRaw   from '../assets/vehicles/ship.svg?raw';
+import jetRaw    from '../assets/vehicles/jet.svg?raw';
 
 // ──── CSSキーフレームを<head>に注入（1回のみ） ───────────────────
 const KF_ID = 'jsdf-splash-kf';
@@ -142,6 +144,34 @@ function TankSVG({ color }) {
   );
 }
 
+/** 16式機動戦闘車（陸上自衛隊） */
+function Tank16SVG({ color }) {
+  return (
+    <div
+      style={{
+        width: 220, color, display: 'block',
+        filter: 'drop-shadow(0 4px 14px rgba(0,0,0,0.6))',
+        transform: 'scaleX(-1)',
+      }}
+      dangerouslySetInnerHTML={{ __html: tank16Raw }}
+    />
+  );
+}
+
+/** PAC-3（陸上自衛隊） */
+function PAC3SVG({ color }) {
+  return (
+    <div
+      style={{
+        width: 220, color, display: 'block',
+        filter: 'drop-shadow(0 4px 14px rgba(0,0,0,0.6))',
+        transform: 'scaleX(-1)',
+      }}
+      dangerouslySetInnerHTML={{ __html: pac3Raw }}
+    />
+  );
+}
+
 /** 護衛艦（海上自衛隊） */
 function ShipSVG({ color }) {
   return (
@@ -167,7 +197,7 @@ const CONFIGS = {
     vehicleColor: '#c8d8a8',
     labelEn:      'JAPAN GROUND SELF-DEFENSE FORCE',
     labelJa:      '陸上自衛隊モード · 起動中',
-    Vehicle:      TankSVG,
+    vehicles:     [TankSVG, Tank16SVG, PAC3SVG],  // 均等ランダム
     mode:         'tank',
     duration:     2700,
     textDelay:    '1.4s',
@@ -179,7 +209,7 @@ const CONFIGS = {
     vehicleColor: '#b8d4f0',
     labelEn:      'JAPAN MARITIME SELF-DEFENSE FORCE',
     labelJa:      '海上自衛隊モード · 起動中',
-    Vehicle:      ShipSVG,
+    vehicles:     [ShipSVG],
     mode:         'ship',
     duration:     2900,
     textDelay:    '1.5s',
@@ -190,7 +220,7 @@ const CONFIGS = {
     vehicleColor: '#dfeeff',
     labelEn:      'JAPAN AIR SELF-DEFENSE FORCE',
     labelJa:      '航空自衛隊モード · 起動中',
-    Vehicle:      JetSVG,
+    vehicles:     [JetSVG],
     mode:         'jet',
     duration:     2600,
     textDelay:    '1.3s',
@@ -203,6 +233,12 @@ const CONFIGS = {
 export default function SplashScreen({ schemeKey, onDone }) {
   const cfg = CONFIGS[schemeKey] ?? CONFIGS.jasdf;
   const [fading, setFading] = useState(false);
+
+  // 起動ごとにプールからランダム選択（useState初期化関数で1回だけ決定）
+  const [Vehicle] = useState(() => {
+    const pool = cfg.vehicles;
+    return pool[Math.floor(Math.random() * pool.length)];
+  });
 
   useEffect(() => {
     injectKeyframes();
@@ -230,9 +266,9 @@ export default function SplashScreen({ schemeKey, onDone }) {
     >
       <GlowLayer />
 
-      {cfg.mode === 'jet'  && <JetScene  cfg={cfg} />}
-      {cfg.mode === 'tank' && <TankScene cfg={cfg} />}
-      {cfg.mode === 'ship' && <ShipScene cfg={cfg} />}
+      {cfg.mode === 'jet'  && <JetScene  cfg={cfg} Vehicle={Vehicle} />}
+      {cfg.mode === 'tank' && <TankScene cfg={cfg} Vehicle={Vehicle} />}
+      {cfg.mode === 'ship' && <ShipScene cfg={cfg} Vehicle={Vehicle} />}
 
       {/* テキスト */}
       <div style={{
@@ -293,7 +329,7 @@ function GlowLayer() {
 }
 
 /** 空自：戦闘機 + 多層飛行機雲（外側グロー＋中層＋2本コアライン） */
-function JetScene({ cfg }) {
+function JetScene({ cfg, Vehicle }) {
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
       {/* 飛行機雲 ① 外側の拡散グロー（幅広・強ぼかし） */}
@@ -333,14 +369,14 @@ function JetScene({ cfg }) {
         position: 'absolute', top: '38%', left: -250,
         animation: 'spJetFly 2.4s cubic-bezier(.18,.72,.28,1) forwards',
       }}>
-        <cfg.Vehicle color={cfg.vehicleColor} />
+        <Vehicle color={cfg.vehicleColor} />
       </div>
     </div>
   );
 }
 
 /** 陸自：戦車 + 地面 + 砂煙（後部上昇パフ + 側面横広がり） */
-function TankScene({ cfg }) {
+function TankScene({ cfg, Vehicle }) {
   // scaleX(-1) 後の車体座標：左端 = 後部、右端 = 砲身
   // 後部パフは left: -30〜10px あたり（コンテナ内）
   const rearPuffs = [
@@ -369,7 +405,7 @@ function TankScene({ cfg }) {
         position: 'absolute', bottom: 'calc(35% + 2px)', left: -250,
         animation: 'spTankRoll 2.2s cubic-bezier(.22,.80,.22,1) forwards',
       }}>
-        <cfg.Vehicle color={cfg.vehicleColor} />
+        <Vehicle color={cfg.vehicleColor} />
 
         {/* ── 後部排気砂煙（上昇パフ） ── */}
         {rearPuffs.map((p, i) => (
@@ -413,7 +449,7 @@ function TankScene({ cfg }) {
 }
 
 /** 海自：護衛艦 + 海面 + 波 + 艦首白波 + 艦尾スクリュー波 + 航跡 */
-function ShipScene({ cfg }) {
+function ShipScene({ cfg, Vehicle }) {
   // ShipSVG は scaleX(-1) 済み → 艦首(bow)=右端、艦尾(stern)=左端
   // コンテナ幅 280px : 艦首 ≈ right:12px / 艦尾 ≈ left:8px
   return (
@@ -459,9 +495,9 @@ function ShipScene({ cfg }) {
           opacity: 0.10, transform: 'scaleY(-0.38)', transformOrigin: 'top left',
           filter: 'blur(4px)', pointerEvents: 'none',
         }}>
-          <ShipSVG color={cfg.vehicleColor} />
+          <Vehicle color={cfg.vehicleColor} />
         </div>
-        <cfg.Vehicle color={cfg.vehicleColor} />
+        <Vehicle color={cfg.vehicleColor} />
 
         {/* ── 艦首スプレー（縦・右端）：船首が水を切る柱状の飛沫 ── */}
         <div style={{
