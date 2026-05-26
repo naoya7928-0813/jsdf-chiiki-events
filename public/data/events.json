@@ -50,7 +50,72 @@
     }
   ],
   "asahikawa": [],
-  "obihiro": [],
+  "obihiro": [
+    {
+      "id": "ob-20260531-4lafr",
+      "pref": "obihiro",
+      "date": "2026-05-31",
+      "weekday": "日",
+      "title": "陸・海・空 自衛隊お仕事ガイダンス 詳細はこちら",
+      "place": "とかちプラザ３Ｆ ３０６研修室",
+      "address": "",
+      "time": "9:30～13:30",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "ob-20260621-7if0a",
+      "pref": "obihiro",
+      "date": "2026-06-21",
+      "weekday": "日",
+      "title": "帯広駐屯地創立記念行事 詳細はこちら",
+      "place": "帯広駐屯地",
+      "address": "",
+      "time": "8:30～15:00",
+      "category": "記念行事",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "ob-20260704-c5hts",
+      "pref": "obihiro",
+      "date": "2026-07-04",
+      "weekday": "土",
+      "title": "第４１回ファミリーコンサート 詳細はこちら",
+      "place": "北ガス市民ホール （北見市民会館）大ホール 全席指定席 入場無料！！",
+      "address": "",
+      "time": "",
+      "category": "体験",
+      "tag": "家族向け",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "ob-20260822-tt9u7",
+      "pref": "obihiro",
+      "date": "2026-08-22",
+      "weekday": "土",
+      "title": "ヘリコプター体験搭乗 詳細はこちら",
+      "place": "帯広駐屯地",
+      "address": "",
+      "time": "",
+      "category": "体験",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    }
+  ],
   "hakodate": [],
   "miyagi": [
     {
@@ -79,6 +144,22 @@
       "address": "",
       "time": "",
       "category": "体験",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "mi-20260607-q0hzf",
+      "pref": "miyagi",
+      "date": "2026-06-07",
+      "weekday": "日",
+      "title": "「WE2026亘理万博」ミリメシ（戦闘糧食）を食べに行こう！",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
       "tag": "",
       "url": "",
       "notes": null,
@@ -356,6 +437,23 @@
       "deadline": null
     },
     {
+      "id": "t-20260616-3p0yh",
+      "pref": "tokyo",
+      "date": "2026-06-16",
+      "endDate": null,
+      "weekday": "火",
+      "title": "蒲田税務署コラボイベント",
+      "place": "大田出張所",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tokyo/oota/event.html#0616",
+      "notes": "・ＶＲ体験 ・隊員との懇談",
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
       "id": "t-20260618-13g12",
       "pref": "tokyo",
       "date": "2026-06-18",
@@ -435,6 +533,38 @@
       "category": "広報活動",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/saitama/event/img/8.5.31huyaka.jpg",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "s-20260613-d4c14",
+      "pref": "saitama",
+      "date": "2026-06-13",
+      "weekday": "土",
+      "title": "春日部警察・自衛隊合同イベント",
+      "place": "さいたま地方法務局 春日部出張所",
+      "address": "",
+      "time": "10:00～15:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/saitama/event/img/8.6.13kasukabe.jpg",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "s-20260820-ycvbl",
+      "pref": "saitama",
+      "date": "2026-08-20",
+      "weekday": "木",
+      "title": "航空自衛隊百里基地見学会",
+      "place": "・Ｆ－２戦闘機見学・救難隊の見学・体験喫食 等（食事代５１４円ご負担いただきます）",
+      "address": "",
+      "time": "",
+      "category": "体験",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/saitama/event/img/8.8.20hyakuri.jpg",
       "notes": null,
       "ageRequirement": null,
       "deadline": null
@@ -1637,7 +1767,56 @@
       "deadline": null
     }
   ],
-  "nagasaki": [],
+  "nagasaki": [
+    {
+      "id": "ng-20260718-tukky",
+      "pref": "nagasaki",
+      "date": "2026-07-18",
+      "weekday": "土",
+      "title": "ガールズガイダンス",
+      "place": "佐世保会場…MIRAI★BASE（佐世保）佐世保駅構内 長崎会場…防衛省長崎合同庁舎4階",
+      "address": "",
+      "time": "13時30分～16時",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/nagasaki/event/index.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "ng-20260607-6e5ez",
+      "pref": "nagasaki",
+      "date": "2026-06-07",
+      "weekday": "日",
+      "title": "護衛艦のしろ一般公開",
+      "place": "水辺の森公園出島岸壁",
+      "address": "",
+      "time": "7日(日)14時～18時(最終受付17時30分) 8日(月)",
+      "category": "一般公開",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/nagasaki/event/index.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "ng-20260627-4j38m",
+      "pref": "nagasaki",
+      "date": "2026-06-27",
+      "weekday": "土",
+      "title": "公安職公務員合同説明会",
+      "place": "諫早消防署4F大会議室",
+      "address": "",
+      "time": "10時～12時",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/nagasaki/event/index.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    }
+  ],
   "kumamoto": [
     {
       "id": "km-20260614-mib4c",
@@ -1693,5 +1872,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/05/26 09:34"
+  "updatedAt": "2026/05/26 16:09"
 }
