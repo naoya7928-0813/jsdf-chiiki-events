@@ -266,6 +266,22 @@
       "deadline": null
     },
     {
+      "id": "iw-20260726-i050f",
+      "pref": "iwate",
+      "date": "2026-07-26",
+      "weekday": "日",
+      "title": "自衛隊岩手地本イベント",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/iwate/assets/img/event/until20260726/shokubataiken.pdf",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
       "id": "iw-20260824-pbsky",
       "pref": "iwate",
       "date": "2026-08-24",
@@ -486,6 +502,23 @@
       "notes": "・護衛艦見学 ・ミニクルーズ ・売店見学",
       "ageRequirement": "17歳～32歳",
       "deadline": "6月1日（月）"
+    },
+    {
+      "id": "t-20260625-drqo2",
+      "pref": "tokyo",
+      "date": "2026-06-25",
+      "endDate": null,
+      "weekday": "木",
+      "title": "専門部隊研修（サイバー、システム通信、映像写真）",
+      "place": "市ヶ谷駐屯地",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tokyo/taitou/index.html#0625",
+      "notes": "・部隊見学 ・体験喫食 ・隊員との懇談",
+      "ageRequirement": "日本国籍を有する18歳～32歳",
+      "deadline": null
     }
   ],
   "saitama": [
@@ -794,22 +827,6 @@
   ],
   "nagano": [
     {
-      "id": "na-20260530-aky9s",
-      "pref": "nagano",
-      "date": "2026-05-30",
-      "weekday": "土",
-      "title": "【長野市】ながとよマルシェ",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "地域参加",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
       "id": "na-20260607-werns",
       "pref": "nagano",
       "date": "2026-06-07",
@@ -835,6 +852,22 @@
       "address": "",
       "time": "",
       "category": "体験",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "na-20260705-563cx",
+      "pref": "nagano",
+      "date": "2026-07-05",
+      "weekday": "日",
+      "title": "【長野市】善光寺表参道夏祭り",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
       "tag": "",
       "url": "",
       "notes": null,
@@ -1872,5 +1905,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/05/26 16:09"
+  "updatedAt": "2026/05/26 23:07"
 }
