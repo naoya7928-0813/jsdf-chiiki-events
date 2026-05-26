@@ -2,11 +2,25 @@
 // 起動時に陸/海/空テーマに合わせた乗り物アニメーションを表示
 
 import { useEffect, useState } from 'react';
+// ── 陸自 ──
 import tankRaw   from '../assets/vehicles/tank.svg?raw';
 import tank16Raw from '../assets/vehicles/tank16.svg?raw';
-import pac3Raw   from '../assets/vehicles/pac3.svg?raw';
-import shipRaw   from '../assets/vehicles/ship.svg?raw';
+import spg19Raw  from '../assets/vehicles/spg19.svg?raw';
+import spg99Raw  from '../assets/vehicles/spg99.svg?raw';
+import uh1Raw    from '../assets/vehicles/uh1.svg?raw';
+// ── 海自 ──
+import izumoRaw  from '../assets/vehicles/izumo.svg?raw';
+import mayaRaw   from '../assets/vehicles/maya.svg?raw';
+import mogamiRaw from '../assets/vehicles/mogami.svg?raw';
+import soryuRaw  from '../assets/vehicles/soryu.svg?raw';
+import us2Raw    from '../assets/vehicles/us2.svg?raw';
+import p1Raw     from '../assets/vehicles/p1.svg?raw';
+// ── 空自 ──
 import jetRaw    from '../assets/vehicles/jet.svg?raw';
+import f2Raw     from '../assets/vehicles/f2.svg?raw';
+import c2Raw     from '../assets/vehicles/c2.svg?raw';
+import pac3Raw   from '../assets/vehicles/pac3.svg?raw';
+import blueimpRaw from '../assets/vehicles/blueimp.svg?raw';
 
 // ──── CSSキーフレームを<head>に注入（1回のみ） ───────────────────
 const KF_ID = 'jsdf-splash-kf';
@@ -158,7 +172,182 @@ function Tank16SVG({ color }) {
   );
 }
 
-/** PAC-3（陸上自衛隊） */
+
+// ── 陸自追加車両 ──────────────────────────────────────────────
+
+/** 19式装輪自走155mmりゅう弾砲（陸上自衛隊） */
+function SPG19SVG({ color }) {
+  return (
+    <div
+      style={{
+        width: 220, color, display: 'block',
+        filter: 'drop-shadow(0 4px 14px rgba(0,0,0,0.6))',
+        transform: 'scaleX(-1)',
+      }}
+      dangerouslySetInnerHTML={{ __html: spg19Raw }}
+    />
+  );
+}
+
+/** 99式自走155mmりゅう弾砲（陸上自衛隊） */
+function SPG99SVG({ color }) {
+  return (
+    <div
+      style={{
+        width: 220, color, display: 'block',
+        filter: 'drop-shadow(0 4px 14px rgba(0,0,0,0.6))',
+        transform: 'scaleX(-1)',
+      }}
+      dangerouslySetInnerHTML={{ __html: spg99Raw }}
+    />
+  );
+}
+
+/** UH-1（陸上自衛隊ヘリコプター） */
+function UH1SVG({ color }) {
+  return (
+    <div
+      style={{
+        width: 220, color, display: 'block',
+        filter: 'drop-shadow(0 4px 14px rgba(0,0,0,0.6))',
+        transform: 'scaleX(-1)',
+      }}
+      dangerouslySetInnerHTML={{ __html: uh1Raw }}
+    />
+  );
+}
+
+// ── 海自艦艇 ──────────────────────────────────────────────────
+
+/** いずも型護衛艦（海上自衛隊） */
+function IzumoSVG({ color }) {
+  return (
+    <div
+      style={{
+        width: 280, color, display: 'block',
+        filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.65))',
+        transform: 'scaleX(-1)',
+      }}
+      dangerouslySetInnerHTML={{ __html: izumoRaw }}
+    />
+  );
+}
+
+/** まや型護衛艦（海上自衛隊） */
+function MayaSVG({ color }) {
+  return (
+    <div
+      style={{
+        width: 280, color, display: 'block',
+        filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.65))',
+        transform: 'scaleX(-1)',
+      }}
+      dangerouslySetInnerHTML={{ __html: mayaRaw }}
+    />
+  );
+}
+
+/** もがみ型護衛艦（海上自衛隊） */
+function MogamiSVG({ color }) {
+  return (
+    <div
+      style={{
+        width: 280, color, display: 'block',
+        filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.65))',
+        transform: 'scaleX(-1)',
+      }}
+      dangerouslySetInnerHTML={{ __html: mogamiRaw }}
+    />
+  );
+}
+
+/** そうりゅう型潜水艦（海上自衛隊） */
+function SoryuSVG({ color }) {
+  return (
+    <div
+      style={{
+        width: 280, color, display: 'block',
+        filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.65))',
+        transform: 'scaleX(-1)',
+      }}
+      dangerouslySetInnerHTML={{ __html: soryuRaw }}
+    />
+  );
+}
+
+/** US-2救難飛行艇（海上自衛隊） */
+function US2SVG({ color }) {
+  return (
+    <div
+      style={{
+        width: 260, color, display: 'block',
+        filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.60))',
+        transform: 'scaleX(-1)',
+      }}
+      dangerouslySetInnerHTML={{ __html: us2Raw }}
+    />
+  );
+}
+
+/** P-1哨戒機（海上自衛隊） */
+function P1SVG({ color }) {
+  return (
+    <div
+      style={{
+        width: 240, color, display: 'block',
+        filter: 'drop-shadow(0 6px 20px rgba(0,0,0,0.55))',
+        transform: 'scaleX(-1)',
+      }}
+      dangerouslySetInnerHTML={{ __html: p1Raw }}
+    />
+  );
+}
+
+// ── 空自航空機 ────────────────────────────────────────────────
+
+/** F-2（航空自衛隊） */
+function F2SVG({ color }) {
+  return (
+    <div
+      style={{
+        width: 220, color, display: 'block',
+        filter: 'drop-shadow(0 6px 20px rgba(0,0,0,0.55))',
+        transform: 'scaleX(-1)',
+      }}
+      dangerouslySetInnerHTML={{ __html: f2Raw }}
+    />
+  );
+}
+
+/** C-2輸送機（航空自衛隊） */
+function C2SVG({ color }) {
+  return (
+    <div
+      style={{
+        width: 240, color, display: 'block',
+        filter: 'drop-shadow(0 6px 20px rgba(0,0,0,0.55))',
+        transform: 'scaleX(-1)',
+      }}
+      dangerouslySetInnerHTML={{ __html: c2Raw }}
+    />
+  );
+}
+
+/** ブルーインパルス（航空自衛隊） */
+function BlueImpSVG({ color }) {
+  return (
+    <div
+      style={{
+        width: 220, color, display: 'block',
+        filter: 'drop-shadow(0 6px 20px rgba(0,0,0,0.55))',
+        transform: 'scaleX(-1)',
+      }}
+      dangerouslySetInnerHTML={{ __html: blueimpRaw }}
+    />
+  );
+}
+
+/** PAC-3発射機（航空自衛隊） */
 function PAC3SVG({ color }) {
   return (
     <div
@@ -168,20 +357,6 @@ function PAC3SVG({ color }) {
         transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: pac3Raw }}
-    />
-  );
-}
-
-/** 護衛艦（海上自衛隊） */
-function ShipSVG({ color }) {
-  return (
-    <div
-      style={{
-        width: 280, color, display: 'block',
-        filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.65))',
-        transform: 'scaleX(-1)',
-      }}
-      dangerouslySetInnerHTML={{ __html: shipRaw }}
     />
   );
 }
@@ -197,7 +372,7 @@ const CONFIGS = {
     vehicleColor: '#c8d8a8',
     labelEn:      'JAPAN GROUND SELF-DEFENSE FORCE',
     labelJa:      '陸上自衛隊モード · 起動中',
-    vehicles:     [TankSVG, Tank16SVG, PAC3SVG],  // 均等ランダム
+    vehicles:     [TankSVG, Tank16SVG, SPG19SVG, SPG99SVG, UH1SVG],  // 均等ランダム（5種）
     mode:         'tank',
     duration:     2700,
     textDelay:    '1.4s',
@@ -209,7 +384,7 @@ const CONFIGS = {
     vehicleColor: '#b8d4f0',
     labelEn:      'JAPAN MARITIME SELF-DEFENSE FORCE',
     labelJa:      '海上自衛隊モード · 起動中',
-    vehicles:     [ShipSVG],
+    vehicles:     [IzumoSVG, MayaSVG, MogamiSVG, SoryuSVG, US2SVG, P1SVG],  // 均等ランダム（6種）
     mode:         'ship',
     duration:     2900,
     textDelay:    '1.5s',
@@ -220,7 +395,7 @@ const CONFIGS = {
     vehicleColor: '#dfeeff',
     labelEn:      'JAPAN AIR SELF-DEFENSE FORCE',
     labelJa:      '航空自衛隊モード · 起動中',
-    vehicles:     [JetSVG],
+    vehicles:     [JetSVG, F2SVG, C2SVG, PAC3SVG, BlueImpSVG],  // 均等ランダム（5種）
     mode:         'jet',
     duration:     2600,
     textDelay:    '1.3s',
