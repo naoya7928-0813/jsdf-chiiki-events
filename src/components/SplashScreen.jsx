@@ -137,6 +137,7 @@ function JetSVG({ color }) {
       style={{
         width: 220, color, display: 'block',
         filter: 'drop-shadow(0 6px 20px rgba(0,0,0,0.55))',
+        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: jetRaw }}
     />
@@ -150,6 +151,7 @@ function TankSVG({ color }) {
       style={{
         width: 220, color, display: 'block',
         filter: 'drop-shadow(0 4px 14px rgba(0,0,0,0.6))',
+        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: tankRaw }}
     />
@@ -192,6 +194,7 @@ function SPG99SVG({ color }) {
       style={{
         width: 220, color, display: 'block',
         filter: 'drop-shadow(0 4px 14px rgba(0,0,0,0.6))',
+        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: spg99Raw }}
     />
@@ -205,6 +208,7 @@ function UH1SVG({ color }) {
       style={{
         width: 220, color, display: 'block',
         filter: 'drop-shadow(0 4px 14px rgba(0,0,0,0.6))',
+        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: uh1Raw }}
     />
@@ -259,6 +263,7 @@ function SoryuSVG({ color }) {
       style={{
         width: 280, color, display: 'block',
         filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.65))',
+        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: soryuRaw }}
     />
@@ -285,6 +290,7 @@ function P1SVG({ color }) {
       style={{
         width: 240, color, display: 'block',
         filter: 'drop-shadow(0 6px 20px rgba(0,0,0,0.55))',
+        transform: 'scaleX(-1)',
       }}
       dangerouslySetInnerHTML={{ __html: p1Raw }}
     />
