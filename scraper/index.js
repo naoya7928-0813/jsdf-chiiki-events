@@ -153,6 +153,29 @@ const URLS = {
 // ページ間の待機時間（Cloudflare/レートリミット対策）
 const BETWEEN_PAGES_MS = 10_000;
 
+// ── OCR キャッシュ ─────────────────────────────────────────────
+// スキャン済み画像/PDFは再スキャンしない（API呼び出し節約）
+// キー: URL文字列, 値: { cachedAt: ISO8601, result: OCR結果オブジェクト }
+// ファイルは git 管理（GitHub Actions 間で引き継がれる）
+const OCR_CACHE_PATH = path.join(__dirname, 'ocr-cache.json');
+let ocrCache = {};
+try {
+  ocrCache = JSON.parse(fs.readFileSync(OCR_CACHE_PATH, 'utf8'));
+  console.log(`[OCR Cache] ${Object.keys(ocrCache).length} 件のキャッシュを読み込み`);
+} catch {
+  // ファイルが存在しない場合は空キャッシュで開始
+}
+
+/** OCRキャッシュをファイルに書き出す（スクレイプ完了時に呼ぶ） */
+function saveOcrCache() {
+  try {
+    fs.writeFileSync(OCR_CACHE_PATH, JSON.stringify(ocrCache, null, 2), 'utf8');
+    console.log(`[OCR Cache] ${Object.keys(ocrCache).length} 件を保存`);
+  } catch (err) {
+    console.warn(`[OCR Cache] 保存失敗: ${err.message}`);
+  }
+}
+
 // ── モックデータ（--mock 時に使用） ───────────────────────────
 const MOCK_DATA = {
   kanagawa: [
@@ -228,38 +251,100 @@ const MOCK_DATA = {
 
 // ── OCR（Gemini Flash による画像・PDF解析） ────────────────────
 
+// ── Groq OCR（画像専用: 栃木・富山・兵庫・滋賀・奈良 など） ────────
+// Groq llama-4-scout 無料枠: 14,400 RPD / 30 RPM（Gemini の約10倍）
+// ※ Groq は PDF 非対応 → PDF は引き続き Gemini を使用
+
+let groqQuotaExhausted = false;
+
 /**
- * Gemini OCR API クォータ枯渇フラグ。
- * 429 エラーでリトライしても失敗した場合に true にセットされ、
- * 以降の全 OCR 呼び出しを即座にスキップする（タイムアウト防止）。
+ * Groq Vision API を呼び出す共通関数（画像のみ対応、PDF不可）。
+ * 429 時は 30 秒待機して 1 回リトライ。リトライ後も失敗で枯渇フラグをセット。
+ *
+ * @param {string} base64   - 画像の base64 文字列
+ * @param {string} mimeType - 画像の MIME タイプ（例: "image/jpeg"）
+ * @param {string} prompt   - OCR プロンプト
+ * @param {string} label    - ログ用ラベル
+ * @returns {Object|null}
  */
+async function callGroqOcr(base64, mimeType, prompt, label = 'OCR') {
+  if (!process.env.GROQ_API_KEY) return null;
+  if (groqQuotaExhausted) {
+    console.warn(`[${label}] Groq クォータ枯渇フラグ → スキップ`);
+    return null;
+  }
+  const retryDelays = [30_000];
+  for (let attempt = 0; attempt <= retryDelays.length; attempt++) {
+    const apiRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method:  'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+        'Content-Type':  'application/json',
+      },
+      body: JSON.stringify({
+        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+        messages: [{
+          role:    'user',
+          content: [
+            { type: 'image_url', image_url: { url: `data:${mimeType};base64,${base64}` } },
+            { type: 'text',      text:      prompt },
+          ],
+        }],
+        max_tokens:  512,
+        temperature: 0,
+      }),
+    });
+    if (!apiRes.ok) {
+      if (apiRes.status === 429 && attempt < retryDelays.length) {
+        console.warn(`[${label}] Groq 429 → ${retryDelays[attempt] / 1000}秒待機してリトライ`);
+        await sleep(retryDelays[attempt]);
+        continue;
+      }
+      if (apiRes.status === 429) {
+        console.warn(`[${label}] Groq 429 リトライ後も失敗 → クォータ枯渇フラグをセット`);
+        groqQuotaExhausted = true;
+        return null;
+      }
+      const errText = await apiRes.text();
+      console.warn(`[${label}] Groq エラー (${apiRes.status}): ${errText.slice(0, 120)}`);
+      return null;
+    }
+    const apiJson   = await apiRes.json();
+    const text      = apiJson.choices?.[0]?.message?.content ?? '';
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      console.warn(`[${label}] Groq JSON パース失敗: ${text.slice(0, 100)}`);
+      return null;
+    }
+    try { return JSON.parse(jsonMatch[0]); } catch { return null; }
+  }
+  return null;
+}
+
+// ── Gemini OCR（PDF専用: 岩手・青森・三重・和歌山 など） ───────────
+// Gemini は PDF をネイティブサポート。Groq はPDF非対応のため PDF のみ引き続き使用。
+// 無料枠: 1,500 RPD / 15 RPM
+
 let geminiQuotaExhausted = false;
 
 /**
- * Gemini OCR API を呼び出す共通関数。
- * 429 レート制限時は 60 秒待機して 1 回リトライする。
- * リトライしても 429 の場合は geminiQuotaExhausted を true にセットし、
- * 以降の全 OCR 呼び出しをスキップする（スクレイプ全体のタイムアウト防止）。
+ * Gemini OCR API を呼び出す共通関数（PDF専用。画像は callGroqOcr を使うこと）。
+ * 429 時は 60 秒待機して 1 回リトライ。リトライ後も失敗で枯渇フラグをセット。
  *
- * OCR必須地本（画像・PDFのみでイベント情報を提供）:
- *   - 栃木: イベントポスターJPG画像（OCR_PROMPT_FULL）
- *   - 富山: イベントポスターJPG画像（OCR_PROMPT_FULL）
- *   - 兵庫: イベント告知バナー画像（OCR_PROMPT_FULL）
+ * OCR必須地本（PDF形式）:
  *   - 岩手・青森など: PDF形式のイベント情報（PDF_OCR_PROMPT）
- *   - 三重・滋賀・奈良・和歌山: チラシPDF/画像（FLYER_OCR_PROMPT）
+ *   - 三重・和歌山: チラシPDF（FLYER_OCR_PROMPT）
  *
- * @param {Array} parts - Gemini API に送る parts 配列（inline_data + text）
- * @param {string} label - ログ出力用ラベル（429ログに表示）
- * @returns {Object|null} JSON パース済みオブジェクト、取得失敗時は null
+ * @param {Array} parts - Gemini API parts 配列（inline_data + text）
+ * @param {string} label - ログ用ラベル
+ * @returns {Object|null}
  */
-async function callGeminiOcr(parts, label = 'OCR') {
+async function callGeminiOcr(parts, label = 'PDF-OCR') {
   if (!process.env.GEMINI_API_KEY) return null;
-  // クォータ枯渇フラグが立っている場合は即座にスキップ（タイムアウト防止）
   if (geminiQuotaExhausted) {
     console.warn(`[${label}] Gemini クォータ枯渇フラグ → スキップ`);
     return null;
   }
-  // 429 発生時のリトライ: 1回のみ60秒待機
   const retryDelays = [60_000];
   for (let attempt = 0; attempt <= retryDelays.length; attempt++) {
     const apiRes = await fetch(
@@ -276,18 +361,17 @@ async function callGeminiOcr(parts, label = 'OCR') {
     if (!apiRes.ok) {
       if (apiRes.status === 429 && attempt < retryDelays.length) {
         const wait = retryDelays[attempt];
-        console.warn(`[${label}] Gemini API 429 → ${wait / 1000}秒待機してリトライ (${attempt + 1}/${retryDelays.length})`);
+        console.warn(`[${label}] Gemini 429 → ${wait / 1000}秒待機してリトライ`);
         await sleep(wait);
         continue;
       }
       if (apiRes.status === 429) {
-        // リトライしても429 → クォータ枯渇と判断し、以降のOCRをすべてスキップ
-        console.warn(`[${label}] Gemini API 429 リトライ後も失敗 → クォータ枯渇フラグをセット（以降のOCRをスキップ）`);
+        console.warn(`[${label}] Gemini 429 リトライ後も失敗 → クォータ枯渇フラグをセット`);
         geminiQuotaExhausted = true;
         return null;
       }
       const errText = await apiRes.text();
-      console.warn(`[${label}] API エラー (${apiRes.status}): ${errText.slice(0, 100)}`);
+      console.warn(`[${label}] Gemini エラー (${apiRes.status}): ${errText.slice(0, 100)}`);
       return null;
     }
     const apiJson   = await apiRes.json();
@@ -311,11 +395,19 @@ const OCR_PROMPT = `この自衛隊イベントのポスター画像から情報
 }`;
 
 /**
- * ポスター画像URLを受け取り、Gemini Flash でOCRしてJSON を返す。
- * GEMINI_API_KEY が未設定の場合は null を返す（OCRスキップ）。
+ * ポスター画像URLを受け取り OCR して JSON を返す（キャッシュ対応）。
+ * GROQ_API_KEY が設定されていれば Groq を使用、なければ Gemini にフォールバック。
+ * 結果はキャッシュに保存され、次回以降は API 呼び出しをスキップする。
  */
 async function ocrImage(imageUrl) {
-  if (!process.env.GEMINI_API_KEY || !imageUrl) return null;
+  if (!imageUrl) return null;
+  if (!process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) return null;
+
+  // キャッシュヒット → 即返す
+  if (ocrCache[imageUrl]) {
+    console.log(`[OCR] キャッシュヒット: ${imageUrl.split('/').pop()}`);
+    return ocrCache[imageUrl].result;
+  }
 
   try {
     const imgRes = await fetch(imageUrl, {
@@ -328,16 +420,22 @@ async function ocrImage(imageUrl) {
       console.warn(`[OCR] 画像取得失敗 (${imgRes.status}): ${imageUrl}`);
       return null;
     }
-
     const buf      = await imgRes.arrayBuffer();
     const base64   = Buffer.from(buf).toString('base64');
     const mimeType = (imgRes.headers.get('content-type') || 'image/jpeg').split(';')[0].trim();
 
-    return await callGeminiOcr([
-      { inline_data: { mime_type: mimeType, data: base64 } },
-      { text: OCR_PROMPT },
-    ], 'OCR');
-
+    let result = null;
+    if (process.env.GROQ_API_KEY) {
+      result = await callGroqOcr(base64, mimeType, OCR_PROMPT, 'OCR');
+    }
+    if (!result && process.env.GEMINI_API_KEY) {
+      result = await callGeminiOcr([
+        { inline_data: { mime_type: mimeType, data: base64 } },
+        { text: OCR_PROMPT },
+      ], 'OCR');
+    }
+    if (result) ocrCache[imageUrl] = { cachedAt: new Date().toISOString(), result };
+    return result;
   } catch (err) {
     console.warn(`[OCR] ${imageUrl} → ${err.message}`);
     return null;
@@ -437,7 +535,7 @@ async function enrichWithPdfOcr(events) {
       notes:          [ev.notes, ocr.notes].filter(Boolean).join('\n')       || null,
     } : ev);
 
-    // 8秒待機（Gemini APIのレート制限対策: Gemini Flash 無料枠は15RPM）
+    // 8秒待機（Gemini PDF-OCRのレート制限対策: 15RPM）
     await sleep(8000);
   }
 
@@ -459,12 +557,23 @@ const FLYER_OCR_PROMPT = `この自衛隊イベントのチラシ（PDF・画像
 }`;
 
 /**
- * PDF または画像 URL を受け取り、Gemini Flash で全情報（date 含む）を OCR して JSON を返す。
- * 近畿WP系地本のチラシ専用。
+ * PDF または画像 URL を受け取り、全情報（date 含む）を OCR して JSON を返す。
+ * 近畿WP系地本のチラシ専用。キャッシュ対応。
+ * - 画像: Groq 優先（フォールバック Gemini）
+ * - PDF:  Gemini のみ（Groq は PDF 非対応）
  */
 async function ocrFlyerFull(url) {
-  if (!process.env.GEMINI_API_KEY || !url) return null;
+  if (!url) return null;
   const isPdf = /\.pdf(\?.*)?$/i.test(url);
+  if (isPdf && !process.env.GEMINI_API_KEY) return null;
+  if (!isPdf && !process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) return null;
+
+  // キャッシュヒット
+  if (ocrCache[url]) {
+    console.log(`[チラシOCR] キャッシュヒット: ${url.split('/').pop()}`);
+    return ocrCache[url].result;
+  }
+
   try {
     const res = await fetch(url, {
       headers: {
@@ -477,10 +586,27 @@ async function ocrFlyerFull(url) {
     const base64 = Buffer.from(buf).toString('base64');
     const mime   = isPdf ? 'application/pdf' : (res.headers.get('content-type') || 'image/jpeg').split(';')[0].trim();
 
-    return await callGeminiOcr([
-      { inline_data: { mime_type: mime, data: base64 } },
-      { text: FLYER_OCR_PROMPT },
-    ], 'チラシOCR');
+    let result = null;
+    if (isPdf) {
+      // PDF → Gemini のみ（Groq は PDF 非対応）
+      result = await callGeminiOcr([
+        { inline_data: { mime_type: mime, data: base64 } },
+        { text: FLYER_OCR_PROMPT },
+      ], 'チラシOCR-PDF');
+    } else {
+      // 画像 → Groq 優先、フォールバック Gemini
+      if (process.env.GROQ_API_KEY) {
+        result = await callGroqOcr(base64, mime, FLYER_OCR_PROMPT, 'チラシOCR');
+      }
+      if (!result && process.env.GEMINI_API_KEY) {
+        result = await callGeminiOcr([
+          { inline_data: { mime_type: mime, data: base64 } },
+          { text: FLYER_OCR_PROMPT },
+        ], 'チラシOCR');
+      }
+    }
+    if (result) ocrCache[url] = { cachedAt: new Date().toISOString(), result };
+    return result;
   } catch (err) {
     console.warn(`[チラシOCR] ${url} → ${err.message}`);
     return null;
@@ -499,14 +625,14 @@ async function enrichFromFlyer(events, prefLabel) {
       results.push(ev);
       continue;
     }
-    if (!process.env.GEMINI_API_KEY) {
+    if (!process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) {
       // APIキーなし → スタブは捨てる
       continue;
     }
     console.log(`[${prefLabel} チラシOCR] ${ev.title}`);
     const ocr = await ocrFlyerFull(ev._flyerUrl);
-    // 8秒待機（Gemini APIのレート制限対策: 三重・滋賀・奈良・和歌山はOCR必須地本）
-    await sleep(8000);
+    // 2秒待機（Groq画像OCR: 30RPM対応。PDFはGeminiのため8秒は enrichWithPdfOcr 側で行う）
+    await sleep(2000);
     if (!ocr || !ocr.date) {
       console.log(`  → 日付取得失敗: スキップ`);
       continue;
@@ -573,10 +699,19 @@ const OCR_PROMPT_FULL = `この自衛隊イベントのポスター画像から�
 }`;
 
 /**
- * 画像 1 枚から全イベント情報（日付・場所含む）を OCR する（栃木専用）。
+ * 画像 1 枚から全イベント情報（日付・場所含む）を OCR する（栃木・富山・兵庫用）。
+ * キャッシュ対応。Groq 優先、フォールバックで Gemini。
  */
 async function ocrImageFull(imageUrl) {
-  if (!process.env.GEMINI_API_KEY || !imageUrl) return null;
+  if (!imageUrl) return null;
+  if (!process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) return null;
+
+  // キャッシュヒット
+  if (ocrCache[imageUrl]) {
+    console.log(`[OCR-FULL] キャッシュヒット: ${imageUrl.split('/').pop()}`);
+    return ocrCache[imageUrl].result;
+  }
+
   try {
     const imgRes = await fetch(imageUrl, {
       headers: {
@@ -589,10 +724,18 @@ async function ocrImageFull(imageUrl) {
     const base64   = Buffer.from(buf).toString('base64');
     const mimeType = (imgRes.headers.get('content-type') || 'image/jpeg').split(';')[0].trim();
 
-    return await callGeminiOcr([
-      { inline_data: { mime_type: mimeType, data: base64 } },
-      { text: OCR_PROMPT_FULL },
-    ], 'OCR-FULL');
+    let result = null;
+    if (process.env.GROQ_API_KEY) {
+      result = await callGroqOcr(base64, mimeType, OCR_PROMPT_FULL, 'OCR-FULL');
+    }
+    if (!result && process.env.GEMINI_API_KEY) {
+      result = await callGeminiOcr([
+        { inline_data: { mime_type: mimeType, data: base64 } },
+        { text: OCR_PROMPT_FULL },
+      ], 'OCR-FULL');
+    }
+    if (result) ocrCache[imageUrl] = { cachedAt: new Date().toISOString(), result };
+    return result;
   } catch (err) {
     console.warn(`[OCR-FULL] ${imageUrl} → ${err.message}`);
     return null;
@@ -633,8 +776,8 @@ function isImageUrl(url) {
  * 失敗したイベントは元データのまま保持する。
  */
 async function enrichWithOcr(events) {
-  if (!process.env.GEMINI_API_KEY) {
-    console.log('[OCR] GEMINI_API_KEY 未設定のためスキップ');
+  if (!process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) {
+    console.log('[OCR] GROQ_API_KEY / GEMINI_API_KEY ともに未設定のためスキップ');
     return events;
   }
 
@@ -659,8 +802,8 @@ async function enrichWithOcr(events) {
     const cleanUrl = ev.imageUrl ? ev.url : null;
     results.push({ ...mergeOcr(ev, ocr), url: cleanUrl });
 
-    // 8秒待機（Gemini APIのレート制限対策: Gemini Flash 無料枠は15RPM）
-    await sleep(8000);
+    // 2秒待機（Groq: 30RPM、キャッシュヒット時はほぼ即時）
+    await sleep(2000);
   }
 
   return results;
@@ -1217,8 +1360,8 @@ async function fetchHyogo(context) {
     await page.close();
   }
 
-  if (!process.env.GEMINI_API_KEY) {
-    console.log('[兵庫] GEMINI_API_KEY 未設定のため OCR スキップ');
+  if (!process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) {
+    console.log('[兵庫] GROQ_API_KEY / GEMINI_API_KEY ともに未設定のため OCR スキップ');
     return [];
   }
   if (imageUrls.length === 0) return [];
@@ -1228,8 +1371,8 @@ async function fetchHyogo(context) {
   for (const imgUrl of imageUrls) {
     console.log(`[兵庫 OCR] ${imgUrl}`);
     const ocr = await ocrImageFull(imgUrl);
-    // 8秒待機（Gemini APIのレート制限対策: 兵庫はOCR必須地本）
-    await sleep(8000);
+    // 2秒待機（Groq: 30RPM、キャッシュヒット時はほぼ即時）
+    await sleep(2000);
     if (!ocr) continue;
 
     const rawDate = toHalfWidth((ocr.date || '').replace(/\s+/g, ' ').trim());
@@ -1320,8 +1463,8 @@ async function fetchTochigi(context) {
     await page.close();
   }
 
-  if (!process.env.GEMINI_API_KEY) {
-    console.log('[栃木] GEMINI_API_KEY 未設定のため OCR スキップ');
+  if (!process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) {
+    console.log('[栃木] GROQ_API_KEY / GEMINI_API_KEY ともに未設定のため OCR スキップ');
     return [];
   }
   if (imageUrls.length === 0) return [];
@@ -1331,8 +1474,8 @@ async function fetchTochigi(context) {
   for (const imgUrl of imageUrls) {
     console.log(`[栃木 OCR] ${imgUrl}`);
     const ocr = await ocrImageFull(imgUrl);
-    // 8秒待機（Gemini APIのレート制限対策: 栃木はOCR必須地本）
-    await sleep(8000);
+    // 2秒待機（Groq: 30RPM、キャッシュヒット時はほぼ即時）
+    await sleep(2000);
     if (!ocr) continue;
 
     const rawDate = toHalfWidth((ocr.date || '').replace(/\s+/g, ' ').trim());
@@ -1409,8 +1552,8 @@ async function fetchToyama(context) {
     await page.close();
   }
 
-  if (!process.env.GEMINI_API_KEY) {
-    console.log('[富山] GEMINI_API_KEY 未設定のため OCR スキップ');
+  if (!process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) {
+    console.log('[富山] GROQ_API_KEY / GEMINI_API_KEY ともに未設定のため OCR スキップ');
     return [];
   }
   if (imageUrls.length === 0) return [];
@@ -1420,8 +1563,8 @@ async function fetchToyama(context) {
   for (const imgUrl of imageUrls) {
     console.log(`[富山 OCR] ${imgUrl}`);
     const ocr = await ocrImageFull(imgUrl);
-    // 8秒待機（Gemini APIのレート制限対策: 富山はOCR必須地本）
-    await sleep(8000);
+    // 2秒待機（Groq: 30RPM、キャッシュヒット時はほぼ即時）
+    await sleep(2000);
     if (!ocr) continue;
 
     const rawDate = toHalfWidth((ocr.date || '').replace(/\s+/g, ' ').trim());
@@ -2302,6 +2445,9 @@ async function main() {
     okinawa:   okinawaEvents.map(strip),
     updatedAt: nowJST(),
   };
+  // OCRキャッシュを保存（スキャン済みURLを記録 → 次回以降の再スキャンを防ぐ）
+  saveOcrCache();
+
   writeOutput(output);
   // 新規イベントを検出してプッシュ通知（非同期・失敗しても続行）
   await notifyNewEvents(prev, output).catch(err =>

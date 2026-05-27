@@ -57,7 +57,8 @@ jobs:
         working-directory: scraper
         run: node index.js
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY:    ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY:  ${{ secrets.GEMINI_API_KEY }}
 
       # ── 変更があればコミット & プッシュ ──────────────────────
       - name: 変更をコミット & プッシュ
@@ -67,11 +68,20 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add public/data/events.json public/events.html public/events/ public/sitemap.xml
+          git add public/data/events.json public/events.html public/events/ public/sitemap.xml scraper/ocr-cache.json
 
-          STATUS=$(git status --porcelain public/data/events.json public/events.html public/sitemap.xml)
-          if [ -z "$STATUS" ]; then
+          EVENTS_STATUS=$(git status --porcelain public/data/events.json public/events.html public/sitemap.xml)
+          CACHE_STATUS=$(git status --porcelain scraper/ocr-cache.json)
+
+          if [ -z "$EVENTS_STATUS" ] && [ -z "$CACHE_STATUS" ]; then
             echo "データに変更がありませんでした。コミットをスキップします。"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          elif [ -z "$EVENTS_STATUS" ] && [ -n "$CACHE_STATUS" ]; then
+            # OCRキャッシュのみ更新 → コミットするがデプロイしない
+            git commit -m "chore: update ocr cache [skip ci]"
+            git pull --rebase
+            git push || (git pull --rebase && git push)
+            echo "OCRキャッシュを更新しました（イベントデータ変更なし）。"
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             git commit -m "chore: update events data [skip ci]"
