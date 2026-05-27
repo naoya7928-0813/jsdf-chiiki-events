@@ -16,7 +16,7 @@ jobs:
   scrape:
     name: イベントデータ取得
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     permissions:
       contents: write

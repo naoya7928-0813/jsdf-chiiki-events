@@ -1097,17 +1097,24 @@ async function fetchWpPosts(ctx, pref, prefKey, idPrefix, listUrl, urlsFn, postF
   if (postUrls.length === 0) return [];
 
   // ── 各投稿ページ ──
+  // 一覧スタブが取れた URL は個別ページアクセスをスキップ（CF 待機タイムアウトの削減）
+  const listStubUrlSet = new Set(listStubs.map(s => s.url));
+  const postsToFetch   = postUrls.filter(u => !listStubUrlSet.has(u));
+  if (postsToFetch.length < postUrls.length) {
+    console.log(`[${pref}] 個別投稿: ${postsToFetch.length}件 (一覧スタブで ${listStubs.length}件をカバー済み)`);
+  }
+
   const events = [];
   const succeededUrls = new Set();
   let counter  = 0;
-  for (const postUrl of postUrls) {
+  for (const postUrl of postsToFetch) {
     const postPage = await ctx.newPage();
     try {
       await postPage.goto(postUrl, { waitUntil: 'domcontentloaded', timeout: 30_000 });
       try {
         await postPage.waitForFunction(
           () => { const t = document.title; return t.length > 0 && !t.includes('Just a moment') && !t.includes('しばらくお待ちください'); },
-          { timeout: 60_000 }  // 30s → 60s に延長（CF チャレンジ完了待ち）
+          { timeout: 30_000 }
         );
       } catch {}
       await postPage.waitForTimeout(2000);
@@ -1117,7 +1124,7 @@ async function fetchWpPosts(ctx, pref, prefKey, idPrefix, listUrl, urlsFn, postF
       // CF チャレンジ判定: body テキストが極端に短い場合はブロックされている
       const bodyText = $('body').text().replace(/\s+/g, ' ').trim();
       if (bodyText.length < 100) {
-        console.log(`[${pref}] ${postUrl.split('/').slice(-2,-1)[0]} → CF ブロック検出、一覧スタブを使用`);
+        console.log(`[${pref}] ${postUrl.split('/').slice(-2,-1)[0]} → CF ブロック`);
       } else {
         const evs = postFn($, postUrl, ++counter);
         if (evs.length) {
@@ -1134,11 +1141,11 @@ async function fetchWpPosts(ctx, pref, prefKey, idPrefix, listUrl, urlsFn, postF
     await sleep(1500);
   }
 
-  // 個別投稿で取得できなかった URL に対して一覧スタブをフォールバックとして追加
-  const fallbackStubs = listStubs.filter(s => !succeededUrls.has(s.url));
-  if (fallbackStubs.length > 0) {
-    console.log(`[${pref}] 一覧スタブ ${fallbackStubs.length} 件をフォールバック追加`);
-    events.push(...fallbackStubs);
+  // 一覧スタブをそのまま追加（個別ページで取得できなかった分をカバー）
+  if (listStubs.length > 0) {
+    const nonSucceeded = listStubs.filter(s => !succeededUrls.has(s.url));
+    console.log(`[${pref}] 一覧スタブ ${nonSucceeded.length} 件を追加`);
+    events.push(...nonSucceeded);
   }
 
   console.log(`[${pref}] ${events.length} 件取得`);
