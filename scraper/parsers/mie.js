@@ -43,7 +43,7 @@ function parseMiePost($, url, counter) {
     weekday = monthM[3];
   }
 
-  if (!dateStr || isPast(dateStr)) return [];
+  if (dateStr && isPast(dateStr)) return [];
 
   // ── タイトル ─────────────────────────────────────────────────
   // 三重の投稿は h1 が常に「お知らせ」のため、本文先頭（YYYY.MM.DD の前）からイベント名を取る
@@ -54,6 +54,35 @@ function parseMiePost($, url, counter) {
        || $('title').text().replace(/\s*[–—-]\s*.*$/, '').trim()))
     .replace(/「|」/g, '').trim();
   if (!rawTitle || rawTitle === 'お知らせ') return [];
+
+  // ── HTMLに日付なし → チラシ（PDF/画像）リンクにフォールバック ──
+  if (!dateStr) {
+    let flyerUrl = '';
+    $('a[href]').each((_, a) => {
+      const h = ($(a).attr('href') || '').trim();
+      if (/\.pdf(\?.*)?$/i.test(h) && h.includes('mod.go.jp')) {
+        flyerUrl = h; return false;
+      }
+    });
+    if (!flyerUrl) {
+      $('img[src]').each((_, img) => {
+        const s = ($(img).attr('src') || '').trim();
+        if (/\.(jpe?g|png)(\?.*)?$/i.test(s) && /wp-content|uploads/i.test(s)
+            && !/logo|header|nav|footer|icon/i.test(s)) {
+          flyerUrl = s.startsWith('http') ? s : `https://www.mod.go.jp${s.startsWith('/') ? '' : '/'}${s}`;
+          return false;
+        }
+      });
+    }
+    if (!flyerUrl) return [];
+    return [{
+      id: `mi-flyer-${counter}`, pref: 'mie', date: '', weekday: '',
+      title: rawTitle.substring(0, 60), place: '', address: '', time: '',
+      category: guessCategory(toHalfWidth(rawTitle)), tag: guessTag(rawTitle),
+      url, notes: null, ageRequirement: null, deadline: null, imageUrl: '',
+      _flyerUrl: flyerUrl,
+    }];
+  }
 
   // ── 場所 ─────────────────────────────────────────────────────
   const placeM = halfBody.match(/[●■]?場所\s+(.{2,60?})(?:\s+[●■]|イベント内容|日時|$)/);

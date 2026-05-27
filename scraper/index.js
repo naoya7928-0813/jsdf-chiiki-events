@@ -416,6 +416,133 @@ async function enrichWithPdfOcr(events) {
   return results;
 }
 
+// ── チラシ全情報OCR（近畿WP系地本向け：PDF・画像両対応、date含む） ─────
+
+const FLYER_OCR_PROMPT = `この自衛隊イベントのチラシ（PDF・画像）から情報を抽出してください。
+以下のJSONのみを返してください（説明文不要）。該当情報がない項目はnullにしてください。
+{
+  "title": "チラシに書かれた正確なイベント名",
+  "date": "開催日（「令和X年Y月Z日（曜日）」の形式で。例: 令和8年6月15日（日））",
+  "place": "開催場所・会場名（施設名のみ、住所不要）",
+  "time": "開催時間（例: 10:00～16:00）",
+  "ageRequirement": "参加資格・対象者を簡潔に（例: 18歳〜32歳未満）",
+  "deadline": "応募締切日（例: 6月1日（日））",
+  "notes": "定員・抽選有無・注意事項など重要事項のみ50文字以内"
+}`;
+
+/**
+ * PDF または画像 URL を受け取り、Gemini Flash で全情報（date 含む）を OCR して JSON を返す。
+ * 近畿WP系地本のチラシ専用。
+ */
+async function ocrFlyerFull(url) {
+  if (!process.env.GEMINI_API_KEY || !url) return null;
+  const isPdf = /\.pdf(\?.*)?$/i.test(url);
+  try {
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Referer':    'https://www.mod.go.jp/',
+      },
+    });
+    if (!res.ok) { console.warn(`[チラシOCR] 取得失敗 ${res.status}: ${url}`); return null; }
+    const buf    = await res.arrayBuffer();
+    const base64 = Buffer.from(buf).toString('base64');
+    const mime   = isPdf ? 'application/pdf' : (res.headers.get('content-type') || 'image/jpeg').split(';')[0].trim();
+    const apiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      {
+        method:  'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [
+            { inline_data: { mime_type: mime, data: base64 } },
+            { text: FLYER_OCR_PROMPT },
+          ]}],
+          generationConfig: { maxOutputTokens: 512, temperature: 0 },
+        }),
+      }
+    );
+    if (!apiRes.ok) { console.warn(`[チラシOCR] API エラー ${apiRes.status}`); return null; }
+    const apiJson   = await apiRes.json();
+    const text      = apiJson.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return null;
+    return JSON.parse(jsonMatch[0]);
+  } catch (err) {
+    console.warn(`[チラシOCR] ${url} → ${err.message}`);
+    return null;
+  }
+}
+
+/**
+ * _flyerUrl を持つスタブイベントに対してチラシOCRを実行し、
+ * date・title・place 等を補完して返す。date が取れないまたは過去の場合は除外。
+ * 近畿WP系地本（三重・滋賀・奈良・和歌山）向け。
+ */
+async function enrichFromFlyer(events, prefLabel) {
+  const results = [];
+  for (const ev of events) {
+    if (!ev._flyerUrl) {
+      results.push(ev);
+      continue;
+    }
+    if (!process.env.GEMINI_API_KEY) {
+      // APIキーなし → スタブは捨てる
+      continue;
+    }
+    console.log(`[${prefLabel} チラシOCR] ${ev.title}`);
+    const ocr = await ocrFlyerFull(ev._flyerUrl);
+    await sleep(4500);
+    if (!ocr || !ocr.date) {
+      console.log(`  → 日付取得失敗: スキップ`);
+      continue;
+    }
+
+    // OCR日付を解析
+    const rawDate = toHalfWidth((ocr.date || '').replace(/\s+/g, ' ').trim());
+    const reiwaM  = rawDate.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
+    const gregM   = rawDate.match(/(\d{4})年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
+    const monthM  = rawDate.match(/(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
+
+    let dateStr = '', weekday = '';
+    if (reiwaM) {
+      const y = reiwaToAD(parseInt(reiwaM[1], 10));
+      dateStr = `${y}-${padTwo(parseInt(reiwaM[2], 10))}-${padTwo(parseInt(reiwaM[3], 10))}`;
+      weekday = reiwaM[4];
+    } else if (gregM) {
+      dateStr = `${gregM[1]}-${padTwo(parseInt(gregM[2], 10))}-${padTwo(parseInt(gregM[3], 10))}`;
+      weekday = gregM[4];
+    } else if (monthM) {
+      const now = new Date();
+      dateStr = `${now.getFullYear()}-${padTwo(parseInt(monthM[1], 10))}-${padTwo(parseInt(monthM[2], 10))}`;
+      weekday = monthM[3];
+    }
+
+    if (!dateStr || isPast(dateStr)) {
+      console.log(`  → 過去またはスキップ: ${ocr.date}`);
+      continue;
+    }
+
+    const { _flyerUrl, ...baseEv } = ev;
+    const title = (ocr.title && fixOcrTitle(ocr.title.trim())) || ev.title;
+    results.push({
+      ...baseEv,
+      id:             `${ev.id.split('-')[0]}-${dateStr.replace(/-/g, '')}`,
+      date:           dateStr,
+      weekday,
+      title,
+      place:          (ocr.place          && ocr.place.trim())          || '',
+      time:           (ocr.time           && ocr.time.trim())           || '',
+      ageRequirement: (ocr.ageRequirement && ocr.ageRequirement.trim()) || null,
+      deadline:       (ocr.deadline       && ocr.deadline.trim())       || null,
+      notes:          ocr.notes || null,
+      category:       guessCategory(toHalfWidth(title)),
+    });
+    console.log(`  → ${dateStr} ${title.substring(0, 30)}`);
+  }
+  return results;
+}
+
 // 栃木専用: 全イベント情報（日付・場所含む）を画像から抽出するプロンプト
 const OCR_PROMPT_FULL = `この自衛隊イベントのポスター画像から情報を抽出してください。
 以下のJSONのみを返してください（説明文不要）。該当情報がない項目はnullにしてください。
@@ -1904,6 +2031,12 @@ async function main() {
   hyogoEvents     = fallback(hyogoError,     '兵庫',   hyogoEvents,     'hyogo');
   naraEvents      = fallback(naraError,      '奈良',   naraEvents,      'nara');
   wakayamaEvents  = fallback(wakayamaError,  '和歌山', wakayamaEvents,  'wakayama');
+
+  // ── 近畿WP系地本: チラシ（PDF/画像）から日付・タイトルを OCR で補完 ──
+  mieEvents      = await enrichFromFlyer(mieEvents,      '三重');
+  shigaEvents    = await enrichFromFlyer(shigaEvents,    '滋賀');
+  naraEvents     = await enrichFromFlyer(naraEvents,     '奈良');
+  wakayamaEvents = await enrichFromFlyer(wakayamaEvents, '和歌山');
   ehimeEvents     = fallback(ehimeError,     '愛媛',   ehimeEvents,     'ehime');
   kagawaEvents    = fallback(kagawaError,    '香川',   kagawaEvents,    'kagawa');
   kochiEvents     = fallback(kochiError,     '高知',   kochiEvents,     'kochi');
@@ -1978,7 +2111,7 @@ async function main() {
   okinawaEvents   = await enrichWithOcr(okinawaEvents);
 
   // imageUrl は最終出力に含めない（内部用フィールド）
-  const strip = ev => { const { imageUrl: _, ...rest } = ev; return rest; };
+  const strip = ev => { const { imageUrl: _, _flyerUrl: __, ...rest } = ev; return rest; };
 
   const output = {
     sapporo:   sapporoEvents.map(strip),

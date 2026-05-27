@@ -38,13 +38,42 @@ function parseShigaPost($, url, counter) {
     weekday = monthM[3];
   }
 
-  if (!dateStr || isPast(dateStr)) return [];
+  if (dateStr && isPast(dateStr)) return [];
 
   // ── タイトル ─────────────────────────────────────────────────
   const rawTitle = ($('h1.entry-title, h1.page-title, .entry-title, h1').first().text().trim()
     || $('title').text().replace(/\s*[–—-]\s*.*$/, '').trim())
     .replace(/「|」/g, '').trim();
   if (!rawTitle) return [];
+
+  // ── HTMLに日付なし → チラシ（PDF/画像）リンクにフォールバック ──
+  if (!dateStr) {
+    let flyerUrl = '';
+    $('a[href]').each((_, a) => {
+      const h = ($(a).attr('href') || '').trim();
+      if (/\.pdf(\?.*)?$/i.test(h) && h.includes('mod.go.jp')) {
+        flyerUrl = h; return false;
+      }
+    });
+    if (!flyerUrl) {
+      $('img[src]').each((_, img) => {
+        const s = ($(img).attr('src') || '').trim();
+        if (/\.(jpe?g|png)(\?.*)?$/i.test(s) && /wp-content|uploads/i.test(s)
+            && !/logo|header|nav|footer|icon/i.test(s)) {
+          flyerUrl = s.startsWith('http') ? s : `https://www.mod.go.jp${s.startsWith('/') ? '' : '/'}${s}`;
+          return false;
+        }
+      });
+    }
+    if (!flyerUrl) return [];
+    return [{
+      id: `sh-flyer-${counter}`, pref: 'shiga', date: '', weekday: '',
+      title: rawTitle.substring(0, 60), place: '', address: '', time: '',
+      category: guessCategory(toHalfWidth(rawTitle)), tag: guessTag(rawTitle),
+      url, notes: null, ageRequirement: null, deadline: null, imageUrl: '',
+      _flyerUrl: flyerUrl,
+    }];
+  }
 
   // ── 場所 ─────────────────────────────────────────────────────
   const placeM = halfBody.match(/(?:場所|会場|開催場所)[：: ]\s*(.{2,60?})(?:\s+(?:日時|内容|対象|締切|[●■])|$)/);
