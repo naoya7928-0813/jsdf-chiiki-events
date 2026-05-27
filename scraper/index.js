@@ -311,7 +311,7 @@ async function callGroqOcr(base64, mimeType, prompt, label = 'OCR') {
     }
     const apiJson   = await apiRes.json();
     const text      = apiJson.choices?.[0]?.message?.content ?? '';
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    const jsonMatch = text.match(/(\[[\s\S]*\]|\{[\s\S]*\})/);
     if (!jsonMatch) {
       console.warn(`[${label}] Groq JSON パース失敗: ${text.slice(0, 100)}`);
       return null;
@@ -376,7 +376,7 @@ async function callGeminiOcr(parts, label = 'PDF-OCR') {
     }
     const apiJson   = await apiRes.json();
     const text      = apiJson.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    const jsonMatch = text.match(/(\[[\s\S]*\]|\{[\s\S]*\})/);
     if (!jsonMatch) return null;
     try { return JSON.parse(jsonMatch[0]); } catch { return null; }
   }
@@ -761,6 +761,57 @@ function mergeOcr(ev, ocr) {
     notes: [ev.notes, ocr.notes].filter(Boolean).join('\n') || null,
     url:            ocrUrl,
   };
+}
+
+/**
+ * OCR 結果を個別イベントオブジェクトの配列に展開する。
+ *
+ * Groq llama-4-scout は1枚の画像に複数イベントが含まれる場合、
+ * フィールド値を配列で返すことがある（例: title/date/place が同じ長さの配列）。
+ * また、モデルによってはオブジェクト配列 [{...}, {...}] を返す場合もある。
+ *
+ * この関数はどちらの形式も受け取り、常に個別オブジェクトの配列として返す。
+ * スカラー値の場合は要素1つの配列として返す。
+ *
+ * @param {Object|Object[]|null} ocr - callGroqOcr / callGeminiOcr の戻り値
+ * @returns {Object[]} 正規化された個別イベントオブジェクトの配列
+ */
+function expandOcrResult(ocr) {
+  if (!ocr) return [];
+
+  // モデルがオブジェクト配列 [{...}, {...}] で返した場合
+  if (Array.isArray(ocr)) {
+    return ocr.filter(item => item && typeof item === 'object');
+  }
+
+  const isArr = (v) => Array.isArray(v);
+
+  // 全フィールドがスカラー → そのまま1件として返す
+  if (!isArr(ocr.title) && !isArr(ocr.date) && !isArr(ocr.place)) {
+    return [ocr];
+  }
+
+  // フィールド値が配列の場合: 最大長を決定してインデックスでzipする
+  const len = Math.max(
+    isArr(ocr.title) ? ocr.title.length : 1,
+    isArr(ocr.date)  ? ocr.date.length  : 1,
+    isArr(ocr.place) ? ocr.place.length : 1,
+  );
+
+  const results = [];
+  for (let i = 0; i < len; i++) {
+    results.push({
+      title:          isArr(ocr.title)          ? (ocr.title[i]          ?? null) : ocr.title,
+      date:           isArr(ocr.date)            ? (ocr.date[i]           ?? null) : ocr.date,
+      place:          isArr(ocr.place)           ? (ocr.place[i]          ?? null) : ocr.place,
+      time:           isArr(ocr.time)            ? (ocr.time[i]           ?? null) : ocr.time,
+      ageRequirement: isArr(ocr.ageRequirement)  ? (ocr.ageRequirement[i] ?? null) : ocr.ageRequirement,
+      deadline:       isArr(ocr.deadline)        ? (ocr.deadline[i]       ?? null) : ocr.deadline,
+      notes:          isArr(ocr.notes)           ? (ocr.notes[i]          ?? null) : ocr.notes,
+      url:            isArr(ocr.url)             ? (ocr.url[i]            ?? null) : ocr.url,
+    });
+  }
+  return results;
 }
 
 /** URL が画像ファイル（jpg/jpeg/png/gif/webp）を指しているか判定 */
@@ -1375,51 +1426,53 @@ async function fetchHyogo(context) {
     await sleep(2000);
     if (!ocr) continue;
 
-    const rawDate = toHalfWidth((ocr.date || '').replace(/\s+/g, ' ').trim());
-    const dtMatch = rawDate.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/)
-      || rawDate.match(/(\d{4})年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/);
+    for (const item of expandOcrResult(ocr)) {
+      const rawDate = toHalfWidth((item.date || '').replace(/\s+/g, ' ').trim());
+      const dtMatch = rawDate.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/)
+        || rawDate.match(/(\d{4})年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/);
 
-    let dateStr = '', weekday = '';
-    if (dtMatch && dtMatch[0].startsWith('令和')) {
-      const year = reiwaToAD(parseInt(dtMatch[1], 10));
-      dateStr  = `${year}-${padTwo(parseInt(dtMatch[2], 10))}-${padTwo(parseInt(dtMatch[3], 10))}`;
-      weekday  = dtMatch[4];
-    } else if (dtMatch) {
-      dateStr  = `${dtMatch[1]}-${padTwo(parseInt(dtMatch[2], 10))}-${padTwo(parseInt(dtMatch[3], 10))}`;
-      weekday  = dtMatch[4];
-    } else {
-      // ファイル名から日付を推定（例: 0530aono_banner.png → 5月30日）
-      const fnMatch = imgUrl.match(/(\d{2})(\d{2})[a-z]/i);
-      if (fnMatch) {
-        const now = new Date();
-        const m = parseInt(fnMatch[1], 10), d = parseInt(fnMatch[2], 10);
-        const inFut = m > now.getMonth() + 1 || (m === now.getMonth() + 1 && d >= now.getDate());
-        dateStr = `${inFut ? now.getFullYear() : now.getFullYear() + 1}-${padTwo(m)}-${padTwo(d)}`;
+      let dateStr = '', weekday = '';
+      if (dtMatch && dtMatch[0].startsWith('令和')) {
+        const year = reiwaToAD(parseInt(dtMatch[1], 10));
+        dateStr  = `${year}-${padTwo(parseInt(dtMatch[2], 10))}-${padTwo(parseInt(dtMatch[3], 10))}`;
+        weekday  = dtMatch[4];
+      } else if (dtMatch) {
+        dateStr  = `${dtMatch[1]}-${padTwo(parseInt(dtMatch[2], 10))}-${padTwo(parseInt(dtMatch[3], 10))}`;
+        weekday  = dtMatch[4];
+      } else {
+        // ファイル名から日付を推定（例: 0530aono_banner.png → 5月30日）
+        const fnMatch = imgUrl.match(/(\d{2})(\d{2})[a-z]/i);
+        if (fnMatch) {
+          const now = new Date();
+          const m = parseInt(fnMatch[1], 10), d = parseInt(fnMatch[2], 10);
+          const inFut = m > now.getMonth() + 1 || (m === now.getMonth() + 1 && d >= now.getDate());
+          dateStr = `${inFut ? now.getFullYear() : now.getFullYear() + 1}-${padTwo(m)}-${padTwo(d)}`;
+        }
       }
+
+      if (!dateStr || isPast(dateStr)) continue;
+
+      const title = item.title ? fixOcrTitle(item.title.trim()) : '';
+      if (!title) continue;
+
+      events.push({
+        id:             `hy-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
+        pref:           'hyogo',
+        date:           dateStr,
+        weekday,
+        title,
+        place:          (item.place          || '').trim(),
+        address:        '',
+        time:           (item.time           || '').trim(),
+        category:       guessCategory(toHalfWidth(title)),
+        tag:            guessTag(title),
+        url:            URLS.hyogo,
+        notes:          item.notes          || null,
+        ageRequirement: item.ageRequirement || null,
+        deadline:       item.deadline       || null,
+        imageUrl:       '',
+      });
     }
-
-    if (!dateStr || isPast(dateStr)) continue;
-
-    const title = ocr.title ? fixOcrTitle(ocr.title.trim()) : '';
-    if (!title) continue;
-
-    events.push({
-      id:             `hy-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
-      pref:           'hyogo',
-      date:           dateStr,
-      weekday,
-      title,
-      place:          (ocr.place          || '').trim(),
-      address:        '',
-      time:           (ocr.time           || '').trim(),
-      category:       guessCategory(toHalfWidth(title)),
-      tag:            guessTag(title),
-      url:            URLS.hyogo,
-      notes:          ocr.notes          || null,
-      ageRequirement: ocr.ageRequirement || null,
-      deadline:       ocr.deadline       || null,
-      imageUrl:       '',
-    });
   }
 
   console.log(`[兵庫] ${events.length} 件取得 (OCR)`);
@@ -1478,37 +1531,39 @@ async function fetchTochigi(context) {
     await sleep(2000);
     if (!ocr) continue;
 
-    const rawDate = toHalfWidth((ocr.date || '').replace(/\s+/g, ' ').trim());
-    const dtMatch = rawDate.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/);
-    if (!dtMatch) { console.warn(`[栃木 OCR] 日付パース失敗: "${ocr.date}"`); continue; }
+    for (const item of expandOcrResult(ocr)) {
+      const rawDate = toHalfWidth((item.date || '').replace(/\s+/g, ' ').trim());
+      const dtMatch = rawDate.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/);
+      if (!dtMatch) { console.warn(`[栃木 OCR] 日付パース失敗: "${item.date}"`); continue; }
 
-    const year    = reiwaToAD(parseInt(dtMatch[1], 10));
-    const month   = parseInt(dtMatch[2], 10);
-    const day     = parseInt(dtMatch[3], 10);
-    const weekday = dtMatch[4];
-    const dateStr = `${year}-${padTwo(month)}-${padTwo(day)}`;
-    if (isPast(dateStr)) continue;
+      const year    = reiwaToAD(parseInt(dtMatch[1], 10));
+      const month   = parseInt(dtMatch[2], 10);
+      const day     = parseInt(dtMatch[3], 10);
+      const weekday = dtMatch[4];
+      const dateStr = `${year}-${padTwo(month)}-${padTwo(day)}`;
+      if (isPast(dateStr)) continue;
 
-    const title = ocr.title ? fixOcrTitle(ocr.title.trim()) : '';
-    if (!title) continue;
+      const title = item.title ? fixOcrTitle(item.title.trim()) : '';
+      if (!title) continue;
 
-    events.push({
-      id:             `tc-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
-      pref:           'tochigi',
-      date:           dateStr,
-      weekday,
-      title,
-      place:          (ocr.place          || '').trim(),
-      address:        '',
-      time:           (ocr.time           || '').trim(),
-      category:       guessCategory(toHalfWidth(title)),
-      tag:            guessTag(title),
-      url:            '',
-      notes:          ocr.notes          || null,
-      ageRequirement: ocr.ageRequirement || null,
-      deadline:       ocr.deadline       || null,
-      imageUrl:       '',  // OCR 済みのため再処理不要
-    });
+      events.push({
+        id:             `tc-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
+        pref:           'tochigi',
+        date:           dateStr,
+        weekday,
+        title,
+        place:          (item.place          || '').trim(),
+        address:        '',
+        time:           (item.time           || '').trim(),
+        category:       guessCategory(toHalfWidth(title)),
+        tag:            guessTag(title),
+        url:            '',
+        notes:          item.notes          || null,
+        ageRequirement: item.ageRequirement || null,
+        deadline:       item.deadline       || null,
+        imageUrl:       '',  // OCR 済みのため再処理不要
+      });
+    }
   }
 
   console.log(`[栃木] ${events.length} 件取得 (OCR)`);
@@ -1567,34 +1622,36 @@ async function fetchToyama(context) {
     await sleep(2000);
     if (!ocr) continue;
 
-    const rawDate = toHalfWidth((ocr.date || '').replace(/\s+/g, ' ').trim());
-    const dtMatch = rawDate.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/);
-    if (!dtMatch) { console.warn(`[富山 OCR] 日付パース失敗: "${ocr.date}"`); continue; }
+    for (const item of expandOcrResult(ocr)) {
+      const rawDate = toHalfWidth((item.date || '').replace(/\s+/g, ' ').trim());
+      const dtMatch = rawDate.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/);
+      if (!dtMatch) { console.warn(`[富山 OCR] 日付パース失敗: "${item.date}"`); continue; }
 
-    const year    = reiwaToAD(parseInt(dtMatch[1], 10));
-    const dateStr = `${year}-${padTwo(parseInt(dtMatch[2], 10))}-${padTwo(parseInt(dtMatch[3], 10))}`;
-    if (isPast(dateStr)) continue;
+      const year    = reiwaToAD(parseInt(dtMatch[1], 10));
+      const dateStr = `${year}-${padTwo(parseInt(dtMatch[2], 10))}-${padTwo(parseInt(dtMatch[3], 10))}`;
+      if (isPast(dateStr)) continue;
 
-    const title = ocr.title ? fixOcrTitle(ocr.title.trim()) : '';
-    if (!title) continue;
+      const title = item.title ? fixOcrTitle(item.title.trim()) : '';
+      if (!title) continue;
 
-    events.push({
-      id:             `to-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
-      pref:           'toyama',
-      date:           dateStr,
-      weekday:        dtMatch[4],
-      title,
-      place:          (ocr.place          || '').trim(),
-      address:        '',
-      time:           (ocr.time           || '').trim(),
-      category:       guessCategory(toHalfWidth(title)),
-      tag:            guessTag(title),
-      url:            '',
-      notes:          ocr.notes          || null,
-      ageRequirement: ocr.ageRequirement || null,
-      deadline:       ocr.deadline       || null,
-      imageUrl:       '',
-    });
+      events.push({
+        id:             `to-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
+        pref:           'toyama',
+        date:           dateStr,
+        weekday:        dtMatch[4],
+        title,
+        place:          (item.place          || '').trim(),
+        address:        '',
+        time:           (item.time           || '').trim(),
+        category:       guessCategory(toHalfWidth(title)),
+        tag:            guessTag(title),
+        url:            '',
+        notes:          item.notes          || null,
+        ageRequirement: item.ageRequirement || null,
+        deadline:       item.deadline       || null,
+        imageUrl:       '',
+      });
+    }
   }
 
   console.log(`[富山] ${events.length} 件取得 (OCR)`);
