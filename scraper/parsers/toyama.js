@@ -15,6 +15,16 @@ function resolveUrl(href) {
  * @param {import('cheerio').CheerioAPI} $
  * @returns {string[]} 画像の絶対 URL 配列
  */
+/**
+ * 除外すべきテンプレート/ロゴ画像パターン:
+ *   - /images/logo*.jpg, logo*.JPG  → サイトヘッダーロゴ
+ *   - img-top*.jpg                  → ページ上部装飾画像
+ *   - ivento.jpg                    → セクションヘッダー固定画像
+ *   - /images/top.png               → トップ装飾
+ * イベントポスターは通常 /content/04-event/ 配下のイベント固有ファイル名を持つ。
+ */
+const TOYAMA_EXCLUDE = /\/images\/logo|img-top\d*\.|ivento\.jpg|\/images\/top\.|logo\d+\.(jpg|JPG)/i;
+
 function parseToyamaImages($) {
   const seen = new Set();
   const urls = [];
@@ -26,6 +36,7 @@ function parseToyamaImages($) {
     for (const raw of [href, src]) {
       if (!raw) continue;
       if (!/\.jpe?g$/i.test(raw)) continue;
+      if (TOYAMA_EXCLUDE.test(raw)) continue;   // テンプレート画像を除外
       const abs = resolveUrl(raw);
       if (abs && !seen.has(abs)) { seen.add(abs); urls.push(abs); }
     }

@@ -518,10 +518,11 @@ async function enrichFromFlyer(events, prefLabel) {
     }
 
     const { _flyerUrl, ...baseEv } = ev;
-    const title = (ocr.title && fixOcrTitle(ocr.title.trim())) || ev.title;
+    const title   = (ocr.title && fixOcrTitle(ocr.title.trim())) || ev.title;
+    const idBase  = ev.id.split('-')[0];  // 例: 'na', 'mi', 'sh', 'wk'
     results.push({
       ...baseEv,
-      id:             `${ev.id.split('-')[0]}-${dateStr.replace(/-/g, '')}`,
+      id:             `${idBase}-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
       date:           dateStr,
       weekday,
       title,
@@ -531,6 +532,7 @@ async function enrichFromFlyer(events, prefLabel) {
       deadline:       (ocr.deadline       && ocr.deadline.trim())       || null,
       notes:          ocr.notes || null,
       category:       guessCategory(toHalfWidth(title)),
+      tag:            guessTag(title),
     });
     console.log(`  → ${dateStr} ${title.substring(0, 30)}`);
   }
@@ -973,9 +975,98 @@ async function fetchNagano() {
  * @param {Function}       postFn   - 個別投稿 HTML から events 配列を返す関数(($, url, counter) => [])
  * @param {number}         maxPosts - 最大取得投稿数
  */
-async function fetchWpPosts(ctx, pref, listUrl, urlsFn, postFn, maxPosts = 5) {
+/**
+ * 一覧ページの $ から投稿 URL と紐づくサムネイル画像を抽出してスタブを生成する。
+ *
+ * 近畿 WP 系地本（三重・滋賀・奈良・和歌山）では個別投稿ページが Cloudflare に
+ * ブロックされる（一覧ページは取得可能）。一覧ページに掲載されたサムネイル画像を
+ * _flyerUrl としてスタブ化し、enrichFromFlyer で OCR する。
+ *
+ * @param {import('cheerio').CheerioAPI} $ - 一覧ページの cheerio インスタンス
+ * @param {string[]} postUrls - 投稿 URL 配列
+ * @param {string} pref - 都道府県キー（例: 'nara'）
+ * @param {string} prefLabel - ログ用ラベル（例: '奈良'）
+ * @returns {Array<Object>} _flyerUrl 付きスタブ配列
+ */
+/**
+ * 一覧ページの $ から投稿 URL と紐づくサムネイル画像を抽出してスタブを生成する。
+ *
+ * @param {import('cheerio').CheerioAPI} $ - 一覧ページの cheerio インスタンス
+ * @param {string[]} postUrls - 投稿 URL 配列
+ * @param {string} prefKey  - 都道府県英語キー（例: 'nara'）— pref フィールドに使用
+ * @param {string} idPrefix - ID プレフィックス（例: 'na'）
+ * @param {string} prefLabel - ログ用ラベル（例: '奈良'）
+ * @returns {Array<Object>} _flyerUrl 付きスタブ配列
+ */
+function extractListPageStubs($, postUrls, prefKey, idPrefix, prefLabel) {
+  const postUrlSet = new Set(postUrls);
+  const stubs      = [];
+  let counter      = 0;
+
+  // 各投稿リンクを基点に、最も近い article/li/div コンテナを探して画像を取得する
+  $('a[href]').each((_, link) => {
+    const url = ($(link).attr('href') || '').trim().replace(/\/$/, '') + '/';
+    const normalUrl = ($(link).attr('href') || '').trim();
+    const matchUrl = postUrlSet.has(url) ? url : (postUrlSet.has(normalUrl) ? normalUrl : null);
+    if (!matchUrl || stubs.some(s => s.url === matchUrl)) return;
+
+    // コンテナ: article → li → .post/.entry → 親3段目まで試みる
+    const $container = $(link).closest('article, li, .post, .entry, .hentry, [class*="post-"], [class*="entry-"]');
+    const $scope     = $container.length ? $container : $(link).parent().parent().parent();
+
+    // タイトル
+    const rawTitle = ($scope.find('.entry-title, h2, h3, h4, h1').first().text()
+                   || $(link).text() || '').trim().replace(/[「」]|掲載しました。?/g, '').trim();
+
+    // サムネイル画像（wp-content/uploads に限定）
+    let flyerUrl = '';
+    $scope.find('img').each((_, img) => {
+      for (const attr of ['src', 'data-src', 'data-lazy-src']) {
+        const s = ($(img).attr(attr) || '').trim();
+        if (s && /wp-content|\/uploads\//i.test(s)
+              && /\.(jpe?g|png)/i.test(s)
+              && !/logo|icon|arrow|nophoto|noimage|dummy/i.test(s)) {
+          flyerUrl = s.startsWith('http') ? s : `https://www.mod.go.jp${s.startsWith('/') ? '' : '/'}${s}`;
+          return false;
+        }
+      }
+      // srcset の最初の画像も試みる
+      const srcset = ($(img).attr('srcset') || '').split(',')[0].trim().split(' ')[0];
+      if (srcset && /wp-content|\/uploads\//i.test(srcset) && /\.(jpe?g|png)/i.test(srcset)) {
+        flyerUrl = srcset.startsWith('http') ? srcset : `https://www.mod.go.jp${srcset}`;
+        return false;
+      }
+    });
+
+    if (!flyerUrl) return;   // 画像なし → スキップ
+
+    stubs.push({
+      id:             `${idPrefix}-flyer-${++counter}`,
+      pref:           prefKey,
+      date:           '', weekday: '',
+      title:          (rawTitle || matchUrl.split('/').filter(Boolean).pop() || 'event').substring(0, 60),
+      place:          '', address: '', time: '',
+      category:       '', tag:      '',
+      url:            matchUrl,
+      notes:          null, ageRequirement: null, deadline: null, imageUrl: '',
+      _flyerUrl:      flyerUrl,
+    });
+  });
+
+  console.log(`[${prefLabel}] 一覧ページ画像スタブ: ${stubs.length} 件 (${stubs.map(s => s._flyerUrl.split('/').pop()).join(', ')})`);
+  return stubs;
+}
+
+/**
+ * @param {string} pref      - ログ用ラベル（例: '奈良'）
+ * @param {string} prefKey   - 都道府県英語キー（例: 'nara'）
+ * @param {string} idPrefix  - ID プレフィックス（例: 'na'）
+ */
+async function fetchWpPosts(ctx, pref, prefKey, idPrefix, listUrl, urlsFn, postFn, maxPosts = 5) {
   console.log(`[${pref}] 一覧ページ取得: ${listUrl}`);
   let postUrls = [];
+  let listStubs = [];
+  let listHtml = '';
 
   // ── 一覧ページ ──
   const listPage = await ctx.newPage();
@@ -988,10 +1079,15 @@ async function fetchWpPosts(ctx, pref, listUrl, urlsFn, postFn, maxPosts = 5) {
       );
     } catch {}
     await listPage.waitForTimeout(2000);
-    const html = await listPage.content();
-    const $    = cheerio.load(html, { decodeEntities: false });
+    listHtml   = await listPage.content();
+    const $    = cheerio.load(listHtml, { decodeEntities: false });
     postUrls   = [...new Set(urlsFn($))].slice(0, maxPosts);
     console.log(`[${pref}] 投稿 URL ${postUrls.length} 件取得`);
+
+    // 一覧ページからサムネイルスタブも取得（個別投稿が CF ブロックされる場合のフォールバック）
+    if (postUrls.length > 0) {
+      listStubs = extractListPageStubs($, postUrls, prefKey, idPrefix, pref);
+    }
   } catch (err) {
     console.warn(`[${pref}] 一覧ページ失敗: ${err.message.substring(0, 60)}`);
   } finally {
@@ -1002,6 +1098,7 @@ async function fetchWpPosts(ctx, pref, listUrl, urlsFn, postFn, maxPosts = 5) {
 
   // ── 各投稿ページ ──
   const events = [];
+  const succeededUrls = new Set();
   let counter  = 0;
   for (const postUrl of postUrls) {
     const postPage = await ctx.newPage();
@@ -1010,15 +1107,25 @@ async function fetchWpPosts(ctx, pref, listUrl, urlsFn, postFn, maxPosts = 5) {
       try {
         await postPage.waitForFunction(
           () => { const t = document.title; return t.length > 0 && !t.includes('Just a moment') && !t.includes('しばらくお待ちください'); },
-          { timeout: 30_000 }
+          { timeout: 60_000 }  // 30s → 60s に延長（CF チャレンジ完了待ち）
         );
       } catch {}
       await postPage.waitForTimeout(2000);
       const html = await postPage.content();
       const $    = cheerio.load(html, { decodeEntities: false });
-      const evs  = postFn($, postUrl, ++counter);
-      if (evs.length) console.log(`[${pref}] ${postUrl.split('/').slice(-2,-1)[0]} → ${evs[0].date} ${evs[0].title.substring(0,30)}`);
-      events.push(...evs);
+
+      // CF チャレンジ判定: body テキストが極端に短い場合はブロックされている
+      const bodyText = $('body').text().replace(/\s+/g, ' ').trim();
+      if (bodyText.length < 100) {
+        console.log(`[${pref}] ${postUrl.split('/').slice(-2,-1)[0]} → CF ブロック検出、一覧スタブを使用`);
+      } else {
+        const evs = postFn($, postUrl, ++counter);
+        if (evs.length) {
+          console.log(`[${pref}] ${postUrl.split('/').slice(-2,-1)[0]} → ${evs[0].date} ${evs[0].title.substring(0,30)}`);
+          events.push(...evs);
+          succeededUrls.add(postUrl);
+        }
+      }
     } catch (err) {
       console.warn(`[${pref}] 投稿取得失敗: ${err.message.substring(0, 60)}`);
     } finally {
@@ -1027,14 +1134,22 @@ async function fetchWpPosts(ctx, pref, listUrl, urlsFn, postFn, maxPosts = 5) {
     await sleep(1500);
   }
 
+  // 個別投稿で取得できなかった URL に対して一覧スタブをフォールバックとして追加
+  const fallbackStubs = listStubs.filter(s => !succeededUrls.has(s.url));
+  if (fallbackStubs.length > 0) {
+    console.log(`[${pref}] 一覧スタブ ${fallbackStubs.length} 件をフォールバック追加`);
+    events.push(...fallbackStubs);
+  }
+
   console.log(`[${pref}] ${events.length} 件取得`);
   return events;
 }
 
-const fetchMie      = (ctx) => fetchWpPosts(ctx, '三重',   URLS.mie,      parseMiePostUrls,      parseMiePost,      5);
-const fetchShiga    = (ctx) => fetchWpPosts(ctx, '滋賀',   URLS.shiga,    parseShigaPostUrls,    parseShigaPost,    5);
-const fetchNara     = (ctx) => fetchWpPosts(ctx, '奈良',   URLS.nara,     parseNaraPostUrls,     parseNaraPost,     5);
-const fetchWakayama = (ctx) => fetchWpPosts(ctx, '和歌山', URLS.wakayama, parseWakayamaPostUrls, parseWakayamaPost, 5);
+//                                   label    prefKey      idPrefix  listUrl         urlsFn                postFn           maxPosts
+const fetchMie      = (ctx) => fetchWpPosts(ctx, '三重',   'mie',      'mi',  URLS.mie,      parseMiePostUrls,      parseMiePost,      5);
+const fetchShiga    = (ctx) => fetchWpPosts(ctx, '滋賀',   'shiga',    'sh',  URLS.shiga,    parseShigaPostUrls,    parseShigaPost,    5);
+const fetchNara     = (ctx) => fetchWpPosts(ctx, '奈良',   'nara',     'na',  URLS.nara,     parseNaraPostUrls,     parseNaraPost,     5);
+const fetchWakayama = (ctx) => fetchWpPosts(ctx, '和歌山', 'wakayama', 'wk',  URLS.wakayama, parseWakayamaPostUrls, parseWakayamaPost, 5);
 
 /**
  * 兵庫地本: TOP ページからイベントバナー画像を取得し OCR でイベントを抽出する。
