@@ -229,8 +229,17 @@ const MOCK_DATA = {
 // ── OCR（Gemini Flash による画像・PDF解析） ────────────────────
 
 /**
+ * Gemini OCR API クォータ枯渇フラグ。
+ * 429 エラーでリトライしても失敗した場合に true にセットされ、
+ * 以降の全 OCR 呼び出しを即座にスキップする（タイムアウト防止）。
+ */
+let geminiQuotaExhausted = false;
+
+/**
  * Gemini OCR API を呼び出す共通関数。
- * 429 レート制限時は 30 秒 → 60 秒の遅延でリトライする。
+ * 429 レート制限時は 60 秒待機して 1 回リトライする。
+ * リトライしても 429 の場合は geminiQuotaExhausted を true にセットし、
+ * 以降の全 OCR 呼び出しをスキップする（スクレイプ全体のタイムアウト防止）。
  *
  * OCR必須地本（画像・PDFのみでイベント情報を提供）:
  *   - 栃木: イベントポスターJPG画像（OCR_PROMPT_FULL）
@@ -245,8 +254,13 @@ const MOCK_DATA = {
  */
 async function callGeminiOcr(parts, label = 'OCR') {
   if (!process.env.GEMINI_API_KEY) return null;
-  // 429 発生時のリトライ待機時間: 1回目30秒、2回目60秒（それでも失敗したらnull）
-  const retryDelays = [30_000, 60_000];
+  // クォータ枯渇フラグが立っている場合は即座にスキップ（タイムアウト防止）
+  if (geminiQuotaExhausted) {
+    console.warn(`[${label}] Gemini クォータ枯渇フラグ → スキップ`);
+    return null;
+  }
+  // 429 発生時のリトライ: 1回のみ60秒待機
+  const retryDelays = [60_000];
   for (let attempt = 0; attempt <= retryDelays.length; attempt++) {
     const apiRes = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
@@ -265,6 +279,12 @@ async function callGeminiOcr(parts, label = 'OCR') {
         console.warn(`[${label}] Gemini API 429 → ${wait / 1000}秒待機してリトライ (${attempt + 1}/${retryDelays.length})`);
         await sleep(wait);
         continue;
+      }
+      if (apiRes.status === 429) {
+        // リトライしても429 → クォータ枯渇と判断し、以降のOCRをすべてスキップ
+        console.warn(`[${label}] Gemini API 429 リトライ後も失敗 → クォータ枯渇フラグをセット（以降のOCRをスキップ）`);
+        geminiQuotaExhausted = true;
+        return null;
       }
       const errText = await apiRes.text();
       console.warn(`[${label}] API エラー (${apiRes.status}): ${errText.slice(0, 100)}`);
@@ -1038,7 +1058,18 @@ function extractListPageStubs($, postUrls, prefKey, idPrefix, prefLabel) {
       }
     });
 
-    if (!flyerUrl) return;   // 画像なし → スキップ
+    // 画像がない場合はPDFリンクも試みる（三重・和歌山など画像なしWP地本向け）
+    if (!flyerUrl) {
+      $scope.find('a[href]').each((_, a) => {
+        const h = ($(a).attr('href') || '').trim();
+        if (/\.pdf(\?.*)?$/i.test(h) && /mod\.go\.jp/i.test(h)) {
+          flyerUrl = h.startsWith('http') ? h : `https://www.mod.go.jp${h.startsWith('/') ? '' : '/'}${h}`;
+          return false;
+        }
+      });
+    }
+
+    if (!flyerUrl) return;   // 画像・PDFなし → スキップ
 
     stubs.push({
       id:             `${idPrefix}-flyer-${++counter}`,

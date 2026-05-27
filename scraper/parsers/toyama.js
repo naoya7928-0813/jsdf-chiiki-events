@@ -23,7 +23,7 @@ function resolveUrl(href) {
  *   - /images/top.png               → トップ装飾
  * イベントポスターは通常 /content/04-event/ 配下のイベント固有ファイル名を持つ。
  */
-const TOYAMA_EXCLUDE = /\/images\/logo|img-top\d*\.|ivento\.jpg|\/images\/top\.|logo\d+\.(jpg|JPG)/i;
+const TOYAMA_EXCLUDE = /\/images\/logo|img-top|ivento\.jpg|\/images\/top\.|logo\d+\.(jpg|JPG)/i;
 
 function parseToyamaImages($) {
   const seen = new Set();
