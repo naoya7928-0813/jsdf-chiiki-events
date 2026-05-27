@@ -1354,9 +1354,11 @@ async function fetchWpPosts(ctx, pref, prefKey, idPrefix, listUrl, urlsFn, postF
       const html = await postPage.content();
       const $    = cheerio.load(html, { decodeEntities: false });
 
-      // CF チャレンジ判定: body テキストが極端に短い場合はブロックされている
+      // CF チャレンジ判定: body が短い or CF 固有テキストを含む
       const bodyText = $('body').text().replace(/\s+/g, ' ').trim();
-      if (bodyText.length < 100) {
+      const isCfBlocked = bodyText.length < 100
+        || /Just a moment|Enable JavaScript and cookies|しばらくお待ちください/i.test(bodyText);
+      if (isCfBlocked) {
         console.log(`[${pref}] ${postUrl.split('/').slice(-2,-1)[0]} → CF ブロック`);
       } else {
         const evs = postFn($, postUrl, ++counter);
@@ -1379,6 +1381,19 @@ async function fetchWpPosts(ctx, pref, prefKey, idPrefix, listUrl, urlsFn, postF
     const nonSucceeded = listStubs.filter(s => !succeededUrls.has(s.url));
     console.log(`[${pref}] 一覧スタブ ${nonSucceeded.length} 件を追加`);
     events.push(...nonSucceeded);
+  }
+
+  // フォールバック: 個別投稿・スタブからも取得できなかった場合、
+  // 一覧ページ本文を直接 postFn でパース試みる（三重・滋賀など埋め込み型 WP 地本向け）
+  if (events.length === 0 && listHtml) {
+    try {
+      const $list = cheerio.load(listHtml, { decodeEntities: false });
+      const listEvs = postFn($list, listUrl, 0);
+      if (listEvs.length > 0) {
+        console.log(`[${pref}] 一覧ページ直接パース: ${listEvs.length} 件`);
+        events.push(...listEvs);
+      }
+    } catch { /* 失敗しても無視 */ }
   }
 
   console.log(`[${pref}] ${events.length} 件取得`);
