@@ -707,6 +707,22 @@
   "chiba": [],
   "niigata": [
     {
+      "id": "ni-20260530-hs0bw",
+      "pref": "niigata",
+      "date": "2026-05-30",
+      "weekday": "土",
+      "title": "キッズおしごと体験",
+      "place": "万代シティーパーク",
+      "address": "",
+      "time": "10:00～16:00",
+      "category": "体験",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
       "id": "ni-20260530-eheus",
       "pref": "niigata",
       "date": "2026-05-30",
@@ -1673,7 +1689,24 @@
   "hyogo": [],
   "nara": [],
   "wakayama": [],
-  "ehime": [],
+  "ehime": [
+    {
+      "id": "em-20260606-ajcex",
+      "pref": "ehime",
+      "date": "2026-06-06",
+      "weekday": "土",
+      "title": "マイナビ インターンシップ＆キャリア発見フェア",
+      "place": "アイテムえひめ",
+      "address": "",
+      "time": "",
+      "category": "採用イベント",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/ehime/event.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    }
+  ],
   "kagawa": [
     {
       "id": "kg-20260606-gx21o",
@@ -2098,5 +2131,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/05/27 16:25"
+  "updatedAt": "2026/05/27 20:20"
 }
