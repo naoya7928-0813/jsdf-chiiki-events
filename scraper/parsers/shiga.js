@@ -51,8 +51,9 @@ function parseShigaPost($, url, counter) {
     let flyerUrl = '';
     $('a[href]').each((_, a) => {
       const h = ($(a).attr('href') || '').trim();
-      if (/\.pdf(\?.*)?$/i.test(h) && h.includes('mod.go.jp')) {
-        flyerUrl = h; return false;
+      if (/\.pdf(\?.*)?$/i.test(h) && (h.startsWith('/') || h.includes('mod.go.jp'))) {
+        flyerUrl = h.startsWith('http') ? h : `https://www.mod.go.jp${h.startsWith('/') ? '' : '/'}${h}`;
+        return false;
       }
     });
     if (!flyerUrl) {

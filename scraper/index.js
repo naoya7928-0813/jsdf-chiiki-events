@@ -1233,20 +1233,27 @@ function extractListPageStubs($, postUrls, prefKey, idPrefix, prefLabel) {
                    || $(link).text() || '').trim().replace(/[「」]|掲載しました。?/g, '').trim();
 
     // サムネイル画像（wp-content/uploads に限定）
+    // 除外: ロゴ・アイコン・矢印・nophoto など汎用画像
+    //       ファイル名が MD5 ハッシュのみ（WordPress プレースホルダー）も除外
+    const isPlaceholder = (s) =>
+      /logo|icon|arrow|nophoto|noimage|dummy|placeholder/i.test(s)
+      || /\/[0-9a-f]{32}\.(jpe?g|png)$/i.test(s);   // WP MD5ハッシュプレースホルダー
+
     let flyerUrl = '';
     $scope.find('img').each((_, img) => {
       for (const attr of ['src', 'data-src', 'data-lazy-src']) {
         const s = ($(img).attr(attr) || '').trim();
         if (s && /wp-content|\/uploads\//i.test(s)
               && /\.(jpe?g|png)/i.test(s)
-              && !/logo|icon|arrow|nophoto|noimage|dummy/i.test(s)) {
+              && !isPlaceholder(s)) {
           flyerUrl = s.startsWith('http') ? s : `https://www.mod.go.jp${s.startsWith('/') ? '' : '/'}${s}`;
           return false;
         }
       }
       // srcset の最初の画像も試みる
       const srcset = ($(img).attr('srcset') || '').split(',')[0].trim().split(' ')[0];
-      if (srcset && /wp-content|\/uploads\//i.test(srcset) && /\.(jpe?g|png)/i.test(srcset)) {
+      if (srcset && /wp-content|\/uploads\//i.test(srcset) && /\.(jpe?g|png)/i.test(srcset)
+          && !isPlaceholder(srcset)) {
         flyerUrl = srcset.startsWith('http') ? srcset : `https://www.mod.go.jp${srcset}`;
         return false;
       }
@@ -1256,7 +1263,8 @@ function extractListPageStubs($, postUrls, prefKey, idPrefix, prefLabel) {
     if (!flyerUrl) {
       $scope.find('a[href]').each((_, a) => {
         const h = ($(a).attr('href') || '').trim();
-        if (/\.pdf(\?.*)?$/i.test(h) && /mod\.go\.jp/i.test(h)) {
+        // 相対URL（/pco/...）も絶対URL（https://www.mod.go.jp/...）も受け入れる
+        if (/\.pdf(\?.*)?$/i.test(h) && (h.startsWith('/') || /mod\.go\.jp/i.test(h))) {
           flyerUrl = h.startsWith('http') ? h : `https://www.mod.go.jp${h.startsWith('/') ? '' : '/'}${h}`;
           return false;
         }

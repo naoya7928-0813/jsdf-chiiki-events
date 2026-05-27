@@ -60,8 +60,9 @@ function parseMiePost($, url, counter) {
     let flyerUrl = '';
     $('a[href]').each((_, a) => {
       const h = ($(a).attr('href') || '').trim();
-      if (/\.pdf(\?.*)?$/i.test(h) && h.includes('mod.go.jp')) {
-        flyerUrl = h; return false;
+      if (/\.pdf(\?.*)?$/i.test(h) && (h.startsWith('/') || h.includes('mod.go.jp'))) {
+        flyerUrl = h.startsWith('http') ? h : `https://www.mod.go.jp${h.startsWith('/') ? '' : '/'}${h}`;
+        return false;
       }
     });
     if (!flyerUrl) {
@@ -118,10 +119,23 @@ function parseMiePost($, url, counter) {
  */
 function parseMiePostUrls($) {
   const urls = [];
+  const seen = new Set();
+
+  // /post-N 形式（WP自動ID）
   $('a[href*="mod.go.jp/pco/mie/post-"]').each((_, a) => {
     const href = $(a).attr('href') || '';
-    if (href && !urls.includes(href)) urls.push(href);
+    if (href && !seen.has(href)) { seen.add(href); urls.push(href); }
   });
+
+  // /events-page/[slug]/ 形式（親ページの子ページとして掲載する三重の形式）
+  $('a[href*="mod.go.jp/pco/mie/events-page/"]').each((_, a) => {
+    const href = $(a).attr('href') || '';
+    // /events-page/ 自身は除外、子スラッグのみ
+    if (href && !/\/events-page\/?$/.test(href) && !seen.has(href)) {
+      seen.add(href); urls.push(href);
+    }
+  });
+
   return urls;
 }
 
