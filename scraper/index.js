@@ -226,7 +226,58 @@ const MOCK_DATA = {
   okinawa:   [],
 };
 
-// ── OCR（Claude Haiku による画像解析） ─────────────────────────
+// ── OCR（Gemini Flash による画像・PDF解析） ────────────────────
+
+/**
+ * Gemini OCR API を呼び出す共通関数。
+ * 429 レート制限時は 30 秒 → 60 秒の遅延でリトライする。
+ *
+ * OCR必須地本（画像・PDFのみでイベント情報を提供）:
+ *   - 栃木: イベントポスターJPG画像（OCR_PROMPT_FULL）
+ *   - 富山: イベントポスターJPG画像（OCR_PROMPT_FULL）
+ *   - 兵庫: イベント告知バナー画像（OCR_PROMPT_FULL）
+ *   - 岩手・青森など: PDF形式のイベント情報（PDF_OCR_PROMPT）
+ *   - 三重・滋賀・奈良・和歌山: チラシPDF/画像（FLYER_OCR_PROMPT）
+ *
+ * @param {Array} parts - Gemini API に送る parts 配列（inline_data + text）
+ * @param {string} label - ログ出力用ラベル（429ログに表示）
+ * @returns {Object|null} JSON パース済みオブジェクト、取得失敗時は null
+ */
+async function callGeminiOcr(parts, label = 'OCR') {
+  if (!process.env.GEMINI_API_KEY) return null;
+  // 429 発生時のリトライ待機時間: 1回目30秒、2回目60秒（それでも失敗したらnull）
+  const retryDelays = [30_000, 60_000];
+  for (let attempt = 0; attempt <= retryDelays.length; attempt++) {
+    const apiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      {
+        method:  'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts }],
+          generationConfig: { maxOutputTokens: 512, temperature: 0 },
+        }),
+      }
+    );
+    if (!apiRes.ok) {
+      if (apiRes.status === 429 && attempt < retryDelays.length) {
+        const wait = retryDelays[attempt];
+        console.warn(`[${label}] Gemini API 429 → ${wait / 1000}秒待機してリトライ (${attempt + 1}/${retryDelays.length})`);
+        await sleep(wait);
+        continue;
+      }
+      const errText = await apiRes.text();
+      console.warn(`[${label}] API エラー (${apiRes.status}): ${errText.slice(0, 100)}`);
+      return null;
+    }
+    const apiJson   = await apiRes.json();
+    const text      = apiJson.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return null;
+    try { return JSON.parse(jsonMatch[0]); } catch { return null; }
+  }
+  return null;
+}
 
 const OCR_PROMPT = `この自衛隊イベントのポスター画像から情報を抽出してください。
 以下のJSONのみを返してください（説明文不要）。該当情報がない項目はnullにしてください。
@@ -262,32 +313,10 @@ async function ocrImage(imageUrl) {
     const base64   = Buffer.from(buf).toString('base64');
     const mimeType = (imgRes.headers.get('content-type') || 'image/jpeg').split(';')[0].trim();
 
-    const apiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method:  'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [
-            { inline_data: { mime_type: mimeType, data: base64 } },
-            { text: OCR_PROMPT },
-          ] }],
-          generationConfig: { maxOutputTokens: 512, temperature: 0 },
-        }),
-      }
-    );
-
-    if (!apiRes.ok) {
-      const errText = await apiRes.text();
-      console.warn(`[OCR] API エラー (${apiRes.status}): ${errText.slice(0, 100)}`);
-      return null;
-    }
-
-    const apiJson   = await apiRes.json();
-    const text      = apiJson.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return null;
-    return JSON.parse(jsonMatch[0]);
+    return await callGeminiOcr([
+      { inline_data: { mime_type: mimeType, data: base64 } },
+      { text: OCR_PROMPT },
+    ], 'OCR');
 
   } catch (err) {
     console.warn(`[OCR] ${imageUrl} → ${err.message}`);
@@ -340,32 +369,10 @@ async function ocrPdf(pdfUrl) {
     const buf    = await pdfRes.arrayBuffer();
     const base64 = Buffer.from(buf).toString('base64');
 
-    const apiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method:  'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [
-            { inline_data: { mime_type: 'application/pdf', data: base64 } },
-            { text: PDF_OCR_PROMPT },
-          ] }],
-          generationConfig: { maxOutputTokens: 512, temperature: 0 },
-        }),
-      }
-    );
-
-    if (!apiRes.ok) {
-      const errText = await apiRes.text();
-      console.warn(`[PDF-OCR] API エラー (${apiRes.status}): ${errText.slice(0, 100)}`);
-      return null;
-    }
-
-    const apiJson   = await apiRes.json();
-    const text      = apiJson.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return null;
-    return JSON.parse(jsonMatch[0]);
+    return await callGeminiOcr([
+      { inline_data: { mime_type: 'application/pdf', data: base64 } },
+      { text: PDF_OCR_PROMPT },
+    ], 'PDF-OCR');
 
   } catch (err) {
     console.warn(`[PDF-OCR] ${pdfUrl} → ${err.message}`);
@@ -410,7 +417,8 @@ async function enrichWithPdfOcr(events) {
       notes:          [ev.notes, ocr.notes].filter(Boolean).join('\n')       || null,
     } : ev);
 
-    await sleep(4500);
+    // 8秒待機（Gemini APIのレート制限対策: Gemini Flash 無料枠は15RPM）
+    await sleep(8000);
   }
 
   return results;
@@ -448,26 +456,11 @@ async function ocrFlyerFull(url) {
     const buf    = await res.arrayBuffer();
     const base64 = Buffer.from(buf).toString('base64');
     const mime   = isPdf ? 'application/pdf' : (res.headers.get('content-type') || 'image/jpeg').split(';')[0].trim();
-    const apiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method:  'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [
-            { inline_data: { mime_type: mime, data: base64 } },
-            { text: FLYER_OCR_PROMPT },
-          ]}],
-          generationConfig: { maxOutputTokens: 512, temperature: 0 },
-        }),
-      }
-    );
-    if (!apiRes.ok) { console.warn(`[チラシOCR] API エラー ${apiRes.status}`); return null; }
-    const apiJson   = await apiRes.json();
-    const text      = apiJson.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return null;
-    return JSON.parse(jsonMatch[0]);
+
+    return await callGeminiOcr([
+      { inline_data: { mime_type: mime, data: base64 } },
+      { text: FLYER_OCR_PROMPT },
+    ], 'チラシOCR');
   } catch (err) {
     console.warn(`[チラシOCR] ${url} → ${err.message}`);
     return null;
@@ -492,7 +485,8 @@ async function enrichFromFlyer(events, prefLabel) {
     }
     console.log(`[${prefLabel} チラシOCR] ${ev.title}`);
     const ocr = await ocrFlyerFull(ev._flyerUrl);
-    await sleep(4500);
+    // 8秒待機（Gemini APIのレート制限対策: 三重・滋賀・奈良・和歌山はOCR必須地本）
+    await sleep(8000);
     if (!ocr || !ocr.date) {
       console.log(`  → 日付取得失敗: スキップ`);
       continue;
@@ -572,26 +566,11 @@ async function ocrImageFull(imageUrl) {
     const buf      = await imgRes.arrayBuffer();
     const base64   = Buffer.from(buf).toString('base64');
     const mimeType = (imgRes.headers.get('content-type') || 'image/jpeg').split(';')[0].trim();
-    const apiRes   = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method:  'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [
-            { inline_data: { mime_type: mimeType, data: base64 } },
-            { text: OCR_PROMPT_FULL },
-          ] }],
-          generationConfig: { maxOutputTokens: 512, temperature: 0 },
-        }),
-      }
-    );
-    if (!apiRes.ok) { console.warn(`[OCR-FULL] API エラー (${apiRes.status})`); return null; }
-    const apiJson   = await apiRes.json();
-    const text      = apiJson.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return null;
-    return JSON.parse(jsonMatch[0]);
+
+    return await callGeminiOcr([
+      { inline_data: { mime_type: mimeType, data: base64 } },
+      { text: OCR_PROMPT_FULL },
+    ], 'OCR-FULL');
   } catch (err) {
     console.warn(`[OCR-FULL] ${imageUrl} → ${err.message}`);
     return null;
@@ -658,7 +637,8 @@ async function enrichWithOcr(events) {
     const cleanUrl = ev.imageUrl ? ev.url : null;
     results.push({ ...mergeOcr(ev, ocr), url: cleanUrl });
 
-    await sleep(4500);
+    // 8秒待機（Gemini APIのレート制限対策: Gemini Flash 無料枠は15RPM）
+    await sleep(8000);
   }
 
   return results;
@@ -1095,7 +1075,8 @@ async function fetchHyogo(context) {
   for (const imgUrl of imageUrls) {
     console.log(`[兵庫 OCR] ${imgUrl}`);
     const ocr = await ocrImageFull(imgUrl);
-    await sleep(4500);
+    // 8秒待機（Gemini APIのレート制限対策: 兵庫はOCR必須地本）
+    await sleep(8000);
     if (!ocr) continue;
 
     const rawDate = toHalfWidth((ocr.date || '').replace(/\s+/g, ' ').trim());
@@ -1197,7 +1178,8 @@ async function fetchTochigi(context) {
   for (const imgUrl of imageUrls) {
     console.log(`[栃木 OCR] ${imgUrl}`);
     const ocr = await ocrImageFull(imgUrl);
-    await sleep(4500);
+    // 8秒待機（Gemini APIのレート制限対策: 栃木はOCR必須地本）
+    await sleep(8000);
     if (!ocr) continue;
 
     const rawDate = toHalfWidth((ocr.date || '').replace(/\s+/g, ' ').trim());
@@ -1285,7 +1267,8 @@ async function fetchToyama(context) {
   for (const imgUrl of imageUrls) {
     console.log(`[富山 OCR] ${imgUrl}`);
     const ocr = await ocrImageFull(imgUrl);
-    await sleep(4500);
+    // 8秒待機（Gemini APIのレート制限対策: 富山はOCR必須地本）
+    await sleep(8000);
     if (!ocr) continue;
 
     const rawDate = toHalfWidth((ocr.date || '').replace(/\s+/g, ' ').trim());
