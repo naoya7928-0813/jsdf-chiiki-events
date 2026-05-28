@@ -1350,7 +1350,7 @@ async function fetchWpPosts(ctx, pref, prefKey, idPrefix, listUrl, urlsFn, postF
   let listStubs = [];
   let listHtml = '';
 
-  // ── 一覧ページ ──
+  // ── 一覧ページ（CF クリアランス用: ページを開いたまま保持する）──
   const listPage = await ctx.newPage();
   try {
     await listPage.goto(listUrl, { waitUntil: 'domcontentloaded', timeout: 30_000 });
@@ -1372,11 +1372,14 @@ async function fetchWpPosts(ctx, pref, prefKey, idPrefix, listUrl, urlsFn, postF
     }
   } catch (err) {
     console.warn(`[${pref}] 一覧ページ失敗: ${err.message.substring(0, 60)}`);
-  } finally {
     await listPage.close();
+    return [];
   }
 
-  if (postUrls.length === 0) return [];
+  if (postUrls.length === 0) {
+    await listPage.close();
+    return [];
+  }
 
   // ── 各投稿ページ ──
   // 一覧スタブが取れた URL は個別ページアクセスをスキップ（CF 待機タイムアウトの削減）
@@ -1390,24 +1393,49 @@ async function fetchWpPosts(ctx, pref, prefKey, idPrefix, listUrl, urlsFn, postF
   const succeededUrls = new Set();
   let counter  = 0;
   for (const postUrl of postsToFetch) {
-    const postPage = await ctx.newPage();
+    const slug = postUrl.replace(/\/$/, '').split('/').pop();
+    let html = null;
+
+    // ① 一覧ページの CF クリアランス済みセッションで fetch（高速・CF 再チャレンジなし）
     try {
-      await postPage.goto(postUrl, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+      html = await listPage.evaluate(async (url) => {
+        try {
+          const r = await fetch(url, { credentials: 'include' });
+          if (!r.ok) return null;
+          return await r.text();
+        } catch { return null; }
+      }, postUrl);
+    } catch { /* listPage が閉じている場合など */ }
+
+    // ② fetch 失敗時フォールバック: 新規ページで goto
+    if (!html) {
+      const postPage = await ctx.newPage();
       try {
-        await postPage.waitForFunction(
-          () => { const t = document.title; return t.length > 0 && !t.includes('Just a moment') && !t.includes('しばらくお待ちください'); },
-          { timeout: 30_000 }
-        );
-      } catch {}
-      await postPage.waitForTimeout(2000);
-      const html = await postPage.content();
-      const $    = cheerio.load(html, { decodeEntities: false });
+        await postPage.goto(postUrl, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+        try {
+          await postPage.waitForFunction(
+            () => { const t = document.title; return t.length > 0 && !t.includes('Just a moment') && !t.includes('しばらくお待ちください'); },
+            { timeout: 30_000 }
+          );
+        } catch {}
+        await postPage.waitForTimeout(2000);
+        html = await postPage.content();
+      } catch (err) {
+        console.warn(`[${pref}] 投稿取得失敗: ${err.message.substring(0, 60)}`);
+      } finally {
+        await postPage.close();
+      }
+    }
+
+    if (!html) { await sleep(1000); continue; }
+
+    try {
+      const $ = cheerio.load(html, { decodeEntities: false });
 
       // CF チャレンジ判定: body が短い or CF 固有テキストを含む
       const bodyText = $('body').text().replace(/\s+/g, ' ').trim();
       const isCfBlocked = bodyText.length < 100
         || /Just a moment|Enable JavaScript and cookies|しばらくお待ちください/i.test(bodyText);
-      const slug = postUrl.replace(/\/$/, '').split('/').pop();
       if (isCfBlocked) {
         console.log(`[${pref}] ${slug} → CF ブロック (bodyLen=${bodyText.length})`);
       } else {
@@ -1421,12 +1449,12 @@ async function fetchWpPosts(ctx, pref, prefKey, idPrefix, listUrl, urlsFn, postF
         }
       }
     } catch (err) {
-      console.warn(`[${pref}] 投稿取得失敗: ${err.message.substring(0, 60)}`);
-    } finally {
-      await postPage.close();
+      console.warn(`[${pref}] 投稿パース失敗: ${err.message.substring(0, 60)}`);
     }
-    await sleep(1500);
+    await sleep(1000);
   }
+
+  await listPage.close();
 
   // 一覧スタブをそのまま追加（個別ページで取得できなかった分をカバー）
   if (listStubs.length > 0) {
