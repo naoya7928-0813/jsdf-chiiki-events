@@ -1382,50 +1382,34 @@ async function fetchWpPosts(ctx, pref, prefKey, idPrefix, listUrl, urlsFn, postF
   }
 
   // ── 各投稿ページ ──
-  // 一覧スタブがある URL のセット（in-page fetch 成功時にスタブより HTML を優先するため参照する）
+  // 一覧スタブがある URL のセット（goto 成功時にスタブより HTML を優先するため参照する）
   const listStubUrlSet = new Set(listStubs.map(s => s.url));
 
   const events = [];
   const succeededUrls = new Set();
   let counter  = 0;
 
-  // すべての投稿 URL で in-page fetch を試みる
-  // 　- スタブ対象 URL も含む（HTML パースが成功すれば OCR より精度が高い）
-  // 　- スタブ対象でない URL は fetch 失敗時に ctx.newPage() フォールバックも使う
+  // listPage を各投稿 URL に直接 goto する（CF クリアランス済みブラウザセッションを再利用）
+  // - fetch() はヘッダーの差異で CF にブロックされるが、同一ページ遷移なら通過できる可能性がある
+  // - ctx.newPage() は別ページでも同コンテキストだが、遷移履歴・接続が異なり CF に検知される
+  // - スタブ対象も含め全 URL を試みる（HTML パースが成功すれば OCR より精度が高い）
   for (const postUrl of postUrls) {
     const slug = postUrl.replace(/\/$/, '').split('/').pop();
     const hasStub = listStubUrlSet.has(postUrl);
     let html = null;
 
-    // ① 一覧ページの CF クリアランス済みセッションで fetch（高速・CF 再チャレンジなし）
+    // listPage で goto（一覧ページから遷移するブラウザ操作を模倣・Referer ヘッダー付き）
     try {
-      html = await listPage.evaluate(async (url) => {
-        try {
-          const r = await fetch(url, { credentials: 'include' });
-          if (!r.ok) return null;
-          return await r.text();
-        } catch { return null; }
-      }, postUrl);
-    } catch { /* listPage が閉じている場合など */ }
-
-    // ② fetch 失敗かつスタブなし URL のみ: 新規ページで goto（スタブ URL は OCR に任せる）
-    if (!html && !hasStub) {
-      const postPage = await ctx.newPage();
+      await listPage.goto(postUrl, { waitUntil: 'domcontentloaded', timeout: 30_000, referer: listUrl });
       try {
-        await postPage.goto(postUrl, { waitUntil: 'domcontentloaded', timeout: 30_000 });
-        try {
-          await postPage.waitForFunction(
-            () => { const t = document.title; return t.length > 0 && !t.includes('Just a moment') && !t.includes('しばらくお待ちください'); },
-            { timeout: 30_000 }
-          );
-        } catch {}
-        await postPage.waitForTimeout(2000);
-        html = await postPage.content();
-      } catch (err) {
-        console.warn(`[${pref}] 投稿取得失敗: ${err.message.substring(0, 60)}`);
-      } finally {
-        await postPage.close();
-      }
+        await listPage.waitForFunction(
+          () => { const t = document.title; return t.length > 0 && !t.includes('Just a moment') && !t.includes('しばらくお待ちください'); },
+          { timeout: 8_000 }
+        );
+      } catch {}
+      html = await listPage.content();
+    } catch (err) {
+      console.warn(`[${pref}] ${slug} 取得失敗: ${err.message.substring(0, 60)}`);
     }
 
     if (!html) { await sleep(500); continue; }
