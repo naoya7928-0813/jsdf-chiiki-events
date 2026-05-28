@@ -133,56 +133,7 @@
     }
   ],
   "hakodate": [],
-  "miyagi": [
-    {
-      "id": "mi-20260530-ajgj0",
-      "pref": "miyagi",
-      "date": "2026-05-30",
-      "weekday": "土",
-      "title": "マイナビ「インターンシップ＆キャリア発見EXPO」",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "採用イベント",
-      "tag": "",
-      "url": "https://job.mynavi.jp/conts/event/2028/10576/index.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "mi-20260606-pwft7",
-      "pref": "miyagi",
-      "date": "2026-06-06",
-      "weekday": "土",
-      "title": "キッズおしごと体験フェスタinイオンタウン仙台泉大沢",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "体験",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
-      "id": "mi-20260607-q0hzf",
-      "pref": "miyagi",
-      "date": "2026-06-07",
-      "weekday": "日",
-      "title": "「WE2026亘理万博」ミリメシ（戦闘糧食）を食べに行こう！",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    }
-  ],
+  "miyagi": [],
   "aomori": [],
   "iwate": [
     {
@@ -665,6 +616,38 @@
       "tag": "",
       "url": "",
       "notes": "＜広報展示ブース設置します！＞ 小型トラック、高機動車展示あります！！ 制服試着コーナーもあります！ 記念撮影ができますよ！！",
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "gu-20260606-vcn89",
+      "pref": "gunma",
+      "date": "2026-06-06",
+      "weekday": "土",
+      "title": "太田市水防訓練防災フェア",
+      "place": "中央消防署 屋外訓練場",
+      "address": "太田市鳥山下町409-1",
+      "time": "(訓練) 9:00 ～ 10:30 (防災フェア) 10:30 ～ 12:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "＜広報展示ブース設置します！＞ 中型トラック、野外炊具２号を展示予定です。 制服試着コーナーもあります！ 記念撮影ができますよ♪",
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "gu-20260628-9gamw",
+      "pref": "gunma",
+      "date": "2026-06-28",
+      "weekday": "日",
+      "title": "トヨタガズーレーシング ラリーチャレンジ",
+      "place": "渋川市総合公園",
+      "address": "渋川市渋川（明保野）4230",
+      "time": "9:00 ～ 16:30",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "＜広報展示ブース設置します！＞ 高機動車を展示予定です。 制服試着コーナーもあります！ 記念撮影ができますよ♪",
       "ageRequirement": null,
       "deadline": null
     }
@@ -1154,11 +1137,11 @@
       "endDate": null
     },
     {
-      "id": "ai-20260531-6hyai",
+      "id": "ai-20260531-0wcro",
       "pref": "aichi",
       "date": "2026-05-31",
       "weekday": "日",
-      "title": "豊田所説明会",
+      "title": "豊田所｜自衛隊採用制度説明会",
       "place": "",
       "address": "",
       "time": "",
@@ -1171,11 +1154,11 @@
       "endDate": null
     },
     {
-      "id": "ai-20260531-375uv",
+      "id": "ai-20260531-vyz8b",
       "pref": "aichi",
       "date": "2026-05-31",
       "weekday": "日",
-      "title": "豊川所公務員合同説明会",
+      "title": "豊川所｜公務員合同説明会",
       "place": "",
       "address": "",
       "time": "",
@@ -1188,11 +1171,11 @@
       "endDate": null
     },
     {
-      "id": "ai-20260607-eu3fg",
+      "id": "ai-20260607-o8peq",
       "pref": "aichi",
       "date": "2026-06-07",
       "weekday": "日",
-      "title": "豊田所説明会",
+      "title": "豊田所｜自衛隊採用制度説明会",
       "place": "",
       "address": "",
       "time": "",
@@ -1205,11 +1188,11 @@
       "endDate": null
     },
     {
-      "id": "ai-20260613-7o8rd",
+      "id": "ai-20260613-k7vxj",
       "pref": "aichi",
       "date": "2026-06-13",
       "weekday": "土",
-      "title": "豊田所説明会",
+      "title": "豊田所｜自衛隊採用制度説明会",
       "place": "",
       "address": "",
       "time": "",
@@ -1222,11 +1205,11 @@
       "endDate": null
     },
     {
-      "id": "ai-20260615-recc2",
+      "id": "ai-20260615-4u61a",
       "pref": "aichi",
       "date": "2026-06-15",
       "weekday": "月",
-      "title": "金山所ハローワーク名古屋南説明会",
+      "title": "金山所｜ハローワーク名古屋南説明会",
       "place": "",
       "address": "",
       "time": "",
@@ -1239,11 +1222,11 @@
       "endDate": null
     },
     {
-      "id": "ai-20260620-5qkzd",
+      "id": "ai-20260620-g6687",
       "pref": "aichi",
       "date": "2026-06-20",
       "weekday": "土",
-      "title": "豊田所説明会",
+      "title": "豊田所｜自衛隊採用制度説明会",
       "place": "",
       "address": "",
       "time": "",
@@ -1290,11 +1273,11 @@
       "endDate": null
     },
     {
-      "id": "ai-20260620-ip9z5",
+      "id": "ai-20260620-zqyjo",
       "pref": "aichi",
       "date": "2026-06-20",
       "weekday": "土",
-      "title": "名古屋所説明会",
+      "title": "名古屋所｜自衛官制度説明会",
       "place": "",
       "address": "",
       "time": "",
@@ -1307,11 +1290,11 @@
       "endDate": null
     },
     {
-      "id": "ai-20260621-0ja2o",
+      "id": "ai-20260621-e0wmd",
       "pref": "aichi",
       "date": "2026-06-21",
       "weekday": "日",
-      "title": "名古屋所説明会",
+      "title": "名古屋所｜自衛官制度説明会",
       "place": "",
       "address": "",
       "time": "",
@@ -1324,11 +1307,11 @@
       "endDate": null
     },
     {
-      "id": "ai-20260623-r07g7",
+      "id": "ai-20260623-a6zxn",
       "pref": "aichi",
       "date": "2026-06-23",
       "weekday": "火",
-      "title": "金山所ハローワーク名古屋南説明会",
+      "title": "金山所｜ハローワーク名古屋南説明会",
       "place": "",
       "address": "",
       "time": "",
@@ -1358,11 +1341,11 @@
       "endDate": null
     },
     {
-      "id": "ai-20260628-8jqgh",
+      "id": "ai-20260628-nw1e7",
       "pref": "aichi",
       "date": "2026-06-28",
       "weekday": "日",
-      "title": "豊田所説明会",
+      "title": "豊田所｜自衛隊採用制度説明会",
       "place": "",
       "address": "",
       "time": "",
@@ -1375,11 +1358,11 @@
       "endDate": null
     },
     {
-      "id": "ai-20260704-qnu70",
+      "id": "ai-20260704-e8j34",
       "pref": "aichi",
       "date": "2026-07-04",
       "weekday": "土",
-      "title": "豊橋所公務員合同採用説明会",
+      "title": "豊橋所｜公務員合同採用説明会",
       "place": "",
       "address": "",
       "time": "",
@@ -1392,11 +1375,11 @@
       "endDate": null
     },
     {
-      "id": "ai-20260705-nofzs",
+      "id": "ai-20260705-44mau",
       "pref": "aichi",
       "date": "2026-07-05",
       "weekday": "日",
-      "title": "岡崎市公安系公務員ガイダンス",
+      "title": "岡崎所｜公安系公務員ガイダンス",
       "place": "",
       "address": "",
       "time": "",
@@ -1494,11 +1477,11 @@
       "endDate": null
     },
     {
-      "id": "ai-20260718-fhogm",
+      "id": "ai-20260718-wj6a0",
       "pref": "aichi",
       "date": "2026-07-18",
       "weekday": "土",
-      "title": "豊川市公安系公務員説明会",
+      "title": "豊川所｜公安系公務員説明会",
       "place": "",
       "address": "",
       "time": "",
@@ -1506,6 +1489,40 @@
       "tag": "",
       "url": "",
       "notes": "公安系公務員",
+      "ageRequirement": null,
+      "deadline": null,
+      "endDate": null
+    },
+    {
+      "id": "ai-20260718-u74xo",
+      "pref": "aichi",
+      "date": "2026-07-18",
+      "weekday": "土",
+      "title": "名古屋所｜自衛隊制度説明会",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "自衛隊制度",
+      "ageRequirement": null,
+      "deadline": null,
+      "endDate": null
+    },
+    {
+      "id": "ai-20260719-nh9x9",
+      "pref": "aichi",
+      "date": "2026-07-19",
+      "weekday": "日",
+      "title": "名古屋所｜自衛隊制度説明会",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
       "endDate": null
@@ -1528,11 +1545,45 @@
       "endDate": null
     },
     {
-      "id": "ai-20260728-ww2kr",
+      "id": "ai-20260725-t1mrv",
+      "pref": "aichi",
+      "date": "2026-07-25",
+      "weekday": "土",
+      "title": "名古屋所｜高等工科学校制度説明会",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "学生向け",
+      "url": "",
+      "notes": "自衛隊制度",
+      "ageRequirement": null,
+      "deadline": null,
+      "endDate": null
+    },
+    {
+      "id": "ai-20260726-dpd60",
+      "pref": "aichi",
+      "date": "2026-07-26",
+      "weekday": "日",
+      "title": "名古屋所｜高等工科学校制度説明会",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "学生向け",
+      "url": "",
+      "notes": "自衛隊制度",
+      "ageRequirement": null,
+      "deadline": null,
+      "endDate": null
+    },
+    {
+      "id": "ai-20260728-8wwo8",
       "pref": "aichi",
       "date": "2026-07-28",
       "weekday": "火",
-      "title": "岡崎所自衛隊サマーツアー",
+      "title": "岡崎所｜自衛隊サマーツアー in 豊川駐屯地",
       "place": "",
       "address": "",
       "time": "",
@@ -1545,11 +1596,11 @@
       "endDate": null
     },
     {
-      "id": "ai-20260730-66p2t",
+      "id": "ai-20260730-5az6x",
       "pref": "aichi",
       "date": "2026-07-30",
       "weekday": "木",
-      "title": "安城所自衛隊・警察合同職場見学会",
+      "title": "安城所｜自衛隊・警察合同職場見学会",
       "place": "",
       "address": "",
       "time": "",
@@ -1613,11 +1664,11 @@
       "endDate": null
     },
     {
-      "id": "ai-20260826-6dry4",
+      "id": "ai-20260826-07se4",
       "pref": "aichi",
       "date": "2026-08-26",
       "weekday": "水",
-      "title": "安城｜自衛隊・海上保安庁・警察2DAY合同職場見学会",
+      "title": "安城所｜自衛隊・海上保安庁・警察2DAY合同職場見学会",
       "place": "",
       "address": "",
       "time": "",
@@ -1630,11 +1681,11 @@
       "endDate": null
     },
     {
-      "id": "ai-20260827-tlxgd",
+      "id": "ai-20260827-bkfjx",
       "pref": "aichi",
       "date": "2026-08-27",
       "weekday": "木",
-      "title": "安城｜自衛隊・海上保安庁・警察2DAY合同職場見学会",
+      "title": "安城所｜自衛隊・海上保安庁・警察2DAY合同職場見学会",
       "place": "",
       "address": "",
       "time": "",
@@ -2180,5 +2231,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/05/28 09:23"
+  "updatedAt": "2026/05/28 16:15"
 }
