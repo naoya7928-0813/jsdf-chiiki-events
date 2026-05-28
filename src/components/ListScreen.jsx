@@ -134,14 +134,21 @@ export default function ListScreen({
 
         return catOk && tagOk && periodOk;
       })
-      .sort((a, b) => new Date(a.date) - new Date(b.date));
+      .sort((a, b) => {
+        // 日程未定（date=""）は常に末尾へ
+        if (!a.date && !b.date) return 0;
+        if (!a.date) return 1;
+        if (!b.date) return -1;
+        return new Date(a.date) - new Date(b.date);
+      });
   }, [list, activeCategory, activeTag, activePeriod]);
 
   // ── イベントグループ化 ─────────────────────────────────────
   const grouped = useMemo(() => {
     const g = {};
     for (const e of filteredList) {
-      const k = parseYM(e.date);
+      // date が空（日程未定）の場合は専用グループへ（filteredList は末尾に並ぶ）
+      const k = e.date ? parseYM(e.date) : '日程未定';
       (g[k] = g[k] || []).push(e);
     }
     return g;
@@ -367,7 +374,7 @@ export default function ListScreen({
                 </div>
 
                 {evs.map(ev => {
-                  const { m, d }   = splitDate(ev.date);
+                  const { m, d }   = ev.date ? splitDate(ev.date) : { m: null, d: null };
                   const endSplit   = ev.endDate ? splitDate(ev.endDate) : null;
                   const isWeekend  = /[土日祝]/.test(ev.weekday);
                   const dateColor  = isWeekend ? accent : primary;
@@ -392,15 +399,27 @@ export default function ListScreen({
                           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                           minWidth: 48, borderRight: '1px solid var(--border)', paddingRight: 12,
                         }}>
-                          <div style={{ fontSize: 9, color: 'var(--text-muted)', fontFamily: F.mono, letterSpacing: 1 }}>
-                            {endSplit && endSplit.m !== m ? `${m}〜${endSplit.m}月` : `${m}月`}
-                          </div>
-                          <div style={{ fontFamily: F.serif, fontSize: endSplit ? 16 : 26, fontWeight: 600, lineHeight: 1, color: dateColor, marginTop: 2 }}>
-                            {endSplit ? `${d}〜${endSplit.d}日` : d}
-                          </div>
-                          {ev.weekday && (
-                            <div style={{ fontSize: 9, marginTop: 3, color: dateColor, fontWeight: 500 }}>
-                              ({ev.endWeekday ? `${ev.weekday}〜${ev.endWeekday}` : ev.weekday})
+                          {m !== null ? (
+                            <>
+                              <div style={{ fontSize: 9, color: 'var(--text-muted)', fontFamily: F.mono, letterSpacing: 1 }}>
+                                {endSplit && endSplit.m !== m ? `${m}〜${endSplit.m}月` : `${m}月`}
+                              </div>
+                              <div style={{ fontFamily: F.serif, fontSize: endSplit ? 16 : 26, fontWeight: 600, lineHeight: 1, color: dateColor, marginTop: 2 }}>
+                                {endSplit ? `${d}〜${endSplit.d}日` : d}
+                              </div>
+                              {ev.weekday && (
+                                <div style={{ fontSize: 9, marginTop: 3, color: dateColor, fontWeight: 500 }}>
+                                  ({ev.endWeekday ? `${ev.weekday}〜${ev.endWeekday}` : ev.weekday})
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            /* 日程未定イベント（CF ブロックで日付取得不能） */
+                            <div style={{
+                              fontSize: 10, color: 'var(--text-muted)', fontFamily: F.sans,
+                              textAlign: 'center', lineHeight: 1.5, fontWeight: 500,
+                            }}>
+                              日程<br/>未定
                             </div>
                           )}
                         </div>

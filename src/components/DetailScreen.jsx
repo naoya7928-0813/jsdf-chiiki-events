@@ -38,7 +38,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
 
   const starred    = favorites.has(ev.id);
   const isApplied  = applied?.has(ev.id) ?? false;
-  const { m, d }  = splitDate(ev.date);
+  const { m, d }  = ev.date ? splitDate(ev.date) : { m: null, d: null };
   const endSplit  = ev.endDate ? splitDate(ev.endDate) : null;
   const todayStr  = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
   const isOngoing = !!(ev.endDate && ev.date < todayStr);
@@ -151,15 +151,24 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
               minWidth: 56, textAlign: 'center', padding: '6px 10px',
               background: 'rgba(255,255,255,0.12)', borderRadius: 8,
             }}>
-              <div style={{ fontSize: 9, fontFamily: F.mono, opacity: 0.8 }}>
-                {endSplit && endSplit.m !== m ? `${m}〜${endSplit.m}月` : `${m}月`}
-              </div>
-              <div style={{ fontFamily: F.serif, fontSize: endSplit ? 15 : 24, fontWeight: 600, lineHeight: 1 }}>
-                {endSplit ? `${d}〜${endSplit.d}日` : d}
-              </div>
-              {ev.weekday && (
-                <div style={{ fontSize: 9, marginTop: 2 }}>
-                  {isOngoing ? '開催中' : `(${ev.endWeekday ? `${ev.weekday}〜${ev.endWeekday}` : ev.weekday})`}
+              {m !== null ? (
+                <>
+                  <div style={{ fontSize: 9, fontFamily: F.mono, opacity: 0.8 }}>
+                    {endSplit && endSplit.m !== m ? `${m}〜${endSplit.m}月` : `${m}月`}
+                  </div>
+                  <div style={{ fontFamily: F.serif, fontSize: endSplit ? 15 : 24, fontWeight: 600, lineHeight: 1 }}>
+                    {endSplit ? `${d}〜${endSplit.d}日` : d}
+                  </div>
+                  {ev.weekday && (
+                    <div style={{ fontSize: 9, marginTop: 2 }}>
+                      {isOngoing ? '開催中' : `(${ev.endWeekday ? `${ev.weekday}〜${ev.endWeekday}` : ev.weekday})`}
+                    </div>
+                  )}
+                </>
+              ) : (
+                /* 日程未定（CF ブロックで日付取得不能） */
+                <div style={{ fontFamily: F.sans, fontSize: 12, fontWeight: 600, lineHeight: 1.6, opacity: 0.85 }}>
+                  日程<br/>未定
                 </div>
               )}
             </div>

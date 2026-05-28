@@ -1306,7 +1306,38 @@ function extractListPageStubs($, postUrls, prefKey, idPrefix, prefLabel) {
       textWeekday = mM[3];
     }
 
-    if (!textDate || isPast(textDate) || !rawTitle) return;  // 日付なし・過去・タイトルなし → スキップ
+    if (!rawTitle) return;  // タイトルなし → スキップ
+
+    if (!textDate) {
+      // 日付が取れない → リンクスタブ（タイトル + 公式 URL のみ、日程未定）
+      // CF ブロックで個別投稿を取得できない場合の最終フォールバック
+      const cleanTitle = rawTitle
+        .replace(/\d{4}\.\d{2}\.\d{2}/g, '')                               // YYYY.MM.DD 形式の日付
+        .replace(/令和\d+年\d+月\d+日[（(][月火水木金土日祝]+[）)]/g, '')   // 令和年号の日付
+        .replace(/\d{4}年\d+月\d+日[（(][月火水木金土日祝]+[）)]/g, '')     // 西暦の日付
+        .replace(/\d+月\d+日[（(][月火水木金土日祝]+[）)]/g, '')             // 月日のみの日付
+        .replace(/^\s*NEW\s*|\s*NEW\s*$/gi, '')                             // NEW ラベル
+        .replace(/^\s*イベント情報\s*|\s*イベント情報\s*$/g, '')             // カテゴリ接頭辞
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (!cleanTitle) return;  // クリーン後に空になったらスキップ
+
+      stubs.push({
+        id:             `${idPrefix}-link-${++counter}`,
+        pref:           prefKey,
+        date:           '', weekday: '',
+        title:          cleanTitle.substring(0, 60),
+        place:          '', address: '', time: '',
+        category:       guessCategory(toHalfWidth(cleanTitle)),
+        tag:            guessTag(cleanTitle),
+        url:            matchUrl,
+        notes:          '日時・場所等の詳細は公式サイトをご確認ください',
+        ageRequirement: null, deadline: null, imageUrl: '',
+      });
+      return;
+    }
+
+    if (isPast(textDate)) return;  // 過去イベント → スキップ
 
     // 場所・時間も抽出
     const placeM = containerText.match(/(?:場所|会場|開催場所)[：: ]\s*(.{2,50}?)(?:\s+(?:日時|内容|[●■])|$)/);
@@ -1332,10 +1363,12 @@ function extractListPageStubs($, postUrls, prefKey, idPrefix, prefLabel) {
   });
 
   const imgStubs  = stubs.filter(s => s._flyerUrl);
-  const textStubs = stubs.filter(s => !s._flyerUrl);
+  const textStubs = stubs.filter(s => !s._flyerUrl && s.date);
+  const linkStubs = stubs.filter(s => !s._flyerUrl && !s.date);
   if (imgStubs.length > 0)  console.log(`[${prefLabel}] 一覧ページ画像スタブ: ${imgStubs.length} 件 (${imgStubs.map(s => s._flyerUrl.split('/').pop()).join(', ')})`);
   if (textStubs.length > 0) console.log(`[${prefLabel}] 一覧ページテキストスタブ: ${textStubs.length} 件 (${textStubs.map(s => `${s.date} ${s.title.substring(0,20)}`).join(', ')})`);
-  if (imgStubs.length === 0 && textStubs.length === 0) console.log(`[${prefLabel}] 一覧ページ画像スタブ: 0 件 ()`);
+  if (linkStubs.length > 0) console.log(`[${prefLabel}] 一覧ページリンクスタブ: ${linkStubs.length} 件 (${linkStubs.map(s => s.title.substring(0, 20)).join(', ')})`);
+  if (stubs.length === 0)   console.log(`[${prefLabel}] 一覧ページ画像スタブ: 0 件 ()`);
   return stubs;
 }
 
@@ -1441,11 +1474,18 @@ async function fetchWpPosts(ctx, pref, prefKey, idPrefix, listUrl, urlsFn, postF
 
   await listPage.close();
 
-  // 一覧スタブをそのまま追加（in-page fetch で取得できなかった分をカバー → OCR へ）
+  // 一覧スタブをそのまま追加（in-page fetch で取得できなかった分をカバー）
+  // - 画像/PDF スタブ: OCR に渡して日付・内容を補完
+  // - リンクスタブ（date=""）: CF ブロックで個別投稿取得不能 → タイトル+URL のみ表示
   if (listStubs.length > 0) {
     const nonSucceeded = listStubs.filter(s => !succeededUrls.has(s.url));
     if (nonSucceeded.length > 0) {
-      console.log(`[${pref}] 一覧スタブ ${nonSucceeded.length} 件を追加 (OCR待ち)`);
+      const ocrCount  = nonSucceeded.filter(s => s._flyerUrl).length;            // 画像/PDF → OCR
+      const textCount = nonSucceeded.filter(s => !s._flyerUrl && s.date).length;  // テキスト日付あり
+      const linkCount = nonSucceeded.filter(s => !s._flyerUrl && !s.date).length; // CF ブロック → リンクのみ
+      if (ocrCount > 0)   console.log(`[${pref}] 一覧スタブ ${ocrCount} 件を追加 (OCR待ち)`);
+      if (textCount > 0)  console.log(`[${pref}] 一覧スタブ ${textCount} 件を追加 (テキスト日付)`);
+      if (linkCount > 0)  console.log(`[${pref}] 一覧スタブ ${linkCount} 件を追加 (日程未定リンク)`);
       events.push(...nonSucceeded);
     }
   }
