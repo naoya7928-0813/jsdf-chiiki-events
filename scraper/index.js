@@ -1382,18 +1382,19 @@ async function fetchWpPosts(ctx, pref, prefKey, idPrefix, listUrl, urlsFn, postF
   }
 
   // ── 各投稿ページ ──
-  // 一覧スタブが取れた URL は個別ページアクセスをスキップ（CF 待機タイムアウトの削減）
+  // 一覧スタブがある URL のセット（in-page fetch 成功時にスタブより HTML を優先するため参照する）
   const listStubUrlSet = new Set(listStubs.map(s => s.url));
-  const postsToFetch   = postUrls.filter(u => !listStubUrlSet.has(u));
-  if (postsToFetch.length < postUrls.length) {
-    console.log(`[${pref}] 個別投稿: ${postsToFetch.length}件 (一覧スタブで ${listStubs.length}件をカバー済み)`);
-  }
 
   const events = [];
   const succeededUrls = new Set();
   let counter  = 0;
-  for (const postUrl of postsToFetch) {
+
+  // すべての投稿 URL で in-page fetch を試みる
+  // 　- スタブ対象 URL も含む（HTML パースが成功すれば OCR より精度が高い）
+  // 　- スタブ対象でない URL は fetch 失敗時に ctx.newPage() フォールバックも使う
+  for (const postUrl of postUrls) {
     const slug = postUrl.replace(/\/$/, '').split('/').pop();
+    const hasStub = listStubUrlSet.has(postUrl);
     let html = null;
 
     // ① 一覧ページの CF クリアランス済みセッションで fetch（高速・CF 再チャレンジなし）
@@ -1407,8 +1408,8 @@ async function fetchWpPosts(ctx, pref, prefKey, idPrefix, listUrl, urlsFn, postF
       }, postUrl);
     } catch { /* listPage が閉じている場合など */ }
 
-    // ② fetch 失敗時フォールバック: 新規ページで goto
-    if (!html) {
+    // ② fetch 失敗かつスタブなし URL のみ: 新規ページで goto（スタブ URL は OCR に任せる）
+    if (!html && !hasStub) {
       const postPage = await ctx.newPage();
       try {
         await postPage.goto(postUrl, { waitUntil: 'domcontentloaded', timeout: 30_000 });
@@ -1427,7 +1428,7 @@ async function fetchWpPosts(ctx, pref, prefKey, idPrefix, listUrl, urlsFn, postF
       }
     }
 
-    if (!html) { await sleep(1000); continue; }
+    if (!html) { await sleep(500); continue; }
 
     try {
       const $ = cheerio.load(html, { decodeEntities: false });
@@ -1437,30 +1438,33 @@ async function fetchWpPosts(ctx, pref, prefKey, idPrefix, listUrl, urlsFn, postF
       const isCfBlocked = bodyText.length < 100
         || /Just a moment|Enable JavaScript and cookies|しばらくお待ちください/i.test(bodyText);
       if (isCfBlocked) {
-        console.log(`[${pref}] ${slug} → CF ブロック (bodyLen=${bodyText.length})`);
+        // CF ブロック: スタブなし URL のみログ（スタブ URL は後で OCR が処理する）
+        if (!hasStub) console.log(`[${pref}] ${slug} → CF ブロック (bodyLen=${bodyText.length})`);
       } else {
         const evs = postFn($, postUrl, ++counter);
         if (evs.length) {
           console.log(`[${pref}] ${slug} → ${evs[0].date} ${evs[0].title.substring(0,30)}`);
           events.push(...evs);
-          succeededUrls.add(postUrl);
+          succeededUrls.add(postUrl);  // スタブ URL は OCR をスキップ
         } else {
-          console.log(`[${pref}] ${slug} → コンテンツ取得済み・0件 (bodyLen=${bodyText.length})`);
+          if (!hasStub) console.log(`[${pref}] ${slug} → コンテンツ取得済み・0件 (bodyLen=${bodyText.length})`);
         }
       }
     } catch (err) {
       console.warn(`[${pref}] 投稿パース失敗: ${err.message.substring(0, 60)}`);
     }
-    await sleep(1000);
+    await sleep(500);
   }
 
   await listPage.close();
 
-  // 一覧スタブをそのまま追加（個別ページで取得できなかった分をカバー）
+  // 一覧スタブをそのまま追加（in-page fetch で取得できなかった分をカバー → OCR へ）
   if (listStubs.length > 0) {
     const nonSucceeded = listStubs.filter(s => !succeededUrls.has(s.url));
-    console.log(`[${pref}] 一覧スタブ ${nonSucceeded.length} 件を追加`);
-    events.push(...nonSucceeded);
+    if (nonSucceeded.length > 0) {
+      console.log(`[${pref}] 一覧スタブ ${nonSucceeded.length} 件を追加 (OCR待ち)`);
+      events.push(...nonSucceeded);
+    }
   }
 
   // フォールバック: 個別投稿・スタブからも取得できなかった場合、
