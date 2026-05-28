@@ -1271,22 +1271,71 @@ function extractListPageStubs($, postUrls, prefKey, idPrefix, prefLabel) {
       });
     }
 
-    if (!flyerUrl) return;   // 画像・PDFなし → スキップ
+    if (flyerUrl) {
+      // 画像/PDFあり → OCR スタブ（日付は後でOCRで補完）
+      stubs.push({
+        id:             `${idPrefix}-flyer-${++counter}`,
+        pref:           prefKey,
+        date:           '', weekday: '',
+        title:          (rawTitle || matchUrl.split('/').filter(Boolean).pop() || 'event').substring(0, 60),
+        place:          '', address: '', time: '',
+        category:       '', tag:      '',
+        url:            matchUrl,
+        notes:          null, ageRequirement: null, deadline: null, imageUrl: '',
+        _flyerUrl:      flyerUrl,
+      });
+      return;
+    }
+
+    // 画像・PDFなし → コンテナのテキストから直接日付を抽出（三重・滋賀・和歌山 CF対策）
+    const containerText = toHalfWidth($scope.text().replace(/\s+/g, ' ').trim());
+    let textDate = '', textWeekday = '';
+    const rM = containerText.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
+    const gM = containerText.match(/(\d{4})年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
+    const mM = containerText.match(/(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
+    if (rM) {
+      const y = reiwaToAD(parseInt(rM[1], 10));
+      textDate    = `${y}-${padTwo(parseInt(rM[2], 10))}-${padTwo(parseInt(rM[3], 10))}`;
+      textWeekday = rM[4];
+    } else if (gM) {
+      textDate    = `${gM[1]}-${padTwo(parseInt(gM[2], 10))}-${padTwo(parseInt(gM[3], 10))}`;
+      textWeekday = gM[4];
+    } else if (mM) {
+      const now = new Date();
+      textDate    = `${now.getFullYear()}-${padTwo(parseInt(mM[1], 10))}-${padTwo(parseInt(mM[2], 10))}`;
+      textWeekday = mM[3];
+    }
+
+    if (!textDate || isPast(textDate) || !rawTitle) return;  // 日付なし・過去・タイトルなし → スキップ
+
+    // 場所・時間も抽出
+    const placeM = containerText.match(/(?:場所|会場|開催場所)[：: ]\s*(.{2,50}?)(?:\s+(?:日時|内容|[●■])|$)/);
+    const place  = placeM ? placeM[1].trim().substring(0, 60) : '';
+    const timeM  = containerText.match(/(\d+:\d+[～〜]\d+:\d+)/);
+    const time   = timeM ? timeM[1] : '';
 
     stubs.push({
-      id:             `${idPrefix}-flyer-${++counter}`,
+      id:             `${idPrefix}-${textDate.replace(/-/g, '')}-${++counter}`,
       pref:           prefKey,
-      date:           '', weekday: '',
-      title:          (rawTitle || matchUrl.split('/').filter(Boolean).pop() || 'event').substring(0, 60),
-      place:          '', address: '', time: '',
-      category:       '', tag:      '',
+      date:           textDate,
+      weekday:        textWeekday,
+      title:          rawTitle.substring(0, 60),
+      place,
+      address:        '',
+      time,
+      category:       guessCategory(toHalfWidth(rawTitle)),
+      tag:            guessTag(rawTitle),
       url:            matchUrl,
       notes:          null, ageRequirement: null, deadline: null, imageUrl: '',
-      _flyerUrl:      flyerUrl,
+      // _flyerUrl なし → enrichFromFlyer はそのまま通過
     });
   });
 
-  console.log(`[${prefLabel}] 一覧ページ画像スタブ: ${stubs.length} 件 (${stubs.map(s => s._flyerUrl.split('/').pop()).join(', ')})`);
+  const imgStubs  = stubs.filter(s => s._flyerUrl);
+  const textStubs = stubs.filter(s => !s._flyerUrl);
+  if (imgStubs.length > 0)  console.log(`[${prefLabel}] 一覧ページ画像スタブ: ${imgStubs.length} 件 (${imgStubs.map(s => s._flyerUrl.split('/').pop()).join(', ')})`);
+  if (textStubs.length > 0) console.log(`[${prefLabel}] 一覧ページテキストスタブ: ${textStubs.length} 件 (${textStubs.map(s => `${s.date} ${s.title.substring(0,20)}`).join(', ')})`);
+  if (imgStubs.length === 0 && textStubs.length === 0) console.log(`[${prefLabel}] 一覧ページ画像スタブ: 0 件 ()`);
   return stubs;
 }
 
@@ -1358,14 +1407,17 @@ async function fetchWpPosts(ctx, pref, prefKey, idPrefix, listUrl, urlsFn, postF
       const bodyText = $('body').text().replace(/\s+/g, ' ').trim();
       const isCfBlocked = bodyText.length < 100
         || /Just a moment|Enable JavaScript and cookies|しばらくお待ちください/i.test(bodyText);
+      const slug = postUrl.replace(/\/$/, '').split('/').pop();
       if (isCfBlocked) {
-        console.log(`[${pref}] ${postUrl.split('/').slice(-2,-1)[0]} → CF ブロック`);
+        console.log(`[${pref}] ${slug} → CF ブロック (bodyLen=${bodyText.length})`);
       } else {
         const evs = postFn($, postUrl, ++counter);
         if (evs.length) {
-          console.log(`[${pref}] ${postUrl.split('/').slice(-2,-1)[0]} → ${evs[0].date} ${evs[0].title.substring(0,30)}`);
+          console.log(`[${pref}] ${slug} → ${evs[0].date} ${evs[0].title.substring(0,30)}`);
           events.push(...evs);
           succeededUrls.add(postUrl);
+        } else {
+          console.log(`[${pref}] ${slug} → コンテンツ取得済み・0件 (bodyLen=${bodyText.length})`);
         }
       }
     } catch (err) {
