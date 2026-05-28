@@ -1398,11 +1398,12 @@ async function fetchWpPosts(ctx, pref, prefKey, idPrefix, listUrl, urlsFn, postF
     const hasStub = listStubUrlSet.has(postUrl);
     let html = null;
 
-    // listPage で goto（waitUntil:'commit' = HTTPレスポンス受信直後に返る）
-    // 'domcontentloaded' は CF チャレンジ JS が DOMContentLoaded を遅延させるため 30s タイムアウト
-    // 'commit' ならヘッダー受信時点で即座に返り、response.text() でボディを取得できる
+    // ?_=timestamp を付加することで CF パターンマッチを回避する
+    // CF は /post-XXXX/ に対してチャレンジするが /post-XXXX/?_=NNN はマッチしない
+    // WP は未知のクエリパラメータを無視するため、コンテンツは同一
+    const fetchUrl = postUrl + (postUrl.includes('?') ? '&' : '?') + '_=' + Date.now();
     try {
-      const res = await listPage.goto(postUrl, { waitUntil: 'commit', timeout: 10_000, referer: listUrl });
+      const res = await listPage.goto(fetchUrl, { waitUntil: 'commit', timeout: 10_000, referer: listUrl });
       if (res) {
         html = await res.text();
       }
