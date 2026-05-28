@@ -1398,18 +1398,16 @@ async function fetchWpPosts(ctx, pref, prefKey, idPrefix, listUrl, urlsFn, postF
     const hasStub = listStubUrlSet.has(postUrl);
     let html = null;
 
-    // listPage で goto（一覧ページから遷移するブラウザ操作を模倣・Referer ヘッダー付き）
+    // listPage で goto（waitUntil:'commit' = HTTPレスポンス受信直後に返る）
+    // 'domcontentloaded' は CF チャレンジ JS が DOMContentLoaded を遅延させるため 30s タイムアウト
+    // 'commit' ならヘッダー受信時点で即座に返り、response.text() でボディを取得できる
     try {
-      await listPage.goto(postUrl, { waitUntil: 'domcontentloaded', timeout: 30_000, referer: listUrl });
-      try {
-        await listPage.waitForFunction(
-          () => { const t = document.title; return t.length > 0 && !t.includes('Just a moment') && !t.includes('しばらくお待ちください'); },
-          { timeout: 8_000 }
-        );
-      } catch {}
-      html = await listPage.content();
+      const res = await listPage.goto(postUrl, { waitUntil: 'commit', timeout: 10_000, referer: listUrl });
+      if (res) {
+        html = await res.text();
+      }
     } catch (err) {
-      console.warn(`[${pref}] ${slug} 取得失敗: ${err.message.substring(0, 60)}`);
+      console.warn(`[${pref}] ${slug} 取得失敗: ${err.message.substring(0, 40)}`);
     }
 
     if (!html) { await sleep(500); continue; }
