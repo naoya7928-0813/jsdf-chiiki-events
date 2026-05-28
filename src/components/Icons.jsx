@@ -22,4 +22,9 @@ export const ICO = {
   copy:    (c = '#6b7280', s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke={c} strokeWidth="1.6"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke={c} strokeWidth="1.6" strokeLinecap="round"/></svg>,
   // 申請済みアイコン（クリップボード＋チェック）
   applied: (c = '#16a34a', s = 18, filled = false) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" stroke={c} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/><rect x="9" y="3" width="6" height="4" rx="1" stroke={c} strokeWidth="1.6" fill={filled ? c : 'none'}/><path d="M8.5 12.5l2.5 2.5 4.5-4.5" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  // ── 現在地・レーダー ──────────────────────────────────────────
+  // 現在地ボタン用（照準＋矢印風）
+  locator: (c = '#fff', s = 18) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" fill={c}/><circle cx="12" cy="12" r="7" stroke={c} strokeWidth="1.6"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2" stroke={c} strokeWidth="1.6" strokeLinecap="round"/></svg>,
+  // 電話アイコン
+  phone:   (c = '#fff', s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z" stroke={c} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>,
 };

@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { ICO } from './Icons';
 import { BottomTabBar, F, Spinner, ErrorBanner } from './Shared';
 import JapanMap from './JapanMap';
+import NearbyOfficesModal from './NearbyOfficesModal';
 import { REGION_BY_ID, SUPPORTED_PREFECTURES, countEventsByRegion, getSupportedPrefsByRegion } from '../data/regionMap';
 
 
@@ -13,6 +14,9 @@ export default function HomeScreen({
   initialRegionId,
 }) {
   const { primary } = theme;
+
+  // 近くの施設モーダル
+  const [nearbyOpen, setNearbyOpen] = useState(false);
 
   // 地図上で選択中の地域ID
   const [selectedRegionId, setSelectedRegionId] = useState(initialRegionId ?? null);
@@ -65,31 +69,49 @@ export default function HomeScreen({
             </div>
           </div>
 
-          {/* 通知ベルボタン */}
-          <button
-            onClick={onOpenNotifications}
-            aria-label={`通知${unreadCount > 0 ? `（未読${unreadCount}件）` : ''}`}
-            style={{
-              width: 44, height: 44, borderRadius: 10,
-              background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.22)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', padding: 0, position: 'relative',
-            }}
-          >
-            {ICO.bell('#fff', 17)}
-            {unreadCount > 0 && (
-              <div style={{
-                position: 'absolute', top: -4, right: -4,
-                minWidth: 16, height: 16, borderRadius: 8,
-                background: '#ef4444', border: '2px solid rgba(0,0,0,0.4)',
+          {/* ヘッダー右側ボタン群 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+
+            {/* 現在地検索ボタン */}
+            <button
+              onClick={() => setNearbyOpen(true)}
+              aria-label="近くの施設を検索"
+              style={{
+                width: 44, height: 44, borderRadius: 10,
+                background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.22)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 9, color: '#fff', fontFamily: F.mono, fontWeight: 700,
-                padding: '0 3px',
-              }}>
-                {unreadCount > 9 ? '9+' : unreadCount}
-              </div>
-            )}
-          </button>
+                cursor: 'pointer', padding: 0,
+              }}
+            >
+              {ICO.locator('#fff', 18)}
+            </button>
+
+            {/* 通知ベルボタン */}
+            <button
+              onClick={onOpenNotifications}
+              aria-label={`通知${unreadCount > 0 ? `（未読${unreadCount}件）` : ''}`}
+              style={{
+                width: 44, height: 44, borderRadius: 10,
+                background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.22)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', padding: 0, position: 'relative',
+              }}
+            >
+              {ICO.bell('#fff', 17)}
+              {unreadCount > 0 && (
+                <div style={{
+                  position: 'absolute', top: -4, right: -4,
+                  minWidth: 16, height: 16, borderRadius: 8,
+                  background: '#ef4444', border: '2px solid rgba(0,0,0,0.4)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 9, color: '#fff', fontFamily: F.mono, fontWeight: 700,
+                  padding: '0 3px',
+                }}>
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </div>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -227,6 +249,13 @@ export default function HomeScreen({
           else if (id === 'settings')  onOpenSettings();
         }}
         primary={primary}
+      />
+
+      {/* ── 近くの施設モーダル（ボトムシート） ── */}
+      <NearbyOfficesModal
+        isOpen={nearbyOpen}
+        onClose={() => setNearbyOpen(false)}
+        theme={theme}
       />
     </div>
   );

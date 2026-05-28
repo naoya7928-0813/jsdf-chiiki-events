@@ -1,0 +1,406 @@
+{
+  "updatedAt": "2026-05-28",
+  "note": "地本データは公開情報から手動コンパイル。募集案内所は別途scraper/build-offices.jsで追加予定。",
+  "offices": [
+    {
+      "id": "hq-sapporo",   "type": "hq", "pref": "sapporo",
+      "name": "自衛隊札幌地方協力本部",
+      "address": "北海道札幌市中央区北3条西7丁目1",
+      "lat": 43.0636, "lng": 141.3469,
+      "tel": "011-631-5471",
+      "url": "https://www.mod.go.jp/pco/sapporo/"
+    },
+    {
+      "id": "hq-asahikawa", "type": "hq", "pref": "asahikawa",
+      "name": "自衛隊旭川地方協力本部",
+      "address": "北海道旭川市花咲町6丁目",
+      "lat": 43.7709, "lng": 142.3649,
+      "tel": "0166-51-7330",
+      "url": "https://www.mod.go.jp/pco/asahikawa/"
+    },
+    {
+      "id": "hq-obihiro",   "type": "hq", "pref": "obihiro",
+      "name": "自衛隊帯広地方協力本部",
+      "address": "北海道帯広市西6条南7丁目5",
+      "lat": 42.9175, "lng": 143.1977,
+      "tel": "0155-23-2485",
+      "url": "https://www.mod.go.jp/pco/obihiro/"
+    },
+    {
+      "id": "hq-hakodate",  "type": "hq", "pref": "hakodate",
+      "name": "自衛隊函館地方協力本部",
+      "address": "北海道函館市新川町25-18",
+      "lat": 41.7725, "lng": 140.7286,
+      "tel": "0138-53-6241",
+      "url": "https://www.mod.go.jp/pco/hakodate/"
+    },
+    {
+      "id": "hq-miyagi",    "type": "hq", "pref": "miyagi",
+      "name": "自衛隊宮城地方協力本部",
+      "address": "宮城県仙台市宮城野区元寺小路中丁78-17",
+      "lat": 38.2682, "lng": 140.9104,
+      "tel": "022-295-2612",
+      "url": "https://www.mod.go.jp/pco/miyagi/"
+    },
+    {
+      "id": "hq-aomori",    "type": "hq", "pref": "aomori",
+      "name": "自衛隊青森地方協力本部",
+      "address": "青森県青森市新町1-3-20",
+      "lat": 40.8231, "lng": 140.7466,
+      "tel": "017-777-7917",
+      "url": "https://www.mod.go.jp/pco/aomori/"
+    },
+    {
+      "id": "hq-iwate",     "type": "hq", "pref": "iwate",
+      "name": "自衛隊岩手地方協力本部",
+      "address": "岩手県盛岡市上田4-1-1",
+      "lat": 39.7069, "lng": 141.1378,
+      "tel": "019-651-3351",
+      "url": "https://www.mod.go.jp/pco/iwate/"
+    },
+    {
+      "id": "hq-akita",     "type": "hq", "pref": "akita",
+      "name": "自衛隊秋田地方協力本部",
+      "address": "秋田県秋田市山王7-1-3",
+      "lat": 39.7186, "lng": 140.1048,
+      "tel": "018-823-1451",
+      "url": "https://www.mod.go.jp/pco/akita/"
+    },
+    {
+      "id": "hq-yamagata",  "type": "hq", "pref": "yamagata",
+      "name": "自衛隊山形地方協力本部",
+      "address": "山形県山形市小白川町1-8-39",
+      "lat": 38.2512, "lng": 140.3408,
+      "tel": "023-622-7314",
+      "url": "https://www.mod.go.jp/pco/yamagata/"
+    },
+    {
+      "id": "hq-fukushima", "type": "hq", "pref": "fukushima",
+      "name": "自衛隊福島地方協力本部",
+      "address": "福島県福島市栄町6-6",
+      "lat": 37.7607, "lng": 140.4738,
+      "tel": "024-531-2351",
+      "url": "https://www.mod.go.jp/pco/fukushima/"
+    },
+    {
+      "id": "hq-kanagawa",  "type": "hq", "pref": "kanagawa",
+      "name": "自衛隊神奈川地方協力本部",
+      "address": "神奈川県横浜市中区山下町37",
+      "lat": 35.4427, "lng": 139.6499,
+      "tel": "045-662-9476",
+      "url": "https://www.mod.go.jp/pco/kanagawa/"
+    },
+    {
+      "id": "hq-tokyo",     "type": "hq", "pref": "tokyo",
+      "name": "自衛隊東京地方協力本部",
+      "address": "東京都新宿区市谷本村町5-1",
+      "lat": 35.6862, "lng": 139.7316,
+      "tel": "03-3268-3111",
+      "url": "https://www.mod.go.jp/pco/tokyo/"
+    },
+    {
+      "id": "hq-saitama",   "type": "hq", "pref": "saitama",
+      "name": "自衛隊埼玉地方協力本部",
+      "address": "埼玉県さいたま市南区南本町1-6-1",
+      "lat": 35.8588, "lng": 139.6467,
+      "tel": "048-831-6044",
+      "url": "https://www.mod.go.jp/pco/saitama/"
+    },
+    {
+      "id": "hq-gunma",     "type": "hq", "pref": "gunma",
+      "name": "自衛隊群馬地方協力本部",
+      "address": "群馬県前橋市大手町2-3-1",
+      "lat": 36.3895, "lng": 139.0630,
+      "tel": "027-251-0016",
+      "url": "https://www.mod.go.jp/pco/gunma/"
+    },
+    {
+      "id": "hq-tochigi",   "type": "hq", "pref": "tochigi",
+      "name": "自衛隊栃木地方協力本部",
+      "address": "栃木県宇都宮市本町4-12",
+      "lat": 36.5628, "lng": 139.8831,
+      "tel": "028-634-3385",
+      "url": "https://www.mod.go.jp/pco/tochigi/"
+    },
+    {
+      "id": "hq-ibaraki",   "type": "hq", "pref": "ibaraki",
+      "name": "自衛隊茨城地方協力本部",
+      "address": "茨城県水戸市南町3-4-57",
+      "lat": 36.3660, "lng": 140.4717,
+      "tel": "029-231-3315",
+      "url": "https://www.mod.go.jp/pco/ibaraki/"
+    },
+    {
+      "id": "hq-chiba",     "type": "hq", "pref": "chiba",
+      "name": "自衛隊千葉地方協力本部",
+      "address": "千葉県千葉市中央区千葉港2-1",
+      "lat": 35.6078, "lng": 140.1014,
+      "tel": "043-242-5501",
+      "url": "https://www.mod.go.jp/pco/chiba/"
+    },
+    {
+      "id": "hq-niigata",   "type": "hq", "pref": "niigata",
+      "name": "自衛隊新潟地方協力本部",
+      "address": "新潟県新潟市中央区西堀通6番町866",
+      "lat": 37.9161, "lng": 139.0365,
+      "tel": "025-285-0513",
+      "url": "https://www.mod.go.jp/pco/niigata/"
+    },
+    {
+      "id": "hq-toyama",    "type": "hq", "pref": "toyama",
+      "name": "自衛隊富山地方協力本部",
+      "address": "富山県富山市桜橋通り3-1",
+      "lat": 36.6953, "lng": 137.2116,
+      "tel": "076-432-3730",
+      "url": "https://www.mod.go.jp/pco/toyama/"
+    },
+    {
+      "id": "hq-ishikawa",  "type": "hq", "pref": "ishikawa",
+      "name": "自衛隊石川地方協力本部",
+      "address": "石川県金沢市西念3-4-1",
+      "lat": 36.5657, "lng": 136.6367,
+      "tel": "076-291-6214",
+      "url": "https://www.mod.go.jp/pco/ishikawa/"
+    },
+    {
+      "id": "hq-fukui",     "type": "hq", "pref": "fukui",
+      "name": "自衛隊福井地方協力本部",
+      "address": "福井県福井市宝永3-5-34",
+      "lat": 36.0602, "lng": 136.2179,
+      "tel": "0776-22-3070",
+      "url": "https://www.mod.go.jp/pco/fukui/"
+    },
+    {
+      "id": "hq-yamanashi", "type": "hq", "pref": "yamanashi",
+      "name": "自衛隊山梨地方協力本部",
+      "address": "山梨県甲府市丸の内1-1-18",
+      "lat": 35.6629, "lng": 138.5689,
+      "tel": "055-252-3838",
+      "url": "https://www.mod.go.jp/pco/yamanashi/"
+    },
+    {
+      "id": "hq-nagano",    "type": "hq", "pref": "nagano",
+      "name": "自衛隊長野地方協力本部",
+      "address": "長野県長野市南県町686-1",
+      "lat": 36.6498, "lng": 138.1946,
+      "tel": "026-232-3831",
+      "url": "https://www.mod.go.jp/pco/nagano/"
+    },
+    {
+      "id": "hq-gifu",      "type": "hq", "pref": "gifu",
+      "name": "自衛隊岐阜地方協力本部",
+      "address": "岐阜県岐阜市神田町6-14",
+      "lat": 35.4230, "lng": 136.7570,
+      "tel": "058-262-1818",
+      "url": "https://www.mod.go.jp/pco/gifu/"
+    },
+    {
+      "id": "hq-shizuoka",  "type": "hq", "pref": "shizuoka",
+      "name": "自衛隊静岡地方協力本部",
+      "address": "静岡県静岡市葵区追手町9-6",
+      "lat": 34.9770, "lng": 138.3830,
+      "tel": "054-252-4000",
+      "url": "https://www.mod.go.jp/pco/sizuoka/"
+    },
+    {
+      "id": "hq-aichi",     "type": "hq", "pref": "aichi",
+      "name": "自衛隊愛知地方協力本部",
+      "address": "愛知県名古屋市東区泉1-13-3",
+      "lat": 35.1819, "lng": 136.9207,
+      "tel": "052-961-4366",
+      "url": "https://www.mod.go.jp/pco/aichi/"
+    },
+    {
+      "id": "hq-mie",       "type": "hq", "pref": "mie",
+      "name": "自衛隊三重地方協力本部",
+      "address": "三重県津市広明町13",
+      "lat": 34.7303, "lng": 136.5085,
+      "tel": "059-213-2007",
+      "url": "https://www.mod.go.jp/pco/mie/"
+    },
+    {
+      "id": "hq-shiga",     "type": "hq", "pref": "shiga",
+      "name": "自衛隊滋賀地方協力本部",
+      "address": "滋賀県大津市竜が丘21-10",
+      "lat": 35.0084, "lng": 135.8699,
+      "tel": "077-524-6130",
+      "url": "https://www.mod.go.jp/pco/shiga/"
+    },
+    {
+      "id": "hq-kyoto",     "type": "hq", "pref": "kyoto",
+      "name": "自衛隊京都地方協力本部",
+      "address": "京都府京都市伏見区深草一ノ坪町13",
+      "lat": 34.9403, "lng": 135.7609,
+      "tel": "075-641-0501",
+      "url": "https://www.mod.go.jp/pco/kyoto/"
+    },
+    {
+      "id": "hq-osaka",     "type": "hq", "pref": "osaka",
+      "name": "自衛隊大阪地方協力本部",
+      "address": "大阪府大阪市中央区大手前4-1-67",
+      "lat": 34.6867, "lng": 135.5196,
+      "tel": "06-6942-0744",
+      "url": "https://www.mod.go.jp/pco/osaka/"
+    },
+    {
+      "id": "hq-hyogo",     "type": "hq", "pref": "hyogo",
+      "name": "自衛隊兵庫地方協力本部",
+      "address": "兵庫県神戸市中央区下山手通4-4-12",
+      "lat": 34.6921, "lng": 135.1893,
+      "tel": "078-261-9777",
+      "url": "https://www.mod.go.jp/pco/hyogo/"
+    },
+    {
+      "id": "hq-nara",      "type": "hq", "pref": "nara",
+      "name": "自衛隊奈良地方協力本部",
+      "address": "奈良県奈良市四条大路3-4-1",
+      "lat": 34.6826, "lng": 135.8280,
+      "tel": "0742-23-7001",
+      "url": "https://www.mod.go.jp/pco/nara/"
+    },
+    {
+      "id": "hq-wakayama",  "type": "hq", "pref": "wakayama",
+      "name": "自衛隊和歌山地方協力本部",
+      "address": "和歌山県和歌山市北出島1-5-21",
+      "lat": 34.2296, "lng": 135.1694,
+      "tel": "073-422-5116",
+      "url": "https://www.mod.go.jp/pco/wakayama/"
+    },
+    {
+      "id": "hq-tokushima", "type": "hq", "pref": "tokushima",
+      "name": "自衛隊徳島地方協力本部",
+      "address": "徳島県徳島市万代町3-5-1",
+      "lat": 34.0714, "lng": 134.5534,
+      "tel": "088-623-2220",
+      "url": "https://www.mod.go.jp/pco/tokushima/"
+    },
+    {
+      "id": "hq-kagawa",    "type": "hq", "pref": "kagawa",
+      "name": "自衛隊香川地方協力本部",
+      "address": "香川県高松市サンポート2-1",
+      "lat": 34.3444, "lng": 134.0480,
+      "tel": "087-823-9207",
+      "url": "https://www.mod.go.jp/pco/kagawa/"
+    },
+    {
+      "id": "hq-ehime",     "type": "hq", "pref": "ehime",
+      "name": "自衛隊愛媛地方協力本部",
+      "address": "愛媛県松山市二番町3-3-10",
+      "lat": 33.8391, "lng": 132.7650,
+      "tel": "089-941-8381",
+      "url": "https://www.mod.go.jp/pco/ehime/"
+    },
+    {
+      "id": "hq-kochi",     "type": "hq", "pref": "kochi",
+      "name": "自衛隊高知地方協力本部",
+      "address": "高知県高知市旭町1-70",
+      "lat": 33.5578, "lng": 133.5413,
+      "tel": "088-822-6128",
+      "url": "https://www.mod.go.jp/pco/kochi/"
+    },
+    {
+      "id": "hq-tottori",   "type": "hq", "pref": "tottori",
+      "name": "自衛隊鳥取地方協力本部",
+      "address": "鳥取県鳥取市上町225",
+      "lat": 35.5044, "lng": 134.2368,
+      "tel": "0857-22-3468",
+      "url": "https://www.mod.go.jp/pco/tottori/"
+    },
+    {
+      "id": "hq-shimane",   "type": "hq", "pref": "shimane",
+      "name": "自衛隊島根地方協力本部",
+      "address": "島根県松江市朝日町478-18",
+      "lat": 35.4721, "lng": 133.0506,
+      "tel": "0852-21-0935",
+      "url": "https://www.mod.go.jp/pco/shimane/"
+    },
+    {
+      "id": "hq-okayama",   "type": "hq", "pref": "okayama",
+      "name": "自衛隊岡山地方協力本部",
+      "address": "岡山県岡山市北区津島中1-1-1",
+      "lat": 34.6765, "lng": 133.9169,
+      "tel": "086-224-3302",
+      "url": "https://www.mod.go.jp/pco/okayama/"
+    },
+    {
+      "id": "hq-hiroshima", "type": "hq", "pref": "hiroshima",
+      "name": "自衛隊広島地方協力本部",
+      "address": "広島県広島市中区上八丁堀7-44",
+      "lat": 34.3985, "lng": 132.4577,
+      "tel": "082-221-5891",
+      "url": "https://www.mod.go.jp/pco/hiroshima/"
+    },
+    {
+      "id": "hq-yamaguchi", "type": "hq", "pref": "yamaguchi",
+      "name": "自衛隊山口地方協力本部",
+      "address": "山口県山口市旭通り2-9-17",
+      "lat": 34.1861, "lng": 131.4724,
+      "tel": "083-922-5101",
+      "url": "https://www.mod.go.jp/pco/yamaguchi/"
+    },
+    {
+      "id": "hq-fukuoka",   "type": "hq", "pref": "fukuoka",
+      "name": "自衛隊福岡地方協力本部",
+      "address": "福岡県福岡市中央区天神1-10-1",
+      "lat": 33.5907, "lng": 130.3989,
+      "tel": "092-781-9321",
+      "url": "https://www.mod.go.jp/pco/fukuoka/"
+    },
+    {
+      "id": "hq-saga",      "type": "hq", "pref": "saga",
+      "name": "自衛隊佐賀地方協力本部",
+      "address": "佐賀県佐賀市駅前中央3-3-20",
+      "lat": 33.2644, "lng": 130.3003,
+      "tel": "0952-32-4431",
+      "url": "https://www.mod.go.jp/pco/saga/"
+    },
+    {
+      "id": "hq-nagasaki",  "type": "hq", "pref": "nagasaki",
+      "name": "自衛隊長崎地方協力本部",
+      "address": "長崎県長崎市出島町2-25",
+      "lat": 32.7463, "lng": 129.8749,
+      "tel": "095-823-7196",
+      "url": "https://www.mod.go.jp/pco/nagasaki/"
+    },
+    {
+      "id": "hq-kumamoto",  "type": "hq", "pref": "kumamoto",
+      "name": "自衛隊熊本地方協力本部",
+      "address": "熊本県熊本市南区田迎2-9-56",
+      "lat": 32.7621, "lng": 130.7289,
+      "tel": "096-297-2051",
+      "url": "https://www.mod.go.jp/pco/kumamoto/"
+    },
+    {
+      "id": "hq-oita",      "type": "hq", "pref": "oita",
+      "name": "自衛隊大分地方協力本部",
+      "address": "大分県大分市平野912-1",
+      "lat": 33.2401, "lng": 131.6163,
+      "tel": "097-536-6271",
+      "url": "https://www.mod.go.jp/pco/oita/"
+    },
+    {
+      "id": "hq-miyazaki",  "type": "hq", "pref": "miyazaki",
+      "name": "自衛隊宮崎地方協力本部",
+      "address": "宮崎県宮崎市広島1-3-12",
+      "lat": 31.9117, "lng": 131.4239,
+      "tel": "0985-27-7191",
+      "url": "https://www.mod.go.jp/pco/miyazaki/"
+    },
+    {
+      "id": "hq-kagoshima", "type": "hq", "pref": "kagoshima",
+      "name": "自衛隊鹿児島地方協力本部",
+      "address": "鹿児島県鹿児島市東千石町14-35",
+      "lat": 31.5986, "lng": 130.5590,
+      "tel": "099-253-8920",
+      "url": "https://www.mod.go.jp/pco/kagoshima/"
+    },
+    {
+      "id": "hq-okinawa",   "type": "hq", "pref": "okinawa",
+      "name": "自衛隊沖縄地方協力本部",
+      "address": "沖縄県那覇市前島3-25-1",
+      "lat": 26.2126, "lng": 127.6821,
+      "tel": "098-863-3146",
+      "url": "https://www.mod.go.jp/pco/okinawa/"
+    }
+  ]
+}
