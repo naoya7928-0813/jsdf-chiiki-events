@@ -1,0 +1,380 @@
+[
+  {
+    "parent_pco_id": "kanagawa",
+    "office_type": "募集案内所",
+    "name": "横浜中央募集案内所",
+    "address": "神奈川県横浜市中区山下町253-2",
+    "phone": "045-662-9427",
+    "area": "横浜市中区 南区 保土ヶ谷区 西区 旭区 瀬谷区",
+    "url": "https://www.mod.go.jp/pco/kanagawa/"
+  },
+  {
+    "parent_pco_id": "kanagawa",
+    "office_type": "募集案内所",
+    "name": "市ヶ尾募集案内所",
+    "address": "神奈川県横浜市青葉区市ケ尾町1052-1",
+    "phone": "045-971-9281",
+    "area": "横浜市青葉区 緑区 都筑区",
+    "url": "https://www.mod.go.jp/pco/kanagawa/"
+  },
+  {
+    "parent_pco_id": "kanagawa",
+    "office_type": "募集案内所",
+    "name": "藤沢募集案内所",
+    "address": "神奈川県藤沢市藤沢976-2",
+    "phone": "0466-26-2216",
+    "area": "藤沢市 鎌倉市 茅ヶ崎市 寒川町",
+    "url": "https://www.mod.go.jp/pco/kanagawa/"
+  },
+  {
+    "parent_pco_id": "kanagawa",
+    "office_type": "募集案内所",
+    "name": "厚木募集案内所",
+    "address": "神奈川県厚木市中町2-6-24",
+    "phone": "046-400-2486",
+    "area": "厚木市 伊勢原市 愛川町 清川村",
+    "url": "https://www.mod.go.jp/pco/kanagawa/"
+  },
+  {
+    "parent_pco_id": "kanagawa",
+    "office_type": "地域事務所",
+    "name": "横須賀地域事務所",
+    "address": "神奈川県横須賀市若松町3-3",
+    "phone": "046-823-0404",
+    "area": "横須賀市 三浦市 逗子市 葉山町",
+    "url": "https://www.mod.go.jp/pco/kanagawa/"
+  },
+  {
+    "parent_pco_id": "kanagawa",
+    "office_type": "地域事務所",
+    "name": "平塚地域事務所",
+    "address": "神奈川県平塚市代官町9-26",
+    "phone": "0463-22-5547",
+    "area": "平塚市 秦野市 大磯町 二宮町",
+    "url": "https://www.mod.go.jp/pco/kanagawa/"
+  },
+  {
+    "parent_pco_id": "kanagawa",
+    "office_type": "地域事務所",
+    "name": "小田原地域事務所",
+    "address": "神奈川県小田原市栄町1-14-9",
+    "phone": "0465-24-3080",
+    "area": "小田原市 南足柄市 箱根町 真鶴町 湯河原町 中井町 大井町 松田町 山北町 開成町",
+    "url": "https://www.mod.go.jp/pco/kanagawa/"
+  },
+  {
+    "parent_pco_id": "kanagawa",
+    "office_type": "地域事務所",
+    "name": "相模原地域事務所",
+    "address": "神奈川県相模原市中央区相模原4-7-10",
+    "phone": "042-755-0694",
+    "area": "相模原市 座間市",
+    "url": "https://www.mod.go.jp/pco/kanagawa/"
+  },
+  {
+    "parent_pco_id": "tokyo",
+    "office_type": "出張所",
+    "name": "港出張所",
+    "address": "東京都港区西新橋1-6-13",
+    "phone": "03-3591-5101",
+    "area": "千代田区 中央区 港区 大島町 新島村 神津島村 利島村",
+    "url": "https://www.mod.go.jp/pco/tokyo/"
+  },
+  {
+    "parent_pco_id": "tokyo",
+    "office_type": "出張所",
+    "name": "豊島出張所",
+    "address": "東京都豊島区西池袋1-18-1",
+    "phone": "03-3982-7075",
+    "area": "新宿区 豊島区",
+    "url": "https://www.mod.go.jp/pco/tokyo/"
+  },
+  {
+    "parent_pco_id": "tokyo",
+    "office_type": "出張所",
+    "name": "大田出張所",
+    "address": "東京都大田区蒲田5-37-1",
+    "phone": "03-3736-4271",
+    "area": "大田区 品川区 青ヶ島村 小笠原村 八丈町 御蔵島村 三宅村",
+    "url": "https://www.mod.go.jp/pco/tokyo/"
+  },
+  {
+    "parent_pco_id": "tokyo",
+    "office_type": "出張所",
+    "name": "江東出張所",
+    "address": "東京都江東区亀戸6-56-7",
+    "phone": "03-3638-9911",
+    "area": "江東区 墨田区 江戸川区 葛飾区 足立区",
+    "url": "https://www.mod.go.jp/pco/tokyo/"
+  },
+  {
+    "parent_pco_id": "tokyo",
+    "office_type": "出張所",
+    "name": "台東出張所",
+    "address": "東京都台東区上野6-16-23",
+    "phone": "03-3833-5951",
+    "area": "台東区 荒川区 文京区 北区 板橋区",
+    "url": "https://www.mod.go.jp/pco/tokyo/"
+  },
+  {
+    "parent_pco_id": "tokyo",
+    "office_type": "出張所",
+    "name": "立川出張所",
+    "address": "東京都立川市柴崎町3-5-21",
+    "phone": "042-527-2301",
+    "area": "立川市 昭島市 日野市 八王子市 福生市 武蔵村山市 東大和市 あきる野市 羽村市 青梅市 西多摩郡",
+    "url": "https://www.mod.go.jp/pco/tokyo/"
+  },
+  {
+    "parent_pco_id": "tokyo",
+    "office_type": "地域事務所",
+    "name": "足立地域事務所",
+    "address": "東京都足立区千住2-11",
+    "phone": "03-3870-5071",
+    "area": "足立区 葛飾区",
+    "url": "https://www.mod.go.jp/pco/tokyo/"
+  },
+  {
+    "parent_pco_id": "tokyo",
+    "office_type": "地域事務所",
+    "name": "西東京地域事務所",
+    "address": "東京都西東京市田無町3-5-2",
+    "phone": "042-461-3371",
+    "area": "西東京市 小金井市 三鷹市 武蔵野市 調布市 狛江市 稲城市 多摩市",
+    "url": "https://www.mod.go.jp/pco/tokyo/"
+  },
+  {
+    "parent_pco_id": "tokyo",
+    "office_type": "募集案内所",
+    "name": "高円寺募集案内所",
+    "address": "東京都杉並区高円寺南4-27-10",
+    "phone": "03-3318-0818",
+    "area": "杉並区 中野区",
+    "url": "https://www.mod.go.jp/pco/tokyo/"
+  },
+  {
+    "parent_pco_id": "tokyo",
+    "office_type": "募集案内所",
+    "name": "渋谷募集案内所",
+    "address": "東京都渋谷区渋谷1-8-3",
+    "phone": "03-4361-5572",
+    "area": "渋谷区 目黒区 世田谷区",
+    "url": "https://www.mod.go.jp/pco/tokyo/"
+  },
+  {
+    "parent_pco_id": "tokyo",
+    "office_type": "募集案内所",
+    "name": "国分寺募集案内所",
+    "address": "東京都国分寺市南町3-11-18",
+    "phone": "042-324-1010",
+    "area": "国分寺市 小平市 東村山市 国立市 東大和市 清瀬市 東久留米市",
+    "url": "https://www.mod.go.jp/pco/tokyo/"
+  },
+  {
+    "parent_pco_id": "tokyo",
+    "office_type": "募集案内所",
+    "name": "町田募集案内所",
+    "address": "東京都町田市原町田4-1-14",
+    "phone": "042-729-5171",
+    "area": "町田市 相模原市（一部）",
+    "url": "https://www.mod.go.jp/pco/tokyo/"
+  },
+  {
+    "parent_pco_id": "saitama",
+    "office_type": "地域事務所",
+    "name": "さいたま地域事務所",
+    "address": "埼玉県さいたま市大宮区桜木町2-376",
+    "phone": "048-651-2420",
+    "area": "さいたま市 上尾市 蓮田市 白岡市 伊奈町",
+    "url": "https://www.mod.go.jp/pco/saitama/"
+  },
+  {
+    "parent_pco_id": "saitama",
+    "office_type": "地域事務所",
+    "name": "入間地域事務所",
+    "address": "埼玉県所沢市西所沢1-9-19",
+    "phone": "04-2923-4691",
+    "area": "所沢市 入間市 狭山市 飯能市 日高市 毛呂山町 越生町 鶴ヶ島市",
+    "url": "https://www.mod.go.jp/pco/saitama/"
+  },
+  {
+    "parent_pco_id": "saitama",
+    "office_type": "地域事務所",
+    "name": "朝霞地域事務所",
+    "address": "埼玉県朝霞市溝沼1-27-2",
+    "phone": "048-466-4435",
+    "area": "朝霞市 志木市 新座市 和光市 富士見市 ふじみ野市",
+    "url": "https://www.mod.go.jp/pco/saitama/"
+  },
+  {
+    "parent_pco_id": "saitama",
+    "office_type": "地域事務所",
+    "name": "熊谷地域事務所",
+    "address": "埼玉県熊谷市宮町2-93",
+    "phone": "048-521-1231",
+    "area": "熊谷市 行田市 本庄市 深谷市 美里町 神川町 上里町 寄居町",
+    "url": "https://www.mod.go.jp/pco/saitama/"
+  },
+  {
+    "parent_pco_id": "saitama",
+    "office_type": "募集案内所",
+    "name": "川口募集案内所",
+    "address": "埼玉県川口市中青木2-19-5",
+    "phone": "048-259-4004",
+    "area": "川口市 蕨市 戸田市",
+    "url": "https://www.mod.go.jp/pco/saitama/"
+  },
+  {
+    "parent_pco_id": "saitama",
+    "office_type": "募集案内所",
+    "name": "春日部募集案内所",
+    "address": "埼玉県春日部市粕壁1-9-17",
+    "phone": "048-755-7360",
+    "area": "春日部市 草加市 越谷市 八潮市 三郷市 吉川市 松伏町",
+    "url": "https://www.mod.go.jp/pco/saitama/"
+  },
+  {
+    "parent_pco_id": "saitama",
+    "office_type": "募集案内所",
+    "name": "川越募集案内所",
+    "address": "埼玉県川越市通町2-2",
+    "phone": "049-224-0947",
+    "area": "川越市 坂戸市 東松山市 比企郡 秩父市 秩父郡",
+    "url": "https://www.mod.go.jp/pco/saitama/"
+  },
+  {
+    "parent_pco_id": "saitama",
+    "office_type": "募集案内所",
+    "name": "加須募集案内所",
+    "address": "埼玉県加須市中央1-15-1",
+    "phone": "0480-62-6358",
+    "area": "加須市 羽生市 行田市 北埼玉郡",
+    "url": "https://www.mod.go.jp/pco/saitama/"
+  },
+  {
+    "parent_pco_id": "chiba",
+    "office_type": "募集案内所",
+    "name": "千葉募集案内所",
+    "address": "千葉県千葉市中央区富士見2-22-2",
+    "phone": "043-221-1333",
+    "area": "千葉市中央区 美浜区 花見川区 稲毛区",
+    "url": "https://www.mod.go.jp/pco/chiba/"
+  },
+  {
+    "parent_pco_id": "chiba",
+    "office_type": "募集案内所",
+    "name": "柏募集案内所",
+    "address": "千葉県柏市柏3-7-21",
+    "phone": "04-7163-6884",
+    "area": "柏市 流山市 我孫子市 野田市 印西市",
+    "url": "https://www.mod.go.jp/pco/chiba/"
+  },
+  {
+    "parent_pco_id": "chiba",
+    "office_type": "募集案内所",
+    "name": "市川募集案内所",
+    "address": "千葉県市川市八幡2-6-17",
+    "phone": "047-332-3751",
+    "area": "市川市 船橋市 松戸市 浦安市",
+    "url": "https://www.mod.go.jp/pco/chiba/"
+  },
+  {
+    "parent_pco_id": "chiba",
+    "office_type": "出張所",
+    "name": "船橋出張所",
+    "address": "千葉県船橋市前原西2-21-6",
+    "phone": "047-475-2084",
+    "area": "船橋市 習志野市 八千代市 鎌ヶ谷市",
+    "url": "https://www.mod.go.jp/pco/chiba/"
+  },
+  {
+    "parent_pco_id": "chiba",
+    "office_type": "地域事務所",
+    "name": "成田地域事務所",
+    "address": "千葉県成田市囲護台2-2-12",
+    "phone": "0476-22-6275",
+    "area": "成田市 香取市 香取郡 山武郡（一部）",
+    "url": "https://www.mod.go.jp/pco/chiba/"
+  },
+  {
+    "parent_pco_id": "chiba",
+    "office_type": "地域事務所",
+    "name": "木更津地域事務所",
+    "address": "千葉県木更津市東中央1-1-2",
+    "phone": "0438-23-5734",
+    "area": "木更津市 君津市 富津市 袖ヶ浦市",
+    "url": "https://www.mod.go.jp/pco/chiba/"
+  },
+  {
+    "parent_pco_id": "chiba",
+    "office_type": "地域事務所",
+    "name": "茂原地域事務所",
+    "address": "千葉県茂原市町保3-217",
+    "phone": "0475-25-0452",
+    "area": "茂原市 長生郡 山武市 大網白里市",
+    "url": "https://www.mod.go.jp/pco/chiba/"
+  },
+  {
+    "parent_pco_id": "chiba",
+    "office_type": "地域事務所",
+    "name": "銚子地域事務所",
+    "address": "千葉県銚子市若宮町1-1-1",
+    "phone": "0479-22-2073",
+    "area": "銚子市 旭市 匝瑳市 海匝郡",
+    "url": "https://www.mod.go.jp/pco/chiba/"
+  },
+  {
+    "parent_pco_id": "ibaraki",
+    "office_type": "募集案内所",
+    "name": "水戸募集案内所",
+    "address": "茨城県水戸市中央2-7-37",
+    "phone": "029-226-9294",
+    "area": "水戸市 笠間市 ひたちなか市 那珂市 城里町 茨城町 大洗町 東海村",
+    "url": "https://www.mod.go.jp/pco/ibaraki/"
+  },
+  {
+    "parent_pco_id": "ibaraki",
+    "office_type": "出張所",
+    "name": "日立出張所",
+    "address": "茨城県日立市平和町1-13-7",
+    "phone": "0294-21-1524",
+    "area": "日立市 高萩市 北茨城市 常陸大宮市 常陸太田市 大子町",
+    "url": "https://www.mod.go.jp/pco/ibaraki/"
+  },
+  {
+    "parent_pco_id": "ibaraki",
+    "office_type": "地域事務所",
+    "name": "土浦地域事務所",
+    "address": "茨城県土浦市川口1-3-142",
+    "phone": "029-821-6986",
+    "area": "土浦市 石岡市 つくば市 かすみがうら市 つくばみらい市",
+    "url": "https://www.mod.go.jp/pco/ibaraki/"
+  },
+  {
+    "parent_pco_id": "ibaraki",
+    "office_type": "地域事務所",
+    "name": "龍ヶ崎地域事務所",
+    "address": "茨城県龍ヶ崎市3629-5",
+    "phone": "0297-64-3351",
+    "area": "龍ヶ崎市 牛久市 稲敷市 美浦村 阿見町 河内町",
+    "url": "https://www.mod.go.jp/pco/ibaraki/"
+  },
+  {
+    "parent_pco_id": "ibaraki",
+    "office_type": "地域事務所",
+    "name": "筑西地域事務所",
+    "address": "茨城県筑西市二木成816",
+    "phone": "0296-22-7239",
+    "area": "筑西市 下妻市 桜川市 結城市 八千代町 五霞町 境町",
+    "url": "https://www.mod.go.jp/pco/ibaraki/"
+  },
+  {
+    "parent_pco_id": "ibaraki",
+    "office_type": "地域事務所",
+    "name": "古河地域事務所",
+    "address": "茨城県古河市駒羽根285-1",
+    "phone": "0280-32-0851",
+    "area": "古河市 坂東市 常総市 守谷市 取手市 利根町",
+    "url": "https://www.mod.go.jp/pco/ibaraki/"
+  }
+]
