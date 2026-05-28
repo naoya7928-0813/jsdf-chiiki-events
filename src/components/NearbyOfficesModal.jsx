@@ -42,9 +42,22 @@ const MODAL_CSS = `
   45%  { transform: translate(-50%,-50%) scale(2.8); opacity: 1; }
   100% { transform: translate(-50%,-50%) scale(1);   opacity: 1; }
 }
-@keyframes blip-glow {
-  0%,100% { box-shadow: 0 0 3px 1px #00e06070; }
-  50%      { box-shadow: 0 0 10px 3px #00e060bb; }
+/* スイープアーム通過時フラッシュ（グリーン） */
+@keyframes blip-pass {
+  0%   { box-shadow: 0 0 18px 8px #00e060ff, 0 0 36px 16px #00e06088; opacity: 1; }
+  10%  { box-shadow: 0 0 10px 4px #00e060cc; opacity: 0.95; }
+  100% { box-shadow: 0 0 2px  1px #00e06033; opacity: 0.48; }
+}
+/* スイープアーム通過時フラッシュ（白・最近傍） */
+@keyframes blip-pass-top {
+  0%   { box-shadow: 0 0 18px 8px #ffffffee, 0 0 36px 16px #ffffff77; opacity: 1; }
+  10%  { box-shadow: 0 0 10px 4px #ffffffcc; opacity: 0.95; }
+  100% { box-shadow: 0 0 2px  1px #ffffff55; opacity: 0.7; }
+}
+/* JPN ラベル出現 */
+@keyframes blip-label-appear {
+  from { opacity: 0; transform: translate(-50%, 0) scale(0.7); }
+  to   { opacity: 0.9; transform: translate(-50%, 0) scale(1); }
 }
 @keyframes center-pulse {
   0%,100% { box-shadow: 0 0 0  0px #ffffff50, 0 0 8px  #00e06070; }
@@ -507,37 +520,65 @@ function RadarCircle({ blips }) {
         zIndex: 3,
       }} />
 
-      {/* 施設ブリップ（結果件数分だけ表示） */}
-      {blips.map((o, i) => {
-        if (o.lat == null || o.lng == null) return null;
-        const toRad = d => d * Math.PI / 180;
-        const nr    = normDist(o.dist) * RADAR_R;
-        const bx    = nr * Math.sin(toRad(o.bearing));
-        const by    = -nr * Math.cos(toRad(o.bearing));
-        const cx    = RADAR_R + bx;
-        const cy    = RADAR_R + by;
-        const delay = i * STAGGER_MS;
-        const isTop = i === 0;
+      {/* 施設ブリップ（結果件数分）＋ JPN ラベル */}
+      {blips.flatMap((o, i) => {
+        if (o.lat == null || o.lng == null) return [];
+        const toRad  = d => d * Math.PI / 180;
+        const nr     = normDist(o.dist) * RADAR_R;
+        const bx     = nr * Math.sin(toRad(o.bearing));
+        const by     = -nr * Math.cos(toRad(o.bearing));
+        const cx     = RADAR_R + bx;
+        const cy     = RADAR_R + by;
+        const isTop  = i === 0;
+        const dotD   = isTop ? 9 : 7;
+        const dotR   = dotD / 2;
 
-        return (
-          <div key={o.id} style={{
+        // アームが方位角に到達するタイミングを計算
+        const appearsAt = i * STAGGER_MS;
+        const basePass  = (o.bearing / 360) * SWEEP_MS;
+        // ブリップが出現した後の最初のアーム通過を待つ
+        const passDelay = basePass >= appearsAt ? basePass : basePass + SWEEP_MS;
+        const passKf    = isTop ? 'blip-pass-top' : 'blip-pass';
+
+        return [
+          // ブリップ本体
+          <div key={`d${o.id}`} style={{
             position: 'absolute',
             left: cx, top: cy,
-            width: isTop ? 9 : 7,
-            height: isTop ? 9 : 7,
+            width: dotD, height: dotD,
             borderRadius: '50%',
             background: isTop ? '#ffffff' : GREEN,
             transform: 'translate(-50%, -50%) scale(0)',
+            opacity: 0,
             animation: [
-              `blip-appear 0.45s ease-out ${delay}ms forwards`,
-              `blip-glow   2.0s ease-in-out ${delay + 450}ms infinite`,
+              `blip-appear 0.45s ease-out ${appearsAt}ms forwards`,
+              `${passKf} ${SWEEP_MS}ms linear ${passDelay}ms infinite`,
             ].join(', '),
             zIndex: 10,
-            boxShadow: isTop
-              ? `0 0 8px 3px #ffffff88, 0 0 14px ${GREEN}aa`
-              : undefined,
-          }} />
-        );
+          }} />,
+
+          // JPN ラベル（ブリップの直下）
+          <div key={`l${o.id}`} style={{
+            position: 'absolute',
+            left: cx,
+            top: cy + dotR + 2,
+            transform: 'translate(-50%, 0) scale(0.7)',
+            opacity: 0,
+            animation: `blip-label-appear 0.3s ease-out ${appearsAt + 250}ms forwards`,
+            fontSize: 6,
+            color: isTop ? 'rgba(255,255,255,0.92)' : `${GREEN}dd`,
+            fontFamily: 'monospace',
+            fontWeight: 900,
+            letterSpacing: 1.5,
+            whiteSpace: 'nowrap',
+            zIndex: 10,
+            pointerEvents: 'none',
+            lineHeight: 1,
+            textShadow: isTop
+              ? '0 0 5px rgba(255,255,255,0.7)'
+              : `0 0 5px ${GREEN}99`,
+          }}>JPN</div>,
+        ];
       })}
 
       {/* 中心点（現在地） */}
