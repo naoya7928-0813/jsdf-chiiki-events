@@ -1,11 +1,16 @@
 /**
  * NearbyOfficesModal.jsx
- * 現在地から近くの地本・募集案内所を本格レーダーUIで表示するボトムシートモーダル
+ * 現在地から近くの地本・募集案内所等をレーダーUIで表示するボトムシートモーダル
  *
  * Phase:
  *   idle → intro(初回のみ) → locating → dramatic → found
  *                              ↓
  *                           denied / error
+ *
+ * サウンド: Web Audio API でソナーエコー音を合成
+ *   - locating: 2.5秒ごとにスイープping + エコー
+ *   - dramatic: ブリップ出現ごとに検出ping
+ *   - found: ロックオン音
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -15,15 +20,14 @@ import { calcDistance, fetchOfficesData } from '../hooks/useOffices';
 
 // ─── 定数 ────────────────────────────────────────────────────────
 const GREEN       = '#00e060';
-const GREEN_DIM   = '#00e06044';
-const RADAR_BG    = '#010e1a';
-const RADAR_PX    = 244;           // レーダー直径 (px)
-const RADAR_R     = RADAR_PX / 2;  // レーダー半径 (px)
-const DRAMATIC_MS = 2600;          // found 遷移までのディレイ
-const STAGGER_MS  = 160;           // ブリップ出現時差
+const RADAR_PX    = 244;
+const RADAR_R     = RADAR_PX / 2;
+const DRAMATIC_MS = 2800;
+const STAGGER_MS  = 160;
+const SWEEP_MS    = 2500;  // CSS animation と同期
 const INTRO_KEY   = 'jsdf-nearby-intro-seen';
 
-// ─── CSS（一度だけ注入） ─────────────────────────────────────────
+// ─── CSS ────────────────────────────────────────────────────────
 const MODAL_CSS = `
 @keyframes radar-rotate {
   from { transform: rotate(0deg); }
@@ -58,13 +62,12 @@ const MODAL_CSS = `
 
 // ─── 施設種別マスタ ────────────────────────────────────────────
 const TYPE_INFO = {
-  hq:          { short: '地本', bg: '#0b2545' },
-  recruitment: { short: '募集', bg: '#16a34a' },
-  cooperation: { short: '協力', bg: '#ea580c' },
+  hq:          { short: '地本',  bg: '#0b2545' },
+  recruitment: { short: '窓口',  bg: '#16a34a' },
+  cooperation: { short: '協力',  bg: '#ea580c' },
 };
 
 // ─── ユーティリティ ────────────────────────────────────────────
-/** 2 点間の真北起点方位角（deg, 0=N, 90=E） */
 function calcBearing(lat1, lng1, lat2, lng2) {
   const r = d => d * Math.PI / 180;
   const y = Math.sin(r(lng2 - lng1)) * Math.cos(r(lat2));
@@ -73,14 +76,67 @@ function calcBearing(lat1, lng1, lat2, lng2) {
   return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
 }
 
-/** 対数スケールでレーダー半径に正規化（0.0–0.92） */
 function normDist(km) {
   return Math.min(Math.log(Math.max(km, 0.1) + 1) / Math.log(1001), 0.92);
 }
 
-/** localStorage へのアクセス（エラー無視） */
-function lsGet(k)   { try { return localStorage.getItem(k);     } catch { return null; } }
-function lsSet(k,v) { try { localStorage.setItem(k, v);          } catch {} }
+function lsGet(k)   { try { return localStorage.getItem(k);   } catch { return null; } }
+function lsSet(k,v) { try { localStorage.setItem(k, v);        } catch {} }
+
+// ─── Web Audio ソナーエンジン ─────────────────────────────────
+class SonarAudio {
+  constructor() { this._ctx = null; }
+
+  _ctx_() {
+    if (!this._ctx) {
+      this._ctx = new (window.AudioContext || window.webkitAudioContext)();
+      if (this._ctx.state === 'suspended') this._ctx.resume();
+    }
+    return this._ctx;
+  }
+
+  /** 単一ping（正弦波＋指数的フェードアウト） */
+  _ping(freq, dur, vol, delay = 0) {
+    try {
+      const ctx  = this._ctx_();
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      const t = ctx.currentTime + delay;
+      osc.frequency.setValueAtTime(freq, t);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.58, t + dur * 0.4);
+      gain.gain.setValueAtTime(vol, t);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      osc.start(t);
+      osc.stop(t + dur + 0.05);
+    } catch { /* AudioContext がない環境では無視 */ }
+  }
+
+  /** スイープ音: メインping + エコー2回 */
+  sweep() {
+    this._ping(1100, 1.0, 0.14);
+    this._ping(900,  0.75, 0.065, 0.65);
+    this._ping(760,  0.55, 0.032, 1.30);
+  }
+
+  /** ブリップ検出音（各施設ヒット時） */
+  blip(delayMs = 0) {
+    this._ping(1900, 0.22, 0.09, delayMs / 1000);
+  }
+
+  /** ロックオン音（found 遷移時） */
+  lockOn() {
+    this._ping(1500, 0.12, 0.11);
+    this._ping(1900, 0.12, 0.11, 0.13);
+    this._ping(2400, 0.35, 0.09, 0.26);
+  }
+
+  destroy() {
+    try { if (this._ctx) { this._ctx.close(); this._ctx = null; } } catch {}
+  }
+}
 
 // ─────────────────────────────────────────────────────────────────
 // Main
@@ -90,26 +146,51 @@ export default function NearbyOfficesModal({ isOpen, onClose, theme }) {
 
   const [phase,    setPhase]    = useState('idle');
   const [nearby,   setNearby]   = useState([]);
-  const [userPos,  setUserPos]  = useState(null);  // { lat, lng }
+  const [userPos,  setUserPos]  = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
 
-  const abortRef     = useRef(false);
-  const timerRef     = useRef(null);
-  const introSeen    = useRef(lsGet(INTRO_KEY) === '1');
+  const abortRef    = useRef(false);
+  const timerRef    = useRef(null);    // dramatic → found のタイマー
+  const sweepRef    = useRef(null);    // スイープ音インターバル
+  const audioRef    = useRef(null);    // SonarAudio インスタンス
+  const introSeen   = useRef(lsGet(INTRO_KEY) === '1');
 
   // アンマウント時クリーンアップ
-  useEffect(() => () => clearTimeout(timerRef.current), []);
+  useEffect(() => () => {
+    clearTimeout(timerRef.current);
+    clearInterval(sweepRef.current);
+    audioRef.current?.destroy();
+  }, []);
 
-  // ─ 測位メイン ─────────────────────────────────────────────────
+  // ─ スイープ音の開始・停止ヘルパー ─────────────────────────
+  const startSweep = useCallback(() => {
+    clearInterval(sweepRef.current);
+    audioRef.current?.sweep();
+    sweepRef.current = setInterval(() => {
+      if (!abortRef.current) audioRef.current?.sweep();
+    }, SWEEP_MS);
+  }, []);
+
+  const stopSweep = useCallback(() => {
+    clearInterval(sweepRef.current);
+    sweepRef.current = null;
+  }, []);
+
+  // ─ 測位メイン ─────────────────────────────────────────────
   const startLocating = useCallback(async () => {
     setPhase('locating');
     setNearby([]);
     setUserPos(null);
     setErrorMsg('');
 
+    // サウンド開始
+    if (!audioRef.current) audioRef.current = new SonarAudio();
+    startSweep();
+
     const officesPromise = fetchOfficesData().catch(() => null);
 
     if (!navigator.geolocation) {
+      stopSweep();
       setPhase('error');
       setErrorMsg('このブラウザは位置情報に対応していません');
       return;
@@ -124,6 +205,7 @@ export default function NearbyOfficesModal({ isOpen, onClose, theme }) {
         if (abortRef.current) return;
 
         if (!offices) {
+          stopSweep();
           setPhase('error');
           setErrorMsg('施設データの取得に失敗しました');
           return;
@@ -140,15 +222,31 @@ export default function NearbyOfficesModal({ isOpen, onClose, theme }) {
 
         setUserPos({ lat, lng });
         setNearby(sorted);
-        setPhase('dramatic');            // レーダー演出フェーズ
+        setPhase('dramatic');
 
+        // ブリップ音: 件数分だけ時差再生
+        sorted.forEach((_, i) => {
+          audioRef.current?.blip(i * STAGGER_MS);
+        });
+
+        // ロックオン音 (ブリップ完了後)
+        const lockDelay = sorted.length * STAGGER_MS + 300;
+        setTimeout(() => {
+          if (!abortRef.current) audioRef.current?.lockOn();
+        }, lockDelay);
+
+        // found 遷移タイマー
         clearTimeout(timerRef.current);
         timerRef.current = setTimeout(() => {
-          if (!abortRef.current) setPhase('found');
+          if (!abortRef.current) {
+            stopSweep();
+            setPhase('found');
+          }
         }, DRAMATIC_MS);
       },
       (err) => {
         if (abortRef.current) return;
+        stopSweep();
         if (err.code === 1) {
           setPhase('denied');
         } else {
@@ -158,13 +256,16 @@ export default function NearbyOfficesModal({ isOpen, onClose, theme }) {
       },
       { timeout: 15000, maximumAge: 60000 },
     );
-  }, []);
+  }, [startSweep, stopSweep]);
 
-  // ─ isOpen 変化に連動 ───────────────────────────────────────────
+  // ─ isOpen 変化 ─────────────────────────────────────────────
   useEffect(() => {
     if (!isOpen) {
       abortRef.current = true;
       clearTimeout(timerRef.current);
+      stopSweep();
+      audioRef.current?.destroy();
+      audioRef.current = null;
       setPhase('idle');
       setNearby([]);
       setUserPos(null);
@@ -173,11 +274,11 @@ export default function NearbyOfficesModal({ isOpen, onClose, theme }) {
     }
     abortRef.current = false;
     if (!introSeen.current) {
-      setPhase('intro');        // 初回のみ説明画面
+      setPhase('intro');
     } else {
       startLocating();
     }
-  }, [isOpen, startLocating]);
+  }, [isOpen, startLocating, stopSweep]);
 
   function handleIntroConfirm() {
     lsSet(INTRO_KEY, '1');
@@ -193,7 +294,7 @@ export default function NearbyOfficesModal({ isOpen, onClose, theme }) {
     <>
       <style>{MODAL_CSS}</style>
 
-      {/* ── 背景オーバーレイ ─────────────────────────────────────── */}
+      {/* 背景オーバーレイ */}
       <div
         onClick={onClose}
         style={{
@@ -204,7 +305,7 @@ export default function NearbyOfficesModal({ isOpen, onClose, theme }) {
         }}
       />
 
-      {/* ── ボトムシート ─────────────────────────────────────────── */}
+      {/* ボトムシート */}
       <div style={{
         position: 'absolute', left: 0, right: 0, bottom: 0,
         background: 'var(--bg)',
@@ -216,7 +317,7 @@ export default function NearbyOfficesModal({ isOpen, onClose, theme }) {
         animation: 'nearby-slide-up 0.28s ease-out',
       }}>
 
-        {/* ドラッグハンドル */}
+        {/* ハンドル */}
         <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 10, flexShrink: 0 }}>
           <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--border)' }} />
         </div>
@@ -226,8 +327,15 @@ export default function NearbyOfficesModal({ isOpen, onClose, theme }) {
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '8px 20px 10px', flexShrink: 0,
         }}>
-          <div style={{ fontFamily: F.serif, fontSize: 18, fontWeight: 600, color: 'var(--text)' }}>
-            近くの施設
+          <div>
+            <div style={{ fontFamily: F.serif, fontSize: 18, fontWeight: 600, color: 'var(--text)' }}>
+              近くの施設
+            </div>
+            {phase === 'found' && (
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
+                地本・地域事務所・募集案内所
+              </div>
+            )}
           </div>
           <button
             onClick={onClose} aria-label="閉じる"
@@ -255,38 +363,30 @@ export default function NearbyOfficesModal({ isOpen, onClose, theme }) {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// IntroView — 初回のみ表示する位置情報の説明画面
+// IntroView
 // ─────────────────────────────────────────────────────────────────
 function IntroView({ onConfirm, onCancel, primary }) {
   return (
     <div style={{ padding: '4px 0 16px', animation: 'intro-in 0.35s ease-out' }}>
-
-      {/* アイコン + タイトル */}
       <div style={{ textAlign: 'center', marginBottom: 22 }}>
         <div style={{
           width: 60, height: 60, borderRadius: '50%',
           background: `${primary}18`, margin: '0 auto 14px',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 30,
-        }}>
-          📍
-        </div>
+          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30,
+        }}>📍</div>
         <div style={{ fontFamily: F.serif, fontSize: 17, fontWeight: 700, color: 'var(--text)', lineHeight: 1.4 }}>
           現在地を使って施設を探す
         </div>
         <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 8, lineHeight: 1.7 }}>
-          近くの自衛隊地方協力本部（地本）と<br />
-          募集案内所を距離順に表示します
+          近くの地本・地域事務所・募集案内所を<br />距離順に表示します
         </div>
       </div>
 
-      {/* プライバシー説明カード */}
       <div style={{
-        background: 'var(--card)', borderRadius: 14,
-        border: '1px solid var(--border)',
+        background: 'var(--card)', borderRadius: 14, border: '1px solid var(--border)',
         padding: '14px 16px', marginBottom: 20,
       }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', marginBottom: 12, letterSpacing: 0.2 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', marginBottom: 12 }}>
           🛡️ プライバシーについて
         </div>
         {[
@@ -296,8 +396,7 @@ function IntroView({ onConfirm, onCancel, primary }) {
         ].map((text, i) => (
           <div key={i} style={{
             display: 'flex', alignItems: 'center', gap: 9,
-            fontSize: 12, color: 'var(--text-muted)',
-            marginTop: i > 0 ? 9 : 0,
+            fontSize: 12, color: 'var(--text-muted)', marginTop: i > 0 ? 9 : 0,
           }}>
             {ICO.check('#16a34a', 13)}
             <span>{text}</span>
@@ -305,30 +404,19 @@ function IntroView({ onConfirm, onCancel, primary }) {
         ))}
       </div>
 
-      {/* 確認ボタン */}
-      <button
-        onClick={onConfirm}
-        style={{
-          width: '100%', height: 48, borderRadius: 12, border: 'none',
-          background: primary, color: '#fff',
-          fontSize: 15, fontWeight: 700, fontFamily: F.sans,
-          cursor: 'pointer', letterSpacing: 0.3,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-        }}
-      >
+      <button onClick={onConfirm} style={{
+        width: '100%', height: 48, borderRadius: 12, border: 'none',
+        background: primary, color: '#fff', fontSize: 15, fontWeight: 700,
+        fontFamily: F.sans, cursor: 'pointer', letterSpacing: 0.3,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+      }}>
         {ICO.locator('#fff', 17)} 現在地を使って検索する
       </button>
-
-      {/* キャンセル */}
-      <button
-        onClick={onCancel}
-        style={{
-          width: '100%', marginTop: 10, padding: '10px 0',
-          background: 'none', border: 'none',
-          fontSize: 13, color: 'var(--text-muted)',
-          cursor: 'pointer', fontFamily: F.sans,
-        }}
-      >
+      <button onClick={onCancel} style={{
+        width: '100%', marginTop: 10, padding: '10px 0',
+        background: 'none', border: 'none',
+        fontSize: 13, color: 'var(--text-muted)', cursor: 'pointer', fontFamily: F.sans,
+      }}>
         キャンセル
       </button>
     </div>
@@ -336,39 +424,23 @@ function IntroView({ onConfirm, onCancel, primary }) {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// RadarScreen — レーダーUI全体（locating / dramatic フェーズ）
+// RadarScreen
 // ─────────────────────────────────────────────────────────────────
 function RadarScreen({ phase, nearby }) {
   const isDramatic = phase === 'dramatic';
-
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center',
       padding: '18px 0 28px',
     }}>
-
-      {/* ─ レーダー円 ─ */}
       <RadarCircle blips={isDramatic ? nearby : []} />
 
-      {/* ─ ステータステキスト ─ */}
-      <div
-        key={phase}   /* phase 変化で再アニメーション */
-        style={{ marginTop: 22, textAlign: 'center', animation: 'status-in 0.4s ease-out' }}
-      >
-        <div style={{
-          fontSize: 15, fontWeight: 700, color: GREEN,
-          letterSpacing: 0.4, lineHeight: 1.4,
-        }}>
-          {isDramatic
-            ? `⚡ ${nearby.length} 件の施設を検出`
-            : '📡 スキャン中...'}
+      <div key={phase} style={{ marginTop: 22, textAlign: 'center', animation: 'status-in 0.4s ease-out' }}>
+        <div style={{ fontSize: 15, fontWeight: 700, color: GREEN, letterSpacing: 0.4, lineHeight: 1.4 }}>
+          {isDramatic ? `⚡ ${nearby.length} 件の施設を検出` : '📡 スキャン中...'}
         </div>
-        <div style={{
-          fontSize: 12, color: 'var(--text-muted)', marginTop: 5, lineHeight: 1.6,
-        }}>
-          {isDramatic
-            ? '距離を計算しています...'
-            : '現在地と施設データを取得しています'}
+        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 5, lineHeight: 1.6 }}>
+          {isDramatic ? '距離を計算しています...' : '現在地と施設データを取得しています'}
         </div>
       </div>
     </div>
@@ -376,65 +448,50 @@ function RadarScreen({ phase, nearby }) {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// RadarCircle — 実際のレーダー描画（グリーン・スイープアーム・ブリップ）
+// RadarCircle — グリーンレーダー
 // ─────────────────────────────────────────────────────────────────
 function RadarCircle({ blips }) {
   return (
     <div style={{
-      width:  RADAR_PX,
-      height: RADAR_PX,
-      borderRadius: '50%',
-      position: 'relative',
-      background: RADAR_BG,
+      width: RADAR_PX, height: RADAR_PX,
+      borderRadius: '50%', position: 'relative',
+      background: '#010e1a',
       border: `2px solid ${GREEN}66`,
       boxShadow: `0 0 28px ${GREEN}22, 0 0 60px ${GREEN}0a, inset 0 0 40px rgba(0,0,0,0.6)`,
-      overflow: 'hidden',
-      flexShrink: 0,
+      overflow: 'hidden', flexShrink: 0,
     }}>
-
-      {/* ── 同心円（距離リング）── */}
+      {/* 同心円（距離リング） */}
       {[0.33, 0.66, 1.0].map(r => (
         <div key={r} style={{
-          position: 'absolute',
-          borderRadius: '50%',
+          position: 'absolute', borderRadius: '50%',
           border: `1px solid ${r < 1 ? GREEN + '22' : GREEN + '44'}`,
-          width:  `${r * 100}%`,
-          height: `${r * 100}%`,
+          width: `${r * 100}%`, height: `${r * 100}%`,
           top: '50%', left: '50%',
-          transform: 'translate(-50%, -50%)',
-          pointerEvents: 'none',
+          transform: 'translate(-50%, -50%)', pointerEvents: 'none',
         }} />
       ))}
 
-      {/* ── 十字線 ── */}
-      <div style={{
-        position: 'absolute', top: 0, bottom: 0, left: '50%', width: 1,
-        background: `${GREEN}1a`, transform: 'translateX(-50%)', pointerEvents: 'none',
-      }} />
-      <div style={{
-        position: 'absolute', left: 0, right: 0, top: '50%', height: 1,
-        background: `${GREEN}1a`, transform: 'translateY(-50%)', pointerEvents: 'none',
-      }} />
+      {/* 十字線 */}
+      <div style={{ position: 'absolute', top: 0, bottom: 0, left: '50%', width: 1, background: `${GREEN}1a`, transform: 'translateX(-50%)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', left: 0, right: 0, top: '50%', height: 1, background: `${GREEN}1a`, transform: 'translateY(-50%)', pointerEvents: 'none' }} />
 
-      {/* ── 斜め補助線 ── */}
+      {/* 斜め補助線 */}
       {[45, 135].map(deg => (
         <div key={deg} style={{
           position: 'absolute', top: '50%', left: '50%',
-          width: RADAR_PX * 1.42, height: 1,
-          background: `${GREEN}0d`,
-          transform: `translate(-50%, -50%) rotate(${deg}deg)`,
-          pointerEvents: 'none',
+          width: RADAR_PX * 1.42, height: 1, background: `${GREEN}0d`,
+          transform: `translate(-50%, -50%) rotate(${deg}deg)`, pointerEvents: 'none',
         }} />
       ))}
 
-      {/* ── スキャンラインオーバーレイ（CRT感） ── */}
+      {/* CRTスキャンライン */}
       <div style={{
         position: 'absolute', inset: 0, borderRadius: '50%',
         backgroundImage: `repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(0,0,0,0.07) 3px, rgba(0,0,0,0.07) 4px)`,
         pointerEvents: 'none', zIndex: 5,
       }} />
 
-      {/* ── スイープアーム（コニックグラデーション回転）── */}
+      {/* スイープアーム */}
       <div style={{
         position: 'absolute', inset: 0, borderRadius: '50%',
         background: `conic-gradient(
@@ -450,7 +507,7 @@ function RadarCircle({ blips }) {
         zIndex: 3,
       }} />
 
-      {/* ── 施設ブリップ（方位・距離から位置計算）── */}
+      {/* 施設ブリップ（結果件数分だけ表示） */}
       {blips.map((o, i) => {
         if (o.lat == null || o.lng == null) return null;
         const toRad = d => d * Math.PI / 180;
@@ -460,38 +517,39 @@ function RadarCircle({ blips }) {
         const cx    = RADAR_R + bx;
         const cy    = RADAR_R + by;
         const delay = i * STAGGER_MS;
+        const isTop = i === 0;
 
         return (
           <div key={o.id} style={{
             position: 'absolute',
             left: cx, top: cy,
-            width: 7, height: 7,
+            width: isTop ? 9 : 7,
+            height: isTop ? 9 : 7,
             borderRadius: '50%',
-            background: i === 0 ? '#ffffff' : GREEN,
+            background: isTop ? '#ffffff' : GREEN,
             transform: 'translate(-50%, -50%) scale(0)',
             animation: [
               `blip-appear 0.45s ease-out ${delay}ms forwards`,
               `blip-glow   2.0s ease-in-out ${delay + 450}ms infinite`,
             ].join(', '),
             zIndex: 10,
-            boxShadow: i === 0
-              ? `0 0 6px 2px #ffffff88, 0 0 12px ${GREEN}aa`
+            boxShadow: isTop
+              ? `0 0 8px 3px #ffffff88, 0 0 14px ${GREEN}aa`
               : undefined,
           }} />
         );
       })}
 
-      {/* ── 中心点（現在地）── */}
+      {/* 中心点（現在地） */}
       <div style={{
         position: 'absolute', left: '50%', top: '50%',
-        width: 7, height: 7, borderRadius: '50%',
-        background: '#ffffff',
+        width: 7, height: 7, borderRadius: '50%', background: '#ffffff',
         transform: 'translate(-50%, -50%)',
         animation: 'center-pulse 2.2s ease-in-out infinite',
         zIndex: 20,
       }} />
 
-      {/* ── 光沢オーバーレイ ── */}
+      {/* 光沢 */}
       <div style={{
         position: 'absolute', inset: 0, borderRadius: '50%',
         background: 'radial-gradient(ellipse 60% 40% at 35% 25%, rgba(0,255,100,0.06) 0%, transparent 70%)',
@@ -502,7 +560,7 @@ function RadarCircle({ blips }) {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// OfficeList / OfficeCard — 施設一覧
+// OfficeList / OfficeCard
 // ─────────────────────────────────────────────────────────────────
 function OfficeList({ offices, primary }) {
   if (offices.length === 0) {
@@ -514,7 +572,7 @@ function OfficeList({ offices, primary }) {
   }
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 2, letterSpacing: 0.2 }}>
+      <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 2 }}>
         現在地から近い順 · {offices.length} 件
       </div>
       {offices.map((o, i) => (
@@ -532,9 +590,11 @@ function OfficeCard({ office, rank, primary }) {
     ? `${Math.round(office.dist * 1000)} m`
     : `${office.dist.toFixed(1)} km`;
 
-  const mapsUrl = (office.lat && office.lng)
+  const mapsUrl = (office.lat && office.lng && !office.latApprox)
     ? `https://maps.google.com/maps?q=${office.lat},${office.lng}&z=16`
-    : `https://maps.google.com/maps?q=${encodeURIComponent(office.address ?? office.name)}`;
+    : office.address
+      ? `https://maps.google.com/maps?q=${encodeURIComponent(office.address)}`
+      : `https://maps.google.com/maps?q=${encodeURIComponent(office.name)}`;
 
   return (
     <div style={{
@@ -543,7 +603,6 @@ function OfficeCard({ office, rank, primary }) {
       borderRadius: 12, padding: '12px 14px',
       boxShadow: isTop ? `0 2px 12px ${primary}16` : 'none',
     }}>
-
       {/* 種別バッジ・名称・距離 */}
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
         <div style={{
@@ -567,11 +626,29 @@ function OfficeCard({ office, rank, primary }) {
       {/* 住所 */}
       {office.address && (
         <div style={{
-          marginTop: 6, fontSize: 11, color: 'var(--text-muted)',
-          lineHeight: 1.5, display: 'flex', alignItems: 'flex-start', gap: 4,
+          marginTop: 6, fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5,
+          display: 'flex', alignItems: 'flex-start', gap: 4,
         }}>
           {ICO.pin('var(--text-muted)', 11)}
-          <span style={{ flex: 1 }}>{office.address}</span>
+          <span style={{ flex: 1 }}>
+            {office.address}
+            {office.latApprox && (
+              <span style={{ marginLeft: 4, color: 'var(--text-muted)', opacity: 0.7, fontSize: 10 }}>
+                （概算位置）
+              </span>
+            )}
+          </span>
+        </div>
+      )}
+
+      {/* 管轄地域 */}
+      {office.area && (
+        <div style={{
+          marginTop: 4, fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.5,
+          padding: '3px 6px', borderRadius: 4, background: 'var(--bg)',
+          display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+        }}>
+          📍 担当: {office.area}
         </div>
       )}
 
@@ -619,9 +696,7 @@ function DeniedView({ onRetry, primary }) {
         位置情報の使用が拒否されました
       </div>
       <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.8, marginBottom: 24 }}>
-        設定アプリからブラウザの<br />
-        位置情報アクセスを許可してから<br />
-        再度お試しください
+        設定アプリからブラウザの<br />位置情報アクセスを許可してから<br />再度お試しください
       </div>
       <button onClick={onRetry} style={retryBtnStyle(primary)}>
         {ICO.refresh('#fff', 14)} 再試行
@@ -637,9 +712,7 @@ function ErrorView({ msg, onRetry, primary }) {
       <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)', marginBottom: 8 }}>
         エラーが発生しました
       </div>
-      <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 24 }}>
-        {msg}
-      </div>
+      <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 24 }}>{msg}</div>
       <button onClick={onRetry} style={retryBtnStyle(primary)}>
         {ICO.refresh('#fff', 14)} 再試行
       </button>
@@ -650,8 +723,8 @@ function ErrorView({ msg, onRetry, primary }) {
 function retryBtnStyle(primary) {
   return {
     padding: '10px 28px', borderRadius: 10, border: 'none',
-    background: primary, color: '#fff',
-    fontSize: 14, fontWeight: 600, fontFamily: F.sans, cursor: 'pointer',
+    background: primary, color: '#fff', fontSize: 14, fontWeight: 600,
+    fontFamily: F.sans, cursor: 'pointer',
     display: 'inline-flex', alignItems: 'center', gap: 7,
   };
 }
