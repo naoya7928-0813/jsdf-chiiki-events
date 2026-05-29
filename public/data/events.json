@@ -1817,11 +1817,27 @@
   ],
   "mie": [
     {
+      "id": "mi-20260607-1",
+      "pref": "mie",
+      "date": "2026-06-07",
+      "weekday": "日",
+      "title": "航空自衛隊 小牧基地見学",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "体験",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/mie/post-9203/",
+      "notes": "※日付は申込期限。実施日は公式サイトをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
       "id": "mi-20260614-2",
       "pref": "mie",
       "date": "2026-06-14",
       "weekday": "日",
-      "title": "NEW6/14&7/11 自衛隊フリースペースイベント",
+      "title": "6/14&7/11 自衛隊フリースペースイベント",
       "place": "",
       "address": "",
       "time": "",
@@ -1831,13 +1847,110 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null
+    },
+    {
+      "id": "mi-20260704-3",
+      "pref": "mie",
+      "date": "2026-07-04",
+      "weekday": "土",
+      "title": "公安系公務員合同説明会",
+      "place": "",
+      "address": "",
+      "time": "13:00～16:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/mie/post-9182/",
+      "notes": "※日付は申込期限。実施日は公式サイトをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null
     }
   ],
   "shiga": [],
   "kyoto": [],
   "osaka": [],
   "hyogo": [],
-  "nara": [],
+  "nara": [
+    {
+      "id": "na-20260529-5",
+      "pref": "nara",
+      "date": "2026-05-29",
+      "weekday": "金",
+      "title": "防大・防医大 進学説明会",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/nara/post-16010/",
+      "notes": "",
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "na-20260607-4",
+      "pref": "nara",
+      "date": "2026-06-07",
+      "weekday": "日",
+      "title": "第41回自衛隊奈良定期演奏会",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "演奏会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/nara/post-16022/",
+      "notes": "",
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "na-20260705-1",
+      "pref": "nara",
+      "date": "2026-07-05",
+      "weekday": "日",
+      "title": "女性 Only イベント in CAMP YAO",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/nara/post-16277/",
+      "notes": "",
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "na-20260717-3",
+      "pref": "nara",
+      "date": "2026-07-17",
+      "weekday": "金",
+      "title": "公務員合同職業説明会 in 大和八木",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/nara/post-16121/",
+      "notes": "",
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "na-20260724-2",
+      "pref": "nara",
+      "date": "2026-07-24",
+      "weekday": "金",
+      "title": "公務員合同職業説明会 in 大和西大寺",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/nara/post-16137/",
+      "notes": "",
+      "ageRequirement": null,
+      "deadline": null
+    }
+  ],
   "wakayama": [],
   "ehime": [
     {
@@ -2281,5 +2394,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/05/29 20:06"
+  "updatedAt": "2026/05/29 20:27"
 }
