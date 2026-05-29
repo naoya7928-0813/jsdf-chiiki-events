@@ -108,7 +108,12 @@ class SonarAudio {
     return this._ctx;
   }
 
-  /** 単一ping（正弦波＋指数的フェードアウト） */
+  /**
+   * 純粋なソナーping（潜水艦ソナー音）
+   * - 正弦波のみ（ハーモニクスなし）
+   * - 瞬時立ち上がり → 長いフェードアウト
+   * - ごく微妙な周波数降下（-8%）でリアルなping感
+   */
   _ping(freq, dur, vol, delay = 0) {
     try {
       const ctx  = this._ctx_();
@@ -118,32 +123,32 @@ class SonarAudio {
       gain.connect(ctx.destination);
       osc.type = 'sine';
       const t = ctx.currentTime + delay;
+      // 周波数: ごくわずかな下降のみ（-8%、半音以下）
       osc.frequency.setValueAtTime(freq, t);
-      osc.frequency.exponentialRampToValueAtTime(freq * 0.58, t + dur * 0.4);
-      gain.gain.setValueAtTime(vol, t);
+      osc.frequency.linearRampToValueAtTime(freq * 0.92, t + dur * 0.6);
+      // ゲイン: 極短アタック → 緩やかな指数的フェードアウト
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(vol, t + 0.004);
       gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
       osc.start(t);
       osc.stop(t + dur + 0.05);
     } catch { /* AudioContext がない環境では無視 */ }
   }
 
-  /** スイープ音: メインping + エコー2回 */
+  /** スイープ音: レーダーアームが1周するたびに鳴る純粋なping */
   sweep() {
-    this._ping(1100, 1.0, 0.14);
-    this._ping(900,  0.75, 0.065, 0.65);
-    this._ping(760,  0.55, 0.032, 1.30);
+    this._ping(820, 2.8, 0.14);
   }
 
-  /** ブリップ検出音（各施設ヒット時） */
+  /** ブリップ検出音: アームが施設ブリップを通過した瞬間 */
   blip(delayMs = 0) {
-    this._ping(1900, 0.22, 0.09, delayMs / 1000);
+    this._ping(980, 1.4, 0.09, delayMs / 1000);
   }
 
-  /** ロックオン音（found 遷移時） */
+  /** ロックオン音（found 遷移時）: 2音の確認ping */
   lockOn() {
-    this._ping(1500, 0.12, 0.11);
-    this._ping(1900, 0.12, 0.11, 0.13);
-    this._ping(2400, 0.35, 0.09, 0.26);
+    this._ping(820, 2.0, 0.13);
+    this._ping(1050, 1.6, 0.10, 0.35);
   }
 
   destroy() {
