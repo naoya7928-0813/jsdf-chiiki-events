@@ -140,17 +140,6 @@ class SonarAudio {
     this._ping(820, 2.8, 0.14);
   }
 
-  /** ブリップ検出音: アームが施設ブリップを通過した瞬間 */
-  blip(delayMs = 0) {
-    this._ping(980, 1.4, 0.09, delayMs / 1000);
-  }
-
-  /** ロックオン音（found 遷移時）: 2音の確認ping */
-  lockOn() {
-    this._ping(820, 2.0, 0.13);
-    this._ping(1050, 1.6, 0.10, 0.35);
-  }
-
   destroy() {
     try { if (this._ctx) { this._ctx.close(); this._ctx = null; } } catch {}
   }
@@ -242,16 +231,7 @@ export default function NearbyOfficesModal({ isOpen, onClose, theme }) {
         setNearby(sorted);
         setPhase('dramatic');
 
-        // ブリップ音: 件数分だけ時差再生
-        sorted.forEach((_, i) => {
-          audioRef.current?.blip(i * STAGGER_MS);
-        });
-
-        // ロックオン音 (ブリップ完了後)
-        const lockDelay = sorted.length * STAGGER_MS + 300;
-        setTimeout(() => {
-          if (!abortRef.current) audioRef.current?.lockOn();
-        }, lockDelay);
+        // ヒット音・ロックオン音なし（スイープ音のみ）
 
         // found 遷移タイマー
         clearTimeout(timerRef.current);
