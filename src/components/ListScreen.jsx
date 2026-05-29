@@ -5,11 +5,27 @@ import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, matchesTag, APPLIED_T
 import { daysUntil, deadlineDaysUntil, daysLabel, daysColor } from '../utils/date';
 import { REGIONS, SUPPORTED_PREFECTURES, PREFECTURE_INFO } from '../data/regionMap';
 
-const ALL_TAB = { id: 'all', label: '全国', emblem: '全' };
-const ALL_PREF_TABS = [
-  ALL_TAB,
-  ...REGIONS.flatMap(r => r.prefectures.filter(p => SUPPORTED_PREFECTURES.has(p.id))),
+// ── 地方タブ（第1段）─────────────────────────────────────────
+const REGION_TABS = [
+  { id: 'all',      label: '全国',  short: '全' },
+  { id: 'hokkaido', label: '北海道', short: '道' },
+  { id: 'tohoku',   label: '東北',  short: '東' },
+  { id: 'kanto',    label: '関東',  short: '関' },
+  { id: 'chubu',    label: '中部',  short: '中' },
+  { id: 'kinki',    label: '近畿',  short: '近' },
+  { id: 'chugoku',  label: '中国',  short: '国' },
+  { id: 'shikoku',  label: '四国',  short: '四' },
+  { id: 'kyushu',   label: '九州',  short: '九' },
 ];
+
+// region prop から activeRegionId / activePrefId を導出するヘルパー
+function deriveRegionAndPref(region) {
+  if (region === 'all') return { regionId: 'all', prefId: 'all' };
+  if (REGIONS.find(r => r.id === region)) return { regionId: region, prefId: 'all' };
+  const info = PREFECTURE_INFO[region];
+  if (info) return { regionId: info.region, prefId: region };
+  return { regionId: 'all', prefId: 'all' };
+}
 
 export default function ListScreen({
   events, loading, error, updatedAt, checkedAt, onRefresh,
@@ -18,31 +34,86 @@ export default function ListScreen({
   onOpenHome, onOpenDetail, onOpenSettings, onOpenFavorites,
   theme,
 }) {
+  // region prop から2段タブの状態を導出
+  const { regionId: activeRegionId, prefId: activePrefId } = deriveRegionAndPref(region);
+
+  // アクティブ地方の都道府県タブ一覧
+  const prefTabs = useMemo(() => {
+    if (activeRegionId === 'all') return [];
+    return (REGIONS.find(r => r.id === activeRegionId)?.prefectures ?? [])
+      .filter(p => SUPPORTED_PREFECTURES.has(p.id));
+  }, [activeRegionId]);
+
+  // 地方別イベント数（第1段タブのバッジ用）
+  const regionCounts = useMemo(() => {
+    const counts = {};
+    counts['all'] = Object.entries(events)
+      .filter(([k]) => SUPPORTED_PREFECTURES.has(k))
+      .reduce((s, [, evs]) => s + (Array.isArray(evs) ? evs.length : 0), 0);
+    for (const r of REGIONS) {
+      counts[r.id] = r.prefectures
+        .filter(p => SUPPORTED_PREFECTURES.has(p.id))
+        .reduce((s, p) => s + (Array.isArray(events[p.id]) ? events[p.id].length : 0), 0);
+    }
+    return counts;
+  }, [events]);
+
   const list = useMemo(() => {
     if (region === 'all') {
       return Object.entries(events)
         .filter(([key]) => SUPPORTED_PREFECTURES.has(key))
         .flatMap(([, evs]) => Array.isArray(evs) ? evs : []);
     }
+    // 地方レベル選択（region = region ID）
+    const regionData = REGIONS.find(r => r.id === region);
+    if (regionData) {
+      const prefIds = new Set(regionData.prefectures.filter(p => SUPPORTED_PREFECTURES.has(p.id)).map(p => p.id));
+      return Object.entries(events)
+        .filter(([k]) => prefIds.has(k))
+        .flatMap(([, evs]) => Array.isArray(evs) ? evs : []);
+    }
+    // 都道府県レベル選択
     return events[region] ?? [];
   }, [region, events]);
 
-  // アクティブなタブを横スクロールでセンタリング（垂直方向には影響させない）
-  const tabScrollRef = useRef(null);
-  const activeTabRef = useRef(null);
+  // 第1段（地方）タブ横スクロール
+  const regionTabScrollRef = useRef(null);
+  const activeRegionTabRef = useRef(null);
   useEffect(() => {
-    const container = tabScrollRef.current;
-    const btn       = activeTabRef.current;
-    if (!container || !btn) return;
-    const target = btn.offsetLeft - container.clientWidth / 2 + btn.offsetWidth / 2;
-    container.scrollLeft = Math.max(0, target);
-  }, [region]);
+    const c = regionTabScrollRef.current, b = activeRegionTabRef.current;
+    if (!c || !b) return;
+    c.scrollLeft = Math.max(0, b.offsetLeft - c.clientWidth / 2 + b.offsetWidth / 2);
+  }, [activeRegionId]);
+
+  // 第2段（都道府県）タブ横スクロール
+  const prefTabScrollRef = useRef(null);
+  const activePrefTabRef = useRef(null);
+  useEffect(() => {
+    const c = prefTabScrollRef.current, b = activePrefTabRef.current;
+    if (!c || !b) return;
+    c.scrollLeft = Math.max(0, b.offsetLeft - c.clientWidth / 2 + b.offsetWidth / 2);
+  }, [activePrefId]);
+
+  // タブ切り替え時にリストを先頭へ
+  const tabScrollRef    = useRef(null);  // 後方互換のため残す（listScrollRef の別名）
+  const activeTabRef    = useRef(null);
 
   // タブ切り替え時にイベントリストを先頭へスクロール
   const listScrollRef = useRef(null);
   useEffect(() => {
     if (listScrollRef.current) listScrollRef.current.scrollTop = 0;
   }, [region]);
+
+  // 地方タブクリック時の処理
+  const handleRegionClick = (rId) => {
+    onRegionChange(rId);
+    setActiveCategory('all'); setActiveTag('all'); setActivePeriod('all'); setSearchQuery('');
+  };
+  // 都道府県タブクリック時の処理（地方IDまたは都道府県ID）
+  const handlePrefClick = (pId) => {
+    onRegionChange(pId);
+    setActiveCategory('all'); setActiveTag('all'); setActivePeriod('all'); setSearchQuery('');
+  };
 
   // ── 検索 ─────────────────────────────────────────────────
   const [isSearching, setIsSearching] = useState(false);
@@ -235,40 +306,99 @@ export default function ListScreen({
           </div>
         </div>
 
-        {/* 地本タブ（全地本・横スクロール） */}
-        <div ref={tabScrollRef} style={{
-          display: 'flex', overflowX: 'auto', gap: 4, padding: '0 16px',
+        {/* ── 第1段: 地方タブ ── */}
+        <div ref={regionTabScrollRef} style={{
+          display: 'flex', overflowX: 'auto', gap: 4, padding: '0 16px 6px',
           scrollbarWidth: 'none', msOverflowStyle: 'none',
           WebkitOverflowScrolling: 'touch',
         }}
           onWheel={e => { if (e.deltaY !== 0) { e.preventDefault(); e.currentTarget.scrollLeft += e.deltaY; } }}
         >
-          {ALL_PREF_TABS.map(t => {
-            const isA = region === t.id;
-            const count = t.id === 'all'
-              ? Object.entries(events).filter(([key]) => SUPPORTED_PREFECTURES.has(key)).reduce((s, [, evs]) => s + (Array.isArray(evs) ? evs.length : 0), 0)
-              : (events[t.id] ?? []).length;
+          {REGION_TABS.map(rt => {
+            const isA = activeRegionId === rt.id;
+            const cnt = regionCounts[rt.id] ?? 0;
             return (
               <button
-                key={t.id}
-                ref={isA ? activeTabRef : null}
-                onClick={() => { onRegionChange(t.id); setActiveCategory('all'); setActiveTag('all'); setActivePeriod('all'); setSearchQuery(''); }}
+                key={rt.id}
+                ref={isA ? activeRegionTabRef : null}
+                onClick={() => handleRegionClick(rt.id)}
                 style={{
-                  flexShrink: 0, border: 'none', cursor: 'pointer', borderRadius: 8,
-                  background: isA ? '#fff' : 'rgba(255,255,255,0.08)',
-                  color: isA ? primary : 'rgba(255,255,255,0.75)',
-                  padding: '8px 10px', minWidth: 56,
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-                  boxShadow: isA ? '0 1px 3px rgba(0,0,0,0.12)' : 'none',
+                  flexShrink: 0, border: 'none', cursor: 'pointer', borderRadius: 20,
+                  background: isA ? '#fff' : 'rgba(255,255,255,0.1)',
+                  color: isA ? primary : 'rgba(255,255,255,0.82)',
+                  padding: '6px 12px',
+                  display: 'flex', alignItems: 'center', gap: 5,
+                  boxShadow: isA ? '0 1px 4px rgba(0,0,0,0.15)' : 'none',
+                  transition: 'background 0.15s',
                 }}
               >
-                <Emblem ch={t.emblem} size={16} primary={isA ? primary : '#fff'} />
-                <span style={{ fontSize: 11, fontWeight: isA ? 700 : 500, letterSpacing: 0.5 }}>{t.label}</span>
-                <span style={{ fontSize: 9, fontFamily: F.mono, opacity: 0.8 }}>{count}件</span>
+                <span style={{ fontSize: 12, fontWeight: isA ? 700 : 500, letterSpacing: 0.5, whiteSpace: 'nowrap' }}>
+                  {rt.label}
+                </span>
+                <span style={{ fontSize: 10, fontFamily: F.mono, opacity: 0.75 }}>{cnt}</span>
               </button>
             );
           })}
         </div>
+
+        {/* ── 第2段: 都道府県タブ（地方選択時のみ表示） ── */}
+        {activeRegionId !== 'all' && prefTabs.length > 0 && (
+          <div ref={prefTabScrollRef} style={{
+            display: 'flex', overflowX: 'auto', gap: 3, padding: '4px 16px 8px',
+            scrollbarWidth: 'none', msOverflowStyle: 'none',
+            WebkitOverflowScrolling: 'touch',
+            borderTop: '1px solid rgba(255,255,255,0.12)',
+          }}
+            onWheel={e => { if (e.deltaY !== 0) { e.preventDefault(); e.currentTarget.scrollLeft += e.deltaY; } }}
+          >
+            {/* 全地域ボタン */}
+            {(() => {
+              const isA = activePrefId === 'all';
+              const cnt = regionCounts[activeRegionId] ?? 0;
+              return (
+                <button
+                  ref={isA ? activePrefTabRef : null}
+                  onClick={() => handlePrefClick(activeRegionId)}
+                  style={{
+                    flexShrink: 0, border: 'none', cursor: 'pointer', borderRadius: 6,
+                    background: isA ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.08)',
+                    color: isA ? primary : 'rgba(255,255,255,0.7)',
+                    padding: '5px 9px', minWidth: 44,
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
+                    boxShadow: isA ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                  }}
+                >
+                  <span style={{ fontSize: 10, fontWeight: isA ? 700 : 500 }}>全地域</span>
+                  <span style={{ fontSize: 9, fontFamily: F.mono, opacity: 0.75 }}>{cnt}件</span>
+                </button>
+              );
+            })()}
+            {/* 個別都道府県 */}
+            {prefTabs.map(p => {
+              const isA = activePrefId === p.id;
+              const cnt = (events[p.id] ?? []).length;
+              return (
+                <button
+                  key={p.id}
+                  ref={isA ? activePrefTabRef : null}
+                  onClick={() => handlePrefClick(p.id)}
+                  style={{
+                    flexShrink: 0, border: 'none', cursor: 'pointer', borderRadius: 6,
+                    background: isA ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.08)',
+                    color: isA ? primary : 'rgba(255,255,255,0.7)',
+                    padding: '5px 9px', minWidth: 44,
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
+                    boxShadow: isA ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                  }}
+                >
+                  <Emblem ch={p.emblem} size={14} primary={isA ? primary : 'rgba(255,255,255,0.6)'} />
+                  <span style={{ fontSize: 10, fontWeight: isA ? 700 : 500, whiteSpace: 'nowrap' }}>{p.label}</span>
+                  <span style={{ fontSize: 9, fontFamily: F.mono, opacity: 0.75 }}>{cnt}件</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {/* 検索バー（isSearching のときのみ表示） */}
         {isSearching && (
@@ -470,8 +600,8 @@ export default function ListScreen({
                                 {daysLabel(eventDays, 'event')}
                               </span>
                             )}
-                            {/* 全国タブのみ：掲載元の地本名を小さく表示（住所・電話番号等の詳細は詳細画面に集約） */}
-                            {region === 'all' && ev.pref && (
+                            {/* 全国・地方タブ時：掲載元の地本名を小さく表示 */}
+                            {activePrefId === 'all' && ev.pref && (
                               <span style={{
                                 fontSize: 10, color: 'var(--text-muted)', fontFamily: F.mono,
                                 marginLeft: 'auto', flexShrink: 0,
