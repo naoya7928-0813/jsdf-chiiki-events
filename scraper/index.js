@@ -949,7 +949,8 @@ function mergeOcr(ev, ocr) {
   const ocrUrl = (!ev.url && ocr.url && ocr.url.startsWith('http')) ? ocr.url.trim() : ev.url;
   return {
     ...ev,
-    title:          (ocr.title          && fixOcrTitle(ocr.title.trim())) || ev.title,
+    // HTMLパース済みタイトルを優先し、OCRタイトルは未取得時のみ補完
+    title:          ev.title || (ocr.title && fixOcrTitle(ocr.title.trim())) || '',
     time:           (ocr.time           && ocr.time.trim())           || ev.time  || '',
     ageRequirement: (ocr.ageRequirement && ocr.ageRequirement.trim()) || ev.ageRequirement || null,
     deadline:       (ocr.deadline       && ocr.deadline.trim())       || ev.deadline       || null,
