@@ -16,6 +16,7 @@ require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 
 const path    = require('path');
 const fs      = require('fs');
+const crypto  = require('crypto');
 const iconv   = require('iconv-lite');
 const cheerio = require('cheerio');
 
@@ -166,11 +167,27 @@ try {
   // ファイルが存在しない場合は空キャッシュで開始
 }
 
-/** OCRキャッシュをファイルに書き出す（スクレイプ完了時に呼ぶ） */
+/**
+ * OCRキャッシュをファイルに書き出す（スクレイプ完了時に呼ぶ）。
+ * URL キー形式の古いエントリを除去し、ハッシュキー形式に統一する。
+ * 90日以上古いエントリも除去する。
+ */
 function saveOcrCache() {
+  const TTL_DAYS = 90;
+  const cutoff   = Date.now() - TTL_DAYS * 86_400_000;
+
+  // URLキー（古い形式）を除去 — ハッシュは64桁の16進数
+  const cleaned = {};
+  for (const [k, v] of Object.entries(ocrCache)) {
+    const isHash = /^[0-9a-f]{64}$/.test(k);
+    if (!isHash) continue;                                     // URL形式を除外
+    if (v.cachedAt && new Date(v.cachedAt).getTime() < cutoff) continue; // TTL超過
+    cleaned[k] = v;
+  }
+
   try {
-    fs.writeFileSync(OCR_CACHE_PATH, JSON.stringify(ocrCache, null, 2), 'utf8');
-    console.log(`[OCR Cache] ${Object.keys(ocrCache).length} 件を保存`);
+    fs.writeFileSync(OCR_CACHE_PATH, JSON.stringify(cleaned, null, 2), 'utf8');
+    console.log(`[OCR Cache] ${Object.keys(cleaned).length} 件を保存 (クリーンアップ後)`);
   } catch (err) {
     console.warn(`[OCR Cache] 保存失敗: ${err.message}`);
   }
@@ -248,6 +265,181 @@ const MOCK_DATA = {
   kagoshima: [],
   okinawa:   [],
 };
+
+// ── OCR パイプライン共通ユーティリティ ─────────────────────────
+
+/** ファイルバッファの SHA-256 ハッシュを返す（OCRキャッシュのキーに使用） */
+function hashBuffer(buf) {
+  return crypto.createHash('sha256').update(buf).digest('hex');
+}
+
+/**
+ * URL からファイルをダウンロードしてバッファ・ハッシュ・MIMEを返す。
+ * @returns {{ buf: Buffer, hash: string, mime: string }|null}
+ */
+async function downloadFile(url) {
+  try {
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Referer':    'https://www.mod.go.jp/',
+      },
+    });
+    if (!res.ok) { console.warn(`[DL] ${res.status}: ${url}`); return null; }
+    const buf  = Buffer.from(await res.arrayBuffer());
+    const hash = hashBuffer(buf);
+    const mime = (res.headers.get('content-type') || 'application/octet-stream').split(';')[0].trim();
+    return { buf, hash, mime };
+  } catch (err) {
+    console.warn(`[DL] ${url} → ${err.message}`);
+    return null;
+  }
+}
+
+// ── PDF テキスト直接抽出 ─────────────────────────────────────────
+// 官公庁PDFはテキストレイヤーを持つことが多い。
+// 十分なテキストが取れれば OCR API を呼ばずに済む。
+
+let pdfParseLib = null;
+function getPdfParse() {
+  if (!pdfParseLib) {
+    try { pdfParseLib = require('pdf-parse'); } catch { /* ライブラリ未インストール */ }
+  }
+  return pdfParseLib;
+}
+
+/**
+ * PDF バッファから日本語テキストを抽出する。
+ * @returns {string|null} 抽出テキスト（日本語文字が20字未満なら null）
+ */
+async function extractPdfText(buf) {
+  const parse = getPdfParse();
+  if (!parse) return null;
+  try {
+    const data = await parse(buf, { max: 3 }); // 先頭3ページで十分
+    const text = (data.text || '').trim();
+    const jpCount = (text.match(/[぀-鿿＀-￯]/g) || []).length;
+    return jpCount >= 20 ? text : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * テキスト（pdf-parse / Tesseract 出力）からイベント情報を構造化抽出する。
+ *
+ * @param {string} text  - 抽出済みテキスト
+ * @param {'full'|'pdf'} mode
+ *   'full': チラシ全情報（date必須）
+ *   'pdf':  PDF系（title/place/time のみ、date は HTML 側にある）
+ * @returns {Object|null}
+ */
+function parseTextToEvent(text, mode = 'pdf') {
+  const t = toHalfWidth(text.replace(/[ \t]+/g, ' ')).trim();
+  if (!t) return null;
+
+  // 日付
+  let dateStr = null;
+  const reiwaM = t.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日・祝]+)[）)]/);
+  const gregM  = t.match(/(\d{4})年(\d+)月(\d+)日[（(]([月火水木金土日・祝]+)[）)]/);
+  if (reiwaM) {
+    dateStr = `令和${reiwaM[1]}年${reiwaM[2]}月${reiwaM[3]}日（${reiwaM[4]}）`;
+  } else if (gregM) {
+    dateStr = `${gregM[1]}年${gregM[2]}月${gregM[3]}日（${gregM[4]}）`;
+  }
+  if (mode === 'full' && !dateStr) return null;
+
+  // 時刻
+  const timeM = t.match(/(\d{1,2}:\d{2}[～〜~]\d{1,2}:\d{2})/);
+
+  // 場所（ラベル付き行を優先、なければ駐屯地・基地・会館などを検索）
+  let place = null;
+  const placeM = t.match(/(?:場所|会場|開催場所|実施場所)[：: ]\s*([^\n。、]{2,30})/);
+  if (placeM) {
+    place = placeM[1].trim();
+  } else {
+    const facilityM = t.match(/([^\s]{2,20}(?:駐屯地|基地|会館|市民会館|センター|ホール|大学|高校|区役所|庁舎|事務所|公園))/);
+    if (facilityM) place = facilityM[1].trim();
+  }
+
+  // タイトル: 最初の「意味のある」日本語行（8字以上、日付行を除く）
+  let title = null;
+  for (const line of t.split(/\r?\n/)) {
+    const l = line.trim();
+    if (l.length < 6) continue;
+    if (/令和|平成|^\d{4}年|^\d+月\d+日/.test(l)) continue; // 日付行スキップ
+    if (/[぀-鿿]{4,}/.test(l)) {                     // 4字以上の日本語
+      title = l.substring(0, 60);
+      break;
+    }
+  }
+
+  // 応募資格
+  const ageM = t.match(/(?:対象|資格|応募資格|参加資格)[：: ]\s*([^\n。]{5,60})/);
+  // 締切
+  const deadM = t.match(/(?:応募締切|締切|申込締切)[：: ]\s*([^\n。]{3,30})/);
+  // 備考
+  const notesM = t.match(/(?:定員|注意事項|備考)[：: ]\s*([^\n。]{5,80})/);
+
+  const result = {
+    title:          title || null,
+    date:           dateStr,
+    place:          place || null,
+    time:           timeM ? timeM[1] : null,
+    ageRequirement: ageM  ? ageM[1].trim()  : null,
+    deadline:       deadM ? deadM[1].trim() : null,
+    notes:          notesM ? notesM[1].trim() : null,
+  };
+
+  // 有効なフィールドが1つもなければ null
+  if (!result.title && !result.date && !result.place && !result.time) return null;
+  return result;
+}
+
+// ── ローカル Tesseract OCR（画像用） ───────────────────────────
+// node-tesseract-ocr ライブラリ（オプション依存。未インストール時はスキップ）
+// GitHub Actions ubuntu-latest: tesseract-ocr-jpn を apt でインストール済みが前提
+
+let tesseractLib = null;
+let tesseractAvailable = null; // null=未チェック, true/false=チェック済み
+
+function getTesseract() {
+  if (!tesseractLib) {
+    try { tesseractLib = require('node-tesseract-ocr'); } catch { /* 未インストール */ }
+  }
+  return tesseractLib;
+}
+
+async function checkTesseractAvailable() {
+  if (tesseractAvailable !== null) return tesseractAvailable;
+  const lib = getTesseract();
+  if (!lib) { tesseractAvailable = false; return false; }
+  try {
+    // 1x1ピクセルの白PNG（最小限のテスト）
+    const tiny = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI6QAAAABJRU5ErkJggg==', 'base64');
+    await lib.recognize(tiny, { lang: 'jpn', oem: 1, psm: 6 });
+    tesseractAvailable = true;
+  } catch {
+    tesseractAvailable = false;
+  }
+  return tesseractAvailable;
+}
+
+/**
+ * Tesseract で画像バッファをOCRしてテキストを返す。
+ * 日本語文字が10字未満の場合は信頼度が低いとみなし null を返す。
+ */
+async function tryTesseractOcr(buf) {
+  if (!await checkTesseractAvailable()) return null;
+  const lib = getTesseract();
+  try {
+    const text = await lib.recognize(buf, { lang: 'jpn', oem: 1, psm: 6 });
+    const jpCount = (text.match(/[぀-鿿]/g) || []).length;
+    return jpCount >= 10 ? text : null;
+  } catch {
+    return null;
+  }
+}
 
 // ── OCR（Gemini Flash による画像・PDF解析） ────────────────────
 
@@ -395,51 +587,47 @@ const OCR_PROMPT = `この自衛隊イベントのポスター画像から情報
 }`;
 
 /**
- * ポスター画像URLを受け取り OCR して JSON を返す（キャッシュ対応）。
- * GROQ_API_KEY が設定されていれば Groq を使用、なければ Gemini にフォールバック。
- * 結果はキャッシュに保存され、次回以降は API 呼び出しをスキップする。
+ * ポスター画像URLを受け取り OCR して JSON を返す（ハッシュキャッシュ対応）。
+ * パイプライン: Tesseract（ローカル）→ Groq → Gemini
  */
 async function ocrImage(imageUrl) {
   if (!imageUrl) return null;
-  if (!process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) return null;
+  if (!process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) {
+    if (!await checkTesseractAvailable()) return null;
+  }
 
-  // キャッシュヒット → 即返す
-  if (ocrCache[imageUrl]) {
+  const dl = await downloadFile(imageUrl);
+  if (!dl) return null;
+
+  // ハッシュベースキャッシュ確認
+  if (ocrCache[dl.hash]) {
     console.log(`[OCR] キャッシュヒット: ${imageUrl.split('/').pop()}`);
-    return ocrCache[imageUrl].result;
+    return ocrCache[dl.hash].result;
   }
 
-  try {
-    const imgRes = await fetch(imageUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Referer':    'https://www.mod.go.jp/',
-      },
-    });
-    if (!imgRes.ok) {
-      console.warn(`[OCR] 画像取得失敗 (${imgRes.status}): ${imageUrl}`);
-      return null;
-    }
-    const buf      = await imgRes.arrayBuffer();
-    const base64   = Buffer.from(buf).toString('base64');
-    const mimeType = (imgRes.headers.get('content-type') || 'image/jpeg').split(';')[0].trim();
+  const base64 = dl.buf.toString('base64');
+  let result = null;
 
-    let result = null;
-    if (process.env.GROQ_API_KEY) {
-      result = await callGroqOcr(base64, mimeType, OCR_PROMPT, 'OCR');
-    }
-    if (!result && process.env.GEMINI_API_KEY) {
-      result = await callGeminiOcr([
-        { inline_data: { mime_type: mimeType, data: base64 } },
-        { text: OCR_PROMPT },
-      ], 'OCR');
-    }
-    if (result) ocrCache[imageUrl] = { cachedAt: new Date().toISOString(), result };
-    return result;
-  } catch (err) {
-    console.warn(`[OCR] ${imageUrl} → ${err.message}`);
-    return null;
+  // 1. ローカル Tesseract
+  const tessText = await tryTesseractOcr(dl.buf);
+  if (tessText) {
+    result = parseTextToEvent(tessText, 'full');
+    if (result) console.log(`[OCR] Tesseract 成功: ${imageUrl.split('/').pop()}`);
   }
+
+  // 2. Groq Vision
+  if (!result && process.env.GROQ_API_KEY) {
+    result = await callGroqOcr(base64, dl.mime, OCR_PROMPT, 'OCR');
+  }
+  // 3. Gemini Flash
+  if (!result && process.env.GEMINI_API_KEY) {
+    result = await callGeminiOcr([
+      { inline_data: { mime_type: dl.mime, data: base64 } },
+      { text: OCR_PROMPT },
+    ], 'OCR');
+  }
+  if (result) ocrCache[dl.hash] = { cachedAt: new Date().toISOString(), url: imageUrl, result };
+  return result;
 }
 
 /**
@@ -466,36 +654,41 @@ const PDF_OCR_PROMPT = `この自衛隊イベントのPDFから情報を抽出�
 }`;
 
 /**
- * PDF URL を受け取り、Gemini Flash で OCR して JSON を返す。
- * GEMINI_API_KEY が未設定の場合は null を返す（OCR スキップ）。
+ * PDF URL を受け取り OCR して JSON を返す（ハッシュキャッシュ対応）。
+ * パイプライン: PDFテキスト直接抽出 → Gemini Flash OCR
  */
 async function ocrPdf(pdfUrl) {
-  if (!process.env.GEMINI_API_KEY || !pdfUrl) return null;
+  if (!pdfUrl) return null;
 
-  try {
-    const pdfRes = await fetch(pdfUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Referer':    'https://www.mod.go.jp/',
-      },
-    });
-    if (!pdfRes.ok) {
-      console.warn(`[PDF-OCR] PDF取得失敗 (${pdfRes.status}): ${pdfUrl}`);
-      return null;
-    }
+  const dl = await downloadFile(pdfUrl);
+  if (!dl) return null;
 
-    const buf    = await pdfRes.arrayBuffer();
-    const base64 = Buffer.from(buf).toString('base64');
+  // ハッシュベースキャッシュ確認
+  if (ocrCache[dl.hash]) {
+    console.log(`[PDF-OCR] キャッシュヒット: ${pdfUrl.split('/').pop()}`);
+    return ocrCache[dl.hash].result;
+  }
 
-    return await callGeminiOcr([
+  let result = null;
+
+  // 1. PDFテキスト直接抽出（テキストレイヤー付きPDFに有効）
+  const pdfText = await extractPdfText(dl.buf);
+  if (pdfText) {
+    result = parseTextToEvent(pdfText, 'pdf');
+    if (result) console.log(`[PDF-OCR] テキスト抽出成功（API呼び出し不要）: ${pdfUrl.split('/').pop()}`);
+  }
+
+  // 2. Gemini Flash OCR（スキャンPDF用）
+  if (!result && process.env.GEMINI_API_KEY) {
+    const base64 = dl.buf.toString('base64');
+    result = await callGeminiOcr([
       { inline_data: { mime_type: 'application/pdf', data: base64 } },
       { text: PDF_OCR_PROMPT },
     ], 'PDF-OCR');
-
-  } catch (err) {
-    console.warn(`[PDF-OCR] ${pdfUrl} → ${err.message}`);
-    return null;
   }
+
+  if (result) ocrCache[dl.hash] = { cachedAt: new Date().toISOString(), url: pdfUrl, result };
+  return result;
 }
 
 /**
@@ -558,59 +751,63 @@ const FLYER_OCR_PROMPT = `この自衛隊イベントのチラシ（PDF・画像
 
 /**
  * PDF または画像 URL を受け取り、全情報（date 含む）を OCR して JSON を返す。
- * 近畿WP系地本のチラシ専用。キャッシュ対応。
- * - 画像: Groq 優先（フォールバック Gemini）
- * - PDF:  Gemini のみ（Groq は PDF 非対応）
+ * 近畿WP系地本のチラシ専用。ハッシュキャッシュ対応。
+ * パイプライン:
+ *   PDF  → テキスト直接抽出 → Gemini Flash OCR
+ *   画像 → Tesseract → Groq → Gemini
  */
 async function ocrFlyerFull(url) {
   if (!url) return null;
   const isPdf = /\.pdf(\?.*)?$/i.test(url);
-  if (isPdf && !process.env.GEMINI_API_KEY) return null;
-  if (!isPdf && !process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) return null;
 
-  // キャッシュヒット
-  if (ocrCache[url]) {
+  const dl = await downloadFile(url);
+  if (!dl) return null;
+
+  // ハッシュベースキャッシュ確認
+  if (ocrCache[dl.hash]) {
     console.log(`[チラシOCR] キャッシュヒット: ${url.split('/').pop()}`);
-    return ocrCache[url].result;
+    return ocrCache[dl.hash].result;
   }
 
-  try {
-    const res = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Referer':    'https://www.mod.go.jp/',
-      },
-    });
-    if (!res.ok) { console.warn(`[チラシOCR] 取得失敗 ${res.status}: ${url}`); return null; }
-    const buf    = await res.arrayBuffer();
-    const base64 = Buffer.from(buf).toString('base64');
-    const mime   = isPdf ? 'application/pdf' : (res.headers.get('content-type') || 'image/jpeg').split(';')[0].trim();
+  const base64 = dl.buf.toString('base64');
+  let result = null;
 
-    let result = null;
-    if (isPdf) {
-      // PDF → Gemini のみ（Groq は PDF 非対応）
+  if (isPdf) {
+    // 1a. PDF テキスト直接抽出
+    const pdfText = await extractPdfText(dl.buf);
+    if (pdfText) {
+      result = parseTextToEvent(pdfText, 'full');
+      if (result) console.log(`[チラシOCR] PDFテキスト抽出成功（API不要）: ${url.split('/').pop()}`);
+    }
+    // 1b. Gemini Flash OCR（スキャンPDF用）
+    if (!result && process.env.GEMINI_API_KEY) {
       result = await callGeminiOcr([
-        { inline_data: { mime_type: mime, data: base64 } },
+        { inline_data: { mime_type: 'application/pdf', data: base64 } },
         { text: FLYER_OCR_PROMPT },
       ], 'チラシOCR-PDF');
-    } else {
-      // 画像 → Groq 優先、フォールバック Gemini
-      if (process.env.GROQ_API_KEY) {
-        result = await callGroqOcr(base64, mime, FLYER_OCR_PROMPT, 'チラシOCR');
-      }
-      if (!result && process.env.GEMINI_API_KEY) {
-        result = await callGeminiOcr([
-          { inline_data: { mime_type: mime, data: base64 } },
-          { text: FLYER_OCR_PROMPT },
-        ], 'チラシOCR');
-      }
     }
-    if (result) ocrCache[url] = { cachedAt: new Date().toISOString(), result };
-    return result;
-  } catch (err) {
-    console.warn(`[チラシOCR] ${url} → ${err.message}`);
-    return null;
+  } else {
+    // 2a. ローカル Tesseract
+    const tessText = await tryTesseractOcr(dl.buf);
+    if (tessText) {
+      result = parseTextToEvent(tessText, 'full');
+      if (result) console.log(`[チラシOCR] Tesseract 成功: ${url.split('/').pop()}`);
+    }
+    // 2b. Groq Vision
+    if (!result && process.env.GROQ_API_KEY) {
+      result = await callGroqOcr(base64, dl.mime, FLYER_OCR_PROMPT, 'チラシOCR');
+    }
+    // 2c. Gemini Flash
+    if (!result && process.env.GEMINI_API_KEY) {
+      result = await callGeminiOcr([
+        { inline_data: { mime_type: dl.mime, data: base64 } },
+        { text: FLYER_OCR_PROMPT },
+      ], 'チラシOCR');
+    }
   }
+
+  if (result) ocrCache[dl.hash] = { cachedAt: new Date().toISOString(), url, result };
+  return result;
 }
 
 /**
@@ -700,46 +897,44 @@ const OCR_PROMPT_FULL = `この自衛隊イベントのポスター画像から�
 
 /**
  * 画像 1 枚から全イベント情報（日付・場所含む）を OCR する（栃木・富山・兵庫用）。
- * キャッシュ対応。Groq 優先、フォールバックで Gemini。
+ * ハッシュキャッシュ対応。Tesseract → Groq → Gemini の順で試みる。
  */
 async function ocrImageFull(imageUrl) {
   if (!imageUrl) return null;
-  if (!process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) return null;
 
-  // キャッシュヒット
-  if (ocrCache[imageUrl]) {
+  const dl = await downloadFile(imageUrl);
+  if (!dl) return null;
+
+  // ハッシュベースキャッシュ確認
+  if (ocrCache[dl.hash]) {
     console.log(`[OCR-FULL] キャッシュヒット: ${imageUrl.split('/').pop()}`);
-    return ocrCache[imageUrl].result;
+    return ocrCache[dl.hash].result;
   }
 
-  try {
-    const imgRes = await fetch(imageUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Referer':    'https://www.mod.go.jp/',
-      },
-    });
-    if (!imgRes.ok) { console.warn(`[OCR-FULL] 画像取得失敗 (${imgRes.status}): ${imageUrl}`); return null; }
-    const buf      = await imgRes.arrayBuffer();
-    const base64   = Buffer.from(buf).toString('base64');
-    const mimeType = (imgRes.headers.get('content-type') || 'image/jpeg').split(';')[0].trim();
+  const base64 = dl.buf.toString('base64');
+  let result = null;
 
-    let result = null;
-    if (process.env.GROQ_API_KEY) {
-      result = await callGroqOcr(base64, mimeType, OCR_PROMPT_FULL, 'OCR-FULL');
-    }
-    if (!result && process.env.GEMINI_API_KEY) {
-      result = await callGeminiOcr([
-        { inline_data: { mime_type: mimeType, data: base64 } },
-        { text: OCR_PROMPT_FULL },
-      ], 'OCR-FULL');
-    }
-    if (result) ocrCache[imageUrl] = { cachedAt: new Date().toISOString(), result };
-    return result;
-  } catch (err) {
-    console.warn(`[OCR-FULL] ${imageUrl} → ${err.message}`);
-    return null;
+  // 1. ローカル Tesseract
+  const tessText = await tryTesseractOcr(dl.buf);
+  if (tessText) {
+    result = parseTextToEvent(tessText, 'full');
+    if (result) console.log(`[OCR-FULL] Tesseract 成功: ${imageUrl.split('/').pop()}`);
   }
+
+  // 2. Groq Vision
+  if (!result && process.env.GROQ_API_KEY) {
+    result = await callGroqOcr(base64, dl.mime, OCR_PROMPT_FULL, 'OCR-FULL');
+  }
+  // 3. Gemini Flash
+  if (!result && process.env.GEMINI_API_KEY) {
+    result = await callGeminiOcr([
+      { inline_data: { mime_type: dl.mime, data: base64 } },
+      { text: OCR_PROMPT_FULL },
+    ], 'OCR-FULL');
+  }
+
+  if (result) ocrCache[dl.hash] = { cachedAt: new Date().toISOString(), url: imageUrl, result };
+  return result;
 }
 
 /**
