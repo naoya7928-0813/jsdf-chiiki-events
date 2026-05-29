@@ -170,9 +170,9 @@ export default function HomeScreen({
                     )}
                   </div>
 
-                  {/* イベントを見るボタン → 地域の最初の都道府県でイベント一覧へ */}
+                  {/* イベントを見るボタン → 地方タブ（全地域）へ */}
                   <button
-                    onClick={() => hasEvents && onOpenList(firstSupportedPref)}
+                    onClick={() => hasEvents && onOpenList(selectedRegion.id)}
                     disabled={!hasEvents}
                     style={{
                       width: '100%', height: 38, borderRadius: 10, border: 'none',
