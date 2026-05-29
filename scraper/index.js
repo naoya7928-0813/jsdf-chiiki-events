@@ -1504,6 +1504,20 @@ function extractListPageStubs($, postUrls, prefKey, idPrefix, prefLabel) {
 
     if (!rawTitle) return;  // タイトルなし → スキップ
 
+    // タイトルテキストから "6/14" "7/11" などの月/日形式の日付も抽出を試みる
+    if (!textDate) {
+      const titleWithContainer = toHalfWidth((rawTitle + ' ' + containerText).substring(0, 200));
+      // "6/14" or "6月14日" in title/anchor text
+      const slashM = titleWithContainer.match(/(\d{1,2})\/(\d{1,2})(?!\d)/);
+      if (slashM) {
+        const now = new Date();
+        const m = parseInt(slashM[1], 10), d = parseInt(slashM[2], 10);
+        if (m >= 1 && m <= 12 && d >= 1 && d <= 31) {
+          textDate = `${now.getFullYear()}-${padTwo(m)}-${padTwo(d)}`;
+        }
+      }
+    }
+
     if (!textDate) {
       // 日付が取れない → リンクスタブ（タイトル + 公式 URL のみ、日程未定）
       // CF ブロックで個別投稿を取得できない場合の最終フォールバック

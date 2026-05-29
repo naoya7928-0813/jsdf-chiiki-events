@@ -33,7 +33,8 @@ function parseNaraPost($, url, counter) {
     const label = cells.first().text().trim().replace(/\s+/g, '');
     const value = toHalfWidth(cells.eq(1).text().trim().replace(/\s+/g, ' '));
 
-    if (!dateStr && /^(日時|開催日|実施日|日程)/.test(label)) {
+    // 日時・開催日・実施日・日程に加え、申込期限もフォールバックとして使用
+    if (!dateStr && /^(日時|開催日|実施日|日程|申込期限|申込締切|開催予定日)/.test(label)) {
       const rM = value.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
       const gM = value.match(/(\d{4})年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
       const mM = value.match(/(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
