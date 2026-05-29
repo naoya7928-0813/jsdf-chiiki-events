@@ -1632,26 +1632,35 @@ async function fetchWpPosts(ctx, pref, prefKey, idPrefix, listUrl, urlsFn, postF
   const succeededUrls = new Set();
   let counter  = 0;
 
-  // listPage を各投稿 URL に直接 goto する（CF クリアランス済みブラウザセッションを再利用）
-  // - fetch() はヘッダーの差異で CF にブロックされるが、同一ページ遷移なら通過できる可能性がある
-  // - ctx.newPage() は別ページでも同コンテキストだが、遷移履歴・接続が異なり CF に検知される
-  // - スタブ対象も含め全 URL を試みる（HTML パースが成功すれば OCR より精度が高い）
+  // 個別投稿を取得する（2段階戦略）:
+  // 1st: listPage で同一タブ遷移（CF クリアランス再利用）
+  // 2nd: 新規ページで取得（1st が失敗した場合のフォールバック）
   for (const postUrl of postUrls) {
     const slug = postUrl.replace(/\/$/, '').split('/').pop();
     const hasStub = listStubUrlSet.has(postUrl);
     let html = null;
 
-    // ?_=timestamp を付加することで CF パターンマッチを回避する
-    // CF は /post-XXXX/ に対してチャレンジするが /post-XXXX/?_=NNN はマッチしない
-    // WP は未知のクエリパラメータを無視するため、コンテンツは同一
+    // 1st: listPage の同一タブで遷移（?_=timestamp でCFパターンマッチ回避）
     const fetchUrl = postUrl + (postUrl.includes('?') ? '&' : '?') + '_=' + Date.now();
     try {
       const res = await listPage.goto(fetchUrl, { waitUntil: 'commit', timeout: 10_000, referer: listUrl });
-      if (res) {
-        html = await res.text();
-      }
+      if (res) html = await res.text();
     } catch (err) {
-      console.warn(`[${pref}] ${slug} 取得失敗: ${err.message.substring(0, 40)}`);
+      console.warn(`[${pref}] ${slug} 取得失敗(tab1): ${err.message.substring(0, 40)}`);
+    }
+
+    // 2nd: 新規ページで取得（listPage が CF に再ブロックされた場合のフォールバック）
+    if (!html || html.length < 500) {
+      const freshPage = await ctx.newPage();
+      try {
+        await freshPage.goto(postUrl, { waitUntil: 'domcontentloaded', timeout: 15_000, referer: listUrl });
+        await freshPage.waitForTimeout(1500);
+        html = await freshPage.content();
+      } catch (err) {
+        // サイレントに失敗（スタブが代替）
+      } finally {
+        await freshPage.close();
+      }
     }
 
     if (!html) { await sleep(500); continue; }

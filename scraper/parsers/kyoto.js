@@ -86,47 +86,27 @@ function parseKyoto($) {
 
     // ── パターン2: 「X月 イベント情報」ヘッダーの PDF/画像形式 ───
     if (/イベント情報/.test(firstCellText)) {
-      // PDF優先（テキスト抽出 or OCR が使える）
-      const pdfLinks = [];
+      // 画像優先（Groq Vision / Tesseract が使えるため）
+      // 同じ href に PDF と PNG の両方がある場合は PNG を使う
+      const imgUrls = [];
+      $(tbl).find('img[src]').each((_, img) => {
+        const src = $(img).attr('src') || '';
+        if (/\.(jpe?g|png|gif|webp)/i.test(src)) imgUrls.push(toAbs(src));
+      });
+      const pdfUrls = [];
       $(tbl).find('a[href]').each((_, a) => {
         const href = $(a).attr('href') || '';
-        if (/\.pdf(\?.*)?$/i.test(href)) pdfLinks.push(toAbs(href));
+        if (/\.pdf(\?.*)?$/i.test(href)) pdfUrls.push(toAbs(href));
       });
 
-      if (pdfLinks.length) {
-        // 重複除去して PDF ごとにスタブを1件
-        for (const pdfUrl of [...new Set(pdfLinks)]) {
-          if (seenUrl.has(pdfUrl)) continue;
-          seenUrl.add(pdfUrl);
-          events.push({
-            id:             `ky-stub-${titleHash('', pdfUrl.split('/').pop())}`,
-            pref:           'kyoto',
-            date:           '',
-            weekday:        '',
-            title:          '京都地本イベント',
-            place:          '',
-            address:        '',
-            time:           '',
-            category:       '採用イベント',
-            tag:            '',
-            url:            SOURCE_URL,
-            notes:          null,
-            ageRequirement: null,
-            deadline:       null,
-            imageUrl:       '',
-            _flyerUrl:      pdfUrl,
-          });
-        }
-      } else {
-        // PDFがなければ画像のみ（1スタブ）
-        const img = $(tbl).find('img').first();
-        const src = img.attr('src') || '';
-        if (!src) return;
-        const imgUrl = toAbs(src);
-        if (seenUrl.has(imgUrl)) return;
-        seenUrl.add(imgUrl);
+      // 優先順: 画像 → PDF（画像があれば Groq/Tesseract で処理可能）
+      const candidates = imgUrls.length ? imgUrls : pdfUrls;
+
+      for (const flyerUrl of [...new Set(candidates)]) {
+        if (seenUrl.has(flyerUrl)) continue;
+        seenUrl.add(flyerUrl);
         events.push({
-          id:             `ky-stub-${titleHash('', imgUrl.split('/').pop())}`,
+          id:             `ky-stub-${titleHash('', flyerUrl.split('/').pop())}`,
           pref:           'kyoto',
           date:           '',
           weekday:        '',
@@ -141,7 +121,7 @@ function parseKyoto($) {
           ageRequirement: null,
           deadline:       null,
           imageUrl:       '',
-          _flyerUrl:      imgUrl,
+          _flyerUrl:      flyerUrl,
         });
       }
     }
