@@ -2689,16 +2689,33 @@ async function main() {
   mieEvents       = fallback(mieError,       '三重',   mieEvents,       'mie');
   shigaEvents     = fallback(shigaError,     '滋賀',   shigaEvents,     'shiga');
   kyotoEvents     = fallback(kyotoError,     '京都',   kyotoEvents,     'kyoto');
-  osakaEvents     = fallback(osakaError,     '大阪',   osakaEvents,     'osaka');
+  // 大阪: エラー時フォールバック＋準備中（0件）の場合も前回データを保持
+  osakaEvents = fallback(osakaError, '大阪', osakaEvents, 'osaka');
+  if (!osakaError && osakaEvents.length === 0 && (prev['osaka'] ?? []).length > 0) {
+    console.warn('[大阪] イベント0件（準備中）→ 前回データを維持');
+    osakaEvents = prev['osaka'] ?? [];
+  }
   hyogoEvents     = fallback(hyogoError,     '兵庫',   hyogoEvents,     'hyogo');
   naraEvents      = fallback(naraError,      '奈良',   naraEvents,      'nara');
   wakayamaEvents  = fallback(wakayamaError,  '和歌山', wakayamaEvents,  'wakayama');
 
-  // ── 近畿WP系地本: チラシ（PDF/画像）から日付・タイトルを OCR で補完 ──
-  mieEvents      = await enrichFromFlyer(mieEvents,      '三重');
-  shigaEvents    = await enrichFromFlyer(shigaEvents,    '滋賀');
-  naraEvents     = await enrichFromFlyer(naraEvents,     '奈良');
-  wakayamaEvents = await enrichFromFlyer(wakayamaEvents, '和歌山');
+  // ── 近畿WP系地本 + 京都: チラシ（PDF/画像）から日付・タイトルを OCR で補完 ──
+  // OCR全件失敗時は前回データを保持する（クォータ枯渇対策）
+  const enrichWithFallback = async (events, label, prevKey) => {
+    const hadStubs = events.some(e => e._flyerUrl);
+    const enriched = await enrichFromFlyer(events, label);
+    if (hadStubs && enriched.length === 0 && (prev[prevKey] ?? []).length > 0) {
+      console.warn(`[${label}] OCR全件失敗 → 前回データを維持 (${(prev[prevKey] ?? []).length}件)`);
+      return prev[prevKey] ?? [];
+    }
+    return enriched;
+  };
+
+  kyotoEvents    = await enrichWithFallback(kyotoEvents,    '京都',  'kyoto');
+  mieEvents      = await enrichWithFallback(mieEvents,      '三重',  'mie');
+  shigaEvents    = await enrichWithFallback(shigaEvents,    '滋賀',  'shiga');
+  naraEvents     = await enrichWithFallback(naraEvents,     '奈良',  'nara');
+  wakayamaEvents = await enrichWithFallback(wakayamaEvents, '和歌山','wakayama');
   ehimeEvents     = fallback(ehimeError,     '愛媛',   ehimeEvents,     'ehime');
   kagawaEvents    = fallback(kagawaError,    '香川',   kagawaEvents,    'kagawa');
   kochiEvents     = fallback(kochiError,     '高知',   kochiEvents,     'kochi');
