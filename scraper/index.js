@@ -1665,22 +1665,45 @@ async function fetchWpPosts(ctx, pref, prefKey, idPrefix, listUrl, urlsFn, postF
 
     if (!html) { await sleep(500); continue; }
 
-    try {
-      const $ = cheerio.load(html, { decodeEntities: false });
+    // CF チャレンジ判定ヘルパー
+    const checkCf = ($inner) => {
+      const bt = $inner('body').text().replace(/\s+/g, ' ').trim();
+      return bt.length < 100 || /Just a moment|Enable JavaScript and cookies|しばらくお待ちください/i.test(bt);
+    };
 
-      // CF チャレンジ判定: body が短い or CF 固有テキストを含む
+    try {
+      let $ = cheerio.load(html, { decodeEntities: false });
+
+      // 1stパスでCFブロックを検出 → 新規ページで再試行
+      if (checkCf($)) {
+        if (!hasStub) console.log(`[${pref}] ${slug} → CF検出、新規ページで再試行...`);
+        const freshPage = await ctx.newPage();
+        try {
+          await freshPage.goto(postUrl, { waitUntil: 'domcontentloaded', timeout: 20_000, referer: listUrl });
+          await freshPage.waitForTimeout(2000);
+          const freshHtml = await freshPage.content();
+          if (freshHtml && freshHtml.length > 500) {
+            const $fresh = cheerio.load(freshHtml, { decodeEntities: false });
+            if (!checkCf($fresh)) {
+              $ = $fresh;
+              html = freshHtml;
+              console.log(`[${pref}] ${slug} → 新規ページで取得成功`);
+            }
+          }
+        } catch { /* サイレントに失敗 */ } finally {
+          await freshPage.close();
+        }
+      }
+
       const bodyText = $('body').text().replace(/\s+/g, ' ').trim();
-      const isCfBlocked = bodyText.length < 100
-        || /Just a moment|Enable JavaScript and cookies|しばらくお待ちください/i.test(bodyText);
-      if (isCfBlocked) {
-        // CF ブロック: スタブなし URL のみログ（スタブ URL は後で OCR が処理する）
+      if (bodyText.length < 100 || /Just a moment|Enable JavaScript|しばらくお待ちください/i.test(bodyText)) {
         if (!hasStub) console.log(`[${pref}] ${slug} → CF ブロック (bodyLen=${bodyText.length})`);
       } else {
         const evs = postFn($, postUrl, ++counter);
         if (evs.length) {
           console.log(`[${pref}] ${slug} → ${evs[0].date} ${evs[0].title.substring(0,30)}`);
           events.push(...evs);
-          succeededUrls.add(postUrl);  // スタブ URL は OCR をスキップ
+          succeededUrls.add(postUrl);
         } else {
           if (!hasStub) console.log(`[${pref}] ${slug} → コンテンツ取得済み・0件 (bodyLen=${bodyText.length})`);
         }
