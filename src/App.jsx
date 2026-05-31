@@ -98,8 +98,12 @@ export default function App() {
     }
   }, [activePrefId, saveLastRegion]);
 
-  // ── カラーテーマ（JGSDF 固定） ───────────────────────────
-  const schemeKey = DEFAULT_SCHEME;
+  // ── カラーテーマ ──────────────────────────────────────────
+  const [schemeKey, setSchemeKey] = useState(loadScheme);
+  const handleColorChange = useCallback((key) => {
+    setSchemeKey(key);
+    try { localStorage.setItem('jsdf-scheme', key); } catch {}
+  }, []);
 
   // ── 地本設定（ListScreen 用） ─────────────────────────────
   // 起動時・画面遷移時は常に「全国」から開始（前回選択した都道府県を引き継がない）
@@ -317,6 +321,7 @@ export default function App() {
       {screen === 'settings' && (
         <SettingsScreen
           theme={theme}
+          onColorChange={handleColorChange}
           onDarkModeChange={handleDarkModeChange}
           autoMode={autoMode}
           onAutoModeChange={handleAutoModeChange}

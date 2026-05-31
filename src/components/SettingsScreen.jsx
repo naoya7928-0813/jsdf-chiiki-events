@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ICO } from './Icons';
 import { BottomTabBar, F } from './Shared';
-import { REGION_SOURCE } from '../config';
+import { COLOR_SCHEMES, REGION_SOURCE } from '../config';
 import { usePushNotification } from '../hooks/usePushNotification';
 
 // package.json の version を vite.config.js の define で埋め込んだ定数
@@ -9,12 +9,12 @@ import { usePushNotification } from '../hooks/usePushNotification';
 
 export default function SettingsScreen({
   theme,
-  onDarkModeChange,
+  onColorChange, onDarkModeChange,
   autoMode, onAutoModeChange,
   onOpenHome, onOpenRegion, onOpenList, onOpenFavorites,
   onOpenLegal,
 }) {
-  const { primary, darkMode } = theme;
+  const { primary, schemeKey, darkMode } = theme;
 
   // ── Web Push ─────────────────────────────────────────────────
   const push = usePushNotification();
@@ -133,6 +133,44 @@ export default function SettingsScreen({
             primary={primary}
             last
           />
+        </Card>
+
+        {/* ─ 2. テーマカラー ─ */}
+        <GroupTitle>テーマカラー</GroupTitle>
+        <Card>
+          <div style={{ padding: '14px' }}>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>
+              アプリの配色（3自衛隊のカラーから選択）
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {Object.entries(COLOR_SCHEMES).map(([k, v]) => {
+                const isA = schemeKey === k;
+                return (
+                  <button key={k} onClick={() => onColorChange(k)} style={{
+                    flex: 1, minHeight: 76, padding: 10,
+                    border: `1.5px solid ${isA ? v.primary : 'var(--border)'}`,
+                    background: isA ? v.primary : 'var(--card)',
+                    borderRadius: 10, cursor: 'pointer',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                    gap: 5, fontFamily: F.sans, transition: 'all 0.15s',
+                  }}>
+                    <div style={{
+                      width: 22, height: 22, borderRadius: '50%',
+                      background: v.primary,
+                      border: '2px solid #fff',
+                      boxShadow: isA ? `0 0 0 2px ${v.primary}` : `0 0 0 1.5px ${v.primary}44`,
+                    }} />
+                    <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: 0.5, color: isA ? '#fff' : 'var(--text)' }}>
+                      {v.label}
+                    </div>
+                    <div style={{ fontSize: 9, letterSpacing: 1.5, fontFamily: F.mono, color: isA ? 'rgba(255,255,255,0.75)' : 'var(--text-muted)' }}>
+                      {v.sub}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </Card>
 
         {/* ─ 4. ダークモード（3択セグメント） ─ */}
