@@ -98,12 +98,8 @@ export default function App() {
     }
   }, [activePrefId, saveLastRegion]);
 
-  // ── カラーテーマ ──────────────────────────────────────────
-  const [schemeKey, setSchemeKey] = useState(loadScheme);
-  const handleColorChange = useCallback((key) => {
-    setSchemeKey(key);
-    try { localStorage.setItem('jsdf-scheme', key); } catch {}
-  }, []);
+  // ── カラーテーマ（JGSDF 固定） ───────────────────────────
+  const schemeKey = DEFAULT_SCHEME;
 
   // ── 地本設定（ListScreen 用） ─────────────────────────────
   // 起動時・画面遷移時は常に「全国」から開始（前回選択した都道府県を引き継がない）
@@ -141,12 +137,6 @@ export default function App() {
   // ── テーマオブジェクト ────────────────────────────────────
   const scheme = COLOR_SCHEMES[schemeKey] ?? COLOR_SCHEMES[DEFAULT_SCHEME];
   const theme  = { ...scheme, schemeKey, darkMode };
-
-  // ホーム画面アイコンをスキームに合わせて切替（Safari で「ホーム画面に追加」前に選択しておく用）
-  useEffect(() => {
-    const link = document.querySelector('link[rel="apple-touch-icon"]');
-    if (link) link.href = `/icons/apple-touch-icon-${schemeKey}.png?v=${Date.now()}`;
-  }, [schemeKey]);
 
   // Safari のステータスバー theme-color をテーマに合わせて更新
   useEffect(() => {
@@ -327,7 +317,6 @@ export default function App() {
       {screen === 'settings' && (
         <SettingsScreen
           theme={theme}
-          onColorChange={handleColorChange}
           onDarkModeChange={handleDarkModeChange}
           autoMode={autoMode}
           onAutoModeChange={handleAutoModeChange}

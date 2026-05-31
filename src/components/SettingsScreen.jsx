@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ICO } from './Icons';
 import { BottomTabBar, F } from './Shared';
-import { COLOR_SCHEMES, REGION_SOURCE } from '../config';
+import { REGION_SOURCE } from '../config';
 import { usePushNotification } from '../hooks/usePushNotification';
 
 // package.json の version を vite.config.js の define で埋め込んだ定数
@@ -9,12 +9,12 @@ import { usePushNotification } from '../hooks/usePushNotification';
 
 export default function SettingsScreen({
   theme,
-  onColorChange, onDarkModeChange,
+  onDarkModeChange,
   autoMode, onAutoModeChange,
   onOpenHome, onOpenRegion, onOpenList, onOpenFavorites,
   onOpenLegal,
 }) {
-  const { primary, schemeKey, darkMode } = theme;
+  const { primary, darkMode } = theme;
 
   // ── Web Push ─────────────────────────────────────────────────
   const push = usePushNotification();
@@ -133,62 +133,6 @@ export default function SettingsScreen({
             primary={primary}
             last
           />
-        </Card>
-
-        {/* ─ 2. テーマカラー ─ */}
-        <GroupTitle>テーマカラー</GroupTitle>
-        <Card>
-          <div style={{ padding: '14px' }}>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>
-              アプリの配色（3自衛隊のカラーから選択）
-            </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {Object.entries(COLOR_SCHEMES).map(([k, v]) => {
-                const isA = schemeKey === k;
-                return (
-                  <button key={k} onClick={() => onColorChange(k)} style={{
-                    flex: 1, minHeight: 76, padding: 10,
-                    border: `1.5px solid ${isA ? v.primary : 'var(--border)'}`,
-                    background: isA ? v.primary : 'var(--card)',
-                    borderRadius: 10, cursor: 'pointer',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                    gap: 5, fontFamily: F.sans, transition: 'all 0.15s',
-                  }}>
-                    <div style={{
-                      width: 22, height: 22, borderRadius: '50%',
-                      background: v.primary,
-                      border: '2px solid #fff',
-                      boxShadow: isA ? `0 0 0 2px ${v.primary}` : `0 0 0 1.5px ${v.primary}44`,
-                    }} />
-                    <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: 0.5, color: isA ? '#fff' : 'var(--text)' }}>
-                      {v.label}
-                    </div>
-                    <div style={{ fontSize: 9, letterSpacing: 1.5, fontFamily: F.mono, color: isA ? 'rgba(255,255,255,0.75)' : 'var(--text-muted)' }}>
-                      {v.sub}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-            {/* ホーム画面アイコン色変更ガイド */}
-            <div style={{
-              marginTop: 12, padding: '9px 11px',
-              background: `${primary}12`,
-              borderRadius: 8, display: 'flex', gap: 8, alignItems: 'flex-start',
-            }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, marginTop: 1 }}>
-                <rect x="3" y="3" width="18" height="18" rx="3" stroke={primary} strokeWidth="1.8"/>
-                <path d="M12 8v8M8 12h8" stroke={primary} strokeWidth="1.8" strokeLinecap="round"/>
-              </svg>
-              <div style={{ fontSize: 11, color: 'var(--text-sub)', lineHeight: 1.6 }}>
-                ホーム画面アイコンの色も選択中のテーマに合わせて変わります。
-                <br />
-                <span style={{ color: 'var(--text-muted)' }}>
-                  このカラーを選択してから Safari の「ホーム画面に追加」を行うと、選んだ自衛隊の色でアイコンが保存されます。
-                </span>
-              </div>
-            </div>
-          </div>
         </Card>
 
         {/* ─ 4. ダークモード（3択セグメント） ─ */}
