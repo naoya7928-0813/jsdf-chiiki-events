@@ -10,6 +10,7 @@ import { usePushNotification } from '../hooks/usePushNotification';
 export default function SettingsScreen({
   theme,
   onColorChange, onDarkModeChange,
+  autoMode, onAutoModeChange,
   onOpenHome, onOpenRegion, onOpenList, onOpenFavorites,
   onOpenLegal,
 }) {
@@ -121,6 +122,19 @@ export default function SettingsScreen({
           }
         </div>
 
+        {/* ─ 1.5 オートモード（自動更新設定） ─ */}
+        <GroupTitle>アプリケーション設定</GroupTitle>
+        <Card>
+          <ToggleRow
+            label="オートモード (自動更新)"
+            sub="5分ごとの自動更新と、バックグラウンド復帰時の自動再取得を行います"
+            on={autoMode}
+            onChange={() => onAutoModeChange(!autoMode)}
+            primary={primary}
+            last
+          />
+        </Card>
+
         {/* ─ 2. テーマカラー ─ */}
         <GroupTitle>テーマカラー</GroupTitle>
         <Card>
@@ -155,6 +169,24 @@ export default function SettingsScreen({
                   </button>
                 );
               })}
+            </div>
+            {/* ホーム画面アイコン色変更ガイド */}
+            <div style={{
+              marginTop: 12, padding: '9px 11px',
+              background: `${primary}12`,
+              borderRadius: 8, display: 'flex', gap: 8, alignItems: 'flex-start',
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, marginTop: 1 }}>
+                <rect x="3" y="3" width="18" height="18" rx="3" stroke={primary} strokeWidth="1.8"/>
+                <path d="M12 8v8M8 12h8" stroke={primary} strokeWidth="1.8" strokeLinecap="round"/>
+              </svg>
+              <div style={{ fontSize: 11, color: 'var(--text-sub)', lineHeight: 1.6 }}>
+                ホーム画面アイコンの色も選択中のテーマに合わせて変わります。
+                <br />
+                <span style={{ color: 'var(--text-muted)' }}>
+                  このカラーを選択してから Safari の「ホーム画面に追加」を行うと、選んだ自衛隊の色でアイコンが保存されます。
+                </span>
+              </div>
             </div>
           </div>
         </Card>

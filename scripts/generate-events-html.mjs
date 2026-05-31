@@ -99,17 +99,36 @@ function toEventSchema(ev, prefLabel) {
       name: `${prefLabel}地方協力本部`,
     },
     url: ev.url || SITE_URL,
+    image: [
+      `${SITE_URL}/icons/icon-512.png`
+    ],
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'JPY',
+      availability: 'https://schema.org/InStock',
+      url: ev.url || SITE_URL
+    }
   };
   if (ev.endDate) obj.endDate = ev.endDate;
-  if (ev.place) {
-    obj.location = {
-      '@type': 'Place',
-      name: ev.place,
-      address: { '@type': 'PostalAddress', addressCountry: 'JP' },
-    };
+
+  // location is a required property for Google Event rich results.
+  const locationObj = {
+    '@type': 'Place',
+    name: ev.place || `${prefLabel}地方協力本部`,
+    address: {
+      '@type': 'PostalAddress',
+      addressCountry: 'JP',
+      addressRegion: prefLabel
+    }
+  };
+  if (ev.address) {
+    locationObj.address.streetAddress = ev.address;
   }
+  obj.location = locationObj;
+
   const desc = [ev.category, ev.ageRequirement, ev.notes].filter(Boolean).join('。');
-  if (desc) obj.description = desc;
+  obj.description = desc || ev.title;
   return obj;
 }
 

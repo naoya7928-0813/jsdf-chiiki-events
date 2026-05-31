@@ -19,7 +19,7 @@ function filterPastEvents(rawData, today) {
   const out = {};
   for (const [k, v] of Object.entries(rawData)) {
     if (!Array.isArray(v)) { out[k] = v; continue; }
-    out[k] = v.filter(ev => ev.date && (ev.endDate ?? ev.date) >= today);
+    out[k] = v.filter(ev => ev.date && (ev.endDate || ev.date) >= today);
   }
   return out;
 }
@@ -33,7 +33,7 @@ function fmtNow() {
   }).replace(',', '');
 }
 
-export function useEvents() {
+export function useEvents(autoMode = true) {
   const [rawData,   setRawData]   = useState(null);
   const [loading,   setLoading]   = useState(true);
   const [error,     setError]     = useState(null);
@@ -63,6 +63,7 @@ export function useEvents() {
   // ── 定期フェッチ + 画面復帰時フェッチ ───────────────────────
   useEffect(() => {
     fetchEvents();
+    if (!autoMode) return;
     const interval = setInterval(fetchEvents, REFRESH_INTERVAL_MS);
     const onVisible = () => { if (document.visibilityState === 'visible') fetchEvents(); };
     document.addEventListener('visibilitychange', onVisible);
@@ -70,7 +71,7 @@ export function useEvents() {
       clearInterval(interval);
       document.removeEventListener('visibilitychange', onVisible);
     };
-  }, [fetchEvents]);
+  }, [fetchEvents, autoMode]);
 
   // ── JST 深夜0時タイマー：日付が変わったら自動でフィルター更新 ─
   useEffect(() => {

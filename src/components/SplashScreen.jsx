@@ -360,8 +360,8 @@ const CONFIGS = {
     groundColor:  '#3a4a20',
     accentColor:  '#8bc34a',
     vehicleColor: '#c8d8a8',
-    labelEn:      'JAPAN GROUND SELF-DEFENSE FORCE',
-    labelJa:      '陸上自衛隊モード · 起動中',
+    labelEn:      '陸上自衛隊イベント情報まとめ（非公式）',
+    labelJa:      '起動中...',
     vehicles:     [TankSVG, Tank16SVG, SPG19SVG, SPG99SVG, UH1SVG],  // 均等ランダム（5種）
     mode:         'tank',
     duration:     2700,
@@ -372,8 +372,8 @@ const CONFIGS = {
     seaTop:       '#071030',
     accentColor:  '#4a90d9',
     vehicleColor: '#b8d4f0',
-    labelEn:      'JAPAN MARITIME SELF-DEFENSE FORCE',
-    labelJa:      '海上自衛隊モード · 起動中',
+    labelEn:      '海上自衛隊イベント情報まとめ（非公式）',
+    labelJa:      '起動中...',
     vehicles:     [IzumoSVG, MayaSVG, MogamiSVG, SoryuSVG, US2SVG, P1SVG],  // 均等ランダム（6種）
     mode:         'ship',
     duration:     2900,
@@ -383,8 +383,8 @@ const CONFIGS = {
     bg:           'radial-gradient(130% 95% at 50% 0%, #0b2545 0%, #071a33 68%, #03101f 100%)',
     accentColor:  '#4aa3ff',
     vehicleColor: '#dfeeff',
-    labelEn:      'JAPAN AIR SELF-DEFENSE FORCE',
-    labelJa:      '航空自衛隊モード · 起動中',
+    labelEn:      '航空自衛隊イベント情報まとめ（非公式）',
+    labelJa:      '起動中...',
     vehicles:     [JetSVG, F2SVG, C2SVG, PAC3SVG, BlueImpSVG],  // 均等ランダム（5種）
     mode:         'jet',
     duration:     2600,
@@ -443,15 +443,14 @@ export default function SplashScreen({ schemeKey, onDone }) {
         animation: `spTextIn 0.85s ease ${cfg.textDelay} both`,
       }}>
         <div style={{
-          fontSize: 10, letterSpacing: '0.28em',
-          color: 'rgba(255,255,255,0.5)', marginBottom: 10,
-          textTransform: 'uppercase',
+          fontSize: 15, fontWeight: 700,
+          letterSpacing: '0.10em', color: cfg.accentColor, marginBottom: 8,
         }}>
           {cfg.labelEn}
         </div>
         <div style={{
-          fontSize: 17, fontWeight: 700,
-          letterSpacing: '0.14em', color: cfg.accentColor,
+          fontSize: 11, letterSpacing: '0.18em',
+          color: 'rgba(255,255,255,0.45)',
         }}>
           {cfg.labelJa}
         </div>

@@ -18,6 +18,7 @@ function loadRegion()       { try { return localStorage.getItem('jsdf-region') |
 function loadDarkMode()     { try { return localStorage.getItem('jsdf-dark')   || 'system';       } catch { return 'system';       } }
 function loadLastMapRegion(){ try { return localStorage.getItem('jsdf-last-region') || null;       } catch { return null;           } }
 function loadLastPrefId()   { try { return localStorage.getItem('jsdf-last-pref')   || null;       } catch { return null;           } }
+function loadAutoMode()     { try { return localStorage.getItem('jsdf-auto-mode') !== 'false';    } catch { return true;           } }
 
 // favorites: イベントIDの Set として管理
 function loadFavorites() {
@@ -118,6 +119,13 @@ export default function App() {
     try { localStorage.setItem('jsdf-dark', mode); } catch {}
   }, []);
 
+  // ── オートモード（自動更新） ──────────────────────────────
+  const [autoMode, setAutoMode] = useState(loadAutoMode);
+  const handleAutoModeChange = useCallback((enabled) => {
+    setAutoMode(enabled);
+    try { localStorage.setItem('jsdf-auto-mode', String(enabled)); } catch {}
+  }, []);
+
   // data-theme 属性を documentElement に適用
   useEffect(() => {
     const apply = () => {
@@ -134,6 +142,12 @@ export default function App() {
   const scheme = COLOR_SCHEMES[schemeKey] ?? COLOR_SCHEMES[DEFAULT_SCHEME];
   const theme  = { ...scheme, schemeKey, darkMode };
 
+  // ホーム画面アイコンをスキームに合わせて切替（Safari で「ホーム画面に追加」前に選択しておく用）
+  useEffect(() => {
+    const link = document.querySelector('link[rel="apple-touch-icon"]');
+    if (link) link.href = `/icons/apple-touch-icon-${schemeKey}.png?v=${Date.now()}`;
+  }, [schemeKey]);
+
   // Safari のステータスバー theme-color をテーマに合わせて更新
   useEffect(() => {
     const metaTheme = document.querySelector('meta[name="theme-color"]');
@@ -141,7 +155,7 @@ export default function App() {
   }, [scheme.primary]);
 
   // ── データ取得 ────────────────────────────────────────────
-  const { events, loading, error, updatedAt, checkedAt, refresh } = useEvents();
+  const { events, loading, error, updatedAt, checkedAt, refresh } = useEvents(autoMode);
 
   // ── お気に入り ────────────────────────────────────────────
   const [favorites, setFavorites] = useState(loadFavorites);
@@ -315,6 +329,8 @@ export default function App() {
           theme={theme}
           onColorChange={handleColorChange}
           onDarkModeChange={handleDarkModeChange}
+          autoMode={autoMode}
+          onAutoModeChange={handleAutoModeChange}
           onOpenHome={() => setScreen('home')}
           onOpenList={() => { handleRegionChange('all'); setScreen('list'); }}
           onOpenRegion={openRegion}
