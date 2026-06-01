@@ -63,10 +63,13 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
   const source    = REGION_SOURCE[regionKey] ?? REGION_SOURCE['tokyo'];
 
   // 地図クエリ: place が取れていれば表示（address があれば精度向上）
-  // place だけでも固有名詞（基地名・会場名）は Google Maps で正確に特定できる
+  // 「A×B」「A・B」のように複数会場が列挙される場合は最初の会場のみ Map 検索に使う
   const hasLocation = !!(ev.place && ev.place.trim());
+  const primaryPlace = ev.place
+    ? ev.place.replace(/×/g, '・').split(/[・\/]/)[0].trim()
+    : '';
   const mapQuery    = encodeURIComponent(
-    [ev.place, ev.address].filter(Boolean).join(' ')
+    [ev.address || primaryPlace].filter(Boolean).join(' ')
   );
   const mapSrc      = `https://maps.google.com/maps?q=${mapQuery}&output=embed&hl=ja&z=15`;
 

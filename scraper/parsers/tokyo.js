@@ -82,8 +82,13 @@ function parseTokyo($) {
     const time = timeMatch ? timeMatch[1].trim() : rawTime;
 
     // ── 場所 ──
-    const place = (fields['場所'] || fields['開催場所'] || fields['会場'] || '')
+    // 「A×B」「A・B」のように複数会場が列挙される場合は「×」を「・」に統一し
+    // Map検索用には最初の会場名だけを address フィールドに入れる
+    const rawPlace = (fields['場所'] || fields['開催場所'] || fields['会場'] || '')
       .replace(/^\s+/, '').trim();
+    const place = rawPlace.replace(/×/g, '・');
+    // 複数会場は「・」区切りの最初の会場を Maps 検索用 address に使う
+    const address = place.split(/[・\/]/)[0].trim();
 
     // ── カテゴリ・タグ ──
     const rawCategory = fields['種目'] || fields['区分'] || fields['カテゴリ'] || '';
@@ -116,7 +121,7 @@ function parseTokyo($) {
       weekday,
       title,
       place,
-      address: '',
+      address: address !== place ? address : '',
       time,
       category,
       tag,
