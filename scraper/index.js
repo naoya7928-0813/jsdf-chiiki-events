@@ -2041,25 +2041,23 @@ async function fetchToyama(context) {
 // ── 募集案内所ページ から PDF/画像を収集してイベントを抽出 ─────────
 
 /**
- * ページを fetch してCheerioオブジェクトを返す（文字コード自動判定）。
- * 取得失敗時は null を返す。
+ * Playwright ステルスコンテキストでページを取得して Cheerio オブジェクトを返す。
+ * mod.go.jp は Cloudflare 保護のため素の fetch() では 403 になるため必須。
+ * @param {import('playwright').BrowserContext} ctx
+ * @param {string} url
  */
-async function fetchPage(url) {
+async function fetchPagePlaywright(ctx, url) {
+  let page = null;
   try {
-    const res = await fetch(url, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'Referer': 'https://www.mod.go.jp/' },
-      signal:  AbortSignal.timeout(30_000),
-    });
-    if (!res.ok) { console.warn(`  [fetch] HTTP ${res.status}: ${url}`); return null; }
-    const rawBuf = Buffer.from(await res.arrayBuffer());
-    const ct     = res.headers.get('content-type') || '';
-    const html   = ct.includes('euc') ? iconv.decode(rawBuf, 'euc-jp')
-                 : ct.includes('shift') ? iconv.decode(rawBuf, 'shift_jis')
-                 : rawBuf.toString('utf8');
+    page = await ctx.newPage();
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+    const html = await page.content();
     return cheerio.load(html);
   } catch (err) {
     console.warn(`  [fetch] エラー: ${url} → ${err.message}`);
     return null;
+  } finally {
+    if (page) await page.close().catch(() => {});
   }
 }
 
@@ -2095,9 +2093,13 @@ function parseOcrDate(ocrDate) {
  * 取得できなかった場合は「公式ページ参照」スタブイベントを生成する。
  * 戻り値: events[] (pref フィールド付き)
  */
-async function scrapeOfficeAssets() {
+async function scrapeOfficeAssets(withFreshContext) {
   if (!process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) {
     console.log('[OfficeOCR] APIキー未設定のためスキップ');
+    return [];
+  }
+  if (!withFreshContext) {
+    console.log('[OfficeOCR] Playwright コンテキスト未提供（モックモード）のためスキップ');
     return [];
   }
 
@@ -2127,20 +2129,24 @@ async function scrapeOfficeAssets() {
   // ── 各地本HQから1レベル自動探索 ──────────────────────────────────
   for (const hq of hqEntries) {
     console.log(`[OfficeOCR] 探索: ${hq.name} (${hq.pref}) ${hq.url}`);
-    const $ = await fetchPage(hq.url);
+
+    // Playwright ステルスコンテキストで地本トップページを取得
+    const $ = await withFreshContext(ctx => fetchPagePlaywright(ctx, hq.url));
     if (!$) { await sleep(BETWEEN_PAGES_MS); continue; }
 
     // イベント系サブリンクを収集（既スクレイプ & 既探索を除外）
-    const skip    = new Set([...alreadyScraped, ...exploredPages]);
+    const skip     = new Set([...alreadyScraped, ...exploredPages]);
     const subLinks = findEventLinks($, hq.url, skip);
     console.log(`  サブリンク候補: ${subLinks.length}件`);
+
+    await sleep(BETWEEN_PAGES_MS);
 
     // サブリンクをアセット探索
     for (const { url: subUrl, text: linkText } of subLinks) {
       if (exploredPages.has(subUrl)) continue;
       exploredPages.add(subUrl);
 
-      const $sub = await fetchPage(subUrl);
+      const $sub = await withFreshContext(ctx => fetchPagePlaywright(ctx, subUrl));
       if (!$sub) { await sleep(3000); continue; }
 
       const assets  = sortByPriority(extractAssets($sub, subUrl));
@@ -3024,6 +3030,7 @@ async function main() {
   okinawaEvents   = await enrichWithOcr(okinawaEvents);
 
   // ── 募集案内所ページから PDF/画像 OCR でイベントを収集 ────────
+  console.log('[wait] 募集案内所探索を開始します...');
   const officeEvents = await scrapeOfficeAssets(withFreshContext);
 
   // imageUrl は最終出力に含めない（内部用フィールド）
