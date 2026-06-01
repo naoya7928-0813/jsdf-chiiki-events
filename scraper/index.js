@@ -2134,40 +2134,30 @@ async function scrapeOfficeAssets(withFreshContext) {
     const $ = await withFreshContext(ctx => fetchPagePlaywright(ctx, hq.url));
     if (!$) { await sleep(BETWEEN_PAGES_MS); continue; }
 
-    // イベント系サブリンクを収集（既スクレイプ & 既探索を除外）
-    const skip     = new Set([...alreadyScraped, ...exploredPages]);
-    const subLinks = findEventLinks($, hq.url, skip);
-    console.log(`  サブリンク候補: ${subLinks.length}件`);
+    // イベント系リンクを分類（HTMLページ / PDF・画像の直接リンク）
+    const skip                    = new Set([...alreadyScraped, ...exploredPages]);
+    const { pages: subPages, assets: directAssets } = findEventLinks($, hq.url, skip);
+    console.log(`  サブページ候補: ${subPages.length}件 / 直接アセット: ${directAssets.length}件`);
 
     await sleep(BETWEEN_PAGES_MS);
 
-    // サブリンクをアセット探索
-    for (const { url: subUrl, text: linkText } of subLinks) {
-      if (exploredPages.has(subUrl)) continue;
-      exploredPages.add(subUrl);
-
-      const $sub = await withFreshContext(ctx => fetchPagePlaywright(ctx, subUrl));
-      if (!$sub) { await sleep(3000); continue; }
-
-      const assets  = sortByPriority(extractAssets($sub, subUrl));
-      const highMed = assets.filter(a => a.priority !== 'low');
-      if (highMed.length === 0) { await sleep(3000); continue; }
-
-      console.log(`  ${subUrl.split('/').slice(-2).join('/')} → 高中アセット ${highMed.length}件`);
-
+    /**
+     * アセット群に対してOCRを実行し、成功イベント or 公式ページ参照スタブを生成する。
+     * @param {Array} assets - sortByPriority 済みアセット配列
+     * @param {string} sourceUrl - スタブの url に使うページURL
+     * @param {string} pref
+     */
+    async function processAssets(assets, sourceUrl, pref) {
+      const prefCode = (pref || 'xx').slice(0, 2);
       let foundAtLeastOne = false;
 
-      for (const asset of highMed) {
-        const ocr = await ocrFlyerFull(asset.url);
+      for (const asset of assets) {
+        const ocr    = await ocrFlyerFull(asset.url);
         await sleep(2000);
-
         const parsed = ocr ? parseOcrDate(ocr.date) : null;
-        const pref   = urlToPref[normalizeUrl(subUrl)] || urlToPref[normalizeUrl(hq.url)] || hq.pref;
-        const prefCode = (pref || 'xx').slice(0, 2);
 
         if (parsed && !isPast(parsed.dateStr)) {
-          // ── OCR成功: 通常イベント ──────────────────────────────
-          const title = (ocr.title && fixOcrTitle(ocr.title.trim())) || asset.linkText || linkText || '(タイトル不明)';
+          const title = (ocr.title && fixOcrTitle(ocr.title.trim())) || asset.text || asset.linkText || '(タイトル不明)';
           allEvents.push({
             id:             `${prefCode}-off-${parsed.dateStr.replace(/-/g, '')}-${titleHash(parsed.dateStr, title)}`,
             pref,
@@ -2189,14 +2179,12 @@ async function scrapeOfficeAssets(withFreshContext) {
           console.log(`    ✓ ${parsed.dateStr} ${title.slice(0, 30)}`);
 
         } else if (!foundAtLeastOne) {
-          // ── OCR失敗 or 日付取得不可: 公式ページ参照スタブ ───────
-          // 同一ページで1件以上成功していればスタブは不要
-          const stubTitle = (asset.linkText || linkText || hq.name)
-            ? `${asset.linkText || linkText || hq.name}（公式ページ参照）`
+          // OCR失敗 or 日付なし → 公式ページ参照スタブ（ページ単位で1件のみ）
+          const stubTitle = (asset.text || asset.linkText || hq.name)
+            ? `${asset.text || asset.linkText || hq.name}（公式ページ参照）`
             : '公式ページでイベント情報を確認';
-
           allEvents.push({
-            id:          `${prefCode}-ref-${todayJST.replace(/-/g, '')}-${titleHash(todayJST, subUrl)}`,
+            id:          `${prefCode}-ref-${todayJST.replace(/-/g, '')}-${titleHash(todayJST, sourceUrl)}`,
             pref,
             date:        todayJST,
             weekday:     calcWeekday(todayJST),
@@ -2206,15 +2194,43 @@ async function scrapeOfficeAssets(withFreshContext) {
             time:        '',
             category:    '広報活動',
             tag:         '',
-            url:         subUrl,
+            url:         sourceUrl,
             notes:       'チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。',
             ageRequirement: null,
             deadline:       null,
             source_type: 'office_notice',
           });
-          console.log(`    ⚠ 公式ページ参照スタブ追加: ${subUrl}`);
+          console.log(`    ⚠ 公式ページ参照スタブ: ${sourceUrl}`);
         }
       }
+    }
+
+    // ── 直接PDF/画像リンクをOCR ──────────────────────────────────
+    if (directAssets.length > 0) {
+      const sorted = sortByPriority(directAssets);
+      const highMed = sorted.filter(a => a.priority !== 'low');
+      if (highMed.length > 0) {
+        const pref = urlToPref[normalizeUrl(hq.url)] || hq.pref;
+        console.log(`  直接アセット ${highMed.length}件をOCR中...`);
+        await processAssets(highMed, hq.url, pref);
+      }
+    }
+
+    // ── HTMLサブページを探索してアセット抽出 ─────────────────────
+    for (const { url: subUrl, text: linkText } of subPages) {
+      if (exploredPages.has(subUrl)) continue;
+      exploredPages.add(subUrl);
+
+      const $sub = await withFreshContext(ctx => fetchPagePlaywright(ctx, subUrl));
+      if (!$sub) { await sleep(3000); continue; }
+
+      const assets  = sortByPriority(extractAssets($sub, subUrl));
+      const highMed = assets.filter(a => a.priority !== 'low');
+      if (highMed.length === 0) { await sleep(3000); continue; }
+
+      console.log(`  ${subUrl.split('/').slice(-2).join('/')} → 高中アセット ${highMed.length}件`);
+      const pref = urlToPref[normalizeUrl(subUrl)] || urlToPref[normalizeUrl(hq.url)] || hq.pref;
+      await processAssets(highMed, subUrl, pref);
       await sleep(BETWEEN_PAGES_MS);
     }
     await sleep(BETWEEN_PAGES_MS);

@@ -1,6 +1,6 @@
 'use strict';
 
-const { normalizeUrl } = require('./normalizeUrl');
+const { normalizeUrl, isPdfUrl, isImageUrl, isAssetUrl } = require('./normalizeUrl');
 
 // イベント・フライヤー系ページを示すキーワード（URLパス or リンクテキスト）
 const EVENT_URL_KW = /event|oshirase|news|topics|bosyu|chirashi|annai|setsumei|recruit|koho|kiji|post|saiyou|announce|info|schedule|calendar/i;
@@ -10,17 +10,20 @@ const EVENT_TXT_KW = /イベント|行事|お知らせ|新着|募集案内|チ�
 const SKIP_URL_KW = /contact|access|jimusyo|about|privacy|sitemap|staff|history|link|mail|recruit_top|gaiyou|rinen|nenpou|map/i;
 
 /**
- * ページ内から「イベント情報系サブページ」へのリンクを抽出する。
- * 同一 mod.go.jp/pco ドメイン内のリンクのみ対象。
+ * ページ内のリンクを2種類に分類して返す。
+ *  - pages: イベント情報系 HTML サブページ（Playwrightで取得してから資産抽出）
+ *  - assets: PDF/画像の直接リンク（downloadFile → OCR で直接処理）
  *
  * @param {import('cheerio').CheerioAPI} $
- * @param {string} pageUrl - 現在のページURL
- * @param {Set<string>} visited - 訪問済み or 既スクレイプ対象のURL（重複除去用）
- * @returns {Array<{url: string, text: string}>}
+ * @param {string} pageUrl
+ * @param {Set<string>} visited - 訪問済み/既スクレイプ対象URL
+ * @returns {{ pages: Array<{url,text}>, assets: Array<{url,text,type}> }}
  */
 function findEventLinks($, pageUrl, visited = new Set()) {
-  const seen  = new Set();
-  const links = [];
+  const seenPages  = new Set();
+  const seenAssets = new Set();
+  const pages  = [];
+  const assets = [];
 
   $('a[href]').each((_, el) => {
     const href = $(el).attr('href') || '';
@@ -28,14 +31,32 @@ function findEventLinks($, pageUrl, visited = new Set()) {
     const norm = normalizeUrl(href, pageUrl);
     if (!norm) return;
     if (!norm.includes('mod.go.jp/pco')) return;
-    if (seen.has(norm) || visited.has(norm)) return;
+    if (visited.has(norm)) return;
+
+    // PDF/画像リンク → assets として直接OCR対象にする
+    if (isAssetUrl(norm)) {
+      if (seenAssets.has(norm)) return;
+      // イベント系キーワードを含むもの or 説明会・体験・採用 系ファイル名のみ
+      if (!EVENT_URL_KW.test(norm) && !EVENT_TXT_KW.test(text)) return;
+      seenAssets.add(norm);
+      assets.push({
+        url:      norm,
+        text:     text.slice(0, 80),
+        type:     isPdfUrl(norm) ? 'pdf' : 'image',
+        sourcePageUrl: pageUrl,
+      });
+      return;
+    }
+
+    // HTML ページ → event系キーワードがあるものを探索対象にする
+    if (seenPages.has(norm)) return;
     if (SKIP_URL_KW.test(norm)) return;
     if (!EVENT_URL_KW.test(norm) && !EVENT_TXT_KW.test(text)) return;
-    seen.add(norm);
-    links.push({ url: norm, text: text.slice(0, 80) });
+    seenPages.add(norm);
+    pages.push({ url: norm, text: text.slice(0, 80) });
   });
 
-  return links;
+  return { pages, assets };
 }
 
 module.exports = { findEventLinks };
