@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-28",
+  "updatedAt": "2026-06-01",
   "note": "地本50件＋地域事務所・募集案内所等（全国）。座標はジオコーディング済み（latApprox=trueは親地本座標で近似）。",
   "offices": [
     {
@@ -836,26 +836,12 @@
       "type": "recruitment",
       "pref": "kyoto",
       "name": "宇治地域事務所",
-      "address": "自衛隊京都地方協力本部・宇治地域事務所 京都府宇治市広野町西裏71-5 S.C OKUBO 202号室 TEL:0774-44-7139",
-      "lat": 34.9453,
-      "lng": 135.7674,
+      "address": "京都府宇治市広野町西裏71-5 S.C OKUBO 202号室",
+      "lat": 34.9135,
+      "lng": 135.7917,
       "tel": "0774-44-7139",
       "url": "https://www.mod.go.jp/pco/kyoto/kouhoushitsu/index.html",
-      "area": "",
-      "latApprox": true
-    },
-    {
-      "id": "loc-kyoto-24",
-      "type": "recruitment",
-      "pref": "kyoto",
-      "name": "自衛隊宇治地域事務所",
-      "address": "自衛隊京都地方協力本部・宇治地域事務所 京都府宇治市広野町西裏71-5 S.C OKUBO 202号室 TEL:0774-44-7139",
-      "lat": 34.9503,
-      "lng": 135.7739,
-      "tel": "0774-44-7139",
-      "url": "https://www.mod.go.jp/pco/kyoto/kouhoushitsu/index.html",
-      "area": "",
-      "latApprox": true
+      "area": ""
     },
     {
       "id": "loc-niigata-25",
@@ -1212,12 +1198,11 @@
       "pref": "wakayama",
       "name": "橋本地域事務所",
       "address": "",
-      "lat": 34.2096,
-      "lng": 135.1434,
+      "lat": 34.3106,
+      "lng": 135.617,
       "tel": "",
       "url": "https://www.mod.go.jp/pco/wakayama/about/",
-      "area": "橋本市・紀の川市・かつらぎ町・九度山町・高野町",
-      "latApprox": true
+      "area": "橋本市・紀の川市・かつらぎ町・九度山町・高野町"
     },
     {
       "id": "loc-wakayama-55",
@@ -1225,12 +1210,11 @@
       "pref": "wakayama",
       "name": "御坊地域事務所",
       "address": "",
-      "lat": 34.2146,
-      "lng": 135.1499,
+      "lat": 33.8876,
+      "lng": 135.1579,
       "tel": "",
       "url": "https://www.mod.go.jp/pco/wakayama/about/",
-      "area": "御坊市・日高川町・由良町・日高町・美浜町・印南町・みなべ町",
-      "latApprox": true
+      "area": "御坊市・日高川町・由良町・日高町・美浜町・印南町・みなべ町"
     },
     {
       "id": "loc-wakayama-56",
@@ -1238,12 +1222,11 @@
       "pref": "wakayama",
       "name": "新宮地域事務所",
       "address": "",
-      "lat": 34.2196,
-      "lng": 135.1564,
+      "lat": 33.7243,
+      "lng": 135.9849,
       "tel": "",
       "url": "https://www.mod.go.jp/pco/wakayama/about/",
-      "area": "新宮市・那智勝浦町・古座川町・串本町・太地町・北山村",
-      "latApprox": true
+      "area": "新宮市・那智勝浦町・古座川町・串本町・太地町・北山村"
     },
     {
       "id": "loc-wakayama-57",
@@ -1251,12 +1234,11 @@
       "pref": "wakayama",
       "name": "田辺地域事務所",
       "address": "",
-      "lat": 34.2246,
-      "lng": 135.1629,
+      "lat": 33.7323,
+      "lng": 135.3781,
       "tel": "",
       "url": "https://www.mod.go.jp/pco/wakayama/about/",
-      "area": "田辺市・上富田町・白浜町・すさみ町",
-      "latApprox": true
+      "area": "田辺市・上富田町・白浜町・すさみ町"
     },
     {
       "id": "loc-wakayama-58",
@@ -1264,12 +1246,11 @@
       "pref": "wakayama",
       "name": "有田募集案内所",
       "address": "",
-      "lat": 34.2296,
-      "lng": 135.1694,
+      "lat": 34.072,
+      "lng": 135.1278,
       "tel": "",
       "url": "https://www.mod.go.jp/pco/wakayama/about/",
-      "area": "海南市・有田市・紀美野町・有田川町・湯浅町・広川町",
-      "latApprox": true
+      "area": "海南市・有田市・紀美野町・有田川町・湯浅町・広川町"
     },
     {
       "id": "loc-wakayama-59",
@@ -1277,12 +1258,11 @@
       "pref": "wakayama",
       "name": "和歌山募集案内所",
       "address": "",
-      "lat": 34.2346,
-      "lng": 135.1759,
+      "lat": 34.2261,
+      "lng": 135.1676,
       "tel": "",
       "url": "https://www.mod.go.jp/pco/wakayama/about/",
-      "area": "和歌山市・岩出市",
-      "latApprox": true
+      "area": "和歌山市・岩出市"
     },
     {
       "id": "loc-yamagata-60",
