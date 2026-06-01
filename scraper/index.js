@@ -2293,6 +2293,7 @@ async function main() {
   let miyazakiEvents  = [];
   let kagoshimaEvents = [];
   let okinawaEvents   = [];
+  let officeEvents    = [];
   let sapporoError   = false;
   let asahikawaError = false;
   let obihiroError   = false;
@@ -2868,6 +2869,11 @@ async function main() {
       console.error(`[沖縄] 取得失敗: ${err.message}`);
       okinawaError = true;
     }
+
+    // ── 募集案内所ページから PDF/画像 OCR でイベントを収集 ────────
+    // browser.close() の前に呼ぶ必要あり（Playwright が必要なため）
+    console.log('[wait] 募集案内所探索を開始します...');
+    officeEvents = await scrapeOfficeAssets(withFreshContext);
   } finally {
     await browser.close();
   }
@@ -3029,9 +3035,7 @@ async function main() {
   kagoshimaEvents = await enrichWithOcr(kagoshimaEvents);
   okinawaEvents   = await enrichWithOcr(okinawaEvents);
 
-  // ── 募集案内所ページから PDF/画像 OCR でイベントを収集 ────────
-  console.log('[wait] 募集案内所探索を開始します...');
-  const officeEvents = await scrapeOfficeAssets(withFreshContext);
+  // officeEvents は try ブロック内（browser.close前）で収集済み
 
   // imageUrl は最終出力に含めない（内部用フィールド）
   const strip = ev => { const { imageUrl: _, _flyerUrl: __, duplicate_candidate: _d, duplicate_of: _do, ...rest } = ev; return rest; };
