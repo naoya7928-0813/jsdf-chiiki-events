@@ -25,6 +25,7 @@ const { normalizeUrl } = require('./lib/normalizeUrl');
 const { sortByPriority } = require('./lib/priority');
 const { markDuplicates }  = require('./lib/dedup');
 const { extractAssets }   = require('./lib/extractAssets');
+const { findEventLinks }  = require('./lib/exploreLinks');
 
 const { chromium } = require('playwright-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
@@ -2039,142 +2040,181 @@ async function fetchToyama(context) {
 
 // ── 募集案内所ページ から PDF/画像を収集してイベントを抽出 ─────────
 
-// offices.json に登録された事務所ページのうち、地本メインページと重複しないサブページ
-const OFFICE_PAGE_URLS = [
-  // 北海道
-  'https://www.mod.go.jp/pco/sapporo/contact.html',
-  'https://www.mod.go.jp/pco/sapporo/contact_nanbu.html',
-  'https://www.mod.go.jp/pco/sapporo/contact_hokubu.html',
-  // 東北
-  'https://www.mod.go.jp/pco/yamagata/sinjyo/sinjyo.html',
-  'https://www.mod.go.jp/pco/yamagata/yonezawa/yonezawa.html',
-  'https://www.mod.go.jp/pco/iwate/iwatechihon/index.html',
-  // 関東
-  'https://www.mod.go.jp/pco/gunma/bosyuannai/oota_sho/oota.html',
-  'https://www.mod.go.jp/pco/tochigi/jimusyo_oyama.html',
-  'https://www.mod.go.jp/pco/tochigi/jimusyo_mohka.html',
-  'https://www.mod.go.jp/pco/tochigi/jimusyo_ashikaga.html',
-  // 中部
-  'https://www.mod.go.jp/pco/niigata/HP/kamo.html',
-  'https://www.mod.go.jp/pco/niigata/HP/takada.html',
-  'https://www.mod.go.jp/pco/ishikawa/guide/',
-  'https://www.mod.go.jp/pco/sizuoka/office/hamakita.html',
-  // 近畿
-  'https://www.mod.go.jp/pco/kyoto/kouhoushitsu/index.html',
-  'https://www.mod.go.jp/pco/wakayama/about/',
-  // 四国
-  'https://www.mod.go.jp/pco/tokushima/anan.html',
-  'https://www.mod.go.jp/pco/tokushima/kamo.html',
-  // 九州
-  'https://www.mod.go.jp/pco/kagoshima/about/access/index.html',
-  'https://www.mod.go.jp/pco/kumamoto/about/access/index.html',
-  'https://www.mod.go.jp/pco/kochi/access.html',
-];
+/**
+ * ページを fetch してCheerioオブジェクトを返す（文字コード自動判定）。
+ * 取得失敗時は null を返す。
+ */
+async function fetchPage(url) {
+  try {
+    const res = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'Referer': 'https://www.mod.go.jp/' },
+      signal:  AbortSignal.timeout(30_000),
+    });
+    if (!res.ok) { console.warn(`  [fetch] HTTP ${res.status}: ${url}`); return null; }
+    const rawBuf = Buffer.from(await res.arrayBuffer());
+    const ct     = res.headers.get('content-type') || '';
+    const html   = ct.includes('euc') ? iconv.decode(rawBuf, 'euc-jp')
+                 : ct.includes('shift') ? iconv.decode(rawBuf, 'shift_jis')
+                 : rawBuf.toString('utf8');
+    return cheerio.load(html);
+  } catch (err) {
+    console.warn(`  [fetch] エラー: ${url} → ${err.message}`);
+    return null;
+  }
+}
 
-// OFFICE_PAGE_URLS のページから PDF/画像を取得して OCR でイベントを抽出。
-// 既存キャッシュ（SHA-256）にヒットした場合は OCR をスキップ。
-// 戻り値: events[] (pref フィールド付き)
-async function scrapeOfficeAssets(withFreshContext) {
+/**
+ * OCR結果またはアセット情報から日付文字列・曜日を解析する。
+ * @returns {{ dateStr: string, weekday: string }|null}
+ */
+function parseOcrDate(ocrDate) {
+  if (!ocrDate) return null;
+  const t      = toHalfWidth(ocrDate.replace(/\s+/g, ' ').trim());
+  const reiwaM = t.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
+  const gregM  = t.match(/(\d{4})年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
+  const monthM = t.match(/(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
+
+  if (reiwaM) {
+    const y = reiwaToAD(parseInt(reiwaM[1], 10));
+    return { dateStr: `${y}-${padTwo(parseInt(reiwaM[2])  )}-${padTwo(parseInt(reiwaM[3])  )}`, weekday: reiwaM[4] };
+  }
+  if (gregM) {
+    return { dateStr: `${gregM[1]}-${padTwo(parseInt(gregM[2]))}-${padTwo(parseInt(gregM[3]))}`, weekday: gregM[4] };
+  }
+  if (monthM) {
+    const now = new Date(Date.now() + 9 * 3600 * 1000);
+    return { dateStr: `${now.getFullYear()}-${padTwo(parseInt(monthM[1]))}-${padTwo(parseInt(monthM[2]))}`, weekday: monthM[3] };
+  }
+  return null;
+}
+
+/**
+ * 各地本トップページを自動探索し、イベントチラシが掲載されているサブページを発見して
+ * PDF/画像をOCRでイベント情報として抽出する。
+ *
+ * 取得できなかった場合は「公式ページ参照」スタブイベントを生成する。
+ * 戻り値: events[] (pref フィールド付き)
+ */
+async function scrapeOfficeAssets() {
   if (!process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) {
     console.log('[OfficeOCR] APIキー未設定のためスキップ');
     return [];
   }
 
-  // offices.json をロードして URL → pref マップを構築
+  // ── offices.json から地本HQ情報とURL→prefマップを構築 ──────────
   const OFFICES_PATH = path.join(__dirname, '../public/data/offices.json');
-  let officeUrlToPref = {};
+  let hqEntries    = [];    // { pref, url, name }
+  let urlToPref    = {};    // normalizedUrl → pref
   try {
     const officesData = JSON.parse(fs.readFileSync(OFFICES_PATH, 'utf8'));
     for (const o of officesData.offices) {
-      if (o.url && o.pref) officeUrlToPref[o.url.replace(/\/$/, '')] = o.pref;
+      if (!o.url) continue;
+      const norm = normalizeUrl(o.url);
+      if (norm) urlToPref[norm] = o.pref;
+      if (o.type === 'hq') hqEntries.push({ pref: o.pref, url: o.url, name: o.name });
     }
   } catch { /* offices.json がなければスキップ */ }
 
+  // ── 既スクレイプURL集合（自動探索の重複除去に使用） ──────────────
+  const alreadyScraped = new Set(
+    Object.values(URLS).map(u => normalizeUrl(u)).filter(Boolean)
+  );
+
+  const todayJST  = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
   const allEvents = [];
+  const exploredPages = new Set(); // このrun内で訪問済み
 
-  for (const pageUrl of OFFICE_PAGE_URLS) {
-    const pref = officeUrlToPref[pageUrl.replace(/\/$/, '')] || null;
-    console.log(`[OfficeOCR] ${pageUrl}${pref ? ` (${pref})` : ''}`);
+  // ── 各地本HQから1レベル自動探索 ──────────────────────────────────
+  for (const hq of hqEntries) {
+    console.log(`[OfficeOCR] 探索: ${hq.name} (${hq.pref}) ${hq.url}`);
+    const $ = await fetchPage(hq.url);
+    if (!$) { await sleep(BETWEEN_PAGES_MS); continue; }
 
-    let html = null;
-    try {
-      const res = await fetch(pageUrl, {
-        headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://www.mod.go.jp/' },
-        signal:  AbortSignal.timeout(30_000),
-      });
-      if (!res.ok) { console.warn(`  [OfficeOCR] HTTP ${res.status} → スキップ`); continue; }
-      const rawBuf = Buffer.from(await res.arrayBuffer());
-      // EUC-JP / Shift_JIS に対応
-      const ct = res.headers.get('content-type') || '';
-      html = ct.includes('euc') ? iconv.decode(rawBuf, 'euc-jp')
-           : ct.includes('shift') ? iconv.decode(rawBuf, 'shift_jis')
-           : rawBuf.toString('utf8');
-    } catch (err) {
-      console.warn(`  [OfficeOCR] 取得エラー: ${err.message}`);
-      continue;
-    }
+    // イベント系サブリンクを収集（既スクレイプ & 既探索を除外）
+    const skip    = new Set([...alreadyScraped, ...exploredPages]);
+    const subLinks = findEventLinks($, hq.url, skip);
+    console.log(`  サブリンク候補: ${subLinks.length}件`);
 
-    const $       = cheerio.load(html);
-    const assets  = sortByPriority(extractAssets($, pageUrl));
-    const highMed = assets.filter(a => a.priority !== 'low');
-    console.log(`  アセット: ${assets.length}件 (高中優先: ${highMed.length}件)`);
+    // サブリンクをアセット探索
+    for (const { url: subUrl, text: linkText } of subLinks) {
+      if (exploredPages.has(subUrl)) continue;
+      exploredPages.add(subUrl);
 
-    for (const asset of highMed) {
-      const ocr = asset.type === 'pdf'
-        ? await ocrFlyerFull(asset.url)
-        : await ocrFlyerFull(asset.url);
+      const $sub = await fetchPage(subUrl);
+      if (!$sub) { await sleep(3000); continue; }
 
-      if (!ocr || !ocr.date) continue;
+      const assets  = sortByPriority(extractAssets($sub, subUrl));
+      const highMed = assets.filter(a => a.priority !== 'low');
+      if (highMed.length === 0) { await sleep(3000); continue; }
 
-      // 日付解析
-      const rawDate = toHalfWidth((ocr.date || '').replace(/\s+/g, ' ').trim());
-      const reiwaM  = rawDate.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
-      const gregM   = rawDate.match(/(\d{4})年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
-      const monthM  = rawDate.match(/(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
+      console.log(`  ${subUrl.split('/').slice(-2).join('/')} → 高中アセット ${highMed.length}件`);
 
-      let dateStr = '', weekday = '';
-      if (reiwaM) {
-        const y = reiwaToAD(parseInt(reiwaM[1], 10));
-        dateStr = `${y}-${padTwo(parseInt(reiwaM[2], 10))}-${padTwo(parseInt(reiwaM[3], 10))}`;
-        weekday = reiwaM[4];
-      } else if (gregM) {
-        dateStr = `${gregM[1]}-${padTwo(parseInt(gregM[2], 10))}-${padTwo(parseInt(gregM[3], 10))}`;
-        weekday = gregM[4];
-      } else if (monthM) {
-        const now = new Date(Date.now() + 9 * 3600 * 1000);
-        dateStr = `${now.getFullYear()}-${padTwo(parseInt(monthM[1], 10))}-${padTwo(parseInt(monthM[2], 10))}`;
-        weekday = monthM[3];
+      let foundAtLeastOne = false;
+
+      for (const asset of highMed) {
+        const ocr = await ocrFlyerFull(asset.url);
+        await sleep(2000);
+
+        const parsed = ocr ? parseOcrDate(ocr.date) : null;
+        const pref   = urlToPref[normalizeUrl(subUrl)] || urlToPref[normalizeUrl(hq.url)] || hq.pref;
+        const prefCode = (pref || 'xx').slice(0, 2);
+
+        if (parsed && !isPast(parsed.dateStr)) {
+          // ── OCR成功: 通常イベント ──────────────────────────────
+          const title = (ocr.title && fixOcrTitle(ocr.title.trim())) || asset.linkText || linkText || '(タイトル不明)';
+          allEvents.push({
+            id:             `${prefCode}-off-${parsed.dateStr.replace(/-/g, '')}-${titleHash(parsed.dateStr, title)}`,
+            pref,
+            date:           parsed.dateStr,
+            weekday:        parsed.weekday,
+            title,
+            place:          (ocr.place && ocr.place.trim()) || '',
+            address:        '',
+            time:           (ocr.time  && ocr.time.trim())  || '',
+            category:       guessCategory(toHalfWidth(title)),
+            tag:            guessTag(title),
+            url:            asset.url,
+            notes:          ocr.notes || null,
+            ageRequirement: (ocr.ageRequirement && ocr.ageRequirement.trim()) || null,
+            deadline:       (ocr.deadline       && ocr.deadline.trim())       || null,
+            source_type:    'office_ocr',
+          });
+          foundAtLeastOne = true;
+          console.log(`    ✓ ${parsed.dateStr} ${title.slice(0, 30)}`);
+
+        } else if (!foundAtLeastOne) {
+          // ── OCR失敗 or 日付取得不可: 公式ページ参照スタブ ───────
+          // 同一ページで1件以上成功していればスタブは不要
+          const stubTitle = (asset.linkText || linkText || hq.name)
+            ? `${asset.linkText || linkText || hq.name}（公式ページ参照）`
+            : '公式ページでイベント情報を確認';
+
+          allEvents.push({
+            id:          `${prefCode}-ref-${todayJST.replace(/-/g, '')}-${titleHash(todayJST, subUrl)}`,
+            pref,
+            date:        todayJST,
+            weekday:     calcWeekday(todayJST),
+            title:       stubTitle,
+            place:       '',
+            address:     '',
+            time:        '',
+            category:    '広報活動',
+            tag:         '',
+            url:         subUrl,
+            notes:       'チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。',
+            ageRequirement: null,
+            deadline:       null,
+            source_type: 'office_notice',
+          });
+          console.log(`    ⚠ 公式ページ参照スタブ追加: ${subUrl}`);
+        }
       }
-      if (!dateStr || isPast(dateStr)) continue;
-
-      const title = (ocr.title && fixOcrTitle(ocr.title.trim())) || asset.linkText || '(タイトル不明)';
-      const eventPref = pref || 'unknown';
-      const prefCode  = eventPref.slice(0, 2);
-
-      allEvents.push({
-        id:             `${prefCode}-off-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
-        pref:           eventPref,
-        date:           dateStr,
-        weekday,
-        title,
-        place:          (ocr.place && ocr.place.trim()) || '',
-        address:        '',
-        time:           (ocr.time  && ocr.time.trim())  || '',
-        category:       guessCategory(toHalfWidth(title)),
-        tag:            guessTag(title),
-        url:            asset.url,
-        notes:          ocr.notes || null,
-        ageRequirement: (ocr.ageRequirement && ocr.ageRequirement.trim()) || null,
-        deadline:       (ocr.deadline       && ocr.deadline.trim())       || null,
-        source_type:    'office_ocr',
-      });
-
-      await sleep(2000);
+      await sleep(BETWEEN_PAGES_MS);
     }
     await sleep(BETWEEN_PAGES_MS);
   }
 
-  console.log(`[OfficeOCR] 合計 ${allEvents.length} 件のイベントを抽出`);
+  console.log(`[OfficeOCR] 合計 ${allEvents.length} 件（OCR成功 + 公式ページ参照スタブ含む）`);
   return allEvents;
 }
 
