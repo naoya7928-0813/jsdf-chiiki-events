@@ -2126,8 +2126,17 @@ async function scrapeOfficeAssets(withFreshContext) {
   const allEvents = [];
   const exploredPages = new Set(); // このrun内で訪問済み
 
-  // ── 各地本HQから1レベル自動探索 ──────────────────────────────────
+  // ── 各地本HQから1レベル自動探索（タイムアウト対策で上限あり） ──────
+  const MAX_PAGES_PER_HQ  = 2; // 1地本あたり最大探索ページ数
+  const MAX_ASSETS_PER_PAGE = 3; // 1ページあたり最大OCRアセット数
+  const EXPLORE_TIMEOUT_MS  = 25 * 60 * 1000; // 全探索25分上限
+  const exploreStart = Date.now();
+
   for (const hq of hqEntries) {
+    if (Date.now() - exploreStart > EXPLORE_TIMEOUT_MS) {
+      console.log('[OfficeOCR] 時間上限に達したため探索を中断します');
+      break;
+    }
     console.log(`[OfficeOCR] 探索: ${hq.name} (${hq.pref}) ${hq.url}`);
 
     // Playwright ステルスコンテキストで地本トップページを取得
@@ -2147,6 +2156,7 @@ async function scrapeOfficeAssets(withFreshContext) {
      * @param {string} sourceUrl - スタブの url に使うページURL
      * @param {string} pref
      */
+    // 全アセットを試してから成否を判断（ページ単位でスタブ1件のみ）
     async function processAssets(assets, sourceUrl, pref) {
       const prefCode = (pref || 'xx').slice(0, 2);
       let foundAtLeastOne = false;
@@ -2177,38 +2187,39 @@ async function scrapeOfficeAssets(withFreshContext) {
           });
           foundAtLeastOne = true;
           console.log(`    ✓ ${parsed.dateStr} ${title.slice(0, 30)}`);
-
-        } else if (!foundAtLeastOne) {
-          // OCR失敗 or 日付なし → 公式ページ参照スタブ（ページ単位で1件のみ）
-          const stubTitle = (asset.text || asset.linkText || hq.name)
-            ? `${asset.text || asset.linkText || hq.name}（公式ページ参照）`
-            : '公式ページでイベント情報を確認';
-          allEvents.push({
-            id:          `${prefCode}-ref-${todayJST.replace(/-/g, '')}-${titleHash(todayJST, sourceUrl)}`,
-            pref,
-            date:        todayJST,
-            weekday:     calcWeekday(todayJST),
-            title:       stubTitle,
-            place:       '',
-            address:     '',
-            time:        '',
-            category:    '広報活動',
-            tag:         '',
-            url:         sourceUrl,
-            notes:       'チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。',
-            ageRequirement: null,
-            deadline:       null,
-            source_type: 'office_notice',
-          });
-          console.log(`    ⚠ 公式ページ参照スタブ: ${sourceUrl}`);
         }
+      }
+
+      // 全アセット処理後、1件も成功しなかった場合のみスタブを1件追加
+      if (!foundAtLeastOne) {
+        const stubTitle = hq.name
+          ? `${hq.name}（公式ページ参照）`
+          : '公式ページでイベント情報を確認';
+        allEvents.push({
+          id:          `${prefCode}-ref-${titleHash(sourceUrl, pref)}`,
+          pref,
+          date:        todayJST,
+          weekday:     calcWeekday(todayJST),
+          title:       stubTitle,
+          place:       '',
+          address:     '',
+          time:        '',
+          category:    '広報活動',
+          tag:         '',
+          url:         sourceUrl,
+          notes:       'チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。',
+          ageRequirement: null,
+          deadline:       null,
+          source_type: 'office_notice',
+        });
+        console.log(`    ⚠ 公式ページ参照スタブ: ${sourceUrl.split('/').slice(-2).join('/')}`);
       }
     }
 
-    // ── 直接PDF/画像リンクをOCR ──────────────────────────────────
+    // ── 直接PDF/画像リンクをOCR（上限MAX_ASSETS_PER_PAGE） ────────
     if (directAssets.length > 0) {
-      const sorted = sortByPriority(directAssets);
-      const highMed = sorted.filter(a => a.priority !== 'low');
+      const sorted  = sortByPriority(directAssets);
+      const highMed = sorted.filter(a => a.priority !== 'low').slice(0, MAX_ASSETS_PER_PAGE);
       if (highMed.length > 0) {
         const pref = urlToPref[normalizeUrl(hq.url)] || hq.pref;
         console.log(`  直接アセット ${highMed.length}件をOCR中...`);
@@ -2216,16 +2227,19 @@ async function scrapeOfficeAssets(withFreshContext) {
       }
     }
 
-    // ── HTMLサブページを探索してアセット抽出 ─────────────────────
+    // ── HTMLサブページを探索してアセット抽出（上限MAX_PAGES_PER_HQ） ─
+    let hqPageCount = 0;
     for (const { url: subUrl, text: linkText } of subPages) {
+      if (hqPageCount >= MAX_PAGES_PER_HQ) break;
       if (exploredPages.has(subUrl)) continue;
       exploredPages.add(subUrl);
+      hqPageCount++;
 
       const $sub = await withFreshContext(ctx => fetchPagePlaywright(ctx, subUrl));
       if (!$sub) { await sleep(3000); continue; }
 
       const assets  = sortByPriority(extractAssets($sub, subUrl));
-      const highMed = assets.filter(a => a.priority !== 'low');
+      const highMed = assets.filter(a => a.priority !== 'low').slice(0, MAX_ASSETS_PER_PAGE);
       if (highMed.length === 0) { await sleep(3000); continue; }
 
       console.log(`  ${subUrl.split('/').slice(-2).join('/')} → 高中アセット ${highMed.length}件`);
