@@ -20,6 +20,12 @@ const crypto  = require('crypto');
 const iconv   = require('iconv-lite');
 const cheerio = require('cheerio');
 
+const assetCache  = require('./lib/assetCache');
+const { normalizeUrl } = require('./lib/normalizeUrl');
+const { sortByPriority } = require('./lib/priority');
+const { markDuplicates }  = require('./lib/dedup');
+const { extractAssets }   = require('./lib/extractAssets');
+
 const { chromium } = require('playwright-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 chromium.use(StealthPlugin());
@@ -154,44 +160,9 @@ const URLS = {
 // ページ間の待機時間（Cloudflare/レートリミット対策）
 const BETWEEN_PAGES_MS = 10_000;
 
-// ── OCR キャッシュ ─────────────────────────────────────────────
-// スキャン済み画像/PDFは再スキャンしない（API呼び出し節約）
-// キー: URL文字列, 値: { cachedAt: ISO8601, result: OCR結果オブジェクト }
-// ファイルは git 管理（GitHub Actions 間で引き継がれる）
-const OCR_CACHE_PATH = path.join(__dirname, 'ocr-cache.json');
-let ocrCache = {};
-try {
-  ocrCache = JSON.parse(fs.readFileSync(OCR_CACHE_PATH, 'utf8'));
-  console.log(`[OCR Cache] ${Object.keys(ocrCache).length} 件のキャッシュを読み込み`);
-} catch {
-  // ファイルが存在しない場合は空キャッシュで開始
-}
-
-/**
- * OCRキャッシュをファイルに書き出す（スクレイプ完了時に呼ぶ）。
- * URL キー形式の古いエントリを除去し、ハッシュキー形式に統一する。
- * 90日以上古いエントリも除去する。
- */
-function saveOcrCache() {
-  const TTL_DAYS = 90;
-  const cutoff   = Date.now() - TTL_DAYS * 86_400_000;
-
-  // URLキー（古い形式）を除去 — ハッシュは64桁の16進数
-  const cleaned = {};
-  for (const [k, v] of Object.entries(ocrCache)) {
-    const isHash = /^[0-9a-f]{64}$/.test(k);
-    if (!isHash) continue;                                     // URL形式を除外
-    if (v.cachedAt && new Date(v.cachedAt).getTime() < cutoff) continue; // TTL超過
-    cleaned[k] = v;
-  }
-
-  try {
-    fs.writeFileSync(OCR_CACHE_PATH, JSON.stringify(cleaned, null, 2), 'utf8');
-    console.log(`[OCR Cache] ${Object.keys(cleaned).length} 件を保存 (クリーンアップ後)`);
-  } catch (err) {
-    console.warn(`[OCR Cache] 保存失敗: ${err.message}`);
-  }
-}
+// ── OCR キャッシュ（lib/assetCache に委譲） ───────────────────
+// ocr-cache.json は .gitignore 対象。GitHub Actions cache で永続化。
+assetCache.load();
 
 // ── モックデータ（--mock 時に使用） ───────────────────────────
 const MOCK_DATA = {
@@ -275,21 +246,57 @@ function hashBuffer(buf) {
 
 /**
  * URL からファイルをダウンロードしてバッファ・ハッシュ・MIMEを返す。
- * @returns {{ buf: Buffer, hash: string, mime: string }|null}
+ * 既存キャッシュの ETag / Last-Modified を使って条件付きGETを発行し、
+ * 304 Not Modified なら実ダウンロードをスキップする。
+ *
+ * @returns {{ buf: Buffer|null, hash: string, mime: string, notModified: boolean }|null}
  */
 async function downloadFile(url) {
+  const normUrl  = normalizeUrl(url);
+  const existing = normUrl ? assetCache.getByUrl(normUrl) : null;
+
+  const headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+    'Referer':    'https://www.mod.go.jp/',
+  };
+  // OCR成功済みエントリのみ条件付きGET（未OCRなら必ず再ダウンロード）
+  if (existing?.result && existing?.etag)               headers['If-None-Match']     = existing.etag;
+  else if (existing?.result && existing?.last_modified) headers['If-Modified-Since'] = existing.last_modified;
+
   try {
-    const res = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Referer':    'https://www.mod.go.jp/',
-      },
-    });
+    const res = await fetch(url, { headers });
+
+    // 304 Not Modified → ファイル本体は取得不要
+    if (res.status === 304 && existing?.content_sha256) {
+      assetCache.touch(existing.content_sha256);
+      console.log(`[DL] 304 Not Modified: ${url.split('/').pop()}`);
+      return { buf: null, hash: existing.content_sha256, mime: existing.content_type || '', notModified: true };
+    }
+
     if (!res.ok) { console.warn(`[DL] ${res.status}: ${url}`); return null; }
+
     const buf  = Buffer.from(await res.arrayBuffer());
     const hash = hashBuffer(buf);
     const mime = (res.headers.get('content-type') || 'application/octet-stream').split(';')[0].trim();
-    return { buf, hash, mime };
+
+    // レスポンスヘッダーをキャッシュに反映（次回の条件付きGET用）
+    const meta = {
+      asset_url:            url,
+      normalized_asset_url: normUrl || url,
+      content_type:         mime,
+      content_length:       buf.length,
+      etag:                 res.headers.get('etag')          || null,
+      last_modified:        res.headers.get('last-modified') || null,
+      last_checked_at:      new Date().toISOString(),
+    };
+    const cached = assetCache.getByHash(hash);
+    if (cached) {
+      assetCache.set(hash, { ...cached, ...meta });
+    } else {
+      assetCache.set(hash, meta);
+    }
+
+    return { buf, hash, mime, notModified: false };
   } catch (err) {
     console.warn(`[DL] ${url} → ${err.message}`);
     return null;
@@ -600,9 +607,9 @@ async function ocrImage(imageUrl) {
   if (!dl) return null;
 
   // ハッシュベースキャッシュ確認
-  if (ocrCache[dl.hash]) {
+  if (assetCache.getByHash(dl.hash) && assetCache.getByHash(dl.hash).result) {
     console.log(`[OCR] キャッシュヒット: ${imageUrl.split('/').pop()}`);
-    return ocrCache[dl.hash].result;
+    return assetCache.getByHash(dl.hash).result;
   }
 
   const base64 = dl.buf.toString('base64');
@@ -626,7 +633,7 @@ async function ocrImage(imageUrl) {
       { text: OCR_PROMPT },
     ], 'OCR');
   }
-  if (result) ocrCache[dl.hash] = { cachedAt: new Date().toISOString(), url: imageUrl, result };
+  if (result) assetCache.set(dl.hash, { ocr_status: "success", last_ocr_at: new Date().toISOString(), url: imageUrl, result });
   return result;
 }
 
@@ -664,9 +671,9 @@ async function ocrPdf(pdfUrl) {
   if (!dl) return null;
 
   // ハッシュベースキャッシュ確認
-  if (ocrCache[dl.hash]) {
+  if (assetCache.getByHash(dl.hash) && assetCache.getByHash(dl.hash).result) {
     console.log(`[PDF-OCR] キャッシュヒット: ${pdfUrl.split('/').pop()}`);
-    return ocrCache[dl.hash].result;
+    return assetCache.getByHash(dl.hash).result;
   }
 
   let result = null;
@@ -687,7 +694,7 @@ async function ocrPdf(pdfUrl) {
     ], 'PDF-OCR');
   }
 
-  if (result) ocrCache[dl.hash] = { cachedAt: new Date().toISOString(), url: pdfUrl, result };
+  if (result) assetCache.set(dl.hash, { ocr_status: "success", last_ocr_at: new Date().toISOString(), url: pdfUrl, result });
   return result;
 }
 
@@ -764,9 +771,9 @@ async function ocrFlyerFull(url) {
   if (!dl) return null;
 
   // ハッシュベースキャッシュ確認
-  if (ocrCache[dl.hash]) {
+  if (assetCache.getByHash(dl.hash) && assetCache.getByHash(dl.hash).result) {
     console.log(`[チラシOCR] キャッシュヒット: ${url.split('/').pop()}`);
-    return ocrCache[dl.hash].result;
+    return assetCache.getByHash(dl.hash).result;
   }
 
   const base64 = dl.buf.toString('base64');
@@ -806,7 +813,7 @@ async function ocrFlyerFull(url) {
     }
   }
 
-  if (result) ocrCache[dl.hash] = { cachedAt: new Date().toISOString(), url, result };
+  if (result) assetCache.set(dl.hash, { ocr_status: "success", last_ocr_at: new Date().toISOString(), url, result });
   return result;
 }
 
@@ -906,9 +913,9 @@ async function ocrImageFull(imageUrl) {
   if (!dl) return null;
 
   // ハッシュベースキャッシュ確認
-  if (ocrCache[dl.hash]) {
+  if (assetCache.getByHash(dl.hash) && assetCache.getByHash(dl.hash).result) {
     console.log(`[OCR-FULL] キャッシュヒット: ${imageUrl.split('/').pop()}`);
-    return ocrCache[dl.hash].result;
+    return assetCache.getByHash(dl.hash).result;
   }
 
   const base64 = dl.buf.toString('base64');
@@ -933,7 +940,7 @@ async function ocrImageFull(imageUrl) {
     ], 'OCR-FULL');
   }
 
-  if (result) ocrCache[dl.hash] = { cachedAt: new Date().toISOString(), url: imageUrl, result };
+  if (result) assetCache.set(dl.hash, { ocr_status: "success", last_ocr_at: new Date().toISOString(), url: imageUrl, result });
   return result;
 }
 
@@ -2030,6 +2037,147 @@ async function fetchToyama(context) {
   return events.sort((a, b) => a.date.localeCompare(b.date));
 }
 
+// ── 募集案内所ページ から PDF/画像を収集してイベントを抽出 ─────────
+
+// offices.json に登録された事務所ページのうち、地本メインページと重複しないサブページ
+const OFFICE_PAGE_URLS = [
+  // 北海道
+  'https://www.mod.go.jp/pco/sapporo/contact.html',
+  'https://www.mod.go.jp/pco/sapporo/contact_nanbu.html',
+  'https://www.mod.go.jp/pco/sapporo/contact_hokubu.html',
+  // 東北
+  'https://www.mod.go.jp/pco/yamagata/sinjyo/sinjyo.html',
+  'https://www.mod.go.jp/pco/yamagata/yonezawa/yonezawa.html',
+  'https://www.mod.go.jp/pco/iwate/iwatechihon/index.html',
+  // 関東
+  'https://www.mod.go.jp/pco/gunma/bosyuannai/oota_sho/oota.html',
+  'https://www.mod.go.jp/pco/tochigi/jimusyo_oyama.html',
+  'https://www.mod.go.jp/pco/tochigi/jimusyo_mohka.html',
+  'https://www.mod.go.jp/pco/tochigi/jimusyo_ashikaga.html',
+  // 中部
+  'https://www.mod.go.jp/pco/niigata/HP/kamo.html',
+  'https://www.mod.go.jp/pco/niigata/HP/takada.html',
+  'https://www.mod.go.jp/pco/ishikawa/guide/',
+  'https://www.mod.go.jp/pco/sizuoka/office/hamakita.html',
+  // 近畿
+  'https://www.mod.go.jp/pco/kyoto/kouhoushitsu/index.html',
+  'https://www.mod.go.jp/pco/wakayama/about/',
+  // 四国
+  'https://www.mod.go.jp/pco/tokushima/anan.html',
+  'https://www.mod.go.jp/pco/tokushima/kamo.html',
+  // 九州
+  'https://www.mod.go.jp/pco/kagoshima/about/access/index.html',
+  'https://www.mod.go.jp/pco/kumamoto/about/access/index.html',
+  'https://www.mod.go.jp/pco/kochi/access.html',
+];
+
+// OFFICE_PAGE_URLS のページから PDF/画像を取得して OCR でイベントを抽出。
+// 既存キャッシュ（SHA-256）にヒットした場合は OCR をスキップ。
+// 戻り値: events[] (pref フィールド付き)
+async function scrapeOfficeAssets(withFreshContext) {
+  if (!process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) {
+    console.log('[OfficeOCR] APIキー未設定のためスキップ');
+    return [];
+  }
+
+  // offices.json をロードして URL → pref マップを構築
+  const OFFICES_PATH = path.join(__dirname, '../public/data/offices.json');
+  let officeUrlToPref = {};
+  try {
+    const officesData = JSON.parse(fs.readFileSync(OFFICES_PATH, 'utf8'));
+    for (const o of officesData.offices) {
+      if (o.url && o.pref) officeUrlToPref[o.url.replace(/\/$/, '')] = o.pref;
+    }
+  } catch { /* offices.json がなければスキップ */ }
+
+  const allEvents = [];
+
+  for (const pageUrl of OFFICE_PAGE_URLS) {
+    const pref = officeUrlToPref[pageUrl.replace(/\/$/, '')] || null;
+    console.log(`[OfficeOCR] ${pageUrl}${pref ? ` (${pref})` : ''}`);
+
+    let html = null;
+    try {
+      const res = await fetch(pageUrl, {
+        headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://www.mod.go.jp/' },
+        signal:  AbortSignal.timeout(30_000),
+      });
+      if (!res.ok) { console.warn(`  [OfficeOCR] HTTP ${res.status} → スキップ`); continue; }
+      const rawBuf = Buffer.from(await res.arrayBuffer());
+      // EUC-JP / Shift_JIS に対応
+      const ct = res.headers.get('content-type') || '';
+      html = ct.includes('euc') ? iconv.decode(rawBuf, 'euc-jp')
+           : ct.includes('shift') ? iconv.decode(rawBuf, 'shift_jis')
+           : rawBuf.toString('utf8');
+    } catch (err) {
+      console.warn(`  [OfficeOCR] 取得エラー: ${err.message}`);
+      continue;
+    }
+
+    const $       = cheerio.load(html);
+    const assets  = sortByPriority(extractAssets($, pageUrl));
+    const highMed = assets.filter(a => a.priority !== 'low');
+    console.log(`  アセット: ${assets.length}件 (高中優先: ${highMed.length}件)`);
+
+    for (const asset of highMed) {
+      const ocr = asset.type === 'pdf'
+        ? await ocrFlyerFull(asset.url)
+        : await ocrFlyerFull(asset.url);
+
+      if (!ocr || !ocr.date) continue;
+
+      // 日付解析
+      const rawDate = toHalfWidth((ocr.date || '').replace(/\s+/g, ' ').trim());
+      const reiwaM  = rawDate.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
+      const gregM   = rawDate.match(/(\d{4})年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
+      const monthM  = rawDate.match(/(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
+
+      let dateStr = '', weekday = '';
+      if (reiwaM) {
+        const y = reiwaToAD(parseInt(reiwaM[1], 10));
+        dateStr = `${y}-${padTwo(parseInt(reiwaM[2], 10))}-${padTwo(parseInt(reiwaM[3], 10))}`;
+        weekday = reiwaM[4];
+      } else if (gregM) {
+        dateStr = `${gregM[1]}-${padTwo(parseInt(gregM[2], 10))}-${padTwo(parseInt(gregM[3], 10))}`;
+        weekday = gregM[4];
+      } else if (monthM) {
+        const now = new Date(Date.now() + 9 * 3600 * 1000);
+        dateStr = `${now.getFullYear()}-${padTwo(parseInt(monthM[1], 10))}-${padTwo(parseInt(monthM[2], 10))}`;
+        weekday = monthM[3];
+      }
+      if (!dateStr || isPast(dateStr)) continue;
+
+      const title = (ocr.title && fixOcrTitle(ocr.title.trim())) || asset.linkText || '(タイトル不明)';
+      const eventPref = pref || 'unknown';
+      const prefCode  = eventPref.slice(0, 2);
+
+      allEvents.push({
+        id:             `${prefCode}-off-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
+        pref:           eventPref,
+        date:           dateStr,
+        weekday,
+        title,
+        place:          (ocr.place && ocr.place.trim()) || '',
+        address:        '',
+        time:           (ocr.time  && ocr.time.trim())  || '',
+        category:       guessCategory(toHalfWidth(title)),
+        tag:            guessTag(title),
+        url:            asset.url,
+        notes:          ocr.notes || null,
+        ageRequirement: (ocr.ageRequirement && ocr.ageRequirement.trim()) || null,
+        deadline:       (ocr.deadline       && ocr.deadline.trim())       || null,
+        source_type:    'office_ocr',
+      });
+
+      await sleep(2000);
+    }
+    await sleep(BETWEEN_PAGES_MS);
+  }
+
+  console.log(`[OfficeOCR] 合計 ${allEvents.length} 件のイベントを抽出`);
+  return allEvents;
+}
+
 // ── メイン処理 ───────────────────────────────────────────────
 
 async function main() {
@@ -2835,17 +2983,30 @@ async function main() {
   kagoshimaEvents = await enrichWithOcr(kagoshimaEvents);
   okinawaEvents   = await enrichWithOcr(okinawaEvents);
 
+  // ── 募集案内所ページから PDF/画像 OCR でイベントを収集 ────────
+  const officeEvents = await scrapeOfficeAssets(withFreshContext);
+
   // imageUrl は最終出力に含めない（内部用フィールド）
-  const strip = ev => { const { imageUrl: _, _flyerUrl: __, ...rest } = ev; return rest; };
+  const strip = ev => { const { imageUrl: _, _flyerUrl: __, duplicate_candidate: _d, duplicate_of: _do, ...rest } = ev; return rest; };
+
+  // 都道府県ごとのイベントに事務所スクレイプ結果をマージ（重複除去込み）
+  function mergeOfficeEvents(existing, pref) {
+    const fromOffice = officeEvents.filter(e => e.pref === pref);
+    if (!fromOffice.length) return existing;
+    const allIds = new Set(existing.map(e => e.id));
+    const deduped = fromOffice.filter(e => !allIds.has(e.id));
+    const merged  = [...existing, ...deduped];
+    return markDuplicates(merged);
+  }
 
   const output = {
-    sapporo:   sapporoEvents.map(strip),
-    asahikawa: asahikawaEvents.map(strip),
-    obihiro:   obihiroEvents.map(strip),
-    hakodate:  hakodateEvents.map(strip),
-    miyagi:    miyagiEvents.map(strip),
-    aomori:    aomoriEvents.map(strip),
-    iwate:     iwateEvents.map(strip),
+    sapporo:   mergeOfficeEvents(sapporoEvents,   'sapporo').map(strip),
+    asahikawa: mergeOfficeEvents(asahikawaEvents, 'asahikawa').map(strip),
+    obihiro:   mergeOfficeEvents(obihiroEvents,   'obihiro').map(strip),
+    hakodate:  mergeOfficeEvents(hakodateEvents,  'hakodate').map(strip),
+    miyagi:    mergeOfficeEvents(miyagiEvents,    'miyagi').map(strip),
+    aomori:    mergeOfficeEvents(aomoriEvents,    'aomori').map(strip),
+    iwate:     mergeOfficeEvents(iwateEvents,     'iwate').map(strip),
     yamagata:  yamagataEvents.map(strip),
     fukushima: fukushimaEvents.map(strip),
     akita:     akitaEvents.map(strip),
@@ -2892,7 +3053,7 @@ async function main() {
     updatedAt: nowJST(),
   };
   // OCRキャッシュを保存（スキャン済みURLを記録 → 次回以降の再スキャンを防ぐ）
-  saveOcrCache();
+  assetCache.save();
 
   writeOutput(output);
   // 新規イベントを検出してプッシュ通知（非同期・失敗しても続行）

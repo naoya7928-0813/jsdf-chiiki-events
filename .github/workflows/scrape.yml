@@ -1,13 +1,12 @@
 name: スクレイピング & データ更新
 
 on:
-  # 日本時間 8:00 / 12:00 / 16:00 / 20:00 に自動実行
-  # UTC 換算: 23:00(前日) / 03:00 / 07:00 / 11:00
+  # 日本時間 8:00 / 12:00 / 18:00 に自動実行（1日3回）
+  # UTC 換算: 23:00(前日) / 03:00 / 09:00
   schedule:
     - cron: '0 23 * * *'   # 日本時間 08:00
     - cron: '0 3 * * *'    # 日本時間 12:00
-    - cron: '0 7 * * *'    # 日本時間 16:00
-    - cron: '0 11 * * *'   # 日本時間 20:00
+    - cron: '0 9 * * *'    # 日本時間 18:00
 
   # GitHub Actions の UI から手動実行も可能
   workflow_dispatch:
@@ -38,6 +37,15 @@ jobs:
       - name: scraper の依存パッケージをインストール
         working-directory: scraper
         run: npm ci
+
+      # ── OCRキャッシュを復元（git管理外・大容量対応） ────────────
+      - name: OCRキャッシュを復元
+        uses: actions/cache@v4
+        with:
+          path: scraper/ocr-cache.json
+          key: ocr-cache-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            ocr-cache-${{ runner.os }}-
 
       # ── Playwright Chromium バイナリをキャッシュ ─────────────
       - name: Playwright Chromium キャッシュを復元
@@ -72,20 +80,12 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add public/data/events.json public/events.html public/events/ public/sitemap.xml scraper/ocr-cache.json
+          git add public/data/events.json public/events.html public/events/ public/sitemap.xml
 
           EVENTS_STATUS=$(git status --porcelain public/data/events.json public/events.html public/sitemap.xml)
-          CACHE_STATUS=$(git status --porcelain scraper/ocr-cache.json)
 
-          if [ -z "$EVENTS_STATUS" ] && [ -z "$CACHE_STATUS" ]; then
+          if [ -z "$EVENTS_STATUS" ]; then
             echo "データに変更がありませんでした。コミットをスキップします。"
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          elif [ -z "$EVENTS_STATUS" ] && [ -n "$CACHE_STATUS" ]; then
-            # OCRキャッシュのみ更新 → コミットするがデプロイしない
-            git commit -m "chore: update ocr cache [skip ci]"
-            git pull --rebase
-            git push || (git pull --rebase && git push)
-            echo "OCRキャッシュを更新しました（イベントデータ変更なし）。"
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             git commit -m "chore: update events data [skip ci]"

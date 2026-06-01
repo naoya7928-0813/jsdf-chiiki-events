@@ -18,6 +18,9 @@ scraper/research_*.js
 scraper/test_*.js
 scraper/verify_*.js
 
+# OCRキャッシュ（大容量のためgit管理外・GitHub Actions Cacheで永続化）
+scraper/ocr-cache.json
+
 .env*.local
 
 .env*
