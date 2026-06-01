@@ -47,9 +47,78 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null
+    },
+    {
+      "id": "sa-ref-9696e",
+      "pref": "sapporo",
+      "date": "2026-06-02",
+      "weekday": "火",
+      "title": "自衛隊札幌地方協力本部（公式ページ参照）",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/sapporo/",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_notice"
+    },
+    {
+      "id": "sa-ref-zco5n",
+      "pref": "sapporo",
+      "date": "2026-06-02",
+      "weekday": "火",
+      "title": "自衛隊札幌地方協力本部（公式ページ参照）",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/sapporo/recruit.html",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_notice"
     }
   ],
-  "asahikawa": [],
+  "asahikawa": [
+    {
+      "id": "as-ref-bzbxy",
+      "pref": "asahikawa",
+      "date": "2026-06-02",
+      "weekday": "火",
+      "title": "自衛隊旭川地方協力本部（公式ページ参照）",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/asahikawa/",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_notice"
+    },
+    {
+      "id": "as-ref-xtte3",
+      "pref": "asahikawa",
+      "date": "2026-06-02",
+      "weekday": "火",
+      "title": "自衛隊旭川地方協力本部（公式ページ参照）",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/asahikawa/recruit.html",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_notice"
+    }
+  ],
   "obihiro": [
     {
       "id": "ob-20260620-teo9c",
@@ -114,26 +183,96 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null
-    }
-  ],
-  "hakodate": [],
-  "miyagi": [
+    },
     {
-      "id": "mi-20260601-qbe6a",
-      "pref": "miyagi",
-      "date": "2026-06-01",
-      "weekday": "月",
-      "title": "令和8年度<春号>「予備自通信」を掲載",
+      "id": "ob-ref-tl68b",
+      "pref": "obihiro",
+      "date": "2026-06-02",
+      "weekday": "火",
+      "title": "自衛隊帯広地方協力本部（公式ページ参照）",
       "place": "",
       "address": "",
       "time": "",
       "category": "広報活動",
       "tag": "",
-      "url": "https://www.mod.go.jp/pco/miyagi/reserve.html#r8-news",
-      "notes": null,
+      "url": "https://www.mod.go.jp/pco/obihiro/recruit.html",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "source_type": "office_notice"
     },
+    {
+      "id": "ob-ref-zdtie",
+      "pref": "obihiro",
+      "date": "2026-06-02",
+      "weekday": "火",
+      "title": "自衛隊帯広地方協力本部（公式ページ参照）",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/obihiro/recruit_works.html",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_notice"
+    }
+  ],
+  "hakodate": [
+    {
+      "id": "ha-ref-kdk46",
+      "pref": "hakodate",
+      "date": "2026-06-02",
+      "weekday": "火",
+      "title": "自衛隊函館地方協力本部（公式ページ参照）",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/hakodate/",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_notice"
+    },
+    {
+      "id": "ha-ref-e738q",
+      "pref": "hakodate",
+      "date": "2026-06-02",
+      "weekday": "火",
+      "title": "自衛隊函館地方協力本部（公式ページ参照）",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/hakodate/recruitment",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_notice"
+    },
+    {
+      "id": "ha-ref-4zemx",
+      "pref": "hakodate",
+      "date": "2026-06-02",
+      "weekday": "火",
+      "title": "自衛隊函館地方協力本部（公式ページ参照）",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/hakodate/news",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_notice"
+    }
+  ],
+  "miyagi": [
     {
       "id": "mi-20260606-pwft7",
       "pref": "miyagi",
@@ -183,7 +322,59 @@
       "deadline": null
     }
   ],
-  "aomori": [],
+  "aomori": [
+    {
+      "id": "ao-ref-sza3a",
+      "pref": "aomori",
+      "date": "2026-06-02",
+      "weekday": "火",
+      "title": "自衛隊青森地方協力本部（公式ページ参照）",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/aomori/",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_notice"
+    },
+    {
+      "id": "ao-ref-9tul2",
+      "pref": "aomori",
+      "date": "2026-06-02",
+      "weekday": "火",
+      "title": "自衛隊青森地方協力本部（公式ページ参照）",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/aomori/engo/jinzai.html",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_notice"
+    },
+    {
+      "id": "ao-ref-zyzgx",
+      "pref": "aomori",
+      "date": "2026-06-02",
+      "weekday": "火",
+      "title": "自衛隊青森地方協力本部（公式ページ参照）",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/aomori/nyuusatu/mokuji.html",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_notice"
+    }
+  ],
   "iwate": [
     {
       "id": "iw-20260606-2gsn0",
@@ -408,6 +599,23 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null
+    },
+    {
+      "id": "iw-ref-n1zeq",
+      "pref": "iwate",
+      "date": "2026-06-02",
+      "weekday": "火",
+      "title": "自衛隊岩手地方協力本部（公式ページ参照）",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/iwate/boshuu/index.html",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_notice"
     }
   ],
   "yamagata": [
@@ -2088,5 +2296,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/06/01 22:16"
+  "updatedAt": "2026/06/02 01:01"
 }
