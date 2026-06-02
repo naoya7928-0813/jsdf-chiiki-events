@@ -47,23 +47,6 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null
-    },
-    {
-      "id": "sa-ref-9696e",
-      "pref": "sapporo",
-      "date": "2026-06-02",
-      "weekday": "火",
-      "title": "自衛隊札幌地方協力本部のイベント情報（公式ページ参照）",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/sapporo/recruit.html",
-      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_notice"
     }
   ],
   "asahikawa": [
@@ -149,23 +132,6 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null
-    },
-    {
-      "id": "ob-ref-ou4hi",
-      "pref": "obihiro",
-      "date": "2026-06-02",
-      "weekday": "火",
-      "title": "自衛隊広報イベント（日程は公式ページ参照）",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/obihiro/recruit.html",
-      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_notice"
     }
   ],
   "hakodate": [
@@ -391,31 +357,31 @@
       "pref": "iwate",
       "date": "2026-07-26",
       "weekday": "日",
-      "title": "自衛隊岩手地本イベント",
-      "place": "",
+      "title": "自衛隊を「知る」「感じる」",
+      "place": "| 陸上自衛隊岩手駐屯地（岩手県滝沢市後268-433） |",
       "address": "",
-      "time": "",
+      "time": "9:30～14:00",
       "category": "広報活動",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/iwate/assets/img/event/until20260726/shokubataiken.pdf",
       "notes": null,
-      "ageRequirement": null,
-      "deadline": null
+      "ageRequirement": "中学生、保護者、教諭等",
+      "deadline": "令和8年7月2日(木)まで"
     },
     {
       "id": "iw-20260730-ov7y0",
       "pref": "iwate",
       "date": "2026-07-30",
       "weekday": "木",
-      "title": "自衛隊岩手地本イベント",
-      "place": "",
+      "title": "# 航空自衛隊秋田救難隊",
+      "place": "| 航空自衛隊秋田分屯基地 (秋田県秋田市雄和椿川字山龍23",
       "address": "",
-      "time": "",
+      "time": "11:00～14:30",
       "category": "広報活動",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/iwate/assets/img/event/until20260730/akitabuntonkichi.pdf",
       "notes": null,
-      "ageRequirement": null,
+      "ageRequirement": "| 岩手県内の33歳未満の自衛隊に興味のある方 |",
       "deadline": null
     },
     {
@@ -423,15 +389,15 @@
       "pref": "iwate",
       "date": "2026-08-04",
       "weekday": "火",
-      "title": "自衛隊岩手地本イベント",
-      "place": "",
+      "title": "# 自衛隊仙台病院",
+      "place": "| 陸上自衛隊仙台駐屯地（宮城県仙台市宮城野区南目館1－1）",
       "address": "",
-      "time": "",
+      "time": "10:30～14:30",
       "category": "広報活動",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/iwate/assets/img/event/until20260804/sendai.pdf",
       "notes": null,
-      "ageRequirement": null,
+      "ageRequirement": "| 募集対象者等 | |",
       "deadline": null
     },
     {
@@ -439,15 +405,15 @@
       "pref": "iwate",
       "date": "2026-08-07",
       "weekday": "金",
-      "title": "自衛隊岩手地本イベント",
-      "place": "",
+      "title": "# 海上自衛隊",
+      "place": "| 海上自衛隊八戸航空基地（青森県八戸市高館） |",
       "address": "",
-      "time": "",
+      "time": "10:00～13:00",
       "category": "広報活動",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/iwate/assets/img/event/until20260807/hachinohe.pdf",
       "notes": null,
-      "ageRequirement": null,
+      "ageRequirement": "| 岩手県内の33歳未満の自衛隊に興味のある方 |",
       "deadline": null
     },
     {
@@ -497,23 +463,6 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null
-    },
-    {
-      "id": "iw-ref-fjp6e",
-      "pref": "iwate",
-      "date": "2026-06-02",
-      "weekday": "火",
-      "title": "令和8年度 自衛官等募集案内（日程は公式ページ参照）",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/iwate/boshuu/index.html",
-      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_notice"
     }
   ],
   "yamagata": [
@@ -2260,5 +2209,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/06/02 23:02"
+  "updatedAt": "2026/06/02 23:45"
 }
