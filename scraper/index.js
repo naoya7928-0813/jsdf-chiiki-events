@@ -14,11 +14,16 @@ require('dotenv').config({ path: require('path').join(__dirname, '.env') });
  * 出力: public/data/events.json
  */
 
-const path    = require('path');
-const fs      = require('fs');
-const crypto  = require('crypto');
-const iconv   = require('iconv-lite');
-const cheerio = require('cheerio');
+const path      = require('path');
+const fs        = require('fs');
+const fsp       = fs.promises;
+const crypto    = require('crypto');
+const os        = require('os');
+const { execFile } = require('child_process');
+const { promisify } = require('util');
+const execFileAsync = promisify(execFile);
+const iconv     = require('iconv-lite');
+const cheerio   = require('cheerio');
 
 const assetCache  = require('./lib/assetCache');
 const { normalizeUrl } = require('./lib/normalizeUrl');
@@ -521,6 +526,107 @@ async function callGroqOcr(base64, mimeType, prompt, label = 'OCR') {
   return null;
 }
 
+// ── PDF → 画像変換（poppler-utils / pdftoppm） ─────────────────────
+// PDFをJPEG画像配列に変換することで、Groq VisionなどのOCRに渡せるようにする。
+// pdftoppm は GitHub Actions Ubuntu に apt でインストール済みが前提。
+
+let pdftoppmAvailable = null;
+
+async function checkPdftoppm() {
+  if (pdftoppmAvailable !== null) return pdftoppmAvailable;
+  try {
+    await execFileAsync('pdftoppm', ['-v'], { timeout: 5000 });
+    pdftoppmAvailable = true;
+  } catch {
+    pdftoppmAvailable = false;
+  }
+  return pdftoppmAvailable;
+}
+
+/**
+ * PDFバッファを JPEG 画像バッファの配列に変換する（先頭 maxPages ページ）。
+ * pdftoppm（poppler-utils）が必要。利用不可なら空配列を返す。
+ */
+async function pdfToImages(pdfBuf, maxPages = 2) {
+  if (!await checkPdftoppm()) return [];
+  const tmpDir = await fsp.mkdtemp(path.join(os.tmpdir(), 'jsdf-pdf-'));
+  const pdfPath = path.join(tmpDir, 'input.pdf');
+  try {
+    await fsp.writeFile(pdfPath, pdfBuf);
+    await execFileAsync('pdftoppm', [
+      '-jpeg', '-r', '150', '-l', String(maxPages),
+      pdfPath, path.join(tmpDir, 'page'),
+    ], { timeout: 30_000 });
+    const files = (await fsp.readdir(tmpDir))
+      .filter(f => /\.(jpg|jpeg)$/i.test(f))
+      .sort()
+      .slice(0, maxPages);
+    return Promise.all(files.map(f => fsp.readFile(path.join(tmpDir, f))));
+  } catch (err) {
+    console.warn('[PDF2IMG]', err.message);
+    return [];
+  } finally {
+    fsp.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
+  }
+}
+
+// ── Mistral OCR（PDFネイティブサポート） ──────────────────────────
+// Mistral AI OCR API: PDF を直接 OCR してマークダウンで返す。
+// 無料枠あり（新規アカウント時のクレジット）。
+// 必要環境変数: MISTRAL_API_KEY
+
+let mistralQuotaExhausted = false;
+
+/**
+ * Mistral OCR API で PDF/画像をOCRしてイベント情報JSONを返す。
+ * API が返したマークダウン全文を parseTextToEvent() で構造化する。
+ * @param {string} base64 - ファイルのbase64
+ * @param {'application/pdf'|string} mimeType
+ * @param {string} label
+ */
+async function callMistralOcr(base64, mimeType, label = 'Mistral-OCR') {
+  if (!process.env.MISTRAL_API_KEY) return null;
+  if (mistralQuotaExhausted) {
+    console.warn(`[${label}] Mistral クォータ枯渇 → スキップ`);
+    return null;
+  }
+  try {
+    const isPdf = mimeType === 'application/pdf';
+    const body  = {
+      model: 'mistral-ocr-latest',
+      document: isPdf
+        ? { type: 'document', document_base64: base64 }
+        : { type: 'image',    image_base64:    base64 },
+    };
+    const res = await fetch('https://api.mistral.ai/v1/ocr', {
+      method:  'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.MISTRAL_API_KEY}`,
+        'Content-Type':  'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      if (res.status === 429 || res.status === 402) {
+        console.warn(`[${label}] Mistral ${res.status} → クォータ枯渇フラグ`);
+        mistralQuotaExhausted = true;
+        return null;
+      }
+      console.warn(`[${label}] Mistral エラー: ${res.status}`);
+      return null;
+    }
+    const json = await res.json();
+    const text = (json.pages || []).map(p => p.markdown || '').filter(Boolean).join('\n\n');
+    if (!text.trim()) return null;
+    const result = parseTextToEvent(text, 'full');
+    if (result) console.log(`[${label}] Mistral OCR 成功`);
+    return result;
+  } catch (err) {
+    console.warn(`[${label}] Mistral エラー: ${err.message}`);
+    return null;
+  }
+}
+
 // ── Gemini OCR（PDF専用: 岩手・青森・三重・和歌山 など） ───────────
 // Gemini は PDF をネイティブサポート。Groq はPDF非対応のため PDF のみ引き続き使用。
 // 無料枠: 1,500 RPD / 15 RPM
@@ -663,7 +769,12 @@ const PDF_OCR_PROMPT = `この自衛隊イベントのPDFから情報を抽出�
 
 /**
  * PDF URL を受け取り OCR して JSON を返す（ハッシュキャッシュ対応）。
- * パイプライン: PDFテキスト直接抽出 → Gemini Flash OCR
+ * パイプライン:
+ *   1. PDFテキスト直接抽出（テキストレイヤー）
+ *   2. PDF→画像変換 → Tesseract（ローカル）
+ *   3. PDF→画像変換 → Groq Vision（無料・高レート）
+ *   4. Mistral OCR（PDFネイティブ・無料枠）
+ *   5. Gemini Flash（フォールバック）
  */
 async function ocrPdf(pdfUrl) {
   if (!pdfUrl) return null;
@@ -677,25 +788,52 @@ async function ocrPdf(pdfUrl) {
     return assetCache.getByHash(dl.hash).result;
   }
 
+  if (dl.notModified) return null;
+
+  const base64 = dl.buf.toString('base64');
   let result = null;
 
-  // 1. PDFテキスト直接抽出（テキストレイヤー付きPDFに有効）
+  // 1. PDFテキスト直接抽出
   const pdfText = await extractPdfText(dl.buf);
   if (pdfText) {
     result = parseTextToEvent(pdfText, 'pdf');
-    if (result) console.log(`[PDF-OCR] テキスト抽出成功（API呼び出し不要）: ${pdfUrl.split('/').pop()}`);
+    if (result) console.log(`[PDF-OCR] テキスト抽出成功（API不要）: ${pdfUrl.split('/').pop()}`);
   }
 
-  // 2. Gemini Flash OCR（スキャンPDF用）
+  // 2. PDF→画像 → Tesseract
+  if (!result) {
+    const imgs = await pdfToImages(dl.buf, 2);
+    for (const imgBuf of imgs) {
+      const tessText = await tryTesseractOcr(imgBuf);
+      if (tessText) { result = parseTextToEvent(tessText, 'full'); }
+      if (result) { console.log(`[PDF-OCR] Tesseract 成功: ${pdfUrl.split('/').pop()}`); break; }
+    }
+  }
+
+  // 3. PDF→画像 → Groq Vision
+  if (!result && process.env.GROQ_API_KEY) {
+    const imgs = await pdfToImages(dl.buf, 2);
+    for (const imgBuf of imgs) {
+      const imgBase64 = imgBuf.toString('base64');
+      result = await callGroqOcr(imgBase64, 'image/jpeg', PDF_OCR_PROMPT, 'PDF-OCR(Groq)');
+      if (result) { console.log(`[PDF-OCR] Groq Vision 成功: ${pdfUrl.split('/').pop()}`); break; }
+    }
+  }
+
+  // 4. Mistral OCR（PDFネイティブ）
+  if (!result) {
+    result = await callMistralOcr(base64, 'application/pdf', 'PDF-OCR(Mistral)');
+  }
+
+  // 5. Gemini Flash（フォールバック）
   if (!result && process.env.GEMINI_API_KEY) {
-    const base64 = dl.buf.toString('base64');
     result = await callGeminiOcr([
       { inline_data: { mime_type: 'application/pdf', data: base64 } },
       { text: PDF_OCR_PROMPT },
-    ], 'PDF-OCR');
+    ], 'PDF-OCR(Gemini)');
   }
 
-  if (result) assetCache.set(dl.hash, { ocr_status: "success", last_ocr_at: new Date().toISOString(), url: pdfUrl, result });
+  if (result) assetCache.set(dl.hash, { ocr_status: 'success', last_ocr_at: new Date().toISOString(), url: pdfUrl, result });
   return result;
 }
 
@@ -759,10 +897,10 @@ const FLYER_OCR_PROMPT = `この自衛隊イベントのチラシ（PDF・画像
 
 /**
  * PDF または画像 URL を受け取り、全情報（date 含む）を OCR して JSON を返す。
- * 近畿WP系地本のチラシ専用。ハッシュキャッシュ対応。
+ * ハッシュキャッシュ対応。
  * パイプライン:
- *   PDF  → テキスト直接抽出 → Gemini Flash OCR
- *   画像 → Tesseract → Groq → Gemini
+ *   PDF  → テキスト抽出 → PDF→画像(Tesseract) → PDF→画像(Groq) → Mistral OCR → Gemini
+ *   画像 → Tesseract → Groq → Mistral → Gemini
  */
 async function ocrFlyerFull(url) {
   if (!url) return null;
@@ -777,22 +915,43 @@ async function ocrFlyerFull(url) {
     return assetCache.getByHash(dl.hash).result;
   }
 
+  if (dl.notModified) return null;
+
   const base64 = dl.buf.toString('base64');
   let result = null;
 
   if (isPdf) {
-    // 1a. PDF テキスト直接抽出
+    // 1. PDFテキスト直接抽出
     const pdfText = await extractPdfText(dl.buf);
     if (pdfText) {
       result = parseTextToEvent(pdfText, 'full');
       if (result) console.log(`[チラシOCR] PDFテキスト抽出成功（API不要）: ${url.split('/').pop()}`);
     }
-    // 1b. Gemini Flash OCR（スキャンPDF用）
+    // 2. PDF→画像 → Tesseract
+    if (!result) {
+      const imgs = await pdfToImages(dl.buf, 2);
+      for (const imgBuf of imgs) {
+        const t = await tryTesseractOcr(imgBuf);
+        if (t) { result = parseTextToEvent(t, 'full'); }
+        if (result) { console.log(`[チラシOCR] PDF+Tesseract 成功`); break; }
+      }
+    }
+    // 3. PDF→画像 → Groq Vision
+    if (!result && process.env.GROQ_API_KEY) {
+      const imgs = await pdfToImages(dl.buf, 2);
+      for (const imgBuf of imgs) {
+        result = await callGroqOcr(imgBuf.toString('base64'), 'image/jpeg', FLYER_OCR_PROMPT, 'チラシOCR-PDF(Groq)');
+        if (result) { console.log(`[チラシOCR] PDF+Groq 成功`); break; }
+      }
+    }
+    // 4. Mistral OCR（PDFネイティブ）
+    if (!result) result = await callMistralOcr(base64, 'application/pdf', 'チラシOCR-PDF(Mistral)');
+    // 5. Gemini Flash（フォールバック）
     if (!result && process.env.GEMINI_API_KEY) {
       result = await callGeminiOcr([
         { inline_data: { mime_type: 'application/pdf', data: base64 } },
         { text: FLYER_OCR_PROMPT },
-      ], 'チラシOCR-PDF');
+      ], 'チラシOCR-PDF(Gemini)');
     }
   } else {
     // 2a. ローカル Tesseract
@@ -803,14 +962,18 @@ async function ocrFlyerFull(url) {
     }
     // 2b. Groq Vision
     if (!result && process.env.GROQ_API_KEY) {
-      result = await callGroqOcr(base64, dl.mime, FLYER_OCR_PROMPT, 'チラシOCR');
+      result = await callGroqOcr(base64, dl.mime, FLYER_OCR_PROMPT, 'チラシOCR(Groq)');
     }
-    // 2c. Gemini Flash
+    // 2c. Mistral OCR（画像）
+    if (!result) {
+      result = await callMistralOcr(base64, dl.mime, 'チラシOCR(Mistral)');
+    }
+    // 2d. Gemini Flash
     if (!result && process.env.GEMINI_API_KEY) {
       result = await callGeminiOcr([
         { inline_data: { mime_type: dl.mime, data: base64 } },
         { text: FLYER_OCR_PROMPT },
-      ], 'チラシOCR');
+      ], 'チラシOCR(Gemini)');
     }
   }
 

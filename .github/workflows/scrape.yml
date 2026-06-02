@@ -55,9 +55,9 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-chromium-${{ runner.os }}-${{ hashFiles('scraper/package-lock.json') }}
 
-      # ── Tesseract OCR（日本語）をインストール ────────────────
-      - name: Tesseract OCR をインストール
-        run: sudo apt-get install -y tesseract-ocr tesseract-ocr-jpn
+      # ── Tesseract OCR + poppler-utils をインストール ────────────
+      - name: Tesseract OCR + poppler-utils をインストール
+        run: sudo apt-get install -y tesseract-ocr tesseract-ocr-jpn poppler-utils
 
       # ── Playwright 用 Chromium をインストール ────────────────
       - name: Playwright Chromium をインストール
@@ -69,8 +69,9 @@ jobs:
         working-directory: scraper
         run: node index.js
         env:
-          GROQ_API_KEY:    ${{ secrets.GROQ_API_KEY }}
-          GEMINI_API_KEY:  ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY:     ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY:   ${{ secrets.GEMINI_API_KEY }}
+          MISTRAL_API_KEY:  ${{ secrets.MISTRAL_API_KEY }}
 
       # ── 変更があればコミット & プッシュ ──────────────────────
       - name: 変更をコミット & プッシュ
