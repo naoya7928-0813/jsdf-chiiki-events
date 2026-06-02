@@ -591,12 +591,13 @@ async function callMistralOcr(base64, mimeType, label = 'Mistral-OCR') {
     return null;
   }
   try {
-    const isPdf = mimeType === 'application/pdf';
-    const body  = {
+    const isPdf   = mimeType === 'application/pdf';
+    const dataUri = `data:${mimeType};base64,${base64}`;
+    const body    = {
       model: 'mistral-ocr-latest',
       document: isPdf
-        ? { type: 'document', document_base64: base64 }
-        : { type: 'image',    image_base64:    base64 },
+        ? { type: 'document_url', document_url: dataUri }
+        : { type: 'image_url',    image_url:    dataUri },
     };
     const res = await fetch('https://api.mistral.ai/v1/ocr', {
       method:  'POST',
