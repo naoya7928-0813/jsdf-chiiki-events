@@ -154,7 +154,9 @@ jobs:
           const ALL_PREFS = Object.keys(curr).filter(k => Array.isArray(curr[k]));
           const prevIds   = new Set(ALL_PREFS.flatMap(p => (prev[p] || []).map(e => e.id)));
           const newItems  = ALL_PREFS.flatMap(p =>
-            (curr[p] || []).filter(e => !prevIds.has(e.id)).map(e => ({ ...e, _pref: p }))
+            (curr[p] || []).filter(e =>
+              !prevIds.has(e.id) && e.source_type !== 'office_notice'
+            ).map(e => ({ ...e, _pref: p }))
           );
 
           console.log('  全イベント数 :', ALL_PREFS.flatMap(p => curr[p] || []).length, '件');

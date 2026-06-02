@@ -3249,9 +3249,14 @@ async function main() {
     const fromOffice = officeEvents.filter(e => e.pref === pref);
     if (!fromOffice.length) return existing;
     const allIds = new Set(existing.map(e => e.id));
-    const deduped = fromOffice.filter(e => !allIds.has(e.id));
-    const merged  = [...existing, ...deduped];
-    return markDuplicates(merged);
+    const deduped = fromOffice.filter(e => {
+      if (allIds.has(e.id)) return false;
+      // 既存イベントがある地本にはスタブを追加しない（通知ノイズ防止）
+      if (e.source_type === 'office_notice' && existing.length > 0) return false;
+      return true;
+    });
+    if (!deduped.length) return existing;
+    return markDuplicates([...existing, ...deduped]);
   }
 
   const output = {
