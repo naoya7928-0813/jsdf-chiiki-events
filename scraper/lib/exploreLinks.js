@@ -6,8 +6,8 @@ const { normalizeUrl, isPdfUrl, isImageUrl, isAssetUrl } = require('./normalizeU
 const EVENT_URL_KW = /event|oshirase|news|topics|bosyu|chirashi|annai|setsumei|recruit|koho|kiji|post|saiyou|announce|info|schedule|calendar/i;
 const EVENT_TXT_KW = /イベント|行事|お知らせ|新着|募集案内|チラシ|説明会|公開|記念行事|体験|見学|催し|情報|スケジュール|案内|広報/;
 
-// アクセス・組織情報系ページ（スキップ対象）
-const SKIP_URL_KW = /contact|access|jimusyo|about|privacy|sitemap|staff|history|link|mail|recruit_top|gaiyou|rinen|nenpou|map/i;
+// アクセス・組織情報・非イベント系ページ（スキップ対象）
+const SKIP_URL_KW = /contact|access|jimusyo|about|privacy|sitemap|staff|history|link|mail|recruit_top|gaiyou|rinen|nenpou|map|engo|nyuusatu|chotatsu|kanri|soshiki|gaiyo|kokai|jigyo|tenki|syoko|koyo|jinzai|shien|soudan|houdou|press|photo|video|album|gallery/i;
 
 /**
  * ページ内のリンクを2種類に分類して返す。

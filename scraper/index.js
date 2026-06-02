@@ -2156,15 +2156,24 @@ async function scrapeOfficeAssets(withFreshContext) {
      * @param {string} sourceUrl - スタブの url に使うページURL
      * @param {string} pref
      */
-    // 全アセットを試してから成否を判断（ページ単位でスタブ1件のみ）
+    // 既にこの地本でスタブ追加済みか追跡（地本ごとにスタブ1件のみ）
+    const hqStubAdded = new Set();
+
+    // 全アセットを試してから成否を判断
     async function processAssets(assets, sourceUrl, pref) {
       const prefCode = (pref || 'xx').slice(0, 2);
       let foundAtLeastOne = false;
+      let bestOcrTitle    = null; // 日付なしでもタイトルが取れた場合に使用
 
       for (const asset of assets) {
         const ocr    = await ocrFlyerFull(asset.url);
         await sleep(2000);
         const parsed = ocr ? parseOcrDate(ocr.date) : null;
+
+        // OCRでタイトルが取れた場合は記録しておく（日付なしでもスタブで活用）
+        if (ocr?.title && !bestOcrTitle) {
+          bestOcrTitle = fixOcrTitle(ocr.title.trim());
+        }
 
         if (parsed && !isPast(parsed.dateStr)) {
           const title = (ocr.title && fixOcrTitle(ocr.title.trim())) || asset.text || asset.linkText || '(タイトル不明)';
@@ -2190,13 +2199,15 @@ async function scrapeOfficeAssets(withFreshContext) {
         }
       }
 
-      // 全アセット処理後、1件も成功しなかった場合のみスタブを1件追加
-      if (!foundAtLeastOne) {
-        const stubTitle = hq.name
-          ? `${hq.name}（公式ページ参照）`
-          : '公式ページでイベント情報を確認';
+      // 全アセット処理後、1件も成功せず かつ 地本スタブ未追加の場合のみスタブ1件
+      if (!foundAtLeastOne && !hqStubAdded.has(pref)) {
+        hqStubAdded.add(pref);
+        // OCRでタイトルが取れていればそれを使い、なければ「公式ページ参照」
+        const stubTitle = bestOcrTitle
+          ? `${bestOcrTitle}（日程は公式ページ参照）`
+          : `${hq.name}のイベント情報（公式ページ参照）`;
         allEvents.push({
-          id:          `${prefCode}-ref-${titleHash(sourceUrl, pref)}`,
+          id:          `${prefCode}-ref-${titleHash(hq.url, pref)}`,
           pref,
           date:        todayJST,
           weekday:     calcWeekday(todayJST),
