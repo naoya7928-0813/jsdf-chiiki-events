@@ -40,7 +40,7 @@ const { parseKanagawa }      = require('./parsers/kanagawa');
 const { parseTokyo }         = require('./parsers/tokyo');
 const { parseSaitama }       = require('./parsers/saitama');
 const { parseGunma }         = require('./parsers/gunma');
-const { parseIbaraki }       = require('./parsers/ibaraki');
+const { parseIbaraki, parseIbarakiSetsumeikai } = require('./parsers/ibaraki');
 const { parseChiba }         = require('./parsers/chiba');
 const { parseTochigiImages } = require('./parsers/tochigi');
 // 北海道地本
@@ -123,6 +123,7 @@ const URLS = {
   gunma:     'https://www.mod.go.jp/pco/gunma/event.html',
   tochigi:   'https://www.mod.go.jp/pco/tochigi/',
   ibaraki:   'https://www.mod.go.jp/pco/ibaraki/event.html',
+  ibarakiSetsumeikai: 'https://www.mod.go.jp/pco/ibaraki/setsumeikai.html',
   chiba:     'https://www.mod.go.jp/pco/chiba/event.html',
   // 中部地本
   niigata:   'https://www.mod.go.jp/pco/niigata/HP/event-schedule.html',
@@ -1469,8 +1470,33 @@ async function fetchHtmlPref(context, prefLabel, url, parserFn) {
 }
 
 const fetchGunma     = (ctx) => fetchHtmlPref(ctx, '群馬', URLS.gunma,     parseGunma);
-const fetchIbaraki   = (ctx) => fetchHtmlPref(ctx, '茨城', URLS.ibaraki,   parseIbaraki);
 const fetchChiba     = (ctx) => fetchHtmlPref(ctx, '千葉', URLS.chiba,     parseChiba);
+
+/**
+ * 茨城地本: event.html（一般イベント）に加え、setsumeikai.html（各事務所の
+ * 採用説明会スケジュール表）も取得してマージする。
+ */
+async function fetchIbaraki(context) {
+  const main = await fetchHtmlPref(context, '茨城', URLS.ibaraki, parseIbaraki);
+
+  let setsu = [];
+  try {
+    await sleep(BETWEEN_PAGES_MS);
+    setsu = await fetchHtmlPref(
+      context, '茨城(説明会)', URLS.ibarakiSetsumeikai, parseIbarakiSetsumeikai,
+    );
+  } catch (err) {
+    console.warn(`[茨城] 説明会ページ取得失敗: ${err.message}`);
+  }
+
+  const seen   = new Set(main.map(e => e.id));
+  const merged = [...main];
+  for (const ev of setsu) {
+    if (!seen.has(ev.id)) { seen.add(ev.id); merged.push(ev); }
+  }
+  console.log(`[茨城] 合計 ${merged.length} 件（一般 ${main.length} + 説明会 ${setsu.length}）`);
+  return merged.sort((a, b) => a.date.localeCompare(b.date));
+}
 // 近畿地本（HTML スクレイピング）
 const fetchKyoto     = (ctx) => fetchHtmlPref(ctx, '京都', URLS.kyoto,     parseKyoto);
 const fetchOsaka     = (ctx) => fetchHtmlPref(ctx, '大阪', URLS.osaka,     parseOsaka);

@@ -5,6 +5,18 @@
  */
 export const UPDATE_NOTES = [
   {
+    date:    '2026-06-04',
+    version: '1.10.6',
+    type:    'feature',
+    content: '茨城県の各事務所のイベント情報も収集対象に追加',
+  },
+  {
+    date:    '2026-06-04',
+    version: '1.9.6',
+    type:    'fix',
+    content: '群馬県の一部イベントが表示されない不具合を修正',
+  },
+  {
     date:    '2026-06-03',
     version: '1.9.5',
     type:    'improvement',

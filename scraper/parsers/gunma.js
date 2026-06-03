@@ -25,7 +25,11 @@ function parseGunma($) {
     const title = $sec.find('.event_ttl').first().text().replace(/\s+/g, ' ').trim();
     if (!title) return;
 
-    const $lis = $sec.find('div.event_detail_list ul li');
+    // 日時リストは2種類の構造がある:
+    //   (a) <div class="event_detail_list"><ul><li>… （一般イベント）
+    //   (b) <ul class="event_detail_list"><li>…       （説明会・出張所イベント）
+    // どちらの li も拾えるよう .event_detail_list の子孫 li をまとめて取得する
+    const $lis = $sec.find('.event_detail_list li');
     if ($lis.length < 1) return;
 
     const rawDate = toHalfWidth($lis.eq(0).text().replace(/\s+/g, ' ').trim());
