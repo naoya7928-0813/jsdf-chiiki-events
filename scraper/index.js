@@ -634,6 +634,14 @@ async function callMistralOcr(base64, mimeType, label = 'Mistral-OCR') {
 
 let geminiQuotaExhausted = false;
 
+/** OCR結果フィールドを安全に文字列化してtrimする（非文字列・nullも許容） */
+function safeStr(v) {
+  if (!v) return '';
+  if (typeof v === 'string') return v.trim();
+  if (Array.isArray(v)) return v.map(safeStr).filter(Boolean).join(' ').trim();
+  return String(v).trim();
+}
+
 /**
  * Gemini OCR API を呼び出す共通関数（PDF専用。画像は callGroqOcr を使うこと）。
  * 429 時は 60 秒待機して 1 回リトライ。リトライ後も失敗で枯渇フラグをセット。
@@ -867,11 +875,11 @@ async function enrichWithPdfOcr(events) {
 
     results.push(ocr ? {
       ...ev,
-      title:          (ocr.title          && fixOcrTitle(ocr.title.trim()))  || ev.title,
-      place:          (ocr.place          && ocr.place.trim())               || ev.place || '',
-      time:           (ocr.time           && ocr.time.trim())                || ev.time  || '',
-      ageRequirement: (ocr.ageRequirement && ocr.ageRequirement.trim())      || ev.ageRequirement || null,
-      deadline:       (ocr.deadline       && ocr.deadline.trim())            || ev.deadline       || null,
+      title:          (ocr.title          && fixOcrTitle(safeStr(ocr.title)))  || ev.title,
+      place:          (safeStr(ocr.place))               || ev.place || '',
+      time:           safeStr(ocr.time)                || ev.time  || '',
+      ageRequirement: safeStr(ocr.ageRequirement)      || ev.ageRequirement || null,
+      deadline:       safeStr(ocr.deadline)            || ev.deadline       || null,
       notes:          [ev.notes, ocr.notes].filter(Boolean).join('\n')       || null,
     } : ev);
 
@@ -1033,7 +1041,7 @@ async function enrichFromFlyer(events, prefLabel) {
     }
 
     const { _flyerUrl, ...baseEv } = ev;
-    const title   = (ocr.title && fixOcrTitle(ocr.title.trim())) || ev.title;
+    const title   = (ocr.title && fixOcrTitle(safeStr(ocr.title))) || ev.title;
     const idBase  = ev.id.split('-')[0];  // 例: 'na', 'mi', 'sh', 'wk'
     results.push({
       ...baseEv,
@@ -1041,10 +1049,10 @@ async function enrichFromFlyer(events, prefLabel) {
       date:           dateStr,
       weekday,
       title,
-      place:          (ocr.place          && ocr.place.trim())          || '',
-      time:           (ocr.time           && ocr.time.trim())           || '',
-      ageRequirement: (ocr.ageRequirement && ocr.ageRequirement.trim()) || null,
-      deadline:       (ocr.deadline       && ocr.deadline.trim())       || null,
+      place:          (safeStr(ocr.place))          || '',
+      time:           safeStr(ocr.time)           || '',
+      ageRequirement: safeStr(ocr.ageRequirement) || null,
+      deadline:       safeStr(ocr.deadline)       || null,
       notes:          ocr.notes || null,
       category:       guessCategory(toHalfWidth(title)),
       tag:            guessTag(title),
@@ -1122,10 +1130,10 @@ function mergeOcr(ev, ocr) {
   return {
     ...ev,
     // HTMLパース済みタイトルを優先し、OCRタイトルは未取得時のみ補完
-    title:          ev.title || (ocr.title && fixOcrTitle(ocr.title.trim())) || '',
-    time:           (ocr.time           && ocr.time.trim())           || ev.time  || '',
-    ageRequirement: (ocr.ageRequirement && ocr.ageRequirement.trim()) || ev.ageRequirement || null,
-    deadline:       (ocr.deadline       && ocr.deadline.trim())       || ev.deadline       || null,
+    title:          ev.title || (ocr.title && fixOcrTitle(safeStr(ocr.title))) || '',
+    time:           safeStr(ocr.time)           || ev.time  || '',
+    ageRequirement: safeStr(ocr.ageRequirement) || ev.ageRequirement || null,
+    deadline:       safeStr(ocr.deadline)       || ev.deadline       || null,
     notes: [ev.notes, ocr.notes].filter(Boolean).join('\n') || null,
     url:            ocrUrl,
   };
@@ -2336,26 +2344,26 @@ async function scrapeOfficeAssets(withFreshContext) {
 
         // OCRでタイトルが取れた場合は記録しておく（日付なしでもスタブで活用）
         if (ocr?.title && !bestOcrTitle) {
-          bestOcrTitle = fixOcrTitle(ocr.title.trim());
+          bestOcrTitle = fixOcrTitle(safeStr(ocr.title));
         }
 
         if (parsed && !isPast(parsed.dateStr)) {
-          const title = (ocr.title && fixOcrTitle(ocr.title.trim())) || asset.text || asset.linkText || '(タイトル不明)';
+          const title = (ocr.title && fixOcrTitle(safeStr(ocr.title))) || asset.text || asset.linkText || '(タイトル不明)';
           allEvents.push({
             id:             `${prefCode}-off-${parsed.dateStr.replace(/-/g, '')}-${titleHash(parsed.dateStr, title)}`,
             pref,
             date:           parsed.dateStr,
             weekday:        parsed.weekday,
             title,
-            place:          (ocr.place && ocr.place.trim()) || '',
+            place:          safeStr(ocr.place) || '',
             address:        '',
-            time:           (ocr.time  && ocr.time.trim())  || '',
+            time:           safeStr(ocr.time)  || '',
             category:       guessCategory(toHalfWidth(title)),
             tag:            guessTag(title),
             url:            asset.url,
             notes:          ocr.notes || null,
-            ageRequirement: (ocr.ageRequirement && ocr.ageRequirement.trim()) || null,
-            deadline:       (ocr.deadline       && ocr.deadline.trim())       || null,
+            ageRequirement: safeStr(ocr.ageRequirement) || null,
+            deadline:       safeStr(ocr.deadline)       || null,
             source_type:    'office_ocr',
           });
           foundAtLeastOne = true;
