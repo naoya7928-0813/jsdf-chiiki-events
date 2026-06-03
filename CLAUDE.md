@@ -110,6 +110,38 @@ cd scraper && node index.js
 - `public/events/<pref>.html` — イベントがある都道府県分（JSON-LD・canonical付き）
 - `public/sitemap.xml` — 全URLを含む更新済みサイトマップ
 
+## 更新ノートの運用ルール
+
+設定画面に表示される更新ノート（`src/constants/updates.js`）の管理ルール。
+
+### 記載タイミング
+- 修正・実装を行った**後に必ずユーザーに確認を取ってから**記載する
+- 軽微な修正（誤字修正、内部リファクタリング）は記載不要なことが多い
+- ユーザーが記載を指示した場合のみ追加する
+
+### バージョン更新ルール
+- 更新ノートに新規エントリを追加する際は **必ず `package.json` のバージョンも更新** する
+- バージョンの上げ幅の目安:
+  - 機能追加: patch (+0.0.1) 〜 minor (+0.1.0) を状況に応じて
+  - バグ修正のみ: patch (+0.0.1)
+  - 大きな機能追加・破壊的変更: minor (+0.1.0)
+
+### 追加手順
+1. `src/constants/updates.js` の `UPDATE_NOTES` 配列の**先頭**に追加（新しい順）
+2. `package.json` のバージョンを適切に上げる
+3. `src/constants/updates.js` の対象エントリの `version` も合わせて更新
+4. ビルド確認 → コミット → push → デプロイ
+
+```js
+// src/constants/updates.js の例
+{
+  date:    'YYYY-MM-DD',
+  version: '1.X.Y',
+  type:    'feature',  // 'feature' | 'fix' | 'improvement'
+  content: '変更内容の説明',
+},
+```
+
 ## よくある作業
 
 ### 新しい都道府県パーサーを追加

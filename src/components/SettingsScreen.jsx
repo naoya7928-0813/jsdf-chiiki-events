@@ -20,7 +20,8 @@ export default function SettingsScreen({
   // ── Web Push ─────────────────────────────────────────────────
   const push = usePushNotification();
 
-  const [sourceOpen, setSourceOpen] = useState(false);
+  const [sourceOpen,  setSourceOpen]  = useState(false);
+  const [updatesOpen, setUpdatesOpen] = useState(false);
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)', fontFamily: F.sans }}>
@@ -267,45 +268,65 @@ export default function SettingsScreen({
           )}
         </div>
 
-        {/* ─ 7. 更新ノート ─ */}
-        <GroupTitle>更新ノート</GroupTitle>
-        <Card>
-          <div style={{ padding: '4px 0' }}>
-            {UPDATE_NOTES.map((note, i) => {
-              const typeInfo = TYPE_LABEL[note.type] || TYPE_LABEL.improvement;
-              const isLast   = i === UPDATE_NOTES.length - 1;
-              return (
-                <div key={i} style={{
-                  padding: '12px 14px',
-                  borderBottom: isLast ? 'none' : '1px solid var(--sep)',
-                }}>
-                  {/* 日時・バージョン・タイプ */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                    <span style={{
-                      fontSize: 9, fontWeight: 700, letterSpacing: 0.5,
-                      padding: '2px 7px', borderRadius: 4,
-                      background: `${typeInfo.color}18`,
-                      color: typeInfo.color,
-                      fontFamily: F.sans,
-                    }}>
-                      {typeInfo.label}
-                    </span>
-                    <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: F.mono }}>
-                      v{note.version}
-                    </span>
-                    <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: F.mono, marginLeft: 'auto' }}>
-                      {note.date}
-                    </span>
+        {/* ─ 7. 更新ノート（折り畳み式） ─ */}
+        <div style={{
+          margin: '20px 16px 0',
+          background: 'var(--card)',
+          border: '1px solid var(--border)',
+          borderRadius: 12,
+          overflow: 'hidden',
+        }}>
+          <button
+            onClick={() => setUpdatesOpen(v => !v)}
+            style={{
+              width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '14px 16px', background: 'none', border: 'none', cursor: 'pointer',
+              fontFamily: F.sans,
+            }}
+          >
+            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, color: 'var(--text-muted)' }}>
+              更新ノート
+            </span>
+            <span style={{ display: 'flex', transition: 'transform 0.2s', transform: updatesOpen ? 'rotate(90deg)' : 'rotate(0deg)' }}>
+              {ICO.chev('var(--text-muted)', 12)}
+            </span>
+          </button>
+          {updatesOpen && (
+            <div style={{ borderTop: '1px solid var(--border)' }}>
+              {UPDATE_NOTES.map((note, i) => {
+                const typeInfo = TYPE_LABEL[note.type] || TYPE_LABEL.improvement;
+                const isLast   = i === UPDATE_NOTES.length - 1;
+                return (
+                  <div key={i} style={{
+                    padding: '12px 14px',
+                    borderBottom: isLast ? 'none' : '1px solid var(--sep)',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                      <span style={{
+                        fontSize: 9, fontWeight: 700, letterSpacing: 0.5,
+                        padding: '2px 7px', borderRadius: 4,
+                        background: `${typeInfo.color}18`,
+                        color: typeInfo.color,
+                        fontFamily: F.sans,
+                      }}>
+                        {typeInfo.label}
+                      </span>
+                      <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: F.mono }}>
+                        v{note.version}
+                      </span>
+                      <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: F.mono, marginLeft: 'auto' }}>
+                        {note.date}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>
+                      {note.content}
+                    </div>
                   </div>
-                  {/* 更新内容 */}
-                  <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>
-                    {note.content}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
         {/* ─ 8. バージョン ─ */}
         <div style={{ textAlign: 'center', padding: '16px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 20px)', fontSize: 11, color: 'var(--text-muted)', fontFamily: F.mono }}>

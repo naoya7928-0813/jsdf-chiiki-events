@@ -6,7 +6,7 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-06-03',
-    version: '1.8.0',
+    version: '1.8.1',
     type:    'feature',
     content: '東京都・神奈川県の各募集案内所のイベント情報も収集対象に追加',
   },
