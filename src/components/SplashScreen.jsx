@@ -31,9 +31,9 @@ function injectKeyframes() {
   el.textContent = `
     /* ── 空自：戦闘機が左から中央へ飛来して停止（幅220px → 半分110px） ── */
     @keyframes spJetFly {
-      0%        { left: -250px; transform: scale(0.82); }
-      60%       { transform: scale(1); }
-      72%, 100% { left: calc(50% - 110px); transform: scale(1); }
+      0%        { left: -250px; transform: scale(1.025); }
+      60%       { transform: scale(1.25); }
+      72%, 100% { left: calc(50% - 110px); transform: scale(1.25); }
     }
     @keyframes spJetTrail {
       0%   { width: 0; opacity: 0; left: 0; }
@@ -567,6 +567,7 @@ function TankScene({ cfg, Vehicle }) {
       {/* 戦車本体（砂煙もコンテナ内に入れて追従させる） */}
       <div style={{
         position: 'absolute', bottom: 'calc(35% + 2px)', left: -250,
+        transform: 'scale(1.25)', transformOrigin: 'bottom center',
         animation: 'spTankRoll 2.2s cubic-bezier(.22,.80,.22,1) forwards',
       }}>
         <Vehicle color={cfg.vehicleColor} />
@@ -651,6 +652,7 @@ function ShipScene({ cfg, Vehicle }) {
       {/* 護衛艦本体（水飛沫・反射もコンテナ内で追従） */}
       <div style={{
         position: 'absolute', bottom: 'calc(30% + 4px)', left: -320,
+        transform: 'scale(1.25)', transformOrigin: 'bottom center',
         animation: 'spShipSail 2.4s cubic-bezier(.22,.80,.22,1) forwards',
       }}>
         {/* 水面反射（コンテナ内に配置 → 艦と一緒に動く） */}
