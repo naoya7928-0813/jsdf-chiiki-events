@@ -53,8 +53,8 @@
     {
       "id": "as-ref-bzbxy",
       "pref": "asahikawa",
-      "date": "2026-06-02",
-      "weekday": "火",
+      "date": "2026-06-03",
+      "weekday": "水",
       "title": "令和8年度自衛官等採用案内（日程は公式ページ参照）",
       "place": "",
       "address": "",
@@ -155,8 +155,8 @@
     {
       "id": "ha-ref-kdk46",
       "pref": "hakodate",
-      "date": "2026-06-02",
-      "weekday": "火",
+      "date": "2026-06-03",
+      "weekday": "水",
       "title": "自衛隊函館地方協力本部のイベント情報（公式ページ参照）",
       "place": "",
       "address": "",
@@ -218,14 +218,30 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null
+    },
+    {
+      "id": "mi-20260628-7bw6l",
+      "pref": "miyagi",
+      "date": "2026-06-28",
+      "weekday": "日",
+      "title": "警察・消防・自衛隊合同職業説明会",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/miyagi/recruit.html#8.6.28-natori",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
     }
   ],
   "aomori": [
     {
       "id": "ao-ref-sza3a",
       "pref": "aomori",
-      "date": "2026-06-02",
-      "weekday": "火",
+      "date": "2026-06-03",
+      "weekday": "水",
       "title": "令和7年度自衛官等採用案内（日程は公式ページ参照）",
       "place": "",
       "address": "",
@@ -485,22 +501,6 @@
   ],
   "fukushima": [
     {
-      "id": "fs-20260602-jslz1",
-      "pref": "fukushima",
-      "date": "2026-06-02",
-      "weekday": "火",
-      "title": "第3弾 ふくしま発しゃべくり2026",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
       "id": "fs-20260613-u1bqm",
       "pref": "fukushima",
       "date": "2026-06-13",
@@ -630,13 +630,13 @@
       "title": "防衛省自衛隊インターンシップ",
       "place": "",
       "address": "",
-      "time": "0900~1630",
+      "time": "",
       "category": "広報活動",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/saitama/event/img/8.8.21intan.jpg",
-      "notes": "採用・募集目的ではない、自衛隊の仕事を知ってもらう企画",
-      "ageRequirement": "高校生",
-      "deadline": "令和6年7月15日（水）"
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
     }
   ],
   "gunma": [
@@ -2209,5 +2209,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/06/02 23:45"
+  "updatedAt": "2026/06/03 12:22"
 }
