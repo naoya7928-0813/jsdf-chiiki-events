@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ICO } from './Icons';
 import { BottomTabBar, F } from './Shared';
-import { COLOR_SCHEMES, REGION_SOURCE } from '../config';
+import { COLOR_SCHEMES, REGION_SOURCE, REGION_HQ } from '../config';
 import { usePushNotification } from '../hooks/usePushNotification';
+import { fetchOfficesData } from '../hooks/useOffices';
 import { UPDATE_NOTES, TYPE_LABEL } from '../constants/updates';
 
 // package.json の version を vite.config.js の define で埋め込んだ定数
@@ -22,6 +23,34 @@ export default function SettingsScreen({
 
   const [sourceOpen,  setSourceOpen]  = useState(false);
   const [updatesOpen, setUpdatesOpen] = useState(false);
+
+  // ── 掲載元: 各地本の事務所一覧（offices.json を遅延ロード） ──────
+  const [offices,   setOffices]   = useState(null);   // null=未取得 / []=取得失敗
+  const [openHqs,   setOpenHqs]   = useState(() => new Set()); // 展開中の地本キー
+
+  // 掲載元セクションを初めて開いたときに offices.json を取得
+  useEffect(() => {
+    if (sourceOpen && offices === null) {
+      fetchOfficesData()
+        .then(list => setOffices(list))
+        .catch(() => setOffices([]));
+    }
+  }, [sourceOpen, offices]);
+
+  // pref ごとに事務所をグループ化（HQ を先頭に）
+  const officesByPref = {};
+  for (const o of offices || []) {
+    (officesByPref[o.pref] = officesByPref[o.pref] || []).push(o);
+  }
+  for (const key of Object.keys(officesByPref)) {
+    officesByPref[key].sort((a, b) => (a.type === 'hq' ? -1 : b.type === 'hq' ? 1 : 0));
+  }
+
+  const toggleHq = key => setOpenHqs(prev => {
+    const next = new Set(prev);
+    next.has(key) ? next.delete(key) : next.add(key);
+    return next;
+  });
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)', fontFamily: F.sans }}>
@@ -246,15 +275,89 @@ export default function SettingsScreen({
           </button>
           {sourceOpen && (
             <div style={{ padding: '0 16px 14px', borderTop: '1px solid var(--border)' }}>
-              {Object.values(REGION_SOURCE).map(src => (
-                <div key={src.url} style={{
-                  fontSize: 11, color: 'var(--text-muted)',
-                  lineHeight: 1.7, paddingLeft: 8, marginTop: 8,
-                }}>
-                  {'・'}{src.name}
-                </div>
-              ))}
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7, paddingLeft: 8 }}>
+              {/* 各地本ブロック（タップで配下の事務所・募集案内所を展開） */}
+              {Object.entries(REGION_SOURCE).map(([key, src]) => {
+                const hqName   = REGION_HQ[key]?.name || src.name;
+                const list     = officesByPref[key] || [];
+                const branches = list.filter(o => o.type !== 'hq');
+                const open     = openHqs.has(key);
+                return (
+                  <div key={key} style={{
+                    marginTop: 8, borderRadius: 8,
+                    border: '1px solid var(--sep)', overflow: 'hidden',
+                  }}>
+                    <button
+                      onClick={() => toggleHq(key)}
+                      style={{
+                        width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        gap: 8, padding: '9px 11px', background: 'none', border: 'none',
+                        cursor: 'pointer', fontFamily: F.sans, textAlign: 'left',
+                      }}
+                    >
+                      <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)', lineHeight: 1.4 }}>
+                        {hqName}
+                      </span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                        {offices !== null && (
+                          <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+                            {branches.length > 0 ? `案内所 ${branches.length}` : '本部のみ'}
+                          </span>
+                        )}
+                        <span style={{
+                          display: 'flex', transition: 'transform 0.2s',
+                          transform: open ? 'rotate(90deg)' : 'rotate(0deg)',
+                        }}>
+                          {ICO.chev('var(--text-muted)', 11)}
+                        </span>
+                      </span>
+                    </button>
+                    {open && (
+                      <div style={{ padding: '2px 11px 10px', borderTop: '1px solid var(--sep)' }}>
+                        {/* 公式サイトリンク */}
+                        <a
+                          href={src.url} target="_blank" rel="noopener noreferrer"
+                          style={{
+                            display: 'inline-block', fontSize: 11, color: primary,
+                            textDecoration: 'none', margin: '8px 0 4px', wordBreak: 'break-all',
+                          }}
+                        >
+                          {src.name} ↗
+                        </a>
+                        {/* 事務所・募集案内所一覧（位置情報取得済み） */}
+                        {offices === null ? (
+                          <div style={{ fontSize: 11, color: 'var(--text-muted)', padding: '4px 0' }}>
+                            読み込み中…
+                          </div>
+                        ) : list.length === 0 ? (
+                          <div style={{ fontSize: 11, color: 'var(--text-muted)', padding: '4px 0' }}>
+                            事務所情報なし
+                          </div>
+                        ) : (
+                          list.map(o => (
+                            <div key={o.id} style={{
+                              fontSize: 11, color: 'var(--text-muted)',
+                              lineHeight: 1.55, padding: '3px 0 3px 10px',
+                              borderLeft: `2px solid ${o.type === 'hq' ? primary : 'var(--sep)'}`,
+                              marginTop: 4,
+                            }}>
+                              <span style={{ color: 'var(--text)', fontWeight: 500 }}>
+                                {o.name}
+                              </span>
+                              {o.type === 'hq' && (
+                                <span style={{ color: primary, fontSize: 10, marginLeft: 5 }}>本部</span>
+                              )}
+                              {o.address && <div>{o.address}</div>}
+                              {o.tel && <div>TEL {o.tel}</div>}
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7, paddingLeft: 8, marginTop: 12 }}>
                 {'・'}日本地図: Geolonia Inc. / Wikipedia contributors (GFDL)
               </div>
               <div style={{
