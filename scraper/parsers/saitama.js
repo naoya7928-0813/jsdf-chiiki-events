@@ -4,25 +4,36 @@ const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo , titleH
 
 const BASE_URL = 'https://www.mod.go.jp/pco/saitama/event/';
 
-function resolveUrl(href) {
+function resolveUrl(href, baseUrl = BASE_URL) {
   if (!href) return '';
   // HTMLの属性が誤ってhref値に混入したケース（例: "file.jpg target=_blank"）を除去
   const clean = href.split(/\s/)[0].split('%20')[0];
   if (clean.startsWith('http')) return clean;
   try {
-    return new URL(clean, BASE_URL).href;
+    return new URL(clean, baseUrl).href;
   } catch {
     return '';
   }
 }
 
+/** お問い合わせ先テキストから担当事務所名（〜地域事務所/募集案内所/出張所）を抽出 */
+function extractOffice(raw) {
+  if (!raw) return '';
+  const m = raw.match(/([一-龯ぁ-んァ-ヶ]+(?:地域事務所|募集案内所|出張所))/);
+  return m ? m[1] : '';
+}
+
 /**
+ * 埼玉地本のイベント／採用説明会ページをパースする。
+ * `/event/`（一般イベント）と `/job-fair/`（各事務所の採用説明会）が
+ * 同一の section.subSec / h3 / h4 / dl 構造のため、baseUrl を切り替えて共用する。
+ *
  * @param {import('cheerio').CheerioAPI} $
+ * @param {string} [baseUrl] 相対URL解決の基準（job-fair 取得時は当該ページURL）
  * @returns {Array<Object>}
  */
-function parseSaitama($) {
+function parseSaitama($, baseUrl = BASE_URL) {
   const events = [];
-  let idx = 0;
 
   // イベントカードは section.subSec（コメントアウトされた section は Cheerio が自動除外）
   $('section.subSec').each((_i, secEl) => {
@@ -31,7 +42,10 @@ function parseSaitama($) {
     // タイトル: h3[id] 優先、なければ h3
     const title = ($sec.find('h3[id]').first().text()
       || $sec.find('h3').first().text()
-    ).replace(/\s+/g, ' ').trim();
+    ).replace(/\s+/g, ' ').trim()
+      // 末尾に付くことがある日付（例: "…in朝霞 8.6.20（土）"）を除去
+      .replace(/\s*\d{1,2}\.\d{1,2}\.\d{1,2}\s*[（(][月火水木金土日祝・]+[）)]\s*$/, '')
+      .trim();
     if (!title) return;
 
     // 日付: dl ではなく h4 テキストに含まれる（例: 令和８年５月１９日（火））
@@ -59,12 +73,14 @@ function parseSaitama($) {
       fields[key] = dd.text().replace(/\s+/g, ' ').trim();
     });
 
-    // 場所: 見学先 または 場所（埼玉は見学型イベントが多い）
+    // 場所: 見学先 / 場所 / 会場（埼玉は見学型・説明会型イベントが多い）
     const place = (fields['見学先'] || fields['場所'] || fields['会場'] || '').trim();
+    // 住所: 所在地（説明会ページにあり、地図精度向上に使用）
+    const address = (fields['所在地'] || fields['住所'] || '').trim();
 
-    // 時間
+    // 時間: 時程（説明会ページ）も対象に含める
     const time = toHalfWidth(
-      fields['時間'] || fields['集合時間'] || fields['開催時間'] || fields['受付時間'] || ''
+      fields['時間'] || fields['集合時間'] || fields['開催時間'] || fields['受付時間'] || fields['時程'] || ''
     ).trim();
 
     // カテゴリ・タグ
@@ -74,17 +90,23 @@ function parseSaitama($) {
 
     // URL: セクション内の最初のリンク
     const linkHref = $sec.find('a').first().attr('href') || '';
-    const url = resolveUrl(linkHref);
+    const url = resolveUrl(linkHref, baseUrl);
 
     // 画像URL: div.imgContents の a[href] または img[src]
     const $img    = $sec.find('.imgContents');
     const imgHref = $img.find('a').first().attr('href') || '';
     const imgSrc  = $img.find('img').first().attr('src') || '';
-    const imageUrl = resolveUrl(imgHref || imgSrc);
+    const imageUrl = resolveUrl(imgHref || imgSrc, baseUrl);
 
-    const ageRequirement = toHalfWidth(fields['応募資格'] || '').trim() || null;
+    const ageRequirement = toHalfWidth(fields['応募資格'] || fields['対象者'] || '').trim() || null;
     const deadline       = toHalfWidth(fields['応募締切'] || fields['締切'] || '').trim() || null;
-    const notes          = fields['実施内容'] || fields['内容'] || fields['備考'] || null;
+
+    // 担当事務所（お問い合わせ先の〜地域事務所等）を notes 先頭に付与
+    const office    = extractOffice(fields['お問い合わせ先'] || '');
+    const baseNotes = fields['実施内容'] || fields['内容'] || fields['備考'] || null;
+    const notes     = office
+      ? `担当: ${office}${baseNotes ? `\n${baseNotes}` : ''}`
+      : (baseNotes || null);
 
     events.push({
       id:      `s-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
@@ -93,12 +115,12 @@ function parseSaitama($) {
       weekday,
       title,
       place,
-      address: '',
+      address,
       time,
       category,
       tag,
       url,
-      notes:          notes || null,
+      notes,
       ageRequirement,
       deadline,
       imageUrl,

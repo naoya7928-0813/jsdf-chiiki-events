@@ -65,7 +65,7 @@ export default function HomeScreen({
               Main Page
             </div>
             <div style={{ fontFamily: F.serif, fontSize: 22, fontWeight: 600, letterSpacing: 1, marginTop: 4 }}>
-              地本イベント情報
+              地本イベントナビ
             </div>
           </div>
 

@@ -119,6 +119,7 @@ const URLS = {
   kanagawa:  'https://www.mod.go.jp/pco/kanagawa/kouho/event/event.html',
   tokyo:     'https://www.mod.go.jp/pco/tokyo/event2/index.html',
   saitama:   'https://www.mod.go.jp/pco/saitama/event/',
+  saitamaJobFair: 'https://www.mod.go.jp/pco/saitama/job-fair/',
   gunma:     'https://www.mod.go.jp/pco/gunma/event.html',
   tochigi:   'https://www.mod.go.jp/pco/tochigi/',
   ibaraki:   'https://www.mod.go.jp/pco/ibaraki/event.html',
@@ -1374,10 +1375,34 @@ async function fetchTokyo(context) {
 }
 
 /**
- * 埼玉地本ページを取得・パース
+ * 埼玉地本ページを取得・パース。
+ * `/event/`（一般イベント）に加え、`/job-fair/`（各事務所の採用説明会情報）も
+ * 取得してマージする。説明会ページは同一の section.subSec 構造のため
+ * parseSaitama を baseUrl 切り替えで共用する。
  */
 async function fetchSaitama(context) {
-  return fetchHtmlPref(context, '埼玉', URLS.saitama, parseSaitama);
+  const main = await fetchHtmlPref(context, '埼玉', URLS.saitama, parseSaitama);
+
+  // 採用説明会情報（各事務所の説明会イベント）。失敗しても本体イベントは維持。
+  let jobFair = [];
+  try {
+    await sleep(BETWEEN_PAGES_MS);
+    jobFair = await fetchHtmlPref(
+      context, '埼玉(説明会)', URLS.saitamaJobFair,
+      $ => parseSaitama($, URLS.saitamaJobFair),
+    );
+  } catch (err) {
+    console.warn(`[埼玉] 説明会ページ取得失敗: ${err.message}`);
+  }
+
+  // id 重複を除去してマージ
+  const seen   = new Set(main.map(e => e.id));
+  const merged = [...main];
+  for (const ev of jobFair) {
+    if (!seen.has(ev.id)) { seen.add(ev.id); merged.push(ev); }
+  }
+  console.log(`[埼玉] 合計 ${merged.length} 件（一般 ${main.length} + 説明会 ${jobFair.length}）`);
+  return merged.sort((a, b) => a.date.localeCompare(b.date));
 }
 
 /** 共通: HTML ページを Playwright → fetch の順で取得してパーサーに渡す */
