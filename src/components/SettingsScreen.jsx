@@ -3,6 +3,7 @@ import { ICO } from './Icons';
 import { BottomTabBar, F } from './Shared';
 import { COLOR_SCHEMES, REGION_SOURCE } from '../config';
 import { usePushNotification } from '../hooks/usePushNotification';
+import { UPDATE_NOTES, TYPE_LABEL } from '../constants/updates';
 
 // package.json の version を vite.config.js の define で埋め込んだ定数
 /* global __APP_VERSION__ */
@@ -266,7 +267,47 @@ export default function SettingsScreen({
           )}
         </div>
 
-        {/* ─ 7. バージョン ─ */}
+        {/* ─ 7. 更新ノート ─ */}
+        <GroupTitle>更新ノート</GroupTitle>
+        <Card>
+          <div style={{ padding: '4px 0' }}>
+            {UPDATE_NOTES.map((note, i) => {
+              const typeInfo = TYPE_LABEL[note.type] || TYPE_LABEL.improvement;
+              const isLast   = i === UPDATE_NOTES.length - 1;
+              return (
+                <div key={i} style={{
+                  padding: '12px 14px',
+                  borderBottom: isLast ? 'none' : '1px solid var(--sep)',
+                }}>
+                  {/* 日時・バージョン・タイプ */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                    <span style={{
+                      fontSize: 9, fontWeight: 700, letterSpacing: 0.5,
+                      padding: '2px 7px', borderRadius: 4,
+                      background: `${typeInfo.color}18`,
+                      color: typeInfo.color,
+                      fontFamily: F.sans,
+                    }}>
+                      {typeInfo.label}
+                    </span>
+                    <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: F.mono }}>
+                      v{note.version}
+                    </span>
+                    <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: F.mono, marginLeft: 'auto' }}>
+                      {note.date}
+                    </span>
+                  </div>
+                  {/* 更新内容 */}
+                  <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>
+                    {note.content}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+
+        {/* ─ 8. バージョン ─ */}
         <div style={{ textAlign: 'center', padding: '16px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 20px)', fontSize: 11, color: 'var(--text-muted)', fontFamily: F.mono }}>
           自衛隊地本イベント情報 {__APP_VERSION__}
         </div>
