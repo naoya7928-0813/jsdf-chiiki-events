@@ -65,6 +65,16 @@ cd scraper && node index.js
 - カテゴリ標準値: `説明会` / `採用イベント` / `一般公開` / `艦艇公開` / `体験` / `演奏会` / `記念行事` / `広報活動` / `地域参加`
 - `guessCategory()` / `guessTag()` は `scraper/parsers/utils.js` に集約
 
+### PDF/画像アセットの取得・キャッシュ方針（重複取得しない）
+
+**すでに取得済みの PDF/画像は再取得・再 OCR しないこと。** OCR は Gemini API のクォータを消費するため、同一アセットの重複処理は厳禁。実装は `scraper/lib/assetCache.js` と `downloadFile()` に集約されており、新規パーサーや探索ロジックを追加する際もこのキャッシュ経路を必ず通すこと。
+
+- **キャッシュ実体**: `scraper/ocr-cache.json`（`.gitignore` 対象。self-hosted runner 上 + GitHub Actions cache で永続化）。キーはファイル実体の **SHA-256（`content_sha256`）**。
+- **ダウンロード段階の重複回避**: `downloadFile(url)` は正規化 URL でキャッシュを引き、OCR 成功済みエントリがあれば `If-None-Match`(ETag) / `If-Modified-Since`(Last-Modified) で**条件付き GET** を発行。`304 Not Modified` ならファイル本体をダウンロードしない。
+- **OCR 段階の重複回避**: OCR 関数は実行前に `assetCache.getByHash(hash)` を確認し、`result` が存在すれば**OCR API を呼ばずにキャッシュ結果を返す**。URL が変わっても中身（ハッシュ）が同じ PDF/画像は再 OCR されない。
+- **TTL**: 90 日（`assetCache.js` の `TTL_DAYS`）。期限切れエントリは `load()` / `save()` 時に自動破棄。
+- 新しくアセットを取得する処理を書く場合は、必ず `downloadFile()` → ハッシュ照合 → `assetCache` 経由とし、生の `fetch` で PDF/画像を毎回取得し直す実装を追加しないこと。
+
 ## フロントエンド仕様
 
 - **地域マップ**: 8地域（北海道・東北・関東・中部・近畿・中国・四国・九州）
