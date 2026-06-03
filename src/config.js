@@ -23,17 +23,17 @@ export const DEFAULT_SCHEME = 'jgsdf';
 // ─── 地方協力本部 連絡先 ──────────────────────────────────────
 export const REGION_HQ = {
   // 北海道
-  sapporo:   { name: '自衛隊札幌地方協力本部',   tel: '011-631-5471', emblem: '札' },
-  asahikawa: { name: '自衛隊旭川地方協力本部',   tel: '0166-51-7330', emblem: '旭' },
-  obihiro:   { name: '自衛隊帯広地方協力本部',   tel: '0155-23-2485', emblem: '帯' },
-  hakodate:  { name: '自衛隊函館地方協力本部',   tel: '0138-53-6241', emblem: '函' },
+  sapporo:   { name: '札幌地方協力本部',   tel: '011-631-5471', emblem: '札' },
+  asahikawa: { name: '旭川地方協力本部',   tel: '0166-51-7330', emblem: '旭' },
+  obihiro:   { name: '帯広地方協力本部',   tel: '0155-23-2485', emblem: '帯' },
+  hakodate:  { name: '函館地方協力本部',   tel: '0138-53-6241', emblem: '函' },
   // 東北
-  miyagi:    { name: '自衛隊宮城地方協力本部',   tel: '022-295-2612', emblem: '宮' },
-  aomori:    { name: '自衛隊青森地方協力本部',   tel: '017-777-7917', emblem: '青' },
-  iwate:     { name: '自衛隊岩手地方協力本部',   tel: '019-651-3351', emblem: '岩' },
-  akita:     { name: '自衛隊秋田地方協力本部',   tel: '018-823-1451', emblem: '秋' },
-  yamagata:  { name: '自衛隊山形地方協力本部',   tel: '023-622-7314', emblem: '形' },
-  fukushima: { name: '自衛隊福島地方協力本部',   tel: '024-531-2351', emblem: '福' },
+  miyagi:    { name: '宮城地方協力本部',   tel: '022-295-2612', emblem: '宮' },
+  aomori:    { name: '青森地方協力本部',   tel: '017-777-7917', emblem: '青' },
+  iwate:     { name: '岩手地方協力本部',   tel: '019-651-3351', emblem: '岩' },
+  akita:     { name: '秋田地方協力本部',   tel: '018-823-1451', emblem: '秋' },
+  yamagata:  { name: '山形地方協力本部',   tel: '023-622-7314', emblem: '形' },
+  fukushima: { name: '福島地方協力本部',   tel: '024-531-2351', emblem: '福' },
   // 関東
   kanagawa:  { name: '神奈川地方協力本部', tel: '045-662-9476', emblem: '神' },
   tokyo:     { name: '東京地方協力本部',   tel: '03-3268-3111', emblem: '東' },
