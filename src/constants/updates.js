@@ -6,6 +6,30 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-06-03',
+    version: '1.9.4',
+    type:    'feature',
+    content: '埼玉県の各事務所（採用説明会）のイベント情報を収集対象に追加',
+  },
+  {
+    date:    '2026-06-03',
+    version: '1.8.4',
+    type:    'improvement',
+    content: 'アプリ名を「地本イベントナビ」に変更し、非公式であることをわかりやすく明記',
+  },
+  {
+    date:    '2026-06-03',
+    version: '1.8.3',
+    type:    'improvement',
+    content: '設定の「掲載元」に各地本の事務所一覧（位置情報取得済み）を追加',
+  },
+  {
+    date:    '2026-06-03',
+    version: '1.8.2',
+    type:    'fix',
+    content: '神奈川県のイベントが表示されない不具合を修正',
+  },
+  {
+    date:    '2026-06-03',
     version: '1.8.1',
     type:    'feature',
     content: '東京都・神奈川県の各募集案内所のイベント情報も収集対象に追加',
