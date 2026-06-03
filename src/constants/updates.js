@@ -14,7 +14,7 @@ export const UPDATE_NOTES = [
     date:    '2026-06-03',
     version: '1.9.4',
     type:    'feature',
-    content: '埼玉県の各事務所（採用説明会）のイベント情報を収集対象に追加',
+    content: '埼玉県の各事務所のイベント情報も収集対象に追加',
   },
   {
     date:    '2026-06-03',
