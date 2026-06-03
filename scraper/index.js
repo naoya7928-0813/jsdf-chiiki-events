@@ -2299,7 +2299,7 @@ async function scrapeOfficeAssets(withFreshContext) {
   const exploredPages = new Set(); // このrun内で訪問済み
 
   // ── 各地本HQから1レベル自動探索（タイムアウト対策で上限あり） ──────
-  const MAX_PAGES_PER_HQ  = 2; // 1地本あたり最大探索ページ数
+  const MAX_PAGES_PER_HQ  = 4; // 1地本あたり最大探索ページ数（東京は9件あるため4に拡張）
   const MAX_ASSETS_PER_PAGE = 3; // 1ページあたり最大OCRアセット数
   const EXPLORE_TIMEOUT_MS  = 25 * 60 * 1000; // 全探索25分上限
   const exploreStart = Date.now();
