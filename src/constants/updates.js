@@ -6,6 +6,12 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-06-03',
+    version: '1.9.5',
+    type:    'improvement',
+    content: '更新ノートが増えても見やすいよう、一覧をブロック内でスクロール表示に改善',
+  },
+  {
+    date:    '2026-06-03',
     version: '1.9.4',
     type:    'feature',
     content: '埼玉県の各事務所（採用説明会）のイベント情報を収集対象に追加',

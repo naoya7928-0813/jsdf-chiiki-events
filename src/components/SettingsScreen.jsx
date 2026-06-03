@@ -395,7 +395,13 @@ export default function SettingsScreen({
             </span>
           </button>
           {updatesOpen && (
-            <div style={{ borderTop: '1px solid var(--border)' }}>
+            <div style={{
+              borderTop: '1px solid var(--border)',
+              maxHeight: 300,
+              overflowY: 'auto',
+              WebkitOverflowScrolling: 'touch',
+              overscrollBehavior: 'contain',
+            }}>
               {UPDATE_NOTES.map((note, i) => {
                 const typeInfo = TYPE_LABEL[note.type] || TYPE_LABEL.improvement;
                 const isLast   = i === UPDATE_NOTES.length - 1;
