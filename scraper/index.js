@@ -1376,6 +1376,37 @@ async function fetchTokyo(context) {
 }
 
 /**
+ * メインページのイベントとサブページ（採用説明会等）のイベントをマージする。
+ * サブページ取得が失敗（subOk=false）または0件の場合は、前回 events.json に
+ * あったサブページ由来イベント（メインに無く未来日付のもの）を維持することで、
+ * Cloudflare 等の間欠的失敗でサブページ分のイベントが消えるのを防ぐ。
+ */
+function mergeSubpageEvents(main, sub, subOk, prefKey, label) {
+  const mainIds = new Set(main.map(e => e.id));
+  let extra = sub.filter(e => !mainIds.has(e.id));
+
+  if (!subOk || sub.length === 0) {
+    try {
+      const prevAll   = JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8'));
+      const prevExtra = (prevAll[prefKey] || [])
+        .filter(e => !mainIds.has(e.id) && e.date && !isPast(e.date));
+      if (prevExtra.length > extra.length) {
+        console.warn(`[${label}] サブページ取得失敗/0件 → 前回のサブページ ${prevExtra.length}件を維持`);
+        extra = prevExtra;
+      }
+    } catch { /* events.json 未存在は無視 */ }
+  }
+
+  const seen   = new Set(mainIds);
+  const merged = [...main];
+  for (const ev of extra) {
+    if (!seen.has(ev.id)) { seen.add(ev.id); merged.push(ev); }
+  }
+  console.log(`[${label}] 合計 ${merged.length} 件（メイン ${main.length} + サブ ${extra.length}）`);
+  return merged.sort((a, b) => a.date.localeCompare(b.date));
+}
+
+/**
  * 埼玉地本ページを取得・パース。
  * `/event/`（一般イベント）に加え、`/job-fair/`（各事務所の採用説明会情報）も
  * 取得してマージする。説明会ページは同一の section.subSec 構造のため
@@ -1384,26 +1415,21 @@ async function fetchTokyo(context) {
 async function fetchSaitama(context) {
   const main = await fetchHtmlPref(context, '埼玉', URLS.saitama, parseSaitama);
 
-  // 採用説明会情報（各事務所の説明会イベント）。失敗しても本体イベントは維持。
+  // 採用説明会情報（各事務所の説明会イベント）。失敗時は前回分を維持。
   let jobFair = [];
+  let jobFairOk = false;
   try {
     await sleep(BETWEEN_PAGES_MS);
     jobFair = await fetchHtmlPref(
       context, '埼玉(説明会)', URLS.saitamaJobFair,
       $ => parseSaitama($, URLS.saitamaJobFair),
     );
+    jobFairOk = true;
   } catch (err) {
     console.warn(`[埼玉] 説明会ページ取得失敗: ${err.message}`);
   }
 
-  // id 重複を除去してマージ
-  const seen   = new Set(main.map(e => e.id));
-  const merged = [...main];
-  for (const ev of jobFair) {
-    if (!seen.has(ev.id)) { seen.add(ev.id); merged.push(ev); }
-  }
-  console.log(`[埼玉] 合計 ${merged.length} 件（一般 ${main.length} + 説明会 ${jobFair.length}）`);
-  return merged.sort((a, b) => a.date.localeCompare(b.date));
+  return mergeSubpageEvents(main, jobFair, jobFairOk, 'saitama', '埼玉');
 }
 
 /** 共通: HTML ページを Playwright → fetch の順で取得してパーサーに渡す */
@@ -1480,22 +1506,18 @@ async function fetchIbaraki(context) {
   const main = await fetchHtmlPref(context, '茨城', URLS.ibaraki, parseIbaraki);
 
   let setsu = [];
+  let setsuOk = false;
   try {
     await sleep(BETWEEN_PAGES_MS);
     setsu = await fetchHtmlPref(
       context, '茨城(説明会)', URLS.ibarakiSetsumeikai, parseIbarakiSetsumeikai,
     );
+    setsuOk = true;
   } catch (err) {
     console.warn(`[茨城] 説明会ページ取得失敗: ${err.message}`);
   }
 
-  const seen   = new Set(main.map(e => e.id));
-  const merged = [...main];
-  for (const ev of setsu) {
-    if (!seen.has(ev.id)) { seen.add(ev.id); merged.push(ev); }
-  }
-  console.log(`[茨城] 合計 ${merged.length} 件（一般 ${main.length} + 説明会 ${setsu.length}）`);
-  return merged.sort((a, b) => a.date.localeCompare(b.date));
+  return mergeSubpageEvents(main, setsu, setsuOk, 'ibaraki', '茨城');
 }
 // 近畿地本（HTML スクレイピング）
 const fetchKyoto     = (ctx) => fetchHtmlPref(ctx, '京都', URLS.kyoto,     parseKyoto);
