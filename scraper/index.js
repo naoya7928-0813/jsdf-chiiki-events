@@ -1292,6 +1292,20 @@ async function createStealthContext(browser) {
 // ── スクレイピング本体 ───────────────────────────────────────
 
 /**
+ * 神奈川イベントページが正常に取得できたか構造で判定する。
+ * Cloudflare チャレンジ/ブロックページ（HTTP 200 で返ることもある）は
+ * 「イベント一覧」見出しを持たないため、これで本物のページと区別できる。
+ * これにより、ブロック時に 0 件で既存データを上書きする事故を防ぐ。
+ */
+function hasKanagawaEventStructure($) {
+  let found = false;
+  $('h3, H3').each((_i, el) => {
+    if ($(el).text().includes('イベント一覧')) { found = true; return false; }
+  });
+  return found;
+}
+
+/**
  * 神奈川地本ページを取得・パース
  * Shift_JIS ページのため、レスポンスバイト列を iconv-lite でデコードする。
  */
@@ -1316,6 +1330,10 @@ async function fetchKanagawa(context) {
     if (isChallengeTitle(title)) throw new Error(`Cloudflare challenge: ${title.trim()}`);
 
     const $ = cheerio.load(html, { decodeEntities: false });
+    // イベント一覧の構造が無ければチャレンジ/ブロックページとみなし fetch へ
+    if (!hasKanagawaEventStructure($)) {
+      throw new Error('イベント一覧の構造が見つかりません（チャレンジ/ブロックの可能性）');
+    }
     const events = parseKanagawa($);
     console.log(`[神奈川] ${events.length} 件取得 (Playwright)`);
     return events;
@@ -1338,6 +1356,11 @@ async function fetchKanagawa(context) {
   const buffer = await res.arrayBuffer();
   const html   = iconv.decode(Buffer.from(buffer), 'Shift_JIS');
   const $ = cheerio.load(html, { decodeEntities: false });
+  // fetch フォールバックでもチャレンジページ（イベント一覧構造なし）なら
+  // 0 件で既存データを上書きしないよう例外にして前回データを維持させる
+  if (!hasKanagawaEventStructure($)) {
+    throw new Error('fetch でもイベント一覧構造を取得できず（Cloudflare 403/チャレンジの可能性）');
+  }
   const events = parseKanagawa($);
   console.log(`[神奈川] ${events.length} 件取得 (fetch fallback)`);
   return events;
