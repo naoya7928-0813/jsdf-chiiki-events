@@ -2354,6 +2354,139 @@ function parseOcrDate(ocrDate) {
   return null;
 }
 
+// ── 関東 各募集案内所の個別ページ（先回り巡回用URL一覧）────────────
+// 中央ページが事務所イベントを集約しているが、事務所が独自ページにのみ
+// イベント（主にチラシ PDF/画像）を掲載する可能性に備え、毎回巡回する。
+// 日付入りチラシ／イベント系チラシが無ければ即スキップ（高速）。
+const KANTO_OFFICE_URLS = {
+  ibaraki: [
+    'https://www.mod.go.jp/pco/ibaraki/jimusho/hitachi.html',
+    'https://www.mod.go.jp/pco/ibaraki/jimusho/mito.html',
+    'https://www.mod.go.jp/pco/ibaraki/jimusho/tsuchiura.html',
+    'https://www.mod.go.jp/pco/ibaraki/jimusho/ryugasaki.html',
+    'https://www.mod.go.jp/pco/ibaraki/jimusho/chikusei.html',
+  ],
+  gunma: [
+    'https://www.mod.go.jp/pco/gunma/bosyuannai/maebashi_sho/maebashi.html',
+    'https://www.mod.go.jp/pco/gunma/bosyuannai/oota_sho/oota.html',
+    'https://www.mod.go.jp/pco/gunma/bosyuannai/takasaki_sho/takasaki.html',
+    'https://www.mod.go.jp/pco/gunma/bosyuannai/numata_sho/numata.html',
+  ],
+  tochigi: [
+    'https://www.mod.go.jp/pco/tochigi/jimusyo_mohka.html',
+    'https://www.mod.go.jp/pco/tochigi/jimusyo_oyama.html',
+    'https://www.mod.go.jp/pco/tochigi/jimusyo_ashikaga.html',
+  ],
+  chiba: [
+    'https://www.mod.go.jp/pco/chiba/map/itikawatop.html',
+    'https://www.mod.go.jp/pco/chiba/map/funabashitop.html',
+    'https://www.mod.go.jp/pco/chiba/map/narita.html',
+    'https://www.mod.go.jp/pco/chiba/map/mobara.html',
+    'https://www.mod.go.jp/pco/chiba/map/kisaradu.html',
+  ],
+  saitama: [
+    'https://www.mod.go.jp/pco/saitama/office/asaka-office.html',
+    'https://www.mod.go.jp/pco/saitama/office/saitama-office.html',
+    'https://www.mod.go.jp/pco/saitama/office/iruma-office.html',
+    'https://www.mod.go.jp/pco/saitama/office/kumagaya-office.html',
+    'https://www.mod.go.jp/pco/saitama/office/chichibu-office.html',
+  ],
+  tokyo: [
+    'oota', 'kita', 'shinkoiwa', 'taitou', 'adachi', 'koutou', 'shibuya',
+    'toshima', 'kouenji', 'setagaya', 'minato', 'nerima', 'tachikawa',
+    'fussa', 'fuchu', 'kokubunji', 'nishitokyo', 'hachiouji', 'machida',
+  ].map(s => `https://www.mod.go.jp/pco/tokyo/${s}/event.html`),
+  kanagawa: [
+    'yokosuka', 'atugi', 'kamiooka', 'kawasaki', 'ichigao', 'mizo',
+    'fujisawa', 'chuou', 'yokohama', 'hiratuka', 'sagami', 'odawara',
+  ].map(s => `https://www.mod.go.jp/pco/kanagawa/mado/${s}/${s}.html`),
+};
+
+/**
+ * 関東各事務所の個別ページを毎回巡回し、日付入り／イベント系チラシを OCR して
+ * 将来イベントを抽出する。候補チラシが無いページは即スキップ（高速）。
+ * 同一チラシは assetCache によりOCRが一度きりになるため、繰り返し巡回しても安価。
+ * 戻り値: events[]（pref / source_type:'office_crawl' 付き）
+ */
+async function crawlKantoOffices(withFreshContext) {
+  if (!process.env.GEMINI_API_KEY && !process.env.GROQ_API_KEY) {
+    console.log('[KantoOffice] APIキー未設定のためスキップ');
+    return [];
+  }
+  if (!withFreshContext) return [];
+
+  const EVENT_KW = /イベント|説明会|見学|体験|公開|フェス|まつり|祭|相談会|ブース|出張|広報/;
+  const SKIP_ASSET = /logo|icon|banner|btn|common|arrow|header|footer|sns|^tw$|^fb$|insta|youtube|map_|sitemap/i;
+  const events = [];
+  const all = Object.entries(KANTO_OFFICE_URLS);
+  const total = all.reduce((n, [, u]) => n + u.length, 0);
+  let visited = 0;
+  console.log(`[KantoOffice] 関東 ${total} 事務所ページを巡回開始`);
+
+  const CRAWL_DELAY_MS = 3000; // 連続アクセスによる Cloudflare チャレンジ誘発を避ける
+  for (const [pref, urls] of all) {
+    const prefCode = pref.slice(0, 2);
+    for (const url of urls) {
+      visited++;
+      if (visited > 1) await sleep(CRAWL_DELAY_MS);
+      const $ = await withFreshContext(ctx => fetchPagePlaywright(ctx, url));
+      if (!$) continue;
+
+      // 候補チラシ: 将来日付入りファイル名 or イベント系リンク/altテキスト
+      const candidates = [];
+      $('a[href], img[src]').each((_i, el) => {
+        const href = $(el).attr('href') || $(el).attr('src') || '';
+        if (!/\.(pdf|jpe?g|png)/i.test(href) || SKIP_ASSET.test(href)) return;
+        let abs; try { abs = new URL(href, url).href; } catch { return; }
+        const text = (($(el).attr('alt') || '') + ' ' + ($(el).text() || '')).replace(/\s+/g, ' ').trim();
+        const m = abs.match(/(?:^|[\/_])R?(\d{1,2})\.(\d{1,2})\.(\d{1,2})/);
+        if (m) {
+          const mo = parseInt(m[2], 10), dy = parseInt(m[3], 10);
+          if (mo >= 1 && mo <= 12 && dy >= 1 && dy <= 31) {
+            const ds = `${reiwaToAD(parseInt(m[1], 10))}-${padTwo(mo)}-${padTwo(dy)}`;
+            if (!isPast(ds)) candidates.push({ url: abs, text });   // 将来日付チラシ
+            return;                                                  // 過去日付チラシはOCRしない
+          }
+        }
+        // 日付なしでもイベント系の PDF はチラシの可能性が高いので対象にする。
+        // 画像（PNG/JPG）はカレンダー見出し等のUI装飾が多く誤検出するため除外。
+        if (/\.pdf/i.test(abs) && EVENT_KW.test(text)) candidates.push({ url: abs, text });
+      });
+
+      if (candidates.length === 0) continue; // ← 高速スキップ
+
+      const uniq = [...new Map(candidates.map(c => [c.url, c])).values()].slice(0, 3);
+      for (const c of uniq) {
+        const ocr    = await ocrFlyerFull(c.url);
+        const parsed = ocr ? parseOcrDate(ocr.date) : null;
+        if (!parsed || isPast(parsed.dateStr)) continue;
+        const title = (ocr.title && fixOcrTitle(safeStr(ocr.title))) || c.text || '(タイトル不明)';
+        events.push({
+          id:             `${prefCode}-off-${parsed.dateStr.replace(/-/g, '')}-${titleHash(parsed.dateStr, title)}`,
+          pref,
+          date:           parsed.dateStr,
+          weekday:        parsed.weekday,
+          title,
+          place:          safeStr(ocr.place) || '',
+          address:        '',
+          time:           safeStr(ocr.time) || '',
+          category:       guessCategory(toHalfWidth(title)),
+          tag:            guessTag(title),
+          url:            c.url,
+          notes:          ocr.notes || null,
+          ageRequirement: safeStr(ocr.ageRequirement) || null,
+          deadline:       safeStr(ocr.deadline) || null,
+          imageUrl:       c.url,
+          source_type:    'office_crawl',
+        });
+        console.log(`[KantoOffice] ✓ ${pref} ${parsed.dateStr} ${title.slice(0, 26)}`);
+      }
+    }
+  }
+  console.log(`[KantoOffice] 巡回完了: ${visited}事務所 / 抽出 ${events.length}件`);
+  return events;
+}
+
 /**
  * 各地本トップページを自動探索し、イベントチラシが掲載されているサブページを発見して
  * PDF/画像をOCRでイベント情報として抽出する。
@@ -2603,6 +2736,7 @@ async function main() {
   let kagoshimaEvents = [];
   let okinawaEvents   = [];
   let officeEvents    = [];
+  let kantoOfficeEvents = [];
   let sapporoError   = false;
   let asahikawaError = false;
   let obihiroError   = false;
@@ -3183,6 +3317,13 @@ async function main() {
     // browser.close() の前に呼ぶ必要あり（Playwright が必要なため）
     console.log('[wait] 募集案内所探索を開始します...');
     officeEvents = await scrapeOfficeAssets(withFreshContext);
+
+    // ── 関東 各事務所ページの先回り巡回（中央未掲載イベントの収集）──
+    try {
+      kantoOfficeEvents = await crawlKantoOffices(withFreshContext);
+    } catch (err) {
+      console.warn(`[KantoOffice] 巡回失敗: ${err.message}`);
+    }
   } finally {
     await browser.close();
   }
@@ -3349,6 +3490,27 @@ async function main() {
   // imageUrl は最終出力に含めない（内部用フィールド）
   const strip = ev => { const { imageUrl: _, _flyerUrl: __, duplicate_candidate: _d, duplicate_of: _do, ...rest } = ev; return rest; };
 
+  // 関東の先回り巡回で得た事務所イベントを、中央ページの既存イベントへ統合する。
+  // 中央ページと事務所ページで同一イベントが重複しないよう、id だけでなく
+  // 「日付＋タイトル先頭」「日付＋場所先頭」でも重複判定して除外する。
+  function mergeKantoOfficeEvents(existing, pref) {
+    const crawled = kantoOfficeEvents.filter(e => e.pref === pref);
+    if (!crawled.length) return existing;
+    const norm = s => (s || '').replace(/\s+/g, '').replace(/[（(].*?[）)]/g, '');
+    const ids   = new Set(existing.map(e => e.id));
+    const tKeys = new Set(existing.map(e => `${e.date}|${norm(e.title).slice(0, 8)}`));
+    const pKeys = new Set(existing.filter(e => e.place).map(e => `${e.date}|${norm(e.place).slice(0, 8)}`));
+    const add = crawled.filter(e => {
+      if (ids.has(e.id)) return false;
+      if (tKeys.has(`${e.date}|${norm(e.title).slice(0, 8)}`)) return false;
+      if (e.place && pKeys.has(`${e.date}|${norm(e.place).slice(0, 8)}`)) return false;
+      return true;
+    });
+    if (!add.length) return existing;
+    console.log(`[${pref}] 事務所巡回から ${add.length}件を追加`);
+    return markDuplicates([...existing, ...add]);
+  }
+
   // 都道府県ごとのイベントに事務所スクレイプ結果をマージ（重複除去込み）
   function mergeOfficeEvents(existing, pref) {
     const fromOffice = officeEvents.filter(e => e.pref === pref);
@@ -3375,13 +3537,13 @@ async function main() {
     yamagata:  yamagataEvents.map(strip),
     fukushima: fukushimaEvents.map(strip),
     akita:     akitaEvents.map(strip),
-    kanagawa:  kanagawaEvents.map(strip),
-    tokyo:     tokyoEvents.map(strip),
-    saitama:   saitamaEvents.map(strip),
-    gunma:     gunmaEvents.map(strip),
-    tochigi:   tochigiEvents.map(strip),
-    ibaraki:   ibarakiEvents.map(strip),
-    chiba:     chibaEvents.map(strip),
+    kanagawa:  mergeKantoOfficeEvents(kanagawaEvents, 'kanagawa').map(strip),
+    tokyo:     mergeKantoOfficeEvents(tokyoEvents,    'tokyo').map(strip),
+    saitama:   mergeKantoOfficeEvents(saitamaEvents,  'saitama').map(strip),
+    gunma:     mergeKantoOfficeEvents(gunmaEvents,    'gunma').map(strip),
+    tochigi:   mergeKantoOfficeEvents(tochigiEvents,  'tochigi').map(strip),
+    ibaraki:   mergeKantoOfficeEvents(ibarakiEvents,  'ibaraki').map(strip),
+    chiba:     mergeKantoOfficeEvents(chibaEvents,    'chiba').map(strip),
     niigata:   niigataEvents.map(strip),
     toyama:    toyamaEvents.map(strip),
     ishikawa:  ishikawaEvents.map(strip),
