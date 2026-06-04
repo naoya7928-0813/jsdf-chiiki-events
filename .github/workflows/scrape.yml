@@ -15,7 +15,7 @@ jobs:
   scrape:
     name: イベントデータ取得
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 90
 
     permissions:
       contents: write
@@ -105,8 +105,20 @@ jobs:
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             git commit -m "chore: update events data [skip ci]"
-            git pull --rebase
-            git push || (git pull --rebase && git push)
+            # 生成データは常に最新を正とするため、rebase 競合時は本コミット側を採用(-X theirs)。
+            # origin が進んでいても確実に push できるよう数回リトライする。
+            PUSHED=0
+            for i in 1 2 3 4 5; do
+              git fetch origin master || true
+              if git rebase -X theirs origin/master && git push; then
+                PUSHED=1; break
+              fi
+              git rebase --abort 2>/dev/null || true
+              echo "push リトライ $i"; sleep $((5 * i))
+            done
+            if [ "$PUSHED" != "1" ]; then
+              echo "push に失敗しました"; exit 1
+            fi
             echo "events.json を更新しました。"
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
