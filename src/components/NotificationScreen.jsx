@@ -135,7 +135,7 @@ export default function NotificationScreen({
         }}>
           {ICO.clock('var(--text-muted)', 13)}
           <span style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-            毎日 8:00 / 12:00 / 16:00 / 20:00 頃に更新
+            毎日 8:00 / 12:00 / 18:00 頃（1日3回）に更新
           </span>
           <div style={{
             marginLeft: 'auto', flexShrink: 0,

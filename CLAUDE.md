@@ -33,7 +33,7 @@ jsdf-chiiki-events/
 │   ├── generate-events-html.mjs # events.html / events/<pref>.html / sitemap.xml 生成
 │   └── generate-icons.mjs       # PWA アイコン生成
 └── .github/workflows/
-    ├── scrape.yml              # スクレイプ自動化（1日4回 + Vercel デプロイ）
+    ├── scrape.yml              # スクレイプ自動化（1日3回 + Vercel デプロイ）
     └── deploy.yml              # フロントエンド変更時の自動デプロイ（push トリガー）
 ```
 
@@ -59,7 +59,7 @@ cd scraper && node index.js
 
 ## スクレイパー仕様
 
-- スケジュール: 日本時間 8/12/16/20 時（1日4回）
+- スケジュール: 日本時間 8/12/18 時（1日3回）
 - 対象: 47 都道府県の自衛隊地本公式サイト
 - 出力: `public/data/events.json`（`updatedAt` フィールド付き）
 - カテゴリ標準値: `説明会` / `採用イベント` / `一般公開` / `艦艇公開` / `体験` / `演奏会` / `記念行事` / `広報活動` / `地域参加`

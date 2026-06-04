@@ -6,6 +6,12 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-06-04',
+    version: '1.11.8',
+    type:    'fix',
+    content: '通知タブの自動更新時刻表示を、1日3回のスクレイピング予定に合わせて修正',
+  },
+  {
+    date:    '2026-06-04',
     version: '1.11.7',
     type:    'feature',
     content: '京都府・大阪府の各事務所のイベント情報も収集対象に追加',
