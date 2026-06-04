@@ -3,6 +3,13 @@ import { ICO } from './Icons';
 import { Emblem, F, splitDate, SectionTitle, iconBtnStyle } from './Shared';
 import { REGION_HQ, REGION_SOURCE } from '../config';
 
+function officeSourceLabel(ev) {
+  if (!ev?.source_type) return null;
+  if (ev.source_type === 'office_notice') return '公式確認';
+  if (ev.source_type.startsWith('office_')) return '募集案内所';
+  return null;
+}
+
 export default function DetailScreen({ event, onBack, theme, favorites, applied, onToggleFavorite, onToggleApplied }) {
   // ── フック（Rules of Hooks: 早期 return の前に宣言する） ─────────
   const [copied,    setCopied]    = useState(false);
@@ -43,6 +50,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
   const todayStr  = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
   const isOngoing = !!(ev.endDate && ev.date < todayStr);
   const { primary, accent } = theme;
+  const sourceLabel = officeSourceLabel(ev);
 
   // X 共有テキスト（280字制限配慮・非公式サイト注記あり）
   const shareTextX = `${ev.title}\n📅 ${dateStr}　📍 ${ev.place}\n\n自衛隊地本イベント情報で見つけました。最新情報は公式ページをご確認ください。\n#自衛隊 #地本イベント`;
@@ -130,6 +138,13 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
               padding: '3px 8px', borderRadius: 3,
               background: 'rgba(255,255,255,0.15)', letterSpacing: 1.5,
             }}>{ev.category}{ev.tag ? ` · ${ev.tag}` : ''}</div>
+            {sourceLabel && (
+              <div style={{
+                display: 'inline-block', fontSize: 10, fontFamily: F.mono,
+                padding: '3px 8px', borderRadius: 3,
+                background: 'rgba(255,255,255,0.18)', letterSpacing: 1.2,
+              }}>{sourceLabel}</div>
+            )}
             {isApplied && (
               <div style={{
                 display: 'inline-flex', alignItems: 'center', gap: 5,

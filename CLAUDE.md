@@ -64,6 +64,7 @@ cd scraper && node index.js
 - 出力: `public/data/events.json`（`updatedAt` フィールド付き）
 - カテゴリ標準値: `説明会` / `採用イベント` / `一般公開` / `艦艇公開` / `体験` / `演奏会` / `記念行事` / `広報活動` / `地域参加`
 - `guessCategory()` / `guessTag()` は `scraper/parsers/utils.js` に集約
+- 募集案内所・地域事務所のイベントは `public/data/offices.json` の全国314拠点URLをユニーク化して巡回する。関東は個別URL精度が高い `KANTO_OFFICE_URLS` を優先し、それ以外は `crawlNationwideOffices()` でHTML本文の日付イベントをOCRなしで抽出し、PDF/画像チラシ候補のみOCRへ回す。
 
 ### PDF/画像アセットの取得・キャッシュ方針（重複取得しない）
 

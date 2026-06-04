@@ -6,6 +6,12 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-06-04',
+    version: '1.12.8',
+    type:    'feature',
+    content: '全国の募集案内所・地域事務所ページを巡回し、説明会や相談会などのイベント情報も収集対象に追加',
+  },
+  {
+    date:    '2026-06-04',
     version: '1.11.8',
     type:    'fix',
     content: '通知タブの自動更新時刻表示を、1日3回のスクレイピング予定に合わせて修正',

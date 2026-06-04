@@ -27,6 +27,13 @@ function deriveRegionAndPref(region) {
   return { regionId: 'all', prefId: 'all' };
 }
 
+function officeSourceLabel(ev) {
+  if (!ev?.source_type) return null;
+  if (ev.source_type === 'office_notice') return '公式確認';
+  if (ev.source_type.startsWith('office_')) return '募集案内所';
+  return null;
+}
+
 export default function ListScreen({
   events, loading, error, updatedAt, checkedAt, onRefresh,
   region, onRegionChange,
@@ -511,6 +518,7 @@ export default function ListScreen({
                   const isOngoing  = !!(ev.endDate && ev.date < todayStr);
                   const eventDays  = daysUntil(ev.endDate || ev.date);
                   const dlDays     = deadlineDaysUntil(ev.deadline);
+                  const sourceLabel = officeSourceLabel(ev);
                   // 開催まで7日以内、または締切まで3日以内のときバッジ表示
                   const showEvent  = !isOngoing && eventDays >= 0 && eventDays <= 7;
                   const showDl     = dlDays != null && dlDays >= 0 && dlDays <= 3;
@@ -563,6 +571,15 @@ export default function ListScreen({
                               {ev.category}
                             </span>
                             {ev.tag && <span style={{ fontSize: 11, color: 'var(--text-sub)' }}>{ev.tag}</span>}
+                            {sourceLabel && (
+                              <span style={{
+                                fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3,
+                                background: `${primary}12`, color: primary,
+                                letterSpacing: 0.5, flexShrink: 0,
+                              }}>
+                                {sourceLabel}
+                              </span>
+                            )}
                             {favorites?.has(ev.id) && (
                               <span style={{
                                 fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 3,

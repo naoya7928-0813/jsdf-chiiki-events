@@ -26,7 +26,7 @@ const iconv     = require('iconv-lite');
 const cheerio   = require('cheerio');
 
 const assetCache  = require('./lib/assetCache');
-const { normalizeUrl } = require('./lib/normalizeUrl');
+const { normalizeUrl, isAssetUrl, isPdfUrl } = require('./lib/normalizeUrl');
 const { sortByPriority } = require('./lib/priority');
 const { markDuplicates }  = require('./lib/dedup');
 const { extractAssets }   = require('./lib/extractAssets');
@@ -97,6 +97,7 @@ const { toHalfWidth, reiwaToAD, padTwo, isPast, guessCategory, guessTag, calcWee
 
 // ── 設定 ─────────────────────────────────────────────────────
 const OUTPUT_PATH = path.join(__dirname, '../public/data/events.json');
+const OFFICES_PATH = path.join(__dirname, '../public/data/offices.json');
 
 const URLS = {
   // 北海道地本（札幌は複数サブページ）
@@ -2633,6 +2634,283 @@ const KANTO_OFFICE_URLS = {
   ].map(s => `https://www.mod.go.jp/pco/kanagawa/mado/${s}/${s}.html`),
 };
 
+const KANTO_PREFS = new Set(Object.keys(KANTO_OFFICE_URLS));
+
+const OFFICE_EVENT_KW = /イベント|説明会|相談会|見学|体験|公開|フェス|まつり|祭|広報|採用|募集|セミナー|ガイダンス|インターン|オープンキャンパス|フェア|ブース|出張|公務員|自衛官/;
+const OFFICE_ASSET_URL_KW = /event|events|oshirase|news|topics|setsumei|session|recruit|saiyou|bosyu|kouho|chirashi|annai|fair|fes|taiken|kengaku|schedule|calendar/i;
+const OFFICE_SKIP_TEXT_KW = /所在地|住所|電話|TEL|FAX|アクセス|地図|お問い合わせ|メール|受付時間|Copyright|プライバシー|サイトマップ|募集案内所の紹介|地域事務所の紹介|所長|事務所紹介/;
+const OFFICE_SKIP_ASSET_KW = /logo|icon|banner|btn|common|arrow|header|footer|sns|line|instagram|facebook|youtube|map|access|profile|staff|photo|album|gallery|sitemap/i;
+
+function compactText(text) {
+  return (text || '').replace(/\s+/g, ' ').trim();
+}
+
+function decodeForMatch(text) {
+  try { return decodeURIComponent(text); } catch { return text || ''; }
+}
+
+function officeNamesLabel(names) {
+  const uniq = [...new Set((names || []).filter(Boolean))];
+  if (uniq.length <= 3) return uniq.join('・');
+  return `${uniq.slice(0, 3).join('・')} ほか${uniq.length - 3}拠点`;
+}
+
+function loadRecruitmentOfficePages({ excludePrefs = new Set() } = {}) {
+  const pages = new Map();
+  try {
+    const officesData = JSON.parse(fs.readFileSync(OFFICES_PATH, 'utf8'));
+    for (const o of officesData.offices || []) {
+      if (!o.url || o.type === 'hq' || excludePrefs.has(o.pref)) continue;
+      const norm = normalizeUrl(o.url);
+      if (!norm) continue;
+      const key = `${o.pref}|${norm}`;
+      if (!pages.has(key)) {
+        pages.set(key, {
+          pref: o.pref,
+          url: o.url,
+          normalized: norm,
+          officeNames: [],
+        });
+      }
+      pages.get(key).officeNames.push(o.name);
+    }
+  } catch (err) {
+    console.warn(`[OfficeOCR] offices.json 読み込み失敗: ${err.message}`);
+  }
+  return [...pages.values()].sort((a, b) => `${a.pref}|${a.normalized}`.localeCompare(`${b.pref}|${b.normalized}`));
+}
+
+function parseOfficeEventDate(text) {
+  const t = toHalfWidth(compactText(text));
+  const now = new Date(Date.now() + 9 * 3600 * 1000);
+
+  const build = (year, month, day, weekday = '') => {
+    const y = Number(year), m = Number(month), d = Number(day);
+    if (!Number.isInteger(y) || !Number.isInteger(m) || !Number.isInteger(d)) return null;
+    if (m < 1 || m > 12 || d < 1 || d > 31) return null;
+    const dt = new Date(Date.UTC(y, m - 1, d));
+    if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== m - 1 || dt.getUTCDate() !== d) return null;
+    const dateStr = `${y}-${padTwo(m)}-${padTwo(d)}`;
+    if (isPast(dateStr)) return null;
+    return { dateStr, weekday: weekday || calcWeekday(dateStr) };
+  };
+
+  let m = t.match(/(?:令和|R|Ｒ)\s*(\d{1,2})\s*年?\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日?(?:[（(]\s*([月火水木金土日祝])\s*[）)])?/i);
+  if (m) return build(reiwaToAD(parseInt(m[1], 10)), m[2], m[3], m[4]);
+
+  m = t.match(/(20\d{2})\s*[年\/.-]\s*(\d{1,2})\s*(?:月|[\/.-])\s*(\d{1,2})\s*日?(?:[（(]\s*([月火水木金土日祝])\s*[）)])?/);
+  if (m) return build(m[1], m[2], m[3], m[4]);
+
+  m = t.match(/(?:^|[^\d])(\d{1,2})\s*[月\/.]\s*(\d{1,2})\s*日?(?:[（(]\s*([月火水木金土日祝])\s*[）)])?/);
+  if (m) return build(now.getFullYear(), m[1], m[2], m[3]);
+
+  return null;
+}
+
+function cleanOfficeEventTitle(text) {
+  let title = compactText(text)
+    .replace(/https?:\/\/\S+/g, '')
+    .replace(/(?:令和|R|Ｒ)\s*\d{1,2}\s*年?\s*\d{1,2}\s*月\s*\d{1,2}\s*日?(?:[（(]\s*[月火水木金土日祝]\s*[）)])?/gi, '')
+    .replace(/20\d{2}\s*[年\/.-]\s*\d{1,2}\s*(?:月|[\/.-])\s*\d{1,2}\s*日?(?:[（(]\s*[月火水木金土日祝]\s*[）)])?/g, '')
+    .replace(/\d{1,2}\s*[月\/.]\s*\d{1,2}\s*日?(?:[（(]\s*[月火水木金土日祝]\s*[）)])?/g, '')
+    .replace(/詳しくはこちら|こちら|PDF|チラシ|詳細|申込|お申し込み/g, '')
+    .replace(/[｜|»>]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (title.length > 90) title = title.slice(0, 90);
+  return title || '募集案内所イベント';
+}
+
+function officeNotes(meta, extra = null) {
+  const label = officeNamesLabel(meta.officeNames);
+  return [`掲載元: ${label || '募集案内所・地域事務所'}`, extra].filter(Boolean).join('\n') || null;
+}
+
+function makeOfficeEvent({ meta, parsed, title, place, url, notes, sourceType, time = '', ageRequirement = null, deadline = null }) {
+  const prefCode = (meta.pref || 'xx').slice(0, 2);
+  const safeTitle = fixOcrTitle(safeStr(title)) || '募集案内所イベント';
+  return {
+    id:             `${prefCode}-office-${parsed.dateStr.replace(/-/g, '')}-${titleHash(parsed.dateStr, `${url}|${safeTitle}|${meta.pref}`)}`,
+    pref:           meta.pref,
+    date:           parsed.dateStr,
+    weekday:        parsed.weekday,
+    title:          safeTitle,
+    place:          safeStr(place) || officeNamesLabel(meta.officeNames),
+    address:        '',
+    time:           safeStr(time) || '',
+    category:       guessCategory(toHalfWidth(safeTitle)),
+    tag:            guessTag(safeTitle),
+    url,
+    notes:          officeNotes(meta, notes),
+    ageRequirement,
+    deadline,
+    source_type:    sourceType,
+  };
+}
+
+function extractOfficeHtmlEvents($, pageUrl, meta) {
+  const events = [];
+  const seen = new Set();
+  const selector = 'a[href], li, tr, article, section, div[class*="event"], div[class*="news"], div[class*="topic"], div[class*="post"]';
+  $(selector).each((_i, el) => {
+    const text = compactText($(el).text());
+    if (text.length < 8 || text.length > 320) return;
+    if (!OFFICE_EVENT_KW.test(text)) return;
+    if (OFFICE_SKIP_TEXT_KW.test(text)) return;
+    const parsed = parseOfficeEventDate(text);
+    if (!parsed) return;
+
+    const href = $(el).attr('href') || $(el).find('a[href]').first().attr('href') || '';
+    const norm = href ? normalizeUrl(href, pageUrl) : null;
+    let url = pageUrl;
+    if (norm) {
+      try { url = new URL(href, pageUrl).href; } catch { url = norm; }
+    }
+
+    const title = cleanOfficeEventTitle(text);
+    const key = `${parsed.dateStr}|${title.slice(0, 40)}|${normalizeUrl(url) || url}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    events.push(makeOfficeEvent({
+      meta,
+      parsed,
+      title,
+      place: officeNamesLabel(meta.officeNames),
+      url,
+      notes: null,
+      sourceType: 'office_html',
+    }));
+  });
+  return events;
+}
+
+function extractOfficeCandidateAssets($, pageUrl) {
+  const seen = new Set();
+  const candidates = [];
+
+  function add(rawUrl, text = '') {
+    const norm = normalizeUrl(rawUrl, pageUrl);
+    if (!norm || !isAssetUrl(norm) || seen.has(norm)) return;
+    const haystack = decodeForMatch(`${norm} ${text}`);
+    if (OFFICE_SKIP_ASSET_KW.test(haystack)) return;
+    const hasDate = !!parseOfficeEventDate(haystack);
+    const eventish = OFFICE_EVENT_KW.test(haystack) || OFFICE_ASSET_URL_KW.test(haystack);
+    if (!hasDate && !eventish) return;
+
+    let abs;
+    try { abs = new URL(rawUrl, pageUrl).href; } catch { abs = norm; }
+    seen.add(norm);
+    candidates.push({
+      url: abs,
+      normalized: norm,
+      type: isPdfUrl(norm) ? 'pdf' : 'image',
+      linkText: compactText(text).slice(0, 120),
+      sourcePageUrl: pageUrl,
+    });
+  }
+
+  $('a[href]').each((_i, el) => add($(el).attr('href') || '', $(el).text()));
+  $('img[src]').each((_i, el) => {
+    const text = [$(el).attr('alt'), $(el).closest('a').text()].filter(Boolean).join(' ');
+    add($(el).attr('src') || '', text);
+  });
+  return candidates;
+}
+
+async function ocrOfficeAssets(assets, meta, maxAssets = 2) {
+  const events = [];
+  const sorted = sortByPriority(assets).filter(a => a.priority !== 'low').slice(0, maxAssets);
+  for (const asset of sorted) {
+    const ocr = await ocrFlyerFull(asset.url);
+    await sleep(1500);
+    const parsed = ocr ? parseOcrDate(ocr.date) : null;
+    if (!parsed || isPast(parsed.dateStr)) continue;
+    const title = (ocr.title && fixOcrTitle(safeStr(ocr.title))) || asset.linkText || asset.text || '募集案内所イベント';
+    events.push(makeOfficeEvent({
+      meta,
+      parsed,
+      title,
+      place: safeStr(ocr.place) || officeNamesLabel(meta.officeNames),
+      url: asset.url,
+      notes: ocr.notes || null,
+      sourceType: 'office_ocr',
+      time: safeStr(ocr.time) || '',
+      ageRequirement: safeStr(ocr.ageRequirement) || null,
+      deadline: safeStr(ocr.deadline) || null,
+    }));
+  }
+  return events;
+}
+
+/**
+ * offices.json の全国募集案内所・地域事務所URLをユニーク化して巡回する。
+ * 関東は KANTO_OFFICE_URLS の個別URLが精密なためここでは除外する。
+ * HTML本文で日付とイベント語が取れるものはOCRなしで追加し、
+ * PDF/画像チラシ候補だけ既存OCRパイプラインへ流す。
+ */
+async function crawlNationwideOffices(withFreshContext) {
+  if (!withFreshContext) return [];
+  const pages = loadRecruitmentOfficePages({ excludePrefs: KANTO_PREFS });
+  // 既定で全国全件巡回（OFFICE_CRAWL_MAX_PAGES 未指定なら全URLを対象にする）。
+  // 環境変数で上限を指定した場合のみその件数に絞る。
+  const maxPagesEnv = Number.parseInt(process.env.OFFICE_CRAWL_MAX_PAGES || '', 10);
+  const maxPages = Number.isFinite(maxPagesEnv) ? maxPagesEnv : pages.length;
+  const maxSubPages = Number.parseInt(process.env.OFFICE_CRAWL_MAX_SUBPAGES || '2', 10);
+  const maxAssets = Number.parseInt(process.env.OFFICE_CRAWL_MAX_ASSETS || '2', 10);
+  const delayMs = Number.parseInt(process.env.OFFICE_CRAWL_DELAY_MS || '1800', 10);
+  const ocrReady = await hasAnyOcrEngine();
+  const events = [];
+  const seenPages = new Set();
+  const targetPages = pages.slice(0, maxPages);
+
+  console.log(`[OfficeOCR] 全国募集案内所 ${targetPages.length}/${pages.length} URLを巡回開始`);
+  let index = 0;
+  for (const meta of targetPages) {
+    index++;
+    if (seenPages.has(meta.normalized)) continue;
+    seenPages.add(meta.normalized);
+    if (index > 1) await sleep(delayMs);
+    console.log(`[OfficeOCR] ${index}/${targetPages.length} ${meta.pref} ${officeNamesLabel(meta.officeNames)}: ${meta.url}`);
+
+    const $ = await withFreshContext(ctx => fetchPagePlaywright(ctx, meta.url));
+    if (!$) continue;
+
+    events.push(...extractOfficeHtmlEvents($, meta.url, meta));
+    if (ocrReady) {
+      const directAssets = extractOfficeCandidateAssets($, meta.url);
+      if (directAssets.length > 0) {
+        events.push(...await ocrOfficeAssets(directAssets, meta, maxAssets));
+      }
+    }
+
+    const skip = new Set([meta.normalized]);
+    const { pages: subPages, assets: linkedAssets } = findEventLinks($, meta.url, skip);
+    if (ocrReady && linkedAssets.length > 0) {
+      events.push(...await ocrOfficeAssets(linkedAssets, meta, maxAssets));
+    }
+
+    let subCount = 0;
+    for (const sub of subPages.slice(0, Number.isFinite(maxSubPages) ? maxSubPages : 2)) {
+      const norm = normalizeUrl(sub.url);
+      if (!norm || seenPages.has(norm)) continue;
+      seenPages.add(norm);
+      subCount++;
+      await sleep(Math.max(800, Math.floor(delayMs / 2)));
+      const $sub = await withFreshContext(ctx => fetchPagePlaywright(ctx, sub.url));
+      if (!$sub) continue;
+      events.push(...extractOfficeHtmlEvents($sub, sub.url, meta));
+      if (ocrReady) {
+        events.push(...await ocrOfficeAssets(extractOfficeCandidateAssets($sub, sub.url), meta, maxAssets));
+      }
+      if (subCount >= maxSubPages) break;
+    }
+  }
+
+  const deduped = markDuplicates(events).filter(e => !e.duplicate_candidate);
+  console.log(`[OfficeOCR] 全国募集案内所巡回完了: ${deduped.length}件`);
+  return deduped;
+}
+
 /**
  * 関東各事務所の個別ページを毎回巡回し、日付入り／イベント系チラシを OCR して
  * 将来イベントを抽出する。候補チラシが無いページは即スキップ（高速）。
@@ -2736,7 +3014,6 @@ async function scrapeOfficeAssets(withFreshContext) {
   }
 
   // ── offices.json から地本HQ情報とURL→prefマップを構築 ──────────
-  const OFFICES_PATH = path.join(__dirname, '../public/data/offices.json');
   let hqEntries    = [];    // { pref, url, name }
   let urlToPref    = {};    // normalizedUrl → pref
   try {
@@ -3548,6 +3825,14 @@ async function main() {
     // browser.close() の前に呼ぶ必要あり（Playwright が必要なため）
     console.log('[wait] 募集案内所探索を開始します...');
     officeEvents = await scrapeOfficeAssets(withFreshContext);
+    try {
+      officeEvents = [
+        ...officeEvents,
+        ...await crawlNationwideOffices(withFreshContext),
+      ];
+    } catch (err) {
+      console.warn(`[OfficeOCR] 全国募集案内所巡回失敗: ${err.message}`);
+    }
 
     // ── 関東 各事務所ページの先回り巡回（中央未掲載イベントの収集）──
     try {
@@ -3747,67 +4032,77 @@ async function main() {
     const fromOffice = officeEvents.filter(e => e.pref === pref);
     if (!fromOffice.length) return existing;
     const allIds = new Set(existing.map(e => e.id));
+    const norm = s => (s || '').replace(/\s+/g, '').replace(/[（(].*?[）)]/g, '');
+    const tKeys = new Set(existing.map(e => `${e.date}|${norm(e.title).slice(0, 8)}`));
+    const pKeys = new Set(existing.filter(e => e.place).map(e => `${e.date}|${norm(e.place).slice(0, 8)}`));
     const deduped = fromOffice.filter(e => {
       if (allIds.has(e.id)) return false;
       // 既存イベントがある地本にはスタブを追加しない（通知ノイズ防止）
       if (e.source_type === 'office_notice' && existing.length > 0) return false;
+      if (tKeys.has(`${e.date}|${norm(e.title).slice(0, 8)}`)) return false;
+      if (e.place && pKeys.has(`${e.date}|${norm(e.place).slice(0, 8)}`)) return false;
       return true;
     });
     if (!deduped.length) return existing;
     return markDuplicates([...existing, ...deduped]);
   }
 
+  function mergeAllOfficeEvents(existing, pref) {
+    const withKanto = KANTO_PREFS.has(pref) ? mergeKantoOfficeEvents(existing, pref) : existing;
+    return mergeOfficeEvents(withKanto, pref);
+  }
+
   const output = {
-    sapporo:   mergeOfficeEvents(sapporoEvents,   'sapporo').map(strip),
-    asahikawa: mergeOfficeEvents(asahikawaEvents, 'asahikawa').map(strip),
-    obihiro:   mergeOfficeEvents(obihiroEvents,   'obihiro').map(strip),
-    hakodate:  mergeOfficeEvents(hakodateEvents,  'hakodate').map(strip),
-    miyagi:    mergeOfficeEvents(miyagiEvents,    'miyagi').map(strip),
-    aomori:    mergeOfficeEvents(aomoriEvents,    'aomori').map(strip),
-    iwate:     mergeOfficeEvents(iwateEvents,     'iwate').map(strip),
-    yamagata:  yamagataEvents.map(strip),
-    fukushima: fukushimaEvents.map(strip),
-    akita:     akitaEvents.map(strip),
-    kanagawa:  mergeKantoOfficeEvents(kanagawaEvents, 'kanagawa').map(strip),
-    tokyo:     mergeKantoOfficeEvents(tokyoEvents,    'tokyo').map(strip),
-    saitama:   mergeKantoOfficeEvents(saitamaEvents,  'saitama').map(strip),
-    gunma:     mergeKantoOfficeEvents(gunmaEvents,    'gunma').map(strip),
-    tochigi:   mergeKantoOfficeEvents(tochigiEvents,  'tochigi').map(strip),
-    ibaraki:   mergeKantoOfficeEvents(ibarakiEvents,  'ibaraki').map(strip),
-    chiba:     mergeKantoOfficeEvents(chibaEvents,    'chiba').map(strip),
-    niigata:   niigataEvents.map(strip),
-    toyama:    toyamaEvents.map(strip),
-    ishikawa:  ishikawaEvents.map(strip),
-    fukui:     fukuiEvents.map(strip),
-    yamanashi: yamanashiEvents.map(strip),
-    nagano:    naganoEvents.map(strip),
-    gifu:      gifuEvents.map(strip),
-    shizuoka:  shizuokaEvents.map(strip),
-    aichi:     aichiEvents.map(strip),
-    mie:       mieEvents.map(strip),
-    shiga:     shigaEvents.map(strip),
-    kyoto:     kyotoEvents.map(strip),
-    osaka:     osakaEvents.map(strip),
-    hyogo:     hyogoEvents.map(strip),
-    nara:      naraEvents.map(strip),
-    wakayama:  wakayamaEvents.map(strip),
-    ehime:     ehimeEvents.map(strip),
-    kagawa:    kagawaEvents.map(strip),
-    kochi:     kochiEvents.map(strip),
-    tokushima: tokushimaEvents.map(strip),
-    tottori:   tottoriEvents.map(strip),
-    shimane:   shimaneEvents.map(strip),
-    okayama:   okayamaEvents.map(strip),
-    hiroshima: hiroshimaEvents.map(strip),
-    yamaguchi: yamaguchiEvents.map(strip),
-    fukuoka:   fukuokaEvents.map(strip),
-    saga:      sagaEvents.map(strip),
-    nagasaki:  nagasakiEvents.map(strip),
-    kumamoto:  kumamotoEvents.map(strip),
-    oita:      oitaEvents.map(strip),
-    miyazaki:  miyazakiEvents.map(strip),
-    kagoshima: kagoshimaEvents.map(strip),
-    okinawa:   okinawaEvents.map(strip),
+    sapporo:   mergeAllOfficeEvents(sapporoEvents,   'sapporo').map(strip),
+    asahikawa: mergeAllOfficeEvents(asahikawaEvents, 'asahikawa').map(strip),
+    obihiro:   mergeAllOfficeEvents(obihiroEvents,   'obihiro').map(strip),
+    hakodate:  mergeAllOfficeEvents(hakodateEvents,  'hakodate').map(strip),
+    miyagi:    mergeAllOfficeEvents(miyagiEvents,    'miyagi').map(strip),
+    aomori:    mergeAllOfficeEvents(aomoriEvents,    'aomori').map(strip),
+    iwate:     mergeAllOfficeEvents(iwateEvents,     'iwate').map(strip),
+    yamagata:  mergeAllOfficeEvents(yamagataEvents,  'yamagata').map(strip),
+    fukushima: mergeAllOfficeEvents(fukushimaEvents, 'fukushima').map(strip),
+    akita:     mergeAllOfficeEvents(akitaEvents,     'akita').map(strip),
+    kanagawa:  mergeAllOfficeEvents(kanagawaEvents,  'kanagawa').map(strip),
+    tokyo:     mergeAllOfficeEvents(tokyoEvents,     'tokyo').map(strip),
+    saitama:   mergeAllOfficeEvents(saitamaEvents,   'saitama').map(strip),
+    gunma:     mergeAllOfficeEvents(gunmaEvents,     'gunma').map(strip),
+    tochigi:   mergeAllOfficeEvents(tochigiEvents,   'tochigi').map(strip),
+    ibaraki:   mergeAllOfficeEvents(ibarakiEvents,   'ibaraki').map(strip),
+    chiba:     mergeAllOfficeEvents(chibaEvents,     'chiba').map(strip),
+    niigata:   mergeAllOfficeEvents(niigataEvents,   'niigata').map(strip),
+    toyama:    mergeAllOfficeEvents(toyamaEvents,    'toyama').map(strip),
+    ishikawa:  mergeAllOfficeEvents(ishikawaEvents,  'ishikawa').map(strip),
+    fukui:     mergeAllOfficeEvents(fukuiEvents,     'fukui').map(strip),
+    yamanashi: mergeAllOfficeEvents(yamanashiEvents, 'yamanashi').map(strip),
+    nagano:    mergeAllOfficeEvents(naganoEvents,    'nagano').map(strip),
+    gifu:      mergeAllOfficeEvents(gifuEvents,      'gifu').map(strip),
+    shizuoka:  mergeAllOfficeEvents(shizuokaEvents,  'shizuoka').map(strip),
+    aichi:     mergeAllOfficeEvents(aichiEvents,     'aichi').map(strip),
+    mie:       mergeAllOfficeEvents(mieEvents,       'mie').map(strip),
+    shiga:     mergeAllOfficeEvents(shigaEvents,     'shiga').map(strip),
+    kyoto:     mergeAllOfficeEvents(kyotoEvents,     'kyoto').map(strip),
+    osaka:     mergeAllOfficeEvents(osakaEvents,     'osaka').map(strip),
+    hyogo:     mergeAllOfficeEvents(hyogoEvents,     'hyogo').map(strip),
+    nara:      mergeAllOfficeEvents(naraEvents,      'nara').map(strip),
+    wakayama:  mergeAllOfficeEvents(wakayamaEvents,  'wakayama').map(strip),
+    ehime:     mergeAllOfficeEvents(ehimeEvents,     'ehime').map(strip),
+    kagawa:    mergeAllOfficeEvents(kagawaEvents,    'kagawa').map(strip),
+    kochi:     mergeAllOfficeEvents(kochiEvents,     'kochi').map(strip),
+    tokushima: mergeAllOfficeEvents(tokushimaEvents, 'tokushima').map(strip),
+    tottori:   mergeAllOfficeEvents(tottoriEvents,   'tottori').map(strip),
+    shimane:   mergeAllOfficeEvents(shimaneEvents,   'shimane').map(strip),
+    okayama:   mergeAllOfficeEvents(okayamaEvents,   'okayama').map(strip),
+    hiroshima: mergeAllOfficeEvents(hiroshimaEvents, 'hiroshima').map(strip),
+    yamaguchi: mergeAllOfficeEvents(yamaguchiEvents, 'yamaguchi').map(strip),
+    fukuoka:   mergeAllOfficeEvents(fukuokaEvents,   'fukuoka').map(strip),
+    saga:      mergeAllOfficeEvents(sagaEvents,      'saga').map(strip),
+    nagasaki:  mergeAllOfficeEvents(nagasakiEvents,  'nagasaki').map(strip),
+    kumamoto:  mergeAllOfficeEvents(kumamotoEvents,  'kumamoto').map(strip),
+    oita:      mergeAllOfficeEvents(oitaEvents,      'oita').map(strip),
+    miyazaki:  mergeAllOfficeEvents(miyazakiEvents,  'miyazaki').map(strip),
+    kagoshima: mergeAllOfficeEvents(kagoshimaEvents, 'kagoshima').map(strip),
+    okinawa:   mergeAllOfficeEvents(okinawaEvents,   'okinawa').map(strip),
     updatedAt: nowJST(),
   };
   // OCRキャッシュを保存（スキャン済みURLを記録 → 次回以降の再スキャンを防ぐ）
