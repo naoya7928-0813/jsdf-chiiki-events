@@ -47,11 +47,11 @@ export default function SettingsScreen({
     officesByPref[key].sort((a, b) => (a.type === 'hq' ? -1 : b.type === 'hq' ? 1 : 0));
   }
 
-  const toggleHq = key => setOpenHqs(prev => {
-    const next = new Set(prev);
-    next.has(key) ? next.delete(key) : next.add(key);
-    return next;
-  });
+  // 1地本だけ開く（別の地本を開くと、それまで開いていた地本は自動で閉じる）
+  const toggleHq = key => {
+    setOpenHqs(prev => (prev.has(key) ? new Set() : new Set([key])));
+    setArmedOffice(null); // 地本を切り替えたら拠点の選択(1回目タップ)はリセット
+  };
 
   // 掲載元の各拠点タップ: 1回目で選択（テーマカラーで強調）、2回目で公式サイトへ遷移
   const handleOfficeTap = o => {

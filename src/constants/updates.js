@@ -5,6 +5,12 @@
  */
 export const UPDATE_NOTES = [
   {
+    date:    '2026-06-05',
+    version: '1.13.12',
+    type:    'improvement',
+    content: '掲載元で地本を開いたとき、それまで開いていた他の地本が自動で閉じるようにし、一覧を見やすく改善',
+  },
+  {
     date:    '2026-06-04',
     version: '1.13.11',
     type:    'improvement',
