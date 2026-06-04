@@ -66,8 +66,8 @@ const { parseShizuoka }      = require('./parsers/shizuoka');
 const { parseToyamaImages }  = require('./parsers/toyama');
 const { parseNagano }        = require('./parsers/nagano');
 // 近畿地本
-const { parseKyoto }                          = require('./parsers/kyoto');
-const { parseOsaka }                          = require('./parsers/osaka');
+const { parseKyoto, parseKyotoSetsumeikai }   = require('./parsers/kyoto');
+const { parseOsaka, parseOsakaSession }       = require('./parsers/osaka');
 const { parseHyogoImages }                    = require('./parsers/hyogo');
 const { parseMiePost,      parseMiePostUrls }      = require('./parsers/mie');
 const { parseShigaPost,    parseShigaPostUrls }    = require('./parsers/shiga');
@@ -139,7 +139,9 @@ const URLS = {
   mie:       'https://www.mod.go.jp/pco/mie/events-page/',
   shiga:     'https://www.mod.go.jp/pco/shiga/event-briefing/',
   kyoto:     'https://www.mod.go.jp/pco/kyoto/kouhoushitsu/index.html',
+  kyotoSetsumeikai: 'https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html',
   osaka:     'https://www.mod.go.jp/pco/osaka/experience/event.html',
+  osakaSession: 'https://www.mod.go.jp/pco/osaka/recruit/session/menu.html',
   hyogo:     'https://www.mod.go.jp/pco/hyogo/',
   nara:      'https://www.mod.go.jp/pco/nara/events/',
   wakayama:  'https://www.mod.go.jp/pco/wakayama/category/event/',
@@ -1520,8 +1522,38 @@ async function fetchIbaraki(context) {
   return mergeSubpageEvents(main, setsu, setsuOk, 'ibaraki', '茨城');
 }
 // 近畿地本（HTML スクレイピング）
-const fetchKyoto     = (ctx) => fetchHtmlPref(ctx, '京都', URLS.kyoto,     parseKyoto);
-const fetchOsaka     = (ctx) => fetchHtmlPref(ctx, '大阪', URLS.osaka,     parseOsaka);
+/**
+ * 京都地本: kouhoushitsu（イベント）に加え、boshuka/jieikan/setsumeikai.html
+ * （各事務所の募集採用説明会）も取得してマージする。
+ */
+async function fetchKyoto(context) {
+  const main = await fetchHtmlPref(context, '京都', URLS.kyoto, parseKyoto);
+  let setsu = [], setsuOk = false;
+  try {
+    await sleep(BETWEEN_PAGES_MS);
+    setsu = await fetchHtmlPref(context, '京都(説明会)', URLS.kyotoSetsumeikai, parseKyotoSetsumeikai);
+    setsuOk = true;
+  } catch (err) {
+    console.warn(`[京都] 説明会ページ取得失敗: ${err.message}`);
+  }
+  return mergeSubpageEvents(main, setsu, setsuOk, 'kyoto', '京都');
+}
+/**
+ * 大阪地本: experience/event.html（体験イベント）に加え、
+ * recruit/session/menu.html（各事務所の募集説明会）も取得してマージする。
+ */
+async function fetchOsaka(context) {
+  const main = await fetchHtmlPref(context, '大阪', URLS.osaka, parseOsaka);
+  let setsu = [], setsuOk = false;
+  try {
+    await sleep(BETWEEN_PAGES_MS);
+    setsu = await fetchHtmlPref(context, '大阪(説明会)', URLS.osakaSession, parseOsakaSession);
+    setsuOk = true;
+  } catch (err) {
+    console.warn(`[大阪] 説明会ページ取得失敗: ${err.message}`);
+  }
+  return mergeSubpageEvents(main, setsu, setsuOk, 'osaka', '大阪');
+}
 // 東北地本（HTML スクレイピング）
 const fetchMiyagi    = (ctx) => fetchHtmlPref(ctx, '宮城', URLS.miyagi,    parseMiyagi);
 const fetchAomori    = (ctx) => fetchHtmlPref(ctx, '青森', URLS.aomori,    parseAomori);

@@ -1,9 +1,10 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo, titleHash } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo, titleHash, jstYear } = require('./utils');
 
 const BASE       = 'https://www.mod.go.jp/pco/kyoto/kouhoushitsu/';
 const SOURCE_URL = BASE + 'index.html';
+const SETSUMEIKAI_URL = 'https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html';
 
 /** 相対URL → 絶対URL */
 function toAbs(href) {
@@ -130,4 +131,86 @@ function parseKyoto($) {
   return events;
 }
 
-module.exports = { parseKyoto };
+/**
+ * 京都地本の募集採用説明会ページ (boshuka/jieikan/setsumeikai.html) のパーサー。
+ * 各事務所ごとに h3（「○○募集案内所が行う…説明会」）＋テーブル
+ * （実施日 / 時間 / 場所 / お問合せ先）の構成。日付のある行のみ抽出し、
+ * 担当事務所は直前の h3 から得る。「随時実施」等の非日付行はスキップ。
+ *
+ * @param {import('cheerio').CheerioAPI} $
+ * @returns {Array<Object>}
+ */
+function parseKyotoSetsumeikai($) {
+  const events = [];
+  const seq    = $('h3, table').toArray(); // h3→table の対応付け用（DOM順）
+
+  $('table').each((_t, tblEl) => {
+    const $tbl   = $(tblEl);
+    const header = $tbl.find('tr').first().find('th, td')
+      .map((_i, c) => toHalfWidth($(c).text()).replace(/\s+/g, '')).get();
+    const dateCol  = header.findIndex(h => h.includes('実施日'));
+    if (dateCol < 0) return;
+    const timeCol  = header.findIndex(h => h.includes('時間'));
+    const placeCol = header.findIndex(h => h.includes('場所'));
+
+    // 直前の h3 から担当事務所名を得る
+    const idx = seq.indexOf(tblEl);
+    let office = '';
+    for (let j = idx - 1; j >= 0; j--) {
+      if (seq[j].tagName === 'h3') {
+        office = $(seq[j]).text().replace(/\s+/g, ' ').trim().replace(/が行う.*$/, '').trim();
+        break;
+      }
+    }
+
+    $tbl.find('tr').slice(1).each((_r, tr) => {
+      const cells = $(tr).find('th, td');
+      if (!cells.length) return;
+      const dateText = toHalfWidth($(cells[dateCol] || cells[0]).text().replace(/\s+/g, ' ').trim());
+      const dm = dateText.match(/(\d+)月(\d+)日[（(]([月火水木金土日祝])[）)]/);
+      if (!dm) return; // 「随時実施」「平日」等は日付なし → スキップ
+
+      const month = parseInt(dm[1], 10);
+      const day   = parseInt(dm[2], 10);
+      const weekday = dm[3];
+      const dateStr = `${jstYear()}-${padTwo(month)}-${padTwo(day)}`;
+      if (isPast(dateStr)) return;
+
+      // 時間・場所（「時間 & 場所」結合列のケースも処理）
+      let time = '', place = '';
+      const placeRaw = placeCol >= 0 && cells[placeCol] ? $(cells[placeCol]).text().replace(/\s+/g, ' ').trim() : '';
+      const timeRaw  = timeCol  >= 0 && cells[timeCol]  ? toHalfWidth($(cells[timeCol]).text().replace(/\s+/g, ' ').trim()) : '';
+      const tMatch = (timeRaw || placeRaw).match(/\d{1,2}:\d{2}\s*[～~\-]\s*\d{1,2}:\d{2}/);
+      time = tMatch ? tMatch[0].replace(/\s/g, '') : '';
+      if (placeCol >= 0 && placeCol !== timeCol) {
+        place = placeRaw;
+      } else {
+        // 時間&場所が同一セル → 時刻を除いた残りを場所とする
+        place = (placeRaw || timeRaw).replace(time, '').replace(/[■()（）]/g, ' ').replace(/\s+/g, ' ').trim();
+      }
+
+      const title = '自衛官 就職・進学説明会';
+      events.push({
+        id:             `ky-set-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, `${title}|${place}|${office}`)}`,
+        pref:           'kyoto',
+        date:           dateStr,
+        weekday,
+        title,
+        place:          place || office,
+        address:        '',
+        time,
+        category:       '説明会',
+        tag:            guessTag(title),
+        url:            SETSUMEIKAI_URL,
+        notes:          office ? `担当: ${office}` : null,
+        ageRequirement: null,
+        deadline:       null,
+        imageUrl:       '',
+      });
+    });
+  });
+
+  return events.sort((a, b) => a.date.localeCompare(b.date));
+}
+
+module.exports = { parseKyoto, parseKyotoSetsumeikai };

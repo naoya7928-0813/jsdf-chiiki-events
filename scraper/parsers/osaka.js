@@ -83,4 +83,88 @@ function parseOsaka($) {
   return events;
 }
 
-module.exports = { parseOsaka };
+const SESSION_URL = 'https://www.mod.go.jp/pco/osaka/recruit/session/menu.html';
+
+/**
+ * 大阪地本の募集案内所等説明会ページ (recruit/session/menu.html) のパーサー。
+ * 1テーブル＝1案内のキー値形式（場所 / 日時(or期間) / 時間 / 内容）。
+ * 見出し(h2)がカテゴリ（個別説明会・ハローワーク説明会 等）。
+ * 日時から将来の開催日を抽出（①②の複数日対応、A～Bの期間は開始日のみ）。
+ *
+ * @param {import('cheerio').CheerioAPI} $
+ * @returns {Array<Object>}
+ */
+function parseOsakaSession($) {
+  const events = [];
+  const seq = $('h2, h3, table').toArray();
+
+  $('table').each((_t, tblEl) => {
+    const $tbl = $(tblEl);
+
+    // キー値テーブルを Map 化
+    const fields = {};
+    $tbl.find('tr').each((_r, tr) => {
+      const cells = $(tr).find('th, td');
+      if (cells.length < 2) return;
+      const key = toHalfWidth($(cells[0]).text()).replace(/\s+/g, '');
+      const val = $(cells[1]).text().replace(/\s+/g, ' ').trim();
+      if (key && !(key in fields)) fields[key] = val;
+    });
+
+    const dateRaw = toHalfWidth(fields['日時'] || fields['期間'] || fields['日にち'] || '');
+    if (!dateRaw) return;
+
+    const dateMatches = [...dateRaw.matchAll(/(?:令和(\d+)年)?(\d+)月(\d+)日[（(]([月火水木金土日祝])[）)]/g)];
+    if (dateMatches.length === 0) return;
+
+    // 直前の見出し（カテゴリ）
+    const idx = seq.indexOf(tblEl);
+    let heading = '';
+    for (let j = idx - 1; j >= 0; j--) {
+      if (seq[j].tagName === 'h2' || seq[j].tagName === 'h3') { heading = $(seq[j]).text().replace(/\s+/g, ' ').trim(); break; }
+    }
+    const category = heading.replace(/^[０-９0-9]+月\s*/, '').replace(/のご案内$/, '').trim() || '説明会';
+    const place    = (fields['場所'] || '').trim();
+    const content  = (fields['内容'] || '').trim();
+    const timeRaw  = toHalfWidth(fields['時間'] || fields['日時'] || '');
+    const time     = (timeRaw.match(/\d{1,2}:\d{2}\s*[～~\-]\s*\d{1,2}:\d{2}/g) || []).join(' ');
+
+    // 「M月D日(曜)～M月D日(曜)」の期間は開始日のみ。①②列挙は全日。
+    const isRange = /\d+月\d+日[（(][^）)]*[）)]\s*[～~]\s*(?:令和\d+年)?\d+月\d+日/.test(dateRaw);
+    const picks   = isRange ? dateMatches.slice(0, 1) : dateMatches;
+
+    const seen = new Set();
+    for (const m of picks) {
+      const year    = m[1] ? reiwaToAD(parseInt(m[1], 10)) : jstYear();
+      const month   = parseInt(m[2], 10);
+      const day     = parseInt(m[3], 10);
+      const weekday = m[4];
+      const dateStr = `${year}-${padTwo(month)}-${padTwo(day)}`;
+      if (isPast(dateStr) || seen.has(dateStr)) continue;
+      seen.add(dateStr);
+
+      const title = category;
+      events.push({
+        id:             `os-set-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, `${title}|${place}`)}`,
+        pref:           'osaka',
+        date:           dateStr,
+        weekday,
+        title,
+        place,
+        address:        '',
+        time,
+        category:       guessCategory(toHalfWidth(`${title} ${content}`)) || '説明会',
+        tag:            guessTag(title),
+        url:            SESSION_URL,
+        notes:          content || null,
+        ageRequirement: null,
+        deadline:       null,
+        imageUrl:       '',
+      });
+    }
+  });
+
+  return events.sort((a, b) => a.date.localeCompare(b.date));
+}
+
+module.exports = { parseOsaka, parseOsakaSession };
