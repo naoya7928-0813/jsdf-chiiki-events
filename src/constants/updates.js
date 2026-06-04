@@ -6,6 +6,12 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-06-04',
+    version: '1.10.7',
+    type:    'fix',
+    content: '都道府県を切り替えた際に、他県のイベントが一覧に残って表示される不具合を修正',
+  },
+  {
+    date:    '2026-06-04',
     version: '1.10.6',
     type:    'feature',
     content: '茨城県の各事務所のイベント情報も収集対象に追加',

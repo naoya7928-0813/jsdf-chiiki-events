@@ -83,7 +83,9 @@ function parseKanagawa($) {
         : '';
 
       events.push({
-        id:       `k-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
+        // 同一日に同名イベント（例: 高等工科学校説明会）が複数事務所であるため
+        // 会場(place)も含めて id を一意化する
+        id:       `k-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, `${title}|${place}`)}`,
         pref:     'kanagawa',
         date:     dateStr,
         weekday:  '',

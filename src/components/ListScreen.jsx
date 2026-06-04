@@ -503,7 +503,7 @@ export default function ListScreen({
                   <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: F.mono }}>{evs.length}件</div>
                 </div>
 
-                {evs.map(ev => {
+                {evs.map((ev, evIdx) => {
                   const { m, d }   = ev.date ? splitDate(ev.date) : { m: null, d: null };
                   const endSplit   = ev.endDate ? splitDate(ev.endDate) : null;
                   const isWeekend  = /[土日祝]/.test(ev.weekday);
@@ -514,8 +514,11 @@ export default function ListScreen({
                   // 開催まで7日以内、または締切まで3日以内のときバッジ表示
                   const showEvent  = !isOngoing && eventDays >= 0 && eventDays <= 7;
                   const showDl     = dlDays != null && dlDays >= 0 && dlDays <= 3;
+                  // key には id だけでなく月内インデックスも含める。
+                  // 同一日・同名イベントや稀なハッシュ衝突で id が重複しても、
+                  // React の key 衝突（リスト縮小時に旧DOMが残る不具合）を防ぐ。
                   return (
-                    <div key={ev.id} onClick={() => onOpenDetail(ev)} role="button" tabIndex={0}
+                    <div key={`${ev.id}#${evIdx}`} onClick={() => onOpenDetail(ev)} role="button" tabIndex={0}
                       onKeyDown={e => e.key === 'Enter' && onOpenDetail(ev)}
                       style={{
                         background: 'var(--card)', margin: '0 16px 10px', borderRadius: 12, minHeight: 72,
