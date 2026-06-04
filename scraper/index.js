@@ -458,6 +458,133 @@ async function tryTesseractOcr(buf) {
   }
 }
 
+// ── RapidOCR（ローカルONNX OCR。APIクレジット不要） ─────────────
+// GitHub Actions では scraper/requirements-ocr.txt を pip install して使う。
+// 未インストール・失敗時は静かにスキップし、後続OCRへフォールバックする。
+
+const RAPID_OCR_SCRIPT = path.join(__dirname, 'lib', 'rapidocr_cli.py');
+let rapidOcrAvailable = null;
+let rapidOcrPython = null;
+
+async function checkRapidOcrAvailable() {
+  if (process.env.RAPIDOCR_DISABLED === '1') return false;
+  if (rapidOcrAvailable !== null) return rapidOcrAvailable;
+
+  const candidates = [
+    process.env.PYTHON,
+    process.platform === 'win32' ? 'python' : 'python3',
+    'python',
+  ].filter(Boolean);
+
+  for (const cmd of candidates) {
+    try {
+      await execFileAsync(cmd, [RAPID_OCR_SCRIPT, '--check'], { timeout: 15_000, maxBuffer: 1024 * 1024 });
+      rapidOcrPython = cmd;
+      rapidOcrAvailable = true;
+      return true;
+    } catch { /* try next python command */ }
+  }
+
+  rapidOcrAvailable = false;
+  return false;
+}
+
+/**
+ * RapidOCRで画像バッファをOCRしてテキストを返す。
+ * 日本語文字が10字未満の場合は信頼度が低いとみなし null を返す。
+ */
+async function tryRapidOcr(buf, label = 'RapidOCR') {
+  if (!await checkRapidOcrAvailable()) return null;
+  const tmpDir = await fsp.mkdtemp(path.join(os.tmpdir(), 'jsdf-rapidocr-'));
+  const imgPath = path.join(tmpDir, 'input.jpg');
+  try {
+    await fsp.writeFile(imgPath, buf);
+    const { stdout } = await execFileAsync(
+      rapidOcrPython,
+      [RAPID_OCR_SCRIPT, imgPath],
+      { timeout: 75_000, maxBuffer: 2 * 1024 * 1024 }
+    );
+    const json = JSON.parse(stdout);
+    const text = (json.text || '').trim();
+    const jpCount = (text.match(/[぀-鿿]/g) || []).length;
+    if (jpCount >= 10) {
+      console.log(`[${label}] RapidOCR 成功`);
+      return text;
+    }
+    return null;
+  } catch (err) {
+    console.warn(`[${label}] RapidOCR エラー: ${err.message}`);
+    return null;
+  } finally {
+    fsp.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
+  }
+}
+
+// ── OCR.space（無料APIフォールバック） ─────────────────────────
+// Free plan: 25,000 req/month, 500 req/day/IP, 1MB/file, PDF 3 pages.
+// 既存のassetCacheにより同一ファイルは二度OCRしない。
+
+let ocrSpaceQuotaExhausted = false;
+
+async function callOcrSpaceText(base64, mimeType, label = 'OCR.space') {
+  if (!process.env.OCR_SPACE_API_KEY) return null;
+  if (ocrSpaceQuotaExhausted) {
+    console.warn(`[${label}] OCR.space クォータ枯渇フラグ → スキップ`);
+    return null;
+  }
+
+  const maxBytes = Number.parseInt(process.env.OCR_SPACE_MAX_BYTES || '900000', 10);
+  const approxBytes = Math.floor(base64.length * 3 / 4);
+  if (Number.isFinite(maxBytes) && approxBytes > maxBytes) {
+    console.log(`[${label}] OCR.space free limit回避: ${approxBytes} bytes`);
+    return null;
+  }
+
+  const form = new FormData();
+  form.append('apikey', process.env.OCR_SPACE_API_KEY);
+  form.append('base64Image', `data:${mimeType};base64,${base64}`);
+  form.append('language', process.env.OCR_SPACE_LANGUAGE || 'jpn');
+  form.append('OCREngine', process.env.OCR_SPACE_ENGINE || '1');
+  form.append('isOverlayRequired', 'false');
+  form.append('scale', 'true');
+  if (mimeType === 'application/pdf') form.append('filetype', 'PDF');
+
+  try {
+    const res = await fetch('https://api.ocr.space/parse/image', { method: 'POST', body: form });
+    if (!res.ok) {
+      if (res.status === 429 || res.status === 403) ocrSpaceQuotaExhausted = true;
+      console.warn(`[${label}] OCR.space HTTP ${res.status}`);
+      return null;
+    }
+
+    const json = await res.json();
+    const errors = [
+      ...(Array.isArray(json.ErrorMessage) ? json.ErrorMessage : json.ErrorMessage ? [json.ErrorMessage] : []),
+      ...(Array.isArray(json.ErrorDetails) ? json.ErrorDetails : json.ErrorDetails ? [json.ErrorDetails] : []),
+    ].join(' ');
+    if (json.IsErroredOnProcessing || errors) {
+      if (/quota|limit|maximum|daily|monthly/i.test(errors)) ocrSpaceQuotaExhausted = true;
+      console.warn(`[${label}] OCR.space エラー: ${errors.slice(0, 140)}`);
+      return null;
+    }
+
+    const text = (json.ParsedResults || []).map(r => r.ParsedText || '').filter(Boolean).join('\n\n').trim();
+    if (!text) return null;
+    console.log(`[${label}] OCR.space 成功`);
+    return text;
+  } catch (err) {
+    console.warn(`[${label}] OCR.space エラー: ${err.message}`);
+    return null;
+  }
+}
+
+async function hasAnyOcrEngine() {
+  if (process.env.GROQ_API_KEY || process.env.GEMINI_API_KEY || process.env.MISTRAL_API_KEY || process.env.OCR_SPACE_API_KEY) {
+    return true;
+  }
+  return await checkTesseractAvailable() || await checkRapidOcrAvailable();
+}
+
 // ── OCR（Gemini Flash による画像・PDF解析） ────────────────────
 
 // ── Groq OCR（画像専用: 栃木・富山・兵庫・滋賀・奈良 など） ────────
@@ -715,13 +842,11 @@ const OCR_PROMPT = `この自衛隊イベントのポスター画像から情報
 
 /**
  * ポスター画像URLを受け取り OCR して JSON を返す（ハッシュキャッシュ対応）。
- * パイプライン: Tesseract（ローカル）→ Groq → Gemini
+ * パイプライン: Tesseract（ローカル）→ RapidOCR（ローカル）→ Groq → OCR.space → Gemini
  */
 async function ocrImage(imageUrl) {
   if (!imageUrl) return null;
-  if (!process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) {
-    if (!await checkTesseractAvailable()) return null;
-  }
+  if (!await hasAnyOcrEngine()) return null;
 
   const dl = await downloadFile(imageUrl);
   if (!dl) return null;
@@ -742,11 +867,25 @@ async function ocrImage(imageUrl) {
     if (result) console.log(`[OCR] Tesseract 成功: ${imageUrl.split('/').pop()}`);
   }
 
-  // 2. Groq Vision
+  // 2. RapidOCR
+  if (!result) {
+    const rapidText = await tryRapidOcr(dl.buf, 'OCR');
+    if (rapidText) {
+      result = parseTextToEvent(rapidText, 'full');
+      if (result) console.log(`[OCR] RapidOCR 構造化成功: ${imageUrl.split('/').pop()}`);
+    }
+  }
+
+  // 3. Groq Vision
   if (!result && process.env.GROQ_API_KEY) {
     result = await callGroqOcr(base64, dl.mime, OCR_PROMPT, 'OCR');
   }
-  // 3. Gemini Flash
+  // 4. OCR.space
+  if (!result && process.env.OCR_SPACE_API_KEY) {
+    const ocrSpaceText = await callOcrSpaceText(base64, dl.mime, 'OCR');
+    if (ocrSpaceText) result = parseTextToEvent(ocrSpaceText, 'full');
+  }
+  // 5. Gemini Flash
   if (!result && process.env.GEMINI_API_KEY) {
     result = await callGeminiOcr([
       { inline_data: { mime_type: dl.mime, data: base64 } },
@@ -785,9 +924,11 @@ const PDF_OCR_PROMPT = `この自衛隊イベントのPDFから情報を抽出�
  * パイプライン:
  *   1. PDFテキスト直接抽出（テキストレイヤー）
  *   2. PDF→画像変換 → Tesseract（ローカル）
- *   3. PDF→画像変換 → Groq Vision（無料・高レート）
- *   4. Mistral OCR（PDFネイティブ・無料枠）
- *   5. Gemini Flash（フォールバック）
+ *   3. PDF→画像変換 → RapidOCR（ローカル）
+ *   4. PDF→画像変換 → Groq Vision（無料・高レート）
+ *   5. OCR.space（無料API、1MB/3ページ制限内のみ）
+ *   6. Mistral OCR（PDFネイティブ）
+ *   7. Gemini Flash（フォールバック）
  */
 async function ocrPdf(pdfUrl) {
   if (!pdfUrl) return null;
@@ -823,7 +964,17 @@ async function ocrPdf(pdfUrl) {
     }
   }
 
-  // 3. PDF→画像 → Groq Vision
+  // 3. PDF→画像 → RapidOCR
+  if (!result) {
+    const imgs = await pdfToImages(dl.buf, 2);
+    for (const imgBuf of imgs) {
+      const rapidText = await tryRapidOcr(imgBuf, 'PDF-OCR');
+      if (rapidText) result = parseTextToEvent(rapidText, 'pdf');
+      if (result) { console.log(`[PDF-OCR] RapidOCR 成功: ${pdfUrl.split('/').pop()}`); break; }
+    }
+  }
+
+  // 4. PDF→画像 → Groq Vision
   if (!result && process.env.GROQ_API_KEY) {
     const imgs = await pdfToImages(dl.buf, 2);
     for (const imgBuf of imgs) {
@@ -833,12 +984,18 @@ async function ocrPdf(pdfUrl) {
     }
   }
 
-  // 4. Mistral OCR（PDFネイティブ）
+  // 5. OCR.space（PDFネイティブ）
+  if (!result && process.env.OCR_SPACE_API_KEY) {
+    const ocrSpaceText = await callOcrSpaceText(base64, 'application/pdf', 'PDF-OCR(OCR.space)');
+    if (ocrSpaceText) result = parseTextToEvent(ocrSpaceText, 'pdf');
+  }
+
+  // 6. Mistral OCR（PDFネイティブ）
   if (!result) {
     result = await callMistralOcr(base64, 'application/pdf', 'PDF-OCR(Mistral)');
   }
 
-  // 5. Gemini Flash（フォールバック）
+  // 7. Gemini Flash（フォールバック）
   if (!result && process.env.GEMINI_API_KEY) {
     result = await callGeminiOcr([
       { inline_data: { mime_type: 'application/pdf', data: base64 } },
@@ -858,8 +1015,8 @@ async function ocrPdf(pdfUrl) {
  * 新たに PDF 系地本を追加する際はこの関数を main() から呼ぶこと。
  */
 async function enrichWithPdfOcr(events) {
-  if (!process.env.GEMINI_API_KEY) {
-    console.log('[PDF-OCR] GEMINI_API_KEY 未設定のためスキップ');
+  if (!await hasAnyOcrEngine()) {
+    console.log('[PDF-OCR] 利用可能なOCRエンジンがないためスキップ');
     return events;
   }
 
@@ -912,8 +1069,8 @@ const FLYER_OCR_PROMPT = `この自衛隊イベントのチラシ（PDF・画像
  * PDF または画像 URL を受け取り、全情報（date 含む）を OCR して JSON を返す。
  * ハッシュキャッシュ対応。
  * パイプライン:
- *   PDF  → テキスト抽出 → PDF→画像(Tesseract) → PDF→画像(Groq) → Mistral OCR → Gemini
- *   画像 → Tesseract → Groq → Mistral → Gemini
+ *   PDF  → テキスト抽出 → PDF→画像(Tesseract) → PDF→画像(RapidOCR) → PDF→画像(Groq) → OCR.space → Mistral → Gemini
+ *   画像 → Tesseract → RapidOCR → Groq → OCR.space → Mistral → Gemini
  */
 async function ocrFlyerFull(url) {
   if (!url) return null;
@@ -949,7 +1106,16 @@ async function ocrFlyerFull(url) {
         if (result) { console.log(`[チラシOCR] PDF+Tesseract 成功`); break; }
       }
     }
-    // 3. PDF→画像 → Groq Vision
+    // 3. PDF→画像 → RapidOCR
+    if (!result) {
+      const imgs = await pdfToImages(dl.buf, 2);
+      for (const imgBuf of imgs) {
+        const rapidText = await tryRapidOcr(imgBuf, 'チラシOCR-PDF');
+        if (rapidText) result = parseTextToEvent(rapidText, 'full');
+        if (result) { console.log(`[チラシOCR] PDF+RapidOCR 成功`); break; }
+      }
+    }
+    // 4. PDF→画像 → Groq Vision
     if (!result && process.env.GROQ_API_KEY) {
       const imgs = await pdfToImages(dl.buf, 2);
       for (const imgBuf of imgs) {
@@ -957,9 +1123,14 @@ async function ocrFlyerFull(url) {
         if (result) { console.log(`[チラシOCR] PDF+Groq 成功`); break; }
       }
     }
-    // 4. Mistral OCR（PDFネイティブ）
+    // 5. OCR.space（PDFネイティブ）
+    if (!result && process.env.OCR_SPACE_API_KEY) {
+      const ocrSpaceText = await callOcrSpaceText(base64, 'application/pdf', 'チラシOCR-PDF(OCR.space)');
+      if (ocrSpaceText) result = parseTextToEvent(ocrSpaceText, 'full');
+    }
+    // 6. Mistral OCR（PDFネイティブ）
     if (!result) result = await callMistralOcr(base64, 'application/pdf', 'チラシOCR-PDF(Mistral)');
-    // 5. Gemini Flash（フォールバック）
+    // 7. Gemini Flash（フォールバック）
     if (!result && process.env.GEMINI_API_KEY) {
       result = await callGeminiOcr([
         { inline_data: { mime_type: 'application/pdf', data: base64 } },
@@ -973,15 +1144,28 @@ async function ocrFlyerFull(url) {
       result = parseTextToEvent(tessText, 'full');
       if (result) console.log(`[チラシOCR] Tesseract 成功: ${url.split('/').pop()}`);
     }
-    // 2b. Groq Vision
+    // 2b. RapidOCR
+    if (!result) {
+      const rapidText = await tryRapidOcr(dl.buf, 'チラシOCR');
+      if (rapidText) {
+        result = parseTextToEvent(rapidText, 'full');
+        if (result) console.log(`[チラシOCR] RapidOCR 成功: ${url.split('/').pop()}`);
+      }
+    }
+    // 2c. Groq Vision
     if (!result && process.env.GROQ_API_KEY) {
       result = await callGroqOcr(base64, dl.mime, FLYER_OCR_PROMPT, 'チラシOCR(Groq)');
     }
-    // 2c. Mistral OCR（画像）
+    // 2d. OCR.space
+    if (!result && process.env.OCR_SPACE_API_KEY) {
+      const ocrSpaceText = await callOcrSpaceText(base64, dl.mime, 'チラシOCR(OCR.space)');
+      if (ocrSpaceText) result = parseTextToEvent(ocrSpaceText, 'full');
+    }
+    // 2e. Mistral OCR（画像）
     if (!result) {
       result = await callMistralOcr(base64, dl.mime, 'チラシOCR(Mistral)');
     }
-    // 2d. Gemini Flash
+    // 2f. Gemini Flash
     if (!result && process.env.GEMINI_API_KEY) {
       result = await callGeminiOcr([
         { inline_data: { mime_type: dl.mime, data: base64 } },
@@ -1001,13 +1185,14 @@ async function ocrFlyerFull(url) {
  */
 async function enrichFromFlyer(events, prefLabel) {
   const results = [];
+  const ocrReady = await hasAnyOcrEngine();
   for (const ev of events) {
     if (!ev._flyerUrl) {
       results.push(ev);
       continue;
     }
-    if (!process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) {
-      // APIキーなし → スタブは捨てる
+    if (!ocrReady) {
+      // OCRエンジンなし → スタブは捨てる
       continue;
     }
     console.log(`[${prefLabel} チラシOCR] ${ev.title}`);
@@ -1081,7 +1266,7 @@ const OCR_PROMPT_FULL = `この自衛隊イベントのポスター画像から�
 
 /**
  * 画像 1 枚から全イベント情報（日付・場所含む）を OCR する（栃木・富山・兵庫用）。
- * ハッシュキャッシュ対応。Tesseract → Groq → Gemini の順で試みる。
+ * ハッシュキャッシュ対応。Tesseract → RapidOCR → Groq → OCR.space → Gemini の順で試みる。
  */
 async function ocrImageFull(imageUrl) {
   if (!imageUrl) return null;
@@ -1105,11 +1290,25 @@ async function ocrImageFull(imageUrl) {
     if (result) console.log(`[OCR-FULL] Tesseract 成功: ${imageUrl.split('/').pop()}`);
   }
 
-  // 2. Groq Vision
+  // 2. RapidOCR
+  if (!result) {
+    const rapidText = await tryRapidOcr(dl.buf, 'OCR-FULL');
+    if (rapidText) {
+      result = parseTextToEvent(rapidText, 'full');
+      if (result) console.log(`[OCR-FULL] RapidOCR 成功: ${imageUrl.split('/').pop()}`);
+    }
+  }
+
+  // 3. Groq Vision
   if (!result && process.env.GROQ_API_KEY) {
     result = await callGroqOcr(base64, dl.mime, OCR_PROMPT_FULL, 'OCR-FULL');
   }
-  // 3. Gemini Flash
+  // 4. OCR.space
+  if (!result && process.env.OCR_SPACE_API_KEY) {
+    const ocrSpaceText = await callOcrSpaceText(base64, dl.mime, 'OCR-FULL(OCR.space)');
+    if (ocrSpaceText) result = parseTextToEvent(ocrSpaceText, 'full');
+  }
+  // 5. Gemini Flash
   if (!result && process.env.GEMINI_API_KEY) {
     result = await callGeminiOcr([
       { inline_data: { mime_type: dl.mime, data: base64 } },
@@ -1207,8 +1406,8 @@ function isImageUrl(url) {
  * 失敗したイベントは元データのまま保持する。
  */
 async function enrichWithOcr(events) {
-  if (!process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) {
-    console.log('[OCR] GROQ_API_KEY / GEMINI_API_KEY ともに未設定のためスキップ');
+  if (!await hasAnyOcrEngine()) {
+    console.log('[OCR] 利用可能なOCRエンジンがないためスキップ');
     return events;
   }
 
@@ -2065,7 +2264,7 @@ const fetchWakayama = (ctx) => fetchWpPosts(ctx, '和歌山', 'wakayama', 'wk', 
 
 /**
  * 兵庫地本: TOP ページからイベントバナー画像を取得し OCR でイベントを抽出する。
- * GEMINI_API_KEY 未設定の場合は空配列を返す。
+ * 利用可能なOCRエンジンがない場合は空配列を返す。
  */
 async function fetchHyogo(context) {
   console.log(`[兵庫] アクセス: ${URLS.hyogo}`);
@@ -2091,8 +2290,8 @@ async function fetchHyogo(context) {
     await page.close();
   }
 
-  if (!process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) {
-    console.log('[兵庫] GROQ_API_KEY / GEMINI_API_KEY ともに未設定のため OCR スキップ');
+  if (!await hasAnyOcrEngine()) {
+    console.log('[兵庫] 利用可能なOCRエンジンがないため OCR スキップ');
     return [];
   }
   if (imageUrls.length === 0) return [];
@@ -2161,7 +2360,7 @@ async function fetchHyogo(context) {
 
 /**
  * 栃木地本ページを取得し、JPG ポスターを OCR してイベント一覧を返す。
- * GEMINI_API_KEY 未設定の場合は空配列を返す（OCR スキップ）。
+ * 利用可能なOCRエンジンがない場合は空配列を返す（OCR スキップ）。
  */
 async function fetchTochigi(context) {
   console.log(`[栃木] アクセス: ${URLS.tochigi}`);
@@ -2196,8 +2395,8 @@ async function fetchTochigi(context) {
     await page.close();
   }
 
-  if (!process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) {
-    console.log('[栃木] GROQ_API_KEY / GEMINI_API_KEY ともに未設定のため OCR スキップ');
+  if (!await hasAnyOcrEngine()) {
+    console.log('[栃木] 利用可能なOCRエンジンがないため OCR スキップ');
     return [];
   }
   if (imageUrls.length === 0) return [];
@@ -2252,7 +2451,7 @@ async function fetchTochigi(context) {
 
 /**
  * 富山地本ページを取得し、JPG ポスターを OCR してイベント一覧を返す。
- * GEMINI_API_KEY 未設定の場合は空配列を返す（OCR スキップ）。
+ * 利用可能なOCRエンジンがない場合は空配列を返す（OCR スキップ）。
  */
 async function fetchToyama(context) {
   console.log(`[富山] アクセス: ${URLS.toyama}`);
@@ -2287,8 +2486,8 @@ async function fetchToyama(context) {
     await page.close();
   }
 
-  if (!process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) {
-    console.log('[富山] GROQ_API_KEY / GEMINI_API_KEY ともに未設定のため OCR スキップ');
+  if (!await hasAnyOcrEngine()) {
+    console.log('[富山] 利用可能なOCRエンジンがないため OCR スキップ');
     return [];
   }
   if (imageUrls.length === 0) return [];
@@ -2441,8 +2640,8 @@ const KANTO_OFFICE_URLS = {
  * 戻り値: events[]（pref / source_type:'office_crawl' 付き）
  */
 async function crawlKantoOffices(withFreshContext) {
-  if (!process.env.GEMINI_API_KEY && !process.env.GROQ_API_KEY) {
-    console.log('[KantoOffice] APIキー未設定のためスキップ');
+  if (!await hasAnyOcrEngine()) {
+    console.log('[KantoOffice] 利用可能なOCRエンジンがないためスキップ');
     return [];
   }
   if (!withFreshContext) return [];
@@ -2527,8 +2726,8 @@ async function crawlKantoOffices(withFreshContext) {
  * 戻り値: events[] (pref フィールド付き)
  */
 async function scrapeOfficeAssets(withFreshContext) {
-  if (!process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) {
-    console.log('[OfficeOCR] APIキー未設定のためスキップ');
+  if (!await hasAnyOcrEngine()) {
+    console.log('[OfficeOCR] 利用可能なOCRエンジンがないためスキップ');
     return [];
   }
   if (!withFreshContext) {
@@ -3807,4 +4006,3 @@ main().catch(err => {
   console.error('[致命的エラー]', err);
   process.exit(1);
 });
-

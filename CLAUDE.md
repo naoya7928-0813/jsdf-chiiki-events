@@ -46,7 +46,7 @@ npm run dev
 # 本番ビルド（アイコン生成 → HTML 生成 → Vite ビルド）
 npm run build
 
-# スクレイパー実行（要 GEMINI_API_KEY 環境変数）
+# スクレイパー実行（OCR APIキーは任意。RapidOCR/Tesseractはローカル実行）
 cd scraper && node index.js
 ```
 
@@ -55,7 +55,7 @@ cd scraper && node index.js
 - **scrape.yml**: データ変更時のみ Vercel デプロイ（`changed=true` の場合）
 - **deploy.yml**: `src/`, `public/`, `scripts/`, `index.html`, `vite.config.js`, `vercel.json`, `package.json` の変更時に自動デプロイ
 - 手動デプロイ: `gh workflow run deploy.yml`
-- 必要シークレット: `GEMINI_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `NTFY_ADMIN_TOPIC`
+- 必要シークレット: `GROQ_API_KEY`, `GEMINI_API_KEY`, `MISTRAL_API_KEY`, `OCR_SPACE_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `NTFY_ADMIN_TOPIC`
 
 ## スクレイパー仕様
 
@@ -68,6 +68,8 @@ cd scraper && node index.js
 ### PDF/画像アセットの取得・キャッシュ方針（重複取得しない）
 
 **すでに取得済みの PDF/画像は再取得・再 OCR しないこと。** OCR は Gemini API のクォータを消費するため、同一アセットの重複処理は厳禁。実装は `scraper/lib/assetCache.js` と `downloadFile()` に集約されており、新規パーサーや探索ロジックを追加する際もこのキャッシュ経路を必ず通すこと。
+
+OCRの優先順は、無料ローカルOCR（Tesseract → RapidOCR）を先に試し、次に無料枠の大きいAPI（Groq → OCR.space）、最後に Mistral / Gemini へフォールバックする。RapidOCR は `scraper/requirements-ocr.txt` と `scraper/lib/rapidocr_cli.py` で GitHub Actions に導入済み。OCR.space は `OCR_SPACE_API_KEY` がある場合のみ使う。
 
 - **キャッシュ実体**: `scraper/ocr-cache.json`（`.gitignore` 対象。self-hosted runner 上 + GitHub Actions cache で永続化）。キーはファイル実体の **SHA-256（`content_sha256`）**。
 - **ダウンロード段階の重複回避**: `downloadFile(url)` は正規化 URL でキャッシュを引き、OCR 成功済みエントリがあれば `If-None-Match`(ETag) / `If-Modified-Since`(Last-Modified) で**条件付き GET** を発行。`304 Not Modified` ならファイル本体をダウンロードしない。
