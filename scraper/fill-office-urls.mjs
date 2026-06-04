@@ -102,6 +102,7 @@ async function main() {
     const candidate = build(slug);
     const status = await check200(candidate);
     if (status === 200) {
+      o.hasOfficialPage = true;
       if (o.url !== candidate) { o.url = candidate; updated++; }
       else kept++;
       console.log(`✓ ${o.pref} ${o.name} → ${candidate}`);

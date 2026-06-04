@@ -346,7 +346,8 @@ export default function SettingsScreen({
                           </div>
                         ) : (
                           list.map(o => {
-                            const clickable = !!o.url;
+                            // 個別の公式ページを持つ拠点だけリンク可能にする
+                            const clickable = !!o.hasOfficialPage && !!o.url;
                             const armed     = clickable && armedOffice === o.id;
                             return (
                               <div

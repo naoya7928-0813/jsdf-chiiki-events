@@ -202,6 +202,7 @@ async function main() {
       const code = await httpStatus(d.url);
       if (code === 200) {
         verified++;
+        o.hasOfficialPage = true;
         if (o.url !== d.url) { o.url = d.url; updated++; console.log(`✓ ${pref} ${o.name} → ${d.url}`); }
       } else {
         failed++;
