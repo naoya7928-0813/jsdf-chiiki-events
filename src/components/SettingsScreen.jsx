@@ -27,6 +27,7 @@ export default function SettingsScreen({
   // ── 掲載元: 各地本の事務所一覧（offices.json を遅延ロード） ──────
   const [offices,   setOffices]   = useState(null);   // null=未取得 / []=取得失敗
   const [openHqs,   setOpenHqs]   = useState(() => new Set()); // 展開中の地本キー
+  const [armedOffice, setArmedOffice] = useState(null); // 誤操作防止: 1回目タップで選択中の拠点ID
 
   // 掲載元セクションを初めて開いたときに offices.json を取得
   useEffect(() => {
@@ -51,6 +52,17 @@ export default function SettingsScreen({
     next.has(key) ? next.delete(key) : next.add(key);
     return next;
   });
+
+  // 掲載元の各拠点タップ: 1回目で選択（テーマカラーで強調）、2回目で公式サイトへ遷移
+  const handleOfficeTap = o => {
+    if (!o.url) return;
+    if (armedOffice === o.id) {
+      window.open(o.url, '_blank', 'noopener,noreferrer');
+      setArmedOffice(null);
+    } else {
+      setArmedOffice(o.id);
+    }
+  };
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)', fontFamily: F.sans }}>
@@ -333,23 +345,45 @@ export default function SettingsScreen({
                             事務所情報なし
                           </div>
                         ) : (
-                          list.map(o => (
-                            <div key={o.id} style={{
-                              fontSize: 11, color: 'var(--text-muted)',
-                              lineHeight: 1.55, padding: '3px 0 3px 10px',
-                              borderLeft: `2px solid ${o.type === 'hq' ? primary : 'var(--sep)'}`,
-                              marginTop: 4,
-                            }}>
-                              <span style={{ color: 'var(--text)', fontWeight: 500 }}>
-                                {o.name}
-                              </span>
-                              {o.type === 'hq' && (
-                                <span style={{ color: primary, fontSize: 10, marginLeft: 5 }}>本部</span>
-                              )}
-                              {o.address && <div>{o.address}</div>}
-                              {o.tel && <div>TEL {o.tel}</div>}
-                            </div>
-                          ))
+                          list.map(o => {
+                            const clickable = !!o.url;
+                            const armed     = clickable && armedOffice === o.id;
+                            return (
+                              <div
+                                key={o.id}
+                                role={clickable ? 'button' : undefined}
+                                tabIndex={clickable ? 0 : undefined}
+                                onClick={clickable ? () => handleOfficeTap(o) : undefined}
+                                onKeyDown={clickable ? e => {
+                                  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleOfficeTap(o); }
+                                } : undefined}
+                                style={{
+                                  fontSize: 11, color: 'var(--text-muted)',
+                                  lineHeight: 1.55, padding: '5px 8px 5px 10px',
+                                  borderLeft: `2px solid ${(armed || o.type === 'hq') ? primary : 'var(--sep)'}`,
+                                  borderRadius: 4, marginTop: 4,
+                                  background: armed ? `${primary}1f` : 'transparent',
+                                  cursor: clickable ? 'pointer' : 'default',
+                                  transition: 'background 0.15s',
+                                  WebkitTapHighlightColor: 'transparent',
+                                }}
+                              >
+                                <span style={{ color: armed ? primary : 'var(--text)', fontWeight: armed ? 700 : 500 }}>
+                                  {o.name}
+                                </span>
+                                {o.type === 'hq' && (
+                                  <span style={{ color: primary, fontSize: 10, marginLeft: 5 }}>本部</span>
+                                )}
+                                {clickable && (
+                                  <span style={{ color: primary, fontSize: 10, marginLeft: 5, fontWeight: armed ? 700 : 400 }}>
+                                    {armed ? 'もう一度タップで公式サイトへ ↗' : '↗'}
+                                  </span>
+                                )}
+                                {o.address && <div>{o.address}</div>}
+                                {o.tel && <div>TEL {o.tel}</div>}
+                              </div>
+                            );
+                          })
                         )}
                       </div>
                     )}
