@@ -2754,8 +2754,11 @@ function cleanOfficeEventTitle(text) {
     .replace(/[｜|»>]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
-  // 先頭の曜日・記号の断片を除去
-  t = t.replace(/^[\s月火水木金土日祝・,、)）]+/, '').trim();
+  // 先頭の曜日断片（「月祝)」「月・祝)」など、閉じ括弧で終わるものだけ）を除去。
+  // 「水辺」「金沢」「土浦」等の実在語の先頭文字を削らないよう、閉じ括弧を必須にする。
+  t = t.replace(/^(?:[月火水木金土日祝][・･]?){1,3}[）)]\s*/, '').trim();
+  // 先頭の余分な記号（曜日漢字は含めない）を除去
+  t = t.replace(/^[\s・,、)）]+/, '').trim();
   // 未閉じ括弧の整理
   if ((t.match(/（/g) || []).length > (t.match(/）/g) || []).length) t = t.replace(/（[^（）]*$/, '').trim();
   if ((t.match(/\(/g) || []).length > (t.match(/\)/g) || []).length) t = t.replace(/\([^()]*$/, '').trim();

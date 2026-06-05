@@ -62,8 +62,9 @@ function cleanOfficeTitle(raw) {
        .replace(/[｜|»>]+/g, ' ')
        .replace(/\s+/g, ' ')
        .trim();
-  // 先頭の曜日・記号の断片を除去
-  t = t.replace(/^[\s月火水木金土日祝・,、)）]+/, '').trim();
+  // 先頭の曜日断片（「月祝)」など閉じ括弧で終わるものだけ）を除去。実在語の先頭（水辺/金沢等）は残す
+  t = t.replace(/^(?:[月火水木金土日祝][・･]?){1,3}[）)]\s*/, '').trim();
+  t = t.replace(/^[\s・,、)）]+/, '').trim();
   // 未閉じ括弧の整理（開きが多い場合は最後の開き以降を削る）
   if ((t.match(/（/g) || []).length > (t.match(/）/g) || []).length) t = t.replace(/（[^（）]*$/, '').trim();
   if ((t.match(/\(/g) || []).length > (t.match(/\)/g) || []).length) t = t.replace(/\([^()]*$/, '').trim();

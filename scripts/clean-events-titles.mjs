@@ -61,7 +61,8 @@ function cleanOfficeTitle(raw) {
        .replace(/[｜|»>]+/g, ' ')
        .replace(/\s+/g, ' ')
        .trim();
-  t = t.replace(/^[\s月火水木金土日祝・,、)）]+/, '').trim();
+  t = t.replace(/^(?:[月火水木金土日祝][・･]?){1,3}[）)]\s*/, '').trim();
+  t = t.replace(/^[\s・,、)）]+/, '').trim();
   if ((t.match(/（/g) || []).length > (t.match(/）/g) || []).length) t = t.replace(/（[^（）]*$/, '').trim();
   if ((t.match(/\(/g) || []).length > (t.match(/\)/g) || []).length) t = t.replace(/\([^()]*$/, '').trim();
   t = t.replace(/^[\s／/:：、,．.\-–—~〜【】\[\]<>!！#＃]+|[\s／/:：、,．.\-–—~〜【】\[\]<>、]+$/g, '').trim();
