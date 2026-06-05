@@ -2710,10 +2710,11 @@ function parseOfficeEventDate(text) {
 }
 
 // 募集案内所イベントとして表示すべきでない（整形しても綺麗にならない）塊か判定
-const OFFICE_JUNK_KW = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|毎日実施|随時実施|Event\s*&\s*Seminar|各種説明会|＆各種/i;
+const OFFICE_JUNK_KW = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|毎日実施|随時実施|Event\s*&\s*Seminar|各種説明会|＆各種|時期及び定員|提出書類|応募方法|別記|様式第|0[0-9０-９]{1,4}[-－—][0-9０-９]{1,4}[-－—][0-9０-９]{3,4}/i;
 const OFFICE_ADDRESS_KW = /[一-龥]{2,3}[都道府県][一-龥]{1,10}[市区郡].{0,18}(?:丁目|番地|ビル|庁舎|[0-9０-９]+階|第[0-9０-９]+)/;
 function isOfficeJunkText(text) {
-  return OFFICE_NONEVENT_KW.test(text) || OFFICE_JUNK_KW.test(text) || OFFICE_ADDRESS_KW.test(text);
+  const weekdays = (String(text || '').match(/[日月火水木金土](?=[\s0-9０-９])/g) || []).length;
+  return OFFICE_NONEVENT_KW.test(text) || OFFICE_JUNK_KW.test(text) || OFFICE_ADDRESS_KW.test(text) || weekdays >= 4;
 }
 
 function cleanOfficeEventTitle(text) {
@@ -2739,7 +2740,10 @@ function cleanOfficeEventTitle(text) {
     .replace(/[、,]?\s*[0-9０-９]{1,2}\s*[月\/.]?\s*[0-9０-９]{0,2}\s*日?\s*[（(][月火水木金土日祝][）)]/g, '')
     .replace(/[0-9０-９]{1,2}\s*[月\/.]\s*[0-9０-９]{1,2}\s*日?/g, '')
     .replace(/[0-9０-９]{1,2}\s*[:：]\s*[0-9０-９]{2}\s*[~〜\-－]?\s*(?:[0-9０-９]{1,2}\s*[:：]\s*[0-9０-９]{2})?/g, '')
+    .replace(/[0-9０-９]{1,2}\s*時\s*[0-9０-９]{0,2}\s*分?\s*[~〜\-－]?\s*(?:[0-9０-９]{1,2}\s*時\s*[0-9０-９]{0,2}\s*分?)?/g, '')
     .replace(/[0-9０-９]{1,2}\s*月(?=\s|$)/g, '');
+  // 複数イベントが連結している場合は最初の項目だけ採用
+  if ((t.match(/令和/g) || []).length >= 2) t = (t.split(/\s*令和[0-9０-９]/)[0] || t).trim();
   // 公式ページ参照などの注記・案内系の語を除去
   t = t.replace(/[（(][^（()）]*(?:公式ページ|日程|ページ参照|参照|事前|まで)[^（()）]*[）)]/g, '')
     .replace(/詳しくはこちら|詳しくみる|詳細はこちら|こちら|VIEW\s*ALL|お知らせ|NEWS|一覧|PDF|チラシ|詳細|お申し込み|申込/gi, '')
@@ -2827,6 +2831,8 @@ function extractOfficeHtmlEvents($, pageUrl, meta) {
     }
 
     const title = cleanOfficeEventTitle(text);
+    // 整形した結果ほとんど中身が残らない（救済不能な）ものはイベントにしない
+    if (title === '募集案内所イベント' || title.replace(/[\s　]/g, '').length < 4) return;
     const key = `${parsed.dateStr}|${title.slice(0, 40)}|${normalizeUrl(url) || url}`;
     if (seen.has(key)) return;
     seen.add(key);

@@ -10,6 +10,7 @@ const OFFICE_NONEVENT_RE = /しました|されました|制度です|養成す�
 // ナビメニュー/カテゴリ一覧の塊（見出し語が複数回出る）は実イベントではない
 const navMenuHits = s => (String(s || '').match(/イベント情報|採用試験情報|入札情報|重要なお知らせ|トピックス|お知らせ一覧|すべて/g) || []).length;
 
+const weekdayCount = s => (String(s || '').match(/[日月火水木金土](?=[\s0-9０-９])/g) || []).length;
 /** 募集案内所イベントとして表示すべきでない（整形しても綺麗にならない）塊か判定 */
 function officeIsJunk(title) {
   const t = String(title || '');
@@ -19,6 +20,9 @@ function officeIsJunk(title) {
   if (/毎日実施|随時実施/.test(t)) return true;                                  // 常時開催の案内
   if (/Event\s*&\s*Seminar|各種説明会|＆各種/i.test(t)) return true;             // 複数イベントの見出し塊
   if (/[一-龥]{2,3}[都道府県][一-龥]{1,10}[市区郡].{0,18}(丁目|番地|ビル|庁舎|[0-9０-９]+階|第[0-9０-９]+)/.test(t)) return true; // 住所塊
+  if (/0[0-9０-９]{1,4}[-－—][0-9０-９]{1,4}[-－—][0-9０-９]{3,4}/.test(t)) return true; // 電話番号混入
+  if (weekdayCount(t) >= 4) return true;                                          // カレンダー表の塊
+  if (/時期及び定員|提出書類|応募方法|別記|様式第/.test(t)) return true;          // フォーム/様式の項目
   return false;
 }
 
@@ -44,9 +48,12 @@ function cleanOfficeTitle(raw) {
        .replace(/[、,]?\s*[0-9０-９]{1,2}\s*[月\/.]?\s*[0-9０-９]{0,2}\s*日?\s*[（(][月火水木金土日祝][）)]/g, '')
        .replace(/[0-9０-９]{1,2}\s*[月\/.]\s*[0-9０-９]{1,2}\s*日?/g, '')
        .replace(/[0-9０-９]{1,2}\s*[:：]\s*[0-9０-９]{2}\s*[~〜\-－]?\s*(?:[0-9０-９]{1,2}\s*[:：]\s*[0-9０-９]{2})?/g, '')
+       .replace(/[0-9０-９]{1,2}\s*時\s*[0-9０-９]{0,2}\s*分?\s*[~〜\-－]?\s*(?:[0-9０-９]{1,2}\s*時\s*[0-9０-９]{0,2}\s*分?)?/g, '')
        .replace(/[0-9０-９]{1,2}\s*月(?=\s|$)/g, '');
   // 注記（公式ページ参照／事前→…まで 等）
   t = t.replace(/[（(][^（()）]*(?:公式ページ|日程|ページ参照|参照|事前|まで)[^（()）]*[）)]/g, '');
+  // 複数イベントが連結している場合は最初の項目だけ採用
+  if ((t.match(/令和/g) || []).length >= 2) t = (t.split(/\s*令和[0-9０-９]/)[0] || t).trim();
   // 案内系の語
   t = t.replace(/詳しくはこちら|詳しくみる|詳細はこちら|VIEW\s*ALL|お知らせ|NEWS|一覧/gi, '')
        .replace(/[｜|»>]+/g, ' ')
@@ -59,7 +66,7 @@ function cleanOfficeTitle(raw) {
   if ((t.match(/\(/g) || []).length > (t.match(/\)/g) || []).length) t = t.replace(/\([^()]*$/, '').trim();
   // 先頭・末尾の記号類を除去（括弧 （）() は正規の閉じを壊さないため対象外）
   t = t.replace(/^[\s／/:：、,．.\-–—~〜＝=【】\[\]<>!！#＃]+|[\s／/:：、,．.\-–—~〜＝=【】\[\]<>、]+$/g, '').trim();
-  return t || raw;
+  return t; // 救済不能（空）の場合は空を返す（呼び出し側で除外）
 }
 
 /** 全イベント共通: 末尾の誘導文言（詳細はこちら 等）を除去 */
@@ -95,8 +102,14 @@ function filterPastEvents(rawData, today) {
     out[k] = v
       .filter(ev => ev.date && (ev.endDate || ev.date) >= today)
       // 募集案内所イベントのうち、整形しても綺麗にならない非イベント（過去報告・制度説明・
-      // お知らせ・ナビメニュー塊・メール/住所混入・常時開催の案内など）を除外
-      .filter(ev => !(isOfficeEvent(ev) && officeIsJunk(ev.title)))
+      // お知らせ・ナビメニュー塊・メール/住所/電話混入・カレンダー塊・常時開催の案内など）を除外。
+      // さらに、整形した結果ほとんど中身が残らない（救済不能な）ものも除外する。
+      .filter(ev => {
+        if (!isOfficeEvent(ev)) return true;
+        if (officeIsJunk(ev.title)) return false;
+        const c = cleanOfficeTitle(ev.title).replace(/[\s　]/g, '');
+        return c.length >= 4;
+      })
       .map(ev => {
         // タイトルの余計な文章を除去（全イベント: 末尾誘導文言／募集案内所: さらに表ヘッダー等）
         const cleaned = isOfficeEvent(ev)
