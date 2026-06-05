@@ -639,10 +639,12 @@ export default function ListScreen({
                               {ev.title}
                             </div>
                           </div>
-                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 5, fontSize: 12, color: 'var(--text-sub)' }}>
-                            <span style={{ flexShrink: 0, display: 'flex', marginTop: 1 }}>{ICO.pin('var(--text-sub)', 12)}</span>
-                            <span style={{ minWidth: 0, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{ev.place}</span>
-                          </div>
+                          {ev.place && String(ev.place).trim() && (
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 5, fontSize: 12, color: 'var(--text-sub)' }}>
+                              <span style={{ flexShrink: 0, display: 'flex', marginTop: 1 }}>{ICO.pin('var(--text-sub)', 12)}</span>
+                              <span style={{ minWidth: 0, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{ev.place}</span>
+                            </div>
+                          )}
                           {/* ④ URLあり → 公式ページ確認バッジ */}
                           {ev.url && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 5, fontSize: 10, color: primary, fontWeight: 600 }}>

@@ -2714,7 +2714,8 @@ const OFFICE_JUNK_KW = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|毎日実
 const OFFICE_ADDRESS_KW = /[一-龥]{2,3}[都道府県][一-龥]{1,10}[市区郡].{0,18}(?:丁目|番地|ビル|庁舎|[0-9０-９]+階|第[0-9０-９]+)/;
 function isOfficeJunkText(text) {
   const weekdays = (String(text || '').match(/[日月火水木金土](?=[\s0-9０-９])/g) || []).length;
-  return OFFICE_NONEVENT_KW.test(text) || OFFICE_JUNK_KW.test(text) || OFFICE_ADDRESS_KW.test(text) || weekdays >= 4;
+  return OFFICE_NONEVENT_KW.test(text) || OFFICE_JUNK_KW.test(text) || OFFICE_ADDRESS_KW.test(text)
+    || weekdays >= 4 || /[队乐贝实团济纪记书译录习场]|�/.test(text); // 末尾はOCR文字化け（簡体字・置換文字）
 }
 
 function cleanOfficeEventTitle(text) {
@@ -2731,6 +2732,8 @@ function cleanOfficeEventTitle(text) {
   // 「時間／…」「場所／…」「開催…」以降は本文ではないので切り落とす
   t = t.split(/\s*(?:時間|場所|日時|開催日|受付期間|受付|開場|開演|問合せ|お問[い合]*せ|連絡先|TEL|電話)\s*[／/:：]?/)[0];
   t = t.split(/\s*開催/)[0];
+  // 区切りの全角スラッシュ以降（時間／場所／… の語が先に除去された残骸）を切り落とす
+  t = t.split(/\s*／/)[0];
   // 先頭の日付・曜日の断片（・8日(月)、(月・祝) 等）
   t = t.replace(/^[\s・･]*[0-9０-９]{0,2}\s*日?\s*[（(][月火水木金土日祝・]+[）)]\s*/, '');
   // 日付・時刻・曜日断片を除去（半角・全角数字の両対応）
