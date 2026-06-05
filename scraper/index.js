@@ -2639,6 +2639,8 @@ const KANTO_PREFS = new Set(Object.keys(KANTO_OFFICE_URLS));
 const OFFICE_EVENT_KW = /イベント|説明会|相談会|見学|体験|公開|フェス|まつり|祭|広報|採用|募集|セミナー|ガイダンス|インターン|オープンキャンパス|フェア|ブース|出張|公務員|自衛官/;
 const OFFICE_ASSET_URL_KW = /event|events|oshirase|news|topics|setsumei|session|recruit|saiyou|bosyu|kouho|chirashi|annai|fair|fes|taiken|kengaku|schedule|calendar/i;
 const OFFICE_SKIP_TEXT_KW = /所在地|住所|電話|TEL|FAX|アクセス|地図|お問い合わせ|メール|受付時間|Copyright|プライバシー|サイトマップ|募集案内所の紹介|地域事務所の紹介|所長|事務所紹介/;
+// 過去の実施報告・採用制度の説明文・お知らせ/合格発表ブロックなど「イベントではない」テキスト
+const OFFICE_NONEVENT_KW = /しました|されました|制度です|養成する|養成課程|修業期間|受付期間|応募資格|教育訓練|試験⽇|試験日|合格発表|合格者|VIEW\s*ALL|更新しました|掲載しました|を養成|の紹介/;
 const OFFICE_SKIP_ASSET_KW = /logo|icon|banner|btn|common|arrow|header|footer|sns|line|instagram|facebook|youtube|map|access|profile|staff|photo|album|gallery|sitemap/i;
 
 function compactText(text) {
@@ -2708,17 +2710,28 @@ function parseOfficeEventDate(text) {
 }
 
 function cleanOfficeEventTitle(text) {
-  let title = compactText(text)
-    .replace(/https?:\/\/\S+/g, '')
+  let t = compactText(text);
+  // 表ヘッダー語（月日（曜日）／イベント名／場 所 等）を除去
+  t = t.replace(/月日\s*[（(]?\s*曜日\s*[）)]?|イベント名|開催\s*日時?|場\s*所|時\s*間|種\s*類|区\s*分|内\s*容/g, ' ');
+  // 「時間／…」「場所／…」「日時／…」「受付…」以降は本文ではないので切り落とす
+  t = t.split(/\s*(?:時間|場所|日時|受付期間|受付|開場|開演|問合せ|お問[い合]*せ|連絡先|TEL|電話)\s*[／/:：]/)[0];
+  // 先頭の日付・曜日の断片（・8日(月)、(月・祝) 等）
+  t = t.replace(/^[\s・･]*\d{0,2}\s*日?\s*[（(][月火水木金土日祝・]+[）)]\s*/, '');
+  // 日付表現を除去
+  t = t.replace(/https?:\/\/\S+/g, '')
     .replace(/(?:令和|R|Ｒ)\s*\d{1,2}\s*年?\s*\d{1,2}\s*月\s*\d{1,2}\s*日?(?:[（(]\s*[月火水木金土日祝]\s*[）)])?/gi, '')
     .replace(/20\d{2}\s*[年\/.-]\s*\d{1,2}\s*(?:月|[\/.-])\s*\d{1,2}\s*日?(?:[（(]\s*[月火水木金土日祝]\s*[）)])?/g, '')
-    .replace(/\d{1,2}\s*[月\/.]\s*\d{1,2}\s*日?(?:[（(]\s*[月火水木金土日祝]\s*[）)])?/g, '')
-    .replace(/詳しくはこちら|こちら|PDF|チラシ|詳細|申込|お申し込み/g, '')
+    .replace(/\d{1,2}\s*[月\/.]\s*\d{1,2}\s*日?(?:[（(]\s*[月火水木金土日祝]\s*[）)])?/g, '');
+  // 公式ページ参照などの注記・案内系の語を除去
+  t = t.replace(/[（(][^（()）]*(?:公式ページ|日程|ページ参照|参照)[^（()）]*[）)]/g, '')
+    .replace(/詳しくはこちら|詳しくみる|詳細はこちら|こちら|VIEW\s*ALL|お知らせ|NEWS|一覧|PDF|チラシ|詳細|お申し込み|申込/gi, '')
     .replace(/[｜|»>]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
-  if (title.length > 90) title = title.slice(0, 90);
-  return title || '募集案内所イベント';
+  // 先頭・末尾の記号類を除去
+  t = t.replace(/^[\s／/:：、,．.\-–—~〜]+|[\s／/:：、,．.\-–—~〜]+$/g, '').trim();
+  if (t.length > 60) t = t.slice(0, 60).trim();
+  return t || '募集案内所イベント';
 }
 
 function officeNotes(meta, extra = null) {
@@ -2754,9 +2767,11 @@ function extractOfficeHtmlEvents($, pageUrl, meta) {
   const selector = 'a[href], li, tr, article, section, div[class*="event"], div[class*="news"], div[class*="topic"], div[class*="post"]';
   $(selector).each((_i, el) => {
     const text = compactText($(el).text());
-    if (text.length < 8 || text.length > 320) return;
+    if (text.length < 8 || text.length > 220) return;
     if (!OFFICE_EVENT_KW.test(text)) return;
     if (OFFICE_SKIP_TEXT_KW.test(text)) return;
+    // 過去の実施報告・採用制度の説明文・お知らせブロックはイベントではないので除外
+    if (OFFICE_NONEVENT_KW.test(text)) return;
     const parsed = parseOfficeEventDate(text);
     if (!parsed) return;
 
@@ -3111,10 +3126,10 @@ async function scrapeOfficeAssets(withFreshContext) {
       // 全アセット処理後、1件も成功せず かつ 地本スタブ未追加の場合のみスタブ1件
       if (!foundAtLeastOne && !hqStubAdded.has(pref)) {
         hqStubAdded.add(pref);
-        // OCRでタイトルが取れていればそれを使い、なければ「公式ページ参照」
+        // OCRでタイトルが取れていればそれを使う（注記はnotesに記載するためタイトルには含めない）
         const stubTitle = bestOcrTitle
-          ? `${bestOcrTitle}（日程は公式ページ参照）`
-          : `${hq.name}のイベント情報（公式ページ参照）`;
+          ? bestOcrTitle
+          : `${hq.name}のイベント情報`;
         allEvents.push({
           id:          `${prefCode}-ref-${titleHash(hq.url, pref)}`,
           pref,
