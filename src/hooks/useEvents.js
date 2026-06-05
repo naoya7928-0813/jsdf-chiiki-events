@@ -7,15 +7,24 @@ const EMPTY = { updatedAt: null };
 const isOfficeEvent = ev => typeof ev?.source_type === 'string' && ev.source_type.startsWith('office');
 // 過去の実施報告・採用制度の説明文・お知らせ/合格発表など「イベントではない」もの
 const OFFICE_NONEVENT_RE = /しました|されました|制度です|養成する|養成課程|修業期間|受付期間|応募資格|教育訓練|合格発表|合格者|VIEW\s*ALL|を養成|の紹介/;
+// ナビメニュー/カテゴリ一覧の塊（見出し語が複数回出る）は実イベントではない
+const navMenuHits = s => (String(s || '').match(/イベント情報|採用試験情報|入札情報|重要なお知らせ|トピックス|お知らせ一覧|すべて/g) || []).length;
 
 /** 募集案内所イベントのタイトルから表ヘッダー・時間/場所・注記などの余計な文章を除去 */
 function cleanOfficeTitle(raw) {
   if (!raw) return raw;
   let t = String(raw).replace(/\s+/g, ' ').trim();
+  // 先頭のラベル（お知らせ/new/重要 等。連続も除去）
+  t = t.replace(/^(?:(?:お知らせ|重要(?:なお知らせ)?|新着|トピックス|new|NEW)\s*)+/gi, '');
   // 先頭に並ぶ表ヘッダー語（月日（曜日） イベント名 場 所 …）を除去
   t = t.replace(/^(?:月日\s*[（(]?\s*曜日\s*[）)]?|イベント名|開催\s*日時?|場\s*所|時\s*間|種\s*類|区\s*分|内\s*容|[（()）\s])+/, '');
-  // 「時間／…」「場所／…」「日時／…」「受付…」以降は本文ではないので切り落とす
-  t = t.split(/\s*(?:時間|場所|日時|受付期間|受付|開場|開演|問合せ|お問[い合]*せ|連絡先|TEL|電話)\s*[／/:：]/)[0];
+  // 「時間／…」「場所／…」「日時／…」「受付…」「開催日…」以降は本文ではないので切り落とす
+  t = t.split(/\s*(?:時間|場所|日時|開催日|受付期間|受付|開場|開演|問合せ|お問[い合]*せ|連絡先|TEL|電話)\s*[／/:：]?/)[0];
+  // 日付・時刻表現を除去（半角・全角数字の両対応）
+  t = t.replace(/(?:令和|R|Ｒ)\s*[0-9０-９]{1,2}\s*年?\s*[0-9０-９]{1,2}\s*月\s*[0-9０-９]{1,2}\s*日?(?:[（(]\s*[月火水木金土日祝]\s*[）)])?/gi, '')
+       .replace(/[0-9０-９]{4}\s*[年\/.-]\s*[0-9０-９]{1,2}\s*(?:月|[\/.-])\s*[0-9０-９]{1,2}\s*日?(?:[（(]\s*[月火水木金土日祝]\s*[）)])?/g, '')
+       .replace(/[0-9０-９]{1,2}\s*[月\/.]\s*[0-9０-９]{1,2}\s*日?(?:[（(]\s*[月火水木金土日祝]\s*[）)])?/g, '')
+       .replace(/[0-9０-９]{1,2}\s*[:：]\s*[0-9０-９]{2}\s*[~〜\-－]?\s*(?:[0-9０-９]{1,2}\s*[:：]\s*[0-9０-９]{2})?/g, '');
   // 公式ページ参照などの注記
   t = t.replace(/[（(][^（()）]*(?:公式ページ|日程|ページ参照|参照)[^（()）]*[）)]/g, '');
   // 案内系の語
@@ -23,7 +32,17 @@ function cleanOfficeTitle(raw) {
        .replace(/[｜|»>]+/g, ' ')
        .replace(/\s+/g, ' ')
        .trim();
-  t = t.replace(/^[\s／/:：、,．.\-–—~〜]+|[\s／/:：、,．.\-–—~〜]+$/g, '').trim();
+  t = t.replace(/^[\s／/:：、,．.\-–—~〜【】\[\]（）()<>]+|[\s／/:：、,．.\-–—~〜【】\[\]（）()<>]+$/g, '').trim();
+  return t || raw;
+}
+
+/** 全イベント共通: 末尾の誘導文言（詳細はこちら 等）を除去 */
+function stripTrailingCta(raw) {
+  if (!raw) return raw;
+  const t = String(raw)
+    .replace(/(?:詳細はこちら(?:から|をご覧ください)?|詳しくはこちら|詳しくみる|こちらをご覧ください|こちらから|こちら|詳細を見る)\s*$/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim();
   return t || raw;
 }
 
@@ -49,15 +68,14 @@ function filterPastEvents(rawData, today) {
     if (!Array.isArray(v)) { out[k] = v; continue; }
     out[k] = v
       .filter(ev => ev.date && (ev.endDate || ev.date) >= today)
-      // 募集案内所イベントのうち、過去報告・制度説明・お知らせ等の非イベントを除外
-      .filter(ev => !(isOfficeEvent(ev) && OFFICE_NONEVENT_RE.test(ev.title || '')))
+      // 募集案内所イベントのうち、過去報告・制度説明・お知らせ・ナビメニュー塊などの非イベントを除外
+      .filter(ev => !(isOfficeEvent(ev) && (OFFICE_NONEVENT_RE.test(ev.title || '') || navMenuHits(ev.title) >= 2)))
       .map(ev => {
-        // 募集案内所イベントはタイトルの余計な文章を除去（curatedイベントは触らない）
-        let e = ev;
-        if (isOfficeEvent(ev)) {
-          const cleaned = cleanOfficeTitle(ev.title);
-          if (cleaned !== ev.title) e = { ...ev, title: cleaned };
-        }
+        // タイトルの余計な文章を除去（全イベント: 末尾誘導文言／募集案内所: さらに表ヘッダー等）
+        const cleaned = isOfficeEvent(ev)
+          ? stripTrailingCta(cleanOfficeTitle(ev.title))
+          : stripTrailingCta(ev.title);
+        let e = cleaned !== ev.title ? { ...ev, title: cleaned } : ev;
         // 同一IDの誤連動を防ぐためIDを一意化
         if (!e.id) return e;
         if (!seenIds.has(e.id)) { seenIds.add(e.id); return e; }

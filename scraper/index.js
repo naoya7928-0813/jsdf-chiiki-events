@@ -2711,27 +2711,48 @@ function parseOfficeEventDate(text) {
 
 function cleanOfficeEventTitle(text) {
   let t = compactText(text);
+  // 先頭のラベル（お知らせ/new/重要/トピックス 等。連続も除去）
+  t = t.replace(/^(?:(?:お知らせ|重要(?:なお知らせ)?|新着|トピックス|new|NEW)\s*)+/gi, '');
   // 表ヘッダー語（月日（曜日）／イベント名／場 所 等）を除去
   t = t.replace(/月日\s*[（(]?\s*曜日\s*[）)]?|イベント名|開催\s*日時?|場\s*所|時\s*間|種\s*類|区\s*分|内\s*容/g, ' ');
-  // 「時間／…」「場所／…」「日時／…」「受付…」以降は本文ではないので切り落とす
-  t = t.split(/\s*(?:時間|場所|日時|受付期間|受付|開場|開演|問合せ|お問[い合]*せ|連絡先|TEL|電話)\s*[／/:：]/)[0];
+  // 「時間／…」「場所／…」「日時／…」「受付…」「開催日…」以降は本文ではないので切り落とす
+  t = t.split(/\s*(?:時間|場所|日時|開催日|受付期間|受付|開場|開演|問合せ|お問[い合]*せ|連絡先|TEL|電話)\s*[／/:：]?/)[0];
   // 先頭の日付・曜日の断片（・8日(月)、(月・祝) 等）
-  t = t.replace(/^[\s・･]*\d{0,2}\s*日?\s*[（(][月火水木金土日祝・]+[）)]\s*/, '');
-  // 日付表現を除去
+  t = t.replace(/^[\s・･]*[0-9０-９]{0,2}\s*日?\s*[（(][月火水木金土日祝・]+[）)]\s*/, '');
+  // 日付・時刻表現を除去（半角・全角数字の両対応）
   t = t.replace(/https?:\/\/\S+/g, '')
-    .replace(/(?:令和|R|Ｒ)\s*\d{1,2}\s*年?\s*\d{1,2}\s*月\s*\d{1,2}\s*日?(?:[（(]\s*[月火水木金土日祝]\s*[）)])?/gi, '')
-    .replace(/20\d{2}\s*[年\/.-]\s*\d{1,2}\s*(?:月|[\/.-])\s*\d{1,2}\s*日?(?:[（(]\s*[月火水木金土日祝]\s*[）)])?/g, '')
-    .replace(/\d{1,2}\s*[月\/.]\s*\d{1,2}\s*日?(?:[（(]\s*[月火水木金土日祝]\s*[）)])?/g, '');
+    .replace(/(?:令和|R|Ｒ)\s*[0-9０-９]{1,2}\s*年?\s*[0-9０-９]{1,2}\s*月\s*[0-9０-９]{1,2}\s*日?(?:[（(]\s*[月火水木金土日祝]\s*[）)])?/gi, '')
+    .replace(/[0-9０-９]{4}\s*[年\/.-]\s*[0-9０-９]{1,2}\s*(?:月|[\/.-])\s*[0-9０-９]{1,2}\s*日?(?:[（(]\s*[月火水木金土日祝]\s*[）)])?/g, '')
+    .replace(/[0-9０-９]{1,2}\s*[月\/.]\s*[0-9０-９]{1,2}\s*日?(?:[（(]\s*[月火水木金土日祝]\s*[）)])?/g, '')
+    .replace(/[0-9０-９]{1,2}\s*[:：]\s*[0-9０-９]{2}\s*[~〜\-－]?\s*(?:[0-9０-９]{1,2}\s*[:：]\s*[0-9０-９]{2})?/g, '');
   // 公式ページ参照などの注記・案内系の語を除去
   t = t.replace(/[（(][^（()）]*(?:公式ページ|日程|ページ参照|参照)[^（()）]*[）)]/g, '')
     .replace(/詳しくはこちら|詳しくみる|詳細はこちら|こちら|VIEW\s*ALL|お知らせ|NEWS|一覧|PDF|チラシ|詳細|お申し込み|申込/gi, '')
     .replace(/[｜|»>]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
-  // 先頭・末尾の記号類を除去
-  t = t.replace(/^[\s／/:：、,．.\-–—~〜]+|[\s／/:：、,．.\-–—~〜]+$/g, '').trim();
+  // 先頭・末尾の記号類（空括弧 [] 【】 等を含む）を除去
+  t = t.replace(/^[\s／/:：、,．.\-–—~〜【】\[\]（）()<>]+|[\s／/:：、,．.\-–—~〜【】\[\]（）()<>]+$/g, '').trim();
   if (t.length > 60) t = t.slice(0, 60).trim();
   return t || '募集案内所イベント';
+}
+
+/**
+ * 出力直前に全イベントのタイトルを最終整形する（収集後の整形チョークポイント）。
+ * events.json に綺麗なタイトルを書き出すことで、アプリ表示だけでなく
+ * プッシュ通知（events.json のタイトルを直接使用）も整形済みになる。
+ */
+function finalizeTitle(title, sourceType) {
+  if (!title) return title;
+  let t = compactText(title);
+  // 全イベント共通: 末尾の誘導文言（詳細はこちら 等）を除去
+  t = t.replace(/(?:詳細はこちら(?:から|をご覧ください)?|詳しくはこちら|詳しくみる|こちらをご覧ください|こちらから|こちら|詳細を見る)\s*$/gi, '').trim();
+  // 募集案内所イベントは表ヘッダー・時間/場所・注記なども除去
+  if (typeof sourceType === 'string' && sourceType.startsWith('office')) {
+    t = cleanOfficeEventTitle(t);
+  }
+  t = t.replace(/\s+/g, ' ').replace(/^[\s／/:：、,．.\-–—~〜]+|[\s／/:：、,．.\-–—~〜]+$/g, '').trim();
+  return t || title;
 }
 
 function officeNotes(meta, extra = null) {
@@ -2772,6 +2793,9 @@ function extractOfficeHtmlEvents($, pageUrl, meta) {
     if (OFFICE_SKIP_TEXT_KW.test(text)) return;
     // 過去の実施報告・採用制度の説明文・お知らせブロックはイベントではないので除外
     if (OFFICE_NONEVENT_KW.test(text)) return;
+    // ナビメニュー/カテゴリ一覧の塊（「イベント情報」等の見出し語が複数回出る）は除外
+    const navHits = (text.match(/イベント情報|採用試験情報|入札情報|重要なお知らせ|トピックス|お知らせ一覧|すべて/g) || []).length;
+    if (navHits >= 2) return;
     const parsed = parseOfficeEventDate(text);
     if (!parsed) return;
 
@@ -4019,7 +4043,11 @@ async function main() {
   // officeEvents は try ブロック内（browser.close前）で収集済み
 
   // imageUrl は最終出力に含めない（内部用フィールド）
-  const strip = ev => { const { imageUrl: _, _flyerUrl: __, duplicate_candidate: _d, duplicate_of: _do, ...rest } = ev; return rest; };
+  const strip = ev => {
+    const { imageUrl: _, _flyerUrl: __, duplicate_candidate: _d, duplicate_of: _do, ...rest } = ev;
+    rest.title = finalizeTitle(rest.title, rest.source_type); // 収集後にタイトルを整形
+    return rest;
+  };
 
   // 関東の先回り巡回で得た事務所イベントを、中央ページの既存イベントへ統合する。
   // 中央ページと事務所ページで同一イベントが重複しないよう、id だけでなく
