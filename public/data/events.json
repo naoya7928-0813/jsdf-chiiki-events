@@ -148,23 +148,6 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null
-    },
-    {
-      "id": "ob-office-20260620-uq7hv",
-      "pref": "obihiro",
-      "date": "2026-06-20",
-      "weekday": "土",
-      "title": "高校生・大学生対象！！ 帯広駐屯地創立記念行事見学ツアー",
-      "place": "釧路出張所・根室地域事務所・網走地域事務所 ほか2拠点",
-      "address": "",
-      "time": "",
-      "category": "体験",
-      "tag": "入場無料",
-      "url": "https://www.mod.go.jp/pco/obihiro/img/bnr/20260518_1.png",
-      "notes": "掲載元: 釧路出張所・根室地域事務所・網走地域事務所 ほか2拠点",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html"
     }
   ],
   "hakodate": [
@@ -218,6 +201,57 @@
       "ageRequirement": "中卒以上32歳未満",
       "deadline": "6月19日（金）",
       "source_type": "office_ocr"
+    },
+    {
+      "id": "ha-office-20260923-eg1f1",
+      "pref": "hakodate",
+      "date": "2026-09-23",
+      "weekday": "水・祝",
+      "title": "はたらくのりものin函館(函館港町ふ頭)一般広報",
+      "place": "今金地域事務所・八雲地域事務所・江差地域事務所 ほか1拠点",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/hakodate/img/R6.9.23hataraknorimono.pdf",
+      "notes": "掲載元: 今金地域事務所・八雲地域事務所・江差地域事務所 ほか1拠点",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html"
+    },
+    {
+      "id": "ha-office-20260803-o479r",
+      "pref": "hakodate",
+      "date": "2026-08-03",
+      "weekday": "月",
+      "title": "掃海母艦｢うらが｣(函館港町ふ頭)艦艇広報",
+      "place": "今金地域事務所・八雲地域事務所・江差地域事務所 ほか1拠点",
+      "address": "",
+      "time": "",
+      "category": "艦艇公開",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/hakodate/img/R6.8.3uragakantei.pdf",
+      "notes": "掲載元: 今金地域事務所・八雲地域事務所・江差地域事務所 ほか1拠点",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html"
+    },
+    {
+      "id": "ha-office-20260715-adq7v",
+      "pref": "hakodate",
+      "date": "2026-07-15",
+      "weekday": "水",
+      "title": "メガドン夏祭り一般広報（ＭＥＧＡドン・キホーテ）",
+      "place": "今金地域事務所・八雲地域事務所・江差地域事務所 ほか1拠点",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/hakodate/img/20240715megadonnatumaturi.pdf",
+      "notes": "掲載元: 今金地域事務所・八雲地域事務所・江差地域事務所 ほか1拠点",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html"
     }
   ],
   "miyagi": [
@@ -602,7 +636,7 @@
       "source_type": "office_notice"
     },
     {
-      "id": "ak-office-20260605-vg17s",
+      "id": "ak-office-20260605-esa0a",
       "pref": "akita",
       "date": "2026-06-05",
       "weekday": "金",
@@ -623,23 +657,6 @@
       "pref": "akita",
       "date": "2026-06-20",
       "weekday": "土",
-      "title": "試験艦あすか一般公開（秋田港）",
-      "place": "秋田募集案内所・能代地域事務所・由利本荘地域事務所 ほか3拠点",
-      "address": "",
-      "time": "",
-      "category": "採用イベント",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/akita/file/result/asuka.png",
-      "notes": "掲載元: 秋田募集案内所・能代地域事務所・由利本荘地域事務所 ほか3拠点",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html"
-    },
-    {
-      "id": "ak-office-20260605-e9v9b",
-      "pref": "akita",
-      "date": "2026-06-05",
-      "weekday": "金",
       "title": "試験艦あすか一般公開（秋田港）",
       "place": "秋田募集案内所・能代地域事務所・由利本荘地域事務所 ほか3拠点",
       "address": "",
@@ -1534,7 +1551,25 @@
       "source_type": "office_ocr"
     }
   ],
-  "ishikawa": [],
+  "ishikawa": [
+    {
+      "id": "is-ref-hggba",
+      "pref": "ishikawa",
+      "date": "2026-06-05",
+      "weekday": "金",
+      "title": "中部方面隊 各種採用試験合格発表",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/ishikawa/hijoukin/index.html",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_notice"
+    }
+  ],
   "fukui": [
     {
       "id": "fu-20260606-go1tt",
@@ -1649,6 +1684,23 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null
+    },
+    {
+      "id": "ya-office-20260803-jtwsg",
+      "pref": "yamanashi",
+      "date": "2026-08-03",
+      "weekday": "月",
+      "title": "期及び定員",
+      "place": "陸上自衛隊北富士駐屯地",
+      "address": "",
+      "time": "8:30～17:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/yamanashi/pdf/event/R8-05-13internship1.pdf",
+      "notes": "掲載元: 巨摩募集案内所",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr"
     }
   ],
   "nagano": [
@@ -2888,6 +2940,74 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null
+    },
+    {
+      "id": "mi-office-20260605-s2lyj",
+      "pref": "mie",
+      "date": "2026-06-05",
+      "weekday": "金",
+      "title": "イベント情報 NEW航空自衛隊 小牧基地見学",
+      "place": "四日市出張所・伊勢地域事務所・松阪地域事務所 ほか2拠点",
+      "address": "",
+      "time": "",
+      "category": "体験",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/mie/post-9203/",
+      "notes": "掲載元: 四日市出張所・伊勢地域事務所・松阪地域事務所 ほか2拠点",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html"
+    },
+    {
+      "id": "mi-office-20260605-iu7yr",
+      "pref": "mie",
+      "date": "2026-06-05",
+      "weekday": "金",
+      "title": "イベント情報 NEW&自衛隊フリースペースイベント",
+      "place": "四日市出張所・伊勢地域事務所・松阪地域事務所 ほか2拠点",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/mie/post-9146/",
+      "notes": "掲載元: 四日市出張所・伊勢地域事務所・松阪地域事務所 ほか2拠点",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html"
+    },
+    {
+      "id": "mi-office-20260605-tvcpv",
+      "pref": "mie",
+      "date": "2026-06-05",
+      "weekday": "金",
+      "title": "イベント情報 NEW夏休み舞鶴基地見学",
+      "place": "四日市出張所・伊勢地域事務所・松阪地域事務所 ほか2拠点",
+      "address": "",
+      "time": "",
+      "category": "体験",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/mie/post-9274/",
+      "notes": "掲載元: 四日市出張所・伊勢地域事務所・松阪地域事務所 ほか2拠点",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html"
+    },
+    {
+      "id": "mi-office-20260614-nu1wd",
+      "pref": "mie",
+      "date": "2026-06-14",
+      "weekday": "日",
+      "title": "&自衛隊フリースペースイベント",
+      "place": "四日市出張所・伊勢地域事務所・松阪地域事務所 ほか2拠点",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/mie/post-9146/",
+      "notes": "掲載元: 四日市出張所・伊勢地域事務所・松阪地域事務所 ほか2拠点",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html"
     }
   ],
   "shiga": [],
@@ -3037,7 +3157,24 @@
       "deadline": null
     },
     {
-      "id": "ky-office-20260628-p05rz",
+      "id": "ky-office-20260623-3aiu9",
+      "pref": "kyoto",
+      "date": "2026-06-23",
+      "weekday": "火",
+      "title": "自衛隊説明会（ハローワーク伏見）",
+      "place": "宮津地域事務所・木津地域事務所",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html#kyoto",
+      "notes": "掲載元: 宮津地域事務所・木津地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html"
+    },
+    {
+      "id": "ky-office-20260628-2r8gb",
       "pref": "kyoto",
       "date": "2026-06-28",
       "weekday": "日",
@@ -3054,7 +3191,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "ky-office-20260629-vs5wo",
+      "id": "ky-office-20260629-rbflo",
       "pref": "kyoto",
       "date": "2026-06-29",
       "weekday": "月",
@@ -3071,7 +3208,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "ky-office-20260620-k2knp",
+      "id": "ky-office-20260620-j97cz",
       "pref": "kyoto",
       "date": "2026-06-20",
       "weekday": "土",
@@ -3088,7 +3225,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "ky-office-20260622-eym7v",
+      "id": "ky-office-20260622-omn0u",
       "pref": "kyoto",
       "date": "2026-06-22",
       "weekday": "月",
@@ -3105,7 +3242,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "ky-office-20260624-u2b7n",
+      "id": "ky-office-20260624-nr6vl",
       "pref": "kyoto",
       "date": "2026-06-24",
       "weekday": "水",
@@ -3259,7 +3396,7 @@
   ],
   "hyogo": [
     {
-      "id": "hy-office-20261011-i42vb",
+      "id": "hy-office-20261011-sb4rv",
       "pref": "hyogo",
       "date": "2026-10-11",
       "weekday": "日",
@@ -3276,7 +3413,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "hy-office-20260808-k47hs",
+      "id": "hy-office-20260808-idxy5",
       "pref": "hyogo",
       "date": "2026-08-08",
       "weekday": "土",
@@ -3293,7 +3430,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "hy-office-20261017-1zkvg",
+      "id": "hy-office-20261017-eb612",
       "pref": "hyogo",
       "date": "2026-10-17",
       "weekday": "土",
@@ -3328,7 +3465,25 @@
       "deadline": null
     }
   ],
-  "wakayama": [],
+  "wakayama": [
+    {
+      "id": "wa-office-20260605-43u2b",
+      "pref": "wakayama",
+      "date": "2026-06-05",
+      "weekday": "金",
+      "title": "イベント情報 公務員合同説明会の",
+      "place": "橋本地域事務所・御坊地域事務所・新宮地域事務所 ほか3拠点",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/wakayama/post-8600/",
+      "notes": "掲載元: 橋本地域事務所・御坊地域事務所・新宮地域事務所 ほか3拠点",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html"
+    }
+  ],
   "ehime": [
     {
       "id": "em-20260606-ajcex",
@@ -3399,7 +3554,7 @@
   ],
   "kochi": [
     {
-      "id": "ko-office-20260606-cw4jg",
+      "id": "ko-office-20260606-lxaom",
       "pref": "kochi",
       "date": "2026-06-06",
       "weekday": "土",
@@ -3501,7 +3656,7 @@
       "deadline": null
     },
     {
-      "id": "ok-office-20260705-dnghu",
+      "id": "ok-office-20260705-c5enn",
       "pref": "okayama",
       "date": "2026-07-05",
       "weekday": "日",
@@ -3518,7 +3673,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "ok-office-20260623-diwaa",
+      "id": "ok-office-20260623-9dhr4",
       "pref": "okayama",
       "date": "2026-06-23",
       "weekday": "火",
@@ -3535,7 +3690,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "ok-office-20260725-xzzlc",
+      "id": "ok-office-20260725-rgr94",
       "pref": "okayama",
       "date": "2026-07-25",
       "weekday": "土",
@@ -3544,7 +3699,7 @@
       "address": "",
       "time": "",
       "category": "説明会",
-      "tag": "要予約",
+      "tag": "学生向け",
       "url": "https://www.mod.go.jp/pco/okayama/img/koutou_open.pdf",
       "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
       "ageRequirement": null,
@@ -3552,7 +3707,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "ok-office-20260705-w0ogb",
+      "id": "ok-office-20260705-hr5qx",
       "pref": "okayama",
       "date": "2026-07-05",
       "weekday": "日",
@@ -3561,7 +3716,7 @@
       "address": "",
       "time": "",
       "category": "説明会",
-      "tag": "要予約",
+      "tag": "オンライン",
       "url": "https://www.mod.go.jp/pco/okayama/img/koutou_online.pdf",
       "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
       "ageRequirement": null,
@@ -3569,7 +3724,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "ok-office-20261009-9gcfx",
+      "id": "ok-office-20261009-z5zo6",
       "pref": "okayama",
       "date": "2026-10-09",
       "weekday": "金",
@@ -3586,7 +3741,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "ok-office-20260623-goo1t",
+      "id": "ok-office-20260623-blc51",
       "pref": "okayama",
       "date": "2026-06-23",
       "weekday": "火",
@@ -3595,7 +3750,7 @@
       "address": "",
       "time": "",
       "category": "説明会",
-      "tag": "要予約",
+      "tag": "オンライン",
       "url": "https://www.mod.go.jp/pco/okayama/img/bouidai_open.pdf",
       "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
       "ageRequirement": null,
@@ -3603,7 +3758,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "ok-office-20260615-ts406",
+      "id": "ok-office-20260615-ppl4i",
       "pref": "okayama",
       "date": "2026-06-15",
       "weekday": "月",
@@ -3620,7 +3775,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "ok-office-20260910-6f6gj",
+      "id": "ok-office-20260910-puj5k",
       "pref": "okayama",
       "date": "2026-09-10",
       "weekday": "木",
@@ -3637,7 +3792,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "ok-office-20260630-tn9l5",
+      "id": "ok-office-20260630-6gp94",
       "pref": "okayama",
       "date": "2026-06-30",
       "weekday": "火",
@@ -3654,7 +3809,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "ok-office-20260605-rrup3",
+      "id": "ok-office-20260605-mbz1z",
       "pref": "okayama",
       "date": "2026-06-05",
       "weekday": "金",
@@ -3671,7 +3826,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "ok-office-20260605-x3xfg",
+      "id": "ok-office-20260605-1v3m4",
       "pref": "okayama",
       "date": "2026-06-05",
       "weekday": "金",
@@ -3959,11 +4114,11 @@
       "deadline": null
     },
     {
-      "id": "na-office-20260720-ht8xd",
+      "id": "na-office-20260720-yhqic",
       "pref": "nagasaki",
       "date": "2026-07-20",
       "weekday": "月・祝",
-      "title": "ジョブガイダンス",
+      "title": "ジョブガイダンス ／～／長崎会場…防衛省長崎合同庁舎4階 大村会場…大村地域事務所",
       "place": "五島駐在員事務所",
       "address": "",
       "time": "",
@@ -3976,28 +4131,11 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20260607-kovws",
-      "pref": "nagasaki",
-      "date": "2026-06-07",
-      "weekday": "日",
-      "title": "護衛艦のしろ一般公開",
-      "place": "五島駐在員事務所",
-      "address": "",
-      "time": "",
-      "category": "一般公開",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/nagasaki/pdf/event/2026_noshiro.pdf",
-      "notes": "掲載元: 五島駐在員事務所",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html"
-    },
-    {
-      "id": "na-office-20261103-ta3gj",
+      "id": "na-office-20261103-jk1k6",
       "pref": "nagasaki",
       "date": "2026-11-03",
       "weekday": "火・祝",
-      "title": "ジョブ＆ジョブチェンジガイダンス",
+      "title": "ジョブ＆ジョブチェンジガイダンス ／：～／佐世保合同庁舎",
       "place": "五島駐在員事務所",
       "address": "",
       "time": "",
@@ -4010,11 +4148,11 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20261109-woe2q",
+      "id": "na-office-20261109-hk1zb",
       "pref": "nagasaki",
       "date": "2026-11-09",
       "weekday": "月",
-      "title": "ジョブ＆ジョブチェンジガイダンス",
+      "title": "ジョブ＆ジョブチェンジガイダンス ／：～／防衛省長崎合同庁舎(4階会議室)",
       "place": "五島駐在員事務所",
       "address": "",
       "time": "",
@@ -4027,11 +4165,11 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20261011-sc8rl",
+      "id": "na-office-20261011-3fxz3",
       "pref": "nagasaki",
       "date": "2026-10-11",
       "weekday": "日",
-      "title": "対馬空港50周年「空の日」空港まつり",
+      "title": "対馬空港50周年「空の日」空港まつり ／：～ ／対馬やまねこ空港展示広報募集ブース設置",
       "place": "五島駐在員事務所",
       "address": "",
       "time": "",
@@ -4044,11 +4182,11 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20261018-edppy",
+      "id": "na-office-20261018-vfj3p",
       "pref": "nagasaki",
       "date": "2026-10-18",
       "weekday": "日",
-      "title": "島原城大手門市",
+      "title": "島原城大手門市 ／：～／島原市役所大手広場ほか展示広報募集ブース設置",
       "place": "五島駐在員事務所",
       "address": "",
       "time": "",
@@ -4061,11 +4199,11 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20261019-s5knu",
+      "id": "na-office-20261019-4ka7h",
       "pref": "nagasaki",
       "date": "2026-10-19",
       "weekday": "月",
-      "title": "中処分母船5号 YDT-5一般広報",
+      "title": "中処分母船5号 YDT-5一般広報 ／：～／島原新港一般公開・展示広報募集ブース設置",
       "place": "五島駐在員事務所",
       "address": "",
       "time": "",
@@ -4078,15 +4216,15 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20261025-50ixc",
+      "id": "na-office-20261025-9bmsw",
       "pref": "nagasaki",
       "date": "2026-10-25",
       "weekday": "日",
-      "title": "掃海艇ひらしま一般広報",
+      "title": "掃海艇ひらしま一般広報 ／：～",
       "place": "五島駐在員事務所",
       "address": "",
       "time": "",
-      "category": "説明会",
+      "category": "艦艇公開",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/nagasaki/pdf/event/20251025_hirashima.pdf",
       "notes": "掲載元: 五島駐在員事務所",
@@ -4095,11 +4233,11 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20260920-c9igt",
+      "id": "na-office-20260920-zu54z",
       "pref": "nagasaki",
       "date": "2026-09-20",
       "weekday": "日",
-      "title": "佐世保地方隊オータムフェスタ2025",
+      "title": "佐世保地方隊オータムフェスタ2025 ／：～／新みなと岸壁・三浦岸壁・国際ターミナル・海自倉島岸壁展示広報募集ブース設置",
       "place": "五島駐在員事務所",
       "address": "",
       "time": "",
@@ -4112,11 +4250,11 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20260801-s9con",
+      "id": "na-office-20260801-r11d7",
       "pref": "nagasaki",
       "date": "2026-08-01",
       "weekday": "土",
-      "title": "浜んまち夏まつり2025",
+      "title": "浜んまち夏まつり2025 ／・：～／ベルナード観光通り展示広報募集ブース設置",
       "place": "五島駐在員事務所",
       "address": "",
       "time": "",
@@ -4129,11 +4267,11 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20260802-xw0zt",
+      "id": "na-office-20260802-ml67w",
       "pref": "nagasaki",
       "date": "2026-08-02",
       "weekday": "日",
-      "title": "中処分母船5号YDT-05寄港一般公開",
+      "title": "中処分母船5号YDT-05寄港一般公開 ／～／五島・福江港",
       "place": "五島駐在員事務所",
       "address": "",
       "time": "",
@@ -4146,11 +4284,11 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20260802-6k2c1",
+      "id": "na-office-20260802-2cbt8",
       "pref": "nagasaki",
       "date": "2026-08-02",
       "weekday": "日",
-      "title": "対馬厳原港まつり",
+      "title": "対馬厳原港まつり ／厳原港東浜ふ頭展示広報募集ブース設置",
       "place": "五島駐在員事務所",
       "address": "",
       "time": "",
@@ -4163,11 +4301,11 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20260808-80w2n",
+      "id": "na-office-20260808-6edju",
       "pref": "nagasaki",
       "date": "2026-08-08",
       "weekday": "土",
-      "title": "航空学生説明会",
+      "title": "航空学生説明会 ／～／大村地域事務所(大村法務総合庁舎)",
       "place": "五島駐在員事務所",
       "address": "",
       "time": "",
@@ -4180,11 +4318,11 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20260810-yi30l",
+      "id": "na-office-20260810-k80xv",
       "pref": "nagasaki",
       "date": "2026-08-10",
       "weekday": "月",
-      "title": "防衛大学校説明会",
+      "title": "防衛大学校説明会 ／～／防衛省長崎合同庁舎(4階会議室)",
       "place": "五島駐在員事務所",
       "address": "",
       "time": "",
@@ -4197,11 +4335,11 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20260823-swte0",
+      "id": "na-office-20260823-4xfc0",
       "pref": "nagasaki",
       "date": "2026-08-23",
       "weekday": "日",
-      "title": "江迎千灯籠まつり",
+      "title": "江迎千灯籠まつり ／～ ／江迎中央公園展示広報募集ブース設置",
       "place": "五島駐在員事務所",
       "address": "",
       "time": "",
@@ -4214,11 +4352,11 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20260830-fdqzd",
+      "id": "na-office-20260830-hvmw8",
       "pref": "nagasaki",
       "date": "2026-08-30",
       "weekday": "日",
-      "title": "FFM-5 護衛艦やはぎ 一般公開",
+      "title": "FFM-5 護衛艦やはぎ 一般公開 ／～",
       "place": "五島駐在員事務所",
       "address": "",
       "time": "",
@@ -4231,11 +4369,11 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20260712-s6moi",
+      "id": "na-office-20260712-mc4i0",
       "pref": "nagasaki",
       "date": "2026-07-12",
       "weekday": "日",
-      "title": "自衛隊ジョブガイダンス",
+      "title": "自衛隊ジョブガイダンス ／長崎会場：防衛省長崎合同庁舎(4F会議室) ／～／大村会場：大村地域事務所",
       "place": "五島駐在員事務所",
       "address": "",
       "time": "",
@@ -4248,11 +4386,11 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20260719-8hzxv",
+      "id": "na-office-20260719-swpqu",
       "pref": "nagasaki",
       "date": "2026-07-19",
       "weekday": "日",
-      "title": "自衛隊ウーマンガイダンス",
+      "title": "自衛隊ウーマンガイダンス ／防衛省長崎合同庁舎(4F会議室) ／～",
       "place": "五島駐在員事務所",
       "address": "",
       "time": "",
@@ -4265,7 +4403,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20261103-0a7ky",
+      "id": "na-office-20261103-9bi9h",
       "pref": "nagasaki",
       "date": "2026-11-03",
       "weekday": "火・祝",
@@ -4282,7 +4420,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20261103-hlvge",
+      "id": "na-office-20261103-cgego",
       "pref": "nagasaki",
       "date": "2026-11-03",
       "weekday": "火・祝",
@@ -4299,7 +4437,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20261109-bvbxo",
+      "id": "na-office-20261109-j1s32",
       "pref": "nagasaki",
       "date": "2026-11-09",
       "weekday": "月",
@@ -4316,7 +4454,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20261110-u34sf",
+      "id": "na-office-20261110-e73ql",
       "pref": "nagasaki",
       "date": "2026-11-10",
       "weekday": "火",
@@ -4333,7 +4471,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20261117-095d6",
+      "id": "na-office-20261117-87n97",
       "pref": "nagasaki",
       "date": "2026-11-17",
       "weekday": "火",
@@ -4350,7 +4488,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20261117-wdf5e",
+      "id": "na-office-20261117-nf76q",
       "pref": "nagasaki",
       "date": "2026-11-17",
       "weekday": "火",
@@ -4367,7 +4505,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20261012-caeeo",
+      "id": "na-office-20261012-e8urh",
       "pref": "nagasaki",
       "date": "2026-10-12",
       "weekday": "月・祝",
@@ -4375,7 +4513,7 @@
       "place": "五島駐在員事務所",
       "address": "",
       "time": "",
-      "category": "地域参加",
+      "category": "広報活動",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/nagasaki/pdf/event/20241012_ootemon.pdf",
       "notes": "掲載元: 五島駐在員事務所",
@@ -4384,7 +4522,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20261012-thec2",
+      "id": "na-office-20261012-7k50z",
       "pref": "nagasaki",
       "date": "2026-10-12",
       "weekday": "月・祝",
@@ -4401,7 +4539,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20261020-v6vsx",
+      "id": "na-office-20261020-tbu8z",
       "pref": "nagasaki",
       "date": "2026-10-20",
       "weekday": "火",
@@ -4418,7 +4556,7 @@
       "source_type": "office_html"
     },
     {
-      "id": "na-office-20261026-sddpl",
+      "id": "na-office-20261026-8tpua",
       "pref": "nagasaki",
       "date": "2026-10-26",
       "weekday": "月",
@@ -4427,7 +4565,7 @@
       "address": "",
       "time": "",
       "category": "一般公開",
-      "tag": "入場無料",
+      "tag": "",
       "url": "https://www.mod.go.jp/pco/nagasaki/pdf/event/20241027_mama.pdf",
       "notes": "掲載元: 五島駐在員事務所",
       "ageRequirement": null,
@@ -4474,7 +4612,7 @@
   ],
   "miyazaki": [
     {
-      "id": "mi-office-20260701-hm6av",
+      "id": "mi-office-20260701-me1q3",
       "pref": "miyazaki",
       "date": "2026-07-01",
       "weekday": "水",
@@ -4493,5 +4631,5 @@
   ],
   "kagoshima": [],
   "okinawa": [],
-  "updatedAt": "2026/06/05 17:09"
+  "updatedAt": "2026/06/05 21:57"
 }
