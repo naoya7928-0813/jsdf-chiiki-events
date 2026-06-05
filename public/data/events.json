@@ -1485,25 +1485,76 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null
+    },
+    {
+      "id": "ni-office-20260718-utd2z",
+      "pref": "niigata",
+      "date": "2026-07-18",
+      "weekday": "土",
+      "title": "てんゆう",
+      "place": "新潟西港　山の下埠頭",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/niigata/files/event/r8.7.18tenryu.pdf",
+      "notes": "掲載元: 加茂地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr"
     }
   ],
   "toyama": [
+    {
+      "id": "to-off-20260613-jj5yt",
+      "pref": "toyama",
+      "date": "2026-06-13",
+      "weekday": "土",
+      "title": "令和8年度6月睦友会奉仕活動のご案内",
+      "place": "JR富山駅周辺",
+      "address": "",
+      "time": "午前7:00～7:30",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/toyama/images/bokuyuukai6.pdf",
+      "notes": "雨天・荒天時は中止",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr"
+    },
     {
       "id": "to-ref-ufxzq",
       "pref": "toyama",
       "date": "2026-06-05",
       "weekday": "金",
-      "title": "日頃より自衛隊富山地方協力本部睦友会の活動に対する格別のご理解とご協力を賜り厚く御礼申し上げます。（日程は公式ページ参照）",
+      "title": "自衛隊イベント（富山地本）（日程は公式ページ参照）",
       "place": "",
       "address": "",
       "time": "",
       "category": "広報活動",
       "tag": "",
-      "url": "https://www.mod.go.jp/pco/toyama/",
+      "url": "https://www.mod.go.jp/pco/toyama/content/03-saiyou/03-saiyou.html",
       "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_notice"
+    },
+    {
+      "id": "to-office-20260613-x0gg2",
+      "pref": "toyama",
+      "date": "2026-06-13",
+      "weekday": "土",
+      "title": "令和8年度6月睦友会奉仕活動のご案内",
+      "place": "JR富山駅周辺",
+      "address": "",
+      "time": "午前7:00～7:30",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/toyama/images/bokuyuukai6.pdf",
+      "notes": "掲載元: 高岡出張所・魚津地域事務所・砺波地域事務所\n雨天・荒天時は中止",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr"
     }
   ],
   "ishikawa": [
@@ -3301,6 +3352,40 @@
   ],
   "osaka": [
     {
+      "id": "os-office-20260610-wtwqv",
+      "pref": "osaka",
+      "date": "2026-06-10",
+      "weekday": "水",
+      "title": "予備 自衛官補 一般 ●第1回採用試験 ●第2回採用試験",
+      "place": "枚方出張所・茨木地域事務所",
+      "address": "",
+      "time": "",
+      "category": "採用イベント",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/osaka/recruit/result.html",
+      "notes": "掲載元: 枚方出張所・茨木地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html"
+    },
+    {
+      "id": "os-office-20260610-zypqq",
+      "pref": "osaka",
+      "date": "2026-06-10",
+      "weekday": "水",
+      "title": "技能 ●第1回採用試験 ●第2回採用試験",
+      "place": "枚方出張所・茨木地域事務所",
+      "address": "",
+      "time": "",
+      "category": "採用イベント",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/osaka/recruit/result.html",
+      "notes": "掲載元: 枚方出張所・茨木地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html"
+    },
+    {
       "id": "os-set-20260611-1lcg9",
       "pref": "osaka",
       "date": "2026-06-11",
@@ -3388,40 +3473,6 @@
       "date": "2026-07-23",
       "weekday": "木",
       "title": "技術曹 ●第1回採用試験 ●第2回採用試験 (海)",
-      "place": "枚方出張所・茨木地域事務所",
-      "address": "",
-      "time": "",
-      "category": "採用イベント",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/osaka/recruit/result.html",
-      "notes": "掲載元: 枚方出張所・茨木地域事務所",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html"
-    },
-    {
-      "id": "os-office-20260610-wtwqv",
-      "pref": "osaka",
-      "date": "2026-06-10",
-      "weekday": "水",
-      "title": "予備 自衛官補 一般 ●第1回採用試験 ●第2回採用試験",
-      "place": "枚方出張所・茨木地域事務所",
-      "address": "",
-      "time": "",
-      "category": "採用イベント",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/osaka/recruit/result.html",
-      "notes": "掲載元: 枚方出張所・茨木地域事務所",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html"
-    },
-    {
-      "id": "os-office-20260610-zypqq",
-      "pref": "osaka",
-      "date": "2026-06-10",
-      "weekday": "水",
-      "title": "技能 ●第1回採用試験 ●第2回採用試験",
       "place": "枚方出張所・茨木地域事務所",
       "address": "",
       "time": "",
@@ -4749,22 +4800,6 @@
       "deadline": null
     },
     {
-      "id": "km-20260614-mib4c",
-      "pref": "kumamoto",
-      "date": "2026-06-14",
-      "weekday": "日",
-      "title": "総合射撃訓練見学ツアー",
-      "place": "自衛隊日出生台演習場",
-      "address": "",
-      "time": "8時00分～20時00分",
-      "category": "体験",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/kumamoto/event/index.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null
-    },
-    {
       "id": "ku-office-20260711-2d0qk",
       "pref": "kumamoto",
       "date": "2026-07-11",
@@ -4780,26 +4815,27 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html"
-    },
+    }
+  ],
+  "oita": [
     {
-      "id": "ku-office-20260614-nedrp",
-      "pref": "kumamoto",
-      "date": "2026-06-14",
-      "weekday": "日",
-      "title": "8時00分～20時00分 総合射撃訓練見学ツアー 自衛隊日出生台演習場（大分県玖珠町） 熊本地本募集課 096-297-2051",
-      "place": "阿蘇地域事務所・宇城募集案内所・菊池分駐所 ほか3拠点",
+      "id": "oi-office-20260630-6xtlq",
+      "pref": "oita",
+      "date": "2026-06-30",
+      "weekday": "火",
+      "title": "防衛省職員（非常勤隊員）募集案内",
+      "place": "自衛隊大分地方協力本部",
       "address": "",
       "time": "",
       "category": "説明会",
       "tag": "",
-      "url": "https://www.mod.go.jp/pco/kumamoto/event/event/20260614_SSSKK/img/20260614_SSSKK.pdf",
-      "notes": "掲載元: 阿蘇地域事務所・宇城募集案内所・菊池分駐所 ほか3拠点",
+      "url": "https://www.mod.go.jp/pco/oita/02_recruit/pdf/2026_06_beppu_gaiyo.pdf",
+      "notes": "掲載元: 別府地域事務所・中津出張所・佐伯地域事務所 ほか2拠点",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_ocr"
     }
   ],
-  "oita": [],
   "miyazaki": [
     {
       "id": "mi-office-20260701-hm6av",
@@ -4856,5 +4892,5 @@
       "source_type": "office_html"
     }
   ],
-  "updatedAt": "2026/06/05 01:00"
+  "updatedAt": "2026/06/05 10:19"
 }
