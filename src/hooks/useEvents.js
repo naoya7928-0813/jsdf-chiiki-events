@@ -17,9 +17,22 @@ function jstToday() {
 function filterPastEvents(rawData, today) {
   if (!rawData || typeof rawData !== 'object') return EMPTY;
   const out = {};
+  // 全県横断でイベントIDの重複（ハッシュ衝突・スキーム揺れ）を一意化する。
+  // 同一IDが複数イベントに付くと、お気に入り(★)が同IDの別イベントへ誤って
+  // 連動してしまうため、2件目以降にだけ接尾辞を付けて分離する。
+  const seenIds = new Set();
   for (const [k, v] of Object.entries(rawData)) {
     if (!Array.isArray(v)) { out[k] = v; continue; }
-    out[k] = v.filter(ev => ev.date && (ev.endDate || ev.date) >= today);
+    out[k] = v
+      .filter(ev => ev.date && (ev.endDate || ev.date) >= today)
+      .map(ev => {
+        if (!ev.id) return ev;
+        if (!seenIds.has(ev.id)) { seenIds.add(ev.id); return ev; }
+        let uid = ev.id, n = 2;
+        while (seenIds.has(uid)) uid = `${ev.id}~${n++}`;
+        seenIds.add(uid);
+        return { ...ev, id: uid };
+      });
   }
   return out;
 }
