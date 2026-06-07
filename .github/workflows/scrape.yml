@@ -88,6 +88,27 @@ jobs:
           SITE_URL:         ${{ secrets.SITE_URL }}
           NOTIFY_SECRET:    ${{ secrets.NOTIFY_SECRET }}
 
+      # ── データ健全性チェック（スクレイプ成功でも取得結果が異常なら警告）──
+      - name: データ健全性チェック
+        run: |
+          count_json() { node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{const d=JSON.parse(s);let n=0;for(const k of Object.keys(d))if(Array.isArray(d[k]))n+=d[k].length;console.log(n)}catch{console.log(-1)}})"; }
+          NEW=$(cat public/data/events.json | count_json)
+          OLD=$(git show HEAD:public/data/events.json 2>/dev/null | count_json)
+          echo "前回:${OLD} 今回:${NEW}"
+          ALERT=""
+          if [ "$NEW" -lt 50 ]; then ALERT="総イベント数が異常に少ない（${NEW}件）"; fi
+          if [ "${OLD:-0}" -gt 0 ] && [ "$NEW" -lt $((OLD * 60 / 100)) ]; then ALERT="総イベント数が前回比で急減（${OLD}→${NEW}件）"; fi
+          if [ -n "$ALERT" ]; then
+            echo "::warning::${ALERT}"
+            curl -s \
+              -H "Title: ⚠️ データ健全性アラート" \
+              -H "Tags: warning" \
+              -H "Priority: high" \
+              -H "Content-Type: text/plain; charset=utf-8" \
+              -d "${ALERT}。スクレイプは成功扱いですが、取得結果に異常の可能性があります。 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+              https://ntfy.sh/${{ secrets.NTFY_ADMIN_TOPIC }} || true
+          fi
+
       # ── 変更があればコミット & プッシュ ──────────────────────
       - name: 変更をコミット & プッシュ
         id: commit
