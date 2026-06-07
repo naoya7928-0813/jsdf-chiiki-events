@@ -5,6 +5,8 @@ import { NTFY_BUG_TOPIC } from '../config';
 /* global __APP_VERSION__ */
 
 const CATEGORIES = ['バグ', '表示崩れ', '表記の誤り', '要望', 'その他'];
+const CONTENT_MAX = 1000; // 内容の最大文字数
+const CONTACT_MAX = 200;  // 連絡先の最大文字数
 
 // 自動添付する状況情報を組み立てる（個人情報は含めない）
 function buildContext(updatedAt) {
@@ -120,10 +122,21 @@ export default function ReportScreen({ theme, updatedAt, onBack }) {
             </div>
 
             {/* 内容 */}
-            <Label>内容 <span style={{ color: '#ef4444' }}>*</span></Label>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 7 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-sub)', letterSpacing: 0.3 }}>
+                内容 <span style={{ color: '#ef4444' }}>*</span>
+              </div>
+              <div style={{
+                fontSize: 11, fontFamily: F.mono,
+                color: content.length >= CONTENT_MAX ? '#ef4444' : 'var(--text-muted)',
+              }}>
+                {content.length} / {CONTENT_MAX}
+              </div>
+            </div>
             <textarea
               value={content}
-              onChange={e => setContent(e.target.value)}
+              onChange={e => setContent(e.target.value.slice(0, CONTENT_MAX))}
+              maxLength={CONTENT_MAX}
               placeholder="例: 一覧画面で〇〇のイベント名が途中で切れて表示されます"
               rows={6}
               style={{ ...inputBase, resize: 'vertical', lineHeight: 1.6, marginBottom: 18 }}
@@ -133,7 +146,8 @@ export default function ReportScreen({ theme, updatedAt, onBack }) {
             <Label>返信先の連絡先（任意）</Label>
             <input
               value={contact}
-              onChange={e => setContact(e.target.value)}
+              onChange={e => setContact(e.target.value.slice(0, CONTACT_MAX))}
+              maxLength={CONTACT_MAX}
               placeholder="メールアドレス等（返信が必要な場合のみ）"
               inputMode="email"
               style={{ ...inputBase, marginBottom: 16 }}
