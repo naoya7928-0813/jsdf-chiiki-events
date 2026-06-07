@@ -2758,11 +2758,65 @@ function makeOfficeEvent({ meta, parsed, title, place, url, notes, sourceType, t
   };
 }
 
+// 表（table）を行・列単位で解析し、日付/名称/場所を列ごとに取得する。
+// 「月日（曜日） イベント名 場 所 …」のように1行へ潰れる不具合を防ぎ、場所も拾える。
+function extractOfficeTableEvents($, table, pageUrl, meta, seen, events) {
+  const rows = $(table).find('tr');
+  if (rows.length < 2) return; // ヘッダ＋データが必要
+  // ヘッダ行（見出し語を含む最初の行）と列見出しを推定
+  let headerIdx = -1;
+  let cols = [];
+  rows.each((ri, tr) => {
+    if (headerIdx >= 0) return;
+    const cells = $(tr).find('th,td').map((_c, c) => compactText($(c).text())).get();
+    if (/月日|日付|日時|開催日|期日|曜日|イベント|行事|名称|内容|場所|会場|時間/.test(cells.join(' '))) {
+      headerIdx = ri; cols = cells;
+    }
+  });
+  // 見出しは「場 所」のように空白入りのことがあるため、空白を除去して照合する
+  const colOf = (re, fb) => { const i = cols.findIndex(c => re.test(c.replace(/\s/g, ''))); return i >= 0 ? i : fb; };
+  const dateCol  = colOf(/月日|日付|日時|開催日|期日/, 0);
+  const titleCol = colOf(/イベント|行事|名称|内容|催/, 1);
+  const placeCol = colOf(/場所|会場|開催地/, -1);
+
+  rows.each((ri, tr) => {
+    if (ri <= headerIdx) return; // ヘッダ行以前はスキップ
+    const cells = $(tr).find('td,th').map((_c, c) => compactText($(c).text())).get();
+    if (cells.length < 2) return;
+    const joined = cells.join(' ');
+    if (!OFFICE_EVENT_KW.test(joined) || isOfficeJunkText(joined)) return;
+    const parsed = parseOfficeEventDate(cells[dateCol] || '') || parseOfficeEventDate(joined);
+    if (!parsed) return;
+    const rawTitle = cells[titleCol] || cells.find((c, i) => i !== dateCol && c) || '';
+    const title = cleanOfficeTitle(rawTitle) || cleanOfficeTitle(joined);
+    if (!title || title.replace(/[\s　]/g, '').length < 4) return;
+    const place = placeCol >= 0 ? compactText(cells[placeCol] || '') : '';
+    const key = `${parsed.dateStr}|${title.slice(0, 40)}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    events.push(makeOfficeEvent({
+      meta, parsed, title,
+      place: place || officeNamesLabel(meta.officeNames),
+      url: pageUrl, notes: null, sourceType: 'office_html',
+    }));
+  });
+}
+
 function extractOfficeHtmlEvents($, pageUrl, meta) {
   const events = [];
   const seen = new Set();
+  // 1) 表は行・列単位で解析（日付/名称/場所を分離）。イベントを抽出できた表だけ「処理済み」とする。
+  const handledTables = new Set();
+  $('table').each((_t, table) => {
+    const before = events.length;
+    extractOfficeTableEvents($, table, pageUrl, meta, seen, events);
+    if (events.length > before) handledTables.add(table); // データ表（レイアウト表は対象外）
+  });
+  // 2) 表の外＋レイアウト表の中の要素を従来どおり解析（データ表は上で処理済みなので除外）
   const selector = 'a[href], li, tr, article, section, div[class*="event"], div[class*="news"], div[class*="topic"], div[class*="post"]';
   $(selector).each((_i, el) => {
+    const tbl = $(el).closest('table').get(0);
+    if (tbl && handledTables.has(tbl)) return; // データ表として整形済み。レイアウト表は通す
     const text = compactText($(el).text());
     if (text.length < 8 || text.length > 220) return;
     if (!OFFICE_EVENT_KW.test(text)) return;
@@ -2785,7 +2839,7 @@ function extractOfficeHtmlEvents($, pageUrl, meta) {
     const title = cleanOfficeEventTitle(text);
     // 整形した結果ほとんど中身が残らない（救済不能な）ものはイベントにしない
     if (title === '募集案内所イベント' || title.replace(/[\s　]/g, '').length < 4) return;
-    const key = `${parsed.dateStr}|${title.slice(0, 40)}|${normalizeUrl(url) || url}`;
+    const key = `${parsed.dateStr}|${title.slice(0, 40)}`;
     if (seen.has(key)) return;
     seen.add(key);
     events.push(makeOfficeEvent({
