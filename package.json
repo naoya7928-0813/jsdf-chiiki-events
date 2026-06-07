@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "node scripts/generate-icons.mjs && node scripts/generate-events-html.mjs && vite build",
     "preview": "vite preview",
-    "generate-icons": "node scripts/generate-icons.mjs"
+    "generate-icons": "node scripts/generate-icons.mjs",
+    "test": "node --test shared/*.test.cjs"
   },
   "dependencies": {
     "@upstash/redis": "^1.38.0",

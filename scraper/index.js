@@ -31,6 +31,8 @@ const { sortByPriority } = require('./lib/priority');
 const { markDuplicates }  = require('./lib/dedup');
 const { extractAssets }   = require('./lib/extractAssets');
 const { findEventLinks }  = require('./lib/exploreLinks');
+// 募集案内所イベントのタイトル整形・非イベント判定（フロント/スクリプトと共通）
+const { officeIsJunk, cleanOfficeTitle, stripTrailingCta } = require('../shared/officeTitle.cjs');
 
 const { chromium } = require('playwright-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
@@ -2639,8 +2641,6 @@ const KANTO_PREFS = new Set(Object.keys(KANTO_OFFICE_URLS));
 const OFFICE_EVENT_KW = /イベント|説明会|相談会|見学|体験|公開|フェス|まつり|祭|広報|採用|募集|セミナー|ガイダンス|インターン|オープンキャンパス|フェア|ブース|出張|公務員|自衛官/;
 const OFFICE_ASSET_URL_KW = /event|events|oshirase|news|topics|setsumei|session|recruit|saiyou|bosyu|kouho|chirashi|annai|fair|fes|taiken|kengaku|schedule|calendar/i;
 const OFFICE_SKIP_TEXT_KW = /所在地|住所|電話|TEL|FAX|アクセス|地図|お問い合わせ|メール|受付時間|Copyright|プライバシー|サイトマップ|募集案内所の紹介|地域事務所の紹介|所長|事務所紹介/;
-// 過去の実施報告・採用制度の説明文・お知らせ/合格発表ブロックなど「イベントではない」テキスト
-const OFFICE_NONEVENT_KW = /しました|されました|制度です|養成する|養成課程|修業期間|受付期間|応募資格|教育訓練|試験⽇|試験日|合格発表|合格者|VIEW\s*ALL|更新しました|掲載しました|を養成|の紹介/;
 const OFFICE_SKIP_ASSET_KW = /logo|icon|banner|btn|common|arrow|header|footer|sns|line|instagram|facebook|youtube|map|access|profile|staff|photo|album|gallery|sitemap/i;
 
 function compactText(text) {
@@ -2709,64 +2709,10 @@ function parseOfficeEventDate(text) {
   return null;
 }
 
-// 募集案内所イベントとして表示すべきでない（整形しても綺麗にならない）塊か判定
-const OFFICE_JUNK_KW = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|毎日実施|随時実施|Event\s*&\s*Seminar|各種説明会|＆各種|時期及び定員|提出書類|応募方法|別記|様式第|0[0-9０-９]{1,4}[-－—][0-9０-９]{1,4}[-－—][0-9０-９]{3,4}/i;
-const OFFICE_ADDRESS_KW = /[一-龥]{2,3}[都道府県][一-龥]{1,10}[市区郡].{0,18}(?:丁目|番地|ビル|庁舎|[0-9０-９]+階|第[0-9０-９]+)/;
-function isOfficeJunkText(text) {
-  const weekdays = (String(text || '').match(/[日月火水木金土](?=[\s0-9０-９])/g) || []).length;
-  return OFFICE_NONEVENT_KW.test(text) || OFFICE_JUNK_KW.test(text) || OFFICE_ADDRESS_KW.test(text)
-    || weekdays >= 4 || /[队乐贝实团济纪记书译录习场]|�/.test(text); // 末尾はOCR文字化け（簡体字・置換文字）
-}
-
-function cleanOfficeEventTitle(text) {
-  let t = compactText(text);
-  // 先頭のラベル（お知らせ/new/重要/トピックス 等。連続も除去）
-  t = t.replace(/^(?:(?:お知らせ|重要(?:なお知らせ)?|新着|トピックス|new|NEW)\s*)+/gi, '');
-  // 『…』で囲まれた正式名称があればそれを優先
-  const quoted = t.match(/『([^』]{4,})』/);
-  if (quoted) t = quoted[1];
-  // 箇条書き・セッションマーカー（●【…】 ● ○）を除去
-  t = t.replace(/[●○]\s*【[^】]*】/g, ' ').replace(/[●○]/g, ' ');
-  // 「時間…」「場所…」「日時…」「開催…」以降は本文ではないので切り落とす。
-  // ※ 語を除去するより前に行う（先に語を消すと区切り記号だけ残る不具合になるため）
-  t = t.split(/\s*(?:時間|場所|日時|開催日|受付期間|受付|開場|開演|問合せ|お問[い合]*せ|連絡先|TEL|電話)\s*[／/:：]?/)[0];
-  t = t.split(/\s*開催/)[0];
-  // 区切りの全角スラッシュ以降（区切りだけ残った残骸）も切り落とす
-  t = t.split(/\s*／/)[0];
-  // 表ヘッダー語（月日（曜日）／イベント名／場 所 等。空白入りの「場 所」など切り落とし後の残り）を除去
-  t = t.replace(/月日\s*[（(]?\s*曜日\s*[）)]?|イベント名|開催\s*日時?|場\s*所|時\s*間|種\s*類|区\s*分|内\s*容/g, ' ');
-  // 先頭の日付・曜日の断片（・8日(月)、(月・祝) 等）
-  t = t.replace(/^[\s・･]*[0-9０-９]{0,2}\s*日?\s*[（(][月火水木金土日祝・]+[）)]\s*/, '');
-  // 日付・時刻・曜日断片を除去（半角・全角数字の両対応）
-  t = t.replace(/https?:\/\/\S+/g, '')
-    .replace(/(?:令和|R|Ｒ)\s*[0-9０-９]{1,2}\s*年?\s*[0-9０-９]{1,2}\s*月\s*[0-9０-９]{1,2}\s*日?(?:[（(]\s*[月火水木金土日祝]\s*[）)])?/gi, '')
-    .replace(/[0-9０-９]{4}\s*[年\/.-]\s*[0-9０-９]{1,2}\s*(?:月|[\/.-])\s*[0-9０-９]{1,2}\s*日?(?:[（(]\s*[月火水木金土日祝]\s*[）)])?/g, '')
-    .replace(/[、,]?\s*[0-9０-９]{1,2}\s*[月\/.]?\s*[0-9０-９]{0,2}\s*日?\s*[（(][月火水木金土日祝][）)]/g, '')
-    .replace(/[0-9０-９]{1,2}\s*[月\/.]\s*[0-9０-９]{1,2}\s*日?/g, '')
-    .replace(/[0-9０-９]{1,2}\s*[:：]\s*[0-9０-９]{2}\s*[~〜\-－]?\s*(?:[0-9０-９]{1,2}\s*[:：]\s*[0-9０-９]{2})?/g, '')
-    .replace(/[0-9０-９]{1,2}\s*時\s*[0-9０-９]{0,2}\s*分?\s*[~〜\-－]?\s*(?:[0-9０-９]{1,2}\s*時\s*[0-9０-９]{0,2}\s*分?)?/g, '')
-    .replace(/[0-9０-９]{1,2}\s*月(?=\s|$)/g, '');
-  // 複数イベントが連結している場合は最初の項目だけ採用
-  if ((t.match(/令和/g) || []).length >= 2) t = (t.split(/\s*令和[0-9０-９]/)[0] || t).trim();
-  // 公式ページ参照などの注記・案内系の語を除去
-  t = t.replace(/[（(][^（()）]*(?:公式ページ|日程|ページ参照|参照|事前|まで)[^（()）]*[）)]/g, '')
-    .replace(/詳しくはこちら|詳しくみる|詳細はこちら|こちら|VIEW\s*ALL|お知らせ|NEWS|一覧|PDF|チラシ|詳細|お申し込み|申込/gi, '')
-    .replace(/[｜|»>]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-  // 先頭の曜日断片（「月祝)」「月・祝)」など、閉じ括弧で終わるものだけ）を除去。
-  // 「水辺」「金沢」「土浦」等の実在語の先頭文字を削らないよう、閉じ括弧を必須にする。
-  t = t.replace(/^(?:[月火水木金土日祝][・･]?){1,3}[）)]\s*/, '').trim();
-  // 先頭の余分な記号（曜日漢字は含めない）を除去
-  t = t.replace(/^[\s・,、)）]+/, '').trim();
-  // 未閉じ括弧の整理
-  if ((t.match(/（/g) || []).length > (t.match(/）/g) || []).length) t = t.replace(/（[^（）]*$/, '').trim();
-  if ((t.match(/\(/g) || []).length > (t.match(/\)/g) || []).length) t = t.replace(/\([^()]*$/, '').trim();
-  // 先頭・末尾の記号類（括弧 （）() は正規の閉じを壊さないため対象外）
-  t = t.replace(/^[\s／/:：、,．.\-–—~〜【】\[\]<>!！#＃]+|[\s／/:：、,．.\-–—~〜【】\[\]<>、]+$/g, '').trim();
-  if (t.length > 60) t = t.slice(0, 60).trim();
-  return t || '募集案内所イベント';
-}
+// 募集案内所イベントの整形・非イベント判定は共通モジュール(shared/officeTitle.cjs)に一本化。
+// 既存の呼び出し契約に合わせた薄いラッパー。
+const isOfficeJunkText    = (text) => officeIsJunk(text);
+const cleanOfficeEventTitle = (text) => cleanOfficeTitle(text) || '募集案内所イベント';
 
 /**
  * 出力直前に全イベントのタイトルを最終整形する（収集後の整形チョークポイント）。
@@ -2775,12 +2721,11 @@ function cleanOfficeEventTitle(text) {
  */
 function finalizeTitle(title, sourceType) {
   if (!title) return title;
-  let t = compactText(title);
   // 全イベント共通: 末尾の誘導文言（詳細はこちら 等）を除去
-  t = t.replace(/(?:詳細はこちら(?:から|をご覧ください)?|詳しくはこちら|詳しくみる|こちらをご覧ください|こちらから|こちら|詳細を見る)\s*$/gi, '').trim();
+  let t = stripTrailingCta(compactText(title));
   // 募集案内所イベントは表ヘッダー・時間/場所・注記なども除去
   if (typeof sourceType === 'string' && sourceType.startsWith('office')) {
-    t = cleanOfficeEventTitle(t);
+    t = cleanOfficeTitle(t);
   }
   t = t.replace(/\s+/g, ' ').replace(/^[\s／/:：、,．.\-–—~〜]+|[\s／/:：、,．.\-–—~〜]+$/g, '').trim();
   return t || title;
