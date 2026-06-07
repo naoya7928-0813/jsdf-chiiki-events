@@ -9,6 +9,7 @@ import SettingsScreen    from './components/SettingsScreen';
 import NotificationScreen from './components/NotificationScreen';
 import FavoritesScreen   from './components/FavoritesScreen';
 import LegalScreen        from './components/LegalScreen';
+import ReportScreen       from './components/ReportScreen';
 import RegionScreen       from './components/RegionScreen';
 import SplashScreen       from './components/SplashScreen';
 
@@ -330,6 +331,15 @@ export default function App() {
           onOpenRegion={openRegion}
           onOpenFavorites={() => setScreen('favorites')}
           onOpenLegal={(doc) => { setLegalDoc(doc); setScreen('legal'); }}
+          onOpenReport={() => setScreen('report')}
+        />
+      )}
+
+      {screen === 'report' && (
+        <ReportScreen
+          theme={theme}
+          updatedAt={updatedAt}
+          onBack={() => setScreen('settings')}
         />
       )}
 

@@ -15,6 +15,7 @@ export default function SettingsScreen({
   autoMode, onAutoModeChange,
   onOpenHome, onOpenRegion, onOpenList, onOpenFavorites,
   onOpenLegal,
+  onOpenReport,
 }) {
   const { primary, schemeKey, darkMode } = theme;
 
@@ -250,6 +251,12 @@ export default function SettingsScreen({
               })}
             </div>
           </div>
+        </Card>
+
+        {/* ─ お問い合わせ ─ */}
+        <GroupTitle>お問い合わせ</GroupTitle>
+        <Card>
+          <LegalLinkRow label="バグ・不具合を報告" onTap={onOpenReport} last />
         </Card>
 
         {/* ─ 5. 法的情報 ─ */}

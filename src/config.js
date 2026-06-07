@@ -1,7 +1,11 @@
-// ─── プッシュ通知 (ntfy.sh) ──────────────────────────────────
-// トピック名は環境変数で管理（.env.local または Vercel 環境変数 VITE_NTFY_TOPIC）
-export const NTFY_TOPIC = import.meta.env.VITE_NTFY_TOPIC ?? '';
-export const NTFY_URL   = NTFY_TOPIC ? `https://ntfy.sh/${NTFY_TOPIC}` : '';
+// ─── プッシュ通知 ─────────────────────────────────────────────
+// イベントのプッシュ通知は Web Push (VAPID) を使用（src/hooks/usePushNotification.js）。
+// 旧 ntfy.sh トピック方式（NTFY_TOPIC / NtfyGuideModal）は廃止済み。
+
+// バグ・不具合報告フォームの送信先（イベント通知とは別の管理者用トピック）。
+// Vercel 環境変数 VITE_NTFY_BUG_TOPIC で上書き可。未設定時は既定トピックを使用。
+// 受信側（管理者）は ntfy アプリでこのトピックを購読する。
+export const NTFY_BUG_TOPIC = import.meta.env.VITE_NTFY_BUG_TOPIC ?? 'jsdf-chiiki-events-bug-7928';
 
 // ─── データソース ─────────────────────────────────────────────
 // GitHub Actions が定期スクレイピングし public/data/events.json に書き出す。
