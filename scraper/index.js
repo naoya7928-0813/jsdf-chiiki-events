@@ -32,7 +32,7 @@ const { markDuplicates }  = require('./lib/dedup');
 const { extractAssets }   = require('./lib/extractAssets');
 const { findEventLinks }  = require('./lib/exploreLinks');
 // 募集案内所イベントのタイトル整形・非イベント判定（フロント/スクリプトと共通）
-const { officeIsJunk, cleanOfficeTitle, stripTrailingCta } = require('../shared/officeTitle.cjs');
+const { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } = require('../shared/officeTitle.cjs');
 
 const { chromium } = require('playwright-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
@@ -2790,7 +2790,8 @@ function extractOfficeTableEvents($, table, pageUrl, meta, seen, events) {
     const rawTitle = cells[titleCol] || cells.find((c, i) => i !== dateCol && c) || '';
     const title = cleanOfficeTitle(rawTitle) || cleanOfficeTitle(joined);
     if (!title || title.replace(/[\s　]/g, '').length < 4) return;
-    const place = placeCol >= 0 ? compactText(cells[placeCol] || '') : '';
+    if (officeIsJunk(title)) return; // 整形後タイトルが非イベント（フォーム項目等）なら除外
+    const place = placeCol >= 0 ? cleanOfficePlace(cells[placeCol] || '') : '';
     const key = `${parsed.dateStr}|${title.slice(0, 40)}`;
     if (seen.has(key)) return;
     seen.add(key);
@@ -2839,6 +2840,7 @@ function extractOfficeHtmlEvents($, pageUrl, meta) {
     const title = cleanOfficeEventTitle(text);
     // 整形した結果ほとんど中身が残らない（救済不能な）ものはイベントにしない
     if (title === '募集案内所イベント' || title.replace(/[\s　]/g, '').length < 4) return;
+    if (officeIsJunk(title)) return; // 整形後タイトルが非イベントなら除外
     const key = `${parsed.dateStr}|${title.slice(0, 40)}`;
     if (seen.has(key)) return;
     seen.add(key);

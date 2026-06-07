@@ -18,10 +18,10 @@ const DRY = process.argv.includes('--dry');
 
 const isOffice = ev => typeof ev?.source_type === 'string' && ev.source_type.startsWith('office');
 // 整形・非イベント判定は共通モジュールに一本化
-import { officeIsJunk, cleanOfficeTitle, stripTrailingCta } from '../shared/officeTitle.cjs';
+import { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } from '../shared/officeTitle.cjs';
 
 const data = JSON.parse(fs.readFileSync(FILE, 'utf8'));
-let dropped = 0, changed = 0, total = 0;
+let dropped = 0, changed = 0, placeChanged = 0, total = 0;
 const samples = [];
 
 for (const k of Object.keys(data)) {
@@ -29,21 +29,26 @@ for (const k of Object.keys(data)) {
   const next = [];
   for (const ev of data[k]) {
     total++;
-    if (isOffice(ev) && officeIsJunk(ev.title)) { dropped++; continue; }
     const cleaned = isOffice(ev) ? stripTrailingCta(cleanOfficeTitle(ev.title)) : stripTrailingCta(ev.title);
-    // 整形しても中身が残らない（救済不能）募集案内所イベントは除外
-    if (isOffice(ev) && (cleaned === '募集案内所イベント' || cleaned.replace(/[\s　]/g, '').length < 4)) { dropped++; continue; }
+    // 非イベント or 整形しても中身が残らない（救済不能）募集案内所イベントは除外
+    if (isOffice(ev) && (officeIsJunk(ev.title) || officeIsJunk(cleaned)
+        || cleaned === '募集案内所イベント' || cleaned.replace(/[\s　]/g, '').length < 4)) { dropped++; continue; }
     if (cleaned !== ev.title) {
       if (samples.length < 25) samples.push(`[${k}] ${ev.title}\n      → ${cleaned}`);
       ev.title = cleaned;
       changed++;
+    }
+    // 募集案内所イベントは場所欄も整形（「時間／…場所／会場」→会場名）
+    if (isOffice(ev) && ev.place) {
+      const cp = cleanOfficePlace(ev.place);
+      if (cp !== ev.place) { ev.place = cp; placeChanged++; }
     }
     next.push(ev);
   }
   data[k] = next;
 }
 
-console.log(`総数:${total} 除外:${dropped} タイトル変更:${changed}`);
+console.log(`総数:${total} 除外:${dropped} タイトル変更:${changed} 場所変更:${placeChanged}`);
 console.log('--- 変更サンプル ---');
 samples.forEach(s => console.log('  ' + s));
 

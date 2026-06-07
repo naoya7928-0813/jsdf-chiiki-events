@@ -38,7 +38,7 @@ function officeIsJunk(title) {
   if (/[一-龥]{2,3}[都道府県][一-龥]{1,10}[市区郡].{0,18}(丁目|番地|ビル|庁舎|[0-9０-９]+階|第[0-9０-９]+)/.test(t)) return true; // 住所塊
   if (/0[0-9０-９]{1,4}[-－—][0-9０-９]{1,4}[-－—][0-9０-９]{3,4}/.test(t)) return true; // 電話番号混入
   if (weekdayCount(t) >= 4) return true;                                          // カレンダー表の塊
-  if (/時期及び定員|提出書類|応募方法|別記|様式第/.test(t)) return true;          // フォーム/様式の項目
+  if (/時期及び定員|及び定員|提出書類|応募方法|別記|様式第/.test(t)) return true;  // フォーム/様式の項目
   if (/[队乐贝实团济纪记书译录习场]|�/.test(t)) return true;                    // OCR文字化け（簡体字・置換文字）
   return false;
 }
@@ -106,4 +106,25 @@ function stripTrailingCta(raw) {
   return t || raw;
 }
 
-module.exports = { officeIsJunk, cleanOfficeTitle, stripTrailingCta, OFFICE_NONEVENT_RE, navMenuHits, weekdayCount };
+/**
+ * 募集案内所イベントの「場所」欄を整形する。
+ * 「時間／…場所／会場…」のように時間と場所が混ざった塊から会場名だけを取り出す。
+ */
+function cleanOfficePlace(raw) {
+  if (!raw) return '';
+  let p = String(raw).replace(/\s+/g, ' ').trim();
+  // 「場所／…」「場所：…」があれば、その後ろ（会場名）を採用
+  const m = p.match(/場\s*所\s*[／/:：]?\s*(.+)$/);
+  if (m) p = m[1].trim();
+  // 残った「時間／…」断片を除去
+  p = p.replace(/時\s*間\s*[／/:：].*$/, '').trim();
+  // 時刻表現を除去
+  p = p.replace(/[0-9０-９]{1,2}\s*[:：時]\s*[0-9０-９]{0,2}\s*分?\s*[~〜\-－]?\s*(?:[0-9０-９]{1,2}\s*[:：時]\s*[0-9０-９]{0,2}\s*分?)?/g, '').trim();
+  // 末尾の活動内容（一般公開・展示広報・募集ブース設置 等）を除去
+  p = p.replace(/(?:一般公開|展示広報|募集ブース設置|・展示広報|にて|ほか)+$/u, '').trim();
+  p = p.replace(/^[／/:：、,・\s]+|[／/:：、,・\s]+$/g, '').trim();
+  if (p.length > 40) p = p.slice(0, 40).trim();
+  return p;
+}
+
+module.exports = { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta, OFFICE_NONEVENT_RE, navMenuHits, weekdayCount };

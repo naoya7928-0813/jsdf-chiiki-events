@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { API_URL, REFRESH_INTERVAL_MS } from '../config';
 // 募集案内所イベントの整形・非イベント判定は共通モジュールに一本化（scraper/スクリプトと共有）
-import { officeIsJunk, cleanOfficeTitle, stripTrailingCta } from '../../shared/officeTitle.cjs';
+import { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } from '../../shared/officeTitle.cjs';
 
 const EMPTY = { updatedAt: null };
 
@@ -39,11 +39,15 @@ function filterPastEvents(rawData, today) {
         return c.length >= 4;
       })
       .map(ev => {
-        // タイトルの余計な文章を除去（全イベント: 末尾誘導文言／募集案内所: さらに表ヘッダー等）
+        // タイトル・場所の余計な文章を除去（募集案内所イベントのみ場所も整形）
         const cleaned = isOfficeEvent(ev)
           ? stripTrailingCta(cleanOfficeTitle(ev.title))
           : stripTrailingCta(ev.title);
-        let e = cleaned !== ev.title ? { ...ev, title: cleaned } : ev;
+        const cleanedPlace = isOfficeEvent(ev) ? cleanOfficePlace(ev.place) : ev.place;
+        let e = ev;
+        if (cleaned !== ev.title || cleanedPlace !== ev.place) {
+          e = { ...ev, title: cleaned, place: cleanedPlace };
+        }
         // 同一IDの誤連動を防ぐためIDを一意化
         if (!e.id) return e;
         if (!seenIds.has(e.id)) { seenIds.add(e.id); return e; }

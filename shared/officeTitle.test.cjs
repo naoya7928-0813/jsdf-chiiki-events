@@ -8,7 +8,7 @@
  */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { cleanOfficeTitle, officeIsJunk, stripTrailingCta } = require('./officeTitle.cjs');
+const { cleanOfficeTitle, officeIsJunk, stripTrailingCta, cleanOfficePlace } = require('./officeTitle.cjs');
 
 // ── cleanOfficeTitle: 余計な文章の除去（生入力 → 期待出力）──────────
 const CLEAN_CASES = [
@@ -103,6 +103,22 @@ test('officeIsJunk: 正規のイベントは除外しない', () => {
   for (const t of JUNK_FALSE) {
     assert.equal(officeIsJunk(t), false, `誤ってJUNK判定: ${t}`);
   }
+});
+
+test('cleanOfficePlace: 時間/場所が混ざった塊から会場名を取り出す', () => {
+  assert.equal(cleanOfficePlace('時間／：13時30分～16時場所／防衛省長崎合同庁舎(4階会議室)'), '防衛省長崎合同庁舎(4階会議室)');
+  assert.equal(cleanOfficePlace('時間／：10時～16時場所／島原新港一般公開・展示広報募集ブース設置'), '島原新港');
+  assert.equal(cleanOfficePlace('場所／厳原港東浜ふ頭展示広報募集ブース設置'), '厳原港東浜ふ頭');
+  assert.equal(cleanOfficePlace('時間／13時～17時 場所／五島・福江港'), '五島・福江港');
+  // 既に綺麗な会場名はそのまま
+  assert.equal(cleanOfficePlace('JR富山駅周辺'), 'JR富山駅周辺');
+  assert.equal(cleanOfficePlace('ハローワーク半田'), 'ハローワーク半田');
+  assert.equal(cleanOfficePlace(''), '');
+});
+
+test('officeIsJunk: フォーム項目「期及び定員」も除外する', () => {
+  assert.equal(officeIsJunk('期及び定員'), true);
+  assert.equal(officeIsJunk('時期及び定員'), true);
 });
 
 test('stripTrailingCta: 末尾の誘導文言を除去する', () => {
