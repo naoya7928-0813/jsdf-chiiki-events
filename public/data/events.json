@@ -224,6 +224,22 @@
   ],
   "miyagi": [
     {
+      "id": "mi-20260613-gdfhq",
+      "pref": "miyagi",
+      "date": "2026-06-13",
+      "weekday": "土",
+      "title": "防災フェアinイオンモール新利府",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
       "id": "mi-20260628-7bw6l",
       "pref": "miyagi",
       "date": "2026-06-28",
@@ -2894,7 +2910,7 @@
   ],
   "mie": [
     {
-      "id": "mi-20260614-2",
+      "id": "mi-20260614-1",
       "pref": "mie",
       "date": "2026-06-14",
       "weekday": "日",
@@ -3694,6 +3710,40 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null
+    },
+    {
+      "id": "ya-office-20260613-2q8sp",
+      "pref": "yamaguchi",
+      "date": "2026-06-13",
+      "weekday": "土",
+      "title": "ミサイル艇 おおたか 一般公開",
+      "place": "下関出張所・宇部地域事務所・防府地域事務所 ほか3拠点",
+      "address": "",
+      "time": "",
+      "category": "一般公開",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/yamaguchi/kitievent.html",
+      "notes": "掲載元: 下関出張所・宇部地域事務所・防府地域事務所 ほか3拠点",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html"
+    },
+    {
+      "id": "ya-office-20260613-ax92e",
+      "pref": "yamaguchi",
+      "date": "2026-06-13",
+      "weekday": "土",
+      "title": "４機関合同公務員説明会 (入場無料・服装自由・保護者同伴歓迎・保護者のみ参加歓迎) 高校・大学卒業後の進路の参考や転職希",
+      "place": "下関出張所・宇部地域事務所・防府地域事務所 ほか3拠点",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "入場無料",
+      "url": "https://www.mod.go.jp/pco/yamaguchi/setsumeikai_boshu.html",
+      "notes": "掲載元: 下関出張所・宇部地域事務所・防府地域事務所 ほか3拠点",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html"
     }
   ],
   "fukuoka": [
@@ -4250,5 +4300,5 @@
   ],
   "kagoshima": [],
   "okinawa": [],
-  "updatedAt": "2026/06/08 18:10"
+  "updatedAt": "2026/06/08 23:01"
 }
