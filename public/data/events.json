@@ -647,7 +647,7 @@
       "time": "",
       "category": "採用イベント",
       "tag": "",
-      "url": "https://www.mod.go.jp/pco/akita/file/result/asuka.png",
+      "url": null,
       "notes": "掲載元: 秋田募集案内所・能代地域事務所・由利本荘地域事務所 ほか3拠点",
       "ageRequirement": null,
       "deadline": null,
@@ -3426,6 +3426,40 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html"
+    },
+    {
+      "id": "os-office-20260705-vpwaz",
+      "pref": "osaka",
+      "date": "2026-07-05",
+      "weekday": "日",
+      "title": "海上自衛隊阪神基地隊サマーフェスタ2026",
+      "place": "枚方出張所・茨木地域事務所",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/osaka/experience/event.html",
+      "notes": "掲載元: 枚方出張所・茨木地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html"
+    },
+    {
+      "id": "os-office-20260627-twc4c",
+      "pref": "osaka",
+      "date": "2026-06-27",
+      "weekday": "土",
+      "title": "陸上自衛隊体験型説明会 in 陸上自衛隊信太山駐屯地",
+      "place": "枚方出張所・茨木地域事務所",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/osaka/experience/event.html",
+      "notes": "掲載元: 枚方出張所・茨木地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html"
     }
   ],
   "hyogo": [
@@ -3844,40 +3878,6 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null
-    },
-    {
-      "id": "ya-office-20260613-2q8sp",
-      "pref": "yamaguchi",
-      "date": "2026-06-13",
-      "weekday": "土",
-      "title": "ミサイル艇 おおたか 一般公開",
-      "place": "下関出張所・宇部地域事務所・防府地域事務所 ほか3拠点",
-      "address": "",
-      "time": "",
-      "category": "一般公開",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/yamaguchi/kitievent.html",
-      "notes": "掲載元: 下関出張所・宇部地域事務所・防府地域事務所 ほか3拠点",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html"
-    },
-    {
-      "id": "ya-office-20260613-ax92e",
-      "pref": "yamaguchi",
-      "date": "2026-06-13",
-      "weekday": "土",
-      "title": "４機関合同公務員説明会 (入場無料・服装自由・保護者同伴歓迎・保護者のみ参加歓迎) 高校・大学卒業後の進路の参考や転職希",
-      "place": "下関出張所・宇部地域事務所・防府地域事務所 ほか3拠点",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "入場無料",
-      "url": "https://www.mod.go.jp/pco/yamaguchi/setsumeikai_boshu.html",
-      "notes": "掲載元: 下関出張所・宇部地域事務所・防府地域事務所 ほか3拠点",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html"
     }
   ],
   "fukuoka": [
@@ -4417,5 +4417,5 @@
   ],
   "kagoshima": [],
   "okinawa": [],
-  "updatedAt": "2026/06/09 16:52"
+  "updatedAt": "2026/06/09 21:54"
 }
