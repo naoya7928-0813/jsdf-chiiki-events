@@ -5,6 +5,12 @@
  */
 export const UPDATE_NOTES = [
   {
+    date:    '2026-06-10',
+    version: '1.14.23',
+    type:    'fix',
+    content: '一部地域でイベント名が住所や「○○地本イベント」などになってしまう不具合を修正',
+  },
+  {
     date:    '2026-06-05',
     version: '1.14.22',
     type:    'improvement',
