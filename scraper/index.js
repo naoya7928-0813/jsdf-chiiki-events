@@ -905,7 +905,23 @@ async function ocrImage(imageUrl) {
  */
 function fixOcrTitle(title) {
   if (!title) return title;
-  return title.replace(/醍/g, '第');
+  // OCR誤認識を修正
+  title = title.replace(/醍/g, '第');
+
+  // 非イベントテキストの除外パターン
+  // 「申し込み」「お問合せ」「住所」などを含むテキストはイベント情報ではない
+  const junkPatterns = [
+    /↑.*申し込み.*↑/,           // 「↑申し込みはこちら↑」
+    /【お問合せ|お問い合わせ/,    // 「【お問合せ先】」
+    /〒\d/,                       // 郵便番号
+    /^\d{2,4}[-－]\d{3,4}[-－]\d{4}/, // 電話番号
+  ];
+
+  for (const pattern of junkPatterns) {
+    if (pattern.test(title)) return null;
+  }
+
+  return title;
 }
 
 // ── PDF OCR（PDF 系地本の標準パターン） ────────────────────────
