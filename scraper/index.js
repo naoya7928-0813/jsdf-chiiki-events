@@ -907,21 +907,30 @@ function fixOcrTitle(title) {
   if (!title) return title;
   // OCR誤認識を修正
   title = title.replace(/醍/g, '第');
+  // 先頭のマークダウン記号（OCRが Markdown 見出しで返す残骸。例「# 海上自衛隊」）を除去
+  title = title.replace(/^[#＃]+\s*/, '').trim();
 
-  // 非イベントテキストの除外パターン
-  // 「申し込み」「お問合せ」「住所」などを含むテキストはイベント情報ではない
-  const junkPatterns = [
-    /↑.*申し込み.*↑/,           // 「↑申し込みはこちら↑」
-    /【お問合せ|お問い合わせ/,    // 「【お問合せ先】」
-    /〒\d/,                       // 郵便番号
-    /^\d{2,4}[-－]\d{3,4}[-－]\d{4}/, // 電話番号
-  ];
-
-  for (const pattern of junkPatterns) {
-    if (pattern.test(title)) return null;
-  }
+  // 非イベントテキストはタイトルにしない（null を返し呼び出し側でフォールバック）
+  if (isJunkOrStubTitle(title)) return null;
 
   return title;
+}
+
+/**
+ * イベントタイトルが「中身のない/不正な」ものか判定する。
+ * OCR残骸・申し込み案内・住所/電話の混入や、内容が取れなかったスタブを検出する。
+ * fixOcrTitle（生成時）と writeOutput（最終出力前）の両方から呼び、経路を問わず防御する。
+ */
+function isJunkOrStubTitle(title) {
+  if (!title) return true;
+  const t = title.trim();
+  if (/↑.*申し込み/.test(t))            return true; // 「↑申し込みはこちら↑」
+  if (/【?お問合せ|お問い合わせ先/.test(t)) return true; // 「【お問合せ先】」
+  if (/〒\s*\d/.test(t))                 return true; // 郵便番号
+  if (/\d{2,4}[-－]\d{3,4}[-－]\d{4}/.test(t)) return true; // 電話番号
+  // 「自衛隊○○地本イベント」「○○地本イベント（場所）」等の中身なしスタブ
+  if (/^(?:自衛隊)?.{0,6}地本イベント(?:\s*（[^）]*）)?$/.test(t)) return true;
+  return false;
 }
 
 // ── PDF OCR（PDF 系地本の標準パターン） ────────────────────────
@@ -1053,28 +1062,17 @@ async function enrichWithPdfOcr(events) {
     const ocr = await ocrPdf(ev.url);
     if (ocr) console.log(`  → title: ${ocr.title ?? '(変更なし)'}, place: ${ocr.place ?? '(変更なし)'}`);
 
-    if (ocr) {
-      const extractedTitle = ocr.title && fixOcrTitle(safeStr(ocr.title));
-      // OCRタイトルを取得できたか、またはスタブタイトルでない場合のみ使用
-      const finalTitle = extractedTitle || (ev.title && !ev.title.includes('自衛隊') ? ev.title : null);
-
-      if (finalTitle) {
-        results.push({
-          ...ev,
-          title:          finalTitle,
-          place:          (safeStr(ocr.place))               || ev.place || '',
-          time:           safeStr(ocr.time)                || ev.time  || '',
-          ageRequirement: safeStr(ocr.ageRequirement)      || ev.ageRequirement || null,
-          deadline:       safeStr(ocr.deadline)            || ev.deadline       || null,
-          notes:          [ev.notes, ocr.notes].filter(Boolean).join('\n')       || null,
-        });
-      } else {
-        // OCRタイトル取得失敗 & スタブタイトルのみの場合はスキップ
-        console.log(`  → OCRタイトル取得失敗: スキップ`);
-      }
-    } else {
-      results.push(ev);
-    }
+    // OCRでタイトルが取れればそれを採用。取れなければ元タイトルを維持し、
+    // 中身なしスタブ（「自衛隊○○地本イベント」等）は writeOutput の最終フィルタで除外する。
+    results.push(ocr ? {
+      ...ev,
+      title:          (ocr.title          && fixOcrTitle(safeStr(ocr.title)))  || ev.title,
+      place:          (safeStr(ocr.place))               || ev.place || '',
+      time:           safeStr(ocr.time)                || ev.time  || '',
+      ageRequirement: safeStr(ocr.ageRequirement)      || ev.ageRequirement || null,
+      deadline:       safeStr(ocr.deadline)            || ev.deadline       || null,
+      notes:          [ev.notes, ocr.notes].filter(Boolean).join('\n')       || null,
+    } : ev);
 
     // 8秒待機（Gemini PDF-OCRのレート制限対策: 15RPM）
     await sleep(8000);
@@ -4239,6 +4237,8 @@ function writeOutput(data) {
       if ((ev.endDate || ev.date) < today) return false;
       // タイトルが「お知らせ」のみ等、内容のないゴミデータを除外
       if (!ev.title || /^お知らせ$/.test(ev.title.trim())) return false;
+      // OCR残骸・申し込み案内・住所混入・中身なしスタブを除外（全経路の最終防御）
+      if (isJunkOrStubTitle(ev.title)) return false;
       return true;
     });
     removedCount += before - data[key].length;
