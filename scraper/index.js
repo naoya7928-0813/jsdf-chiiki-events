@@ -1053,15 +1053,28 @@ async function enrichWithPdfOcr(events) {
     const ocr = await ocrPdf(ev.url);
     if (ocr) console.log(`  → title: ${ocr.title ?? '(変更なし)'}, place: ${ocr.place ?? '(変更なし)'}`);
 
-    results.push(ocr ? {
-      ...ev,
-      title:          (ocr.title          && fixOcrTitle(safeStr(ocr.title)))  || ev.title,
-      place:          (safeStr(ocr.place))               || ev.place || '',
-      time:           safeStr(ocr.time)                || ev.time  || '',
-      ageRequirement: safeStr(ocr.ageRequirement)      || ev.ageRequirement || null,
-      deadline:       safeStr(ocr.deadline)            || ev.deadline       || null,
-      notes:          [ev.notes, ocr.notes].filter(Boolean).join('\n')       || null,
-    } : ev);
+    if (ocr) {
+      const extractedTitle = ocr.title && fixOcrTitle(safeStr(ocr.title));
+      // OCRタイトルを取得できたか、またはスタブタイトルでない場合のみ使用
+      const finalTitle = extractedTitle || (ev.title && !ev.title.includes('自衛隊') ? ev.title : null);
+
+      if (finalTitle) {
+        results.push({
+          ...ev,
+          title:          finalTitle,
+          place:          (safeStr(ocr.place))               || ev.place || '',
+          time:           safeStr(ocr.time)                || ev.time  || '',
+          ageRequirement: safeStr(ocr.ageRequirement)      || ev.ageRequirement || null,
+          deadline:       safeStr(ocr.deadline)            || ev.deadline       || null,
+          notes:          [ev.notes, ocr.notes].filter(Boolean).join('\n')       || null,
+        });
+      } else {
+        // OCRタイトル取得失敗 & スタブタイトルのみの場合はスキップ
+        console.log(`  → OCRタイトル取得失敗: スキップ`);
+      }
+    } else {
+      results.push(ev);
+    }
 
     // 8秒待機（Gemini PDF-OCRのレート制限対策: 15RPM）
     await sleep(8000);
