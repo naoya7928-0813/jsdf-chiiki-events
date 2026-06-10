@@ -69,7 +69,9 @@ jobs:
 
       # ── Tesseract OCR + poppler-utils をインストール ────────────
       - name: Tesseract OCR + poppler-utils をインストール
-        run: sudo apt-get install -y tesseract-ocr tesseract-ocr-jpn poppler-utils
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tesseract-ocr tesseract-ocr-jpn poppler-utils
 
       # ── Playwright 用 Chromium をインストール ────────────────
       - name: Playwright Chromium をインストール
