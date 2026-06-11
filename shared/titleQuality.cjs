@@ -116,8 +116,26 @@ function dedupEvents(list) {
   return kept.map(k => k.ev);
 }
 
+/**
+ * 「場所」欄のゴミを整形する。
+ * - OCRがMarkdown表で返した「| 会場名 |」のパイプ残骸を除去
+ * - 巡回元の事務所リスト（「A事務所・B事務所 ほか1拠点」等）は会場ではないため
+ *   空にする（誤った場所を出すより空欄の方が良い）
+ */
+function cleanPlaceText(raw) {
+  if (!raw) return '';
+  let p = String(raw).replace(/\s+/g, ' ').trim();
+  p = p.replace(/^[|｜\s]+|[|｜\s]+$/g, '').trim(); // Markdown表残骸
+  if (/ほか\d+拠点$/.test(p)) return '';            // 巡回元事務所リスト
+  // 複数の事務所・案内所の列挙も巡回元リスト（実会場は通常1つ）
+  const officeCount = (p.match(/事務所|案内所|出張所|分駐所/g) || []).length;
+  if (officeCount >= 2 && /・/.test(p)) return '';
+  return p;
+}
+
 module.exports = {
   cleanEventTitle,
+  cleanPlaceText,
   isJunkOrStubTitle,
   isStaleDatedEvent,
   dedupEvents,

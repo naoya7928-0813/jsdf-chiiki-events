@@ -7,8 +7,19 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
-  cleanEventTitle, isJunkOrStubTitle, isStaleDatedEvent, dedupEvents,
+  cleanEventTitle, cleanPlaceText, isJunkOrStubTitle, isStaleDatedEvent, dedupEvents,
 } = require('./titleQuality.cjs');
+
+test('cleanPlaceText: パイプ残骸の除去と事務所リストの排除', () => {
+  assert.equal(cleanPlaceText('| 海上自衛隊八戸航空基地（青森県八戸市高館） |'), '海上自衛隊八戸航空基地（青森県八戸市高館）');
+  assert.equal(cleanPlaceText('今金地域事務所・八雲地域事務所・江差地域事務所 ほか1拠点'), '');
+  assert.equal(cleanPlaceText('敦賀地域事務所・敦賀出張所・越前地域事務所 ほか1拠点'), '');
+  assert.equal(cleanPlaceText('金沢募集案内所・七尾出張所'), '');
+  // 実会場はそのまま（事務所1つだけの会場名は正規）
+  assert.equal(cleanPlaceText('横浜地域事務所'), '横浜地域事務所');
+  assert.equal(cleanPlaceText('かが交流プラザさくら'), 'かが交流プラザさくら');
+  assert.equal(cleanPlaceText(''), '');
+});
 
 test('cleanEventTitle: 先頭・末尾のゴミを整形する', () => {
   assert.equal(cleanEventTitle('# 海上自衛隊'), '海上自衛隊');
