@@ -6,6 +6,12 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-06-11',
+    version: '1.14.27',
+    type:    'improvement',
+    content: 'イベント件数を「100+件以上」ではなく実際の件数で表示するように変更',
+  },
+  {
+    date:    '2026-06-11',
     version: '1.14.26',
     type:    'fix',
     content: '安定性の向上（表示エラー対策）',

@@ -103,13 +103,13 @@ export default function JapanMap({ eventCounts, selectedRegionId, onSelect, prim
                   x={x} y={y + bRadius}
                   textAnchor="middle"
                   dominantBaseline="central"
-                  fontSize={20}
+                  fontSize={count > 99 ? 16 : 20}
                   fontWeight={700}
                   fontFamily={F.mono}
                   fill={selected ? primary : '#fff'}
                   style={{ userSelect: 'none' }}
                 >
-                  {count > 99 ? '99+' : count}
+                  {count}
                 </text>
               </g>
             )}

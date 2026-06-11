@@ -111,6 +111,42 @@ OCRの優先順は、無料ローカルOCR（Tesseract → RapidOCR）を先に�
 - **テーマ**: CSS 変数 `var(--bg)` / `var(--text)` / `var(--card)` / `var(--border)` でライト/ダーク切替
 - **プッシュ通知**: ntfy.sh トピック `jsdf-chiiki-events-7928`
 
+## エラー発生時の対処ガイド
+
+エラーの種類ごとの診断・修正手順。**いずれの場合も、データの修正は必ず一次ソース照合（上記必須手順）を踏むこと。**
+
+### 1. アプリが白画面・「表示中に問題が発生しました」が出る
+ErrorBoundary（`src/components/ErrorBoundary.jsx`）のフォールバックが出た場合、カード描画エラーが起きている。
+1. ブラウザの DevTools コンソールで `[ErrorBoundary]` のスタックトレースを確認
+2. 原因は大抵 events.json の想定外データ。`node scripts/check-event-titles.mjs` で形状検証
+3. `useEvents.js` の `normalizeEvent` が防げなかったパターンなら、normalizeEvent に防御を追加
+4. 再現確認: `npm run build && npx vite preview` → Playwright で `pageerror` / `console.error` を収集して描画確認
+
+### 2. イベントデータの異常（名前・日付・場所の誤り、重複）
+1. **切り分け**: `git show <前回コミット>:public/data/events.json` と比較し「前回データ維持」か「毎回生成」かを特定（原因経路が絞れる）
+2. **一次ソース照合**: チラシ・掲載ページの実物で正しい値を確認
+3. **恒久対策**: `shared/titleQuality.cjs` にパターン追加＋テスト（`npm test`）
+4. **既存データ修正**: titleQuality を使うスクリプトで events.json を直接修正 → `node scripts/generate-events-html.mjs` → commit/push（deploy.yml が自動デプロイ）
+
+### 3. スクレイプ失敗・イベント数急減（ntfy アラート）
+1. GitHub Actions のログで失敗した地本・ステップを特定（`gh run view <run-id> --log`）
+2. 地本サイト側の構造変更ならパーサー修正、Cloudflare 検知なら `withFreshContext`/待機時間を確認
+3. **データが消えた場合の復元**: `git show <正常だったコミット>:public/data/events.json > public/data/events.json` → HTML再生成 → commit/push
+4. イベントが全て消える事故の典型は「過去日付フィルター」（writeOutput）。日付生成ロジックと今日の日付の関係を確認
+
+### 4. デプロイ失敗・サイトに反映されない
+1. `gh run list --workflow=deploy.yml --limit 3` で状態確認。push 後に deploy.yml が発火するのは `src/` `public/` 等の変更時のみ
+2. 手動デプロイ: `gh workflow run deploy.yml`
+3. 反映が遅い場合は CDN キャッシュ（events.json は NetworkFirst 3分キャッシュ）を考慮して数分待つ
+
+### 5. OCR 関連の不調
+- `pdf-parse` は **v2（クラスAPI: `new PDFParse({data})` → `getText()`/`getScreenshot()`）**。v1 の関数形式で呼ぶと常に失敗し OCR API に流れてクォータを浪費する
+- OCR クォータ枯渇時は無料ローカル（Tesseract/RapidOCR）のみで動作する設計。`hasAnyOcrEngine()` と各 API キーの設定を確認
+- 同一アセットの再OCRは `scraper/ocr-cache.json`（GitHub Actions cache）で防止。キャッシュ破損時は Actions の cache を削除して再実行
+
+### 6. push が rejected になる
+スクレイプの自動コミットと競合している。`git pull --rebase origin master` → `git push`（生成データの競合は `-X theirs` で最新を正とする）
+
 ## MCP ツール活用ガイド
 
 このプロジェクトでは以下の MCP サーバーを設定済み（`~/.claude/settings.json`）:
