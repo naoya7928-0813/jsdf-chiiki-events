@@ -332,14 +332,30 @@ function getPdfParse() {
 
 /**
  * PDF バッファから日本語テキストを抽出する。
+ * pdf-parse v2（クラスAPI）と v1（関数API）の両方に対応する。
+ * ※ v2 をv1の関数形式で呼ぶと常に例外→null となり、テキスト層のある
+ *    官公庁PDFまで毎回 OCR API に流れてクォータを浪費するので注意。
  * @returns {string|null} 抽出テキスト（日本語文字が20字未満なら null）
  */
 async function extractPdfText(buf) {
-  const parse = getPdfParse();
-  if (!parse) return null;
+  const lib = getPdfParse();
+  if (!lib) return null;
   try {
-    const data = await parse(buf, { max: 3 }); // 先頭3ページで十分
-    const text = (data.text || '').trim();
+    let text = '';
+    if (typeof lib.PDFParse === 'function') {
+      // pdf-parse v2: クラスAPI
+      const parser = new lib.PDFParse({ data: new Uint8Array(buf) });
+      try {
+        const result = await parser.getText({ first: 3 }); // 先頭3ページで十分
+        text = (result.text || '').trim();
+      } finally {
+        await parser.destroy?.();
+      }
+    } else {
+      // pdf-parse v1: 関数API
+      const data = await lib(buf, { max: 3 });
+      text = (data.text || '').trim();
+    }
     const jpCount = (text.match(/[぀-鿿＀-￯]/g) || []).length;
     return jpCount >= 20 ? text : null;
   } catch {
