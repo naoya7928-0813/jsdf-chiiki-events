@@ -3142,6 +3142,16 @@ async function scrapeOfficeAssets(withFreshContext) {
   const EXPLORE_TIMEOUT_MS  = 25 * 60 * 1000; // 全探索25分上限
   const exploreStart = Date.now();
 
+  // 時間上限内で全地本を回りきれないため、開始位置を実行ごとにローテーションする。
+  // 固定順（北→南）だと毎回同じ地点で打ち切られ、西日本のHQが一度も探索されない。
+  // 8時間ごとに開始位置を17ずつ進める（17は50と互いに素）ことで、
+  // 1日3回の定期実行で全50地本がその日のうちに必ず1回は探索される。
+  if (hqEntries.length > 1) {
+    const offset = (Math.floor(Date.now() / (8 * 3600 * 1000)) * 17) % hqEntries.length;
+    hqEntries = [...hqEntries.slice(offset), ...hqEntries.slice(0, offset)];
+    console.log(`[OfficeOCR] HQ探索の開始位置: ${offset}番目（${hqEntries[0].name}）から`);
+  }
+
   for (const hq of hqEntries) {
     if (Date.now() - exploreStart > EXPLORE_TIMEOUT_MS) {
       console.log('[OfficeOCR] 時間上限に達したため探索を中断します');
