@@ -13,6 +13,35 @@ function jstToday() {
   return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
 }
 
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * イベント1件をカードが安全に描画できる形に正規化する。
+ * 描画不能（日付不正・タイトル空）なら null を返して除外する。
+ * スクレイパー側にも防御はあるが、配信済みデータや経路漏れに備えて
+ * カードへ渡す直前でも保証する（エラーバウンダリより手前の防御）。
+ */
+function normalizeEvent(ev) {
+  if (!ev || typeof ev !== 'object') return null;
+  if (typeof ev.date !== 'string' || !DATE_RE.test(ev.date)) return null;
+  const title = typeof ev.title === 'string' ? ev.title.trim() : '';
+  if (!title) return null;
+  const str = v => (typeof v === 'string' ? v : '');
+  return {
+    ...ev,
+    title,
+    place:    str(ev.place),
+    time:     str(ev.time),
+    category: str(ev.category),
+    tag:      str(ev.tag),
+    url:      str(ev.url),
+    weekday:  str(ev.weekday),
+    // endDate は形式不正・開始日より前なら無かったことにする（期間表示の崩れ防止）
+    endDate:    (typeof ev.endDate === 'string' && DATE_RE.test(ev.endDate) && ev.endDate >= ev.date) ? ev.endDate : undefined,
+    endWeekday: (typeof ev.endDate === 'string' && DATE_RE.test(ev.endDate) && ev.endDate >= ev.date) ? str(ev.endWeekday) : undefined,
+  };
+}
+
 /**
  * 終了日（endDate ?? date）が今日以降のイベントのみ残す。
  * スクレイパーが深夜0時〜8時の間に走らなくても
@@ -28,7 +57,8 @@ function filterPastEvents(rawData, today) {
   for (const [k, v] of Object.entries(rawData)) {
     if (!Array.isArray(v)) { out[k] = v; continue; }
     out[k] = v
-      .filter(ev => ev.date && (ev.endDate || ev.date) >= today)
+      .map(normalizeEvent)
+      .filter(ev => ev && (ev.endDate || ev.date) >= today)
       // 募集案内所イベントのうち、整形しても綺麗にならない非イベント（過去報告・制度説明・
       // お知らせ・ナビメニュー塊・メール/住所/電話混入・カレンダー塊・常時開催の案内など）を除外。
       // さらに、整形した結果ほとんど中身が残らない（救済不能な）ものも除外する。

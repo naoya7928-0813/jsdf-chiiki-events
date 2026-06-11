@@ -45,13 +45,27 @@ const CHECKS = [
   ['場所=事務所リスト疑い', (t, ev) => /ほか\d+拠点/.test(ev.place || '')],
 ];
 
+// データ形状の検証（カード描画がエラーにならない最低保証）
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const SHAPE_CHECKS = [
+  ['id欠落',        ev => !ev.id || typeof ev.id !== 'string'],
+  ['date形式不正',  ev => typeof ev.date !== 'string' || !DATE_RE.test(ev.date)],
+  ['title欠落',     ev => typeof ev.title !== 'string' || !ev.title.trim()],
+  ['endDate形式不正', ev => ev.endDate != null && (typeof ev.endDate !== 'string' || !DATE_RE.test(ev.endDate))],
+  ['endDateが開始日より前', ev => typeof ev.endDate === 'string' && DATE_RE.test(ev.endDate) && ev.endDate < ev.date],
+  ['place型不正',   ev => ev.place != null && typeof ev.place !== 'string'],
+];
+
 let flagged = 0;
 let total = 0;
 for (const pref of Object.keys(data)) {
   if (!Array.isArray(data[pref])) continue;
   for (const ev of data[pref]) {
     total++;
-    const hits = CHECKS.filter(([, fn]) => fn(ev.title || '', ev)).map(([name]) => name);
+    const hits = [
+      ...SHAPE_CHECKS.filter(([, fn]) => fn(ev)).map(([name]) => name),
+      ...CHECKS.filter(([, fn]) => fn(ev.title || '', ev)).map(([name]) => name),
+    ];
     if (hits.length) {
       flagged++;
       console.log(`[${pref}] (${hits.join(',')})`);

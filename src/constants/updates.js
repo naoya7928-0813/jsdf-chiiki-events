@@ -6,6 +6,12 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-06-11',
+    version: '1.14.26',
+    type:    'fix',
+    content: '安定性の向上（表示エラー対策）',
+  },
+  {
+    date:    '2026-06-11',
     version: '1.14.25',
     type:    'fix',
     content: 'チラシ画像との照合により、一部イベントの名称（誤字・名称の欠け）・開催場所・終了日を修正',
