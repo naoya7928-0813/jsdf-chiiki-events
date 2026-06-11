@@ -509,6 +509,23 @@
       "source_type": "office_notice"
     },
     {
+      "id": "ak-office-20260611-f42k2",
+      "pref": "akita",
+      "date": "2026-06-11",
+      "weekday": "木",
+      "title": "入札公告のご案内 試験艦あすか一般公開（秋田港）予備自衛官訓練日程",
+      "place": "秋田募集案内所・能代地域事務所・由利本荘地域事務所 ほか3拠点",
+      "address": "",
+      "time": "",
+      "category": "採用イベント",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/akita/asset/tender/index.html",
+      "notes": "掲載元: 秋田募集案内所・能代地域事務所・由利本荘地域事務所 ほか3拠点",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html"
+    },
+    {
       "id": "ak-office-20260620-qo5x8",
       "pref": "akita",
       "date": "2026-06-20",
@@ -1446,6 +1463,40 @@
       "notes": "自衛隊車両展示・広報ブース等",
       "ageRequirement": null,
       "deadline": null
+    },
+    {
+      "id": "fu-off-20260817-m5lzk",
+      "pref": "fukui",
+      "date": "2026-08-17",
+      "weekday": "月",
+      "title": "PREMIUM TOUR 2026",
+      "place": "",
+      "address": "",
+      "time": "8月17日（月）7:00出発〜8月19日（水）22:00到着予定",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/fukui/contents/15-oubo/images/202608premium-tour.pdf",
+      "notes": "定員15名程度・抽選・応募多数は抽選",
+      "ageRequirement": "高校1年生〜32歳未満（日本国籍を有する福井県在住の方）",
+      "deadline": "6月28日（日）",
+      "source_type": "office_ocr"
+    },
+    {
+      "id": "fu-office-20260817-7o0yg",
+      "pref": "fukui",
+      "date": "2026-08-17",
+      "weekday": "月",
+      "title": "PREMIUM TOUR 2026",
+      "place": "敦賀地域事務所・敦賀出張所・越前地域事務所 ほか1拠点",
+      "address": "",
+      "time": "8月17日（月）7:00出発〜8月19日（水）22:00到着予定",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/fukui/contents/15-oubo/images/202608premium-tour.pdf",
+      "notes": "掲載元: 敦賀地域事務所・敦賀出張所・越前地域事務所 ほか1拠点\n定員15名程度・抽選・応募多数は抽選",
+      "ageRequirement": "高校1年生〜32歳未満（日本国籍を有する福井県在住の方）",
+      "deadline": "6月28日（日）",
+      "source_type": "office_ocr"
     }
   ],
   "yamanashi": [
@@ -3864,40 +3915,6 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null
-    },
-    {
-      "id": "ya-office-20260613-2qe47",
-      "pref": "yamaguchi",
-      "date": "2026-06-13",
-      "weekday": "土",
-      "title": "下関基地隊 掃海艇岸壁",
-      "place": "下関出張所・宇部地域事務所・防府地域事務所 ほか3拠点",
-      "address": "",
-      "time": "",
-      "category": "艦艇公開",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/yamaguchi/kitievent.html",
-      "notes": "掲載元: 下関出張所・宇部地域事務所・防府地域事務所 ほか3拠点",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html"
-    },
-    {
-      "id": "ya-office-20260807-jpsmr",
-      "pref": "yamaguchi",
-      "date": "2026-08-07",
-      "weekday": "金",
-      "title": "岩国航空基地 体験搭乗専用の応募フォーム",
-      "place": "下関出張所・宇部地域事務所・防府地域事務所 ほか3拠点",
-      "address": "",
-      "time": "",
-      "category": "体験",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/yamaguchi/special_air-r80807.html",
-      "notes": "掲載元: 下関出張所・宇部地域事務所・防府地域事務所 ほか3拠点",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html"
     }
   ],
   "fukuoka": [
@@ -4437,5 +4454,5 @@
   ],
   "kagoshima": [],
   "okinawa": [],
-  "updatedAt": "2026/06/11 10:26"
+  "updatedAt": "2026/06/11 18:04"
 }
