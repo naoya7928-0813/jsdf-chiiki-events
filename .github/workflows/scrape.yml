@@ -111,6 +111,23 @@ jobs:
               https://ntfy.sh/${{ secrets.NTFY_ADMIN_TOPIC }} || true
           fi
 
+      # ── イベント名の品質チェック（表記ゆれ・記載エラーの疑いを警告）──
+      - name: イベント名の品質チェック
+        run: |
+          if ! OUTPUT=$(node scripts/check-event-titles.mjs); then
+            echo "$OUTPUT"
+            echo "::warning::イベント名に要確認項目があります"
+            curl -s \
+              -H "Title: 📝 イベント名 要確認" \
+              -H "Tags: memo" \
+              -H "Priority: default" \
+              -H "Content-Type: text/plain; charset=utf-8" \
+              -d "$(echo "$OUTPUT" | tail -20)" \
+              https://ntfy.sh/${{ secrets.NTFY_ADMIN_TOPIC }} || true
+          else
+            echo "$OUTPUT"
+          fi
+
       # ── 変更があればコミット & プッシュ ──────────────────────
       - name: 変更をコミット & プッシュ
         id: commit

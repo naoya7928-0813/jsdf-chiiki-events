@@ -33,6 +33,8 @@ const { extractAssets }   = require('./lib/extractAssets');
 const { findEventLinks }  = require('./lib/exploreLinks');
 // 募集案内所イベントのタイトル整形・非イベント判定（フロント/スクリプトと共通）
 const { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } = require('../shared/officeTitle.cjs');
+// イベント名の品質管理（整形・junk判定・年ズレ判定・重複統合）。最終出力の防御に使う
+const { cleanEventTitle, isJunkOrStubTitle, isStaleDatedEvent, dedupEvents } = require('../shared/titleQuality.cjs');
 
 const { chromium } = require('playwright-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
@@ -907,30 +909,13 @@ function fixOcrTitle(title) {
   if (!title) return title;
   // OCR誤認識を修正
   title = title.replace(/醍/g, '第');
-  // 先頭のマークダウン記号（OCRが Markdown 見出しで返す残骸。例「# 海上自衛隊」）を除去
-  title = title.replace(/^[#＃]+\s*/, '').trim();
+  // 先頭・末尾のゴミ（Markdown記号・装飾・新着マーク等）を整形
+  title = cleanEventTitle(title);
 
   // 非イベントテキストはタイトルにしない（null を返し呼び出し側でフォールバック）
   if (isJunkOrStubTitle(title)) return null;
 
   return title;
-}
-
-/**
- * イベントタイトルが「中身のない/不正な」ものか判定する。
- * OCR残骸・申し込み案内・住所/電話の混入や、内容が取れなかったスタブを検出する。
- * fixOcrTitle（生成時）と writeOutput（最終出力前）の両方から呼び、経路を問わず防御する。
- */
-function isJunkOrStubTitle(title) {
-  if (!title) return true;
-  const t = title.trim();
-  if (/↑.*申し込み/.test(t))            return true; // 「↑申し込みはこちら↑」
-  if (/【?お問合せ|お問い合わせ先/.test(t)) return true; // 「【お問合せ先】」
-  if (/〒\s*\d/.test(t))                 return true; // 郵便番号
-  if (/\d{2,4}[-－]\d{3,4}[-－]\d{4}/.test(t)) return true; // 電話番号
-  // 「自衛隊○○地本イベント」「○○地本イベント（場所）」等の中身なしスタブ
-  if (/^(?:自衛隊)?.{0,6}地本イベント(?:\s*（[^）]*）)?$/.test(t)) return true;
-  return false;
 }
 
 // ── PDF OCR（PDF 系地本の標準パターン） ────────────────────────
@@ -4232,6 +4217,8 @@ function writeOutput(data) {
   for (const key of Object.keys(data)) {
     if (!Array.isArray(data[key])) continue;
     const before = data[key].length;
+    // 先頭・末尾のゴミ（#・&・NEW日付・宣伝文句等）を整形してから検査
+    data[key] = data[key].map(ev => ({ ...ev, title: cleanEventTitle(ev.title) }));
     data[key] = data[key].filter(ev => {
       if (!ev.date) return false;
       if ((ev.endDate || ev.date) < today) return false;
@@ -4239,8 +4226,16 @@ function writeOutput(data) {
       if (!ev.title || /^お知らせ$/.test(ev.title.trim())) return false;
       // OCR残骸・申し込み案内・住所混入・中身なしスタブを除外（全経路の最終防御）
       if (isJunkOrStubTitle(ev.title)) return false;
+      // 過去年のイベントが現在年の日付で再登録されたもの（年ズレ）を除外
+      if (isStaleDatedEvent(ev)) return false;
       return true;
     });
+    // 同一（日付×名称×場所）の重複を統合。場所違いの同名イベントは残る
+    data[key] = dedupEvents(data[key]);
+    // 実イベントがある地本では「公式確認」スタブ（office_notice）を出さない
+    if (data[key].some(e => e.source_type !== 'office_notice')) {
+      data[key] = data[key].filter(e => e.source_type !== 'office_notice');
+    }
     removedCount += before - data[key].length;
     // 曜日をカレンダーデータで上書き
     data[key].forEach(ev => {

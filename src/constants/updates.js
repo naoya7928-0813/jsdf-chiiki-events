@@ -5,6 +5,12 @@
  */
 export const UPDATE_NOTES = [
   {
+    date:    '2026-06-11',
+    version: '1.14.24',
+    type:    'fix',
+    content: '過去のイベントが今年の日付で表示される問題、イベント名の乱れ（余計な文字・案内文の混入）、同じイベントの重複表示を修正',
+  },
+  {
     date:    '2026-06-10',
     version: '1.14.23',
     type:    'fix',

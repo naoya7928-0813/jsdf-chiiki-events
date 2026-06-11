@@ -1,0 +1,96 @@
+'use strict';
+
+/**
+ * titleQuality.cjs のテスト
+ * 実行: node --test shared/*.test.cjs（npm test）
+ */
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const {
+  cleanEventTitle, isJunkOrStubTitle, isStaleDatedEvent, dedupEvents,
+} = require('./titleQuality.cjs');
+
+test('cleanEventTitle: 先頭・末尾のゴミを整形する', () => {
+  assert.equal(cleanEventTitle('# 海上自衛隊'), '海上自衛隊');
+  assert.equal(cleanEventTitle('&自衛隊フリースペースイベント'), '自衛隊フリースペースイベント');
+  assert.equal(cleanEventTitle('NEW6/14&7/11 自衛隊フリースペースイベント'), '自衛隊フリースペースイベント');
+  assert.equal(cleanEventTitle('1オンライン説明会'), 'オンライン説明会');
+  assert.equal(
+    cleanEventTitle('自衛隊体験道東フェスタ航空自衛隊（CH-47J）ヘリコプター帯広上空パノラマフライト！！参加費 無料！！'),
+    '自衛隊体験道東フェスタ航空自衛隊（CH-47J）ヘリコプター帯広上空パノラマフライト！！');
+  // 正規タイトルは変更しない
+  assert.equal(cleanEventTitle('4機関合同就職説明会'), '4機関合同就職説明会');
+  assert.equal(cleanEventTitle('第41回ファミリーコンサート'), '第41回ファミリーコンサート');
+});
+
+test('isJunkOrStubTitle: 不正タイトルを検出する', () => {
+  const junk = [
+    '↑申し込みはこちら↑ 【お問合せ先】自衛隊京都地方協力本部 〒604-8482京',
+    '自衛隊岩手地本イベント',
+    '自衛隊岩手地本イベント（釜石）',
+    '期及び定員',
+    '時期及び定員',
+    '入札公告のご案内 試験艦あすか一般公開（秋田港）予備自衛官訓練日程',
+    '★詳細は以下チラシを参照願います。 ★1dayコースの定員はありませんが、 宿泊コースの定員は30名になります。 ★1d',
+    'イベント参加無料 親子で学ぼう！防災マルシェ かが交流プラザさくら 本イベントに自衛隊ブースを出展・展示などを行います。',
+    '1 R.22〜＃2 R.24',
+  ];
+  for (const t of junk) assert.equal(isJunkOrStubTitle(t), true, `junk扱いのはず: ${t}`);
+});
+
+test('isJunkOrStubTitle: 正規のイベント名は除外しない', () => {
+  const valid = [
+    '自衛官 就職・進学説明会',
+    '公務員・合同説明会',
+    'PREMIUM TOUR 2026',
+    'てんゆう',
+    '県民の日',
+    '自衛隊を「知る」「感じる」',
+    '名取市 警察・消防・自衛隊合同職業説明会',
+    '2026サマーキャンプ参加募集の件',
+  ];
+  for (const t of valid) assert.equal(isJunkOrStubTitle(t), false, `正規のはず: ${t}`);
+});
+
+test('isStaleDatedEvent: 過去年イベントの年ズレ再登録を検出する', () => {
+  assert.equal(isStaleDatedEvent({ date: '2026-10-12', title: '2024 ぎょぎょフェス', url: '' }), true);
+  assert.equal(isStaleDatedEvent({ date: '2026-09-20', title: '佐世保地方隊オータムフェスタ2025', url: '' }), true);
+  assert.equal(isStaleDatedEvent({
+    date: '2026-10-26', title: '水辺の森ワイヤーフェス一般公開',
+    url: 'https://www.mod.go.jp/pco/nagasaki/pdf/event/20241027_mama.pdf',
+  }), true);
+  // 同年・全角年は維持
+  assert.equal(isStaleDatedEvent({ date: '2026-07-25', title: '自衛隊体験フェスタ!! 2026', url: '' }), false);
+  assert.equal(isStaleDatedEvent({ date: '2026-06-14', title: 'サマーコンサート２０２６', url: '' }), false);
+});
+
+test('dedupEvents: 同一イベントは統合し、場所違いの同名イベントは残す', () => {
+  // 場所が片方空 → 統合（情報の多い方を残す）
+  const a = dedupEvents([
+    { date: '2026-08-17', title: 'PREMIUM TOUR 2026', place: '', time: '7:00出発' },
+    { date: '2026-08-17', title: 'PREMIUM TOUR 2026', place: '敦賀地域事務所', time: '7:00出発' },
+  ]);
+  assert.equal(a.length, 1);
+  assert.equal(a[0].place, '敦賀地域事務所');
+
+  // 包含関係（名取の合同説明会の表記ゆれ） → 統合
+  const b = dedupEvents([
+    { date: '2026-06-28', title: '警察・消防・自衛隊合同職業説明会(名取）', place: '' },
+    { date: '2026-06-28', title: '名取市 警察・消防・自衛隊合同職業説明会', place: '' },
+  ]);
+  assert.equal(b.length, 1);
+
+  // 同名・同日でも場所が異なれば別イベントとして残す
+  const c = dedupEvents([
+    { date: '2026-06-20', title: '高等工科学校説明会', place: '平塚地域事務所', time: '10:00～12:00' },
+    { date: '2026-06-20', title: '高等工科学校説明会', place: '相模原地域事務所', time: '10:00～11:00' },
+  ]);
+  assert.equal(c.length, 2);
+
+  // 日付が違えば統合しない
+  const d = dedupEvents([
+    { date: '2026-10-12', title: '島原城大手門市', place: '' },
+    { date: '2026-10-18', title: '島原城大手門市', place: '島原市役所大手広場' },
+  ]);
+  assert.equal(d.length, 2);
+});
