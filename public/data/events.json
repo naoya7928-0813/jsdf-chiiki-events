@@ -356,6 +356,22 @@
       "deadline": null
     },
     {
+      "id": "fs-20260711-youtw",
+      "pref": "fukushima",
+      "date": "2026-07-11",
+      "weekday": "土",
+      "title": "海上自衛隊 護衛艦いかづち 一般公開",
+      "place": "護衛艦いかづち一般公開 いわき市小名浜港３号埠頭 自衛隊車両展示 潮目の駅前 駐車場からシャトルバス運行 災害派遣パネル展示 防衛大学校学生来場 イオンモール小名浜店内",
+      "address": "",
+      "time": "09:00～15:30",
+      "category": "一般公開",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
       "id": "fs-20260727-5f35x",
       "pref": "fukushima",
       "date": "2026-07-27",
@@ -1068,7 +1084,7 @@
       "title": "三燕祭（三条市立大学学園祭）",
       "place": "三条市立大学",
       "address": "",
-      "time": "09:00～16:00",
+      "time": "09:00～15:00",
       "category": "採用イベント",
       "tag": "",
       "url": "",
@@ -1100,7 +1116,7 @@
       "title": "五十六＆継之助まつり",
       "place": "長岡駅前歩行者天国道路",
       "address": "",
-      "time": "13:00～16:00",
+      "time": "10:30～16:00",
       "category": "地域参加",
       "tag": "",
       "url": "",
@@ -1116,7 +1132,7 @@
       "title": "えんま市",
       "place": "柏崎市駅前2丁目2－3",
       "address": "",
-      "time": "10:00～18:00",
+      "time": "13:00～19:00",
       "category": "広報活動",
       "tag": "",
       "url": "",
@@ -2864,6 +2880,23 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html"
+    },
+    {
+      "id": "mi-office-20260612-e110y",
+      "pref": "mie",
+      "date": "2026-06-12",
+      "weekday": "金",
+      "title": "イベント情報 NEW＼ 高等工科学校説明会🏫",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "学生向け",
+      "url": "https://www.mod.go.jp/pco/mie/post-9308/",
+      "notes": "掲載元: 四日市出張所・伊勢地域事務所・松阪地域事務所 ほか2拠点",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html"
     }
   ],
   "shiga": [],
@@ -3233,6 +3266,23 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_ocr"
+    },
+    {
+      "id": "os-office-20260627-y55ip",
+      "pref": "osaka",
+      "date": "2026-06-27",
+      "weekday": "土",
+      "title": "体験型説明会 in 信太山駐屯地",
+      "place": "岸和田地域事務所",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/osaka/experience/experience.html#ex01",
+      "notes": "掲載元: 岸和田地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html"
     }
   ],
   "hyogo": [
@@ -3989,7 +4039,7 @@
       "title": "公務員合同就職フェス",
       "place": "熊本城ホール1階 展示ホール",
       "address": "",
-      "time": "13時00分～16時00分",
+      "time": "13時00分～16時30分",
       "category": "採用イベント",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/kumamoto/event/index.html",
@@ -4019,6 +4069,24 @@
   ],
   "miyazaki": [],
   "kagoshima": [],
-  "okinawa": [],
-  "updatedAt": "2026/06/12 10:23"
+  "okinawa": [
+    {
+      "id": "ok-office-20260612-cv6x6",
+      "pref": "okinawa",
+      "date": "2026-06-12",
+      "weekday": "金",
+      "title": "イベント情報 三自衛隊統一募集広報申込みリンク",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "要予約",
+      "url": "https://www.mod.go.jp/pco/okinawa/#",
+      "notes": "掲載元: 那覇募集案内所・沖縄地域事務所・名護地域事務所 ほか2拠点",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html"
+    }
+  ],
+  "updatedAt": "2026/06/12 17:22"
 }
