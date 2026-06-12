@@ -31,6 +31,7 @@ function cleanEventTitle(raw) {
   t = t.replace(/^\d\s*(?=[ァ-ヶ])/, '');          // 「1オンライン説明会」等のページ番号残骸
   t = t.replace(/\s*参加費\s*無料[!！]*$/, '');    // 末尾の宣伝文句
   t = t.replace(/[\u{1F000}-\u{1FAFF}\u{2700}-\u{27BF}\u{FE0F}\u{1F3FB}-\u{1F3FF}]+\s*$/u, ''); // 末尾の絵文字
+  t = t.replace(/[（(]\s*[）)]\s*$/, '');         // 末尾の空括弧「（）」
   t = t.trim();
   // 案内所・事務所名だけのタイトルは説明会イベント（会場名がタイトル化したもの）
   // なので、イベント種別が分かる形に補う（例: 京都の説明会一覧）
@@ -51,7 +52,8 @@ function isJunkOrStubTitle(title) {
   if (/【?お問合せ|お問い合わせ先/.test(t))     return true; // 「【お問合せ先】」
   if (/〒\s*\d/.test(t))                       return true; // 郵便番号（住所混入）
   if (/\d{2,4}[-－]\d{3,4}[-－]\d{4}/.test(t)) return true; // 電話番号
-  if (/及び定員|提出書類|応募方法|様式第/.test(t)) return true; // 様式・フォームの項目断片
+  if (/及び定員|提出書類|応募方法|様式第|試験期日/.test(t)) return true; // 様式・フォームの項目断片
+  if (/タイトル不明/.test(t))                  return true; // OCRフォールバックの残骸
   if (/入札公告|オープンカウンター|実施要領|仕様書/.test(t)) return true; // 調達・契約文書（イベントではない）
   if (/チラシを参照|参照願います/.test(t))      return true; // 注記文の混入
   // リンク文言の単独タイトル（「ダウンロード」「こちら」等）

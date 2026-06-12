@@ -6,6 +6,12 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-06-12',
+    version: '1.14.29',
+    type:    'fix',
+    content: '西日本の地本イベントを拡充・イベント名の表示を調整',
+  },
+  {
+    date:    '2026-06-12',
     version: '1.14.28',
     type:    'fix',
     content: 'イベント名の乱れ（部隊名のみ・スタブ表示）が再発しないよう修正を恒久化',
