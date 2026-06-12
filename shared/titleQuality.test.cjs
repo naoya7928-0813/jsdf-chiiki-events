@@ -36,7 +36,13 @@ test('applyVerifiedOverrides: チラシ照合済みの修正がURLで適用さ�
 
 test('isJunkOrStubTitle: 部隊名のみ・助詞終わりの断片を除外する', () => {
   const junk = ['海上自衛隊', '自衛隊仙台病院', '航空自衛隊秋田救難隊', '陸上自衛隊', '自衛隊', '最新の', '入隊式について、',
-    '募集案内所イベント', 'イベント', '地域事務所イベント'];
+    '募集案内所イベント', 'イベント', '地域事務所イベント',
+    // 2026-06-12 に検出した新パターン
+    'ダウンロード',
+    '主催:防衛省自衛隊愛知地方協力本部',
+    '開催場所:海上自衛隧舞鹤基地（京都府舞鹤市）',
+    '陸上自衛隊 オープンカウンター方式実施要領',
+    '三自衛隊統一募集広報申込みリンク'];
   for (const t of junk) assert.equal(isJunkOrStubTitle(t), true, `junk扱いのはず: ${t}`);
   // イベント種別を含む正規タイトルは除外しない
   const valid = [
@@ -68,9 +74,15 @@ test('cleanEventTitle: 先頭・末尾のゴミを整形する', () => {
   assert.equal(
     cleanEventTitle('自衛隊体験道東フェスタ航空自衛隊（CH-47J）ヘリコプター帯広上空パノラマフライト！！参加費 無料！！'),
     '自衛隊体験道東フェスタ航空自衛隊（CH-47J）ヘリコプター帯広上空パノラマフライト！！');
+  // 見出し残骸・絵文字（2026-06-12 三重で検出）
+  assert.equal(cleanEventTitle('イベント情報 NEW＼ 高等工科学校説明会🏫'), '高等工科学校説明会');
+  // 案内所名のみ → 説明会イベントとして補完（京都）
+  assert.equal(cleanEventTitle('京都募集案内所'), '自衛隊説明会（京都募集案内所）');
+  assert.equal(cleanEventTitle('河原町募集案内所'), '自衛隊説明会（河原町募集案内所）');
   // 正規タイトルは変更しない
   assert.equal(cleanEventTitle('4機関合同就職説明会'), '4機関合同就職説明会');
   assert.equal(cleanEventTitle('第41回ファミリーコンサート'), '第41回ファミリーコンサート');
+  assert.equal(cleanEventTitle('自衛隊説明会（ハローワーク伏見）'), '自衛隊説明会（ハローワーク伏見）');
 });
 
 test('isJunkOrStubTitle: 不正タイトルを検出する', () => {
