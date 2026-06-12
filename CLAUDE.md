@@ -137,6 +137,21 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - **テーマ**: CSS 変数 `var(--bg)` / `var(--text)` / `var(--card)` / `var(--border)` でライト/ダーク切替
 - **プッシュ通知**: ntfy.sh トピック `jsdf-chiiki-events-7928`
 
+## セキュリティ構成（2026-06-13導入）
+
+通常の閲覧は誰でも可能。**書き込み経路のみ**を以下で保護している。新しいAPIを追加する際は必ず同じ防御（`api/_security.js`）を通すこと。
+
+| 経路 | 防御 |
+|------|------|
+| 静的データ（events.json等） | GitHub push権限 + Vercelトークンのみ。**masterはブランチ保護**（force-push・削除禁止） |
+| `/api/subscribe`（購読の登録/解除） | オリジン検証（自サイトのみ。CORS「*」廃止）＋ push endpoint のURL検証（正規プッシュサービスのみ）＋ 保存フィールド限定 ＋ IPレートリミット（20回/10分） |
+| `/api/notify`（通知送信） | `NOTIFY_SECRET`（**タイミングセーフ比較**）＋ IPレートリミット（10回/10分） |
+| 全ページ | セキュリティヘッダ（nosniff / X-Frame-Options DENY / Referrer-Policy / Permissions-Policy / HSTS）を vercel.json で付与 |
+| バグ報告フォーム | ntfy.sh の公開トピック（管理者通知のみ・データ書き換え不可）。スパムは許容リスク |
+
+- レートリミットは Upstash Redis（既存のKV）の INCR+TTL。Redis障害時はブロックしない（可用性優先）
+- 本番URLを変更（独自ドメイン化等）したら `api/_security.js` の `ALLOWED_ORIGINS` を更新すること
+
 ## エラー発生時の対処ガイド
 
 エラーの種類ごとの診断・修正手順。**いずれの場合も、データの修正は必ず一次ソース照合（上記必須手順）を踏むこと。**

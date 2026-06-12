@@ -8,6 +8,7 @@ on:
     paths:
       - 'src/**'
       - 'public/**'
+      - 'api/**'
       - 'scripts/**'
       - 'index.html'
       - 'vite.config.js'

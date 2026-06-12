@@ -2,7 +2,9 @@
 // Body: { secret: string, title: string, body: string, url?: string }
 // NOTIFY_SECRET 環境変数と一致した場合のみ全購読者にプッシュ通知を送信する
 import webpush from 'web-push';
+import { timingSafeEqual } from 'node:crypto';
 import { Redis } from '@upstash/redis';
+import { rateLimit } from './_security.js';
 
 const redis = new Redis({
   url:   process.env.KV_REST_API_URL,
@@ -10,14 +12,24 @@ const redis = new Redis({
 });
 const KEY   = 'push:subscriptions';
 
+/** タイミング攻撃に耐性のあるシークレット比較 */
+function secretMatches(input, expected) {
+  if (typeof input !== 'string' || typeof expected !== 'string' || !expected) return false;
+  const a = Buffer.from(input);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // ── 認証チェック ──────────────────────────────────────────
+  // ── 認証チェック（総当たり抑止のレートリミット付き） ──────────
+  if (!await rateLimit(req, res, 'notify', 10, 600)) return; // 10回/10分/IP
   const secret = req.headers['x-notify-secret'] || req.body?.secret;
-  if (!secret || secret !== process.env.NOTIFY_SECRET) {
+  if (!secretMatches(secret, process.env.NOTIFY_SECRET)) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
