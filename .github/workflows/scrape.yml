@@ -10,6 +10,15 @@ on:
 
   # GitHub Actions の UI から手動実行も可能
   workflow_dispatch:
+    inputs:
+      hq_explore_prefs:
+        description: 'HQ探索を行う地本（カンマ区切りpref。例: kagawa,ehime,fukuoka）。未指定なら通常のローテーション'
+        required: false
+        default: ''
+      hq_explore_timeout_min:
+        description: 'HQ探索の時間上限（分）。未指定なら25分'
+        required: false
+        default: ''
 
 jobs:
   scrape:
@@ -89,6 +98,8 @@ jobs:
           OCR_SPACE_API_KEY: ${{ secrets.OCR_SPACE_API_KEY }}
           SITE_URL:         ${{ secrets.SITE_URL }}
           NOTIFY_SECRET:    ${{ secrets.NOTIFY_SECRET }}
+          HQ_EXPLORE_PREFS:       ${{ github.event.inputs.hq_explore_prefs || '' }}
+          HQ_EXPLORE_TIMEOUT_MIN: ${{ github.event.inputs.hq_explore_timeout_min || '' }}
 
       # ── データ健全性チェック（スクレイプ成功でも取得結果が異常なら警告）──
       - name: データ健全性チェック

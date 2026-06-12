@@ -3107,11 +3107,11 @@ async function crawlKantoOffices(withFreshContext) {
 async function scrapeOfficeAssets(withFreshContext) {
   if (!await hasAnyOcrEngine()) {
     console.log('[OfficeOCR] 利用可能なOCRエンジンがないためスキップ');
-    return [];
+    return { events: [], exploredHqPrefs: new Set() };
   }
   if (!withFreshContext) {
     console.log('[OfficeOCR] Playwright コンテキスト未提供（モックモード）のためスキップ');
-    return [];
+    return { events: [], exploredHqPrefs: new Set() };
   }
 
   // ── offices.json から地本HQ情報とURL→prefマップを構築 ──────────
@@ -3135,19 +3135,30 @@ async function scrapeOfficeAssets(withFreshContext) {
   const todayJST  = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
   const allEvents = [];
   const exploredPages = new Set(); // このrun内で訪問済み
+  const exploredHqPrefs = new Set(); // このrunで実際にHQ探索した地本（前回データ維持の判定用）
 
   // ── 各地本HQから1レベル自動探索（タイムアウト対策で上限あり） ──────
   const MAX_PAGES_PER_HQ  = 4; // 1地本あたり最大探索ページ数（東京は9件あるため4に拡張）
   const MAX_ASSETS_PER_PAGE = 3; // 1ページあたり最大OCRアセット数
-  const EXPLORE_TIMEOUT_MS  = 25 * 60 * 1000; // 全探索25分上限
+  // 時間上限は HQ_EXPLORE_TIMEOUT_MIN（分）で上書き可能（手動の補完実行用）
+  const timeoutMin = Number.parseFloat(process.env.HQ_EXPLORE_TIMEOUT_MIN || '');
+  const EXPLORE_TIMEOUT_MS = (Number.isFinite(timeoutMin) ? timeoutMin : 25) * 60 * 1000;
   const exploreStart = Date.now();
 
-  // 時間上限内で全地本を回りきれないため、開始位置を実行ごとにローテーションする。
-  // 固定順（北→南）だと毎回同じ地点で打ち切られ、西日本のHQが一度も探索されない。
-  // 8時間ごとに開始位置を17ずつ進める（17は50と互いに素）ことで、
-  // 1日3回の定期実行で全50地本がその日のうちに必ず1回は探索される。
-  if (hqEntries.length > 1) {
-    const offset = (Math.floor(Date.now() / (8 * 3600 * 1000)) * 17) % hqEntries.length;
+  // HQ_EXPLORE_PREFS（カンマ区切りpref）指定時は対象地本を限定（取りこぼしの補完実行用）
+  const onlyPrefs = (process.env.HQ_EXPLORE_PREFS || '').split(',').map(s => s.trim()).filter(Boolean);
+  if (onlyPrefs.length) {
+    hqEntries = hqEntries.filter(h => onlyPrefs.includes(h.pref));
+    console.log(`[OfficeOCR] HQ_EXPLORE_PREFS 指定により ${hqEntries.length} 地本に限定: ${hqEntries.map(h => h.pref).join(',')}`);
+  } else if (hqEntries.length > 1) {
+    // 時間上限内で全地本を回りきれないため、開始位置を実行ごとにローテーションする。
+    // 固定順（北→南）だと毎回同じ地点で打ち切られ、西日本のHQが一度も探索されない。
+    // GitHub Actions では実行ごとに増える GITHUB_RUN_NUMBER を使い17ずつ進める
+    // （17は50と互いに素 → 1日3回で全50地本をカバー。cron遅延でも衝突しない）。
+    // ローカル等では8時間窓ベースにフォールバック。
+    const runSeq = Number.parseInt(process.env.GITHUB_RUN_NUMBER || '', 10);
+    const base   = Number.isFinite(runSeq) ? runSeq : Math.floor(Date.now() / (8 * 3600 * 1000));
+    const offset = (base * 17) % hqEntries.length;
     hqEntries = [...hqEntries.slice(offset), ...hqEntries.slice(0, offset)];
     console.log(`[OfficeOCR] HQ探索の開始位置: ${offset}番目（${hqEntries[0].name}）から`);
   }
@@ -3162,6 +3173,7 @@ async function scrapeOfficeAssets(withFreshContext) {
     // Playwright ステルスコンテキストで地本トップページを取得
     const $ = await withFreshContext(ctx => fetchPagePlaywright(ctx, hq.url));
     if (!$) { await sleep(BETWEEN_PAGES_MS); continue; }
+    exploredHqPrefs.add(hq.pref);
 
     // イベント系リンクを分類（HTMLページ / PDF・画像の直接リンク）
     const skip                    = new Set([...alreadyScraped, ...exploredPages]);
@@ -3282,7 +3294,7 @@ async function scrapeOfficeAssets(withFreshContext) {
   }
 
   console.log(`[OfficeOCR] 合計 ${allEvents.length} 件（OCR成功 + 公式ページ参照スタブ含む）`);
-  return allEvents;
+  return { events: allEvents, exploredHqPrefs };
 }
 
 // ── メイン処理 ───────────────────────────────────────────────
@@ -3355,6 +3367,7 @@ async function main() {
   let kagoshimaEvents = [];
   let okinawaEvents   = [];
   let officeEvents    = [];
+  let hqExploredPrefs = new Set(); // このrunでHQ探索した地本（未探索地本は前回officeイベントを維持）
   let kantoOfficeEvents = [];
   let sapporoError   = false;
   let asahikawaError = false;
@@ -3935,7 +3948,9 @@ async function main() {
     // ── 募集案内所ページから PDF/画像 OCR でイベントを収集 ────────
     // browser.close() の前に呼ぶ必要あり（Playwright が必要なため）
     console.log('[wait] 募集案内所探索を開始します...');
-    officeEvents = await scrapeOfficeAssets(withFreshContext);
+    const officeScrape = await scrapeOfficeAssets(withFreshContext);
+    officeEvents    = officeScrape.events;
+    hqExploredPrefs = officeScrape.exploredHqPrefs;
     try {
       officeEvents = [
         ...officeEvents,
@@ -3976,6 +3991,29 @@ async function main() {
   // エラーになった地本は既存 events.json のデータを引き継ぐ（空配列で上書きしない）
   let prev = {};
   try { prev = JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8')); } catch { /* ファイル未存在は無視 */ }
+
+  // ── HQ探索ローテーションの補完 ──────────────────────────────
+  // HQ探索は時間上限のためローテーション制（1runで全地本は回らない）。
+  // 今回HQを探索しなかった地本は、前回の office イベント（office_notice除く）を
+  // 維持して「探索された回だけイベントが現れる」ちらつきを防ぐ。
+  // 過去日付・不正タイトルは writeOutput の最終フィルタで除外される。
+  {
+    const officeIds = new Set([...officeEvents, ...kantoOfficeEvents].map(e => e.id));
+    let kept = 0;
+    for (const [key, arr] of Object.entries(prev)) {
+      if (!Array.isArray(arr)) continue;
+      if (hqExploredPrefs.has(key)) continue; // 今回探索済み → 最新の巡回結果が正
+      for (const e of arr) {
+        const st = e.source_type || '';
+        if (!st.startsWith('office_') || st === 'office_notice') continue;
+        if (!e.date || !e.id || officeIds.has(e.id)) continue;
+        officeEvents.push(e);
+        officeIds.add(e.id);
+        kept++;
+      }
+    }
+    if (kept) console.log(`[OfficeOCR] HQ未探索地本の前回officeイベント ${kept} 件を維持`);
+  }
 
   const fallback = (flag, label, events, key) => {
     if (!flag) return events;
