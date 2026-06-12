@@ -52,8 +52,12 @@ function isJunkOrStubTitle(title) {
   if (/【?お問合せ|お問い合わせ先/.test(t))     return true; // 「【お問合せ先】」
   if (/〒\s*\d/.test(t))                       return true; // 郵便番号（住所混入）
   if (/\d{2,4}[-－]\d{3,4}[-－]\d{4}/.test(t)) return true; // 電話番号
-  if (/及び定員|提出書類|応募方法|様式第|試験期日/.test(t)) return true; // 様式・フォームの項目断片
+  if (/及び定員|提出書類|応募方法|様式第|試験期日|受験案内/.test(t)) return true; // 様式・受験案内の断片
   if (/タイトル不明/.test(t))                  return true; // OCRフォールバックの残骸
+  // 募集種目名のみ（受験案内PDFのOCR。例:「一般曹候補生」「幹部候補生・幹部候補曹」）
+  if (/^(?:一般曹候補生|自衛官候補生|幹部候補生|予備自衛官補?|医科・?歯科幹部|技術曹|貸費学生)(?:[・,、][一-鿿ァ-ヶa-zA-Z・]{0,15})?$/.test(t)) return true;
+  // 住所の混入（「○丁目35-8」等。県名なしの「德島市…」形式は従来の住所ルールを素通りした）
+  if (/丁目[\d０-９]{1,3}[-－‐][\d０-９]/.test(t)) return true;
   if (/入札公告|オープンカウンター|実施要領|仕様書/.test(t)) return true; // 調達・契約文書（イベントではない）
   if (/チラシを参照|参照願います/.test(t))      return true; // 注記文の混入
   // リンク文言の単独タイトル（「ダウンロード」「こちら」等）
@@ -61,8 +65,8 @@ function isJunkOrStubTitle(title) {
   if (/申込み?リンク|応募リンク|広報申込み/.test(t)) return true; // リンク案内の混入
   // ラベル行がタイトル化（「主催:○○」「開催場所:○○」等）
   if (/^(?:主催|共催|開催場所|場所|会場|日時|日程|お問合せ先?)\s*[:：]/.test(t)) return true;
-  // OCR文字化け（簡体字・置換文字。例:「海上自衛隧舞鹤基地」）
-  if (/[队乐贝实团济纪记书译录习场隧鹤舰护]|�/.test(t)) return true;
+  // OCR文字化け（簡体字・置換文字。例:「海上自衛隧舞鹤基地」「四国大学交流亏」）
+  if (/[队乐贝实团济纪记书译录习场隧鹤舰护亏]|�/.test(t)) return true;
   if (/。/.test(t) && t.length >= 30)          return true; // 文章がタイトル化（案内文の混入）
   // 「自衛隊○○地本イベント」「募集案内所イベント」等の中身なしスタブ
   if (/^(?:自衛隊)?(?:.{0,6}地本|募集案内所|地域事務所|出張所)?イベント(?:\s*（[^）]*）)?$/.test(t)) return true;
@@ -97,11 +101,14 @@ function isStaleDatedEvent(ev) {
   return false;
 }
 
-/** 重複判定用の正規化（括弧内・空白・記号を除去） */
+/** 重複判定用の正規化（括弧内・空白・記号・軍種プレフィックスを除去） */
 function normForDedup(s) {
   let t = toHalfAlnum(s);
   t = t.replace(/[（(][^）)]*[）)]/g, '');
   t = t.replace(/[\s　・|｜/／&＆!！?？.。、,，:：~〜～\-－]/g, '');
+  // 「陸上自衛隊体験型説明会in陸上自衛隊信太山駐屯地」と「体験型説明会in信太山駐屯地」
+  // のような軍種名の有無による表記ゆれを同一視する
+  t = t.replace(/陸上自衛隊|海上自衛隊|航空自衛隊|自衛隊/g, '');
   return t;
 }
 
@@ -123,7 +130,7 @@ function dedupEvents(list) {
       const k = kept[i];
       if (k.ev.date !== ev.date) continue;
       const sameTitle = k.n === n && n.length > 0;
-      const contained = !sameTitle && k.n.length >= 10 && n.length >= 10
+      const contained = !sameTitle && k.n.length >= 8 && n.length >= 8
         && (k.n.includes(n) || n.includes(k.n));
       if (!sameTitle && !contained) continue;
       const pk = normForDedup(k.ev.place || '');
@@ -176,6 +183,9 @@ const VERIFIED_OVERRIDES = [
   { urlIncludes: '2026taikenfes.pdf',      set: { endDate: '2026-07-27' } }, // 函館 7/25-27
   { urlIncludes: '202608premium-tour.pdf', set: { endDate: '2026-08-19' } }, // 福井 8/17-19
   { urlIncludes: '0627-27_josei.jpg',      set: { endDate: '2026-06-27' } }, // 東京 6/26-27
+  // 徳島: OCRが場所行を文字化けタイトル化（チラシ: 官公庁合同公務員職業説明会 7/4 四国大学交流プラザ）
+  { urlIncludes: 'setumei/setumei02.pdf',
+    set: { title: '官公庁合同 公務員職業説明会', place: '四国大学交流プラザ（徳島市）', time: '13:00～16:40', category: '説明会' } },
 ];
 
 /** イベントに検証済み修正を適用する（writeOutput から毎回呼ばれる） */

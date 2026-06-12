@@ -5,6 +5,12 @@
  */
 export const UPDATE_NOTES = [
   {
+    date:    '2026-06-13',
+    version: '1.14.30',
+    type:    'fix',
+    content: 'イベント名の表示を調整（文字化け・重複表示の修正）',
+  },
+  {
     date:    '2026-06-12',
     version: '1.14.29',
     type:    'fix',

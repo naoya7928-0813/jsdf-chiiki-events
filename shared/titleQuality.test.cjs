@@ -44,7 +44,11 @@ test('isJunkOrStubTitle: 部隊名のみ・助詞終わりの断片を除外す�
     '陸上自衛隊 オープンカウンター方式実施要領',
     '三自衛隊統一募集広報申込みリンク',
     '1 試験期日',
-    'タイトル不明)'];
+    'タイトル不明)',
+    // 2026-06-13 に検出した新パターン
+    '四国大学交流亏德島市寺島本町2丁目35-8',
+    '一般曹候補生',
+    '幹部候補生・幹部候補曹'];
   for (const t of junk) assert.equal(isJunkOrStubTitle(t), true, `junk扱いのはず: ${t}`);
   // イベント種別を含む正規タイトルは除外しない
   const valid = [
@@ -157,4 +161,19 @@ test('dedupEvents: 同一イベントは統合し、場所違いの同名イベ�
     { date: '2026-10-18', title: '島原城大手門市', place: '島原市役所大手広場' },
   ]);
   assert.equal(d.length, 2);
+
+  // 軍種名の有無による表記ゆれ（大阪 6/27）→ 統合
+  const e = dedupEvents([
+    { date: '2026-06-27', title: '陸上自衛隊体験型説明会 in 陸上自衛隊信太山駐屯地', place: '' },
+    { date: '2026-06-27', title: '体験型説明会 in 信太山駐屯地', place: '岸和田地域事務所' },
+  ]);
+  assert.equal(e.length, 1);
+
+  // 学校名の省略による包含（岡山 7/5）→ 統合
+  const f = dedupEvents([
+    { date: '2026-07-05', title: '陸上自衛隊 高等工科学校 オンライン説明会', place: '' },
+    { date: '2026-07-05', title: 'オンライン説明会', place: '' },
+  ]);
+  assert.equal(f.length, 1);
+  assert.equal(f[0].title, '陸上自衛隊 高等工科学校 オンライン説明会');
 });
