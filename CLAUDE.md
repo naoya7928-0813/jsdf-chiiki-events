@@ -78,6 +78,29 @@ OCRの優先順は、無料ローカルOCR（Tesseract → RapidOCR）を先に�
 - **TTL**: 90 日（`assetCache.js` の `TTL_DAYS`）。期限切れエントリは `load()` / `save()` 時に自動破棄。
 - 新しくアセットを取得する処理を書く場合は、必ず `downloadFile()` → ハッシュ照合 → `assetCache` 経由とし、生の `fetch` で PDF/画像を毎回取得し直す実装を追加しないこと。
 
+## 運営方針：データ反映の必須フロー
+
+イベントデータは必ず次の順で処理する。**文字の整形を飛ばしてサイトカードに反映することは禁止。**
+
+```
+1. スクレイピング（定期 or 手動）
+       ↓
+2. 文字の整形【必須】 … shared/titleQuality.cjs
+   - applyVerifiedOverrides（チラシ照合済み修正）
+   - cleanEventTitle / cleanPlaceText（ゴミ除去・補完）
+   - isJunkOrStubTitle / isStaleDatedEvent（不正・年ズレ除外）
+   - dedupEvents（重複統合）
+   ※ writeOutput が自動適用する。手動で events.json を触る場合も
+     必ず同じ titleQuality パイプラインを通すこと
+       ↓
+3. 品質チェック … scripts/check-event-titles.mjs（CI でも自動実行）
+       ↓
+4. サイトカードへ反映（commit → 自動デプロイ）
+```
+
+- 過去に「整形なし反映」でイベント名が住所・部隊名のみ・リンク文言になる事故が繰り返し発生している。新しい取得経路・パーサーを追加するときも、必ず writeOutput（＝titleQuality適用後）を通る経路にすること。
+- 古いコミットでチェックアウトされた定期実行が旧ルールで出力することがある。スクレイプ後の確認時はデータの生成元コミット（`gh run view <id> --json headSha`）も確認する。
+
 ## スクレイプ後の品質チェック（必須）
 
 スクレイピング実行後（手動・定期問わず）は、**必ずイベント名の全件チェックを行う**こと。
