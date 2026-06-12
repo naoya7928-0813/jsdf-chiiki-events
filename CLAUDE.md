@@ -98,6 +98,9 @@ OCRの優先順は、無料ローカルOCR（Tesseract → RapidOCR）を先に�
 2. 画像を目視し、登録データ（タイトル・日付・年号・場所・複数日開催）と突き合わせる
 3. 典型的なOCR誤り: 脱字（「てんりゅう」→「てんゆう」）、チラシ最上部の部隊名だけ拾う（「海上自衛隊」のみ等）、名称後半の欠落、ファイル名からの場所誤推定、複数日開催の終了日漏れ
 
+### ⚠️ events.json の直接修正は再発する（必ずオーバーライドに登録）
+OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続けるため、**events.json を直接修正しても次のスクレイプで同じ誤りが再生成される**（2026-06-12に実際に再発）。チラシ照合で確定した修正は `shared/titleQuality.cjs` の **`VERIFIED_OVERRIDES`** に登録すること（URLの固有部分＋必要なら日付でマッチ → writeOutput が毎回適用）。同じPDF URLを複数イベントが誤共有することがあるため、タイトル書き換えは日付スコープを推奨。
+
 ### 防御の仕組み（titleQuality）
 - イベント名の整形・不正判定・年ズレ判定・重複統合は **`shared/titleQuality.cjs` に集約**されている（`cleanEventTitle` / `isJunkOrStubTitle` / `isStaleDatedEvent` / `dedupEvents`）
 - タイトルは複数経路（HTMLパーサー / OCR / 事務所巡回 / 前回データ維持）で生成されるため、**個別パーサーではなく `writeOutput` の最終フィルタで経路非依存に防御**する設計

@@ -33,8 +33,8 @@ const { extractAssets }   = require('./lib/extractAssets');
 const { findEventLinks }  = require('./lib/exploreLinks');
 // 募集案内所イベントのタイトル整形・非イベント判定（フロント/スクリプトと共通）
 const { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } = require('../shared/officeTitle.cjs');
-// イベント名の品質管理（整形・junk判定・年ズレ判定・重複統合）。最終出力の防御に使う
-const { cleanEventTitle, cleanPlaceText, isJunkOrStubTitle, isStaleDatedEvent, dedupEvents } = require('../shared/titleQuality.cjs');
+// イベント名の品質管理（検証済み修正・整形・junk判定・年ズレ判定・重複統合）。最終出力の防御に使う
+const { applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, isJunkOrStubTitle, isStaleDatedEvent, dedupEvents } = require('../shared/titleQuality.cjs');
 
 const { chromium } = require('playwright-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
@@ -4243,12 +4243,15 @@ function writeOutput(data) {
   for (const key of Object.keys(data)) {
     if (!Array.isArray(data[key])) continue;
     const before = data[key].length;
-    // 先頭・末尾のゴミ（#・&・NEW日付・宣伝文句等）と場所欄を整形してから検査
-    data[key] = data[key].map(ev => ({
-      ...ev,
-      title: cleanEventTitle(ev.title),
-      place: cleanPlaceText(ev.place),
-    }));
+    // チラシ照合済みの修正を適用 → 先頭・末尾のゴミと場所欄を整形してから検査
+    data[key] = data[key].map(ev => {
+      const fixed = applyVerifiedOverrides(ev);
+      return {
+        ...fixed,
+        title: cleanEventTitle(fixed.title),
+        place: cleanPlaceText(fixed.place),
+      };
+    });
     data[key] = data[key].filter(ev => {
       if (!ev.date) return false;
       if ((ev.endDate || ev.date) < today) return false;

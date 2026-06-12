@@ -47,8 +47,14 @@ function isJunkOrStubTitle(title) {
   if (/入札公告/.test(t))                      return true; // 調達情報（イベントではない）
   if (/チラシを参照|参照願います/.test(t))      return true; // 注記文の混入
   if (/。/.test(t) && t.length >= 30)          return true; // 文章がタイトル化（案内文の混入）
-  // 「自衛隊○○地本イベント」「○○地本イベント（場所）」等の中身なしスタブ
-  if (/^(?:自衛隊)?.{0,6}地本イベント(?:\s*（[^）]*）)?$/.test(t)) return true;
+  // 「自衛隊○○地本イベント」「募集案内所イベント」等の中身なしスタブ
+  if (/^(?:自衛隊)?(?:.{0,6}地本|募集案内所|地域事務所|出張所)?イベント(?:\s*（[^）]*）)?$/.test(t)) return true;
+  // 部隊・組織名だけでイベント種別（見学・説明会等）が無いタイトル
+  // （OCRがチラシ最上部の部隊名だけを拾ったもの。例:「海上自衛隊」「自衛隊仙台病院」）
+  // ※ 実在イベントの場合は VERIFIED_OVERRIDES でチラシ照合済みの正式名を登録して救済する
+  if (/^(?:陸上|海上|航空)?自衛隊(?:[一-鿿ァ-ヶー]{2,8}(?:病院|救難隊|音楽隊|基地|部隊|駐屯地))?$/.test(t)) return true;
+  // 助詞・読点で終わる文の断片（タイトルの途中切れ。例:「最新の」「○○について、」）
+  if (/[をがはにへとの、]$/.test(t))           return true;
   // 日本語がほぼ無い断片（例:「1 R.22〜＃2 R.24」）。英語タイトルは許容
   const jp = (t.match(/[぀-ヿ㐀-䶿一-鿿]/g) || []).length;
   if (jp < 3 && !/[A-Za-z]{4,}/.test(t))       return true;
@@ -117,6 +123,58 @@ function dedupEvents(list) {
 }
 
 /**
+ * チラシ実物との目視照合で確定した修正の恒久登録テーブル。
+ *
+ * OCRキャッシュは誤ったタイトルを保持し続けるため、events.json を直接
+ * 修正しても次のスクレイプで再発する。ここに登録すれば writeOutput が
+ * 毎回適用するので再発しない。
+ * 【運用】CIの品質チェックで不正タイトルが検出されたら、必ずチラシ実物
+ * （url/imageUrl のPDF/画像）を目視照合し、正しい値をここに追加すること。
+ * マッチは URL の固有部分（＋必要なら日付）で行う。チラシが差し替わって
+ * URLが変われば自動的に適用されなくなる（新チラシは新規OCRされる）。
+ */
+const VERIFIED_OVERRIDES = [
+  // 新潟: OCRが「てんりゅう」を「てんゆう」と脱字（チラシ: 令和8年7/18-20 新潟西港）
+  { urlIncludes: 'r8.7.18tenryu.pdf',
+    set: { title: '訓練支援艦てんりゅう 一般公開', endDate: '2026-07-20', category: '一般公開' } },
+  // 岩手: チラシ最上部の部隊名/キャッチコピーだけが拾われ「見学」等が欠落
+  { urlIncludes: 'shokubataiken.pdf',
+    set: { title: '自衛隊職場体験（岩手駐屯地）', category: '体験' } },
+  { urlIncludes: 'akitabuntonkichi.pdf',
+    set: { title: '航空自衛隊秋田分屯基地（秋田救難隊）見学', place: '航空自衛隊秋田分屯基地', category: '体験' } },
+  { urlIncludes: '/sendai.pdf',
+    set: { title: '自衛隊仙台病院・東北方面衛生隊見学', category: '体験' } },
+  { urlIncludes: '/hachinohe.pdf',
+    set: { title: '海上自衛隊八戸航空基地見学', category: '体験' } },
+  // 岩手: 1つのPDFに2会場（チラシ: 6/20花巻なはんプラザ・6/27北上市生涯学習センター）。
+  // ファイル名(kitakami)から場所を誤推定していた
+  { urlIncludes: 'kitakami.pdf', date: '2026-06-20', set: { place: 'なはんプラザ（花巻市）' } },
+  { urlIncludes: 'kitakami.pdf', date: '2026-06-27', set: { place: '北上市生涯学習センター' } },
+  // 岡山: チラシ名称の後半が欠落。
+  // ※ 別イベント（6/23 防衛大学校オンライン説明会）が同じPDF URLを誤共有して
+  //   いるため、必ず日付でスコープすること（URLだけだと誤適用する）
+  { urlIncludes: 'bouidai_open.pdf', date: '2026-06-20',
+    set: { title: '防衛医科大学校 OPEN CAMPUS 2026' } },
+  // 複数日開催の終了日（チラシ記載）
+  { urlIncludes: '2026taikenfes.pdf',      set: { endDate: '2026-07-27' } }, // 函館 7/25-27
+  { urlIncludes: '202608premium-tour.pdf', set: { endDate: '2026-08-19' } }, // 福井 8/17-19
+  { urlIncludes: '0627-27_josei.jpg',      set: { endDate: '2026-06-27' } }, // 東京 6/26-27
+];
+
+/** イベントに検証済み修正を適用する（writeOutput から毎回呼ばれる） */
+function applyVerifiedOverrides(ev) {
+  if (!ev) return ev;
+  const u = String(ev.url || '') + ' ' + String(ev.imageUrl || '');
+  let out = ev;
+  for (const o of VERIFIED_OVERRIDES) {
+    if (!u.includes(o.urlIncludes)) continue;
+    if (o.date && ev.date !== o.date) continue;
+    out = { ...out, ...o.set };
+  }
+  return out;
+}
+
+/**
  * 「場所」欄のゴミを整形する。
  * - OCRがMarkdown表で返した「| 会場名 |」のパイプ残骸を除去
  * - 巡回元の事務所リスト（「A事務所・B事務所 ほか1拠点」等）は会場ではないため
@@ -134,6 +192,7 @@ function cleanPlaceText(raw) {
 }
 
 module.exports = {
+  applyVerifiedOverrides,
   cleanEventTitle,
   cleanPlaceText,
   isJunkOrStubTitle,

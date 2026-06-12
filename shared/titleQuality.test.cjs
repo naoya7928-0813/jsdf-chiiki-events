@@ -7,8 +7,47 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
-  cleanEventTitle, cleanPlaceText, isJunkOrStubTitle, isStaleDatedEvent, dedupEvents,
+  applyVerifiedOverrides, cleanEventTitle, cleanPlaceText,
+  isJunkOrStubTitle, isStaleDatedEvent, dedupEvents,
 } = require('./titleQuality.cjs');
+
+test('applyVerifiedOverrides: チラシ照合済みの修正がURLで適用される', () => {
+  // 新潟てんりゅう: タイトル・終了日・カテゴリ
+  const a = applyVerifiedOverrides({
+    date: '2026-07-18', title: 'てんゆう',
+    url: 'https://www.mod.go.jp/pco/niigata/files/event/r8.7.18tenryu.pdf',
+  });
+  assert.equal(a.title, '訓練支援艦てんりゅう 一般公開');
+  assert.equal(a.endDate, '2026-07-20');
+  // 岩手: 部隊名のみ → 正式名
+  const b = applyVerifiedOverrides({
+    date: '2026-08-07', title: '海上自衛隊',
+    url: 'https://www.mod.go.jp/pco/iwate/assets/img/event/until20260807/hachinohe.pdf',
+  });
+  assert.equal(b.title, '海上自衛隊八戸航空基地見学');
+  // 岩手北上PDF: 日付で場所を出し分け
+  const kita = 'https://www.mod.go.jp/pco/iwate/assets/img/event/until20260627/kitakami.pdf';
+  assert.equal(applyVerifiedOverrides({ date: '2026-06-20', title: '公務員・合同説明会', url: kita }).place, 'なはんプラザ（花巻市）');
+  assert.equal(applyVerifiedOverrides({ date: '2026-06-27', title: '公務員・合同説明会', url: kita }).place, '北上市生涯学習センター');
+  // 無関係なURLは変更しない
+  const c = applyVerifiedOverrides({ date: '2026-07-01', title: 'そのまま', url: 'https://example.com/x.pdf' });
+  assert.equal(c.title, 'そのまま');
+});
+
+test('isJunkOrStubTitle: 部隊名のみ・助詞終わりの断片を除外する', () => {
+  const junk = ['海上自衛隊', '自衛隊仙台病院', '航空自衛隊秋田救難隊', '陸上自衛隊', '自衛隊', '最新の', '入隊式について、',
+    '募集案内所イベント', 'イベント', '地域事務所イベント'];
+  for (const t of junk) assert.equal(isJunkOrStubTitle(t), true, `junk扱いのはず: ${t}`);
+  // イベント種別を含む正規タイトルは除外しない
+  const valid = [
+    '海上自衛隊八戸航空基地見学',
+    '海上自衛隊佐世保音楽隊 定例演奏会＜佐賀公演＞',
+    '自衛隊フリースペースイベント',
+    '自衛隊女子会のご案内',
+    '陸上自衛隊体験型説明会 in 陸上自衛隊信太山駐屯地',
+  ];
+  for (const t of valid) assert.equal(isJunkOrStubTitle(t), false, `正規のはず: ${t}`);
+});
 
 test('cleanPlaceText: パイプ残骸の除去と事務所リストの排除', () => {
   assert.equal(cleanPlaceText('| 海上自衛隊八戸航空基地（青森県八戸市高館） |'), '海上自衛隊八戸航空基地（青森県八戸市高館）');

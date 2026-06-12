@@ -5,6 +5,12 @@
  */
 export const UPDATE_NOTES = [
   {
+    date:    '2026-06-12',
+    version: '1.14.28',
+    type:    'fix',
+    content: 'イベント名の乱れ（部隊名のみ・スタブ表示）が再発しないよう修正を恒久化',
+  },
+  {
     date:    '2026-06-11',
     version: '1.14.27',
     type:    'improvement',
