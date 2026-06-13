@@ -15,7 +15,9 @@ export default async function handler(req, res) {
       ? Object.values(all).map(v => (typeof v === 'string' ? JSON.parse(v) : v))
       : [])
       // 下書きは公開しない。status 未設定（旧データ）は公開扱い。
-      .filter(e => e && e.status !== 'draft');
+      .filter(e => e && e.status !== 'draft')
+      // 担当官名など裏側情報は公開しない（createdBy/updatedBy/タイムスタンプを除去）
+      .map(({ createdBy, updatedBy, createdAt, updatedAt, status, ...pub }) => pub);
     return res.status(200).json({ events });
   } catch (err) {
     console.error('[manual-events] redis error', err);

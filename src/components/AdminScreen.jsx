@@ -41,7 +41,7 @@ function toDeadlineStr(d) {
 const miniOut = (c) => ({ fontSize: 11.5, fontWeight: 600, cursor: 'pointer', borderRadius: 7, padding: '5px 10px', color: c, background: 'transparent', border: `1px solid ${c}55` });
 function fmtTime(iso) { try { return new Date(iso).toLocaleString('ja-JP', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Tokyo' }); } catch { return iso || ''; } }
 
-export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn, onAuthChange, initialFilter = 'all' }) {
+export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn, onAuthChange, initialFilter = 'all', initialEditEvent = null }) {
   const { primary } = theme;
   const [auth, setAuth] = useState(() => { try { return JSON.parse(localStorage.getItem(SS_KEY)) || null; } catch { return null; } });
   const [account, setAccount] = useState(null);
@@ -90,6 +90,13 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   }, []);
 
   function applyScope(pref) { if (pref && pref !== '*') setForm(f => ({ ...f, pref })); }
+
+  // 詳細画面から渡された編集対象を、ログイン確認後に一度だけフォームへ読み込む
+  const [editConsumed, setEditConsumed] = useState(false);
+  const [fromDetail, setFromDetail] = useState(false); // 詳細起点の編集（戻る/保存で詳細へ戻す）
+  useEffect(() => {
+    if (account && initialEditEvent && !editConsumed) { startEdit(initialEditEvent); setEditConsumed(true); setFromDetail(true); }
+  }, [account, initialEditEvent, editConsumed]);
 
   async function handleLogin() {
     setAuthErr(''); setBusy(true);
@@ -140,8 +147,10 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         if (form.deadline) patch.deadline = toDeadlineStr(form.deadline);
         const r = await fetch('/api/admin/events', { method: 'PATCH', headers: headers(), body: JSON.stringify({ id: editingId, patch }) });
         const j = await r.json().catch(() => ({}));
-        if (r.ok) { setMsg({ type: 'ok', text: '更新しました（利用者への通知は送りません）。' }); cancelEdit(); loadList(); }
-        else setMsg({ type: 'err', text: j.error || '更新に失敗しました。' });
+        if (r.ok) {
+          if (fromDetail) { onBack?.(); return; } // 詳細起点の編集 → 詳細へ戻す
+          setMsg({ type: 'ok', text: '更新しました（利用者への通知は送りません）。' }); cancelEdit(); loadList();
+        } else setMsg({ type: 'err', text: j.error || '更新に失敗しました。' });
       } else {
         const payload = { ...form, endDate: form.multiDay ? form.endDate : '', time: buildTime(form), deadline: toDeadlineStr(form.deadline) };
         delete payload.multiDay; delete payload.timeStart; delete payload.timeEnd;
@@ -215,7 +224,8 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const showForm = filter !== 'draft' || !!editingId;
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)', fontFamily: F.sans }}>
-      <ScreenHeader primary={primary} title={filter === 'draft' ? '下書き確認' : 'イベント追加・修正'} subtitle="ADMIN" onBack={onBack}
+      <ScreenHeader primary={primary} title={editingId ? '編集' : (filter === 'draft' ? '下書き確認' : 'イベント追加・修正')} subtitle="ADMIN"
+        onBack={(editingId && !fromDetail) ? cancelEdit : onBack}
         trailing={<button onClick={logout} style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', borderRadius: 8, fontSize: 12, padding: '6px 10px', cursor: 'pointer' }}>ログアウト</button>} />
       <div data-admin-scroll style={{ flex: 1, overflowY: 'auto', padding: '16px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 28px)' }}>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>ログイン中: <strong style={{ color: 'var(--text)' }}>{account.label}</strong>（担当: {prefLabel}）</div>
@@ -343,7 +353,8 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
                 <span style={{ fontSize: 10, fontWeight: 700, color: '#fff', background: STATUS_COLOR[ev.status] || '#888', borderRadius: 5, padding: '2px 6px' }}>{STATUS_LABEL[ev.status] || ev.status || '—'}</span>
                 <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 600, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.title}</div>
               </div>
-              <div style={{ fontSize: 11.5, color: 'var(--text-muted)', margin: '4px 0 10px' }}>{(PREFECTURE_INFO[ev.pref]?.label || ev.pref)}・{ev.date}{ev.endDate ? `〜${ev.endDate}` : ''}{ev.place ? `・${ev.place}` : ''}</div>
+              <div style={{ fontSize: 11.5, color: 'var(--text-muted)', margin: '4px 0 2px' }}>{(PREFECTURE_INFO[ev.pref]?.label || ev.pref)}・{ev.date}{ev.endDate ? `〜${ev.endDate}` : ''}{ev.place ? `・${ev.place}` : ''}</div>
+              <div style={{ fontSize: 10.5, color: 'var(--text-muted)', opacity: 0.8, margin: '0 0 10px' }}>担当: 作成 {ev.createdBy || '—'}{ev.updatedBy && ev.updatedBy !== ev.createdBy ? ` / 最終編集 ${ev.updatedBy}` : ''}</div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 <Mini onClick={() => startEdit(ev)} color={primary}>編集</Mini>
                 {ev.status !== 'published' && <Mini onClick={() => setStatus(ev.id, 'published')} color="#16a34a">公開</Mini>}

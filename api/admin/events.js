@@ -156,6 +156,7 @@ export default async function handler(req, res) {
         else { delete ev.endDate; delete ev.endWeekday; }
       }
       ev.updatedAt = new Date().toISOString();
+      ev.updatedBy = account.user;  // 編集した担当官（裏側のみ・公開には出さない）
       await redis.hset(KEY, { [id]: JSON.stringify(ev) });
       const note = patch.status !== undefined
         ? `状態→${({ draft: '下書き', published: '公開', closed: '締切', cancelled: '中止' })[ev.status] || ev.status}`

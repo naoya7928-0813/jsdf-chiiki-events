@@ -181,7 +181,10 @@ export default function App() {
     try { return !!localStorage.getItem('jsdf-admin-auth'); } catch { return false; }
   });
   const [adminFilter, setAdminFilter] = useState('all'); // 'all' | 'draft'
-  const openAdmin = useCallback((filter = 'all') => { setAdminFilter(filter); setScreen('admin'); }, []);
+  const [initialEditEvent, setInitialEditEvent] = useState(null);
+  const openAdmin = useCallback((filter = 'all') => { setInitialEditEvent(null); setAdminFilter(filter); setScreen('admin'); }, []);
+  // 詳細画面から運営者が追加済みイベントを編集（手動イベントのみ）
+  const editEventAsAdmin = useCallback((ev) => { setInitialEditEvent(ev); setAdminFilter('all'); setScreen('admin'); }, []);
 
   // Safari のステータスバー theme-color をテーマに合わせて更新
   useEffect(() => {
@@ -388,6 +391,8 @@ export default function App() {
           onToggleApplied={handleToggleApplied}
           autoApply={autoApply}
           onMarkApplied={handleMarkApplied}
+          adminAuthed={adminAuthed}
+          onEditEvent={editEventAsAdmin}
           onBack={() => setScreen(detailBack)}
           onReport={openReportForEvent}
         />
@@ -418,8 +423,9 @@ export default function App() {
           theme={theme}
           mode="manage"
           initialFilter={adminFilter}
+          initialEditEvent={initialEditEvent}
           onAuthChange={setAdminAuthed}
-          onBack={() => setScreen('settings')}
+          onBack={() => { setInitialEditEvent(null); setScreen(initialEditEvent ? 'detail' : 'settings'); }}
         />
       )}
 

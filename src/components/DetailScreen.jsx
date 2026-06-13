@@ -10,7 +10,7 @@ function officeSourceLabel(ev) {
   return null;
 }
 
-export default function DetailScreen({ event, onBack, theme, favorites, applied, onToggleFavorite, onToggleApplied, autoApply, onMarkApplied, onReport }) {
+export default function DetailScreen({ event, onBack, theme, favorites, applied, onToggleFavorite, onToggleApplied, autoApply, onMarkApplied, onReport, adminAuthed, onEditEvent }) {
   // ── フック（Rules of Hooks: 早期 return の前に宣言する） ─────────
   const [copied,    setCopied]    = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
@@ -436,6 +436,20 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
             }}>
               当サイトは有志による非公式サイトです。防衛省・自衛隊および各地方協力本部とは直接関係ありません。イベントの開催可否・申込方法・変更などは、必ず公式ページで最新情報をご確認ください。
             </div>
+            {/* 運営者ログイン時: 手動追加イベントをその場で編集 */}
+            {adminAuthed && ev.source_type === 'manual' && onEditEvent && (
+              <button
+                onClick={() => onEditEvent(ev)}
+                style={{
+                  marginTop: 10, width: '100%', minHeight: 44,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                  background: primary, border: 'none', borderRadius: 8,
+                  color: '#fff', fontSize: 13, fontWeight: 700, fontFamily: F.sans, cursor: 'pointer',
+                }}
+              >
+                このイベントを編集（運営者）
+              </button>
+            )}
             {/* この情報の誤りを報告（イベントID・地本名を引き継ぐ） */}
             {onReport && (
               <button
@@ -448,7 +462,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
                   fontFamily: F.sans, cursor: 'pointer',
                 }}
               >
-                ⚠️ この情報の誤りを報告する
+                この情報の誤りを報告する
               </button>
             )}
           </div>
