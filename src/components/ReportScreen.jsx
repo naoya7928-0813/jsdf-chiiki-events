@@ -61,6 +61,7 @@ export default function ReportScreen({ theme, updatedAt, onBack }) {
           priority: (category === 'バグ' || category === '表示崩れ') ? 4 : 3,
         }),
       });
+      if (res.status === 429) { setStatus('rate'); return; } // 送信が多すぎる
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setStatus('done');
     } catch {
@@ -189,6 +190,16 @@ export default function ReportScreen({ theme, updatedAt, onBack }) {
                 fontSize: 12.5, color: '#ef4444', lineHeight: 1.6,
               }}>
                 送信に失敗しました。通信環境をご確認のうえ、もう一度お試しください。
+              </div>
+            )}
+
+            {status === 'rate' && (
+              <div style={{
+                padding: '10px 13px', borderRadius: 10, marginBottom: 14,
+                background: '#f59e0b14', border: '1px solid #f59e0b44',
+                fontSize: 12.5, color: '#b45309', lineHeight: 1.6,
+              }}>
+                短時間に送信が集中したため、一時的に受け付けを制限しています。しばらく待ってから、もう一度お試しください。
               </div>
             )}
 

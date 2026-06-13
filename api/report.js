@@ -4,8 +4,8 @@
 // トピックはサーバー環境変数 NTFY_BUG_TOPIC でのみ扱い、ブラウザからは
 // このエンドポイントに投げるだけにする。
 //
-// ※ レート制限・本文サニタイズは別途（次の改善項目）で追加する。
-import { checkOrigin } from './_security.js';
+// ※ 本文サニタイズは別途（次の改善項目）で追加する。
+import { checkOrigin, rateLimit } from './_security.js';
 
 // 既定トピックは「すでに公開済み」の旧トピック（フォールバック）。
 // 完全にローテーションするには Vercel 環境変数 NTFY_BUG_TOPIC に
@@ -18,6 +18,10 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(204).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  // 連投・スパム抑止: 1 IP あたり 10分で 5 件まで（人の報告には十分）。
+  // 本文チェックより前に数えることで、空連投での総当たりも抑止する。
+  if (!await rateLimit(req, res, 'report', 5, 600)) return;
 
   const { title, message, priority } = req.body ?? {};
   if (typeof message !== 'string' || !message.trim()) {
