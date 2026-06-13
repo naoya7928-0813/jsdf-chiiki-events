@@ -48,7 +48,8 @@ export default function AdminScreen({ theme, onBack }) {
   const [offices, setOffices] = useState([]);
 
   // 入力支援用に offices.json を読み込み（案内所プルダウン・住所補完）
-  useEffect(() => { fetchOfficesData().then(d => setOffices(d?.offices || [])).catch(() => {}); }, []);
+  // fetchOfficesData は offices 配列を直接返す
+  useEffect(() => { fetchOfficesData().then(d => setOffices(Array.isArray(d) ? d : (d?.offices || []))).catch(() => {}); }, []);
 
   // 選択中の地本の拠点（本部・案内所・事務所）
   const prefOffices = useMemo(
