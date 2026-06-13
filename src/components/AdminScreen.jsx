@@ -8,7 +8,7 @@ import { facilitiesForPref, AGE_OPTIONS } from '../data/jsdfFacilities';
  * 運営者管理画面。
  *  mode='login'  : ログインのみ。成功したら onLoggedIn() で通常サイトへ戻す（#admin 用）
  *  mode='manage' : 管理（イベント追加・修正／下書き確認）。設定の運営者メニューから開く
- * 認証情報は sessionStorage に保持し、各APIへ x-admin-user / x-admin-pass で送る。
+ * 認証情報は localStorage に保持し、各APIへ x-admin-user / x-admin-pass で送る。
  */
 
 const CATEGORIES = ['説明会', '採用イベント', '一般公開', '艦艇公開', '体験', '演奏会', '記念行事', '広報活動', '地域参加'];
@@ -43,11 +43,11 @@ function fmtTime(iso) { try { return new Date(iso).toLocaleString('ja-JP', { mon
 
 export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn, onAuthChange, initialFilter = 'all' }) {
   const { primary } = theme;
-  const [auth, setAuth] = useState(() => { try { return JSON.parse(sessionStorage.getItem(SS_KEY)) || null; } catch { return null; } });
+  const [auth, setAuth] = useState(() => { try { return JSON.parse(localStorage.getItem(SS_KEY)) || null; } catch { return null; } });
   const [account, setAccount] = useState(null);
   // 保存済み認証で自動ログイン中は、ログイン画面を一瞬出さないようローディング表示にする
   const [checking, setChecking] = useState(() => {
-    try { return !!JSON.parse(sessionStorage.getItem(SS_KEY)); } catch { return false; }
+    try { return !!JSON.parse(localStorage.getItem(SS_KEY)); } catch { return false; }
   });
   const [uInput, setUInput] = useState('');
   const [pInput, setPInput] = useState('');
@@ -80,7 +80,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
       try {
         const r = await fetch('/api/admin/login', { method: 'POST', headers: headers(), body: '{}' });
         if (r.ok) { const j = await r.json(); setAccount({ pref: j.pref, label: j.label }); applyScope(j.pref); loadList(); }
-        else { setAuth(null); try { sessionStorage.removeItem(SS_KEY); } catch { /* noop */ } onAuthChange?.(false); }
+        else { setAuth(null); try { localStorage.removeItem(SS_KEY); } catch { /* noop */ } onAuthChange?.(false); }
       } catch { /* noop */ }
       finally { setChecking(false); }
     })();
@@ -96,7 +96,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
       const r = await fetch('/api/admin/login', { method: 'POST', headers: headers(a), body: '{}' });
       if (r.ok) {
         const j = await r.json();
-        setAuth(a); try { sessionStorage.setItem(SS_KEY, JSON.stringify(a)); } catch { /* noop */ }
+        setAuth(a); try { localStorage.setItem(SS_KEY, JSON.stringify(a)); } catch { /* noop */ }
         onAuthChange?.(true);
         setUInput(''); setPInput('');
         if (mode === 'login' && onLoggedIn) { onLoggedIn(); return; } // 通常サイトへ
@@ -106,7 +106,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
     } catch { setAuthErr('通信に失敗しました。'); }
     finally { setBusy(false); }
   }
-  function logout() { setAuth(null); setAccount(null); setList([]); try { sessionStorage.removeItem(SS_KEY); } catch { /* noop */ } onAuthChange?.(false); onBack?.(); }
+  function logout() { setAuth(null); setAccount(null); setList([]); try { localStorage.removeItem(SS_KEY); } catch { /* noop */ } onAuthChange?.(false); onBack?.(); }
 
   async function submit(status) {
     setMsg(null);

@@ -175,9 +175,10 @@ export default function App() {
     setIsAdmin(false);
   }, []);
 
-  // 運営者としてログイン済みか（設定に管理メニューを出す）。AdminScreenが認証情報を保持
+  // 運営者としてログイン済みか（設定に管理メニューを出す）。AdminScreenが認証情報を保持。
+  // localStorage に保存するため、端末を再起動してもログイン状態が残る。
   const [adminAuthed, setAdminAuthed] = useState(() => {
-    try { return !!sessionStorage.getItem('jsdf-admin-auth'); } catch { return false; }
+    try { return !!localStorage.getItem('jsdf-admin-auth'); } catch { return false; }
   });
   const [adminFilter, setAdminFilter] = useState('all'); // 'all' | 'draft'
   const openAdmin = useCallback((filter = 'all') => { setAdminFilter(filter); setScreen('admin'); }, []);
