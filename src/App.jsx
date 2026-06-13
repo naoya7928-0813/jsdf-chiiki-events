@@ -58,6 +58,8 @@ export default function App() {
   const [detailEvent, setDetailEvent] = useState(null);
   const [detailBack,  setDetailBack]  = useState('region');
   const [legalDoc,    setLegalDoc]    = useState(null);
+  const [reportTarget, setReportTarget] = useState(null);  // 報告対象イベント（詳細から報告時）
+  const [reportBack,   setReportBack]   = useState('settings'); // 報告画面の戻り先
 
   // 地図で選択中の地域ID（null = 未選択）
   // 起動時は常に未選択（前回セッションの選択を引き継がない）
@@ -79,6 +81,14 @@ export default function App() {
     setDetailEvent(ev);
     setDetailBack(backTo);
     setScreen('detail');
+  }, []);
+
+  // イベント詳細から「情報の誤りを報告」: 対象イベントを引き継いで報告画面へ
+  const openReportForEvent = useCallback((ev, regionKey) => {
+    const prefLabel = PREFECTURE_INFO[regionKey]?.label || regionKey || '';
+    setReportTarget({ id: ev.id, pref: regionKey || '', prefLabel, title: ev.title || '', date: ev.date || '' });
+    setReportBack('detail');
+    setScreen('report');
   }, []);
 
   // 地図から地域画面へ遷移
@@ -316,6 +326,7 @@ export default function App() {
           onToggleFavorite={handleToggleFavorite}
           onToggleApplied={handleToggleApplied}
           onBack={() => setScreen(detailBack)}
+          onReport={openReportForEvent}
         />
       )}
 
@@ -331,7 +342,7 @@ export default function App() {
           onOpenRegion={openRegion}
           onOpenFavorites={() => setScreen('favorites')}
           onOpenLegal={(doc) => { setLegalDoc(doc); setScreen('legal'); }}
-          onOpenReport={() => setScreen('report')}
+          onOpenReport={() => { setReportTarget(null); setReportBack('settings'); setScreen('report'); }}
         />
       )}
 
@@ -339,7 +350,8 @@ export default function App() {
         <ReportScreen
           theme={theme}
           updatedAt={updatedAt}
-          onBack={() => setScreen('settings')}
+          target={reportTarget}
+          onBack={() => setScreen(reportBack)}
         />
       )}
 

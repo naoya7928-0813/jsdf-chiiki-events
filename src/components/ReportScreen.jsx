@@ -28,9 +28,10 @@ function buildContext(updatedAt) {
   };
 }
 
-export default function ReportScreen({ theme, updatedAt, onBack }) {
+export default function ReportScreen({ theme, updatedAt, onBack, target }) {
   const { primary } = theme;
-  const [category, setCategory] = useState('バグ');
+  // 詳細から「情報の誤りを報告」で開いた場合は種別を事前選択
+  const [category, setCategory] = useState(target ? 'イベント情報の誤り' : 'バグ');
   const [content,  setContent]  = useState('');
   const [contact,  setContact]  = useState('');
   const [status,   setStatus]   = useState('idle'); // idle | sending | done | error
@@ -42,10 +43,19 @@ export default function ReportScreen({ theme, updatedAt, onBack }) {
   async function handleSubmit() {
     if (!canSend) return;
     setStatus('sending');
+    // 詳細から開いた場合は対象イベント情報を添付（イベントID・地本名・名称・日付）
+    const targetBlock = target
+      ? `―― 対象イベント（自動添付）――\n` +
+        `地本: ${target.prefLabel || target.pref || '不明'}\n` +
+        `イベント名: ${target.title || '不明'}\n` +
+        `開催日: ${target.date || '不明'}\n` +
+        `イベントID: ${target.id || '不明'}\n\n`
+      : '';
     const message =
       `【種別】${category}\n` +
       `【内容】\n${content.trim()}\n\n` +
       `【連絡先】${contact.trim() || '未記入'}\n\n` +
+      targetBlock +
       `―― 状況（自動添付）――\n` +
       `ページURL: ${ctx.url}\n` +
       `バージョン: ${ctx.version}\n` +
@@ -108,6 +118,27 @@ export default function ReportScreen({ theme, updatedAt, onBack }) {
             <p style={{ fontSize: 12.5, color: 'var(--text-muted)', lineHeight: 1.7, margin: '0 0 16px' }}>
               アプリの不具合・表示の崩れ・表記の誤り・ご要望などをお知らせください。
             </p>
+
+            {/* 対象イベント（詳細から「情報の誤りを報告」で開いた場合のみ） */}
+            {target && (
+              <div style={{
+                marginBottom: 18, padding: '11px 13px', borderRadius: 10,
+                background: `${primary}0c`, border: `1px solid ${primary}33`,
+              }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: primary, marginBottom: 5, letterSpacing: 0.3 }}>
+                  報告対象のイベント
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', lineHeight: 1.5 }}>
+                  {target.title || '（名称不明）'}
+                </div>
+                <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 3 }}>
+                  {[target.prefLabel && `${target.prefLabel}地本`, target.date].filter(Boolean).join('・')}
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6, lineHeight: 1.7 }}>
+                  このイベントの情報（日付・場所・名称など）の誤りを下にご記入ください。
+                </div>
+              </div>
+            )}
 
             {/* 種別 */}
             <Label>種別</Label>
