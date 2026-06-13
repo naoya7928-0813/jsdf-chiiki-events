@@ -110,11 +110,26 @@ export function useEvents(autoMode = true) {
 
   const fetchEvents = useCallback(async () => {
     try {
-      const res = await fetch(API_URL, { cache: 'no-cache' });
+      // 本体（events.json）と運営の手動追加イベントを並行取得してマージする。
+      // 手動イベントの取得失敗は無視し、本体表示を妨げない。
+      const [res, manual] = await Promise.all([
+        fetch(API_URL, { cache: 'no-cache' }),
+        fetch('/api/manual-events', { cache: 'no-cache' })
+          .then(r => (r.ok ? r.json() : null))
+          .then(j => (Array.isArray(j?.events) ? j.events : []))
+          .catch(() => []),
+      ]);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       if (typeof json !== 'object' || json === null) throw new Error('invalid response shape');
-      setRawData(json);
+      // 手動イベントを地本ごとに合流（既存配列の末尾に追加）
+      const merged = { ...json };
+      for (const ev of manual) {
+        const k = ev?.pref;
+        if (!k) continue;
+        merged[k] = Array.isArray(merged[k]) ? [...merged[k], ev] : [ev];
+      }
+      setRawData(merged);
       hasData.current = true;
       setError(null);
     } catch (err) {

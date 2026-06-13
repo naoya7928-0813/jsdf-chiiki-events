@@ -48,10 +48,14 @@ jobs:
         run: |
           CLEAN_TOKEN=$(printf '%s' "$VTOKEN" | tr -d '\r\n')
           ARGS=""
-          if [ -n "$NTFY_BUG_TOPIC" ]; then ARGS="-e NTFY_BUG_TOPIC=$NTFY_BUG_TOPIC"; fi
+          if [ -n "$NTFY_BUG_TOPIC" ]; then ARGS="$ARGS -e NTFY_BUG_TOPIC=$NTFY_BUG_TOPIC"; fi
+          if [ -n "$ADMIN_SECRET" ];   then ARGS="$ARGS -e ADMIN_SECRET=$ADMIN_SECRET"; fi
+          if [ -n "$ADMIN_ACCOUNTS_B64" ]; then ARGS="$ARGS -e ADMIN_ACCOUNTS_B64=$ADMIN_ACCOUNTS_B64"; fi
           npx vercel --prod --token "$CLEAN_TOKEN" $ARGS
         env:
           VTOKEN:            ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           NTFY_BUG_TOPIC:    ${{ secrets.NTFY_BUG_TOPIC }}
+          ADMIN_SECRET:      ${{ secrets.ADMIN_SECRET }}
+          ADMIN_ACCOUNTS_B64: ${{ secrets.ADMIN_ACCOUNTS_B64 }}

@@ -10,6 +10,7 @@ import NotificationScreen from './components/NotificationScreen';
 import FavoritesScreen   from './components/FavoritesScreen';
 import LegalScreen        from './components/LegalScreen';
 import ReportScreen       from './components/ReportScreen';
+import AdminScreen        from './components/AdminScreen';
 import RegionScreen       from './components/RegionScreen';
 import SplashScreen       from './components/SplashScreen';
 
@@ -153,6 +154,20 @@ export default function App() {
   const scheme = COLOR_SCHEMES[schemeKey] ?? COLOR_SCHEMES[DEFAULT_SCHEME];
   const theme  = { ...scheme, schemeKey, darkMode };
 
+  // ── 運営者管理ページ（裏口）: 隠しURL #admin で表示 ──────────────
+  const [isAdmin, setIsAdmin] = useState(
+    () => typeof window !== 'undefined' && window.location.hash.replace(/^#/, '') === 'admin'
+  );
+  useEffect(() => {
+    const onHash = () => setIsAdmin(window.location.hash.replace(/^#/, '') === 'admin');
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+  const closeAdmin = useCallback(() => {
+    try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch { /* noop */ }
+    setIsAdmin(false);
+  }, []);
+
   // Safari のステータスバー theme-color をテーマに合わせて更新
   useEffect(() => {
     const metaTheme = document.querySelector('meta[name="theme-color"]');
@@ -250,6 +265,11 @@ export default function App() {
     setNotifHistory([]);
     try { localStorage.removeItem('jsdf-notif-history'); } catch {}
   }, []);
+
+  // 隠しURL #admin: 運営者管理ページを全画面表示（通常UIとは独立）
+  if (isAdmin) {
+    return <AdminScreen theme={theme} onBack={closeAdmin} />;
+  }
 
   return (
     <div style={{
