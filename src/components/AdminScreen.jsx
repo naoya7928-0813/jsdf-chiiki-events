@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { ScreenHeader, F } from './Shared';
 import { PREFECTURE_INFO } from '../data/regionMap';
 import { fetchOfficesData } from '../hooks/useOffices';
-import { facilitiesForPref, TIME_OPTIONS, AGE_OPTIONS } from '../data/jsdfFacilities';
+import { facilitiesForPref, AGE_OPTIONS } from '../data/jsdfFacilities';
 
 /**
  * 運営者管理画面。
@@ -22,8 +22,14 @@ const WD = ['日', '月', '火', '水', '木', '金', '土'];
 
 const EMPTY = {
   pref: 'tokyo', multiDay: false, date: '', endDate: '', title: '', place: '', address: '',
-  time: '', category: '広報活動', tag: '', ageRequirement: '', deadline: '', url: '', notes: '',
+  timeStart: '', timeEnd: '', category: '広報活動', tag: '', ageRequirement: '', deadline: '', url: '', notes: '',
 };
+
+// 開始/終了の時刻入力 → カード表記の time 文字列「HH:MM～HH:MM」
+function buildTime(f) {
+  if (f.timeStart && f.timeEnd) return `${f.timeStart}～${f.timeEnd}`;
+  return f.timeStart || '';
+}
 
 // 締切 date(YYYY-MM-DD) → カード表記「M月D日（曜）」文字列
 function toDeadlineStr(d) {
@@ -39,6 +45,10 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const { primary } = theme;
   const [auth, setAuth] = useState(() => { try { return JSON.parse(sessionStorage.getItem(SS_KEY)) || null; } catch { return null; } });
   const [account, setAccount] = useState(null);
+  // 保存済み認証で自動ログイン中は、ログイン画面を一瞬出さないようローディング表示にする
+  const [checking, setChecking] = useState(() => {
+    try { return !!JSON.parse(sessionStorage.getItem(SS_KEY)); } catch { return false; }
+  });
   const [uInput, setUInput] = useState('');
   const [pInput, setPInput] = useState('');
   const [authErr, setAuthErr] = useState('');
@@ -65,13 +75,14 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
 
   // 保存済み認証で自動ログイン（管理画面を開いたとき）
   useEffect(() => {
-    if (!auth) return;
+    if (!auth) { setChecking(false); return; }
     (async () => {
       try {
         const r = await fetch('/api/admin/login', { method: 'POST', headers: headers(), body: '{}' });
         if (r.ok) { const j = await r.json(); setAccount({ pref: j.pref, label: j.label }); applyScope(j.pref); loadList(); }
         else { setAuth(null); try { sessionStorage.removeItem(SS_KEY); } catch { /* noop */ } onAuthChange?.(false); }
       } catch { /* noop */ }
+      finally { setChecking(false); }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -101,8 +112,8 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
     setMsg(null);
     if (!form.title.trim() || !form.date) { setMsg({ type: 'err', text: 'タイトルと開催日は必須です。' }); return; }
     setBusy(true);
-    const payload = { ...form, endDate: form.multiDay ? form.endDate : '', deadline: toDeadlineStr(form.deadline) };
-    delete payload.multiDay;
+    const payload = { ...form, endDate: form.multiDay ? form.endDate : '', time: buildTime(form), deadline: toDeadlineStr(form.deadline) };
+    delete payload.multiDay; delete payload.timeStart; delete payload.timeEnd;
     try {
       const r = await fetch('/api/admin/events', { method: 'POST', headers: headers(), body: JSON.stringify({ event: { ...payload, status } }) });
       const j = await r.json().catch(() => ({}));
@@ -131,22 +142,19 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const isScoped = account && account.pref !== '*';
   const prefOffices = useMemo(() => offices.filter(o => o.pref === form.pref), [offices, form.pref]);
   const facilities = useMemo(() => facilitiesForPref(form.pref), [form.pref]);
-  const placeCandidates = useMemo(() => {
-    const s = new Set();
-    facilities.forEach(f => s.add(f.name));
-    prefOffices.forEach(o => o.name && s.add(o.name));
-    list.forEach(e => e.pref === form.pref && e.place && s.add(e.place));
-    return [...s].slice(0, 80);
-  }, [facilities, prefOffices, list, form.pref]);
-  const addrCandidates = useMemo(() => {
-    const s = new Set();
-    facilities.forEach(f => f.address && s.add(f.address));
-    prefOffices.forEach(o => o.address && s.add(o.address));
-    return [...s].slice(0, 80);
-  }, [facilities, prefOffices, form.pref]);
 
-  const input = { width: '100%', boxSizing: 'border-box', fontFamily: F.sans, fontSize: 14, color: 'var(--text)', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 10, padding: '11px 13px', outline: 'none', marginBottom: 12 };
+  const input ={ width: '100%', boxSizing: 'border-box', fontFamily: F.sans, fontSize: 14, color: 'var(--text)', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 10, padding: '11px 13px', outline: 'none', marginBottom: 12 };
   const label = { fontSize: 12, fontWeight: 700, color: 'var(--text-sub)', marginBottom: 6, letterSpacing: 0.3 };
+
+  // ── 自動ログイン確認中: ログイン画面のちらつきを防ぐローディング ──
+  if (!account && checking) {
+    return (
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)', fontFamily: F.sans }}>
+        <ScreenHeader primary={primary} title="運営者" subtitle="ADMIN" onBack={onBack} />
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: 13 }}>読み込み中…</div>
+      </div>
+    );
+  }
 
   // ── ログイン画面 ──
   if (!account) {
@@ -190,9 +198,9 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
             return <button key={v} onClick={() => set('multiDay', v === 'multi')} style={{ flex: 1, padding: '9px 0', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', border: `1px solid ${on ? primary : 'var(--border)'}`, background: on ? `${primary}18` : 'var(--card)', color: on ? primary : 'var(--text-sub)' }}>{jp}</button>;
           })}
         </div>
-        <div style={{ display: 'flex', gap: 10 }}>
-          <div style={{ flex: 1 }}><div style={label}>{form.multiDay ? '開始日 *' : '開催日 *'}</div><input type="date" value={form.date} onChange={e => set('date', e.target.value)} style={input} /></div>
-          {form.multiDay && <div style={{ flex: 1 }}><div style={label}>終了日</div><input type="date" value={form.endDate} onChange={e => set('endDate', e.target.value)} style={input} /></div>}
+        <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+          <div style={{ flex: 1, minWidth: 0 }}><div style={label}>{form.multiDay ? '開始日 *' : '開催日 *'}</div><input type="date" value={form.date} onChange={e => set('date', e.target.value)} style={input} /></div>
+          {form.multiDay && <div style={{ flex: 1, minWidth: 0 }}><div style={label}>終了日</div><input type="date" value={form.endDate} onChange={e => set('endDate', e.target.value)} style={input} /></div>}
         </div>
 
         <div style={label}>イベント名 *</div>
@@ -203,10 +211,15 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
           <div style={{ flex: 1 }}><div style={label}>申込要否</div><select value={form.tag} onChange={e => set('tag', e.target.value)} style={input}>{APPLY_OPTS.map(o => <option key={o} value={o}>{o || '—'}</option>)}</select></div>
         </div>
 
-        <div style={{ display: 'flex', gap: 10 }}>
-          <div style={{ flex: 1 }}><div style={label}>時間</div><select value={form.time} onChange={e => set('time', e.target.value)} style={input}>{TIME_OPTIONS.map(o => <option key={o} value={o}>{o || '—'}</option>)}</select></div>
-          <div style={{ flex: 1 }}><div style={label}>申込締切</div><input type="date" value={form.deadline} onChange={e => set('deadline', e.target.value)} style={input} /></div>
+        <div style={label}>時間</div>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 12 }}>
+          <input type="time" value={form.timeStart} onChange={e => set('timeStart', e.target.value)} style={{ ...input, marginBottom: 0, flex: 1, minWidth: 0 }} />
+          <span style={{ color: 'var(--text-muted)', fontSize: 14 }}>〜</span>
+          <input type="time" value={form.timeEnd} onChange={e => set('timeEnd', e.target.value)} style={{ ...input, marginBottom: 0, flex: 1, minWidth: 0 }} />
         </div>
+
+        <div style={label}>申込締切</div>
+        <input type="date" value={form.deadline} onChange={e => set('deadline', e.target.value)} style={input} />
 
         <div style={label}>対象・年齢</div>
         <select value={AGE_OPTIONS.includes(form.ageRequirement) ? form.ageRequirement : ''} onChange={e => set('ageRequirement', e.target.value)} style={input}>{AGE_OPTIONS.map(o => <option key={o} value={o}>{o || '—（自由入力は下欄）'}</option>)}</select>
@@ -224,12 +237,10 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
           {prefOffices.length > 0 && <optgroup label="案内所・事務所">{prefOffices.map((o, i) => <option key={'o' + i} value={`o:${i}`}>{o.name}</option>)}</optgroup>}
         </select>
 
-        <div style={label}>会場名</div>
-        <input list="vv-places" value={form.place} onChange={e => set('place', e.target.value)} placeholder="例: 陸上自衛隊〇〇駐屯地" style={input} />
-        <datalist id="vv-places">{placeCandidates.map(p => <option key={p} value={p} />)}</datalist>
+        <div style={label}>会場名（上の選択で自動入力／自由入力も可）</div>
+        <input value={form.place} onChange={e => set('place', e.target.value)} placeholder="例: 陸上自衛隊〇〇駐屯地" style={input} />
         <div style={label}>住所</div>
-        <input list="vv-addrs" value={form.address} onChange={e => set('address', e.target.value)} placeholder="例: 東京都〇〇区…" style={input} />
-        <datalist id="vv-addrs">{addrCandidates.map(a => <option key={a} value={a} />)}</datalist>
+        <input value={form.address} onChange={e => set('address', e.target.value)} placeholder="例: 東京都〇〇区…" style={input} />
         {(form.address || form.place) && <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(form.address || form.place)}`} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', margin: '-4px 0 14px', fontSize: 12, fontWeight: 600, color: primary, textDecoration: 'none' }}>🗺 地図で確認</a>}
 
         <div style={label}>公式URL</div>
@@ -301,7 +312,7 @@ function PreviewCard({ form, primary, prefLabel }) {
       </div>
       <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', lineHeight: 1.4 }}>{form.title || '（イベント名）'}</div>
       <div style={{ fontSize: 12.5, color: 'var(--text-muted)', marginTop: 6, lineHeight: 1.7 }}>
-        📅 {form.date || '----/--/--'}{form.multiDay && form.endDate ? `〜${form.endDate}` : ''}{form.time ? `　${form.time}` : ''}<br />
+        📅 {form.date || '----/--/--'}{form.multiDay && form.endDate ? `〜${form.endDate}` : ''}{buildTime(form) ? `　${buildTime(form)}` : ''}<br />
         {form.place && <>📍 {form.place}<br /></>}
         {form.ageRequirement && <>🎯 {form.ageRequirement}<br /></>}
         {form.deadline && <>締切 {toDeadlineStr(form.deadline)}</>}
