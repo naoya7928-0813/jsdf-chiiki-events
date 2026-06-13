@@ -3,6 +3,13 @@ import { registerRoute } from 'workbox-routing';
 import { NetworkFirst, CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
 import { ExpirationPlugin } from 'workbox-expiration';
 
+// ── 即時更新（古いバンドルが残り続けて新機能が出ない問題を防ぐ） ──
+// skipWaiting + clients.claim で新しい SW を待たせず即有効化する。
+self.skipWaiting();
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
+});
+
 // ── プリキャッシュ ─────────────────────────────────────────────
 cleanupOutdatedCaches();
 precacheAndRoute(self.__WB_MANIFEST);
@@ -17,12 +24,14 @@ registerRoute(
   })
 );
 
+// 公開読み取り（手動イベント）のみキャッシュ対象にする。
+// 管理API（/api/admin/*）や報告・購読などはキャッシュせず常に最新をネットワークから取得。
 registerRoute(
-  ({ url }) => url.pathname.startsWith('/api/'),
+  ({ url }) => url.pathname === '/api/manual-events',
   new NetworkFirst({
     cacheName: 'api-cache',
-    plugins: [new ExpirationPlugin({ maxAgeSeconds: 300 })],
-    networkTimeoutSeconds: 10,
+    plugins: [new ExpirationPlugin({ maxAgeSeconds: 120 })],
+    networkTimeoutSeconds: 8,
   })
 );
 

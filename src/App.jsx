@@ -155,15 +155,22 @@ export default function App() {
   const theme  = { ...scheme, schemeKey, darkMode };
 
   // ── 運営者管理ページ（裏口）: 隠しURL #admin で表示 ──────────────
-  const [isAdmin, setIsAdmin] = useState(
-    () => typeof window !== 'undefined' && window.location.hash.replace(/^#/, '') === 'admin'
-  );
+  // SWの自動更新やPWA起動で #admin が落ちても維持できるよう sessionStorage にも記録する。
+  const ADMIN_FLAG = 'jsdf-admin-open';
+  const readAdmin = () => {
+    if (typeof window === 'undefined') return false;
+    if (window.location.hash.replace(/^#/, '') === 'admin') return true;
+    try { return sessionStorage.getItem(ADMIN_FLAG) === '1'; } catch { return false; }
+  };
+  const [isAdmin, setIsAdmin] = useState(readAdmin);
   useEffect(() => {
-    const onHash = () => setIsAdmin(window.location.hash.replace(/^#/, '') === 'admin');
+    if (isAdmin) { try { sessionStorage.setItem(ADMIN_FLAG, '1'); } catch { /* noop */ } }
+    const onHash = () => { if (window.location.hash.replace(/^#/, '') === 'admin') setIsAdmin(true); };
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
-  }, []);
+  }, [isAdmin]);
   const closeAdmin = useCallback(() => {
+    try { sessionStorage.removeItem(ADMIN_FLAG); } catch { /* noop */ }
     try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch { /* noop */ }
     setIsAdmin(false);
   }, []);
