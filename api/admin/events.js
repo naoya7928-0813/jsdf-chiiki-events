@@ -6,7 +6,7 @@
 // 認証は x-admin-user/x-admin-pass（または後方互換の x-admin-secret）。
 // 地本スコープ: pref!=='*' のアカウントは自分の地本のみ操作可。
 // 保存先は Upstash Redis hash `manual:events`（field=id, value=JSON）。
-import { checkOrigin, rateLimit, requireAccount, canManagePref, redis, cleanText } from '../_security.js';
+import { checkOrigin, rateLimit, requireAccount, canManagePref, redis, cleanText, resolveStaff, whoOf } from '../_security.js';
 
 const KEY = 'manual:events';
 const HKEY = 'manual:history';
@@ -29,18 +29,6 @@ const PREFS = new Set([
   'ehime','kochi','fukuoka','saga','nagasaki','kumamoto','oita','miyazaki','kagoshima','okinawa',
 ]);
 const STATUSES = new Set(['draft', 'published', 'closed', 'cancelled']);
-
-// 個人番号（仮）: 担当官名と権限。001=募集案内所 所長（追加・削除可）、他は編集のみ。
-const STAFF = {
-  '001': { name: '東京 募集案内所 所長（仮）', addDelete: true },
-  '002': { name: '東京 担当官A（仮）',        addDelete: false },
-  '003': { name: '東京 担当官B（仮）',        addDelete: false },
-};
-// リクエストの個人番号を解決（ヘッダ x-admin-staff か body.staff）
-function resolveStaff(req) {
-  const no = String(req.headers['x-admin-staff'] || req.body?.staff || '').trim();
-  return STAFF[no] ? { no, ...STAFF[no] } : null;
-}
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const WD = ['日', '月', '火', '水', '木', '金', '土'];
 const weekdayOf = d => { const t = new Date(d + 'T00:00:00Z'); return Number.isNaN(t.getTime()) ? '' : WD[t.getUTCDay()]; };
@@ -109,7 +97,7 @@ export default async function handler(req, res) {
   const account = requireAccount(req, res);
   if (!account) return;
   const staff = resolveStaff(req);            // 個人番号（仮）。担当官名・権限
-  const who = staff ? `${staff.no} ${staff.name}` : account.user; // createdBy/updatedBy 表記
+  const who = whoOf(account, staff);          // createdBy/updatedBy 表記
 
   // ── 一覧（担当地本のみ。* は全件） ──
   if (req.method === 'GET') {

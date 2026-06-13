@@ -4,6 +4,7 @@
 import { redis } from './_security.js';
 
 const KEY = 'manual:events';
+const OKEY = 'manual:overrides';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
@@ -18,7 +19,21 @@ export default async function handler(req, res) {
       .filter(e => e && e.status !== 'draft')
       // 担当官名など裏側情報は公開しない（createdBy/updatedBy/タイムスタンプを除去）
       .map(({ createdBy, updatedBy, createdAt, updatedAt, status, ...pub }) => pub);
-    return res.status(200).json({ events });
+
+    // 既存イベントの上書き（スクレイプイベント等）。表示フィールドのみ公開（_by/_at は除去）
+    let overrides = {};
+    try {
+      const oraw = await redis.hgetall(OKEY);
+      if (oraw) {
+        for (const [id, v] of Object.entries(oraw)) {
+          const o = typeof v === 'string' ? JSON.parse(v) : v;
+          const { _by, _at, ...pub } = o || {};
+          overrides[id] = pub;
+        }
+      }
+    } catch { /* 取得失敗は無視 */ }
+
+    return res.status(200).json({ events, overrides });
   } catch (err) {
     console.error('[manual-events] redis error', err);
     return res.status(200).json({ events: [] }); // 取得失敗時は空（本体表示を妨げない）

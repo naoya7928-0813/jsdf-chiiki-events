@@ -154,6 +154,22 @@ export function canManagePref(account, pref) {
   return account && (account.pref === '*' || account.pref === pref);
 }
 
+// 個人番号（仮）→ 担当官名・権限。001=募集案内所 所長のみ追加・削除可
+export const STAFF = {
+  '001': { name: '東京 募集案内所 所長（仮）', addDelete: true },
+  '002': { name: '東京 担当官A（仮）',        addDelete: false },
+  '003': { name: '東京 担当官B（仮）',        addDelete: false },
+};
+/** リクエストの個人番号を解決（ヘッダ x-admin-staff か body.staff） */
+export function resolveStaff(req) {
+  const no = String(req.headers['x-admin-staff'] || req.body?.staff || '').trim();
+  return STAFF[no] ? { no, ...STAFF[no] } : null;
+}
+/** createdBy/updatedBy 用の表記（担当官名 or アカウント名） */
+export function whoOf(account, staff) {
+  return staff ? `${staff.no} ${staff.name}` : (account?.user || '');
+}
+
 // 除去対象のコードポイント判定（制御文字・双方向・ゼロ幅。タブ/改行は別途扱う）
 function isRemovableCode(c) {
   if (c === 9 || c === 10) return false;

@@ -15,7 +15,7 @@ const CATEGORIES = ['説明会', '採用イベント', '一般公開', '艦艇�
 const APPLY_OPTS = ['', '要予約', '予約不要', '事前申込制', '入場無料', '要問合せ'];
 const STATUS_LABEL = { draft: '下書き', published: '公開中', closed: '締切', cancelled: '中止' };
 const STATUS_COLOR = { draft: '#888', published: '#16a34a', closed: '#b45309', cancelled: '#ef4444' };
-const ACTION_LABEL = { add: '登録', update: '編集', status: '状態変更', delete: '削除' };
+const ACTION_LABEL = { add: '登録', update: '編集', status: '状態変更', delete: '削除', override: '上書き修正', 'override-clear': '上書き取消' };
 const PREF_ENTRIES = Object.entries(PREFECTURE_INFO);
 const SS_KEY = 'jsdf-admin-auth';
 const STAFF_KEY = 'jsdf-admin-staff';
@@ -139,20 +139,37 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   }
   function cancelEdit() { setEditingId(null); setEditingDeadline(null); setForm(f => ({ ...EMPTY, pref: f.pref })); setMsg(null); }
 
+  // 既存イベント（スクレイプ等）の上書きを取り消して元に戻す
+  async function revertOverride() {
+    if (!editingId || String(editingId).startsWith('manual-')) return;
+    if (!window.confirm('このイベントの上書き修正を取り消して元の内容に戻しますか？')) return;
+    setBusy(true);
+    try {
+      const r = await fetch('/api/admin/overrides', { method: 'DELETE', headers: headers(), body: JSON.stringify({ id: editingId, pref: form.pref }) });
+      if (r.ok) { if (fromDetail) { onBack?.(); return; } setMsg({ type: 'ok', text: '上書きを取り消しました。' }); cancelEdit(); }
+      else setMsg({ type: 'err', text: '取り消しに失敗しました。' });
+    } catch { setMsg({ type: 'err', text: '通信に失敗しました。' }); }
+    finally { setBusy(false); }
+  }
+
   async function submit(status) {
     setMsg(null);
     if (!form.title.trim() || !form.date) { setMsg({ type: 'err', text: 'タイトルと開催日は必須です。' }); return; }
     setBusy(true);
     try {
       if (editingId) {
-        // 編集（PATCH・通知なし）。締切は再入力時のみ更新
+        // 編集（通知なし）。締切は再入力時のみ更新
         const patch = {
           title: form.title, place: form.place, address: form.address, time: buildTime(form),
           category: form.category, tag: form.tag, ageRequirement: form.ageRequirement,
           url: form.url, notes: form.notes, date: form.date, endDate: form.multiDay ? form.endDate : '',
         };
         if (form.deadline) patch.deadline = toDeadlineStr(form.deadline);
-        const r = await fetch('/api/admin/events', { method: 'PATCH', headers: headers(), body: JSON.stringify({ id: editingId, patch }) });
+        // 手動追加イベント(manual-…)は本体をPATCH。それ以外（スクレイプ等）はID単位の上書き保存。
+        const isManual = String(editingId).startsWith('manual-');
+        const r = isManual
+          ? await fetch('/api/admin/events', { method: 'PATCH', headers: headers(), body: JSON.stringify({ id: editingId, patch }) })
+          : await fetch('/api/admin/overrides', { method: 'POST', headers: headers(), body: JSON.stringify({ id: editingId, pref: form.pref, patch }) });
         const j = await r.json().catch(() => ({}));
         if (r.ok) {
           if (fromDetail) { onBack?.(); return; } // 詳細起点の編集 → 詳細へ戻す
@@ -327,9 +344,19 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
 
         {/* 保存ボタン（編集時は更新／キャンセル） */}
         {editingId ? (
-          <div style={{ display: 'flex', gap: 10, marginBottom: 26 }}>
-            <button onClick={cancelEdit} disabled={busy} style={{ flex: 1, padding: 15, borderRadius: 12, fontFamily: F.sans, fontSize: 15, fontWeight: 700, cursor: busy ? 'default' : 'pointer', background: 'var(--card)', border: '1px solid var(--border)', color: 'var(--text-sub)' }}>キャンセル</button>
-            <button onClick={() => submit()} disabled={busy} style={{ flex: 2, padding: 15, borderRadius: 12, border: 'none', fontFamily: F.sans, fontSize: 15, fontWeight: 700, color: '#fff', background: busy ? 'var(--border)' : primary, cursor: busy ? 'default' : 'pointer' }}>{busy ? '更新中…' : '変更を更新する'}</button>
+          <div style={{ marginBottom: 26 }}>
+            {!String(editingId).startsWith('manual-') && (
+              <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginBottom: 8, lineHeight: 1.6 }}>
+                これは自動収集イベントの「上書き修正」です（元データは変えず、表示内容のみ上書きします）。
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={cancelEdit} disabled={busy} style={{ flex: 1, padding: 15, borderRadius: 12, fontFamily: F.sans, fontSize: 15, fontWeight: 700, cursor: busy ? 'default' : 'pointer', background: 'var(--card)', border: '1px solid var(--border)', color: 'var(--text-sub)' }}>キャンセル</button>
+              <button onClick={() => submit()} disabled={busy} style={{ flex: 2, padding: 15, borderRadius: 12, border: 'none', fontFamily: F.sans, fontSize: 15, fontWeight: 700, color: '#fff', background: busy ? 'var(--border)' : primary, cursor: busy ? 'default' : 'pointer' }}>{busy ? '更新中…' : '変更を更新する'}</button>
+            </div>
+            {!String(editingId).startsWith('manual-') && (
+              <button onClick={revertOverride} disabled={busy} style={{ marginTop: 10, width: '100%', padding: 12, borderRadius: 10, background: 'transparent', border: '1px solid #ef444455', color: '#ef4444', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>上書きを取り消して元に戻す</button>
+            )}
           </div>
         ) : canAddDelete ? (
           <div style={{ display: 'flex', gap: 10, marginBottom: 26 }}>

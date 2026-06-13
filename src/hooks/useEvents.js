@@ -120,24 +120,33 @@ export function useEvents(autoMode = true) {
 
   const fetchEvents = useCallback(async () => {
     try {
-      // 本体（events.json）と運営の手動追加イベントを並行取得してマージする。
-      // 手動イベントの取得失敗は無視し、本体表示を妨げない。
-      const [res, manual] = await Promise.all([
+      // 本体（events.json）と運営の手動追加イベント＋上書き修正を並行取得してマージする。
+      // 取得失敗は無視し、本体表示を妨げない。
+      const [res, manualResp] = await Promise.all([
         fetch(API_URL, { cache: 'no-cache' }),
         fetch('/api/manual-events', { cache: 'no-cache' })
           .then(r => (r.ok ? r.json() : null))
-          .then(j => (Array.isArray(j?.events) ? j.events : []))
-          .catch(() => []),
+          .then(j => ({ events: Array.isArray(j?.events) ? j.events : [], overrides: (j && j.overrides) || {} }))
+          .catch(() => ({ events: [], overrides: {} })),
       ]);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       if (typeof json !== 'object' || json === null) throw new Error('invalid response shape');
+      const { events: manual, overrides } = manualResp;
       // 手動イベントを地本ごとに合流（既存配列の末尾に追加）
       const merged = { ...json };
       for (const ev of manual) {
         const k = ev?.pref;
         if (!k) continue;
         merged[k] = Array.isArray(merged[k]) ? [...merged[k], ev] : [ev];
+      }
+      // 運営の上書き修正をイベントID一致で再適用（スクレイプ上書き後も反映）
+      const hasOverrides = overrides && Object.keys(overrides).length > 0;
+      if (hasOverrides) {
+        for (const k of Object.keys(merged)) {
+          if (!Array.isArray(merged[k])) continue;
+          merged[k] = merged[k].map(ev => (ev && overrides[ev.id]) ? { ...ev, ...overrides[ev.id] } : ev);
+        }
       }
       setRawData(merged);
       hasData.current = true;

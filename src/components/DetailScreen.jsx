@@ -105,8 +105,8 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
               {ICO.back('#fff', 16)}
             </button>
             <div style={{ display: 'flex', gap: 8 }}>
-              {/* 運営者ログイン時: 手動イベントの編集（右上） */}
-              {adminAuthed && ev.source_type === 'manual' && onEditEvent && (
+              {/* 運営者ログイン時: イベントの編集（右上）。手動／自動収集どちらも可 */}
+              {adminAuthed && onEditEvent && (
                 <button onClick={() => onEditEvent(ev)} aria-label="このイベントを編集" style={{ ...iconBtnStyle, background: '#fff' }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
                 </button>
