@@ -216,6 +216,24 @@ export default function App() {
     });
   }, []);
 
+  // 公式サイトを開いたとき自動で申請済みにする（設定でON/OFF・既定ON）
+  const [autoApply, setAutoApply] = useState(() => {
+    try { return localStorage.getItem('jsdf-auto-apply') !== '0'; } catch { return true; }
+  });
+  const handleAutoApplyChange = useCallback((on) => {
+    setAutoApply(on);
+    try { localStorage.setItem('jsdf-auto-apply', on ? '1' : '0'); } catch {}
+  }, []);
+  const handleMarkApplied = useCallback((id) => {
+    if (!id) return;
+    setApplied(prev => {
+      if (prev.has(id)) return prev;
+      const next = new Set(prev); next.add(id);
+      try { localStorage.setItem('jsdf-applied', JSON.stringify([...next])); } catch {}
+      return next;
+    });
+  }, []);
+
   // ── 通知履歴 ──────────────────────────────────────────────
   const [notifHistory, setNotifHistory] = useState(loadNotifHistory);
   const lastProcessedAt = useRef(null);
@@ -368,6 +386,8 @@ export default function App() {
           applied={applied}
           onToggleFavorite={handleToggleFavorite}
           onToggleApplied={handleToggleApplied}
+          autoApply={autoApply}
+          onMarkApplied={handleMarkApplied}
           onBack={() => setScreen(detailBack)}
           onReport={openReportForEvent}
         />
@@ -380,6 +400,8 @@ export default function App() {
           onDarkModeChange={handleDarkModeChange}
           autoMode={autoMode}
           onAutoModeChange={handleAutoModeChange}
+          autoApply={autoApply}
+          onAutoApplyChange={handleAutoApplyChange}
           onOpenHome={() => setScreen('home')}
           onOpenList={() => { handleRegionChange('all'); setScreen('list'); }}
           onOpenRegion={openRegion}

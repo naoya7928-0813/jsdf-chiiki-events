@@ -10,7 +10,7 @@ function officeSourceLabel(ev) {
   return null;
 }
 
-export default function DetailScreen({ event, onBack, theme, favorites, applied, onToggleFavorite, onToggleApplied, onReport }) {
+export default function DetailScreen({ event, onBack, theme, favorites, applied, onToggleFavorite, onToggleApplied, autoApply, onMarkApplied, onReport }) {
   // ── フック（Rules of Hooks: 早期 return の前に宣言する） ─────────
   const [copied,    setCopied]    = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
@@ -83,7 +83,10 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
 
   // 個別URL → なければ地本公式サイト にフォールバック
   const targetUrl = ev.url || source?.url || '';
+  // 公式サイトを開いたら（設定がONのとき）自動で申請済みにする
+  const markAppliedIfAuto = () => { if (autoApply) onMarkApplied?.(ev.id); };
   const openUrl = () => {
+    markAppliedIfAuto();
     if (targetUrl) window.open(targetUrl, '_blank', 'noopener,noreferrer');
   };
 
@@ -284,6 +287,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
                     href={targetUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={markAppliedIfAuto}
                     style={{
                       display: 'inline-flex', alignItems: 'center', gap: 5,
                       padding: '8px 16px', borderRadius: 8,
@@ -412,6 +416,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
               href={source.url}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={markAppliedIfAuto}
               aria-label={`${source.name}の公式ページで確認（外部サイトへ移動）`}
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,

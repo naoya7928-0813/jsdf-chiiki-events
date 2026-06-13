@@ -129,17 +129,31 @@ export default async function handler(req, res) {
       if (!raw) return res.status(404).json({ error: 'not found' });
       const ev = typeof raw === 'string' ? JSON.parse(raw) : raw;
       if (!canManagePref(account, ev.pref)) return res.status(403).json({ error: '権限がありません' });
-      // 許可された項目のみ更新
+      // 許可された項目のみ更新（既存イベントの編集に対応。※手動イベントは通知対象外）
       if (patch.status !== undefined) {
         if (!STATUSES.has(patch.status)) return res.status(400).json({ error: 'status が不正です' });
         ev.status = patch.status;
       }
-      for (const f of ['title', 'place', 'time', 'url', 'notes', 'category']) {
+      // 文字項目（cleanText + 長さ上限）
+      const TXT = { title: 120, place: 80, address: 100, time: 40, category: 20, tag: 30, ageRequirement: 100, notes: 300, deadline: 40 };
+      for (const f of Object.keys(TXT)) {
         if (patch[f] !== undefined) {
-          const max = f === 'notes' ? 300 : f === 'url' ? 500 : f === 'title' ? 120 : 80;
-          if (f === 'url' && patch[f] && !/^https?:\/\//i.test(patch[f])) return res.status(400).json({ error: 'URL不正' });
-          ev[f] = f === 'url' ? String(patch[f]).slice(0, 500) : (cleanText(patch[f], max) || (f === 'notes' ? null : ''));
+          const v = cleanText(patch[f], TXT[f]);
+          ev[f] = v || (['notes', 'ageRequirement', 'deadline'].includes(f) ? null : '');
         }
+      }
+      if (patch.title !== undefined && !ev.title) return res.status(400).json({ error: 'タイトルは必須です' });
+      if (patch.url !== undefined) {
+        const u = String(patch.url || '').trim();
+        if (u && !/^https?:\/\//i.test(u)) return res.status(400).json({ error: 'URL不正' });
+        ev.url = u.slice(0, 500);
+      }
+      // 日付（変更時は曜日も再計算）
+      if (patch.date !== undefined && DATE_RE.test(patch.date)) { ev.date = patch.date; ev.weekday = weekdayOf(patch.date); }
+      if (patch.endDate !== undefined) {
+        const ed = String(patch.endDate || '').trim();
+        if (ed && DATE_RE.test(ed) && ed >= ev.date) { ev.endDate = ed; ev.endWeekday = weekdayOf(ed); }
+        else { delete ev.endDate; delete ev.endWeekday; }
       }
       ev.updatedAt = new Date().toISOString();
       await redis.hset(KEY, { [id]: JSON.stringify(ev) });

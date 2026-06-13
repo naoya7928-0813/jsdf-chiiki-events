@@ -13,6 +13,7 @@ export default function SettingsScreen({
   theme,
   onColorChange, onDarkModeChange,
   autoMode, onAutoModeChange,
+  autoApply, onAutoApplyChange,
   onOpenHome, onOpenRegion, onOpenList, onOpenFavorites,
   onOpenLegal,
   onOpenReport,
@@ -177,6 +178,13 @@ export default function SettingsScreen({
             on={autoMode}
             onChange={() => onAutoModeChange(!autoMode)}
             primary={primary}
+          />
+          <ToggleRow
+            label="公式サイトを開いたら申込済みにする"
+            sub="イベント詳細から公式ページを開いたとき、自動で「申請済み」に切り替えます"
+            on={autoApply}
+            onChange={() => onAutoApplyChange?.(!autoApply)}
+            primary={primary}
             last
           />
         </Card>
@@ -260,8 +268,8 @@ export default function SettingsScreen({
           <>
             <GroupTitle>運営者メニュー</GroupTitle>
             <Card>
-              <LegalLinkRow label="🛠 イベント追加・修正" onTap={() => onOpenAdmin?.('all')} />
-              <LegalLinkRow label="📝 下書き確認" onTap={() => onOpenAdmin?.('draft')} last />
+              <LegalLinkRow label="イベント追加・修正" onTap={() => onOpenAdmin?.('all')} />
+              <LegalLinkRow label="下書き確認" onTap={() => onOpenAdmin?.('draft')} last />
             </Card>
           </>
         )}

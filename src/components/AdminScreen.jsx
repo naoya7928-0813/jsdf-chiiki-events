@@ -56,7 +56,9 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const [list, setList] = useState([]);
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
-  const [filter, setFilter] = useState(initialFilter); // all | draft
+  const [filter] = useState(initialFilter); // all（追加修正＝公開系）| draft（下書き確認）
+  const [editingId, setEditingId] = useState(null);
+  const [editingDeadline, setEditingDeadline] = useState(null);
   const [msg, setMsg] = useState(null);
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState(false);
@@ -108,19 +110,48 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   }
   function logout() { setAuth(null); setAccount(null); setList([]); try { localStorage.removeItem(SS_KEY); } catch { /* noop */ } onAuthChange?.(false); onBack?.(); }
 
+  // 既存イベントの編集を開始（フォームへ読み込み）。※編集はユーザー通知を飛ばさない
+  function startEdit(ev) {
+    const tm = (ev.time || '').match(/(\d{1,2}:\d{2})\s*[～~-]\s*(\d{1,2}:\d{2})/);
+    setForm({
+      pref: ev.pref, multiDay: !!ev.endDate, date: ev.date || '', endDate: ev.endDate || '',
+      title: ev.title || '', place: ev.place || '', address: ev.address || '',
+      timeStart: tm ? tm[1] : '', timeEnd: tm ? tm[2] : '',
+      category: ev.category || '広報活動', tag: ev.tag || '', ageRequirement: ev.ageRequirement || '',
+      deadline: '', url: ev.url || '', notes: ev.notes || '',
+    });
+    setEditingId(ev.id); setEditingDeadline(ev.deadline || null); setPreview(false); setMsg(null);
+    try { document.querySelector('[data-admin-scroll]')?.scrollTo({ top: 0, behavior: 'smooth' }); } catch { /* noop */ }
+  }
+  function cancelEdit() { setEditingId(null); setEditingDeadline(null); setForm(f => ({ ...EMPTY, pref: f.pref })); setMsg(null); }
+
   async function submit(status) {
     setMsg(null);
     if (!form.title.trim() || !form.date) { setMsg({ type: 'err', text: 'タイトルと開催日は必須です。' }); return; }
     setBusy(true);
-    const payload = { ...form, endDate: form.multiDay ? form.endDate : '', time: buildTime(form), deadline: toDeadlineStr(form.deadline) };
-    delete payload.multiDay; delete payload.timeStart; delete payload.timeEnd;
     try {
-      const r = await fetch('/api/admin/events', { method: 'POST', headers: headers(), body: JSON.stringify({ event: { ...payload, status } }) });
-      const j = await r.json().catch(() => ({}));
-      if (r.ok) {
-        setMsg({ type: 'ok', text: status === 'published' ? '公開しました（全利用者に表示）。' : '下書き保存しました。' });
-        setForm(f => ({ ...EMPTY, pref: f.pref, category: f.category })); setPreview(false); loadList();
-      } else setMsg({ type: 'err', text: j.error || '保存に失敗しました。' });
+      if (editingId) {
+        // 編集（PATCH・通知なし）。締切は再入力時のみ更新
+        const patch = {
+          title: form.title, place: form.place, address: form.address, time: buildTime(form),
+          category: form.category, tag: form.tag, ageRequirement: form.ageRequirement,
+          url: form.url, notes: form.notes, date: form.date, endDate: form.multiDay ? form.endDate : '',
+        };
+        if (form.deadline) patch.deadline = toDeadlineStr(form.deadline);
+        const r = await fetch('/api/admin/events', { method: 'PATCH', headers: headers(), body: JSON.stringify({ id: editingId, patch }) });
+        const j = await r.json().catch(() => ({}));
+        if (r.ok) { setMsg({ type: 'ok', text: '更新しました（利用者への通知は送りません）。' }); cancelEdit(); loadList(); }
+        else setMsg({ type: 'err', text: j.error || '更新に失敗しました。' });
+      } else {
+        const payload = { ...form, endDate: form.multiDay ? form.endDate : '', time: buildTime(form), deadline: toDeadlineStr(form.deadline) };
+        delete payload.multiDay; delete payload.timeStart; delete payload.timeEnd;
+        const r = await fetch('/api/admin/events', { method: 'POST', headers: headers(), body: JSON.stringify({ event: { ...payload, status } }) });
+        const j = await r.json().catch(() => ({}));
+        if (r.ok) {
+          setMsg({ type: 'ok', text: status === 'published' ? '公開しました（全利用者に表示）。' : '下書き保存しました。' });
+          setForm(f => ({ ...EMPTY, pref: f.pref, category: f.category })); setPreview(false); loadList();
+        } else setMsg({ type: 'err', text: j.error || '保存に失敗しました。' });
+      }
     } catch { setMsg({ type: 'err', text: '通信に失敗しました。' }); }
     finally { setBusy(false); }
   }
@@ -176,15 +207,18 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
 
   // ── 管理画面 ──
   const prefLabel = isScoped ? (PREFECTURE_INFO[account.pref]?.label || account.pref) : '全地本';
-  const shown = filter === 'draft' ? list.filter(e => e.status === 'draft') : list;
+  // 追加修正ページ＝公開系（下書き以外）、下書き確認ページ＝下書きのみ。重複を避けて分離。
+  const shown = filter === 'draft' ? list.filter(e => e.status === 'draft') : list.filter(e => e.status !== 'draft');
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)', fontFamily: F.sans }}>
       <ScreenHeader primary={primary} title={filter === 'draft' ? '下書き確認' : 'イベント追加・修正'} subtitle="ADMIN" onBack={onBack}
         trailing={<button onClick={logout} style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', borderRadius: 8, fontSize: 12, padding: '6px 10px', cursor: 'pointer' }}>ログアウト</button>} />
-      <div style={{ flex: 1, overflowY: 'auto', padding: '16px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 28px)' }}>
+      <div data-admin-scroll style={{ flex: 1, overflowY: 'auto', padding: '16px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 28px)' }}>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>ログイン中: <strong style={{ color: 'var(--text)' }}>{account.label}</strong>（担当: {prefLabel}）</div>
 
-        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 12 }}>イベントを登録</div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: editingId ? primary : 'var(--text)', marginBottom: 12 }}>
+          {editingId ? '既存イベントを編集中' : 'イベントを登録'}
+        </div>
 
         <div style={label}>地本</div>
         {isScoped ? <div style={{ ...input, background: 'var(--bg)', color: 'var(--text-muted)' }}>{prefLabel}（ログイン地本）</div>
@@ -198,10 +232,13 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
             return <button key={v} onClick={() => set('multiDay', v === 'multi')} style={{ flex: 1, padding: '9px 0', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', border: `1px solid ${on ? primary : 'var(--border)'}`, background: on ? `${primary}18` : 'var(--card)', color: on ? primary : 'var(--text-sub)' }}>{jp}</button>;
           })}
         </div>
-        <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-          <div style={{ flex: 1, minWidth: 0 }}><div style={label}>{form.multiDay ? '開始日 *' : '開催日 *'}</div><input type="date" value={form.date} onChange={e => set('date', e.target.value)} style={input} /></div>
-          {form.multiDay && <div style={{ flex: 1, minWidth: 0 }}><div style={label}>終了日</div><input type="date" value={form.endDate} onChange={e => set('endDate', e.target.value)} style={input} /></div>}
-        </div>
+        {/* 連日は日付入力が幅を取るため縦に並べる（右マージン消失を防ぐ） */}
+        <div style={label}>{form.multiDay ? '開始日 *' : '開催日 *'}</div>
+        <input type="date" value={form.date} onChange={e => set('date', e.target.value)} style={input} />
+        {form.multiDay && <>
+          <div style={label}>終了日</div>
+          <input type="date" value={form.endDate} onChange={e => set('endDate', e.target.value)} style={input} />
+        </>}
 
         <div style={label}>イベント名 *</div>
         <input value={form.title} onChange={e => set('title', e.target.value)} placeholder="例: 〇〇駐屯地 創立記念行事" style={input} />
@@ -241,30 +278,38 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         <input value={form.place} onChange={e => set('place', e.target.value)} placeholder="例: 陸上自衛隊〇〇駐屯地" style={input} />
         <div style={label}>住所</div>
         <input value={form.address} onChange={e => set('address', e.target.value)} placeholder="例: 東京都〇〇区…" style={input} />
-        {(form.address || form.place) && <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(form.address || form.place)}`} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', margin: '-4px 0 14px', fontSize: 12, fontWeight: 600, color: primary, textDecoration: 'none' }}>🗺 地図で確認</a>}
+        {(form.address || form.place) && <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(form.address || form.place)}`} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', margin: '-4px 0 14px', fontSize: 12, fontWeight: 600, color: primary, textDecoration: 'none' }}>地図で確認</a>}
 
         <div style={label}>公式URL</div>
         <input value={form.url} onChange={e => set('url', e.target.value)} placeholder="https://www.mod.go.jp/pco/..." inputMode="url" style={input} />
         <div style={label}>備考</div>
         <textarea value={form.notes} onChange={e => set('notes', e.target.value)} rows={2} placeholder="補足事項" style={{ ...input, resize: 'vertical' }} />
+        {editingId && editingDeadline && <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginBottom: 12 }}>現在の締切: {editingDeadline}（締切欄を空のままなら保持されます）</div>}
 
-        <button onClick={() => setPreview(p => !p)} style={{ width: '100%', padding: 11, borderRadius: 10, marginBottom: 12, cursor: 'pointer', background: 'transparent', border: '1px solid var(--border)', color: 'var(--text)', fontSize: 13, fontWeight: 600 }}>{preview ? 'プレビューを隠す' : '👁 プレビュー（カード表示イメージ）'}</button>
+        <button onClick={() => setPreview(p => !p)} style={{ width: '100%', padding: 12, borderRadius: 10, marginBottom: 12, cursor: 'pointer', background: 'transparent', border: '1px solid var(--border)', color: 'var(--text)', fontSize: 13, fontWeight: 600 }}>{preview ? 'プレビューを隠す' : 'プレビュー（カード表示イメージ）'}</button>
         {preview && <PreviewCard form={form} primary={primary} prefLabel={isScoped ? prefLabel : (PREFECTURE_INFO[form.pref]?.label || form.pref)} />}
 
         {msg && <div style={{ padding: '10px 13px', borderRadius: 10, margin: '4px 0 12px', fontSize: 12.5, lineHeight: 1.6, background: msg.type === 'ok' ? '#16a34a14' : '#ef444412', border: `1px solid ${msg.type === 'ok' ? '#16a34a44' : '#ef444433'}`, color: msg.type === 'ok' ? '#15803d' : '#ef4444' }}>{msg.text}</div>}
 
-        <div style={{ display: 'flex', gap: 10, marginBottom: 26 }}>
-          <button onClick={() => submit('draft')} disabled={busy} style={{ flex: 1, padding: 13, borderRadius: 12, fontFamily: F.sans, fontSize: 14, fontWeight: 700, cursor: busy ? 'default' : 'pointer', background: 'var(--card)', border: `1px solid ${primary}`, color: primary }}>下書き保存</button>
-          <button onClick={() => submit('published')} disabled={busy} style={{ flex: 1, padding: 13, borderRadius: 12, border: 'none', fontFamily: F.sans, fontSize: 14, fontWeight: 700, color: '#fff', background: busy ? 'var(--border)' : primary, cursor: busy ? 'default' : 'pointer' }}>公開する</button>
-        </div>
+        {/* 保存ボタン（編集時は更新／キャンセル） */}
+        {editingId ? (
+          <div style={{ display: 'flex', gap: 10, marginBottom: 26 }}>
+            <button onClick={cancelEdit} disabled={busy} style={{ flex: 1, padding: 15, borderRadius: 12, fontFamily: F.sans, fontSize: 15, fontWeight: 700, cursor: busy ? 'default' : 'pointer', background: 'var(--card)', border: '1px solid var(--border)', color: 'var(--text-sub)' }}>キャンセル</button>
+            <button onClick={() => submit()} disabled={busy} style={{ flex: 2, padding: 15, borderRadius: 12, border: 'none', fontFamily: F.sans, fontSize: 15, fontWeight: 700, color: '#fff', background: busy ? 'var(--border)' : primary, cursor: busy ? 'default' : 'pointer' }}>{busy ? '更新中…' : '変更を更新する'}</button>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', gap: 10, marginBottom: 26 }}>
+            <button onClick={() => submit('draft')} disabled={busy} style={{ flex: 1, padding: 15, borderRadius: 12, fontFamily: F.sans, fontSize: 15, fontWeight: 700, cursor: busy ? 'default' : 'pointer', background: 'var(--card)', border: `1px solid ${primary}`, color: primary }}>下書き保存</button>
+            <button onClick={() => submit('published')} disabled={busy} style={{ flex: 1, padding: 15, borderRadius: 12, border: 'none', fontFamily: F.sans, fontSize: 15, fontWeight: 700, color: '#fff', background: busy ? 'var(--border)' : primary, cursor: busy ? 'default' : 'pointer' }}>公開する</button>
+          </div>
+        )}
 
         {/* 一覧 + 出力 + 履歴 */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', flex: 1 }}>{filter === 'draft' ? '下書き' : '登録済み'}（{shown.length}）</div>
-          <button onClick={() => setFilter(f => f === 'draft' ? 'all' : 'draft')} style={miniOut(primary)}>{filter === 'draft' ? '全件' : '下書きのみ'}</button>
+          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', flex: 1 }}>{filter === 'draft' ? '下書き一覧' : '公開中のイベント'}（{shown.length}）</div>
           <button onClick={exportCSV} disabled={!list.length} style={miniOut(primary)}>CSV</button>
           <button onClick={exportJSON} disabled={!list.length} style={miniOut(primary)}>JSON</button>
-          <button onClick={toggleHistory} style={miniOut(primary)}>{showHistory ? '履歴×' : '履歴'}</button>
+          <button onClick={toggleHistory} style={miniOut(primary)}>{showHistory ? '履歴を閉じる' : '変更履歴'}</button>
         </div>
 
         {showHistory && (
@@ -282,12 +327,13 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
                 <span style={{ fontSize: 10, fontWeight: 700, color: '#fff', background: STATUS_COLOR[ev.status] || '#888', borderRadius: 5, padding: '2px 6px' }}>{STATUS_LABEL[ev.status] || ev.status || '—'}</span>
                 <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 600, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.title}</div>
               </div>
-              <div style={{ fontSize: 11.5, color: 'var(--text-muted)', margin: '4px 0 8px' }}>{(PREFECTURE_INFO[ev.pref]?.label || ev.pref)}・{ev.date}{ev.endDate ? `〜${ev.endDate}` : ''}{ev.place ? `・${ev.place}` : ''}</div>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              <div style={{ fontSize: 11.5, color: 'var(--text-muted)', margin: '4px 0 10px' }}>{(PREFECTURE_INFO[ev.pref]?.label || ev.pref)}・{ev.date}{ev.endDate ? `〜${ev.endDate}` : ''}{ev.place ? `・${ev.place}` : ''}</div>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <Mini onClick={() => startEdit(ev)} color={primary}>編集</Mini>
                 {ev.status !== 'published' && <Mini onClick={() => setStatus(ev.id, 'published')} color="#16a34a">公開</Mini>}
-                {ev.status === 'published' && <Mini onClick={() => setStatus(ev.id, 'draft')} color="#888">下書きに戻す</Mini>}
-                <Mini onClick={() => setStatus(ev.id, 'closed')} color="#b45309">締切</Mini>
-                <Mini onClick={() => setStatus(ev.id, 'cancelled')} color="#ef4444">中止</Mini>
+                {ev.status === 'published' && <Mini onClick={() => setStatus(ev.id, 'draft')} color="#888">下書きへ</Mini>}
+                {ev.status !== 'closed' && <Mini onClick={() => setStatus(ev.id, 'closed')} color="#b45309">締切</Mini>}
+                {ev.status !== 'cancelled' && <Mini onClick={() => setStatus(ev.id, 'cancelled')} color="#ef4444">中止</Mini>}
                 <Mini onClick={() => remove(ev.id)} color="#ef4444" outline>削除</Mini>
               </div>
             </div>
@@ -298,7 +344,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
 }
 
 function Mini({ onClick, color, outline, children }) {
-  return <button onClick={onClick} style={{ fontSize: 11.5, fontWeight: 600, cursor: 'pointer', borderRadius: 7, padding: '5px 10px', color: outline ? color : '#fff', background: outline ? 'transparent' : color, border: `1px solid ${color}${outline ? '88' : ''}` }}>{children}</button>;
+  return <button onClick={onClick} style={{ fontSize: 13, fontWeight: 700, cursor: 'pointer', borderRadius: 9, padding: '9px 16px', minHeight: 38, color: outline ? color : '#fff', background: outline ? 'transparent' : color, border: `1px solid ${color}${outline ? '88' : ''}` }}>{children}</button>;
 }
 
 function PreviewCard({ form, primary, prefLabel }) {
@@ -312,10 +358,10 @@ function PreviewCard({ form, primary, prefLabel }) {
       </div>
       <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', lineHeight: 1.4 }}>{form.title || '（イベント名）'}</div>
       <div style={{ fontSize: 12.5, color: 'var(--text-muted)', marginTop: 6, lineHeight: 1.7 }}>
-        📅 {form.date || '----/--/--'}{form.multiDay && form.endDate ? `〜${form.endDate}` : ''}{buildTime(form) ? `　${buildTime(form)}` : ''}<br />
-        {form.place && <>📍 {form.place}<br /></>}
-        {form.ageRequirement && <>🎯 {form.ageRequirement}<br /></>}
-        {form.deadline && <>締切 {toDeadlineStr(form.deadline)}</>}
+        日時: {form.date || '----/--/--'}{form.multiDay && form.endDate ? `〜${form.endDate}` : ''}{buildTime(form) ? `　${buildTime(form)}` : ''}<br />
+        {form.place && <>場所: {form.place}<br /></>}
+        {form.ageRequirement && <>対象: {form.ageRequirement}<br /></>}
+        {form.deadline && <>締切: {toDeadlineStr(form.deadline)}</>}
       </div>
     </div>
   );
