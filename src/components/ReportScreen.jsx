@@ -188,8 +188,11 @@ export default function ReportScreen({ theme, updatedAt, onBack, target }) {
               maxLength={CONTACT_MAX}
               placeholder="メールアドレス等（返信が必要な場合のみ）"
               inputMode="email"
-              style={{ ...inputBase, marginBottom: 16 }}
+              style={{ ...inputBase, marginBottom: 6 }}
             />
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 16 }}>
+              ※ 個人で運営しているため、いただいた内容すべてには対応できず、<strong>返信できない場合があります</strong>。あらかじめご了承ください。
+            </div>
 
             {/* 自動添付の案内 */}
             <div style={{
