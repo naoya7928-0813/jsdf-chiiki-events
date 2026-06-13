@@ -41,7 +41,13 @@ jobs:
         run: npm ci
 
       - name: Vercel に本番デプロイ
-        run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
+        # バグ報告の ntfy トピックは GitHub Secret から実行時環境変数として渡す
+        # （リポジトリ・バンドルに出さない）。未設定なら api/report.js が旧トピックに退避。
+        run: |
+          ARGS=""
+          if [ -n "$NTFY_BUG_TOPIC" ]; then ARGS="-e NTFY_BUG_TOPIC=$NTFY_BUG_TOPIC"; fi
+          npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }} $ARGS
         env:
           VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          NTFY_BUG_TOPIC:    ${{ secrets.NTFY_BUG_TOPIC }}

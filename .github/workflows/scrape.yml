@@ -177,10 +177,16 @@ jobs:
       # ── Vercel に本番デプロイ ─────────────────────────────
       - name: Vercel に本番デプロイ
         if: steps.commit.outputs.changed == 'true'
-        run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
+        # バグ報告の ntfy トピックを実行時環境変数として渡す（deploy.yml と同様）。
+        # これがないとスクレイプ起点のデプロイで環境変数が失われ旧トピックに退避する。
+        run: |
+          ARGS=""
+          if [ -n "$NTFY_BUG_TOPIC" ]; then ARGS="-e NTFY_BUG_TOPIC=$NTFY_BUG_TOPIC"; fi
+          npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }} $ARGS
         env:
           VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          NTFY_BUG_TOPIC:    ${{ secrets.NTFY_BUG_TOPIC }}
 
       # ── ntfy.sh でプッシュ通知送信 ────────────────────────
       - name: CDN 伝播待機（Vercel エッジに反映されるまで）
