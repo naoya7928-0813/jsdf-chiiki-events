@@ -205,7 +205,8 @@ export function countEventsByRegion(events) {
     if (!Array.isArray(evs)) continue;
     const regionId = PREFECTURE_TO_REGION[prefId];
     if (!regionId) continue;
-    counts[regionId] = (counts[regionId] ?? 0) + evs.length;
+    // 終了済みは件数に含めない（地図バッジ・総数は開催予定のみ）
+    counts[regionId] = (counts[regionId] ?? 0) + evs.filter(e => !e.ended).length;
   }
   return counts;
 }
@@ -218,5 +219,6 @@ export function getSupportedPrefsByRegion(regionId, events) {
   if (!region) return [];
   return region.prefectures
     .filter(p => SUPPORTED_PREFECTURES.has(p.id))
-    .map(p => ({ ...p, count: (events[p.id] ?? []).length }));
+    // 終了済みは件数に含めない（開催予定のみ）
+    .map(p => ({ ...p, count: (events[p.id] ?? []).filter(e => !e.ended).length }));
 }

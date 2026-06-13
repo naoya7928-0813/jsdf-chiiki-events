@@ -21,9 +21,12 @@ export default function RegionScreen({
   const activeList = useMemo(
     () => {
       const evs = SUPPORTED_PREFECTURES.has(activePrefId) ? (events[activePrefId] ?? []) : [];
-      return [...evs].sort((a, b) => new Date(a.date) - new Date(b.date));
+      // 終了済みは非表示（お気に入り登録済みのみ7日間は表示）
+      return [...evs]
+        .filter(ev => !ev.ended || (favorites?.has(ev.id) ?? false))
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
     },
-    [activePrefId, events]
+    [activePrefId, events, favorites]
   );
 
   if (!region) {

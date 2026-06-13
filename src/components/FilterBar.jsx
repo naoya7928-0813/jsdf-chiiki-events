@@ -77,6 +77,8 @@ export function calcPeriodCounts(events) {
 
 // 申請済みフィルター用の特別タグ ID（TAG_DEFS には含めない）
 export const APPLIED_TAG_ID = '申請済み';
+// 終了済みフィルター用の特別タグ ID（通常は非表示、このタグ選択時のみ表示）
+export const ENDED_TAG_ID = '終了済み';
 
 // ─── 折り畳みトグルの山形アイコン ────────────────────────────
 function ChevUpDown({ up }) {
@@ -126,6 +128,8 @@ export default function FilterBar({
     () => events.filter(ev => applied?.has(ev.id)).length,
     [events, applied]
   );
+  // 終了済みの件数（ended フラグ）
+  const endedCount = useMemo(() => events.filter(ev => ev.ended).length, [events]);
 
   // アクティブなフィルター数（トグルヘッダーのバッジ用）
   const activeCount =
@@ -322,6 +326,36 @@ export default function FilterBar({
                     borderRadius: 8, padding: '0 5px', lineHeight: '16px',
                   }}>
                     {appliedCount}
+                  </span>
+                </button>
+              );
+            })()}
+
+            {/* 終了済みチップ（通常は非表示・選択時のみ終了済みを表示） */}
+            {(() => {
+              const isOn = activeTag === ENDED_TAG_ID;
+              return (
+                <button
+                  onClick={() => onTagChange(isOn ? 'all' : ENDED_TAG_ID)}
+                  style={{
+                    flexShrink: 0, cursor: 'pointer', whiteSpace: 'nowrap',
+                    fontFamily: F.sans, display: 'flex', alignItems: 'center', gap: 5,
+                    padding: '5px 12px', borderRadius: 20,
+                    border: `1.5px solid ${isOn ? '#6b7280' : endedCount > 0 ? '#6b728088' : 'var(--border)'}`,
+                    background: isOn ? '#6b7280' : 'var(--bg)',
+                    color: isOn ? '#fff' : endedCount > 0 ? '#6b7280' : 'var(--text-muted)',
+                    fontSize: 12, fontWeight: isOn ? 600 : 400,
+                    opacity: endedCount === 0 ? 0.4 : 1,
+                  }}
+                >
+                  終了済み
+                  <span style={{
+                    fontSize: 10, fontFamily: F.mono, fontWeight: 600,
+                    background: isOn ? 'rgba(255,255,255,0.25)' : '#6b728022',
+                    color: isOn ? '#fff' : '#6b7280',
+                    borderRadius: 8, padding: '0 5px', lineHeight: '16px',
+                  }}>
+                    {endedCount}
                   </span>
                 </button>
               );

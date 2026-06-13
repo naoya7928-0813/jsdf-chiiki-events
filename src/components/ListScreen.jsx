@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { ICO } from './Icons';
 import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle } from './Shared';
-import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, matchesTag, APPLIED_TAG_ID } from './FilterBar';
+import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, matchesTag, APPLIED_TAG_ID, ENDED_TAG_ID } from './FilterBar';
 import { daysUntil, deadlineDaysUntil, daysLabel, daysColor } from '../utils/date';
 import { REGIONS, SUPPORTED_PREFECTURES, PREFECTURE_INFO } from '../data/regionMap';
 
@@ -195,12 +195,20 @@ export default function ListScreen({
     const nmS = `${nmY}-${pad(nmM)}-01`;
     const nmE = `${nmY}-${pad(nmM)}-${pad(lastDay(nmY, nmM))}`;
 
+    const isEndedFilter = activeTag === ENDED_TAG_ID;
     return list
       .filter(ev => {
         const catOk = activeCategory === 'all'
           || (activeCategory === 'その他' ? !STANDARD_CATEGORIES.includes(ev.category) : ev.category === activeCategory);
-        const tagOk = activeTag === 'all'
+        const tagOk = activeTag === 'all' || isEndedFilter
           || (activeTag === APPLIED_TAG_ID ? (applied?.has(ev.id) ?? false) : matchesTag(ev, activeTag));
+
+        // 終了済みの表示制御:
+        //  - 「終了済み」タグ選択時 → 終了済みのみ表示
+        //  - 通常時 → 終了済みは非表示。ただしお気に入り登録済みは7日間は表示
+        const endedOk = isEndedFilter
+          ? !!ev.ended
+          : (!ev.ended || (favorites?.has(ev.id) ?? false));
 
         const ee = ev.endDate ?? ev.date;
         let periodOk = true;
@@ -210,7 +218,7 @@ export default function ListScreen({
         // 来月：開始日が来月の範囲に入るイベントのみ（今月開始来月終了のイベントは除外）
         if (activePeriod === 'nextMonth') periodOk = ev.date >= nmS && ev.date <= nmE;
 
-        return catOk && tagOk && periodOk;
+        return catOk && tagOk && periodOk && endedOk;
       })
       .sort((a, b) => {
         // 日程未定（date=""）は常に末尾へ
@@ -219,7 +227,7 @@ export default function ListScreen({
         if (!b.date) return -1;
         return new Date(a.date) - new Date(b.date);
       });
-  }, [list, activeCategory, activeTag, activePeriod]);
+  }, [list, activeCategory, activeTag, activePeriod, favorites, applied]);
 
   // ── イベントグループ化 ─────────────────────────────────────
   const grouped = useMemo(() => {
