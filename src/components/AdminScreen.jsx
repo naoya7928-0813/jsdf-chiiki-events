@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { ScreenHeader, F } from './Shared';
 import { PREFECTURE_INFO } from '../data/regionMap';
+import { fetchOfficesData } from '../hooks/useOffices';
 
 /**
  * 運営者管理ページ（裏口）。隠しURL #admin から開く。
@@ -44,6 +45,29 @@ export default function AdminScreen({ theme, onBack }) {
   const [msg, setMsg] = useState(null);
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState(false);
+  const [offices, setOffices] = useState([]);
+
+  // 入力支援用に offices.json を読み込み（案内所プルダウン・住所補完）
+  useEffect(() => { fetchOfficesData().then(d => setOffices(d?.offices || [])).catch(() => {}); }, []);
+
+  // 選択中の地本の拠点（本部・案内所・事務所）
+  const prefOffices = useMemo(
+    () => offices.filter(o => o.pref === form.pref),
+    [offices, form.pref]
+  );
+  // 会場名・住所の過去候補（拠点 + これまでに登録した手動イベント）
+  const placeCandidates = useMemo(() => {
+    const s = new Set();
+    prefOffices.forEach(o => o.name && s.add(o.name));
+    list.forEach(e => e.pref === form.pref && e.place && s.add(e.place));
+    return [...s].slice(0, 50);
+  }, [prefOffices, list, form.pref]);
+  const addressCandidates = useMemo(() => {
+    const s = new Set();
+    prefOffices.forEach(o => o.address && s.add(o.address));
+    list.forEach(e => e.pref === form.pref && e.address && s.add(e.address));
+    return [...s].slice(0, 50);
+  }, [prefOffices, list, form.pref]);
 
   const headers = useCallback((a = auth) => ({
     'Content-Type': 'application/json',
@@ -267,10 +291,39 @@ export default function AdminScreen({ theme, onBack }) {
         <div style={label}>対象</div>
         <input value={form.target} onChange={e => set('target', e.target.value)} placeholder="例: 18〜32歳 / 小学生以上 など" style={input} />
 
+        {/* 案内所・事務所から選択（選ぶと会場名・住所・URLを補完） */}
+        {prefOffices.length > 0 && (
+          <>
+            <div style={label}>案内所・事務所から選択</div>
+            <select
+              value=""
+              onChange={e => {
+                const o = prefOffices.find(x => x.id === e.target.value);
+                if (!o) return;
+                setForm(f => ({ ...f, place: o.name || f.place, address: o.address || f.address, url: f.url || o.url || '' }));
+              }}
+              style={input}
+            >
+              <option value="">— 選択して会場・住所を自動入力 —</option>
+              {prefOffices.map(o => <option key={o.id} value={o.id}>{o.name}（{o.type === 'hq' ? '本部' : '案内所/事務所'}）</option>)}
+            </select>
+          </>
+        )}
+
         <div style={label}>会場名</div>
-        <input value={form.place} onChange={e => set('place', e.target.value)} placeholder="例: 陸上自衛隊〇〇駐屯地" style={input} />
+        <input list="vv-places" value={form.place} onChange={e => set('place', e.target.value)} placeholder="例: 陸上自衛隊〇〇駐屯地" style={input} />
+        <datalist id="vv-places">{placeCandidates.map(p => <option key={p} value={p} />)}</datalist>
+
         <div style={label}>住所</div>
-        <input value={form.address} onChange={e => set('address', e.target.value)} placeholder="例: 東京都〇〇区…" style={input} />
+        <input list="vv-addrs" value={form.address} onChange={e => set('address', e.target.value)} placeholder="例: 東京都〇〇区…" style={input} />
+        <datalist id="vv-addrs">{addressCandidates.map(a => <option key={a} value={a} />)}</datalist>
+        {(form.address || form.place) && (
+          <a
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(form.address || form.place)}`}
+            target="_blank" rel="noopener noreferrer"
+            style={{ display: 'inline-block', margin: '-4px 0 14px', fontSize: 12, fontWeight: 600, color: primary, textDecoration: 'none' }}
+          >🗺 地図で確認</a>
+        )}
 
         <div style={label}>公式URL</div>
         <input value={form.url} onChange={e => set('url', e.target.value)} placeholder="https://www.mod.go.jp/pco/..." inputMode="url" style={input} />
