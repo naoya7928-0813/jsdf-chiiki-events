@@ -159,6 +159,8 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   async function remove(id) { if (!window.confirm('このイベントを削除しますか？')) return; setBusy(true); try { const r = await fetch('/api/admin/events', { method: 'DELETE', headers: headers(), body: JSON.stringify({ id }) }); if (r.ok) loadList(); } finally { setBusy(false); } }
   async function loadHistory() { try { const r = await fetch('/api/admin/history', { headers: headers() }); if (r.ok) { const j = await r.json(); setHistory(j.history || []); } } catch { /* noop */ } }
   function toggleHistory() { const n = !showHistory; setShowHistory(n); if (n) loadHistory(); }
+  async function deleteHistory(at) { try { const r = await fetch('/api/admin/history', { method: 'DELETE', headers: headers(), body: JSON.stringify({ at }) }); if (r.ok) loadHistory(); } catch { /* noop */ } }
+  async function clearHistory() { if (!window.confirm('変更履歴をすべて消去しますか？')) return; try { const r = await fetch('/api/admin/history', { method: 'DELETE', headers: headers(), body: JSON.stringify({ clear: true }) }); if (r.ok) loadHistory(); } catch { /* noop */ } }
 
   function download(name, text, mime) { const b = new Blob([text], { type: mime }); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(u), 1000); }
   function exportJSON() { download(`jsdf-events-${Date.now()}.json`, JSON.stringify(list, null, 2), 'application/json'); }
@@ -209,6 +211,8 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const prefLabel = isScoped ? (PREFECTURE_INFO[account.pref]?.label || account.pref) : '全地本';
   // 追加修正ページ＝公開系（下書き以外）、下書き確認ページ＝下書きのみ。重複を避けて分離。
   const shown = filter === 'draft' ? list.filter(e => e.status === 'draft') : list.filter(e => e.status !== 'draft');
+  // 下書き確認ページでは登録フォームを出さない（編集時のみ表示）。追加修正ページは常時表示。
+  const showForm = filter !== 'draft' || !!editingId;
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)', fontFamily: F.sans }}>
       <ScreenHeader primary={primary} title={filter === 'draft' ? '下書き確認' : 'イベント追加・修正'} subtitle="ADMIN" onBack={onBack}
@@ -216,6 +220,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
       <div data-admin-scroll style={{ flex: 1, overflowY: 'auto', padding: '16px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 28px)' }}>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>ログイン中: <strong style={{ color: 'var(--text)' }}>{account.label}</strong>（担当: {prefLabel}）</div>
 
+        {showForm && (<>
         <div style={{ fontSize: 13, fontWeight: 700, color: editingId ? primary : 'var(--text)', marginBottom: 12 }}>
           {editingId ? '既存イベントを編集中' : 'イベントを登録'}
         </div>
@@ -303,6 +308,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
             <button onClick={() => submit('published')} disabled={busy} style={{ flex: 1, padding: 15, borderRadius: 12, border: 'none', fontFamily: F.sans, fontSize: 15, fontWeight: 700, color: '#fff', background: busy ? 'var(--border)' : primary, cursor: busy ? 'default' : 'pointer' }}>公開する</button>
           </div>
         )}
+        </>)}
 
         {/* 一覧 + 出力 + 履歴 */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
@@ -314,9 +320,19 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
 
         {showHistory && (
           <div style={{ marginBottom: 16, padding: '10px 12px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 10 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', marginBottom: 8 }}>変更履歴（新しい順）</div>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', flex: 1 }}>変更履歴（新しい順）</div>
+              {history.length > 0 && <button onClick={clearHistory} style={{ ...miniOut('#ef4444'), padding: '4px 10px' }}>全消去</button>}
+            </div>
             {history.length === 0 ? <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>履歴はありません。</div>
-              : history.map((h, i) => <div key={i} style={{ fontSize: 11.5, color: 'var(--text-muted)', lineHeight: 1.7, borderTop: i ? '1px solid var(--sep)' : 'none', padding: '5px 0' }}><span style={{ fontFamily: F.mono }}>{fmtTime(h.at)}</span> <strong style={{ color: 'var(--text)' }}>{h.user}</strong> {ACTION_LABEL[h.action] || h.action}{h.note ? `（${h.note}）` : ''}: 「{h.title || '—'}」</div>)}
+              : history.map((h, i) => (
+                <div key={h.at + i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 11.5, color: 'var(--text-muted)', lineHeight: 1.7, borderTop: i ? '1px solid var(--sep)' : 'none', padding: '6px 0' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ fontFamily: F.mono }}>{fmtTime(h.at)}</span> <strong style={{ color: 'var(--text)' }}>{h.user}</strong> {ACTION_LABEL[h.action] || h.action}{h.note ? `（${h.note}）` : ''}: 「{h.title || '—'}」
+                  </div>
+                  <button onClick={() => deleteHistory(h.at)} aria-label="この履歴を削除" style={{ flexShrink: 0, fontSize: 11, fontWeight: 600, color: '#ef4444', background: 'transparent', border: '1px solid #ef444455', borderRadius: 7, padding: '3px 8px', cursor: 'pointer' }}>削除</button>
+                </div>
+              ))}
           </div>
         )}
 
