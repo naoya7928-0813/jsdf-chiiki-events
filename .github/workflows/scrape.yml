@@ -179,11 +179,13 @@ jobs:
         if: steps.commit.outputs.changed == 'true'
         # バグ報告の ntfy トピックを実行時環境変数として渡す（deploy.yml と同様）。
         # これがないとスクレイプ起点のデプロイで環境変数が失われ旧トピックに退避する。
+        # VERCEL_TOKEN は env 経由で渡す（インライン展開は末尾改行で壊れるため）
         run: |
           ARGS=""
           if [ -n "$NTFY_BUG_TOPIC" ]; then ARGS="-e NTFY_BUG_TOPIC=$NTFY_BUG_TOPIC"; fi
-          npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }} $ARGS
+          npx vercel --prod $ARGS
         env:
+          VERCEL_TOKEN:      ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           NTFY_BUG_TOPIC:    ${{ secrets.NTFY_BUG_TOPIC }}
