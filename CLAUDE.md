@@ -147,7 +147,7 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 | `/api/subscribe`（購読の登録/解除） | オリジン検証（自サイトのみ。CORS「*」廃止）＋ push endpoint のURL検証（正規プッシュサービスのみ）＋ 保存フィールド限定 ＋ IPレートリミット（20回/10分） |
 | `/api/notify`（通知送信） | `NOTIFY_SECRET`（**タイミングセーフ比較**）＋ IPレートリミット（10回/10分） |
 | 全ページ | セキュリティヘッダ（nosniff / X-Frame-Options DENY / Referrer-Policy / Permissions-Policy / HSTS）を vercel.json で付与 |
-| バグ報告フォーム | ntfy.sh の公開トピック（管理者通知のみ・データ書き換え不可）。スパムは許容リスク |
+| `/api/report`（バグ報告） | オリジン検証。ntfyトピック名は**サーバー環境変数 `NTFY_BUG_TOPIC` のみ**で扱い、フロント/バンドルに出さない（旧トピックは公開済みのためVercelで新値に設定して要ローテーション） |
 
 - レートリミットは Upstash Redis（既存のKV）の INCR+TTL。Redis障害時はブロックしない（可用性優先）
 - 本番URLを変更（独自ドメイン化等）したら `api/_security.js` の `ALLOWED_ORIGINS` を更新すること

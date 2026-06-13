@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { ScreenHeader, F } from './Shared';
-import { NTFY_BUG_TOPIC } from '../config';
 
 /* global __APP_VERSION__ */
 
@@ -51,13 +50,14 @@ export default function ReportScreen({ theme, updatedAt, onBack }) {
       `データ更新: ${ctx.updatedAt}\n` +
       `送信日時: ${ctx.sentAt}`;
     try {
-      const res = await fetch('https://ntfy.sh', {
+      // 送信先トピックはサーバー側（/api/report）でのみ扱う。
+      // フロントにはトピック名を持たせない。
+      const res = await fetch('/api/report', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          topic: NTFY_BUG_TOPIC,
           title: `🐞 ${category}の報告`,
           message,
-          tags: ['beetle'],
           priority: (category === 'バグ' || category === '表示崩れ') ? 4 : 3,
         }),
       });
