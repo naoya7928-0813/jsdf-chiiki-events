@@ -3,7 +3,7 @@ import { ScreenHeader, F } from './Shared';
 
 /* global __APP_VERSION__ */
 
-const CATEGORIES = ['バグ', '表示崩れ', '表記の誤り', '要望', 'その他'];
+const CATEGORIES = ['バグ', '表示崩れ', 'イベント情報の誤り', '表記の誤り', '要望', 'その他'];
 const CONTENT_MAX = 1000; // 内容の最大文字数
 const CONTACT_MAX = 200;  // 連絡先の最大文字数
 
@@ -58,7 +58,7 @@ export default function ReportScreen({ theme, updatedAt, onBack }) {
         body: JSON.stringify({
           title: `🐞 ${category}の報告`,
           message,
-          priority: (category === 'バグ' || category === '表示崩れ') ? 4 : 3,
+          priority: ['バグ', '表示崩れ', 'イベント情報の誤り'].includes(category) ? 4 : 3,
         }),
       });
       if (res.status === 429) { setStatus('rate'); return; } // 送信が多すぎる
@@ -138,7 +138,9 @@ export default function ReportScreen({ theme, updatedAt, onBack }) {
               value={content}
               onChange={e => setContent(e.target.value.slice(0, CONTENT_MAX))}
               maxLength={CONTENT_MAX}
-              placeholder="例: 一覧画面で〇〇のイベント名が途中で切れて表示されます"
+              placeholder={category === 'イベント情報の誤り'
+                ? '例: 〇〇県の「△△イベント」の日付（または場所・名称）が実際と違います。正しくは□□です'
+                : '例: 一覧画面で〇〇のイベント名が途中で切れて表示されます'}
               rows={6}
               style={{ ...inputBase, resize: 'vertical', lineHeight: 1.6, marginBottom: 18 }}
             />
