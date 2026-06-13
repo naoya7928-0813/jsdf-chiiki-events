@@ -142,6 +142,9 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            {ev.ended && (
+              <div style={{ display: 'inline-block', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 3, background: '#fff', color: '#6b7280', letterSpacing: 1 }}>終了済み</div>
+            )}
             <div style={{
               display: 'inline-block', fontSize: 10, fontFamily: F.mono,
               padding: '3px 8px', borderRadius: 3,

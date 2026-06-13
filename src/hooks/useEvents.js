@@ -14,6 +14,14 @@ function jstToday() {
 }
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const ENDED_KEEP_DAYS = 7; // 終了したイベントを「終了済み」として公開表示し続ける日数
+
+/** "YYYY-MM-DD" の n 日前を "YYYY-MM-DD" で返す */
+function daysBefore(dateStr, n) {
+  const d = new Date(dateStr + 'T00:00:00Z');
+  d.setUTCDate(d.getUTCDate() - n);
+  return d.toISOString().slice(0, 10);
+}
 
 /**
  * イベント1件をカードが安全に描画できる形に正規化する。
@@ -43,12 +51,13 @@ function normalizeEvent(ev) {
 }
 
 /**
- * 終了日（endDate ?? date）が今日以降のイベントのみ残す。
- * スクレイパーが深夜0時〜8時の間に走らなくても
- * クライアント側で即座に前日イベントを非表示にする。
+ * 終了したイベントは即非表示にせず「終了済み」として ENDED_KEEP_DAYS 日間は表示する。
+ * 終了日（endDate ?? date）が「今日 − 7日」以降のものを残し、
+ * 終了済み（end < today）には ended フラグを付けてカードでタグ表示する。
  */
 function filterPastEvents(rawData, today) {
   if (!rawData || typeof rawData !== 'object') return EMPTY;
+  const cutoff = daysBefore(today, ENDED_KEEP_DAYS); // これ以前に終了したものは非表示
   const out = {};
   // 全県横断でイベントIDの重複（ハッシュ衝突・スキーム揺れ）を一意化する。
   // 同一IDが複数イベントに付くと、お気に入り(★)が同IDの別イベントへ誤って
@@ -58,7 +67,8 @@ function filterPastEvents(rawData, today) {
     if (!Array.isArray(v)) { out[k] = v; continue; }
     out[k] = v
       .map(normalizeEvent)
-      .filter(ev => ev && (ev.endDate || ev.date) >= today)
+      .filter(ev => ev && (ev.endDate || ev.date) >= cutoff)
+      .map(ev => ({ ...ev, ended: (ev.endDate || ev.date) < today }))
       // 募集案内所イベントのうち、整形しても綺麗にならない非イベント（過去報告・制度説明・
       // お知らせ・ナビメニュー塊・メール/住所/電話混入・カレンダー塊・常時開催の案内など）を除外。
       // さらに、整形した結果ほとんど中身が残らない（救済不能な）ものも除外する。

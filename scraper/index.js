@@ -4274,9 +4274,12 @@ function writeOutput(data) {
   const dir = path.dirname(OUTPUT_PATH);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
-  // 今日（JST）より前の日付のイベントを削除
+  // 終了したイベントは「終了済み」として1週間（ENDED_KEEP_DAYS）残し、それ以前のみ削除。
+  // フロント側でも同じ閾値で「終了済み」タグを付けて表示する。
+  const ENDED_KEEP_DAYS = 7;
   const jstNow = new Date(Date.now() + 9 * 3600 * 1000);
   const today = jstNow.toISOString().slice(0, 10); // "YYYY-MM-DD"
+  const cutoff = new Date(jstNow.getTime() - ENDED_KEEP_DAYS * 86400000).toISOString().slice(0, 10);
   let removedCount = 0;
   for (const key of Object.keys(data)) {
     if (!Array.isArray(data[key])) continue;
@@ -4292,7 +4295,7 @@ function writeOutput(data) {
     });
     data[key] = data[key].filter(ev => {
       if (!ev.date) return false;
-      if ((ev.endDate || ev.date) < today) return false;
+      if ((ev.endDate || ev.date) < cutoff) return false; // 終了から1週間を過ぎたものだけ削除
       // タイトルが「お知らせ」のみ等、内容のないゴミデータを除外
       if (!ev.title || /^お知らせ$/.test(ev.title.trim())) return false;
       // OCR残骸・申し込み案内・住所混入・中身なしスタブを除外（全経路の最終防御）

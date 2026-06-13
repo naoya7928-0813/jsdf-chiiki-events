@@ -214,6 +214,9 @@ function EventCard({ ev, isFav, primary, accent, onTap }) {
         {/* 内容列 */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5, flexWrap: 'wrap' }}>
+            {ev.ended && (
+              <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3, background: '#6b7280', color: '#fff', letterSpacing: 0.5 }}>終了済み</span>
+            )}
             <span style={{
               fontSize: 10, padding: '2px 7px', borderRadius: 3,
               background: `${primary}18`, color: primary,
