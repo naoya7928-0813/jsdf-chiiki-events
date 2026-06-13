@@ -16,6 +16,8 @@ export default function SettingsScreen({
   onOpenHome, onOpenRegion, onOpenList, onOpenFavorites,
   onOpenLegal,
   onOpenReport,
+  adminAuthed,
+  onOpenAdmin,
 }) {
   const { primary, schemeKey, darkMode } = theme;
 
@@ -252,6 +254,17 @@ export default function SettingsScreen({
             </div>
           </div>
         </Card>
+
+        {/* ─ 運営者メニュー（ログイン時のみ表示） ─ */}
+        {adminAuthed && (
+          <>
+            <GroupTitle>運営者メニュー</GroupTitle>
+            <Card>
+              <LegalLinkRow label="🛠 イベント追加・修正" onTap={() => onOpenAdmin?.('all')} />
+              <LegalLinkRow label="📝 下書き確認" onTap={() => onOpenAdmin?.('draft')} last />
+            </Card>
+          </>
+        )}
 
         {/* ─ お問い合わせ ─ */}
         <GroupTitle>お問い合わせ</GroupTitle>

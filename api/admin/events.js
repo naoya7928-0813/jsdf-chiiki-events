@@ -61,13 +61,7 @@ function buildEvent(input, account) {
   if (url.length > 500) url = url.slice(0, 500);
 
   const status = STATUSES.has(e.status) ? e.status : 'draft';
-  // 陸海空区分（複数可）・申込要否・締切・対象 などフェーズ1の拡張項目
-  const branches = Array.isArray(e.branches)
-    ? e.branches.filter(b => ['army', 'navy', 'air'].includes(b)) : [];
-  const apply = cleanText(e.apply, 20);        // 申込要否（要予約/不要 等）
-  let deadline = String(e.deadline || '').trim();
-  if (deadline && !DATE_RE.test(deadline)) deadline = '';
-
+  // 既存イベントカードと同じスキーマに揃える（tag=申込要否, ageRequirement=対象/年齢, deadline=締切文字列）
   return {
     event: {
       id: `manual-${pref}-${date.replace(/-/g, '')}-${rand()}`,
@@ -79,11 +73,9 @@ function buildEvent(input, account) {
       address: cleanText(e.address, 100),
       time:    cleanText(e.time, 40),
       category: cleanText(e.category, 20) || '広報活動',
-      tag:     cleanText(e.tag, 20),
-      branches,
-      apply,
-      deadline: deadline || null,
-      target:  cleanText(e.target, 100),
+      tag:     cleanText(e.tag, 30),             // 申込要否（要予約/予約不要/入場無料 等）
+      ageRequirement: cleanText(e.ageRequirement, 100) || null, // 対象・年齢
+      deadline: cleanText(e.deadline, 40) || null,              // 締切（例: 7月20日（金））
       url,
       notes:   cleanText(e.notes, 300) || null,
       status,

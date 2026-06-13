@@ -175,6 +175,13 @@ export default function App() {
     setIsAdmin(false);
   }, []);
 
+  // 運営者としてログイン済みか（設定に管理メニューを出す）。AdminScreenが認証情報を保持
+  const [adminAuthed, setAdminAuthed] = useState(() => {
+    try { return !!sessionStorage.getItem('jsdf-admin-auth'); } catch { return false; }
+  });
+  const [adminFilter, setAdminFilter] = useState('all'); // 'all' | 'draft'
+  const openAdmin = useCallback((filter = 'all') => { setAdminFilter(filter); setScreen('admin'); }, []);
+
   // Safari のステータスバー theme-color をテーマに合わせて更新
   useEffect(() => {
     const metaTheme = document.querySelector('meta[name="theme-color"]');
@@ -273,9 +280,17 @@ export default function App() {
     try { localStorage.removeItem('jsdf-notif-history'); } catch {}
   }, []);
 
-  // 隠しURL #admin: 運営者管理ページを全画面表示（通常UIとは独立）
+  // 隠しURL #admin: ログインのみ。成功したら通常サイトへ戻す（管理は設定から）
   if (isAdmin) {
-    return <AdminScreen theme={theme} onBack={closeAdmin} />;
+    return (
+      <AdminScreen
+        theme={theme}
+        mode="login"
+        onAuthChange={setAdminAuthed}
+        onLoggedIn={() => { setAdminAuthed(true); closeAdmin(); }}
+        onBack={closeAdmin}
+      />
+    );
   }
 
   return (
@@ -370,6 +385,18 @@ export default function App() {
           onOpenFavorites={() => setScreen('favorites')}
           onOpenLegal={(doc) => { setLegalDoc(doc); setScreen('legal'); }}
           onOpenReport={() => { setReportTarget(null); setReportBack('settings'); setScreen('report'); }}
+          adminAuthed={adminAuthed}
+          onOpenAdmin={openAdmin}
+        />
+      )}
+
+      {screen === 'admin' && (
+        <AdminScreen
+          theme={theme}
+          mode="manage"
+          initialFilter={adminFilter}
+          onAuthChange={setAdminAuthed}
+          onBack={() => setScreen('settings')}
         />
       )}
 
