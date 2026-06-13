@@ -15,6 +15,13 @@ const APPLY_OPTS = ['', '要予約', '予約不要', '要問合せ'];
 const BRANCHES = [['army', '陸'], ['navy', '海'], ['air', '空']];
 const STATUS_LABEL = { draft: '下書き', published: '公開中', closed: '締切', cancelled: '中止' };
 const STATUS_COLOR = { draft: '#888', published: '#16a34a', closed: '#b45309', cancelled: '#ef4444' };
+const ACTION_LABEL = { add: '登録', update: '編集', status: '状態変更', delete: '削除' };
+const miniOut = (c) => ({ fontSize: 11.5, fontWeight: 600, cursor: 'pointer', borderRadius: 7, padding: '5px 10px', color: c, background: 'transparent', border: `1px solid ${c}55` });
+function fmtTime(iso) {
+  try {
+    return new Date(iso).toLocaleString('ja-JP', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Tokyo' });
+  } catch { return iso || ''; }
+}
 const PREF_ENTRIES = Object.entries(PREFECTURE_INFO);
 const SS_KEY = 'jsdf-admin-auth';
 
@@ -32,6 +39,8 @@ export default function AdminScreen({ theme, onBack }) {
   const [authErr, setAuthErr] = useState('');
   const [form, setForm] = useState(EMPTY);
   const [list, setList] = useState([]);
+  const [history, setHistory] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
   const [msg, setMsg] = useState(null);
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState(false);
@@ -119,6 +128,39 @@ export default function AdminScreen({ theme, onBack }) {
       const r = await fetch('/api/admin/events', { method: 'DELETE', headers: headers(), body: JSON.stringify({ id }) });
       if (r.ok) loadList();
     } finally { setBusy(false); }
+  }
+
+  async function loadHistory() {
+    try {
+      const r = await fetch('/api/admin/history', { headers: headers() });
+      if (r.ok) { const j = await r.json(); setHistory(j.history || []); }
+    } catch { /* noop */ }
+  }
+  function toggleHistory() {
+    const next = !showHistory; setShowHistory(next);
+    if (next) loadHistory();
+  }
+
+  // ── CSV / JSON 出力（表示中の一覧をダウンロード） ──
+  function download(filename, text, mime) {
+    const blob = new Blob([text], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  function exportJSON() {
+    download(`jsdf-events-${Date.now()}.json`, JSON.stringify(list, null, 2), 'application/json');
+  }
+  function exportCSV() {
+    const cols = ['id', 'pref', 'date', 'endDate', 'title', 'place', 'address', 'time', 'category', 'branches', 'apply', 'deadline', 'target', 'url', 'notes', 'status'];
+    const esc = v => {
+      let s = Array.isArray(v) ? v.join('/') : (v == null ? '' : String(v));
+      if (/[",\n]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
+      return s;
+    };
+    const rows = [cols.join(',')].concat(list.map(e => cols.map(c => esc(e[c])).join(',')));
+    download(`jsdf-events-${Date.now()}.csv`, '﻿' + rows.join('\r\n'), 'text/csv;charset=utf-8');
   }
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
@@ -262,8 +304,29 @@ export default function AdminScreen({ theme, onBack }) {
           }}>公開する</button>
         </div>
 
-        {/* 一覧 */}
-        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>登録済み（{list.length}）</div>
+        {/* 一覧ヘッダ + 出力 */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', flex: 1 }}>登録済み（{list.length}）</div>
+          <button onClick={exportCSV} disabled={!list.length} style={miniOut(primary)}>CSV出力</button>
+          <button onClick={exportJSON} disabled={!list.length} style={miniOut(primary)}>JSON出力</button>
+          <button onClick={toggleHistory} style={miniOut(primary)}>{showHistory ? '履歴を隠す' : '変更履歴'}</button>
+        </div>
+
+        {/* 変更履歴 */}
+        {showHistory && (
+          <div style={{ marginBottom: 16, padding: '10px 12px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 10 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', marginBottom: 8 }}>変更履歴（新しい順・最新200件）</div>
+            {history.length === 0 ? <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>履歴はありません。</div>
+              : history.map((h, i) => (
+                <div key={i} style={{ fontSize: 11.5, color: 'var(--text-muted)', lineHeight: 1.7, borderTop: i ? '1px solid var(--sep)' : 'none', padding: '5px 0' }}>
+                  <span style={{ fontFamily: F.mono }}>{fmtTime(h.at)}</span>
+                  {' '}<strong style={{ color: 'var(--text)' }}>{h.user}</strong>
+                  {' '}{ACTION_LABEL[h.action] || h.action}
+                  {h.note ? `（${h.note}）` : ''}: {(PREFECTURE_INFO[h.pref]?.label || h.pref)}「{h.title || '—'}」
+                </div>
+              ))}
+          </div>
+        )}
         {list.length === 0 ? <div style={{ fontSize: 12.5, color: 'var(--text-muted)' }}>まだありません。</div>
           : list.map(ev => (
             <div key={ev.id} style={{ padding: '10px 12px', marginBottom: 8, background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 10 }}>

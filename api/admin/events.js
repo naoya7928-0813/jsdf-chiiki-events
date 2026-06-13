@@ -9,7 +9,17 @@
 import { checkOrigin, rateLimit, requireAccount, canManagePref, redis, cleanText } from '../_security.js';
 
 const KEY = 'manual:events';
+const HKEY = 'manual:history';
 const MAX_EVENTS = 500;
+
+// 変更履歴を Redis リストに追記（最新300件保持）
+async function logHistory(account, action, ev, note = '') {
+  try {
+    const entry = { at: new Date().toISOString(), user: account.user, action, id: ev.id, pref: ev.pref, title: ev.title, note };
+    await redis.lpush(HKEY, JSON.stringify(entry));
+    await redis.ltrim(HKEY, 0, 299);
+  } catch { /* 履歴失敗は本処理を妨げない */ }
+}
 
 const PREFS = new Set([
   'sapporo','asahikawa','obihiro','hakodate','aomori','iwate','miyagi','akita','yamagata','fukushima',
@@ -112,6 +122,7 @@ export default async function handler(req, res) {
     try {
       if (await redis.hlen(KEY) >= MAX_EVENTS) return res.status(409).json({ error: '登録上限に達しています' });
       await redis.hset(KEY, { [built.event.id]: JSON.stringify(built.event) });
+      await logHistory(account, 'add', built.event, built.event.status === 'published' ? '公開で登録' : '下書きで登録');
       return res.status(200).json({ ok: true, event: built.event });
     } catch (err) { console.error('[admin/events] POST', err); return res.status(500).json({ error: 'failed to save' }); }
   }
@@ -140,6 +151,10 @@ export default async function handler(req, res) {
       }
       ev.updatedAt = new Date().toISOString();
       await redis.hset(KEY, { [id]: JSON.stringify(ev) });
+      const note = patch.status !== undefined
+        ? `状態→${({ draft: '下書き', published: '公開', closed: '締切', cancelled: '中止' })[ev.status] || ev.status}`
+        : '内容を編集';
+      await logHistory(account, patch.status !== undefined ? 'status' : 'update', ev, note);
       return res.status(200).json({ ok: true, event: ev });
     } catch (err) { console.error('[admin/events] PATCH', err); return res.status(500).json({ error: 'failed to update' }); }
   }
@@ -150,11 +165,14 @@ export default async function handler(req, res) {
     if (!id) return res.status(400).json({ error: 'id is required' });
     try {
       const raw = await redis.hget(KEY, id);
+      let deleted = { id, pref: '', title: '' };
       if (raw) {
         const ev = typeof raw === 'string' ? JSON.parse(raw) : raw;
         if (!canManagePref(account, ev.pref)) return res.status(403).json({ error: '権限がありません' });
+        deleted = ev;
       }
       await redis.hdel(KEY, id);
+      await logHistory(account, 'delete', deleted, '削除');
       return res.status(200).json({ ok: true });
     } catch (err) { console.error('[admin/events] DELETE', err); return res.status(500).json({ error: 'failed to delete' }); }
   }
