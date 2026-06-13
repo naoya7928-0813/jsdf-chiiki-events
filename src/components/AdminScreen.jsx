@@ -122,7 +122,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
     } catch { setAuthErr('通信に失敗しました。'); }
     finally { setBusy(false); }
   }
-  function logout() { setAuth(null); setAccount(null); setList([]); try { localStorage.removeItem(SS_KEY); } catch { /* noop */ } onAuthChange?.(false); onBack?.(); }
+  function logout() { setAuth(null); setAccount(null); setList([]); try { localStorage.removeItem(SS_KEY); } catch { /* noop */ } onAuthChange?.(false); }
 
   // 既存イベントの編集を開始（フォームへ読み込み）。※編集はユーザー通知を飛ばさない
   function startEdit(ev) {

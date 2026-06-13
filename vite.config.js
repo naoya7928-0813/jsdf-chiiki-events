@@ -1,14 +1,22 @@
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 // package.json からバージョンを読み取り、ビルド時に __APP_VERSION__ として埋め込む
 const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url)));
+const r = (p) => fileURLToPath(new URL(p, import.meta.url));
 
 export default defineConfig({
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
+  },
+  build: {
+    rollupOptions: {
+      // 公開アプリ(index) と 運営者専用ページ(admin) の2エントリ
+      input: { main: r('./index.html'), admin: r('./admin.html') },
+    },
   },
   plugins: [
     react(),

@@ -10,7 +10,6 @@ import NotificationScreen from './components/NotificationScreen';
 import FavoritesScreen   from './components/FavoritesScreen';
 import LegalScreen        from './components/LegalScreen';
 import ReportScreen       from './components/ReportScreen';
-import AdminScreen        from './components/AdminScreen';
 import RegionScreen       from './components/RegionScreen';
 import SplashScreen       from './components/SplashScreen';
 
@@ -154,37 +153,16 @@ export default function App() {
   const scheme = COLOR_SCHEMES[schemeKey] ?? COLOR_SCHEMES[DEFAULT_SCHEME];
   const theme  = { ...scheme, schemeKey, darkMode };
 
-  // ── 運営者管理ページ（裏口）: 隠しURL #admin で表示 ──────────────
-  // SWの自動更新やPWA起動で #admin が落ちても維持できるよう sessionStorage にも記録する。
-  const ADMIN_FLAG = 'jsdf-admin-open';
-  const readAdmin = () => {
-    if (typeof window === 'undefined') return false;
-    if (window.location.hash.replace(/^#/, '') === 'admin') return true;
-    try { return sessionStorage.getItem(ADMIN_FLAG) === '1'; } catch { return false; }
-  };
-  const [isAdmin, setIsAdmin] = useState(readAdmin);
-  useEffect(() => {
-    if (isAdmin) { try { sessionStorage.setItem(ADMIN_FLAG, '1'); } catch { /* noop */ } }
-    const onHash = () => { if (window.location.hash.replace(/^#/, '') === 'admin') setIsAdmin(true); };
-    window.addEventListener('hashchange', onHash);
-    return () => window.removeEventListener('hashchange', onHash);
-  }, [isAdmin]);
-  const closeAdmin = useCallback(() => {
-    try { sessionStorage.removeItem(ADMIN_FLAG); } catch { /* noop */ }
-    try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch { /* noop */ }
-    setIsAdmin(false);
-  }, []);
-
-  // 運営者としてログイン済みか（設定に管理メニューを出す）。AdminScreenが認証情報を保持。
-  // localStorage に保存するため、端末を再起動してもログイン状態が残る。
-  const [adminAuthed, setAdminAuthed] = useState(() => {
+  // 運営者としてログイン済みか（詳細の「編集」表示制御）。運営者ページ(/admin.html)で
+  // ログインすると localStorage に認証が入り、同一オリジンの公開アプリでも参照できる。
+  const [adminAuthed] = useState(() => {
     try { return !!localStorage.getItem('jsdf-admin-auth'); } catch { return false; }
   });
-  const [adminFilter, setAdminFilter] = useState('all'); // 'all' | 'draft'
-  const [initialEditEvent, setInitialEditEvent] = useState(null);
-  const openAdmin = useCallback((filter = 'all') => { setInitialEditEvent(null); setAdminFilter(filter); setScreen('admin'); }, []);
-  // 詳細画面から運営者が追加済みイベントを編集（手動イベントのみ）
-  const editEventAsAdmin = useCallback((ev) => { setInitialEditEvent(ev); setAdminFilter('all'); setScreen('admin'); }, []);
+  // 詳細の「編集」: 別口の運営者ページへ対象イベントを引き継いで遷移する
+  const editEventAsAdmin = useCallback((ev) => {
+    try { sessionStorage.setItem('jsdf-admin-edit', JSON.stringify(ev)); } catch { /* noop */ }
+    window.location.href = '/admin.html';
+  }, []);
 
   // Safari のステータスバー theme-color をテーマに合わせて更新
   useEffect(() => {
@@ -302,19 +280,6 @@ export default function App() {
     try { localStorage.removeItem('jsdf-notif-history'); } catch {}
   }, []);
 
-  // 隠しURL #admin: ログインのみ。成功したら通常サイトへ戻す（管理は設定から）
-  if (isAdmin) {
-    return (
-      <AdminScreen
-        theme={theme}
-        mode="login"
-        onAuthChange={setAdminAuthed}
-        onLoggedIn={() => { setAdminAuthed(true); closeAdmin(); }}
-        onBack={closeAdmin}
-      />
-    );
-  }
-
   return (
     <div style={{
       maxWidth: 430, margin: '0 auto',
@@ -413,19 +378,6 @@ export default function App() {
           onOpenFavorites={() => setScreen('favorites')}
           onOpenLegal={(doc) => { setLegalDoc(doc); setScreen('legal'); }}
           onOpenReport={() => { setReportTarget(null); setReportBack('settings'); setScreen('report'); }}
-          adminAuthed={adminAuthed}
-          onOpenAdmin={openAdmin}
-        />
-      )}
-
-      {screen === 'admin' && (
-        <AdminScreen
-          theme={theme}
-          mode="manage"
-          initialFilter={adminFilter}
-          initialEditEvent={initialEditEvent}
-          onAuthChange={setAdminAuthed}
-          onBack={() => { setInitialEditEvent(null); setScreen(initialEditEvent ? 'detail' : 'settings'); }}
         />
       )}
 
