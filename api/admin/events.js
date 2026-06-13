@@ -29,6 +29,18 @@ const PREFS = new Set([
   'ehime','kochi','fukuoka','saga','nagasaki','kumamoto','oita','miyazaki','kagoshima','okinawa',
 ]);
 const STATUSES = new Set(['draft', 'published', 'closed', 'cancelled']);
+
+// 個人番号（仮）: 担当官名と権限。001=募集案内所 所長（追加・削除可）、他は編集のみ。
+const STAFF = {
+  '001': { name: '東京 募集案内所 所長（仮）', addDelete: true },
+  '002': { name: '東京 担当官A（仮）',        addDelete: false },
+  '003': { name: '東京 担当官B（仮）',        addDelete: false },
+};
+// リクエストの個人番号を解決（ヘッダ x-admin-staff か body.staff）
+function resolveStaff(req) {
+  const no = String(req.headers['x-admin-staff'] || req.body?.staff || '').trim();
+  return STAFF[no] ? { no, ...STAFF[no] } : null;
+}
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const WD = ['日', '月', '火', '水', '木', '金', '土'];
 const weekdayOf = d => { const t = new Date(d + 'T00:00:00Z'); return Number.isNaN(t.getTime()) ? '' : WD[t.getUTCDay()]; };
@@ -90,12 +102,14 @@ function buildEvent(input, account) {
 export default async function handler(req, res) {
   if (!checkOrigin(req, res)) return;
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PATCH, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-admin-user, x-admin-pass, x-admin-secret');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-admin-user, x-admin-pass, x-admin-secret, x-admin-staff');
   if (req.method === 'OPTIONS') return res.status(204).end();
 
   if (!await rateLimit(req, res, 'admin-events', 80, 600)) return;
   const account = requireAccount(req, res);
   if (!account) return;
+  const staff = resolveStaff(req);            // 個人番号（仮）。担当官名・権限
+  const who = staff ? `${staff.no} ${staff.name}` : account.user; // createdBy/updatedBy 表記
 
   // ── 一覧（担当地本のみ。* は全件） ──
   if (req.method === 'GET') {
@@ -107,14 +121,16 @@ export default async function handler(req, res) {
     } catch (err) { console.error('[admin/events] GET', err); return res.status(500).json({ error: 'failed to list' }); }
   }
 
-  // ── 追加 ──
+  // ── 追加（個人番号 001=所長 のみ可） ──
   if (req.method === 'POST') {
+    if (!staff || !staff.addDelete) return res.status(403).json({ error: 'この個人番号ではイベントを追加できません（所長のみ可）' });
     const built = buildEvent(req.body?.event, account);
     if (built.error) return res.status(400).json({ error: built.error });
+    built.event.createdBy = who; built.event.updatedBy = who; // 担当官名を記録
     try {
       if (await redis.hlen(KEY) >= MAX_EVENTS) return res.status(409).json({ error: '登録上限に達しています' });
       await redis.hset(KEY, { [built.event.id]: JSON.stringify(built.event) });
-      await logHistory(account, 'add', built.event, built.event.status === 'published' ? '公開で登録' : '下書きで登録');
+      await logHistory({ user: who, pref: account.pref }, 'add', built.event, built.event.status === 'published' ? '公開で登録' : '下書きで登録');
       return res.status(200).json({ ok: true, event: built.event });
     } catch (err) { console.error('[admin/events] POST', err); return res.status(500).json({ error: 'failed to save' }); }
   }
@@ -156,18 +172,19 @@ export default async function handler(req, res) {
         else { delete ev.endDate; delete ev.endWeekday; }
       }
       ev.updatedAt = new Date().toISOString();
-      ev.updatedBy = account.user;  // 編集した担当官（裏側のみ・公開には出さない）
+      ev.updatedBy = who;  // 編集した担当官（裏側のみ・公開には出さない）
       await redis.hset(KEY, { [id]: JSON.stringify(ev) });
       const note = patch.status !== undefined
         ? `状態→${({ draft: '下書き', published: '公開', closed: '締切', cancelled: '中止' })[ev.status] || ev.status}`
         : '内容を編集';
-      await logHistory(account, patch.status !== undefined ? 'status' : 'update', ev, note);
+      await logHistory({ user: who, pref: account.pref }, patch.status !== undefined ? 'status' : 'update', ev, note);
       return res.status(200).json({ ok: true, event: ev });
     } catch (err) { console.error('[admin/events] PATCH', err); return res.status(500).json({ error: 'failed to update' }); }
   }
 
-  // ── 削除 ──
+  // ── 削除（個人番号 001=所長 のみ可） ──
   if (req.method === 'DELETE') {
+    if (!staff || !staff.addDelete) return res.status(403).json({ error: 'この個人番号ではイベントを削除できません（所長のみ可）' });
     const id = String(req.body?.id || '').trim();
     if (!id) return res.status(400).json({ error: 'id is required' });
     try {
@@ -179,7 +196,7 @@ export default async function handler(req, res) {
         deleted = ev;
       }
       await redis.hdel(KEY, id);
-      await logHistory(account, 'delete', deleted, '削除');
+      await logHistory({ user: who, pref: account.pref }, 'delete', deleted, '削除');
       return res.status(200).json({ ok: true });
     } catch (err) { console.error('[admin/events] DELETE', err); return res.status(500).json({ error: 'failed to delete' }); }
   }

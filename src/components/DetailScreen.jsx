@@ -105,6 +105,12 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
               {ICO.back('#fff', 16)}
             </button>
             <div style={{ display: 'flex', gap: 8 }}>
+              {/* 運営者ログイン時: 手動イベントの編集（右上） */}
+              {adminAuthed && ev.source_type === 'manual' && onEditEvent && (
+                <button onClick={() => onEditEvent(ev)} aria-label="このイベントを編集" style={{ ...iconBtnStyle, background: '#fff' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                </button>
+              )}
               {/* 申請済みトグル */}
               <button
                 onClick={() => onToggleApplied?.(ev.id)}
@@ -436,20 +442,6 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
             }}>
               当サイトは有志による非公式サイトです。防衛省・自衛隊および各地方協力本部とは直接関係ありません。イベントの開催可否・申込方法・変更などは、必ず公式ページで最新情報をご確認ください。
             </div>
-            {/* 運営者ログイン時: 手動追加イベントをその場で編集 */}
-            {adminAuthed && ev.source_type === 'manual' && onEditEvent && (
-              <button
-                onClick={() => onEditEvent(ev)}
-                style={{
-                  marginTop: 10, width: '100%', minHeight: 44,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                  background: primary, border: 'none', borderRadius: 8,
-                  color: '#fff', fontSize: 13, fontWeight: 700, fontFamily: F.sans, cursor: 'pointer',
-                }}
-              >
-                このイベントを編集（運営者）
-              </button>
-            )}
             {/* この情報の誤りを報告（イベントID・地本名を引き継ぐ） */}
             {onReport && (
               <button

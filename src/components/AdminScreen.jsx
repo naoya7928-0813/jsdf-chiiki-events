@@ -18,6 +18,10 @@ const STATUS_COLOR = { draft: '#888', published: '#16a34a', closed: '#b45309', c
 const ACTION_LABEL = { add: '登録', update: '編集', status: '状態変更', delete: '削除' };
 const PREF_ENTRIES = Object.entries(PREFECTURE_INFO);
 const SS_KEY = 'jsdf-admin-auth';
+const STAFF_KEY = 'jsdf-admin-staff';
+// 個人番号（仮）→ 担当官名。001=募集案内所 所長のみ追加・削除可
+const STAFF = { '001': '東京 募集案内所 所長（仮）', '002': '東京 担当官A（仮）', '003': '東京 担当官B（仮）' };
+const STAFF_ADD_DELETE = new Set(['001']);
 const WD = ['日', '月', '火', '水', '木', '金', '土'];
 
 const EMPTY = {
@@ -63,10 +67,13 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState(false);
   const [offices, setOffices] = useState([]);
+  const [staff, setStaff] = useState(() => { try { return localStorage.getItem(STAFF_KEY) || ''; } catch { return ''; } });
+  const staffName = STAFF[staff] || '';
+  const canAddDelete = STAFF_ADD_DELETE.has(staff);
 
   useEffect(() => { fetchOfficesData().then(d => setOffices(Array.isArray(d) ? d : (d?.offices || []))).catch(() => {}); }, []);
 
-  const headers = useCallback((a = auth) => ({ 'Content-Type': 'application/json', 'x-admin-user': a?.user || '', 'x-admin-pass': a?.pass || '' }), [auth]);
+  const headers = useCallback((a = auth) => ({ 'Content-Type': 'application/json', 'x-admin-user': a?.user || '', 'x-admin-pass': a?.pass || '', 'x-admin-staff': staff || '' }), [auth, staff]);
 
   const loadList = useCallback(async (a = auth) => {
     try {
@@ -228,7 +235,19 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         onBack={(editingId && !fromDetail) ? cancelEdit : onBack}
         trailing={<button onClick={logout} style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', borderRadius: 8, fontSize: 12, padding: '6px 10px', cursor: 'pointer' }}>ログアウト</button>} />
       <div data-admin-scroll style={{ flex: 1, overflowY: 'auto', padding: '16px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 28px)' }}>
-        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>ログイン中: <strong style={{ color: 'var(--text)' }}>{account.label}</strong>（担当: {prefLabel}）</div>
+        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10 }}>ログイン中: <strong style={{ color: 'var(--text)' }}>{account.label}</strong>（担当: {prefLabel}）</div>
+
+        {/* 個人番号（仮）→ 担当官名を自動表示。001=所長のみ追加・削除可 */}
+        <div style={{ marginBottom: 14, padding: '10px 12px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 10 }}>
+          <div style={{ ...label, marginBottom: 6 }}>個人番号</div>
+          <input value={staff} inputMode="numeric"
+            onChange={e => { const v = e.target.value.replace(/\D/g, '').slice(0, 3); setStaff(v); try { localStorage.setItem(STAFF_KEY, v); } catch { /* noop */ } }}
+            placeholder="例: 001" style={{ ...input, marginBottom: 6 }} />
+          {staffName
+            ? <div style={{ fontSize: 12.5, color: 'var(--text)' }}>担当官: <strong>{staffName}</strong> <span style={{ color: canAddDelete ? '#15803d' : 'var(--text-muted)' }}>{canAddDelete ? '（追加・削除・編集 可）' : '（編集のみ／追加・削除不可）'}</span></div>
+            : staff ? <div style={{ fontSize: 12, color: '#ef4444' }}>未登録の個人番号です（仮: 001 / 002 / 003）</div>
+              : <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>個人番号を入力すると担当官名が表示されます（仮: 001=所長 / 002 / 003）</div>}
+        </div>
 
         {showForm && (<>
         <div style={{ fontSize: 13, fontWeight: 700, color: editingId ? primary : 'var(--text)', marginBottom: 12 }}>
@@ -312,10 +331,14 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
             <button onClick={cancelEdit} disabled={busy} style={{ flex: 1, padding: 15, borderRadius: 12, fontFamily: F.sans, fontSize: 15, fontWeight: 700, cursor: busy ? 'default' : 'pointer', background: 'var(--card)', border: '1px solid var(--border)', color: 'var(--text-sub)' }}>キャンセル</button>
             <button onClick={() => submit()} disabled={busy} style={{ flex: 2, padding: 15, borderRadius: 12, border: 'none', fontFamily: F.sans, fontSize: 15, fontWeight: 700, color: '#fff', background: busy ? 'var(--border)' : primary, cursor: busy ? 'default' : 'pointer' }}>{busy ? '更新中…' : '変更を更新する'}</button>
           </div>
-        ) : (
+        ) : canAddDelete ? (
           <div style={{ display: 'flex', gap: 10, marginBottom: 26 }}>
             <button onClick={() => submit('draft')} disabled={busy} style={{ flex: 1, padding: 15, borderRadius: 12, fontFamily: F.sans, fontSize: 15, fontWeight: 700, cursor: busy ? 'default' : 'pointer', background: 'var(--card)', border: `1px solid ${primary}`, color: primary }}>下書き保存</button>
             <button onClick={() => submit('published')} disabled={busy} style={{ flex: 1, padding: 15, borderRadius: 12, border: 'none', fontFamily: F.sans, fontSize: 15, fontWeight: 700, color: '#fff', background: busy ? 'var(--border)' : primary, cursor: busy ? 'default' : 'pointer' }}>公開する</button>
+          </div>
+        ) : (
+          <div style={{ marginBottom: 26, padding: '12px 14px', borderRadius: 10, background: 'var(--card)', border: '1px dashed var(--border)', fontSize: 12.5, color: 'var(--text-muted)', lineHeight: 1.7 }}>
+            この個人番号ではイベントの新規追加はできません（追加・削除は <strong>001（所長）</strong> のみ）。既存イベントの「編集」は可能です。
           </div>
         )}
         </>)}
@@ -361,7 +384,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
                 {ev.status === 'published' && <Mini onClick={() => setStatus(ev.id, 'draft')} color="#888">下書きへ</Mini>}
                 {ev.status !== 'closed' && <Mini onClick={() => setStatus(ev.id, 'closed')} color="#b45309">締切</Mini>}
                 {ev.status !== 'cancelled' && <Mini onClick={() => setStatus(ev.id, 'cancelled')} color="#ef4444">中止</Mini>}
-                <Mini onClick={() => remove(ev.id)} color="#ef4444" outline>削除</Mini>
+                {canAddDelete && <Mini onClick={() => remove(ev.id)} color="#ef4444" outline>削除</Mini>}
               </div>
             </div>
           ))}
