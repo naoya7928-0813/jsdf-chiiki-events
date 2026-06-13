@@ -2,106 +2,10 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
+import { injectGlobalStyles } from './globalStyles';
 
-// ─── グローバルスタイル ───────────────────────────────────────
-// CSS変数でライト/ダーク両モードのカラーを定義する。
-// コンポーネントは var(--bg) / var(--card) 等を inline style で参照する。
-const style = document.createElement('style');
-style.textContent = `
-  /* ─── ライトモード（デフォルト） ─── */
-  :root {
-    --bg:         #f5f6f8;
-    --card:       #ffffff;
-    --border:     #e5e8ee;
-    --sep:        #eef1f6;
-    --text:       #0f172a;
-    --text-sub:   #475569;
-    --text-muted: #6b7280;
-    --icon-muted: #c8cdd6;
-    --month-sep:  #d8dce3;
-    --tag-bg:     #eef1f6;
-    --badge-bg:   #eef1f6;
-    --map-gray:        #d1d5db;
-    --map-hover:       #c4c8d0;
-    --notice-bg:       rgba(133,107,0,0.07);
-    --notice-border:   rgba(133,107,0,0.15);
-  }
-
-  /* ─── ダークモード ─── */
-  [data-theme="dark"] {
-    --bg:         #0d1117;
-    --card:       #161b22;
-    --border:     #30363d;
-    --sep:        #21262d;
-    --text:       #e6edf3;
-    --text-sub:   #8b949e;
-    --text-muted: #6e7681;
-    --icon-muted: #484f58;
-    --month-sep:  #30363d;
-    --tag-bg:     #21262d;
-    --badge-bg:   #21262d;
-    --map-gray:        #2d3748;
-    --map-hover:       #3d4a5e;
-    --notice-bg:       rgba(255,200,0,0.06);
-    --notice-border:   rgba(255,200,0,0.12);
-  }
-
-  /* ─── OS設定がダーク かつ data-theme 未指定の場合 ─── */
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]):not([data-theme="dark"]) {
-      --bg:         #0d1117;
-      --card:       #161b22;
-      --border:     #30363d;
-      --sep:        #21262d;
-      --text:       #e6edf3;
-      --text-sub:   #8b949e;
-      --text-muted: #6e7681;
-      --icon-muted: #484f58;
-      --month-sep:  #30363d;
-      --tag-bg:     #21262d;
-      --badge-bg:   #21262d;
-      --map-gray:        #2d3748;
-      --map-hover:       #3d4a5e;
-      --notice-bg:       rgba(255,200,0,0.06);
-      --notice-border:   rgba(255,200,0,0.12);
-    }
-  }
-
-  /* ─── リセット & ベース ─── */
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  html, body {
-    height: 100%;
-    background: var(--bg);
-    overscroll-behavior: none;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-  }
-
-  body {
-    font-feature-settings: "palt" 1;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-    color: var(--text);
-  }
-
-  #root {
-    height: 100%;
-    height: 100dvh;
-  }
-
-  /* スクロールバー非表示（モバイル風） */
-  ::-webkit-scrollbar { display: none; }
-  * { scrollbar-width: none; }
-
-  /* ボタンのデフォルトスタイルリセット */
-  button { -webkit-appearance: none; appearance: none; }
-
-  /* アニメーション */
-  @keyframes spin { to { transform: rotate(360deg); } }
-`;
-document.head.appendChild(style);
+// ─── グローバルスタイル（公開/運営で共通） ──────────────────────
+injectGlobalStyles();
 
 // vite-plugin-pwa が registerType:'autoUpdate' で SW を自動登録するため手動登録は不要
 

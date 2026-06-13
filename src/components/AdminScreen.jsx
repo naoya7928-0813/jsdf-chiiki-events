@@ -45,7 +45,7 @@ function toDeadlineStr(d) {
 const miniOut = (c) => ({ fontSize: 11.5, fontWeight: 600, cursor: 'pointer', borderRadius: 7, padding: '5px 10px', color: c, background: 'transparent', border: `1px solid ${c}55` });
 function fmtTime(iso) { try { return new Date(iso).toLocaleString('ja-JP', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Tokyo' }); } catch { return iso || ''; } }
 
-export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn, onAuthChange, initialFilter = 'all', initialEditEvent = null }) {
+export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn, onAuthChange, initialFilter = 'all', initialEditEvent = null, showTabs = false }) {
   const { primary } = theme;
   const [auth, setAuth] = useState(() => { try { return JSON.parse(localStorage.getItem(SS_KEY)) || null; } catch { return null; } });
   const [account, setAccount] = useState(null);
@@ -60,7 +60,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const [list, setList] = useState([]);
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
-  const [filter] = useState(initialFilter); // all（追加修正＝公開系）| draft（下書き確認）
+  const [filter, setFilter] = useState(initialFilter); // all（追加修正＝公開系）| draft（下書き確認）
   const [editingId, setEditingId] = useState(null);
   const [editingDeadline, setEditingDeadline] = useState(null);
   const [msg, setMsg] = useState(null);
@@ -251,6 +251,21 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
       <ScreenHeader primary={primary} title={editingId ? '編集' : (filter === 'draft' ? '下書き確認' : 'イベント追加・修正')} subtitle="ADMIN"
         onBack={(editingId && !fromDetail) ? cancelEdit : onBack}
         trailing={<button onClick={logout} style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', borderRadius: 8, fontSize: 12, padding: '6px 10px', cursor: 'pointer' }}>ログアウト</button>} />
+      {/* タブ（追加・修正／下書き）。1ページで全機能にアクセス */}
+      {showTabs && !editingId && (
+        <div style={{ display: 'flex', gap: 8, padding: '10px 16px 0', flexShrink: 0 }}>
+          {[['all', 'イベント追加・修正'], ['draft', '下書き']].map(([v, jp]) => {
+            const on = filter === v;
+            return (
+              <button key={v} onClick={() => setFilter(v)} style={{
+                flex: 1, padding: '9px 0', borderRadius: 9, fontFamily: F.sans, fontSize: 13, fontWeight: 700,
+                cursor: 'pointer', border: `1px solid ${on ? primary : 'var(--border)'}`,
+                background: on ? primary : 'var(--card)', color: on ? '#fff' : 'var(--text-sub)',
+              }}>{jp}{v === 'draft' && list.filter(e => e.status === 'draft').length > 0 ? `（${list.filter(e => e.status === 'draft').length}）` : ''}</button>
+            );
+          })}
+        </div>
+      )}
       <div data-admin-scroll style={{ flex: 1, overflowY: 'auto', padding: '16px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 28px)' }}>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10 }}>ログイン中: <strong style={{ color: 'var(--text)' }}>{account.label}</strong>（担当: {prefLabel}）</div>
 
