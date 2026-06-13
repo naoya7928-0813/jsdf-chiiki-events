@@ -12,6 +12,8 @@ function buildContext(updatedAt) {
   const version = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '不明';
   let size = '';
   try { size = `${window.innerWidth}×${window.innerHeight}`; } catch { /* noop */ }
+  let url = '';
+  try { url = window.location.href; } catch { /* noop */ }
   const sentAt = new Date().toLocaleString('ja-JP', {
     year: 'numeric', month: '2-digit', day: '2-digit',
     hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Tokyo',
@@ -20,6 +22,7 @@ function buildContext(updatedAt) {
     version,
     ua: (typeof navigator !== 'undefined' && navigator.userAgent) || '不明',
     size,
+    url: url || '不明',
     updatedAt: updatedAt || '不明',
     sentAt,
   };
@@ -44,6 +47,7 @@ export default function ReportScreen({ theme, updatedAt, onBack }) {
       `【内容】\n${content.trim()}\n\n` +
       `【連絡先】${contact.trim() || '未記入'}\n\n` +
       `―― 状況（自動添付）――\n` +
+      `ページURL: ${ctx.url}\n` +
       `バージョン: ${ctx.version}\n` +
       `端末/ブラウザ: ${ctx.ua}\n` +
       `画面サイズ: ${ctx.size}\n` +
@@ -162,7 +166,7 @@ export default function ReportScreen({ theme, updatedAt, onBack }) {
               background: `${primary}08`, border: `1px solid ${primary}22`,
             }}>
               <div style={{ fontSize: 11.5, color: 'var(--text-muted)', lineHeight: 1.7 }}>
-                ※ 不具合の調査のため、ご利用中の<strong>アプリのバージョン・端末/ブラウザ情報・画面サイズ・データの更新時刻</strong>が自動で一緒に送信されます（氏名・位置情報などの個人情報は含まれません）。
+                ※ 不具合の調査のため、ご利用中の<strong>ページURL・アプリのバージョン・端末/ブラウザ情報・画面サイズ・データの更新時刻</strong>が自動で一緒に送信されます（氏名・位置情報などの個人情報は含まれません）。
               </div>
               <button onClick={() => setShowCtx(v => !v)} style={{
                 marginTop: 8, padding: 0, background: 'none', border: 'none', cursor: 'pointer',
@@ -177,6 +181,7 @@ export default function ReportScreen({ theme, updatedAt, onBack }) {
                   fontSize: 11, color: 'var(--text-muted)', fontFamily: F.mono, lineHeight: 1.7,
                   wordBreak: 'break-all',
                 }}>
+                  ページURL: {ctx.url}<br />
                   バージョン: {ctx.version}<br />
                   端末/ブラウザ: {ctx.ua}<br />
                   画面サイズ: {ctx.size}<br />
