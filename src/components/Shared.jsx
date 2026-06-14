@@ -1,4 +1,9 @@
+import { createContext, useContext } from 'react';
 import { ICO } from './Icons';
+
+// 運営者ナビ用コンテキスト。operator=true のときだけ下部タブに「管理」を出す。
+// 公開アプリ(/)では provider を置かないため、管理タブも管理コードも一切現れない。
+export const OperatorNavContext = createContext(null);
 
 // ── タブバー用メディアクエリを<head>に注入（1回のみ） ──────────
 const _TB_CSS_ID = 'jsdf-tabbar-mq';
@@ -129,6 +134,7 @@ export function ScreenHeader({ primary, title, subtitle, onBack, trailing }) {
 
 // ─── 下部タブバー（CSS変数対応） ──────────────────────────────
 export function BottomTabBar({ active, onChange, primary }) {
+  const op = useContext(OperatorNavContext);
   const tabs = [
     { id: 'home',      label: 'ホーム',     icon: (c, s)     => ICO.home(c, s) },
     { id: 'list',      label: 'イベント',   icon: (c, s)     => ICO.cal(c, s)  },
@@ -136,6 +142,10 @@ export function BottomTabBar({ active, onChange, primary }) {
     { id: 'favorites', label: 'お気に入り', icon: (c, s, on) => ICO.star(c, s, on ? c : 'none') },
     { id: 'settings',  label: '設定',       icon: (c, s)     => ICO.user(c, s) },
   ];
+  // 運営者モードのみ「管理」タブを追加（公開アプリには出ない）
+  if (op?.operator) {
+    tabs.push({ id: 'admin', label: '管理', icon: (c, s) => ICO.gear(c, s), onTap: op.openAdmin });
+  }
   return (
     <div className="jsdf-tab-bar" style={{
       borderTop: '1px solid var(--border)',
@@ -148,7 +158,7 @@ export function BottomTabBar({ active, onChange, primary }) {
           || (active === 'detail'    && t.id === 'list')
           || (active === 'favorites' && t.id === 'favorites');
         return (
-          <button key={t.id} onClick={() => onChange(t.id)} aria-label={t.label} style={{
+          <button key={t.id} onClick={() => (t.onTap ? t.onTap() : onChange(t.id))} aria-label={t.label} style={{
             border: 'none', background: 'transparent', cursor: 'pointer',
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
             padding: '4px 12px', minHeight: 44,

@@ -1,63 +1,23 @@
 // 運営者専用ページ（/admin.html）のエントリ。公開アプリ(/)とは別口。
-// 表示方法は #admin の頃と同じく、アプリと同一テーマ・同一コンテナで全画面表示する。
-import { useState } from 'react';
+// 中身は公開サイトの完全コピー（App）を「運営者モード」で起動したもの。
+//  - 開いた時点でログイン必須
+//  - 下部ナビに「管理」タブ（イベント追加・修正／下書き／変更履歴／CSV等）
+//  - イベント詳細に編集ボタン
+// 公開アプリ(/)にはこれらの機能・コードは一切含まれない（App に operator を渡さないため）。
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { injectGlobalStyles } from './globalStyles';
-import { COLOR_SCHEMES, DEFAULT_SCHEME } from './config';
+import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
-import AdminScreen from './components/AdminScreen';
+import { injectGlobalStyles } from './globalStyles';
 
-// 公開アプリと同じグローバルCSS（CSS変数・リセット）
+// 公開アプリと同じグローバルCSS（CSS変数・リセット）。配色/ダークモードは
+// App 内で localStorage(jsdf-scheme / jsdf-dark) から復元するため、見た目は完全に揃う。
 injectGlobalStyles();
 
-// 公開アプリと同じ配色設定を localStorage から引き継ぐ
-function loadScheme()  { try { return localStorage.getItem('jsdf-scheme') || DEFAULT_SCHEME; } catch { return DEFAULT_SCHEME; } }
-function loadDark()    { try { return localStorage.getItem('jsdf-dark')   || 'system';       } catch { return 'system'; } }
-function resolveIsDark(mode) {
-  if (mode === 'dark')  return true;
-  if (mode === 'light') return false;
-  try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch { return false; }
-}
-
-// 公開アプリの詳細「編集」から渡された対象イベント（sessionStorage 経由）
-function consumeEditTarget() {
-  try {
-    const raw = sessionStorage.getItem('jsdf-admin-edit');
-    if (raw) { sessionStorage.removeItem('jsdf-admin-edit'); return JSON.parse(raw); }
-  } catch { /* noop */ }
-  return null;
-}
-
-function AdminApp() {
-  const schemeKey = loadScheme();
-  const darkMode  = loadDark();
-  document.documentElement.dataset.theme = resolveIsDark(darkMode) ? 'dark' : 'light';
-  const scheme = COLOR_SCHEMES[schemeKey] ?? COLOR_SCHEMES[DEFAULT_SCHEME];
-  const theme  = { ...scheme, schemeKey, darkMode };
-
-  const [editTarget] = useState(consumeEditTarget);
-
-  // #admin の頃と同じく、アプリと同一の中央コンテナで全画面表示
-  return (
-    <div style={{
-      maxWidth: 430, margin: '0 auto', height: '100dvh',
-      display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden',
-      background: 'var(--bg)', boxShadow: '0 0 40px rgba(0,0,0,0.12)',
-    }}>
-      <AdminScreen
-        theme={theme}
-        mode="manage"
-        initialFilter="all"
-        initialEditEvent={editTarget}
-        showTabs
-        onBack={() => { window.location.href = '/'; }}
-      />
-    </div>
-  );
-}
-
 createRoot(document.getElementById('root')).render(
-  <ErrorBoundary>
-    <AdminApp />
-  </ErrorBoundary>
+  <StrictMode>
+    <ErrorBoundary>
+      <App operator />
+    </ErrorBoundary>
+  </StrictMode>
 );

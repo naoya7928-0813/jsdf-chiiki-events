@@ -1,7 +1,8 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
 import { useEvents } from './hooks/useEvents';
 import { COLOR_SCHEMES, DEFAULT_SCHEME } from './config';
 import { PREFECTURE_INFO } from './data/regionMap';
+import { OperatorNavContext } from './components/Shared';
 import HomeScreen        from './components/HomeScreen';
 import ListScreen        from './components/ListScreen';
 import DetailScreen      from './components/DetailScreen';
@@ -12,6 +13,8 @@ import LegalScreen        from './components/LegalScreen';
 import ReportScreen       from './components/ReportScreen';
 import RegionScreen       from './components/RegionScreen';
 import SplashScreen       from './components/SplashScreen';
+// 管理画面は運営者ページ(/admin.html)でのみ使う。遅延読込で公開バンドルから分離する。
+const AdminScreen = lazy(() => import('./components/AdminScreen'));
 
 // ─── localStorage 復元ヘルパー ────────────────────────────────
 function loadScheme()       { try { return localStorage.getItem('jsdf-scheme') || DEFAULT_SCHEME; } catch { return DEFAULT_SCHEME; } }
@@ -47,7 +50,7 @@ function resolveIsDark(mode) {
   return window.matchMedia('(prefers-color-scheme: dark)').matches;
 }
 
-export default function App() {
+export default function App({ operator = false }) {
   // ── スプラッシュ ──────────────────────────────────────────
   // ページロード（再起動）のたびに毎回表示する
   const [showSplash, setShowSplash] = useState(true);
@@ -153,16 +156,24 @@ export default function App() {
   const scheme = COLOR_SCHEMES[schemeKey] ?? COLOR_SCHEMES[DEFAULT_SCHEME];
   const theme  = { ...scheme, schemeKey, darkMode };
 
-  // 運営者としてログイン済みか（詳細の「編集」表示制御）。運営者ページ(/admin.html)で
-  // ログインすると localStorage に認証が入り、同一オリジンの公開アプリでも参照できる。
-  const [adminAuthed] = useState(() => {
+  // 運営者ログイン状態。運営者ページ(/admin.html, operator=true)でのみ意味を持つ。
+  // 公開アプリ(operator=false)では常に false 扱いで、編集機能・管理タブは一切出ない。
+  const [adminAuthed, setAdminAuthed] = useState(() => {
+    if (!operator) return false;
     try { return !!localStorage.getItem('jsdf-admin-auth'); } catch { return false; }
   });
-  // 詳細の「編集」: 別口の運営者ページへ対象イベントを引き継いで遷移する
+  // 詳細の「編集」: 同じ運営者サイト内で管理画面を開き、対象イベントを編集する
+  const [adminEditEvent, setAdminEditEvent] = useState(null);
   const editEventAsAdmin = useCallback((ev) => {
-    try { sessionStorage.setItem('jsdf-admin-edit', JSON.stringify(ev)); } catch { /* noop */ }
-    window.location.href = '/admin.html';
+    setAdminEditEvent(ev);
+    setScreen('admin');
   }, []);
+  // 管理タブ／編集から戻るときの遷移先
+  const closeAdmin = useCallback(() => {
+    const back = adminEditEvent ? 'detail' : 'home';
+    setAdminEditEvent(null);
+    setScreen(back);
+  }, [adminEditEvent]);
 
   // Safari のステータスバー theme-color をテーマに合わせて更新
   useEffect(() => {
@@ -280,15 +291,35 @@ export default function App() {
     try { localStorage.removeItem('jsdf-notif-history'); } catch {}
   }, []);
 
+  const containerStyle = {
+    maxWidth: 430, margin: '0 auto',
+    height: '100dvh',
+    display: 'flex', flexDirection: 'column',
+    position: 'relative', overflow: 'hidden',
+    background: 'var(--bg)',
+    boxShadow: '0 0 40px rgba(0,0,0,0.12)',
+  };
+
+  // ── 運営者サイトはログイン必須。未ログインならログイン画面のみ表示 ──
+  if (operator && !adminAuthed) {
+    return (
+      <div style={containerStyle}>
+        <Suspense fallback={null}>
+          <AdminScreen
+            theme={theme}
+            mode="login"
+            onLoggedIn={() => setAdminAuthed(true)}
+            onAuthChange={(ok) => setAdminAuthed(ok)}
+            onBack={() => { window.location.href = '/'; }}
+          />
+        </Suspense>
+      </div>
+    );
+  }
+
   return (
-    <div style={{
-      maxWidth: 430, margin: '0 auto',
-      height: '100dvh',
-      display: 'flex', flexDirection: 'column',
-      position: 'relative', overflow: 'hidden',
-      background: 'var(--bg)',
-      boxShadow: '0 0 40px rgba(0,0,0,0.12)',
-    }}>
+    <OperatorNavContext.Provider value={{ operator, openAdmin: () => { setAdminEditEvent(null); setScreen('admin'); } }}>
+    <div style={containerStyle}>
 
       {/* ── スプラッシュ画面（テーマに応じた乗り物アニメーション） ── */}
       {showSplash && (
@@ -426,6 +457,22 @@ export default function App() {
           onOpenSettings={() => setScreen('settings')}
         />
       )}
+
+      {/* ── 管理画面（運営者サイトのみ・「管理」タブ／詳細の編集から） ── */}
+      {operator && screen === 'admin' && (
+        <Suspense fallback={null}>
+          <AdminScreen
+            theme={theme}
+            mode="manage"
+            initialFilter="all"
+            initialEditEvent={adminEditEvent}
+            showTabs
+            onAuthChange={(ok) => setAdminAuthed(ok)}
+            onBack={closeAdmin}
+          />
+        </Suspense>
+      )}
     </div>
+    </OperatorNavContext.Provider>
   );
 }
