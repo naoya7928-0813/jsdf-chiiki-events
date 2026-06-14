@@ -10,6 +10,9 @@
  *   public/icons/apple-touch-icon-jgsdf.png    — 陸上自衛隊カラー
  *   public/icons/apple-touch-icon-jmsdf.png    — 海上自衛隊カラー
  *   public/icons/apple-touch-icon-jasdf.png    — 航空自衛隊カラー
+ *   public/icons/icon-admin-192.png            — 運営用 PWA (「地」下に「運営用」)
+ *   public/icons/icon-admin-512.png            — 運営用 PWA maskable
+ *   public/icons/apple-touch-icon-admin.png    — 運営用 iOS
  */
 
 import sharp from 'sharp';
@@ -50,7 +53,48 @@ function buildSvg(bg) {
 </svg>`);
 }
 
+// 運営用アイコン: 通常と同じ意匠で「地」の真下に「運営用」を入れる（通常版は変更しない）
+function buildAdminSvg(bg) {
+  return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="110" fill="${bg}"/>
+  <circle cx="256" cy="248" r="180" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="4"/>
+  <circle cx="256" cy="248" r="134" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+  <text x="256" y="268"
+    text-anchor="middle"
+    font-family="'Hiragino Mincho ProN','Yu Mincho','游明朝','Noto Serif JP',serif"
+    font-size="150"
+    font-weight="700"
+    fill="#ffffff"
+    letter-spacing="-4">地</text>
+  <text x="256" y="372"
+    text-anchor="middle"
+    font-family="'Hiragino Sans','Yu Gothic','游ゴシック','Noto Sans JP',sans-serif"
+    font-size="62"
+    font-weight="700"
+    fill="#ffffff"
+    letter-spacing="2">運営用</text>
+</svg>`);
+}
+
 const tasks = [];
+
+// 運営用アイコン（デフォルト JGSDF 色・通常版と同じ背景）
+const adminSvg = buildAdminSvg(SCHEMES.jgsdf.bg);
+tasks.push(
+  sharp(adminSvg).resize(192, 192).png()
+    .toFile(resolve(outDir, 'icon-admin-192.png'))
+    .then(() => console.log('✓ icon-admin-192.png (192x192) — 運営用'))
+);
+tasks.push(
+  sharp(adminSvg).resize(512, 512).png()
+    .toFile(resolve(outDir, 'icon-admin-512.png'))
+    .then(() => console.log('✓ icon-admin-512.png (512x512) — 運営用'))
+);
+tasks.push(
+  sharp(adminSvg).resize(180, 180).png()
+    .toFile(resolve(outDir, 'apple-touch-icon-admin.png'))
+    .then(() => console.log('✓ apple-touch-icon-admin.png (180x180) — 運営用'))
+);
 
 // 各スキームの apple-touch-icon を生成
 for (const [key, { bg, label }] of Object.entries(SCHEMES)) {
