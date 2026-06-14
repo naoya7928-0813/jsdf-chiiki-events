@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
@@ -7,6 +7,30 @@ import { VitePWA } from 'vite-plugin-pwa';
 // package.json からバージョンを読み取り、ビルド時に __APP_VERSION__ として埋め込む
 const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url)));
 const r = (p) => fileURLToPath(new URL(p, import.meta.url));
+
+// admin.html だけ別マニフェストを参照させる。vite-plugin-pwa は全HTMLに
+// 公開用 /manifest.webmanifest（start_url:"/"）を注入するため、その後に
+// admin.html のみ /admin.webmanifest（start_url:"/admin.html"）へ差し替える。
+// これでホーム画面追加時、運営アプリは運営サイトを起動し、公開と別アプリになる。
+function adminManifestSwap() {
+  return {
+    name: 'admin-manifest-swap',
+    // ビルド完了後（vite-plugin-pwa の注入も終わった後）に dist/admin.html を書き換える
+    closeBundle() {
+      try {
+        const fp = r('./dist/admin.html');
+        if (!existsSync(fp)) return;
+        let html = readFileSync(fp, 'utf8');
+        if (html.includes('/manifest.webmanifest')) {
+          html = html.replace(/href="\/manifest\.webmanifest"/g, 'href="/admin.webmanifest"');
+          writeFileSync(fp, html);
+          // eslint-disable-next-line no-console
+          console.log('[admin-manifest-swap] dist/admin.html を /admin.webmanifest に差し替えました');
+        }
+      } catch (e) { console.warn('[admin-manifest-swap] 失敗:', e?.message); }
+    },
+  };
+}
 
 export default defineConfig({
   define: {
@@ -20,6 +44,7 @@ export default defineConfig({
   },
   plugins: [
     react(),
+    adminManifestSwap(),
     VitePWA({
       strategies: 'injectManifest',
       srcDir: 'src',
@@ -41,6 +66,8 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/',
+        id: '/',
+        scope: '/',
         lang: 'ja',
         icons: [
           { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
