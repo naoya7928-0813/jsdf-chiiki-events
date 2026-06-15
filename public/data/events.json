@@ -205,25 +205,7 @@
       "deadline": null
     }
   ],
-  "aomori": [
-    {
-      "id": "ao-ref-sza3a",
-      "pref": "aomori",
-      "date": "2026-06-15",
-      "weekday": "月",
-      "title": "令和7年度自衛官等採用案内",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/aomori/",
-      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_notice"
-    }
-  ],
+  "aomori": [],
   "iwate": [
     {
       "id": "iw-20260620-qsr38",
@@ -354,25 +336,7 @@
       "deadline": null
     }
   ],
-  "yamagata": [
-    {
-      "id": "ya-ref-wwdcm",
-      "pref": "yamagata",
-      "date": "2026-06-15",
-      "weekday": "月",
-      "title": "自衛隊山形地方協力本部のイベント情報",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/yamagata/",
-      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_notice"
-    }
-  ],
+  "yamagata": [],
   "fukushima": [
     {
       "id": "fs-20260711-youtw",
@@ -1003,26 +967,72 @@
       "deadline": null
     }
   ],
-  "chiba": [
+  "chiba": [],
+  "niigata": [
     {
-      "id": "ch-ref-ln45y",
-      "pref": "chiba",
-      "date": "2026-06-15",
-      "weekday": "月",
-      "title": "令和8年度自衛官等採用案内",
-      "place": "",
+      "id": "ni-20260620-c2c93",
+      "pref": "niigata",
+      "date": "2026-06-20",
+      "weekday": "土",
+      "title": "弥彦防災フェア",
+      "place": "弥彦中学校体育館",
       "address": "",
-      "time": "",
+      "time": "10:00～12:30",
       "category": "広報活動",
       "tag": "",
-      "url": "https://www.mod.go.jp/pco/chiba/",
-      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "url": "",
+      "notes": null,
       "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_notice"
-    }
-  ],
-  "niigata": [
+      "deadline": null
+    },
+    {
+      "id": "ni-20260621-14qzb",
+      "pref": "niigata",
+      "date": "2026-06-21",
+      "weekday": "日",
+      "title": "NEXT marche【ココロと体にメンテナンスを】",
+      "place": "ネクストジェネレーションタウン",
+      "address": "",
+      "time": "11:00～15:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "ni-20260627-m9tjc",
+      "pref": "niigata",
+      "date": "2026-06-27",
+      "weekday": "土",
+      "title": "シーサイドカーニバル",
+      "place": "道の駅 能生 マリンドリーム能生",
+      "address": "",
+      "time": "10:00～16:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    },
+    {
+      "id": "ni-20260627-e0vw8",
+      "pref": "niigata",
+      "date": "2026-06-27",
+      "weekday": "土",
+      "title": "フェスらて",
+      "place": "アオーレ長岡",
+      "address": "",
+      "time": "10:00～16:00",
+      "category": "地域参加",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null
+    },
     {
       "id": "ni-office-20260718-utd2z",
       "pref": "niigata",
@@ -1043,25 +1053,7 @@
       "endWeekday": "月・祝"
     }
   ],
-  "toyama": [
-    {
-      "id": "to-ref-ufxzq",
-      "pref": "toyama",
-      "date": "2026-06-15",
-      "weekday": "月",
-      "title": "令和8年度6月睦友会奉仕活動のご案内",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/toyama/",
-      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_notice"
-    }
-  ],
+  "toyama": [],
   "ishikawa": [
     {
       "id": "ik-20260712-x6cr5",
@@ -1146,7 +1138,7 @@
       "deadline": null
     },
     {
-      "id": "fu-off-20260817-m5lzk",
+      "id": "fu-office-20260817-7o0yg",
       "pref": "fukui",
       "date": "2026-08-17",
       "weekday": "月",
@@ -1157,7 +1149,7 @@
       "category": "広報活動",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/fukui/contents/15-oubo/images/202608premium-tour.pdf",
-      "notes": "定員15名程度・抽選・応募多数は抽選",
+      "notes": "掲載元: 敦賀地域事務所・敦賀出張所・越前地域事務所 ほか1拠点\n定員15名程度・抽選・応募多数は抽選",
       "ageRequirement": "高校1年生〜32歳未満（日本国籍を有する福井県在住の方）",
       "deadline": "6月28日（日）",
       "source_type": "office_ocr",
@@ -1201,22 +1193,6 @@
     }
   ],
   "nagano": [
-    {
-      "id": "na-20260615-xhb8x",
-      "pref": "nagano",
-      "date": "2026-06-15",
-      "weekday": "月",
-      "title": "【松本市】自衛隊 お仕事紹介",
-      "place": "イオンモール松本 「風庭」エリア, 日本、〒390-8560 長野県松本市中央4丁目9−51",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "場所：イオンモール松本 風庭１F あぶり牛たん万 前 時間：１５：００～１９：３０ 内容：「自衛隊ってなにしてるの？」その疑問を解決！仕事内容、生活、ワークライフバランス、待遇等をわかりやすく説明させて頂きます。 来場者にはグッズプレゼント(^^)/",
-      "ageRequirement": null,
-      "deadline": null
-    },
     {
       "id": "na-20260617-2d18h",
       "pref": "nagano",
@@ -1334,8 +1310,8 @@
     {
       "id": "gi-ref-xpc46",
       "pref": "gifu",
-      "date": "2026-06-15",
-      "weekday": "月",
+      "date": "2026-06-16",
+      "weekday": "火",
       "title": "令和8年度自衛官等採用案内",
       "place": "",
       "address": "",
@@ -1368,23 +1344,6 @@
     }
   ],
   "aichi": [
-    {
-      "id": "ai-20260615-4u61a",
-      "pref": "aichi",
-      "date": "2026-06-15",
-      "weekday": "月",
-      "title": "金山所｜ハローワーク名古屋南説明会",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "自衛隊制度",
-      "ageRequirement": null,
-      "deadline": null,
-      "endDate": null
-    },
     {
       "id": "ai-20260620-g6687",
       "pref": "aichi",
@@ -2695,43 +2654,9 @@
       "source_type": "office_ocr"
     }
   ],
-  "mie": [
-    {
-      "id": "mi-office-20260614-gz3y3",
-      "pref": "mie",
-      "date": "2026-06-14",
-      "weekday": "日",
-      "title": "自衛隊フリースペースイベント",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/mie/post-9146/",
-      "notes": "掲載元: 四日市出張所・伊勢地域事務所・松阪地域事務所 ほか2拠点",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html"
-    }
-  ],
+  "mie": [],
   "shiga": [],
   "kyoto": [
-    {
-      "id": "ky-set-20260615-79k74",
-      "pref": "kyoto",
-      "date": "2026-06-15",
-      "weekday": "月",
-      "title": "自衛官 就職・進学説明会",
-      "place": "ハローワーク西陣 烏丸御池庁舎",
-      "address": "",
-      "time": "9:00～12:00",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
-      "notes": "担当: 河原町募集案内所",
-      "ageRequirement": null,
-      "deadline": null
-    },
     {
       "id": "ky-set-20260620-oyqcj",
       "pref": "kyoto",
@@ -3138,7 +3063,25 @@
     }
   ],
   "wakayama": [],
-  "ehime": [],
+  "ehime": [
+    {
+      "id": "eh-ref-ie7w6",
+      "pref": "ehime",
+      "date": "2026-06-16",
+      "weekday": "火",
+      "title": "自衛官募集",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/ehime/recruit/01nishi.html",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_notice"
+    }
+  ],
   "kagawa": [
     {
       "id": "kg-20260711-90jyg",
@@ -3173,7 +3116,25 @@
       "deadline": null
     }
   ],
-  "kochi": [],
+  "kochi": [
+    {
+      "id": "ko-ref-9hhrq",
+      "pref": "kochi",
+      "date": "2026-06-16",
+      "weekday": "火",
+      "title": "令和8年度 自衛官等 採用試験予定",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kochi/",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_notice"
+    }
+  ],
   "tokushima": [
     {
       "id": "to-off-20260704-kvs5z",
@@ -3193,8 +3154,44 @@
       "source_type": "office_ocr"
     }
   ],
-  "tottori": [],
-  "shimane": [],
+  "tottori": [
+    {
+      "id": "to-ref-b3xna",
+      "pref": "tottori",
+      "date": "2026-06-16",
+      "weekday": "火",
+      "title": "第69回自衛隊音楽演奏会",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tottori/content/00-saiyou/recruit.html",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_notice"
+    }
+  ],
+  "shimane": [
+    {
+      "id": "sh-ref-nfvfa",
+      "pref": "shimane",
+      "date": "2026-06-16",
+      "weekday": "火",
+      "title": "自衛隊島根地方協力本部のイベント情報",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/shimane/recruit/exam.html",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_notice"
+    }
+  ],
   "okayama": [
     {
       "id": "ok-20260627-8n8e7",
@@ -3245,23 +3242,6 @@
       "deadline": null
     },
     {
-      "id": "ok-office-20260720-shla9",
-      "pref": "okayama",
-      "date": "2026-07-20",
-      "weekday": "月・祝",
-      "title": "自衛官×警察官 職員採用試験合同説明会",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "採用イベント",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/okayama/img/okayama_godo.pdf",
-      "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html"
-    },
-    {
       "id": "ok-office-20260705-828n9",
       "pref": "okayama",
       "date": "2026-07-05",
@@ -3279,23 +3259,6 @@
       "source_type": "office_html"
     },
     {
-      "id": "ok-office-20260714-yyh4r",
-      "pref": "okayama",
-      "date": "2026-07-14",
-      "weekday": "火",
-      "title": "募集中 【２等陸・海・空士（任期制自衛官）】募集",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/gsdf/jieikanbosyu/about/recruit/jieikankoho.html",
-      "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html"
-    },
-    {
       "id": "ok-office-20260705-c5enn",
       "pref": "okayama",
       "date": "2026-07-05",
@@ -3307,6 +3270,40 @@
       "category": "採用イベント",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/okayama/img/kurashiki_godo.pdf",
+      "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html"
+    },
+    {
+      "id": "ok-office-20260720-shla9",
+      "pref": "okayama",
+      "date": "2026-07-20",
+      "weekday": "月・祝",
+      "title": "自衛官×警察官 職員採用試験合同説明会",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "採用イベント",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/okayama/img/okayama_godo.pdf",
+      "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html"
+    },
+    {
+      "id": "ok-office-20260714-yyh4r",
+      "pref": "okayama",
+      "date": "2026-07-14",
+      "weekday": "火",
+      "title": "募集中 【２等陸・海・空士（任期制自衛官）】募集",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/gsdf/jieikanbosyu/about/recruit/jieikankoho.html",
       "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
       "ageRequirement": null,
       "deadline": null,
@@ -3375,23 +3372,6 @@
       "category": "説明会",
       "tag": "学生向け",
       "url": "https://www.mod.go.jp/gsdf/jieikanbosyu/about/recruit/taihigakusei.html",
-      "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html"
-    },
-    {
-      "id": "ok-office-20260615-ppl4i",
-      "pref": "okayama",
-      "date": "2026-06-15",
-      "weekday": "月",
-      "title": "倉敷わかものハローワーク（就職・転職）",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "採用イベント",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/okayama/setumei/setumei.html#harowa",
       "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
       "ageRequirement": null,
       "deadline": null,
@@ -3901,5 +3881,5 @@
   "miyazaki": [],
   "kagoshima": [],
   "okinawa": [],
-  "updatedAt": "2026/06/15 19:24"
+  "updatedAt": "2026/06/16 00:58"
 }
