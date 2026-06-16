@@ -1,18 +1,19 @@
 name: スクレイピング & データ更新
 
 on:
-  # 通知が日本時間 8:00 / 12:00 / 18:00 ごろに届くよう「開始」時刻を設定。
-  #   GitHub Actions のスケジュールは :00 ちょうどが最も混雑して数十分〜数時間
-  #   遅延するため、混雑の少ない :43 開始にする。さらにスクレイプ所要(実測 約63分)
-  #   を見込み、目標時刻の約77分前に開始する（63分実行 + 14分の遅延吸収）。
-  #   開始(JST)  → 約63分後に完了・通知 → 目標通知時刻
-  #   06:43      → 約07:46                → 08:00
-  #   10:43      → 約11:46                → 12:00
-  #   16:43      → 約17:46                → 18:00
+  # 【通知は必ず 08:00 / 12:00 / 18:00(JST) のスロットで送る設計】
+  #   通知ステップ内で「目標スロットまで待ってから送信」する（下部参照）。そのため
+  #   スクレイプはスロットより十分前に開始し、スロット到達前に終わらせておく。
+  #   GitHub のスケジュールは :00 ちょうどが最も遅延するため :27 開始にして遅延を圧縮。
+  #   スクレイプ実測 約63分 + 起動遅延吸収 約30分 = 目標スロットの約93分前に開始。
+  #   開始(JST)  → 約63分で完了 → スロットまで待機 → 通知
+  #   06:27      → 約07:30        → 08:00 に送信
+  #   10:27      → 約11:30        → 12:00 に送信
+  #   16:27      → 約17:30        → 18:00 に送信
   schedule:
-    - cron: '43 21 * * *'  # JST 06:43 開始 → 通知 08:00 ごろ
-    - cron: '43 1 * * *'   # JST 10:43 開始 → 通知 12:00 ごろ
-    - cron: '43 7 * * *'   # JST 16:43 開始 → 通知 18:00 ごろ
+    - cron: '27 21 * * *'  # JST 06:27 開始 → 通知 08:00
+    - cron: '27 1 * * *'   # JST 10:27 開始 → 通知 12:00
+    - cron: '27 7 * * *'   # JST 16:27 開始 → 通知 18:00
 
   # GitHub Actions の UI から手動実行も可能
   workflow_dispatch:
@@ -30,7 +31,8 @@ jobs:
   scrape:
     name: イベントデータ取得
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    # スクレイプ(約63分) + 目標スロットまでの待機(最大約93分) を見込んで上限を延ばす
+    timeout-minutes: 130
 
     permissions:
       contents: write
@@ -294,6 +296,30 @@ jobs:
           node /tmp/check_notify.js
 
           if [ -f /tmp/notify_data.json ]; then
+            # ── 通知を必ず 08:00 / 12:00 / 18:00(JST) スロットで送る ──
+            # スクレイプが早く終わっても、トリガー元 cron に対応する目標スロットまで
+            # 待ってから送信する。GitHub 起動が遅延し既にスロットを過ぎている場合
+            # （WAIT<=0）や、想定外に遠い場合（>3h）は待たず即送信。手動実行も即送信。
+            #   TZ非依存で確実にするため UTC で目標を持つ（JST=UTC+9）:
+            #   08:00JST=23:00UTC / 12:00JST=03:00UTC / 18:00JST=09:00UTC
+            #   各スロットのUTC時刻は、その枠のジョブが動く UTC 同日内に必ず来る。
+            case "${{ github.event.schedule }}" in
+              "27 21 * * *") TARGET_UTC="23:00" ;;  # → 08:00 JST
+              "27 1 * * *")  TARGET_UTC="03:00" ;;  # → 12:00 JST
+              "27 7 * * *")  TARGET_UTC="09:00" ;;  # → 18:00 JST
+              *)             TARGET_UTC="" ;;
+            esac
+            if [ -n "$TARGET_UTC" ]; then
+              TARGET_EPOCH=$(date -u -d "$(date -u +%Y-%m-%d) $TARGET_UTC:00" +%s)
+              WAIT=$(( TARGET_EPOCH - $(date -u +%s) ))
+              if [ "$WAIT" -gt 0 ] && [ "$WAIT" -le 10800 ]; then
+                echo "[通知] 目標スロット(UTC ${TARGET_UTC}) まで ${WAIT}s 待機してから送信します"
+                sleep "$WAIT"
+              else
+                echo "[通知] 待機なしで即送信（WAIT=${WAIT}s）"
+              fi
+            fi
+
             TOTAL=$(node -p "require('/tmp/notify_data.json').total")
             REGION_NAMES=$(node -p "require('/tmp/notify_data.json').regionNames")
 
