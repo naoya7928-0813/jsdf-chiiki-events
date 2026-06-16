@@ -91,6 +91,31 @@ test('cleanEventTitle: 先頭・末尾のゴミを整形する', () => {
   assert.equal(cleanEventTitle('自衛隊説明会（ハローワーク伏見）'), '自衛隊説明会（ハローワーク伏見）');
 });
 
+test('cleanEventTitle: 更新バッジ接頭辞・会場連結・末尾断片を整形（2026-06-16 帯広で検出）', () => {
+  // 「更新情報new」バッジ + 「！！ 会場名 ～」連結 + 末尾助詞断片をすべて除去
+  assert.equal(
+    cleanEventTitle('更新情報new 公務員合同説明会の！！ 帯広とかちプラザ１Ｆアトリウム ～'),
+    '公務員合同説明会');
+  // 更新バッジの各種表記
+  assert.equal(cleanEventTitle('更新情報New 高等工科学校説明会'), '高等工科学校説明会');
+  assert.equal(cleanEventTitle('新着情報 ヘリコプター体験搭乗'), 'ヘリコプター体験搭乗');
+  // 末尾の波ダッシュ・助詞断片
+  assert.equal(cleanEventTitle('自衛官募集説明会 ～'), '自衛官募集説明会');
+  assert.equal(cleanEventTitle('採用説明会の'), '採用説明会');
+  // 年号サフィックスや！！直後に空白の無い本文は切らない（誤爆防止）
+  assert.equal(cleanEventTitle('自衛隊体験フェスタ!! 2026'), '自衛隊体験フェスタ!! 2026');
+  assert.equal(cleanEventTitle('公務員合同説明会入場無料！！どなたでも参加できます！！'),
+    '公務員合同説明会入場無料！！どなたでも参加できます！！');
+});
+
+test('cleanEventTitle: 複数イベントの連結は先頭イベントのみ残す（2026-06-16 広島で検出）', () => {
+  assert.equal(
+    cleanEventTitle('第１回公安系公務員合同説明会in広島の 公安系公務員合同説明会inふくやまの 公安職公務員ガイダンスのご案内'),
+    '第１回公安系公務員合同説明会in広島');
+  // 単独イベント（イベント語1回）は連結扱いしない
+  assert.equal(cleanEventTitle('公務員合同説明会のご案内'), '公務員合同説明会のご案内');
+});
+
 test('isJunkOrStubTitle: 不正タイトルを検出する', () => {
   const junk = [
     '↑申し込みはこちら↑ 【お問合せ先】自衛隊京都地方協力本部 〒604-8482京',
