@@ -4281,6 +4281,10 @@ function writeOutput(data) {
   const today = jstNow.toISOString().slice(0, 10); // "YYYY-MM-DD"
   const cutoff = new Date(jstNow.getTime() - ENDED_KEEP_DAYS * 86400000).toISOString().slice(0, 10);
   let removedCount = 0;
+  // ★ ここが全イベントカードの最終整形・検証ゲート。各フィールドの書式・記述ルールの
+  //    正準は CLAUDE.md「イベントカード記述ルール（正準仕様）」。実装は shared/titleQuality.cjs
+  //    （+ 募集案内所は shared/officeTitle.cjs、カテゴリ/タグ/曜日は parsers/utils.js）。
+  //    新経路を足すときも必ずこのゲート（titleQuality 適用後）を通すこと。
   for (const key of Object.keys(data)) {
     if (!Array.isArray(data[key])) continue;
     const before = data[key].length;
