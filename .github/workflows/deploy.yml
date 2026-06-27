@@ -59,3 +59,10 @@ jobs:
           NTFY_BUG_TOPIC:    ${{ secrets.NTFY_BUG_TOPIC }}
           ADMIN_SECRET:      ${{ secrets.ADMIN_SECRET }}
           ADMIN_ACCOUNTS_B64: ${{ secrets.ADMIN_ACCOUNTS_B64 }}
+
+      - name: IndexNow へURL送信（Bing/Yandex等。Google非対応はsitemap巡回）
+        # 本番反映後にキーファイルが公開されている前提で送信。失敗してもデプロイは成功扱い。
+        continue-on-error: true
+        run: |
+          sleep 20
+          node scripts/indexnow.mjs
