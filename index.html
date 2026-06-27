@@ -48,16 +48,25 @@
     [
       {
         "@context": "https://schema.org",
+        "@type": "Organization",
+        "@id": "https://jsdf-chiiki-events.vercel.app/#operator",
+        "name": "地本イベントナビ（非公式）",
+        "alternateName": "自衛隊地本イベント情報【非公式まとめ】",
+        "url": "https://jsdf-chiiki-events.vercel.app/",
+        "logo": "https://jsdf-chiiki-events.vercel.app/icons/icon-512.png",
+        "description": "全国の自衛隊地方協力本部が公開するイベント情報を、有志が非公式に集約・配信する個人運営サービスです。",
+        "disambiguatingDescription": "本サービスは防衛省・自衛隊および各地方協力本部とは一切関係のない、有志による非公式の情報まとめです。公式機関ではありません。",
+        "knowsAbout": ["自衛隊のイベント情報", "自衛隊地方協力本部（地本）", "自衛官募集イベント", "駐屯地・基地の一般公開"]
+      },
+      {
+        "@context": "https://schema.org",
         "@type": "WebSite",
-        "name": "自衛隊地本イベント情報",
+        "name": "自衛隊地本イベント情報（非公式まとめ）",
         "alternateName": "自衛隊地方協力本部イベント情報",
         "url": "https://jsdf-chiiki-events.vercel.app/",
         "description": "全国の自衛隊地本イベントを都道府県別にまとめて確認できる非公式アプリ。防衛省・自衛隊とは無関係の個人運営サービスです。",
         "inLanguage": "ja",
-        "potentialAction": {
-          "@type": "SearchAction",
-          "target": "https://jsdf-chiiki-events.vercel.app/"
-        }
+        "publisher": { "@id": "https://jsdf-chiiki-events.vercel.app/#operator" }
       },
       {
         "@context": "https://schema.org",
@@ -101,7 +110,7 @@
 
     <!-- SEO用 静的フッター（常時HTMLに存在しクロール可能。トップから各ページへ内部リンクを通す） -->
     <footer id="seo-footer" style="font-family:sans-serif;max-width:960px;margin:24px auto 40px;padding:16px;border-top:1px solid #e2e6ee;line-height:1.9;color:#33415c;font-size:0.85em">
-      <p style="margin:0 0 6px"><a href="/events.html" style="color:#0b2545;font-weight:600">全国の自衛隊地本イベント一覧（都道府県別）</a></p>
+      <p style="margin:0 0 6px"><a href="/events.html" style="color:#0b2545;font-weight:600">全国の自衛隊地本イベント一覧（都道府県別）</a> ｜ <a href="/guide.html" style="color:#0b2545">自衛隊イベント参加ガイド</a></p>
       <div style="display:flex;flex-wrap:wrap;gap:4px 14px">
         <div class="seo-reg"><b>北海道</b> <a href="/events/sapporo.html">札幌</a> <a href="/events/asahikawa.html">旭川</a> <a href="/events/obihiro.html">帯広</a> <a href="/events/hakodate.html">函館</a></div>
         <div class="seo-reg"><b>東北</b> <a href="/events/aomori.html">青森</a> <a href="/events/iwate.html">岩手</a> <a href="/events/miyagi.html">宮城</a> <a href="/events/akita.html">秋田</a> <a href="/events/yamagata.html">山形</a> <a href="/events/fukushima.html">福島</a></div>

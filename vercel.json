@@ -4,7 +4,7 @@
   "framework": "vite",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/((?!api|assets|icons|data|events|admin\\.html|admin\\.webmanifest|manifest\\.webmanifest|sitemap\\.xml|robots\\.txt|google).*)", "destination": "/index.html" }
+    { "source": "/((?!api|assets|icons|data|events|guide\\.html|llms\\.txt|admin\\.html|admin\\.webmanifest|manifest\\.webmanifest|sitemap\\.xml|robots\\.txt|google).*)", "destination": "/index.html" }
   ],
   "headers": [
     {

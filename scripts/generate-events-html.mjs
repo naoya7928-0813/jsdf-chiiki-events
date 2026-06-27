@@ -204,8 +204,12 @@ function toEventSchema(ev, prefLabel) {
       name: `${prefLabel}地方協力本部`,
     },
     url: ev.url || SITE_URL,
+    // イベント個別のチラシ画像があればそれを使う（リッチリザルトの見栄え向上）。
+    // 無ければサイト共通アイコンにフォールバック。
     image: [
-      `${SITE_URL}/icons/icon-512.png`
+      (typeof ev.imageUrl === 'string' && /^https?:\/\//.test(ev.imageUrl))
+        ? ev.imageUrl
+        : `${SITE_URL}/icons/icon-512.png`
     ],
     offers: {
       '@type': 'Offer',
@@ -314,6 +318,7 @@ ${allJsonLd}
   陸上・海上・航空自衛隊の説明会、記念行事、駐屯地・基地の一般公開、体験搭乗など各種イベントを都道府県別に掲載しています。</p>
   <p class="meta">
     最終更新：${esc(updatedAt)}　／　全 ${allEvents.length} 件掲載<br />
+    はじめての方へ：<a href="${SITE_URL}/guide.html">自衛隊イベント参加ガイド（説明会の流れ・持ち物・申込）</a><br />
     アプリ版（PWA）：<a href="${SITE_URL}/">${SITE_URL}/</a><br />
     開発者向けJSONデータ：<a href="${SITE_URL}/data/events.json">/data/events.json</a>
   </p>
@@ -407,15 +412,23 @@ ${prefJsonLd}
     a { color: #0b2545; }
     nav { margin-bottom: 1.5em; font-size: 0.9em; }
     .region-nav { background:#f4f6fa; border-radius:4px; padding:8px 12px; line-height:2; }
+    .natidx .idx { margin: 0.2em 0; }
+    .natidx .idx h3 { font-size: 0.95em; margin: 0.8em 0 0.2em; }
+    .natidx .idx p { font-size: 0.9em; line-height: 1.9; margin: 0; }
   </style>
 </head>
 <body>
-  <nav><a href="/events.html">← 全国の自衛隊イベント一覧</a>　／　<a href="/">アプリ版（PWA）</a></nav>
+  <nav><a href="/events.html">← 全国の自衛隊イベント一覧</a>　／　<a href="/guide.html">参加ガイド</a>　／　<a href="/">アプリ版（PWA）</a></nav>
   <h1>${esc(prefLabel)}の自衛隊イベント情報（${esc(prefLabel)}地方協力本部）</h1>
 ${prefEvergreen(prefLabel)}
   <h2>${esc(prefLabel)}の開催予定・最新イベント</h2>
 ${eventBlock}
   ${regionNav(prefKey)}
+  <section class="natidx" style="margin-top:2.5em">
+    <h2>全国の自衛隊地本イベント（都道府県別）</h2>
+    <p class="meta">他の地域の地方協力本部が公開する説明会・駐屯地／基地の一般公開・記念行事・体験イベントもご覧いただけます。</p>
+${nationalIndex()}
+  </section>
   <footer>
     <p class="meta" style="margin-top:3em">
       ⚠️ 当サイトは有志による非公式サイトです。防衛省・自衛隊および${esc(prefLabel)}地方協力本部とは直接関係ありません。<br />
@@ -438,6 +451,99 @@ for (const f of readdirSync(EVENTS_DIR)) {
     console.log(`[generate-events-html] 孤立ファイル削除: events/${f}`);
   }
 }
+
+// ── 参加ガイド guide.html を生成（長尾の情報収集クエリ向けエバーグリーン） ──
+// 「自衛隊 説明会 流れ / 持ち物 / 服装 / 申込 / 体験搭乗 申し込み / 一般公開 楽しみ方 / 年齢」等。
+// FAQ は可視本文と FAQPage 構造化データを同一データから生成し本文一致を担保する（2026年要件）。
+const GUIDE_FAQ = [
+  { q: '自衛隊の地本イベントにはどんな種類がありますか？',
+    a: '主に、入隊・採用を検討する方向けの「自衛隊説明会・採用イベント」、どなたでも参加できる「駐屯地・基地の一般公開」「記念行事」、艦艇を見学できる「艦艇公開・体験航海」、ヘリや輸送機の「体験搭乗」、音楽隊の「演奏会」、地域のお祭りへの参加などがあります。本サイトでは都道府県別にこれらを自動集約して掲載しています。' },
+  { q: '自衛隊の説明会に参加するには申し込みが必要ですか？',
+    a: '説明会・個別相談会・体験イベントは、事前予約・事前申込が必要なことが多いです。一方で駐屯地／基地の一般公開や記念行事は申込不要で参加できる場合が一般的です。申込方法・締切・定員は各イベントの公式ページで必ずご確認ください。本サイトの各イベントには「要予約／予約不要」などの目安を表示しています。' },
+  { q: '説明会の持ち物・服装は？',
+    a: '一般的な説明会では特別な持ち物は不要ですが、筆記用具とメモ、配布資料を入れる袋があると便利です。本人確認書類の提示を求められる場合があります。服装は私服で問題ありませんが、清潔感のある服装が無難です。屋外の一般公開・体験イベントは歩きやすい靴と、季節に応じた防寒・暑さ・雨対策をおすすめします。' },
+  { q: '自衛官の採用区分と年齢の目安を教えてください。',
+    a: '代表的な区分として、自衛官候補生（18歳以上33歳未満が目安）、一般曹候補生、高等工科学校生徒（15歳以上17歳未満の男子・中卒〜高卒見込み）、防衛大学校・防衛医科大学校などがあります。年齢・学歴の要件は年度や区分で異なるため、必ず最新の募集要項を地方協力本部の公式サイトでご確認ください。' },
+  { q: '駐屯地・基地の一般公開は何を楽しめますか？',
+    a: '装備品・車両・航空機の展示、訓練展示や音楽演奏、戦車・ヘリの地上展示、子ども向け体験コーナー、売店・キッチンカーなどが一般的です。記念行事では観閲式や式典が行われることもあります。当日は混雑・駐車場・手荷物検査などの案内に従ってください。最新の開催可否・内容は公式情報をご確認ください。' },
+  { q: '体験搭乗・体験航海はどう申し込みますか？',
+    a: '体験搭乗（ヘリ・輸送機など）や体験航海（艦艇）は、人気が高く事前申込・抽選となることが多いです。募集は地方協力本部や駐屯地・基地の公式サイト、募集案内所で告知されます。本サイトでも体験系イベントを「体験」カテゴリで掲載しているので、気になる地域のページを確認し、公式の募集要項に沿ってお申し込みください。' },
+  { q: 'イベント情報はどのくらいの頻度で更新されますか？',
+    a: '本サイトは全国の地方協力本部・募集案内所の公式サイトを1日3回自動巡回し、最新のイベント情報を都道府県別に更新しています。ただし公式の中止・変更・延期が即時に反映されない場合があります。参加前には必ず各イベントの公式ページで最新情報をご確認ください。' },
+];
+
+const guideJsonLd = JSON.stringify([
+  { '@context': 'https://schema.org', '@type': 'FAQPage',
+    mainEntity: GUIDE_FAQ.map(f => ({ '@type': 'Question', name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
+  { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: '自衛隊地本イベント情報', item: `${SITE_URL}/` },
+      { '@type': 'ListItem', position: 2, name: '自衛隊イベント参加ガイド', item: `${SITE_URL}/guide.html` },
+    ] },
+]);
+
+const guideHtml = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>自衛隊イベント参加ガイド | 説明会の流れ・持ち物・申込・体験搭乗の探し方【非公式】</title>
+  <meta name="description" content="自衛隊の説明会・一般公開・体験搭乗・記念行事に参加する前に知っておきたいこと。申込の要否、持ち物・服装、自衛官の採用区分と年齢の目安、体験搭乗の探し方などを非公式にまとめた参加ガイドです。" />
+  <meta name="keywords" content="自衛隊 説明会 流れ,自衛隊 説明会 持ち物,自衛隊 説明会 服装,自衛隊 体験搭乗 申し込み,駐屯地 一般公開 楽しみ方,自衛官候補生 年齢,自衛隊 イベント 申込,地方協力本部" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="${SITE_URL}/guide.html" />
+  <meta property="og:title" content="自衛隊イベント参加ガイド【非公式】" />
+  <meta property="og:description" content="説明会の流れ・持ち物・申込の要否、体験搭乗の探し方、採用区分と年齢の目安をまとめた参加ガイド。" />
+  <meta property="og:url" content="${SITE_URL}/guide.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:image" content="${SITE_URL}/icons/icon-512.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="自衛隊イベント参加ガイド【非公式】" />
+  <meta name="twitter:description" content="説明会の流れ・持ち物・申込の要否、体験搭乗の探し方、採用区分と年齢の目安をまとめた参加ガイド。" />
+  <meta name="twitter:image" content="${SITE_URL}/icons/icon-512.png" />
+  <script type="application/ld+json">
+${guideJsonLd}
+  </script>
+  <style>
+    body { font-family: sans-serif; max-width: 900px; margin: 0 auto; padding: 16px; line-height: 1.8; }
+    h1 { font-size: 1.4em; }
+    h2 { font-size: 1.15em; margin-top: 2em; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
+    h3 { font-size: 1.02em; margin: 1.4em 0 0.3em; }
+    nav { margin-bottom: 1.5em; font-size: 0.9em; }
+    .meta { color: #666; font-size: 0.85em; }
+    a { color: #0b2545; }
+  </style>
+</head>
+<body>
+  <nav><a href="/events.html">← 全国の自衛隊イベント一覧</a>　／　<a href="/">アプリ版（PWA）</a></nav>
+  <h1>自衛隊イベント参加ガイド｜説明会・一般公開・体験搭乗の歩き方</h1>
+  <p>本ページは、自衛隊の地方協力本部（地本）が開催する各種イベントに、はじめて参加する方・入隊を検討している方向けに、よくある疑問を非公式にまとめたガイドです。
+  全国の最新イベントは<a href="/events.html">都道府県別の一覧</a>からご確認いただけます。</p>
+  <p class="meta">当サイトは有志による非公式サイトです。防衛省・自衛隊および各地方協力本部とは直接関係ありません。最新・正確な情報は各公式サイトでご確認ください。</p>
+
+  ${GUIDE_FAQ.map(f => `<section>
+    <h2>${esc(f.q)}</h2>
+    <p>${esc(f.a)}</p>
+  </section>`).join('\n  ')}
+
+  <section style="margin-top:2.5em">
+    <h2>地域から自衛隊イベントを探す</h2>
+    <p class="meta">お住まいの都道府県の最新イベント（説明会・一般公開・記念行事・体験）はこちらから。</p>
+${nationalIndex()}
+  </section>
+
+  <footer>
+    <p class="meta" style="margin-top:3em">
+      ⚠️ 当サイトは有志による非公式サイトです。参加・申込・中止・変更などの最新情報は、必ず各地方協力本部の公式サイトでご確認ください。
+      公式情報は <a href="https://www.mod.go.jp/" rel="nofollow noopener" target="_blank">防衛省・自衛隊 公式サイト</a> をご覧ください。
+    </p>
+  </footer>
+</body>
+</html>
+`;
+writeFileSync(join(__dirname, '../public/guide.html'), minifyHtml(guideHtml), 'utf8');
+console.log('[generate-events-html] guide.html を生成');
 
 // ── sitemap.xml を更新 ──────────────────────────────────────────
 // 全都道府県ページを掲載。非ページの events.json は含めない（インデックス未登録の原因）。
@@ -463,10 +569,16 @@ const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
+  <url>
+    <loc>${SITE_URL}/guide.html</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
 ${prefUrls}
 </urlset>
 `;
 
 const sitemapPath = join(__dirname, '../public/sitemap.xml');
 writeFileSync(sitemapPath, sitemap, 'utf8');
-console.log(`[generate-events-html] sitemap.xml を更新（${Object.keys(PREF_LABELS).length + 2} URL）`);
+console.log(`[generate-events-html] sitemap.xml を更新（${Object.keys(PREF_LABELS).length + 3} URL）`);
