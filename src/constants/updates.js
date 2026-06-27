@@ -5,6 +5,12 @@
  */
 export const UPDATE_NOTES = [
   {
+    date:    '2026-06-27',
+    version: '1.14.31',
+    type:    'fix',
+    content: '現在地から近い事務所を探す機能の不具合を修正',
+  },
+  {
     date:    '2026-06-13',
     version: '1.14.30',
     type:    'fix',
