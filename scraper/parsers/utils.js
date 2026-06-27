@@ -6,10 +6,44 @@
 
 // 令和元年 = 2019年（令和1年 = 2019年、令和N年 = 2018 + N）
 const REIWA_BASE = 2018;
+// 平成元年 = 1989年（平成N年 = 1988 + N）
+const HEISEI_BASE = 1988;
 
 /** 令和年 → 西暦 */
 function reiwaToAD(n) {
   return REIWA_BASE + n;
+}
+
+/**
+ * 和暦の年表記（「元」または数字）を数値に変換。"元" → 1。
+ * 例: reiwaNum('元') === 1, reiwaNum('8') === 8
+ */
+function reiwaNum(s) {
+  const str = String(s ?? '').trim();
+  if (/^元$/.test(str)) return 1;
+  const n = parseInt(toHalfWidth(str), 10);
+  return Number.isInteger(n) ? n : NaN;
+}
+
+/**
+ * 年が明記されていない「M月D日（曜）」の年を、曜日との整合で厳格に確定する。
+ * - 曜日が無ければ従来どおり現在年を返す（最弱の手がかり）。
+ * - 曜日があれば「現在年・翌年」のうち曜日が一致する年だけを採用（直近の将来を優先）。
+ *   現在年・翌年いずれの曜日とも一致しなければ null を返す
+ *   ＝古いチラシ/OCR誤読の可能性が高いので日付を確定しない（呼び出し側で除外）。
+ * @returns {number|null} 西暦年。確定できなければ null。
+ */
+function resolveYearByWeekday(month, day, weekday, nowYear) {
+  const m = Number(month), d = Number(day);
+  if (!Number.isInteger(m) || !Number.isInteger(d)) return null;
+  const targetW = String(weekday || '').replace(/[・\s祝]/g, '');
+  if (!targetW || !WEEKDAY_JP.includes(targetW)) return nowYear; // 手がかり無し→現在年
+  for (const y of [nowYear, nowYear + 1]) {
+    const dt = new Date(Date.UTC(y, m - 1, d));
+    if (dt.getUTCMonth() !== m - 1 || dt.getUTCDate() !== d) continue; // 無効日
+    if (WEEKDAY_JP[dt.getUTCDay()] === targetW) return y;
+  }
+  return null; // 直近の将来に曜日一致なし＝確定不可
 }
 
 /** 日付の数値を2桁ゼロ埋め */
@@ -154,4 +188,4 @@ function titleHash(date, title) {
   return (h >>> 0).toString(36).padStart(5, '0').slice(-5);
 }
 
-module.exports = { reiwaToAD, padTwo, toHalfWidth, jstYear, isPast, guessCategory, guessTag, guessTags, calcWeekday, titleHash };
+module.exports = { reiwaToAD, reiwaNum, resolveYearByWeekday, HEISEI_BASE, padTwo, toHalfWidth, jstYear, isPast, guessCategory, guessTag, guessTags, calcWeekday, titleHash };

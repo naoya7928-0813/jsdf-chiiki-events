@@ -97,7 +97,7 @@ const { parseOita }      = require('./parsers/oita');
 const { parseMiyazaki }  = require('./parsers/miyazaki');
 const { parseKagoshima } = require('./parsers/kagoshima');
 const { parseOkinawa }   = require('./parsers/okinawa');
-const { toHalfWidth, reiwaToAD, padTwo, isPast, guessCategory, guessTag, calcWeekday, titleHash } = require('./parsers/utils');
+const { toHalfWidth, reiwaToAD, reiwaNum, resolveYearByWeekday, HEISEI_BASE, padTwo, isPast, guessCategory, guessTag, calcWeekday, titleHash } = require('./parsers/utils');
 
 // ── 設定 ─────────────────────────────────────────────────────
 const OUTPUT_PATH = path.join(__dirname, '../public/data/events.json');
@@ -378,7 +378,7 @@ function parseTextToEvent(text, mode = 'pdf') {
 
   // 日付
   let dateStr = null;
-  const reiwaM = t.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日・祝]+)[）)]/);
+  const reiwaM = t.match(/令和\s*(元|\d+)\s*年(\d+)月(\d+)日[（(]([月火水木金土日・祝]+)[）)]/);
   const gregM  = t.match(/(\d{4})年(\d+)月(\d+)日[（(]([月火水木金土日・祝]+)[）)]/);
   if (reiwaM) {
     dateStr = `令和${reiwaM[1]}年${reiwaM[2]}月${reiwaM[3]}日（${reiwaM[4]}）`;
@@ -1237,22 +1237,30 @@ async function enrichFromFlyer(events, prefLabel) {
 
     // OCR日付を解析
     const rawDate = toHalfWidth((ocr.date || '').replace(/\s+/g, ' ').trim());
-    const reiwaM  = rawDate.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
+    const reiwaM  = rawDate.match(/令和\s*(元|\d+)\s*年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
+    const heiseiM = rawDate.match(/平成\s*(元|\d+)\s*年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
     const gregM   = rawDate.match(/(\d{4})年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
     const monthM  = rawDate.match(/(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
 
     let dateStr = '', weekday = '';
     if (reiwaM) {
-      const y = reiwaToAD(parseInt(reiwaM[1], 10));
+      const y = reiwaToAD(reiwaNum(reiwaM[1]));
       dateStr = `${y}-${padTwo(parseInt(reiwaM[2], 10))}-${padTwo(parseInt(reiwaM[3], 10))}`;
       weekday = reiwaM[4];
+    } else if (heiseiM) {
+      const y = HEISEI_BASE + reiwaNum(heiseiM[1]);
+      dateStr = `${y}-${padTwo(parseInt(heiseiM[2], 10))}-${padTwo(parseInt(heiseiM[3], 10))}`;
+      weekday = heiseiM[4];
     } else if (gregM) {
       dateStr = `${gregM[1]}-${padTwo(parseInt(gregM[2], 10))}-${padTwo(parseInt(gregM[3], 10))}`;
       weekday = gregM[4];
     } else if (monthM) {
-      const now = new Date();
-      dateStr = `${now.getFullYear()}-${padTwo(parseInt(monthM[1], 10))}-${padTwo(parseInt(monthM[2], 10))}`;
-      weekday = monthM[3];
+      const nowY = new Date(Date.now() + 9 * 3600 * 1000).getFullYear();
+      const yr = resolveYearByWeekday(monthM[1], monthM[2], monthM[3], nowY);
+      if (yr != null) {
+        dateStr = `${yr}-${padTwo(parseInt(monthM[1], 10))}-${padTwo(parseInt(monthM[2], 10))}`;
+        weekday = monthM[3];
+      }
     }
 
     if (!dateStr || isPast(dateStr)) {
@@ -2024,20 +2032,28 @@ function extractListPageStubs($, postUrls, prefKey, idPrefix, prefLabel) {
     // 画像・PDFなし → コンテナのテキストから直接日付を抽出（三重・滋賀・和歌山 CF対策）
     const containerText = toHalfWidth($scope.text().replace(/\s+/g, ' ').trim());
     let textDate = '', textWeekday = '';
-    const rM = containerText.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
+    const rM = containerText.match(/令和\s*(元|\d+)\s*年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
+    const hM = containerText.match(/平成\s*(元|\d+)\s*年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
     const gM = containerText.match(/(\d{4})年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
     const mM = containerText.match(/(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
     if (rM) {
-      const y = reiwaToAD(parseInt(rM[1], 10));
+      const y = reiwaToAD(reiwaNum(rM[1]));
       textDate    = `${y}-${padTwo(parseInt(rM[2], 10))}-${padTwo(parseInt(rM[3], 10))}`;
       textWeekday = rM[4];
+    } else if (hM) {
+      const y = HEISEI_BASE + reiwaNum(hM[1]);
+      textDate    = `${y}-${padTwo(parseInt(hM[2], 10))}-${padTwo(parseInt(hM[3], 10))}`;
+      textWeekday = hM[4];
     } else if (gM) {
       textDate    = `${gM[1]}-${padTwo(parseInt(gM[2], 10))}-${padTwo(parseInt(gM[3], 10))}`;
       textWeekday = gM[4];
     } else if (mM) {
-      const now = new Date();
-      textDate    = `${now.getFullYear()}-${padTwo(parseInt(mM[1], 10))}-${padTwo(parseInt(mM[2], 10))}`;
-      textWeekday = mM[3];
+      const nowY = new Date(Date.now() + 9 * 3600 * 1000).getFullYear();
+      const yr = resolveYearByWeekday(mM[1], mM[2], mM[3], nowY);
+      if (yr != null) {
+        textDate    = `${yr}-${padTwo(parseInt(mM[1], 10))}-${padTwo(parseInt(mM[2], 10))}`;
+        textWeekday = mM[3];
+      }
     }
 
     if (!rawTitle) return;  // タイトルなし → スキップ
@@ -2338,12 +2354,12 @@ async function fetchHyogo(context) {
 
     for (const item of expandOcrResult(ocr)) {
       const rawDate = toHalfWidth((item.date || '').replace(/\s+/g, ' ').trim());
-      const dtMatch = rawDate.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/)
+      const dtMatch = rawDate.match(/令和\s*(元|\d+)\s*年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/)
         || rawDate.match(/(\d{4})年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/);
 
       let dateStr = '', weekday = '';
       if (dtMatch && dtMatch[0].startsWith('令和')) {
-        const year = reiwaToAD(parseInt(dtMatch[1], 10));
+        const year = reiwaToAD(reiwaNum(dtMatch[1]));
         dateStr  = `${year}-${padTwo(parseInt(dtMatch[2], 10))}-${padTwo(parseInt(dtMatch[3], 10))}`;
         weekday  = dtMatch[4];
       } else if (dtMatch) {
@@ -2598,20 +2614,35 @@ async function fetchPagePlaywright(ctx, url) {
 function parseOcrDate(ocrDate) {
   if (!ocrDate) return null;
   const t      = toHalfWidth(ocrDate.replace(/\s+/g, ' ').trim());
-  const reiwaM = t.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
+  // 令和（元年含む）/ 平成（元年含む）/ 西暦 / 年なし月日（曜日で年を確定）
+  const reiwaM  = t.match(/令和\s*(元|\d+)\s*年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
+  const heiseiM = t.match(/平成\s*(元|\d+)\s*年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
   const gregM  = t.match(/(\d{4})年(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
   const monthM = t.match(/(\d+)月(\d+)日[（(]([月火水木金土日祝]+)[）)]/);
 
+  // 過去日付は確定しても呼び出し側で除外されるが、ここでも明確化のため検査する。
+  const past = (s) => s < new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+
   if (reiwaM) {
-    const y = reiwaToAD(parseInt(reiwaM[1], 10));
-    return { dateStr: `${y}-${padTwo(parseInt(reiwaM[2])  )}-${padTwo(parseInt(reiwaM[3])  )}`, weekday: reiwaM[4] };
+    const y = reiwaToAD(reiwaNum(reiwaM[1]));
+    const dateStr = `${y}-${padTwo(parseInt(reiwaM[2]))}-${padTwo(parseInt(reiwaM[3]))}`;
+    return past(dateStr) ? null : { dateStr, weekday: reiwaM[4] };
+  }
+  if (heiseiM) {
+    const y = HEISEI_BASE + reiwaNum(heiseiM[1]);
+    const dateStr = `${y}-${padTwo(parseInt(heiseiM[2]))}-${padTwo(parseInt(heiseiM[3]))}`;
+    return past(dateStr) ? null : { dateStr, weekday: heiseiM[4] };
   }
   if (gregM) {
-    return { dateStr: `${gregM[1]}-${padTwo(parseInt(gregM[2]))}-${padTwo(parseInt(gregM[3]))}`, weekday: gregM[4] };
+    const dateStr = `${gregM[1]}-${padTwo(parseInt(gregM[2]))}-${padTwo(parseInt(gregM[3]))}`;
+    return past(dateStr) ? null : { dateStr, weekday: gregM[4] };
   }
   if (monthM) {
     const now = new Date(Date.now() + 9 * 3600 * 1000);
-    return { dateStr: `${now.getFullYear()}-${padTwo(parseInt(monthM[1]))}-${padTwo(parseInt(monthM[2]))}`, weekday: monthM[3] };
+    const yr = resolveYearByWeekday(monthM[1], monthM[2], monthM[3], now.getFullYear());
+    if (yr == null) return null; // 曜日が直近将来と不一致＝古い/誤読 → 確定しない
+    const dateStr = `${yr}-${padTwo(parseInt(monthM[1]))}-${padTwo(parseInt(monthM[2]))}`;
+    return past(dateStr) ? null : { dateStr, weekday: monthM[3] };
   }
   return null;
 }
@@ -2725,14 +2756,24 @@ function parseOfficeEventDate(text) {
     return { dateStr, weekday: weekday || calcWeekday(dateStr) };
   };
 
-  let m = t.match(/(?:令和|R|Ｒ)\s*(\d{1,2})\s*年?\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日?(?:[（(]\s*([月火水木金土日祝])\s*[）)])?/i);
-  if (m) return build(reiwaToAD(parseInt(m[1], 10)), m[2], m[3], m[4]);
+  // 令和（「元年」含む）/ R表記。元 → 1。過去日付は build() の isPast で除外。
+  let m = t.match(/(?:令和|R|Ｒ)\s*(元|\d{1,2})\s*年?\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日?(?:[（(]\s*([月火水木金土日祝])\s*[）)])?/i);
+  if (m) return build(reiwaToAD(reiwaNum(m[1])), m[2], m[3], m[4]);
+
+  // 平成（「元年」含む）。ほぼ確実に過去 → build() の isPast で除外される。
+  m = t.match(/平成\s*(元|\d{1,2})\s*年?\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日?(?:[（(]\s*([月火水木金土日祝])\s*[）)])?/);
+  if (m) return build(HEISEI_BASE + reiwaNum(m[1]), m[2], m[3], m[4]);
 
   m = t.match(/(20\d{2})\s*[年\/.-]\s*(\d{1,2})\s*(?:月|[\/.-])\s*(\d{1,2})\s*日?(?:[（(]\s*([月火水木金土日祝])\s*[）)])?/);
   if (m) return build(m[1], m[2], m[3], m[4]);
 
+  // 年が無い「M月D日（曜）」: 曜日と整合する年を厳格に確定（合わなければ却下）。
   m = t.match(/(?:^|[^\d])(\d{1,2})\s*[月\/.]\s*(\d{1,2})\s*日?(?:[（(]\s*([月火水木金土日祝])\s*[）)])?/);
-  if (m) return build(now.getFullYear(), m[1], m[2], m[3]);
+  if (m) {
+    const yr = resolveYearByWeekday(m[1], m[2], m[3], now.getFullYear());
+    if (yr == null) return null; // 曜日が直近の将来と不一致＝古いチラシ/誤読 → 確定しない
+    return build(yr, m[1], m[2], m[3]);
+  }
 
   return null;
 }

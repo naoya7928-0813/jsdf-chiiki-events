@@ -201,40 +201,6 @@
       "source_type": "office_ocr",
       "endDate": "2026-07-27",
       "endWeekday": "月"
-    },
-    {
-      "id": "ha-office-20260923-eg1f1",
-      "pref": "hakodate",
-      "date": "2026-09-23",
-      "weekday": "水・祝",
-      "title": "はたらくのりものin函館(函館港町ふ頭)一般広報",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/hakodate/img/R6.9.23hataraknorimono.pdf",
-      "notes": "掲載元: 今金地域事務所・八雲地域事務所・江差地域事務所 ほか1拠点",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html"
-    },
-    {
-      "id": "ha-office-20260803-o479r",
-      "pref": "hakodate",
-      "date": "2026-08-03",
-      "weekday": "月",
-      "title": "掃海母艦｢うらが｣(函館港町ふ頭)艦艇広報",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "艦艇公開",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/hakodate/img/R6.8.3uragakantei.pdf",
-      "notes": "掲載元: 今金地域事務所・八雲地域事務所・江差地域事務所 ほか1拠点",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html"
     }
   ],
   "miyagi": [
@@ -997,23 +963,6 @@
       "tag": "",
       "url": "https://www.mod.go.jp/pco/kanagawa/kouho/event/event-kengaku.html",
       "notes": null
-    },
-    {
-      "id": "ka-off-20261221-1u1ac",
-      "pref": "kanagawa",
-      "date": "2026-12-21",
-      "weekday": "月",
-      "title": "「掃海艇はつしま」一般公開",
-      "place": "江ノ島湘南港本船岸壁",
-      "address": "",
-      "time": "22日 AM9:00～11:00、PM13:00～16:00",
-      "category": "一般公開",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/kanagawa/mado/hiratuka/mamoritaimus/mamotai1-12.pdf",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr"
     }
   ],
   "tokyo": [],
@@ -4481,81 +4430,9 @@
       "deadline": null
     }
   ],
-  "oita": [
-    {
-      "id": "oi-ref-vlw2e",
-      "pref": "oita",
-      "date": "2026-06-27",
-      "weekday": "土",
-      "title": "自衛隊大分地方協力本部のイベント情報",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/oita/02_recruit.html",
-      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_notice"
-    }
-  ],
-  "miyazaki": [
-    {
-      "id": "mi-ref-9p1na",
-      "pref": "miyazaki",
-      "date": "2026-06-27",
-      "weekday": "土",
-      "title": "陸上自衛隊 武器・装備品等一般公開",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/miyazaki/recruit.html",
-      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_notice"
-    }
-  ],
-  "kagoshima": [
-    {
-      "id": "ka-ref-ab43a",
-      "pref": "kagoshima",
-      "date": "2026-06-27",
-      "weekday": "土",
-      "title": "２等陸・海・空士（任期制自衛官）制度について",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/kagoshima/information",
-      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_notice"
-    }
-  ],
-  "okinawa": [
-    {
-      "id": "ok-ref-exz92",
-      "pref": "okinawa",
-      "date": "2026-06-27",
-      "weekday": "土",
-      "title": "令和7年度自衛官等採用案内",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/okinawa/",
-      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_notice"
-    }
-  ],
-  "updatedAt": "2026/06/27 19:38"
+  "oita": [],
+  "miyazaki": [],
+  "kagoshima": [],
+  "okinawa": [],
+  "updatedAt": "2026/06/27 15:07"
 }

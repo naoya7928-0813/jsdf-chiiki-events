@@ -113,11 +113,32 @@ function isStaleDatedEvent(ev) {
   const evYear = parseInt(String(ev.date || '').slice(0, 4), 10);
   if (!evYear) return false;
   const t = toHalfAlnum(ev.title || '');
+  const url = String(ev.url || '');
+  let durl = url; try { durl = decodeURIComponent(url); } catch { /* keep raw */ }
+
+  // ── タイトル ──────────────────────────────────────────────
+  // 西暦（20XX）がイベント年より古い
   for (const m of t.matchAll(/(?:^|\D)(20\d{2})(?:\D|$)/g)) {
     if (parseInt(m[1], 10) < evYear) return true;
   }
-  const um = String(ev.url || '').match(/\/(20\d{2})\d{4}[^/]*\.(?:pdf|jpe?g|png|gif)/i);
+  // 和暦（令和元年/令和N年・平成元年/平成N年）。
+  // 「年度」は会計年度で当年と1年ずれて表記され得るため、2年以上前のときだけ古いとみなす。
+  for (const m of `${t} ${durl}`.matchAll(/(令和|平成)\s*(元|\d{1,2})\s*年(度)?/g)) {
+    const base = m[1] === '令和' ? 2018 : 1988;
+    const y = base + (m[2] === '元' ? 1 : parseInt(m[2], 10));
+    const isFiscal = !!m[3];
+    if (isFiscal ? (y <= evYear - 2) : (y < evYear)) return true;
+  }
+
+  // ── URL / ファイル名の日付スタンプ ──────────────────────────
+  // 西暦8桁: 20YYMMDD_xxx.pdf
+  const um = url.match(/\/(20\d{2})\d{4}[^/]*\.(?:pdf|jpe?g|png|gif)/i);
   if (um && parseInt(um[1], 10) < evYear) return true;
+  // 和暦スタンプ: R6.9.23 / H31.1.5（令和/平成 + 年 . 月 . 日）。MOD公式の命名規則。
+  for (const m of url.matchAll(/(?:^|[^A-Za-z0-9])([RrHh])(\d{1,2})[.\-_]\d{1,2}[.\-_]\d{1,2}/g)) {
+    const base = /[Rr]/.test(m[1]) ? 2018 : 1988;
+    if (base + parseInt(m[2], 10) < evYear) return true;
+  }
   return false;
 }
 

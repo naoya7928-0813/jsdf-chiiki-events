@@ -157,6 +157,30 @@ test('isStaleDatedEvent: 過去年イベントの年ズレ再登録を検出す�
   assert.equal(isStaleDatedEvent({ date: '2026-06-14', title: 'サマーコンサート２０２６', url: '' }), false);
 });
 
+test('isStaleDatedEvent: 和暦の年ズレ（令和元年・R6スタンプ）を検出する', () => {
+  // 令和元年(2019) をタイトルに含むのに 2026 で登録（江の島・掃海艇はつしま型）
+  assert.equal(isStaleDatedEvent({ date: '2026-12-21', title: '令和元年「掃海艇はつしま」一般公開', url: '' }), true);
+  // 平成31年(2019)
+  assert.equal(isStaleDatedEvent({ date: '2026-05-10', title: '平成31年度 記念行事', url: '' }), true);
+  // URL の和暦ファイル名スタンプ R6.9.23（令和6年=2024）（函館型）
+  assert.equal(isStaleDatedEvent({
+    date: '2026-09-23', title: 'はたらくのりものin函館 一般広報',
+    url: 'https://www.mod.go.jp/pco/hakodate/img/R6.9.23hataraknorimono.pdf',
+  }), true);
+  assert.equal(isStaleDatedEvent({
+    date: '2026-08-03', title: '掃海母艦うらが 艦艇広報',
+    url: 'https://www.mod.go.jp/pco/hakodate/img/R6.8.3uragakantei.pdf',
+  }), true);
+  // 当年(令和8=2026)は維持。会計年度「令和8年度」も誤検出しない。
+  assert.equal(isStaleDatedEvent({ date: '2026-06-15', title: '令和8年度 自衛官候補生募集', url: '' }), false);
+  assert.equal(isStaleDatedEvent({ date: '2026-04-10', title: '令和8年度採用説明会', url: '' }), false);
+  // 当年の R8 スタンプURLは維持
+  assert.equal(isStaleDatedEvent({
+    date: '2026-07-20', title: '護衛艦一般公開',
+    url: 'https://www.mod.go.jp/pco/x/img/R8.7.20kantei.pdf',
+  }), false);
+});
+
 test('dedupEvents: 同一イベントは統合し、場所違いの同名イベントは残す', () => {
   // 場所が片方空 → 統合（情報の多い方を残す）
   const a = dedupEvents([
