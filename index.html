@@ -17,6 +17,17 @@
     <!-- テーマカラー（vite-plugin-pwa が manifest に注入するが iOS 用に明示） -->
     <meta name="theme-color" content="#0b2545" />
 
+    <!-- 起動時のちらつき防止（FOUC対策・JS実行前から適用）
+         グローバルCSSは main.jsx の injectGlobalStyles() でJS実行時に注入されるため、
+         それまでの間に素のHTML（特に #root 外の SEO 用フッター）が画面に一瞬出るのを防ぐ。
+         空の #root をビューポート高にして、後続の #seo-footer を初期表示で画面外（下）に置く。
+         フッターは通常フロー内に残るため、クローラーの内部リンク巡回には影響しない。 -->
+    <style>
+      html, body { margin: 0; }
+      body { background: #f5f6f8; }
+      #root { min-height: 100vh; min-height: 100dvh; }
+    </style>
+
     <!-- OGP -->
     <meta property="og:title" content="自衛隊地方協力本部（地本）イベント情報【非公式まとめ】" />
     <meta property="og:description" content="全国の自衛隊地本イベントを都道府県別にまとめて確認できる非公式アプリです。説明会・体験搭乗・駐屯地一般公開・記念行事など陸・海・空の最新情報を掲載。" />
