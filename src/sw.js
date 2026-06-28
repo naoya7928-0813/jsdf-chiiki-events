@@ -35,6 +35,17 @@ registerRoute(
   })
 );
 
+// 天気予報（詳細画面の遅延取得）。サーバー側で Redis + CDN キャッシュ済み。
+// SW でも短時間キャッシュし、再表示・オフライン時のちらつきを抑える。
+registerRoute(
+  ({ url }) => url.pathname === '/api/weather',
+  new NetworkFirst({
+    cacheName: 'weather-cache',
+    plugins: [new ExpirationPlugin({ maxEntries: 100, maxAgeSeconds: 3600 })],
+    networkTimeoutSeconds: 8,
+  })
+);
+
 registerRoute(
   ({ url }) => url.hostname === 'fonts.googleapis.com',
   new StaleWhileRevalidate({ cacheName: 'google-fonts-stylesheets' })

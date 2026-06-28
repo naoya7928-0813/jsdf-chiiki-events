@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { ICO } from './Icons';
 import { Emblem, F, splitDate, SectionTitle, iconBtnStyle } from './Shared';
 import { REGION_HQ, REGION_SOURCE } from '../config';
+import WeatherCard from './WeatherCard';
 
 function officeSourceLabel(ev) {
   if (!ev?.source_type) return null;
@@ -225,6 +226,9 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
 
       {/* スクロール本文 */}
       <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '16px 0' }}>
+        {/* 開催日の天気（「開催日時」と「開催場所」の間に表示。詳細画面でのみ遅延取得） */}
+        <WeatherCard event={ev} theme={theme} />
+
         {/* 開催場所 + 地図 */}
         <div style={{ padding: '6px 16px 14px' }}>
           <SectionTitle>開催場所</SectionTitle>

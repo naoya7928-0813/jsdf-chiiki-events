@@ -5,6 +5,12 @@
  */
 export const UPDATE_NOTES = [
   {
+    date:    '2026-06-28',
+    version: '1.15.31',
+    type:    'feature',
+    content: 'イベント詳細画面に開催日の天気予報を追加（開催16日前から表示。参考情報のため開催可否は公式をご確認ください）',
+  },
+  {
     date:    '2026-06-27',
     version: '1.14.31',
     type:    'fix',

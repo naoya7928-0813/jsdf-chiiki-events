@@ -14,7 +14,13 @@
       "url": "https://www.mod.go.jp/pco/sapporo/event_station.html",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 42.78923,
+        "longitude": 143.697037,
+        "label": "北海道浦幌町",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "sp-st-20260712-2",
@@ -30,7 +36,13 @@
       "url": "https://www.mod.go.jp/pco/sapporo/event_station.html",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.59026,
+        "longitude": 134.381577,
+        "label": "鳥取県岩美町",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "sp-st-20260718-3",
@@ -46,7 +58,13 @@
       "url": "https://www.mod.go.jp/pco/sapporo/event_station.html",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.59026,
+        "longitude": 134.381577,
+        "label": "鳥取県岩美町",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "sp-st-20260718-5",
@@ -62,7 +80,13 @@
       "url": "https://www.mod.go.jp/pco/sapporo/event_station.html",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 43.01041,
+        "longitude": 141.695282,
+        "label": "北海道長沼町",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "sp-st-20260726-4",
@@ -78,7 +102,13 @@
       "url": "https://www.mod.go.jp/pco/sapporo/event_station.html",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 43.19603,
+        "longitude": 141.77536,
+        "label": "北海道岩見沢市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "sp-st-20260906-6",
@@ -94,7 +124,13 @@
       "url": "https://www.mod.go.jp/pco/sapporo/event_station.html",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 42.821011,
+        "longitude": 141.651001,
+        "label": "北海道千歳市",
+        "accuracy": "municipality"
+      }
     }
   ],
   "asahikawa": [
@@ -113,7 +149,13 @@
       "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_notice"
+      "source_type": "office_notice",
+      "weatherLocation": {
+        "latitude": 43.771435,
+        "longitude": 142.365295,
+        "label": "北海道旭川市",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "obihiro": [
@@ -131,7 +173,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 43.090778,
+        "longitude": 141.340973,
+        "label": "北海道札幌市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ob-20260711-q7z5j",
@@ -147,7 +195,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 42.924175,
+        "longitude": 143.196228,
+        "label": "北海道帯広市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ob-20260822-tt9u7",
@@ -163,7 +217,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 42.924175,
+        "longitude": 143.196228,
+        "label": "北海道帯広市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ob-office-20260725-3ab53",
@@ -180,7 +240,13 @@
       "notes": "掲載元: 釧路出張所・根室地域事務所・網走地域事務所 ほか2拠点",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 42.924175,
+        "longitude": 143.196228,
+        "label": "北海道帯広市",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "hakodate": [
@@ -201,7 +267,13 @@
       "deadline": "6月19日（金）",
       "source_type": "office_ocr",
       "endDate": "2026-07-27",
-      "endWeekday": "月"
+      "endWeekday": "月",
+      "weatherLocation": {
+        "latitude": 41.768688,
+        "longitude": 140.728943,
+        "label": "北海道函館市",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "miyagi": [
@@ -219,7 +291,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 38.268578,
+        "longitude": 140.87207,
+        "label": "宮城県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "mi-20260704-t5wai",
@@ -235,7 +313,13 @@
       "url": "https://job.mynavi.jp/conts/event/2028/10599/index.html",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 38.268578,
+        "longitude": 140.87207,
+        "label": "宮城県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "mi-20260704-0crla",
@@ -251,7 +335,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 38.268578,
+        "longitude": 140.87207,
+        "label": "宮城県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "mi-20260711-04kgk",
@@ -267,7 +357,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 38.268578,
+        "longitude": 140.87207,
+        "label": "宮城県",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "aomori": [],
@@ -286,7 +382,13 @@
       "url": "https://www.mod.go.jp/pco/iwate/assets/img/event/until20260705/suo.pdf",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.702068,
+        "longitude": 141.154465,
+        "label": "岩手県盛岡市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "iw-20260705-sc3ha",
@@ -302,7 +404,13 @@
       "url": "https://www.mod.go.jp/pco/iwate/assets/img/event/until20260705/suo.pdf",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.702068,
+        "longitude": 141.154465,
+        "label": "岩手県盛岡市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "iw-20260705-sc3ha",
@@ -318,7 +426,13 @@
       "url": "https://www.mod.go.jp/pco/iwate/assets/img/event/until20260705/sentoushageki.pdf",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.703526,
+        "longitude": 141.152695,
+        "label": "岩手県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "iw-20260726-i050f",
@@ -334,7 +448,13 @@
       "url": "https://www.mod.go.jp/pco/iwate/assets/img/event/2026SB/until20260731_1.pdf",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.702068,
+        "longitude": 141.154465,
+        "label": "岩手県盛岡市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "iw-20260726-i050f",
@@ -350,7 +470,13 @@
       "url": "https://www.mod.go.jp/pco/iwate/assets/img/event/until20260726/shokubataiken.pdf",
       "notes": null,
       "ageRequirement": "中学生、保護者、教諭等",
-      "deadline": "令和8年7月2日(木)まで"
+      "deadline": "令和8年7月2日(木)まで",
+      "weatherLocation": {
+        "latitude": 35.59026,
+        "longitude": 134.381577,
+        "label": "鳥取県岩美町",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "iw-20260801-793n9",
@@ -366,7 +492,13 @@
       "url": "https://www.mod.go.jp/pco/iwate/assets/img/event/until20260801/hatarakukuruma.pdf",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 40.271206,
+        "longitude": 141.30481,
+        "label": "岩手県二戸郡",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "iw-20260803-q35zo",
@@ -382,7 +514,13 @@
       "url": "https://www.mod.go.jp/pco/iwate/assets/img/event/until20260803/ichinoseki.pdf",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.703526,
+        "longitude": 141.152695,
+        "label": "岩手県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "iw-20260804-2upio",
@@ -398,7 +536,13 @@
       "url": "https://www.mod.go.jp/pco/iwate/assets/img/event/until20260804/sendai.pdf",
       "notes": null,
       "ageRequirement": "| 募集対象者等 | |",
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.59026,
+        "longitude": 134.381577,
+        "label": "鳥取県岩美町",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "iw-20260807-fyiwj",
@@ -414,7 +558,13 @@
       "url": "https://www.mod.go.jp/pco/iwate/assets/img/event/until20260807/hachinohe.pdf",
       "notes": null,
       "ageRequirement": "| 岩手県内の33歳未満の自衛隊に興味のある方 |",
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.485832,
+        "longitude": 134.444153,
+        "label": "兵庫県新温泉町",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "iw-office-20260725-ybyd9",
@@ -431,7 +581,13 @@
       "notes": "掲載元: 盛岡地域事務所・花巻地域事務所・一関出張所 ほか4拠点",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 39.703526,
+        "longitude": 141.152695,
+        "label": "岩手県",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "yamagata": [
@@ -449,7 +605,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 38.240433,
+        "longitude": 140.363693,
+        "label": "山形県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ya-20260628-ziwee",
@@ -465,7 +627,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 38.101845,
+        "longitude": 140.037781,
+        "label": "山形県長井市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ya-20260628-hqrcq",
@@ -481,7 +649,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 41.67178,
+        "longitude": 140.412903,
+        "label": "北海道木古内町",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ya-20260628-ifbf1",
@@ -497,7 +671,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 43.845978,
+        "longitude": 142.453735,
+        "label": "北海道旭川市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ya-20260629-rq9b1",
@@ -513,7 +693,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 43.03207,
+        "longitude": 141.761566,
+        "label": "北海道由仁町",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ya-20260630-80yg5",
@@ -529,7 +715,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 43.03207,
+        "longitude": 141.761566,
+        "label": "北海道由仁町",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ya-20260702-rk0f0",
@@ -545,7 +737,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.880955,
+        "longitude": 136.33902,
+        "label": "福井県池田町",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ya-20260704-b7l21",
@@ -561,7 +759,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 38.601078,
+        "longitude": 140.406845,
+        "label": "山形県尾花沢市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ya-20260705-l4uyf",
@@ -577,7 +781,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 38.483383,
+        "longitude": 140.380386,
+        "label": "山形県村山市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ya-20260707-0nhb7",
@@ -593,7 +803,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 38.483383,
+        "longitude": 140.380386,
+        "label": "山形県村山市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ya-20260709-vut98",
@@ -609,7 +825,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 37.921867,
+        "longitude": 140.116135,
+        "label": "山形県米沢市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ya-20260711-owoql",
@@ -625,7 +847,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 43.03207,
+        "longitude": 141.761566,
+        "label": "北海道由仁町",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ya-20260712-rozgb",
@@ -641,7 +869,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 38.240433,
+        "longitude": 140.363693,
+        "label": "山形県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ya-20260718-s54gy",
@@ -657,7 +891,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 38.914639,
+        "longitude": 139.836548,
+        "label": "山形県酒田市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ya-office-20260712-19ur7",
@@ -674,7 +914,13 @@
       "notes": "掲載元: 鶴岡出張所・酒田地域事務所",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 38.240433,
+        "longitude": 140.363693,
+        "label": "山形県",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "fukushima": [
@@ -692,7 +938,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 37.050453,
+        "longitude": 140.887726,
+        "label": "福島県いわき市",
+        "accuracy": "municipality"
+      }
     },
     {
       "id": "fs-20260727-5f35x",
@@ -708,7 +960,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 37.76083,
+        "longitude": 140.474747,
+        "label": "福島県福島市",
+        "accuracy": "municipality"
+      }
     },
     {
       "id": "fs-20260819-awqt8",
@@ -724,7 +982,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 38.409859,
+        "longitude": 140.371384,
+        "label": "山形県東根市",
+        "accuracy": "municipality"
+      }
     },
     {
       "id": "fs-20260928-ysdga",
@@ -740,7 +1004,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.69389,
+        "longitude": 139.703613,
+        "label": "東京都新宿区",
+        "accuracy": "municipality"
+      }
     }
   ],
   "akita": [
@@ -759,7 +1029,13 @@
       "notes": "掲載元: 秋田募集案内所・能代地域事務所・由利本荘地域事務所 ほか3拠点",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 39.718624,
+        "longitude": 140.102386,
+        "label": "秋田県",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "kanagawa": [
@@ -775,7 +1051,13 @@
       "category": "説明会",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/kanagawa/mado/hiratuka/hiratuka.html",
-      "notes": null
+      "notes": null,
+      "weatherLocation": {
+        "latitude": 36.155277,
+        "longitude": 139.86853,
+        "label": "茨城県八千代町",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "k-20260707-szuo9",
@@ -789,7 +1071,13 @@
       "category": "説明会",
       "tag": "個別",
       "url": "https://www.mod.go.jp/pco/kanagawa/mado/kawasaki/kawasaki.html",
-      "notes": null
+      "notes": null,
+      "weatherLocation": {
+        "latitude": 42.678802,
+        "longitude": 140.767303,
+        "label": "北海道真狩村",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "k-20260711-16zr4",
@@ -803,7 +1091,13 @@
       "category": "説明会",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/kanagawa/mado/sagami/sagami.html",
-      "notes": null
+      "notes": null,
+      "weatherLocation": {
+        "latitude": 35.571388,
+        "longitude": 139.373337,
+        "label": "神奈川県相模原市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "k-20260712-lcbwv",
@@ -817,7 +1111,13 @@
       "category": "説明会",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/kanagawa/mado/ichigao/ichigao.html",
-      "notes": null
+      "notes": null,
+      "weatherLocation": {
+        "latitude": 34.438686,
+        "longitude": 135.77211,
+        "label": "奈良県高取町",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "k-20260725-mouik",
@@ -831,7 +1131,13 @@
       "category": "説明会",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/kanagawa/mado/yokohama/yokohama.html",
-      "notes": null
+      "notes": null,
+      "weatherLocation": {
+        "latitude": 41.083328,
+        "longitude": 141.247498,
+        "label": "神奈川県",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "k-20260726-08wdp",
@@ -845,7 +1151,13 @@
       "category": "採用イベント",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/kanagawa/mado/atugi/atugi.html",
-      "notes": null
+      "notes": null,
+      "weatherLocation": {
+        "latitude": 35.443054,
+        "longitude": 139.362503,
+        "label": "神奈川県厚木市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "k-20260726-km8g7",
@@ -859,7 +1171,13 @@
       "category": "体験",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/kanagawa/kouho/event/event-kengaku.html",
-      "notes": null
+      "notes": null,
+      "weatherLocation": {
+        "latitude": 35.723259,
+        "longitude": 140.66864,
+        "label": "千葉県旭市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "k-20260726-u03bt",
@@ -873,7 +1191,13 @@
       "category": "説明会",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/kanagawa/mado/hiratuka/hiratuka.html",
-      "notes": null
+      "notes": null,
+      "weatherLocation": {
+        "latitude": 36.155277,
+        "longitude": 139.86853,
+        "label": "茨城県八千代町",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "k-20260828-pfisj",
@@ -887,7 +1211,13 @@
       "category": "体験",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/kanagawa/kouho/event/event-kengaku.html",
-      "notes": null
+      "notes": null,
+      "weatherLocation": {
+        "latitude": 35.723259,
+        "longitude": 140.66864,
+        "label": "千葉県旭市",
+        "accuracy": "venue"
+      }
     }
   ],
   "tokyo": [],
@@ -906,7 +1236,13 @@
       "url": null,
       "notes": "予約なしのご参加もOKです",
       "ageRequirement": "高校生～32歳までの方及びその保護者様",
-      "deadline": "なし"
+      "deadline": "なし",
+      "weatherLocation": {
+        "latitude": 35.857033,
+        "longitude": 139.649017,
+        "label": "埼玉県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "s-20260704-yllw6",
@@ -922,7 +1258,13 @@
       "url": null,
       "notes": "担当: さいたま地域事務所\n予約不要、入場無料、服装自由",
       "ageRequirement": "34歳迄の方（保護者の方も一緒に参加いただけます）",
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.89637,
+        "longitude": 139.799561,
+        "label": "埼玉県越谷市",
+        "accuracy": "address"
+      }
     },
     {
       "id": "s-20260725-g4wbs",
@@ -938,7 +1280,13 @@
       "url": "tel:0484664435",
       "notes": "担当: 朝霞地域事務所",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.857033,
+        "longitude": 139.649017,
+        "label": "埼玉県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "s-20260725-e69my",
@@ -954,7 +1302,13 @@
       "url": "tel:0484664435",
       "notes": "担当: 朝霞地域事務所",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.857033,
+        "longitude": 139.649017,
+        "label": "埼玉県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "s-20260728-x120i",
@@ -970,7 +1324,13 @@
       "url": "tel:0484664435",
       "notes": "担当: 朝霞地域事務所",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.857033,
+        "longitude": 139.649017,
+        "label": "埼玉県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "s-20260820-ycvbl",
@@ -986,7 +1346,13 @@
       "url": "https://www.mod.go.jp/pco/saitama/event/img/8.8.20hyakuri.jpg",
       "notes": "応募多数の場合は、抽選となり当選された方のみに詳細なご案内をお送りいたします。",
       "ageRequirement": "17歳以上32歳以下",
-      "deadline": "7月15日（水）"
+      "deadline": "7月15日（水）",
+      "weatherLocation": {
+        "latitude": 35.857033,
+        "longitude": 139.649017,
+        "label": "埼玉県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "s-20260821-zbucj",
@@ -1002,7 +1368,13 @@
       "url": "https://www.mod.go.jp/pco/saitama/event/img/8.8.21intan.jpg",
       "notes": "※採用・募集目的ではなく、自衛隊の仕事を知ってもらう企画です。",
       "ageRequirement": "高校生",
-      "deadline": "令和6年7月15日（水）"
+      "deadline": "令和6年7月15日（水）",
+      "weatherLocation": {
+        "latitude": 35.857033,
+        "longitude": 139.649017,
+        "label": "埼玉県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "s-20260823-4luf8",
@@ -1018,7 +1390,13 @@
       "url": null,
       "notes": "担当: 熊谷地域事務所\n予約不要、入場無料、服装自由、途中入退場可能",
       "ageRequirement": "高校生以上で公務員の仕事に興味のある方",
-      "deadline": "null"
+      "deadline": "null",
+      "weatherLocation": {
+        "latitude": 36.139412,
+        "longitude": 139.392044,
+        "label": "埼玉県熊谷市",
+        "accuracy": "address"
+      }
     },
     {
       "id": "s-20260827-trz9e",
@@ -1034,7 +1412,13 @@
       "url": "tel:0484664435",
       "notes": "担当: 朝霞地域事務所",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.857033,
+        "longitude": 139.649017,
+        "label": "埼玉県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "s-20260830-91kci",
@@ -1050,7 +1434,13 @@
       "url": "https://www.mod.go.jp/pco/saitama/event/img/8.8.30intan.jpg",
       "notes": "定員になり次第、締切",
       "ageRequirement": "大学生・短期大学生・専門学生",
-      "deadline": "令和8年7月30日（木）"
+      "deadline": "令和8年7月30日（木）",
+      "weatherLocation": {
+        "latitude": 35.857033,
+        "longitude": 139.649017,
+        "label": "埼玉県",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "gunma": [
@@ -1068,7 +1458,13 @@
       "url": "",
       "notes": "＜広報展示ブース設置します！＞ 高機動車を展示予定です。 制服試着コーナーもあります！ 記念撮影ができますよ♪",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.496037,
+        "longitude": 138.978714,
+        "label": "群馬県渋川市",
+        "accuracy": "address"
+      }
     },
     {
       "id": "gu-20260710-q10fo",
@@ -1084,7 +1480,13 @@
       "url": "",
       "notes": "＜広報展示ブース設置します！＞ メガクルーザーと高機動車とのコラボ予定です。 制服試着コーナーもあります！ 記念撮影ができますよ♪",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.318714,
+        "longitude": 139.021667,
+        "label": "群馬県高崎市",
+        "accuracy": "address"
+      }
     },
     {
       "id": "gu-20260718-lewu0",
@@ -1100,7 +1502,13 @@
       "url": "",
       "notes": "＜広報展示ブース設置します！＞ 1/2tトラック（小型）を展示予定です。 制服試着コーナーもあります！ 記念撮影ができますよ♪",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.413738,
+        "longitude": 139.232452,
+        "label": "群馬県桐生市",
+        "accuracy": "address"
+      }
     },
     {
       "id": "gu-20260719-zxf3r",
@@ -1116,7 +1524,13 @@
       "url": "",
       "notes": "＜広報展示ブース設置します！＞ 制服試着コーナーもあります！ 記念撮影ができますよ♪",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.163223,
+        "longitude": 139.054337,
+        "label": "群馬県藤岡市",
+        "accuracy": "address"
+      }
     },
     {
       "id": "gu-20260725-qs691",
@@ -1132,7 +1546,13 @@
       "url": "",
       "notes": "＜広報展示ブース設置します！＞ 高機動車を展示予定です。 制服試着コーナーもあります！ 記念撮影ができますよ♪",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.570629,
+        "longitude": 138.809082,
+        "label": "群馬県東吾妻町",
+        "accuracy": "address"
+      }
     },
     {
       "id": "gu-20260726-vcs09",
@@ -1148,7 +1568,13 @@
       "url": "",
       "notes": "＜広報展示ブース設置します！＞ 1/2tトラック（小型）を展示予定です。 制服試着コーナーもあります！ 記念撮影ができますよ♪",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.775787,
+        "longitude": 139.231995,
+        "label": "群馬県片品村",
+        "accuracy": "address"
+      }
     },
     {
       "id": "gu-off-20260718-fu234",
@@ -1165,7 +1591,13 @@
       "notes": null,
       "ageRequirement": "16歳〜32歳までの女性、保護者等",
       "deadline": "7月17日（金）",
-      "source_type": "office_ocr"
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 36.389462,
+        "longitude": 139.063461,
+        "label": "群馬県前橋市",
+        "accuracy": "venue"
+      }
     }
   ],
   "tochigi": [
@@ -1184,7 +1616,13 @@
       "notes": "雨天開催。荒天順延。順延時7月19日（日）。",
       "ageRequirement": null,
       "deadline": "令和6月15日まで",
-      "source_type": "office_ocr"
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 35.515518,
+        "longitude": 134.454926,
+        "label": "兵庫県新温泉町",
+        "accuracy": "municipality"
+      }
     },
     {
       "id": "to-off-20260718-y3r0x",
@@ -1201,7 +1639,13 @@
       "notes": "7/19 抽選会",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_ocr"
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 34.689095,
+        "longitude": 135.515732,
+        "label": "大阪府大阪市",
+        "accuracy": "venue"
+      }
     }
   ],
   "ibaraki": [
@@ -1219,7 +1663,13 @@
       "url": "",
       "notes": "担当: 筑西地域事務所",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.230785,
+        "longitude": 139.895737,
+        "label": "茨城県結城市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ib-20260704-2u93g",
@@ -1235,7 +1685,13 @@
       "url": "",
       "notes": "担当: 龍ヶ崎地域事務所",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.341736,
+        "longitude": 140.446823,
+        "label": "茨城県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ib-20260704-nbxkc",
@@ -1251,7 +1707,13 @@
       "url": "",
       "notes": "担当: 日立出張所",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.457436,
+        "longitude": 140.486801,
+        "label": "茨城県那珂郡",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ib-20260704-dscyb",
@@ -1267,7 +1729,13 @@
       "url": "",
       "notes": "担当: 水戸募集案内所",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.365852,
+        "longitude": 140.471588,
+        "label": "茨城県水戸市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ib-20260705-s8vek",
@@ -1283,7 +1751,13 @@
       "url": "",
       "notes": "担当: 水戸募集案内所",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.39595,
+        "longitude": 140.541367,
+        "label": "茨城県ひたちなか市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ib-20260705-727cv",
@@ -1299,7 +1773,13 @@
       "url": "",
       "notes": "担当: 水戸募集案内所",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.723259,
+        "longitude": 140.66864,
+        "label": "千葉県旭市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ib-20260718-ppsgd",
@@ -1315,7 +1795,13 @@
       "url": "",
       "notes": "担当: 龍ヶ崎地域事務所",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.341736,
+        "longitude": 140.446823,
+        "label": "茨城県",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "chiba": [],
@@ -1335,7 +1821,13 @@
       "notes": "掲載元: 上越地域事務所",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 43.891171,
+        "longitude": 142.982086,
+        "label": "北海道上川町",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ni-office-20260718-7n9l4",
@@ -1352,7 +1844,13 @@
       "notes": "掲載元: 上越地域事務所\n当日参加もOK！お気軽にご参加ください！",
       "ageRequirement": "高校生以上33歳未満（保護者同伴OK！）",
       "deadline": null,
-      "source_type": "office_ocr"
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 37.364952,
+        "longitude": 138.557999,
+        "label": "新潟県柏崎市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ni-office-20260804-zsui5",
@@ -1369,7 +1867,13 @@
       "notes": "掲載元: 加茂地域事務所",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 37.947952,
+        "longitude": 139.327103,
+        "label": "新潟県新発田市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ni-office-20260718-6uwpy",
@@ -1386,7 +1890,13 @@
       "notes": "掲載元: 柏崎地域事務所",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 40.513973,
+        "longitude": 141.49585,
+        "label": "青森県八戸市",
+        "accuracy": "venue"
+      }
     }
   ],
   "toyama": [],
@@ -1405,7 +1915,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.594604,
+        "longitude": 136.625671,
+        "label": "石川県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ik-20260718-onvo5",
@@ -1421,7 +1937,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.257664,
+        "longitude": 139.721995,
+        "label": "石川県",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "is-office-20260820-c5z1f",
@@ -1438,7 +1960,13 @@
       "notes": "掲載元: 金沢募集案内所・七尾出張所・小松地域事務所 ほか1拠点",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 36.594604,
+        "longitude": 136.625671,
+        "label": "石川県",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "fukui": [
@@ -1456,7 +1984,13 @@
       "url": "",
       "notes": "自衛隊車両展示・広報ブース等",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.600555,
+        "longitude": 135.940552,
+        "label": "福井県三方郡",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "fu-20260726-rdwgq",
@@ -1472,7 +2006,13 @@
       "url": "",
       "notes": "自衛隊車両展示・広報ブース等",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.065208,
+        "longitude": 136.221725,
+        "label": "福井県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "fu-office-20260720-6q3su",
@@ -1489,7 +2029,13 @@
       "notes": "掲載元: 敦賀地域事務所・敦賀出張所・越前地域事務所 ほか1拠点\n応募多数の場合は抽選。業務都合により内容変更または中止の場合あり",
       "ageRequirement": "高校1年生から32歳未満の方とその保護者1名",
       "deadline": "7月1日（水）12時",
-      "source_type": "office_ocr"
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 43.244255,
+        "longitude": 141.562607,
+        "label": "北海道当別町",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "fu-off-20260829-9wqev",
@@ -1506,7 +2052,13 @@
       "notes": "応募多数は抽選。当日天候や状況で中止や変更の可能性あり",
       "ageRequirement": "中学3年生から32歳未満",
       "deadline": "7月8日（水）",
-      "source_type": "office_ocr"
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 35.485832,
+        "longitude": 134.444153,
+        "label": "兵庫県新温泉町",
+        "accuracy": "venue"
+      }
     }
   ],
   "yamanashi": [
@@ -1525,7 +2077,13 @@
       "notes": "掲載元: 巨摩募集案内所",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_ocr"
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 35.59026,
+        "longitude": 134.381577,
+        "label": "鳥取県岩美町",
+        "accuracy": "venue"
+      }
     }
   ],
   "nagano": [
@@ -1543,7 +2101,13 @@
       "url": "",
       "notes": "陸上自衛隊 第12音楽隊が須坂市に来ます！ 開場：17：30 開演：18：30 入場無料 ※ご来場多数の場合は、入場を制限させていただく場合があります。 お問い合わせ先：須坂商工会議所 TEL:026-245-0031",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.6511,
+        "longitude": 138.307251,
+        "label": "長野県須坂市",
+        "accuracy": "municipality"
+      }
     },
     {
       "id": "na-20260705-563cx",
@@ -1559,7 +2123,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.651306,
+        "longitude": 138.180908,
+        "label": "長野県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "na-20260718-uimr5",
@@ -1575,7 +2145,13 @@
       "url": "",
       "notes": "自衛隊採用説明会 １０：００～１２：００ 説明内容 ・自衛隊の概要 ・自衛隊の職種、職域 ・福利厚生など 気軽にお立ち寄りください",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.432167,
+        "longitude": 140.280212,
+        "label": "千葉県茂原市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "na-20260718-hm0w8",
@@ -1591,7 +2167,13 @@
       "url": "",
       "notes": "場所：イオンモール松本 風庭２F イオンホール 時間：１１：００～１６：００ (１５：４０受付終了) 内容：「公務員ってなにしてるの？」その疑問を解決！ 自衛隊、防衛省職員、長野県警、北アルプス消防、木曽広域消防、松本市役所、塩尻市役所、安曇野市役所、大町市役所 合同により、公務員の仕事内容、生活、ワークライフバランス、待遇等わかりやすく説明させていただきます。",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.723259,
+        "longitude": 140.66864,
+        "label": "千葉県旭市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "na-20260725-x3tnl",
@@ -1607,7 +2189,13 @@
       "url": "",
       "notes": "今年も、KOMA夏に自衛隊が参加します！ 細部、調整中",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.651306,
+        "longitude": 138.180908,
+        "label": "長野県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "na-20260727-nfuf8",
@@ -1623,7 +2211,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.039165,
+        "longitude": 138.114166,
+        "label": "長野県諏訪市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "na-20260801-jcjfp",
@@ -1639,7 +2233,13 @@
       "url": "",
       "notes": "伊那まつり に自衛隊車両がやって来る！ 細部、調整中",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.651306,
+        "longitude": 138.180908,
+        "label": "長野県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "na-20260817-lb6zo",
@@ -1655,7 +2255,13 @@
       "url": "",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 33.23481,
+        "longitude": 131.779755,
+        "label": "大分県大分市",
+        "accuracy": "venue"
+      }
     }
   ],
   "gifu": [],
@@ -1674,7 +2280,13 @@
       "url": "",
       "notes": "警備の都合上，乗艦前に手荷物検査をさせていただきます。\n乗艦の際は、乗員の指示に従ってください。\nペットを連れての乗艦はご遠慮いただきます。\n艦は突起物が多いので、足元及び頭上に注意してください。\nスカート、サンダル、ハイヒール等での乗艦は安全管理上、危険ですのでご遠慮ください。\n危険物、酒類の持ち込み及びペットを連れての乗艦はお断りさせていただきます。\n天候及び任務等により変更及び中止の場合がございます。\n混雑状況により、乗艦受付を早める場合があります。\n公共交通機関又は近傍の駐車場をご利用ください。（路上駐車はご遠慮ください）",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 34.976944,
+        "longitude": 138.383057,
+        "label": "静岡県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "sz-20260820-rqjrh",
@@ -1690,7 +2302,13 @@
       "url": "",
       "notes": "静岡駅 8:40出発\n沼津駅 9:10出発\n当受入部隊の任務等都合により計画変更又は中止となる場合がございます。\n申し込み確認後、担当事務所より詳細のご案内を差し上げます。\n応募締切は令和8年7月20日(月・祝)24:00まで（申込者多数の場合、抽選の場合があります。ご了承下さい）",
       "ageRequirement": "参加対象静岡県内にお住まいの 中学生以上～32歳までの女性 お子様のお母さま",
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 43.813843,
+        "longitude": 144.778305,
+        "label": "北海道斜里町",
+        "accuracy": "venue"
+      }
     }
   ],
   "aichi": [
@@ -1709,7 +2327,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260628-nw1e7",
@@ -1726,7 +2350,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260628-3gr0g",
@@ -1743,7 +2373,13 @@
       "notes": "イベント",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-office-20260704-c253p",
@@ -1760,7 +2396,13 @@
       "notes": "掲載元: 豊橋地域事務所\n無料・予約優先（定員に達した場合、受付終了の可能性有）",
       "ageRequirement": "年齢問わず、学生・保護者だけでもOK、転職者も大歓迎",
       "deadline": null,
-      "source_type": "office_ocr"
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 37.501484,
+        "longitude": 138.707901,
+        "label": "新潟県出雲崎町",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ai-20260705-44mau",
@@ -1777,7 +2419,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260705-b3x2g",
@@ -1794,7 +2442,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260705-ovza5",
@@ -1811,7 +2465,13 @@
       "notes": "公安系公務員",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260706-897il",
@@ -1828,7 +2488,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260708-bee4z",
@@ -1845,7 +2511,13 @@
       "notes": "イベント",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260710-tqwmu",
@@ -1862,7 +2534,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260711-exscz",
@@ -1879,7 +2557,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260711-mvnf7",
@@ -1896,7 +2580,13 @@
       "notes": "公安系公務員",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260711-kvrvb",
@@ -1913,7 +2603,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260711-pxguw",
@@ -1930,7 +2626,13 @@
       "notes": "公安系公務員",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260712-clm6o",
@@ -1947,7 +2649,13 @@
       "notes": "公安系公務員",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260712-0w6ku",
@@ -1964,7 +2672,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260715-98yiq",
@@ -1981,7 +2695,13 @@
       "notes": "イベント",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260718-a0ax0",
@@ -1998,7 +2718,13 @@
       "notes": "公安系公務員",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260718-wj6a0",
@@ -2015,7 +2741,13 @@
       "notes": "公安系公務員",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260718-u74xo",
@@ -2032,7 +2764,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260718-cttgn",
@@ -2049,7 +2787,13 @@
       "notes": "公安系公務員",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260719-nh9x9",
@@ -2066,7 +2810,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260722-yrhfv",
@@ -2083,7 +2833,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260725-n27nt",
@@ -2100,7 +2856,13 @@
       "notes": "公安系公務員",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260725-t1mrv",
@@ -2117,7 +2879,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260725-8lfww",
@@ -2134,7 +2902,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-office-20260726-dj16v",
@@ -2151,7 +2925,13 @@
       "notes": "掲載元: 半田地域事務所\n事前申込制、保護者同伴",
       "ageRequirement": "中学生または17歳未満の男子及び中学1・2年生女子",
       "deadline": null,
-      "source_type": "office_ocr"
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 35.711559,
+        "longitude": 140.65123,
+        "label": "千葉県旭市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ai-20260726-2pb3k",
@@ -2168,7 +2948,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260726-285zd",
@@ -2185,7 +2971,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260726-02jeb",
@@ -2202,7 +2994,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260728-8wwo8",
@@ -2219,7 +3017,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260728-t78jr",
@@ -2236,7 +3040,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260730-5az6x",
@@ -2253,7 +3063,13 @@
       "notes": "公安系公務員",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260801-e31fa",
@@ -2270,7 +3086,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260801-i6kyr",
@@ -2287,7 +3109,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260801-tscr7",
@@ -2304,7 +3132,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260802-etrpl",
@@ -2321,7 +3155,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260802-r8suu",
@@ -2338,7 +3178,13 @@
       "notes": "公安系公務員",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260802-12779",
@@ -2355,7 +3201,13 @@
       "notes": "公安系公務員",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260805-a1oo7",
@@ -2372,7 +3224,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260805-pu89t",
@@ -2389,7 +3247,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260807-hgcwv",
@@ -2406,7 +3270,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260808-og7d6",
@@ -2423,7 +3293,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260808-le3g0",
@@ -2440,7 +3316,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260808-8jrxa",
@@ -2457,7 +3339,13 @@
       "notes": "公安系公務員",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260816-bo2rp",
@@ -2474,7 +3362,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260822-noxac",
@@ -2491,7 +3385,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260822-86xvn",
@@ -2508,7 +3408,13 @@
       "notes": "公安系公務員",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260822-eikvs",
@@ -2525,7 +3431,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260823-hzzoj",
@@ -2542,7 +3454,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260823-7tahl",
@@ -2559,7 +3477,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260824-irmea",
@@ -2576,7 +3500,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260826-07se4",
@@ -2593,7 +3523,13 @@
       "notes": "公安系公務員",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260827-bkfjx",
@@ -2610,7 +3546,13 @@
       "notes": "公安系公務員",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260830-wo3yk",
@@ -2627,7 +3569,13 @@
       "notes": "学校説明会",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260831-qaesg",
@@ -2644,7 +3592,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260906-yjidh",
@@ -2661,7 +3615,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260909-73tos",
@@ -2678,7 +3638,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260912-ggtz4",
@@ -2695,7 +3661,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260919-eeusr",
@@ -2712,7 +3684,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260927-bccfa",
@@ -2729,7 +3707,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20260928-xn4nj",
@@ -2746,7 +3730,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20261114-7cps6",
@@ -2763,7 +3753,13 @@
       "notes": "自衛隊制度",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20261205-itnlb",
@@ -2780,7 +3776,13 @@
       "notes": "公安系公務員",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-20270220-svd60",
@@ -2797,7 +3799,13 @@
       "notes": "公安系公務員",
       "ageRequirement": null,
       "deadline": null,
-      "endDate": null
+      "endDate": null,
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-office-20260718-aogxm",
@@ -2814,7 +3822,13 @@
       "notes": "掲載元: 安城地域事務所\n定員60名　服装自由",
       "ageRequirement": "高校生以上",
       "deadline": null,
-      "source_type": "office_ocr"
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 34.989376,
+        "longitude": 137.002304,
+        "label": "愛知県刈谷市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ai-office-20260718-gh7ok",
@@ -2831,7 +3845,13 @@
       "notes": "掲載元: 名古屋出張所\n保護者の方・お友達もご一緒いただけます！　チラシ持参で参加すると自衛隊グッズをプレゼント",
       "ageRequirement": "高校3年生～32歳の方",
       "deadline": null,
-      "source_type": "office_ocr"
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 35.18021,
+        "longitude": 136.906586,
+        "label": "愛知県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ai-office-20260705-3vqdj",
@@ -2848,7 +3868,13 @@
       "notes": "掲載元: 岡崎出張所\n予約不要・入退室自由",
       "ageRequirement": "公務員（公安職等）の仕事に興味のある方及びそのご家族",
       "deadline": "null",
-      "source_type": "office_ocr"
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 34.954803,
+        "longitude": 137.173065,
+        "label": "愛知県岡崎市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ai-office-20260715-xc58c",
@@ -2865,7 +3891,13 @@
       "notes": "掲載元: 瀬戸地域事務所",
       "ageRequirement": null,
       "deadline": "令和8年7月6日（月）",
-      "source_type": "office_ocr"
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 35.59026,
+        "longitude": 134.381577,
+        "label": "鳥取県岩美町",
+        "accuracy": "venue"
+      }
     }
   ],
   "mie": [],
@@ -2885,7 +3917,13 @@
       "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
       "notes": "担当: 京都募集案内所",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.011669,
+        "longitude": 135.768112,
+        "label": "京都府京都市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ky-set-20260629-fosny",
@@ -2901,7 +3939,13 @@
       "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
       "notes": "担当: 京都募集案内所",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.711559,
+        "longitude": 140.65123,
+        "label": "千葉県旭市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ky-office-20260628-fhebt",
@@ -2918,7 +3962,13 @@
       "notes": "掲載元: 宮津地域事務所・木津地域事務所",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 35.02124,
+        "longitude": 135.755615,
+        "label": "京都府",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ky-office-20260629-rbflo",
@@ -2935,7 +3985,13 @@
       "notes": "掲載元: 宮津地域事務所・木津地域事務所",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 35.02124,
+        "longitude": 135.755615,
+        "label": "京都府",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "osaka": [
@@ -2954,7 +4010,13 @@
       "notes": "掲載元: 枚方出張所・茨木地域事務所",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 34.686344,
+        "longitude": 135.520035,
+        "label": "大阪府",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "os-office-20260718-hxlen",
@@ -2971,7 +4033,13 @@
       "notes": "掲載元: 岸和田地域事務所\n申し込み多数の場合は抽選。当選者のみに連絡。",
       "ageRequirement": "中学1年から32歳まで（学生優先）",
       "deadline": "6月29日（月）",
-      "source_type": "office_ocr"
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 35.986046,
+        "longitude": 140.313004,
+        "label": "茨城県美浦村",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "os-office-20260718-scxu6",
@@ -2988,7 +4056,13 @@
       "notes": "掲載元: 岸和田地域事務所",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 34.46059,
+        "longitude": 135.37088,
+        "label": "大阪府岸和田市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "os-office-20260723-958b4",
@@ -3005,7 +4079,13 @@
       "notes": "掲載元: 枚方出張所・茨木地域事務所",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 34.686344,
+        "longitude": 135.520035,
+        "label": "大阪府",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "os-office-20260723-7ibqo",
@@ -3022,7 +4102,13 @@
       "notes": "掲載元: 枚方出張所・茨木地域事務所",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 34.686344,
+        "longitude": 135.520035,
+        "label": "大阪府",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "os-office-20260723-ge7ua",
@@ -3039,7 +4125,13 @@
       "notes": "掲載元: 枚方出張所・茨木地域事務所",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 34.686344,
+        "longitude": 135.520035,
+        "label": "大阪府",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "os-office-20260731-tfaz8",
@@ -3056,7 +4148,13 @@
       "notes": "掲載元: 枚方出張所・茨木地域事務所",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 34.686344,
+        "longitude": 135.520035,
+        "label": "大阪府",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "os-office-20260731-ifpfp",
@@ -3073,7 +4171,13 @@
       "notes": "掲載元: 岸和田地域事務所",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 34.46059,
+        "longitude": 135.37088,
+        "label": "大阪府岸和田市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "os-office-20260804-n0sst",
@@ -3090,7 +4194,13 @@
       "notes": "掲載元: 枚方出張所・茨木地域事務所",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 34.686344,
+        "longitude": 135.520035,
+        "label": "大阪府",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "os-office-20260804-rg31l",
@@ -3107,7 +4217,13 @@
       "notes": "掲載元: 岸和田地域事務所",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 34.46059,
+        "longitude": 135.37088,
+        "label": "大阪府岸和田市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "os-off-20260804-37lau",
@@ -3124,7 +4240,13 @@
       "notes": "学生優先※申込多数の場合は抽選\n学生優先※申込多数の場合は抽選",
       "ageRequirement": "15歳から32歳まで",
       "deadline": "7月17日（金）",
-      "source_type": "office_ocr"
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 43.202141,
+        "longitude": 145.524216,
+        "label": "北海道根室市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "os-office-20260818-4tim1",
@@ -3141,7 +4263,13 @@
       "notes": "掲載元: 枚方出張所・茨木地域事務所",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 34.686344,
+        "longitude": 135.520035,
+        "label": "大阪府",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "os-office-20260818-ny0ch",
@@ -3158,7 +4286,13 @@
       "notes": "掲載元: 岸和田地域事務所",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 34.46059,
+        "longitude": 135.37088,
+        "label": "大阪府岸和田市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "os-office-20260818-spbxi",
@@ -3175,7 +4309,13 @@
       "notes": "掲載元: 岸和田地域事務所\n申込多数の場合は抽選。当選者のみに連絡。\n申込多数の場合は抽選。当選者のみに連絡。",
       "ageRequirement": "15歳から32歳まで",
       "deadline": "7月27日（月）",
-      "source_type": "office_ocr"
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 37.582809,
+        "longitude": 140.366119,
+        "label": "福島県二本松市",
+        "accuracy": "venue"
+      }
     }
   ],
   "hyogo": [
@@ -3194,7 +4334,13 @@
       "notes": "掲載元: 青野原分駐所",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 35.553944,
+        "longitude": 139.186737,
+        "label": "神奈川県相模原市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "hy-office-20260808-idxy5",
@@ -3211,7 +4357,13 @@
       "notes": "掲載元: 青野原分駐所",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 35.553944,
+        "longitude": 139.186737,
+        "label": "神奈川県相模原市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "hy-office-20261017-eb612",
@@ -3228,7 +4380,13 @@
       "notes": "掲載元: 青野原分駐所",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 35.553944,
+        "longitude": 139.186737,
+        "label": "神奈川県相模原市",
+        "accuracy": "venue"
+      }
     }
   ],
   "nara": [
@@ -3246,7 +4404,13 @@
       "url": "https://www.mod.go.jp/pco/nara/post-16355/",
       "notes": "参加費無料・送迎つき",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 34.685272,
+        "longitude": 135.832855,
+        "label": "奈良県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "na-20260731-fsqaz",
@@ -3262,7 +4426,13 @@
       "url": "https://www.mod.go.jp/pco/nara/post-16353/",
       "notes": "参加費無料・送迎つき",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 37.582809,
+        "longitude": 140.366119,
+        "label": "福島県二本松市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "na-20260726-cik74",
@@ -3278,7 +4448,13 @@
       "url": "https://www.mod.go.jp/pco/nara/post-16137/",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 34.883911,
+        "longitude": 135.41832,
+        "label": "兵庫県川西市",
+        "accuracy": "venue"
+      }
     }
   ],
   "wakayama": [],
@@ -3297,7 +4473,13 @@
       "url": "https://www.mod.go.jp/pco/ehime/event.html",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 33.88533,
+        "longitude": 132.856171,
+        "label": "愛媛県松山市",
+        "accuracy": "venue"
+      }
     }
   ],
   "kagawa": [
@@ -3315,7 +4497,13 @@
       "url": "https://www.mod.go.jp/pco/kagawa/event.html",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.485832,
+        "longitude": 134.444153,
+        "label": "兵庫県新温泉町",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "kg-20260712-z7ep4",
@@ -3331,7 +4519,13 @@
       "url": "https://www.mod.go.jp/pco/kagawa/event.html",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.764427,
+        "longitude": 136.713577,
+        "label": "石川県かほく市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ka-off-20260808-qse6r",
@@ -3348,7 +4542,13 @@
       "notes": "申込フォームまたは当日窓口で申込",
       "ageRequirement": "16歳から32歳の方",
       "deadline": "8月4日（月）",
-      "source_type": "office_ocr"
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 34.340111,
+        "longitude": 134.043289,
+        "label": "香川県",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "kochi": [
@@ -3367,7 +4567,13 @@
       "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_notice"
+      "source_type": "office_notice",
+      "weatherLocation": {
+        "latitude": 33.559723,
+        "longitude": 133.531113,
+        "label": "高知県",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "tokushima": [
@@ -3386,7 +4592,13 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_ocr"
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 34.065762,
+        "longitude": 134.55928,
+        "label": "徳島県",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "tottori": [
@@ -3405,7 +4617,13 @@
       "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_notice"
+      "source_type": "office_notice",
+      "weatherLocation": {
+        "latitude": 35.503448,
+        "longitude": 134.238266,
+        "label": "鳥取県",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "shimane": [
@@ -3424,7 +4642,13 @@
       "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_notice"
+      "source_type": "office_notice",
+      "weatherLocation": {
+        "latitude": 35.472294,
+        "longitude": 133.050522,
+        "label": "島根県",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "okayama": [
@@ -3442,7 +4666,13 @@
       "url": "https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 34.584999,
+        "longitude": 133.771942,
+        "label": "岡山県倉敷市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ok-20260725-ehoqy",
@@ -3458,7 +4688,13 @@
       "url": "https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.028557,
+        "longitude": 139.722137,
+        "label": "埼玉県宮代町",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ok-office-20260705-828n9",
@@ -3475,7 +4711,13 @@
       "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 34.661739,
+        "longitude": 133.935028,
+        "label": "岡山県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ok-office-20260705-c5enn",
@@ -3492,7 +4734,13 @@
       "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 34.661739,
+        "longitude": 133.935028,
+        "label": "岡山県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ok-office-20260718-i17bi",
@@ -3509,7 +4757,13 @@
       "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 34.661739,
+        "longitude": 133.935028,
+        "label": "岡山県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ok-office-20260720-shla9",
@@ -3526,7 +4780,13 @@
       "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 34.661739,
+        "longitude": 133.935028,
+        "label": "岡山県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ok-office-20260714-yyh4r",
@@ -3543,7 +4803,13 @@
       "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 34.661739,
+        "longitude": 133.935028,
+        "label": "岡山県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ok-office-20260725-rgr94",
@@ -3560,7 +4826,13 @@
       "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 34.661739,
+        "longitude": 133.935028,
+        "label": "岡山県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ok-office-20260705-hr5qx",
@@ -3577,7 +4849,13 @@
       "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 34.661739,
+        "longitude": 133.935028,
+        "label": "岡山県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ok-office-20261009-z5zo6",
@@ -3594,7 +4872,13 @@
       "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 34.661739,
+        "longitude": 133.935028,
+        "label": "岡山県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ok-office-20260910-puj5k",
@@ -3611,7 +4895,13 @@
       "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 34.661739,
+        "longitude": 133.935028,
+        "label": "岡山県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ok-office-20260630-6gp94",
@@ -3628,7 +4918,13 @@
       "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 34.661739,
+        "longitude": 133.935028,
+        "label": "岡山県",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "hiroshima": [
@@ -3646,7 +4942,13 @@
       "url": "https://www.mod.go.jp/pco/hiroshima/events/3620/",
       "notes": "事前申込不要、グッズプレゼント",
       "ageRequirement": "高校生以上",
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 34.396557,
+        "longitude": 132.459641,
+        "label": "広島県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "hi-20260704-ht099",
@@ -3662,7 +4964,13 @@
       "url": "https://www.mod.go.jp/pco/hiroshima/events/3680/",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 34.396557,
+        "longitude": 132.459641,
+        "label": "広島県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "hi-20260704-6iwsv",
@@ -3678,7 +4986,13 @@
       "url": "https://www.mod.go.jp/pco/hiroshima/events/3688/",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 34.396557,
+        "longitude": 132.459641,
+        "label": "広島県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "hi-20260705-qw0q6",
@@ -3694,7 +5008,13 @@
       "url": "https://www.mod.go.jp/pco/hiroshima/events/3612/",
       "notes": "無料、事前申込不要",
       "ageRequirement": "高校生以上（保護者同伴可）",
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 34.396557,
+        "longitude": 132.459641,
+        "label": "広島県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "hi-20260709-ftnnc",
@@ -3710,7 +5030,13 @@
       "url": "https://www.mod.go.jp/pco/hiroshima/events/3603/",
       "notes": "定員530名、事前申込",
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 34.396557,
+        "longitude": 132.459641,
+        "label": "広島県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "hi-20260725-9gutn",
@@ -3726,7 +5052,13 @@
       "url": "https://www.mod.go.jp/pco/hiroshima/events/3629/",
       "notes": "予約不要",
       "ageRequirement": "高校生・専門学生・大学生又はそのご家族の方、公安系公務員に興味のある方、仕事内容や職場の雰囲気を知りたい方、なんとなく公務員がいいなと思っている方",
-      "deadline": "null"
+      "deadline": "null",
+      "weatherLocation": {
+        "latitude": 34.396557,
+        "longitude": 132.459641,
+        "label": "広島県",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "yamaguchi": [
@@ -3745,7 +5077,13 @@
       "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_notice"
+      "source_type": "office_notice",
+      "weatherLocation": {
+        "latitude": 34.186043,
+        "longitude": 131.470657,
+        "label": "山口県",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "fukuoka": [
@@ -3764,7 +5102,13 @@
       "notes": "掲載元: 福岡募集案内所・福岡西募集案内所・福岡地域事務所 ほか10拠点\n事前予約制",
       "ageRequirement": "中高生・受験資格のある方、およびその保護者、教員等",
       "deadline": "7月8日（水）",
-      "source_type": "office_ocr"
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 35.257664,
+        "longitude": 139.721995,
+        "label": "福岡県",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "fu-office-20260725-pmgwl",
@@ -3781,7 +5125,13 @@
       "notes": "掲載元: 福岡募集案内所・福岡西募集案内所・福岡地域事務所 ほか10拠点\n事前予約制",
       "ageRequirement": "誰でも",
       "deadline": "令和8年7月3日（金）",
-      "source_type": "office_ocr"
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 33.606388,
+        "longitude": 130.417969,
+        "label": "福岡県",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "saga": [
@@ -3799,7 +5149,13 @@
       "url": "https://www.mod.go.jp/pco/saga/event/index.html",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 33.249352,
+        "longitude": 130.298798,
+        "label": "佐賀県",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "nagasaki": [
@@ -3817,7 +5173,13 @@
       "url": "https://www.mod.go.jp/pco/nagasaki/event/index.html",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 32.750038,
+        "longitude": 129.867249,
+        "label": "長崎県",
+        "accuracy": "prefecture"
+      }
     },
     {
       "id": "ng-20260718-tukky",
@@ -3833,7 +5195,13 @@
       "url": "https://www.mod.go.jp/pco/nagasaki/event/index.html",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 33.17992,
+        "longitude": 129.715088,
+        "label": "長崎県佐世保市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "ng-20260725-kdayt",
@@ -3849,7 +5217,13 @@
       "url": "https://www.mod.go.jp/pco/nagasaki/event/index.html",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 32.749527,
+        "longitude": 129.879807,
+        "label": "長崎県長崎市",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "na-office-20260720-3t13k",
@@ -3866,7 +5240,13 @@
       "notes": "掲載元: 五島駐在員事務所",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_html"
+      "source_type": "office_html",
+      "weatherLocation": {
+        "latitude": 40.63768,
+        "longitude": 140.602371,
+        "label": "青森県黒石市",
+        "accuracy": "venue"
+      }
     }
   ],
   "kumamoto": [
@@ -3884,7 +5264,13 @@
       "url": "https://www.mod.go.jp/pco/kumamoto/event/index.html",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 42.970818,
+        "longitude": 141.799377,
+        "label": "北海道由仁町",
+        "accuracy": "venue"
+      }
     },
     {
       "id": "km-20260711-2zjol",
@@ -3900,7 +5286,13 @@
       "url": "https://www.mod.go.jp/pco/kumamoto/event/index.html",
       "notes": null,
       "ageRequirement": null,
-      "deadline": null
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 42.970818,
+        "longitude": 141.799377,
+        "label": "北海道由仁町",
+        "accuracy": "venue"
+      }
     }
   ],
   "oita": [
@@ -3919,7 +5311,13 @@
       "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_notice"
+      "source_type": "office_notice",
+      "weatherLocation": {
+        "latitude": 33.238129,
+        "longitude": 131.61264,
+        "label": "大分県",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "miyazaki": [
@@ -3938,7 +5336,13 @@
       "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_notice"
+      "source_type": "office_notice",
+      "weatherLocation": {
+        "latitude": 31.911034,
+        "longitude": 131.423889,
+        "label": "宮崎県",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "kagoshima": [
@@ -3957,7 +5361,13 @@
       "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_notice"
+      "source_type": "office_notice",
+      "weatherLocation": {
+        "latitude": 31.560171,
+        "longitude": 130.558029,
+        "label": "鹿児島県",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "okinawa": [
@@ -3976,7 +5386,13 @@
       "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
       "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_notice"
+      "source_type": "office_notice",
+      "weatherLocation": {
+        "latitude": 26.212444,
+        "longitude": 127.680923,
+        "label": "沖縄県",
+        "accuracy": "prefecture"
+      }
     }
   ],
   "updatedAt": "2026/06/28 20:11"

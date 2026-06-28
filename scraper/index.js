@@ -31,6 +31,7 @@ const { sortByPriority } = require('./lib/priority');
 const { markDuplicates }  = require('./lib/dedup');
 const { extractAssets }   = require('./lib/extractAssets');
 const { findEventLinks }  = require('./lib/exploreLinks');
+const geocode             = require('./lib/geocode');
 // 募集案内所イベントのタイトル整形・非イベント判定（フロント/スクリプトと共通）
 const { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } = require('../shared/officeTitle.cjs');
 // イベント名の品質管理（検証済み修正・整形・junk判定・年ズレ判定・重複統合）。最終出力の防御に使う
@@ -3347,7 +3348,7 @@ async function main() {
   if (isMock) {
     console.log('[mock] HTTP アクセスなしでサンプルデータを出力します');
     const output = { ...MOCK_DATA, updatedAt: nowJST() };
-    writeOutput(output);
+    await writeOutput(output);
     console.log('[mock] 完了');
     return;
   }
@@ -4302,7 +4303,7 @@ async function main() {
   // OCRキャッシュを保存（スキャン済みURLを記録 → 次回以降の再スキャンを防ぐ）
   assetCache.save();
 
-  writeOutput(output);
+  await writeOutput(output);
   // 新規イベントを検出してプッシュ通知（非同期・失敗しても続行）
   await notifyNewEvents(prev, output).catch(err =>
     console.warn('[Push] notifyNewEvents エラー:', err.message)
@@ -4310,7 +4311,7 @@ async function main() {
 }
 
 /** public/data/events.json に書き出す */
-function writeOutput(data) {
+async function writeOutput(data) {
   // ディレクトリが無ければ作成
   const dir = path.dirname(OUTPUT_PATH);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
@@ -4363,6 +4364,14 @@ function writeOutput(data) {
     });
   }
   if (removedCount > 0) console.log(`[フィルタ] 過去イベント ${removedCount} 件を削除`);
+
+  // 開催場所 → 緯度経度（天気予報用）。整形・重複統合後の最終 place/address を使う。
+  // 結果は geocode-cache.json にキャッシュし、同一会場の再検索を避ける。失敗しても続行。
+  try {
+    await geocode.geocodeAll(data, today);
+  } catch (e) {
+    console.warn('[geocode] ジオコーディングに失敗しました:', e.message);
+  }
 
   fs.writeFileSync(OUTPUT_PATH, JSON.stringify(data, null, 2), 'utf8');
   console.log(`[出力] ${OUTPUT_PATH}`);
