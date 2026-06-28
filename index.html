@@ -25,7 +25,10 @@
          視覚的に隠す（off-screen）。リンクは HTML 内に存在するためクローラーは辿れる。 -->
     <style>
       html, body { margin: 0; }
-      body { background: #f5f6f8; }
+      /* ページ自体はスクロールさせない（アプリ内の領域だけスクロール）。
+         モバイルの下部ラバーバンド／余計な動きを防ぐ（JS前から適用）。 */
+      html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+      body { background: #f5f6f8; position: fixed; inset: 0; width: 100%; }
       #root { min-height: 100vh; min-height: 100dvh; }
       /* SEO用フッターを画面から隠す（DOM・内部リンクは保持＝クロール可能） */
       #seo-footer {

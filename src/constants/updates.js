@@ -6,6 +6,12 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-06-28',
+    version: '1.15.33',
+    type:    'fix',
+    content: 'モバイルで画面が余計に動かないよう固定表示に調整（軽微な修正）',
+  },
+  {
+    date:    '2026-06-28',
     version: '1.15.32',
     type:    'fix',
     content: '画面下部の表示を調整（軽微な修正）',

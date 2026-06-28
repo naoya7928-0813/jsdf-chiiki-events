@@ -66,12 +66,19 @@ export const GLOBAL_CSS = `
   html, body {
     height: 100%;
     background: var(--bg);
+    /* ページ自体はスクロールさせず、アプリ内の領域だけスクロールさせる。
+       モバイル（特にiOS）の下部ラバーバンド／余計な動きを抑える。 */
+    overflow: hidden;
     overscroll-behavior: none;
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
   }
 
   body {
+    /* 画面に固定してビューポート外への移動（バウンス）を防ぐ */
+    position: fixed;
+    inset: 0;
+    width: 100%;
     font-feature-settings: "palt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -79,7 +86,7 @@ export const GLOBAL_CSS = `
     color: var(--text);
   }
 
-  #root { height: 100%; height: 100dvh; }
+  #root { height: 100%; height: 100dvh; overflow: hidden; }
 
   ::-webkit-scrollbar { display: none; }
   * { scrollbar-width: none; }
