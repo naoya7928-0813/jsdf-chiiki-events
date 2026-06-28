@@ -40,6 +40,13 @@ jobs:
       - name: 依存パッケージをインストール
         run: npm ci
 
+      # テストとデータ品質チェックが成功した場合のみデプロイする
+      - name: テスト
+        run: npm test
+
+      - name: データ品質チェック（エラーでデプロイ停止）
+        run: node scripts/check-data-quality.mjs
+
       - name: Vercel に本番デプロイ
         # バグ報告の ntfy トピックは GitHub Secret から実行時環境変数として渡す
         # （リポジトリ・バンドルに出さない）。未設定なら api/report.js が旧トピックに退避。

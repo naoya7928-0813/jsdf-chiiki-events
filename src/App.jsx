@@ -160,7 +160,9 @@ export default function App({ operator = false }) {
   // 公開アプリ(operator=false)では常に false 扱いで、編集機能・管理タブは一切出ない。
   const [adminAuthed, setAdminAuthed] = useState(() => {
     if (!operator) return false;
-    try { return !!localStorage.getItem('jsdf-admin-auth'); } catch { return false; }
+    // セッションは HttpOnly Cookie。非機密のアカウント情報の有無で初期表示を決め、
+    // 実際の有効性は AdminScreen がサーバーに確認して onAuthChange で反映する。
+    try { return !!localStorage.getItem('jsdf-admin-account'); } catch { return false; }
   });
   // 詳細の「編集」: 同じ運営者サイト内で管理画面を開き、対象イベントを編集する
   const [adminEditEvent, setAdminEditEvent] = useState(null);

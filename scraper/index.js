@@ -4365,6 +4365,13 @@ async function writeOutput(data) {
   }
   if (removedCount > 0) console.log(`[フィルタ] 過去イベント ${removedCount} 件を削除`);
 
+  // 全県横断でイベントIDの重複（ハッシュ衝突）を一意化（お気に入りの誤連動防止・CI品質ゲート対応）
+  try {
+    const { uniquifyIds } = require('../shared/dataQuality.cjs');
+    const n = uniquifyIds(data);
+    if (n > 0) console.log(`[ID] 重複IDを ${n} 件一意化しました`);
+  } catch (e) { console.warn('[ID] 一意化に失敗:', e.message); }
+
   // 開催場所 → 緯度経度（天気予報用）。整形・重複統合後の最終 place/address を使う。
   // 結果は geocode-cache.json にキャッシュし、同一会場の再検索を避ける。失敗しても続行。
   try {

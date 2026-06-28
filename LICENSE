@@ -1,0 +1,39 @@
+MIT License
+
+Copyright (c) 2026 jsdf-chiiki-events contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+----------------------------------------------------------------------
+
+注記（本ライセンスの適用範囲）:
+
+この MIT ライセンスは、本リポジトリの「自作のソースコード」にのみ適用されます。
+以下は本ライセンスの対象外であり、それぞれの権利者・出典の条件に従います。
+詳細は DATA_SOURCES.md および THIRD_PARTY_NOTICES.md を参照してください。
+
+- 自衛隊地方協力本部・防衛省の公開情報（イベント情報・チラシ等）
+- 国土地理院の座標データ
+- Open-Meteo の気象データ
+- OCR により抽出した第三者の文章
+- npm 依存ライブラリ（各OSSライセンス）
+- アイコン・画像・フォント（各提供元のライセンス）
+
+本プロジェクトは有志による非公式サービスであり、防衛省・自衛隊および各地方協力本部
+とは関係ありません。

@@ -15,13 +15,16 @@ const CATEGORIES = ['説明会', '採用イベント', '一般公開', '艦艇�
 const APPLY_OPTS = ['', '要予約', '予約不要', '事前申込制', '入場無料', '要問合せ'];
 const STATUS_LABEL = { draft: '下書き', published: '公開中', closed: '締切', cancelled: '中止' };
 const STATUS_COLOR = { draft: '#888', published: '#16a34a', closed: '#b45309', cancelled: '#ef4444' };
-const ACTION_LABEL = { add: '登録', update: '編集', status: '状態変更', delete: '削除', override: '上書き修正', 'override-clear': '上書き取消' };
+const ACTION_LABEL = {
+  add: '登録', update: '編集', status: '状態変更', delete: '削除', override: '上書き修正', 'override-clear': '上書き取消',
+  'event.create': '登録', 'event.update': '編集', 'event.delete': '削除',
+  'override.save': '上書き修正', 'override.clear': '上書き取消',
+  'auth.login': 'ログイン', 'auth.logout': 'ログアウト', 'audit.read': '監査閲覧',
+};
 const PREF_ENTRIES = Object.entries(PREFECTURE_INFO);
-const SS_KEY = 'jsdf-admin-auth';
-const STAFF_KEY = 'jsdf-admin-staff';
-// 個人番号（仮）→ 担当官名。001=募集案内所 所長のみ追加・削除可
-const STAFF = { '001': '東京 募集案内所 所長（仮）', '002': '東京 担当官A（仮）', '003': '東京 担当官B（仮）' };
-const STAFF_ADD_DELETE = new Set(['001']);
+// 認証はサーバー側セッション(HttpOnly Cookie)。localStorage には非機密のアカウント情報のみ保持し、
+// パスワードは保存しない。旧キー 'jsdf-admin-auth'(user/pass) は使用を廃止。
+const ACCT_KEY = 'jsdf-admin-account';
 const WD = ['日', '月', '火', '水', '木', '金', '土'];
 
 const EMPTY = {
@@ -47,12 +50,9 @@ function fmtTime(iso) { try { return new Date(iso).toLocaleString('ja-JP', { mon
 
 export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn, onAuthChange, initialFilter = 'all', initialEditEvent = null, showTabs = false }) {
   const { primary } = theme;
-  const [auth, setAuth] = useState(() => { try { return JSON.parse(localStorage.getItem(SS_KEY)) || null; } catch { return null; } });
-  const [account, setAccount] = useState(null);
-  // 保存済み認証で自動ログイン中は、ログイン画面を一瞬出さないようローディング表示にする
-  const [checking, setChecking] = useState(() => {
-    try { return !!JSON.parse(localStorage.getItem(SS_KEY)); } catch { return false; }
-  });
+  const [account, setAccount] = useState(() => { try { return JSON.parse(localStorage.getItem(ACCT_KEY)) || null; } catch { return null; } });
+  // 保存済みアカウント情報があればセッション確認中ローディングを出す（ちらつき防止）
+  const [checking, setChecking] = useState(() => { try { return !!JSON.parse(localStorage.getItem(ACCT_KEY)); } catch { return false; } });
   const [uInput, setUInput] = useState('');
   const [pInput, setPInput] = useState('');
   const [authErr, setAuthErr] = useState('');
@@ -67,29 +67,37 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState(false);
   const [offices, setOffices] = useState([]);
-  const [staff, setStaff] = useState(() => { try { return localStorage.getItem(STAFF_KEY) || ''; } catch { return ''; } });
-  const staffName = STAFF[staff] || '';
-  const canAddDelete = STAFF_ADD_DELETE.has(staff);
+  // 権限はサーバーが解決した account.permissions のみで判定（クライアント個人番号は使わない）
+  const perms = useMemo(() => new Set(account?.permissions || []), [account]);
+  const canCreate = perms.has('event:create');
+  const canAddDelete = perms.has('event:delete');
+  const org = account?.organization ?? account?.pref ?? '*';
 
   useEffect(() => { fetchOfficesData().then(d => setOffices(Array.isArray(d) ? d : (d?.offices || []))).catch(() => {}); }, []);
 
-  const headers = useCallback((a = auth) => ({ 'Content-Type': 'application/json', 'x-admin-user': a?.user || '', 'x-admin-pass': a?.pass || '', 'x-admin-staff': staff || '' }), [auth, staff]);
+  // 全 admin API はセッション Cookie で認証（credentials:'include'）。パスワードは送らない。
+  const adminFetch = useCallback((path, init = {}) => fetch(path, {
+    credentials: 'include',
+    ...init,
+    headers: { 'Content-Type': 'application/json', ...(init.headers || {}) },
+  }), []);
+  const persistAccount = (acc) => { try { acc ? localStorage.setItem(ACCT_KEY, JSON.stringify(acc)) : localStorage.removeItem(ACCT_KEY); } catch { /* noop */ } };
 
-  const loadList = useCallback(async (a = auth) => {
+  const loadList = useCallback(async () => {
     try {
-      const r = await fetch('/api/admin/events', { headers: headers(a) });
-      if (r.ok) { const j = await r.json(); setList(j.events || []); if (j.account) { setAccount(j.account); applyScope(j.account.pref); } }
+      const r = await adminFetch('/api/admin/events');
+      if (r.ok) { const j = await r.json(); setList(j.events || []); if (j.account) { setAccount(a => ({ ...(a || {}), ...j.account })); applyScope(j.account.organization); } }
     } catch { /* noop */ }
-  }, [auth, headers]);
+  }, [adminFetch]);
 
-  // 保存済み認証で自動ログイン（管理画面を開いたとき）
+  // 管理画面を開いたとき、セッション Cookie の有効性をサーバーで確認（パスワードは送らない）
   useEffect(() => {
-    if (!auth) { setChecking(false); return; }
+    if (!account) { setChecking(false); return; }
     (async () => {
       try {
-        const r = await fetch('/api/admin/login', { method: 'POST', headers: headers(), body: '{}' });
-        if (r.ok) { const j = await r.json(); setAccount({ pref: j.pref, label: j.label }); applyScope(j.pref); loadList(); }
-        else { setAuth(null); try { localStorage.removeItem(SS_KEY); } catch { /* noop */ } onAuthChange?.(false); }
+        const r = await adminFetch('/api/admin/events');
+        if (r.ok) { const j = await r.json(); setList(j.events || []); if (j.account) { setAccount(a => ({ ...(a || {}), ...j.account })); applyScope(j.account.organization); } }
+        else { setAccount(null); persistAccount(null); onAuthChange?.(false); }
       } catch { /* noop */ }
       finally { setChecking(false); }
     })();
@@ -107,22 +115,26 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
 
   async function handleLogin() {
     setAuthErr(''); setBusy(true);
-    const a = { user: uInput.trim(), pass: pInput };
     try {
-      const r = await fetch('/api/admin/login', { method: 'POST', headers: headers(a), body: '{}' });
+      // パスワードはこのリクエストでのみ送信し、保存しない。成功でセッション Cookie が発行される。
+      const r = await adminFetch('/api/admin/login', { method: 'POST', body: JSON.stringify({ user: uInput.trim(), pass: pInput }) });
       if (r.ok) {
         const j = await r.json();
-        setAuth(a); try { localStorage.setItem(SS_KEY, JSON.stringify(a)); } catch { /* noop */ }
+        const acc = j.account || { organization: j.pref, label: j.label };
+        setAccount(acc); persistAccount(acc);
         onAuthChange?.(true);
         setUInput(''); setPInput('');
         if (mode === 'login' && onLoggedIn) { onLoggedIn(); return; } // 通常サイトへ
-        setAccount({ pref: j.pref, label: j.label }); applyScope(j.pref); loadList(a);
+        applyScope(acc.organization); loadList();
       } else if (r.status === 429) setAuthErr('試行回数が多すぎます。しばらく待ってください。');
       else setAuthErr('ユーザー名またはパスワードが違います。');
     } catch { setAuthErr('通信に失敗しました。'); }
     finally { setBusy(false); }
   }
-  function logout() { setAuth(null); setAccount(null); setList([]); try { localStorage.removeItem(SS_KEY); } catch { /* noop */ } onAuthChange?.(false); }
+  async function logout() {
+    try { await adminFetch('/api/admin/logout', { method: 'POST' }); } catch { /* noop */ }
+    setAccount(null); setList([]); persistAccount(null); onAuthChange?.(false);
+  }
 
   // 既存イベントの編集を開始（フォームへ読み込み）。※編集はユーザー通知を飛ばさない
   function startEdit(ev) {
@@ -145,7 +157,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
     if (!window.confirm('このイベントの上書き修正を取り消して元の内容に戻しますか？')) return;
     setBusy(true);
     try {
-      const r = await fetch('/api/admin/overrides', { method: 'DELETE', headers: headers(), body: JSON.stringify({ id: editingId, pref: form.pref }) });
+      const r = await adminFetch('/api/admin/overrides', { method: 'DELETE', body: JSON.stringify({ id: editingId }) });
       if (r.ok) { if (fromDetail) { onBack?.(); return; } setMsg({ type: 'ok', text: '上書きを取り消しました。' }); cancelEdit(); }
       else setMsg({ type: 'err', text: '取り消しに失敗しました。' });
     } catch { setMsg({ type: 'err', text: '通信に失敗しました。' }); }
@@ -168,8 +180,8 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         // 手動追加イベント(manual-…)は本体をPATCH。それ以外（スクレイプ等）はID単位の上書き保存。
         const isManual = String(editingId).startsWith('manual-');
         const r = isManual
-          ? await fetch('/api/admin/events', { method: 'PATCH', headers: headers(), body: JSON.stringify({ id: editingId, patch }) })
-          : await fetch('/api/admin/overrides', { method: 'POST', headers: headers(), body: JSON.stringify({ id: editingId, pref: form.pref, patch }) });
+          ? await adminFetch('/api/admin/events', { method: 'PATCH', body: JSON.stringify({ id: editingId, patch }) })
+          : await adminFetch('/api/admin/overrides', { method: 'POST', body: JSON.stringify({ id: editingId, patch }) });
         const j = await r.json().catch(() => ({}));
         if (r.ok) {
           if (fromDetail) { onBack?.(); return; } // 詳細起点の編集 → 詳細へ戻す
@@ -178,7 +190,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
       } else {
         const payload = { ...form, endDate: form.multiDay ? form.endDate : '', time: buildTime(form), deadline: toDeadlineStr(form.deadline) };
         delete payload.multiDay; delete payload.timeStart; delete payload.timeEnd;
-        const r = await fetch('/api/admin/events', { method: 'POST', headers: headers(), body: JSON.stringify({ event: { ...payload, status } }) });
+        const r = await adminFetch('/api/admin/events', { method: 'POST', body: JSON.stringify({ event: { ...payload, status } }) });
         const j = await r.json().catch(() => ({}));
         if (r.ok) {
           setMsg({ type: 'ok', text: status === 'published' ? '公開しました（全利用者に表示）。' : '下書き保存しました。' });
@@ -188,12 +200,11 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
     } catch { setMsg({ type: 'err', text: '通信に失敗しました。' }); }
     finally { setBusy(false); }
   }
-  async function setStatus(id, status) { setBusy(true); try { const r = await fetch('/api/admin/events', { method: 'PATCH', headers: headers(), body: JSON.stringify({ id, patch: { status } }) }); if (r.ok) loadList(); } finally { setBusy(false); } }
-  async function remove(id) { if (!window.confirm('このイベントを削除しますか？')) return; setBusy(true); try { const r = await fetch('/api/admin/events', { method: 'DELETE', headers: headers(), body: JSON.stringify({ id }) }); if (r.ok) loadList(); } finally { setBusy(false); } }
-  async function loadHistory() { try { const r = await fetch('/api/admin/history', { headers: headers() }); if (r.ok) { const j = await r.json(); setHistory(j.history || []); } } catch { /* noop */ } }
+  async function setStatus(id, status) { setBusy(true); try { const r = await adminFetch('/api/admin/events', { method: 'PATCH', body: JSON.stringify({ id, patch: { status } }) }); if (r.ok) loadList(); } finally { setBusy(false); } }
+  async function remove(id) { if (!window.confirm('このイベントを削除しますか？')) return; setBusy(true); try { const r = await adminFetch('/api/admin/events', { method: 'DELETE', body: JSON.stringify({ id }) }); if (r.ok) loadList(); } finally { setBusy(false); } }
+  async function loadHistory() { try { const r = await adminFetch('/api/admin/history'); if (r.ok) { const j = await r.json(); setHistory(j.history || []); } } catch { /* noop */ } }
   function toggleHistory() { const n = !showHistory; setShowHistory(n); if (n) loadHistory(); }
-  async function deleteHistory(at) { try { const r = await fetch('/api/admin/history', { method: 'DELETE', headers: headers(), body: JSON.stringify({ at }) }); if (r.ok) loadHistory(); } catch { /* noop */ } }
-  async function clearHistory() { if (!window.confirm('変更履歴をすべて消去しますか？')) return; try { const r = await fetch('/api/admin/history', { method: 'DELETE', headers: headers(), body: JSON.stringify({ clear: true }) }); if (r.ok) loadHistory(); } catch { /* noop */ } }
+  // 監査履歴は追記専用（削除不可）。削除UI・関数は廃止。
 
   function download(name, text, mime) { const b = new Blob([text], { type: mime }); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(u), 1000); }
   function exportJSON() { download(`jsdf-events-${Date.now()}.json`, JSON.stringify(list, null, 2), 'application/json'); }
@@ -205,7 +216,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   }
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
-  const isScoped = account && account.pref !== '*';
+  const isScoped = account && org !== '*';
   const prefOffices = useMemo(() => offices.filter(o => o.pref === form.pref), [offices, form.pref]);
   const facilities = useMemo(() => facilitiesForPref(form.pref), [form.pref]);
 
@@ -241,7 +252,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   }
 
   // ── 管理画面 ──
-  const prefLabel = isScoped ? (PREFECTURE_INFO[account.pref]?.label || account.pref) : '全地本';
+  const prefLabel = isScoped ? (PREFECTURE_INFO[org]?.label || org) : '全国';
   // 追加修正ページ＝公開系（下書き以外）、下書き確認ページ＝下書きのみ。重複を避けて分離。
   const shown = filter === 'draft' ? list.filter(e => e.status === 'draft') : list.filter(e => e.status !== 'draft');
   // 下書き確認ページでは登録フォームを出さない（編集時のみ表示）。追加修正ページは常時表示。
@@ -269,16 +280,15 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
       <div data-admin-scroll style={{ flex: 1, overflowY: 'auto', padding: '16px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 28px)' }}>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10 }}>ログイン中: <strong style={{ color: 'var(--text)' }}>{account.label}</strong>（担当: {prefLabel}）</div>
 
-        {/* 個人番号（仮）→ 担当官名を自動表示。001=所長のみ追加・削除可 */}
+        {/* 権限はサーバー側のロールで決定（操作者ID＝displayId・氏名は表示しない） */}
         <div style={{ marginBottom: 14, padding: '10px 12px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 10 }}>
-          <div style={{ ...label, marginBottom: 6 }}>個人番号</div>
-          <input value={staff} inputMode="numeric"
-            onChange={e => { const v = e.target.value.replace(/\D/g, '').slice(0, 3); setStaff(v); try { localStorage.setItem(STAFF_KEY, v); } catch { /* noop */ } }}
-            placeholder="例: 001" style={{ ...input, marginBottom: 6 }} />
-          {staffName
-            ? <div style={{ fontSize: 12.5, color: 'var(--text)' }}>担当官: <strong>{staffName}</strong> <span style={{ color: canAddDelete ? '#15803d' : 'var(--text-muted)' }}>{canAddDelete ? '（追加・削除・編集 可）' : '（編集のみ／追加・削除不可）'}</span></div>
-            : staff ? <div style={{ fontSize: 12, color: '#ef4444' }}>未登録の個人番号です（仮: 001 / 002 / 003）</div>
-              : <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>個人番号を入力すると担当官名が表示されます（仮: 001=所長 / 002 / 003）</div>}
+          <div style={{ fontSize: 12.5, color: 'var(--text)' }}>
+            操作者: <strong>{account.displayId || account.label}</strong>
+            {account.role && <span style={{ marginLeft: 6, color: 'var(--text-muted)' }}>役割: {account.role}</span>}
+          </div>
+          <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4 }}>
+            権限: {canCreate ? '追加' : ''}{canAddDelete ? '・削除' : ''}{canCreate ? '・編集' : '編集'}{perms.has('event:publish') ? '・公開' : '（公開不可）'}
+          </div>
         </div>
 
         {showForm && (<>
@@ -396,16 +406,14 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         {showHistory && (
           <div style={{ marginBottom: 16, padding: '10px 12px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', flex: 1 }}>変更履歴（新しい順）</div>
-              {history.length > 0 && <button onClick={clearHistory} style={{ ...miniOut('#ef4444'), padding: '4px 10px' }}>全消去</button>}
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', flex: 1 }}>監査履歴（新しい順・追記専用）</div>
             </div>
             {history.length === 0 ? <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>履歴はありません。</div>
               : history.map((h, i) => (
                 <div key={h.at + i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 11.5, color: 'var(--text-muted)', lineHeight: 1.7, borderTop: i ? '1px solid var(--sep)' : 'none', padding: '6px 0' }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <span style={{ fontFamily: F.mono }}>{fmtTime(h.at)}</span> <strong style={{ color: 'var(--text)' }}>{h.user}</strong> {ACTION_LABEL[h.action] || h.action}{h.note ? `（${h.note}）` : ''}: 「{h.title || '—'}」
+                    <span style={{ fontFamily: F.mono }}>{fmtTime(h.at)}</span> <strong style={{ color: 'var(--text)' }}>{h.actorId || h.user}</strong> {ACTION_LABEL[h.action] || h.action}{h.result && h.result !== 'success' ? `[${h.result}]` : ''}{h.note ? `（${h.note}）` : ''}: 「{h.title || '—'}」
                   </div>
-                  <button onClick={() => deleteHistory(h.at)} aria-label="この履歴を削除" style={{ flexShrink: 0, fontSize: 11, fontWeight: 600, color: '#ef4444', background: 'transparent', border: '1px solid #ef444455', borderRadius: 7, padding: '3px 8px', cursor: 'pointer' }}>削除</button>
                 </div>
               ))}
           </div>

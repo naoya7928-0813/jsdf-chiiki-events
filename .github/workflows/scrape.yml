@@ -147,6 +147,10 @@ jobs:
             echo "$OUTPUT"
           fi
 
+      # ── データ品質チェック（構造破損・ID重複・不正日付・座標範囲等。エラーでデプロイ停止）──
+      - name: データ品質チェック（必須）
+        run: node scripts/check-data-quality.mjs
+
       # ── 変更があればコミット & プッシュ ──────────────────────
       - name: 変更をコミット & プッシュ
         id: commit

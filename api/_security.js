@@ -3,6 +3,8 @@
 // - プッシュ購読 endpoint の検証（正規のプッシュサービスのみ許可）
 // - Upstash Redis ベースの簡易レートリミット
 import { Redis } from '@upstash/redis';
+import authz from '../shared/authz.cjs';
+import sessionUtil from '../shared/session.cjs';
 
 const redis = new Redis({
   url:   process.env.KV_REST_API_URL,
@@ -94,80 +96,169 @@ export function requireAdmin(req, res) {
   return true;
 }
 
-// ── 複数アカウント（地本ごとの権限制御） ──────────────────────────
-// ADMIN_ACCOUNTS_B64: base64(JSON配列)。各要素 { user, pass, pref, label }。
-//   pref '*' は全地本管理。pref 'tokyo' 等はその地本のみ。
-// 後方互換: ADMIN_SECRET（パスワードのみ）は user 'admin' / pref '*' として扱う。
+// ── アカウント解決（RBAC: 権限判定は shared/authz.cjs に集約） ──────
+// ADMIN_ACCOUNTS_B64: base64(JSON配列)。各要素は authz.normalizeAccount のスキーマ
+//   { user, pass, organization|pref, office, role, displayId, permissions, enabled, label }。
+//   後方互換: role 未指定は pref から導出（'*'→national_admin、他→pco_admin）。pass は
+//   平文 or "scrypt$..." ハッシュ（session.cjs で検証）。
+// 後方互換: ADMIN_SECRET（パスワードのみ）は user 'admin' / national_admin として受理。
 function loadAccounts() {
   const out = [];
   try {
     const b64 = process.env.ADMIN_ACCOUNTS_B64;
     if (b64) {
       const arr = JSON.parse(Buffer.from(b64, 'base64').toString('utf8'));
-      if (Array.isArray(arr)) {
-        for (const a of arr) {
-          if (a && a.user && a.pass) out.push({ user: String(a.user), pass: String(a.pass), pref: String(a.pref || '*'), label: String(a.label || a.user) });
-        }
-      }
+      if (Array.isArray(arr)) for (const a of arr) { const n = authz.normalizeAccount(a); if (n) out.push(n); }
     }
   } catch { /* 不正なら無視 */ }
   return out;
 }
 
-/**
- * リクエストの認証情報からアカウントを解決する。
- * - ヘッダ x-admin-user / x-admin-pass（または body.user/body.pass）で照合
- * - 後方互換: x-admin-secret / body.secret が ADMIN_SECRET と一致すれば super
- * @returns {{user, pref, label}|null}  認証失敗時は null
- */
-export function resolveAccount(req) {
-  const user = req.headers['x-admin-user'] || req.body?.user;
-  const pass = req.headers['x-admin-pass'] || req.body?.pass;
-  if (user && pass) {
-    for (const a of loadAccounts()) {
-      if (a.user === String(user) && secretEquals(String(pass), a.pass)) {
-        return { user: a.user, pref: a.pref, label: a.label };
-      }
+const ALLOW_PLAINTEXT    = process.env.LEGACY_PLAINTEXT_PASSWORDS !== 'false'; // 移行期は平文パスワード許可
+const LEGACY_HEADER_AUTH = process.env.LEGACY_HEADER_AUTH !== 'false';         // 移行期はヘッダ認証許可
+
+/** user/pass を検証してアカウントを返す（平文/scrypt両対応・無効アカウントは拒否）。 */
+export function verifyCredentials(user, pass) {
+  if (!user || !pass) return null;
+  for (const a of loadAccounts()) {
+    if (a.user === String(user) && a.enabled !== false &&
+        sessionUtil.verifyPassword(String(pass), a.pass, { allowPlaintext: ALLOW_PLAINTEXT })) {
+      return a;
     }
   }
-  // 後方互換: 単一パスワード
-  const secret = req.headers['x-admin-secret'] || req.body?.secret;
-  if (secret && process.env.ADMIN_SECRET && secretEquals(String(secret), process.env.ADMIN_SECRET)) {
-    return { user: 'admin', pref: '*', label: '全地本管理' };
+  if (process.env.ADMIN_SECRET && secretEquals(String(pass), process.env.ADMIN_SECRET)) {
+    return authz.normalizeAccount({ user: 'admin', pass: process.env.ADMIN_SECRET, pref: '*', label: '全国管理' });
   }
   return null;
 }
 
-/** 認証必須。失敗時は 401/503 を返し null。成功時はアカウントを返す。 */
-export function requireAccount(req, res) {
-  if (!process.env.ADMIN_ACCOUNTS_B64 && !process.env.ADMIN_SECRET) {
-    res.status(503).json({ error: 'admin not configured' });
+/** ヘッダ（x-admin-user/pass か x-admin-secret）からアカウント解決（移行期の後方互換）。 */
+export function resolveAccount(req) {
+  const user = req.headers['x-admin-user'] || req.body?.user;
+  const pass = req.headers['x-admin-pass'] || req.body?.pass;
+  if (user && pass) { const a = verifyCredentials(user, pass); if (a) return a; }
+  const secret = req.headers['x-admin-secret'] || req.body?.secret;
+  if (secret && process.env.ADMIN_SECRET && secretEquals(String(secret), process.env.ADMIN_SECRET)) {
+    return authz.normalizeAccount({ user: 'admin', pass: process.env.ADMIN_SECRET, pref: '*', label: '全国管理' });
+  }
+  return null;
+}
+
+// ── サーバー側セッション（Redis + HttpOnly Cookie） ──────────────
+const SESSION_PREFIX  = 'admin:session:';
+const SESSION_ABS_TTL = Number(process.env.ADMIN_SESSION_TTL || 8 * 3600); // 最大有効期間(秒)
+const SESSION_IDLE    = Number(process.env.ADMIN_SESSION_IDLE || 60 * 60); // 無操作失効(秒)
+const SESSION_SECURE  = process.env.SESSION_INSECURE !== 'true';           // ローカルHTTP検証用に解除可
+
+/** ログイン成功時にセッションを発行し Set-Cookie を付与。失敗時 false。 */
+export async function startSession(res, account) {
+  const token = sessionUtil.newToken();
+  const now = Date.now();
+  const data = { userId: account.userId, user: account.user, createdAt: now, lastSeen: now };
+  try { await redis.set(SESSION_PREFIX + token, JSON.stringify(data), { ex: SESSION_ABS_TTL }); }
+  catch { return false; }
+  res.setHeader('Set-Cookie', sessionUtil.serializeSessionCookie(token, { maxAge: SESSION_ABS_TTL, secure: SESSION_SECURE }));
+  return true;
+}
+
+/** ログアウト: セッション失効 + Cookie 削除。 */
+export async function endSession(req, res) {
+  const token = sessionUtil.getSessionToken(req);
+  if (token) { try { await redis.del(SESSION_PREFIX + token); } catch { /* noop */ } }
+  res.setHeader('Set-Cookie', sessionUtil.clearSessionCookie({ secure: SESSION_SECURE }));
+}
+
+/** Cookie セッションを検証してアカウントを返す（絶対期限・無操作失効・無効化を反映）。 */
+async function resolveSession(req) {
+  const token = sessionUtil.getSessionToken(req);
+  if (!token) return null;
+  let data;
+  try { const raw = await redis.get(SESSION_PREFIX + token); if (!raw) return null; data = typeof raw === 'string' ? JSON.parse(raw) : raw; }
+  catch { return null; }
+  const now = Date.now();
+  if (now - data.createdAt > SESSION_ABS_TTL * 1000 || now - data.lastSeen > SESSION_IDLE * 1000) {
+    try { await redis.del(SESSION_PREFIX + token); } catch { /* noop */ }
     return null;
   }
+  const acc = loadAccounts().find(a => a.userId === data.userId);
+  if (!acc || acc.enabled === false) { try { await redis.del(SESSION_PREFIX + token); } catch { /* noop */ } return null; }
+  data.lastSeen = now;
+  try { await redis.set(SESSION_PREFIX + token, JSON.stringify(data), { ex: SESSION_ABS_TTL }); } catch { /* noop */ }
+  return acc;
+}
+
+/** セッション(優先)→後方互換ヘッダ の順で認証。{account, via} か null。 */
+export async function authenticate(req) {
+  const acc = await resolveSession(req);
+  if (acc) return { account: acc, via: 'session' };
+  if (LEGACY_HEADER_AUTH) { const a = resolveAccount(req); if (a) return { account: a, via: 'header' }; }
+  return null;
+}
+
+/** 認証必須（非同期）。失敗時 401/503 を返し null。新規コードはこちらを使う。 */
+export async function requireAuth(req, res) {
+  if (!process.env.ADMIN_ACCOUNTS_B64 && !process.env.ADMIN_SECRET) { res.status(503).json({ error: 'admin not configured' }); return null; }
+  const r = await authenticate(req);
+  if (!r) { res.status(401).json({ error: 'Unauthorized' }); return null; }
+  return r.account;
+}
+
+/** 後方互換: 同期のアカウント解決（ヘッダのみ）。 */
+export function requireAccount(req, res) {
+  if (!process.env.ADMIN_ACCOUNTS_B64 && !process.env.ADMIN_SECRET) { res.status(503).json({ error: 'admin not configured' }); return null; }
   const acc = resolveAccount(req);
   if (!acc) { res.status(401).json({ error: 'Unauthorized' }); return null; }
   return acc;
 }
 
-/** アカウントが対象地本を操作できるか（'*' は全許可） */
-export function canManagePref(account, pref) {
-  return account && (account.pref === '*' || account.pref === pref);
+// 権限・スコープ判定（deny-by-default）は authz に集約
+export const hasPermission = authz.hasPermission;
+export const canManageScope = authz.canManageScope;
+export const canPublish = authz.canPublish;
+/** 後方互換: 地本スコープ判定（authz.canManageScope へ委譲）。 */
+export function canManagePref(account, pref) { return authz.canManageScope(account, { pref }); }
+
+// ── 監査ログ（追記専用・enriched。削除APIは廃止） ──────────────
+const AUDIT_KEY = 'manual:history';
+const AUDIT_MAX = Number(process.env.AUDIT_MAX || 5000);
+/** 監査エントリを1件追記する（ベストエフォート。本処理は妨げない）。 */
+export async function writeAudit(account, e = {}) {
+  const actorId = (account && account.displayId) || e.actorId || '';
+  const org = (account && account.organization) || e.organization || '';
+  const entry = {
+    at: new Date().toISOString(),
+    requestId: e.requestId || sessionUtil.newRequestId(),
+    actorId,
+    accountId: (account && account.userId) || e.accountId || '',
+    organization: org,
+    office: (account && account.office) || e.office || '',
+    action: e.action || '',
+    targetId: e.targetId || '',
+    result: e.result || 'success',
+    note: e.note || '',
+    ...(e.before !== undefined ? { before: e.before } : {}),
+    ...(e.after !== undefined ? { after: e.after } : {}),
+    // 後方互換（既存履歴GET/UIが参照するフィールド）
+    user: actorId, pref: org, title: e.title || '', id: e.targetId || '',
+  };
+  try { await redis.lpush(AUDIT_KEY, JSON.stringify(entry)); await redis.ltrim(AUDIT_KEY, 0, AUDIT_MAX - 1); }
+  catch { /* 監査失敗は本処理を妨げない */ }
 }
 
-// 個人番号（仮）→ 担当官名・権限。001=募集案内所 所長のみ追加・削除可
-export const STAFF = {
+// ── 開発/移行用の個人番号（既定で無効。authorization には一切使わない） ──
+const ENABLE_DEV_STAFF = process.env.ENABLE_DEV_STAFF === 'true';
+export const STAFF = ENABLE_DEV_STAFF ? {
   '001': { name: '東京 募集案内所 所長（仮）', addDelete: true },
   '002': { name: '東京 担当官A（仮）',        addDelete: false },
   '003': { name: '東京 担当官B（仮）',        addDelete: false },
-};
-/** リクエストの個人番号を解決（ヘッダ x-admin-staff か body.staff） */
+} : {};
 export function resolveStaff(req) {
   const no = String(req.headers['x-admin-staff'] || req.body?.staff || '').trim();
   return STAFF[no] ? { no, ...STAFF[no] } : null;
 }
-/** createdBy/updatedBy 用の表記（担当官名 or アカウント名） */
-export function whoOf(account, staff) {
-  return staff ? `${staff.no} ${staff.name}` : (account?.user || '');
+/** 表示用の操作者ID（displayId 優先。氏名は通常画面に出さない）。 */
+export function whoOf(account) {
+  return (account && account.displayId) || '';
 }
 
 // 除去対象のコードポイント判定（制御文字・双方向・ゼロ幅。タブ/改行は別途扱う）

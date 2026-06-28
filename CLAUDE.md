@@ -273,10 +273,29 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 | `/api/subscribe`（購読の登録/解除） | オリジン検証（自サイトのみ。CORS「*」廃止）＋ push endpoint のURL検証（正規プッシュサービスのみ）＋ 保存フィールド限定 ＋ IPレートリミット（20回/10分） |
 | `/api/notify`（通知送信） | `NOTIFY_SECRET`（**タイミングセーフ比較**）＋ IPレートリミット（10回/10分） |
 | 全ページ | セキュリティヘッダ（nosniff / X-Frame-Options DENY / Referrer-Policy / Permissions-Policy / HSTS）を vercel.json で付与 |
-| `/api/report`（バグ報告） | オリジン検証。ntfyトピック名は**サーバー環境変数 `NTFY_BUG_TOPIC` のみ**で扱い、フロント/バンドルに出さない（旧トピックは公開済みのためVercelで新値に設定して要ローテーション） |
+| `/api/report`（バグ報告） | オリジン検証。ntfyトピック名は**サーバー環境変数 `NTFY_BUG_TOPIC` のみ**。固定フォールバック無し＝未設定時は503で安全に失敗 |
+| `/api/admin/*`（管理） | サーバー側セッション認証（HttpOnly Cookie）＋ RBAC（deny-by-default）＋ スコープ強制＋ 監査ログ。下記参照 |
 
 - レートリミットは Upstash Redis（既存のKV）の INCR+TTL。Redis障害時はブロックしない（可用性優先）
 - 本番URLを変更（独自ドメイン化等）したら `api/_security.js` の `ALLOWED_ORIGINS` を更新すること
+
+### 管理者認証・認可（2026-06-28 強化。詳細は SECURITY.md / OPERATIONS.md）
+- **認証**: ログイン成功で**サーバー側セッション**を発行し HttpOnly/Secure/SameSite=Strict Cookie で保持（`shared/session.cjs`・`api/admin/login.js`・`logout.js`）。セッションは Redis 保存・絶対期限/無操作失効・アカウント無効化で失効。パスワードは **scrypt** 対応（平文は移行期のみ `LEGACY_PLAINTEXT_PASSWORDS=true`）。クライアントはパスワードを保存しない。
+- **認可（RBAC・deny-by-default）**: `shared/authz.cjs`。ロール `office_editor`/`office_manager`/`pco_admin`/`national_admin`/`auditor`/`system_admin`。権限・スコープは**サーバーの認証済みアカウントからのみ**判定。クライアント送信の `pref`・個人番号・role は信用しない（旧 `x-admin-staff` 方式は廃止＝`ENABLE_DEV_STAFF` で開発時のみ）。
+- **IDOR対策**: イベント/オーバーライドの所属地本は**サーバー側で実データから解決**（手動イベントは Redis、スクレイプは events.json）して判定。存在しない対象は拒否。`/api/admin/overrides` の GET/POST/DELETE もスコープ強制。
+- **監査ログ（追記専用）**: `writeAudit`（`manual:history`）。操作・ログイン成功/失敗・権限拒否を requestId/操作者(displayId)/地本/事務所/対象/result/変更前後付きで記録。**削除APIは廃止**（history DELETE は405）。
+- **新APIを足すときは必ず `requireAuth` → `hasPermission`/`canManageScope` → `writeAudit` の順を通すこと。**
+
+### データ品質ゲート（CI）
+- `shared/dataQuality.cjs` + `scripts/check-data-quality.mjs`。ID重複/構造破損/不正・非実在日付/endDate<date/タイトル欠落/pref-キー不一致/座標範囲/accuracy値/手動-スクレイプID衝突/総数異常減少を**エラー（デプロイ停止）**、長すぎるタイトル・会場欠落・URL形式・OCR疑い等を**警告**として検出。
+- deploy.yml / scrape.yml で `npm test` ＋ このチェックが通った場合のみデプロイ。
+
+### 主な環境変数（Vercel / GitHub Secrets）
+- 認証: `ADMIN_ACCOUNTS_B64`（base64 JSON配列: `{user,pass,organization|pref,office,role,displayId,enabled}`）, `ADMIN_SECRET`（後方互換の単一PW）
+- セッション: `ADMIN_SESSION_TTL`(既定28800), `ADMIN_SESSION_IDLE`(既定3600), `SESSION_INSECURE`(ローカルHTTP検証のみ true)
+- 移行フラグ: `LEGACY_PLAINTEXT_PASSWORDS`(既定true→正式運用前 false), `LEGACY_HEADER_AUTH`(既定true→正式運用前 false), `ENABLE_DEV_STAFF`(既定false)
+- 監査: `AUDIT_MAX`(既定5000)
+- 既存: `KV_REST_API_URL`/`KV_REST_API_TOKEN`(Upstash), `NOTIFY_SECRET`, `NTFY_BUG_TOPIC`, `NTFY_ADMIN_TOPIC`, `VERCEL_*`, OCR各種, `SITE_URL`
 
 ## エラー発生時の対処ガイド
 
