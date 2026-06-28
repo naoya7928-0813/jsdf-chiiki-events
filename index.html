@@ -20,12 +20,21 @@
     <!-- 起動時のちらつき防止（FOUC対策・JS実行前から適用）
          グローバルCSSは main.jsx の injectGlobalStyles() でJS実行時に注入されるため、
          それまでの間に素のHTML（特に #root 外の SEO 用フッター）が画面に一瞬出るのを防ぐ。
-         空の #root をビューポート高にして、後続の #seo-footer を初期表示で画面外（下）に置く。
-         フッターは通常フロー内に残るため、クローラーの内部リンク巡回には影響しない。 -->
+         空の #root をビューポート高にしてアプリ描画前の余白を確保する。
+         #seo-footer は内部リンク巡回のため DOM には残すが、利用者には見えないよう
+         視覚的に隠す（off-screen）。リンクは HTML 内に存在するためクローラーは辿れる。 -->
     <style>
       html, body { margin: 0; }
       body { background: #f5f6f8; }
       #root { min-height: 100vh; min-height: 100dvh; }
+      /* SEO用フッターを画面から隠す（DOM・内部リンクは保持＝クロール可能） */
+      #seo-footer {
+        position: absolute !important;
+        width: 1px; height: 1px;
+        padding: 0; margin: -1px;
+        overflow: hidden; clip: rect(0, 0, 0, 0);
+        white-space: nowrap; border: 0;
+      }
     </style>
 
     <!-- OGP -->
