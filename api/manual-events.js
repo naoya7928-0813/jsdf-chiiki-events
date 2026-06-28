@@ -17,8 +17,8 @@ export default async function handler(req, res) {
       : [])
       // 下書きは公開しない。status 未設定（旧データ）は公開扱い。
       .filter(e => e && e.status !== 'draft')
-      // 担当官名など裏側情報は公開しない（createdBy/updatedBy/タイムスタンプを除去）
-      .map(({ createdBy, updatedBy, createdAt, updatedAt, status, ...pub }) => pub);
+      // 担当官名など裏側情報は公開しない（createdBy/updatedBy/タイムスタンプ/再取得フラグを除去）
+      .map(({ createdBy, updatedBy, createdAt, updatedAt, status, weatherLocationNeedsUpdate, ...pub }) => pub);
 
     // 既存イベントの上書き（スクレイプイベント等）。表示フィールドのみ公開（_by/_at は除去）
     let overrides = {};

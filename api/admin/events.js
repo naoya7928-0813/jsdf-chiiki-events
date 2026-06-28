@@ -7,6 +7,7 @@
 // 地本スコープ: pref!=='*' のアカウントは自分の地本のみ操作可。
 // 保存先は Upstash Redis hash `manual:events`（field=id, value=JSON）。
 import { checkOrigin, rateLimit, requireAccount, canManagePref, redis, cleanText, resolveStaff, whoOf } from '../_security.js';
+import W from '../../shared/weather.cjs';
 
 const KEY = 'manual:events';
 const HKEY = 'manual:history';
@@ -33,6 +34,23 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const WD = ['日', '月', '火', '水', '木', '金', '土'];
 const weekdayOf = d => { const t = new Date(d + 'T00:00:00Z'); return Number.isNaN(t.getTime()) ? '' : WD[t.getUTCDay()]; };
 const rand = (n = 6) => Math.random().toString(36).slice(2, 2 + n);
+
+/**
+ * 手動入力の緯度経度を weatherLocation（accuracy:'manual'）に変換。
+ * 数値・日本範囲チェックを通らなければ null。入力は { latitude, longitude, label? }。
+ */
+function parseManualCoords(obj) {
+  if (!obj) return null;
+  const lat = Number(obj.latitude), lon = Number(obj.longitude);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+  const b = W.JP_BOUNDS;
+  if (lat < b.latMin || lat > b.latMax || lon < b.lonMin || lon > b.lonMax) return null;
+  return {
+    latitude: W.roundCoord3(lat), longitude: W.roundCoord3(lon),
+    label: cleanText(obj.label, 40) || '手動指定',
+    accuracy: 'manual', source: 'manual', geocodedAt: W.isoJst(),
+  };
+}
 
 async function readAll() {
   const all = await redis.hgetall(KEY);
@@ -61,6 +79,14 @@ function buildEvent(input, account) {
   if (url.length > 500) url = url.slice(0, 500);
 
   const status = STATUSES.has(e.status) ? e.status : 'draft';
+  const place = cleanText(e.place, 80);
+  const address = cleanText(e.address, 100);
+  // 天気用座標: 手動入力があれば accuracy:'manual'。無ければ未設定にして再ジオコーディング待ちにする
+  // （会場/住所がある場合のみ。スクレイパー or 専用処理が weatherLocationNeedsUpdate を拾って付与）。
+  const manualLoc = parseManualCoords(e.weatherLocation);
+  const weather = manualLoc
+    ? { weatherLocation: manualLoc }
+    : ((place || address) ? { weatherLocation: null, weatherLocationNeedsUpdate: true } : {});
   // 既存イベントカードと同じスキーマに揃える（tag=申込要否, ageRequirement=対象/年齢, deadline=締切文字列）
   return {
     event: {
@@ -69,8 +95,8 @@ function buildEvent(input, account) {
       ...(endDate ? { endDate, endWeekday: weekdayOf(endDate) } : {}),
       weekday: weekdayOf(date),
       title,
-      place:   cleanText(e.place, 80),
-      address: cleanText(e.address, 100),
+      place,
+      address,
       time:    cleanText(e.time, 40),
       category: cleanText(e.category, 20) || '広報活動',
       tag:     cleanText(e.tag, 30),             // 申込要否（要予約/予約不要/入場無料 等）
@@ -78,6 +104,7 @@ function buildEvent(input, account) {
       deadline: cleanText(e.deadline, 40) || null,              // 締切（例: 7月20日（金））
       url,
       notes:   cleanText(e.notes, 300) || null,
+      ...weather,
       status,
       source_type: 'manual',
       createdBy: account.user,
@@ -133,6 +160,8 @@ export default async function handler(req, res) {
       if (!raw) return res.status(404).json({ error: 'not found' });
       const ev = typeof raw === 'string' ? JSON.parse(raw) : raw;
       if (!canManagePref(account, ev.pref)) return res.status(403).json({ error: '権限がありません' });
+      // 場所・住所の変更で既存座標が不正確になるため、変更検知用に編集前の値を控える
+      const beforeLoc = { place: ev.place || '', address: ev.address || '' };
       // 許可された項目のみ更新（既存イベントの編集に対応。※手動イベントは通知対象外）
       if (patch.status !== undefined) {
         if (!STATUSES.has(patch.status)) return res.status(400).json({ error: 'status が不正です' });
@@ -158,6 +187,17 @@ export default async function handler(req, res) {
         const ed = String(patch.endDate || '').trim();
         if (ed && DATE_RE.test(ed) && ed >= ev.date) { ev.endDate = ed; ev.endWeekday = weekdayOf(ed); }
         else { delete ev.endDate; delete ev.endWeekday; }
+      }
+      // 天気用座標の更新:
+      //  1) 手動座標が送られたら accuracy:'manual' で確定（再取得フラグは解除）
+      //  2) 場所/住所が変わったら既存座標を無効化し、再ジオコーディング待ちにする
+      const manualLoc = patch.weatherLocation !== undefined ? parseManualCoords(patch.weatherLocation) : null;
+      if (manualLoc) {
+        ev.weatherLocation = manualLoc;
+        delete ev.weatherLocationNeedsUpdate;
+      } else if (ev.place !== beforeLoc.place || ev.address !== beforeLoc.address) {
+        ev.weatherLocation = null;
+        ev.weatherLocationNeedsUpdate = true;
       }
       ev.updatedAt = new Date().toISOString();
       ev.updatedBy = who;  // 編集した担当官（裏側のみ・公開には出さない）

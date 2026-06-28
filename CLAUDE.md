@@ -207,10 +207,61 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 ## 天気予報（イベント詳細）
 
 イベント詳細画面の「開催日時」と「開催場所」の間に、開催日の天気予報カードを表示する。
+**ロジックの本体は `shared/weather.cjs` に集約**（純粋関数＋redis/fetch注入の orchestration）し、
+スクレイパー・Vercel Function・フロント・テストで共有する（`shared/weather.test.cjs` で検証）。
 
-- **ジオコーディング（スクレイプ時）**: `scraper/lib/geocode.js` が国土地理院（GSI）住所検索APIで `address → venue（会場名）→ municipality → prefecture` の順に座標化し、`writeOutput` 内で各イベントへ `weatherLocation`（`{latitude,longitude,label,accuracy}`）を付与。終了済みイベントは付与しない。結果は **`scraper/geocode-cache.json`（コミット対象）** にキャッシュし同一会場を再検索しない。GSI返却は `[経度,緯度]` の順なので注意。
-- **天気API**: `/api/weather.js`（Vercel Function）。入力 `latitude/longitude/date`。検証＝数値・日本範囲・`YYYY-MM-DD`・今日(JST)から0〜16日。Open-Meteo の daily（`weather_code`/`temperature_2m_max`/`temperature_2m_min`/`precipitation_probability_max`/`wind_speed_10m_max`、timezone `Asia/Tokyo`）を取得。**キャッシュ二段＝Upstash Redis（`weather:{lat3}:{lon3}:{date}`）+ CDN `s-maxage`**。TTL: 0-2日=1h / 3-7日=6h / 8-16日=12h。APIキーは不要（秘密情報をフロントに出さない）。
-- **表示（`src/components/WeatherCard.jsx`）**: 詳細画面でのみ遅延取得（一覧では取得しない）。状態＝17日以上先「予報発表前」/ 座標なし / APIエラー / 8-16日「参考予報」/ 0-7日「開催日の天気予報」。Open-Meteo 出典リンクと「天気は参考情報であり開催可否は公式情報を確認」の注記を必ず併記。SW（`src/sw.js`）で `/api/weather` を NetworkFirst 短期キャッシュ。
+### weatherLocation スキーマ（events.json 各イベント・任意）
+```json
+{
+  "latitude": 35.681,            // 小数3桁
+  "longitude": 139.767,          // 小数3桁
+  "label": "東京都千代田区",      // 表示用（都道府県＋市区町村など）
+  "accuracy": "address",         // 下表
+  "source": "gsi",               // 'gsi' | 'manual'（任意・無くても壊れない）
+  "geocodedAt": "2026-06-28T12:00:00+09:00"  // ISO+09:00（任意）
+}
+```
+`source`/`geocodedAt` は後方互換のため**無くても画面が壊れない**こと。手動編集で座標を消す場合は
+`weatherLocation: null` ＋ `weatherLocationNeedsUpdate: true`（公開APIでは除去）。
+
+| accuracy | 意味 | 天気カードの挙動 |
+|---|---|---|
+| `address` | 住所からの座標 | 通常の「開催日の天気予報」 |
+| `venue` | 会場名からの座標（都道府県名を前置して検索＝同名会場の衝突回避） | 通常の「開催日の天気予報」 |
+| `manual` | 管理画面の手動入力 | 通常の「開催日の天気予報」 |
+| `municipality` | 市区町村レベル | 天気は表示するが「開催地域の参考予報」バッジ＋注記 |
+| `prefecture` | 都道府県代表地点のみ | **Open-Meteo を呼ばず非表示**（「詳細な位置を特定できないため表示できません」）。将来 `allowPrefecture` 設定で許可可能 |
+
+### ジオコーディング（スクレイプ時 / `scraper/lib/geocode.js`）
+- 国土地理院（GSI）住所検索API（無料・キー不要・日本の住所/施設名に強い）。**返却は `[経度,緯度]` の順**。
+- `address → venue → municipality → prefecture` の順に試し、最初のヒットを採用。`writeOutput` 内で付与。終了済みは付与しない。
+- **キャッシュキーは `pref + 正規化住所 + 正規化会場名`**（`shared/weather.cjs` の `geocodeCacheKey`）。会場名だけだと同名会場・住所変更で誤座標を再利用するため。住所/会場が変われば別キーで再取得。正規化＝NFKC・全半角空白統一・改行/連続空白圧縮・郵便番号(〒)除去。
+- 結果は **`scraper/geocode-cache.json`（コミット対象）** に永続化。1実行内は同一GSIクエリをメモ化。
+- 完了時に accuracy 別件数＋成功率をログ。前回比で `prefecture` 急増 / `address`・`venue` 大幅減 / `missing` 発生 / 成功率低下 のとき **GitHub Actions 警告（`::warning::`）**（デプロイは止めない）。
+
+### 天気API（`/api/weather.js`）
+- 入力 `latitude/longitude/date`。検証＝数値・日本範囲・**実在日付**（`2026-02-30` 等を弾く）・今日(JST)から 0〜16日。
+- **日付境界は Asia/Tokyo 基準**（`jstTodayStr`/`daysAhead`。サーバーUTC/実行環境TZに非依存）。
+- Open-Meteo daily（`weather_code`/`temperature_2m_max`/`temperature_2m_min`/`precipitation_probability_max`/`wind_speed_10m_max`、timezone `Asia/Tokyo`）を取得し、**対象日が応答に存在するか・各値が数値/許容null かを検証**。対象日が無ければ `422 {error:'forecast_not_available'}`。
+  - ⚠️ **Open-Meteo の実地平は「今日＋15日」まで**（`forecast_days` 最大16＝今日含む16日）。検証上は 0〜16日を受理するが、ちょうど **+16日** の日は Open-Meteo にデータが無く `forecast_not_available` になり得る（翌日には +15 になり取得可）。
+- **キャッシュ二段＋stale フォールバック**:
+  - `weather:{lat3}:{lon3}:{date}` … 通常キャッシュ。TTL: 0-2日=1h / 3-7日=6h / 8-16日=12h。＋CDN `Cache-Control s-maxage`。
+  - `weather:last-success:{lat3}:{lon3}:{date}` … 最終正常データ（72h）。取得成功時に併せて保存。
+  - Open-Meteo 失敗時は最終正常データを `stale:true` で返す（無ければ `502`）。
+- **座標キーは小数3桁（約100m単位）に丸めて共有**：近隣会場の予報はほぼ同一で、API負荷削減を優先するため意図的に同一キャッシュにする。より高精度が必要なら4桁へ。`-0`/浮動小数点表記の揺れは `coord3str`/`roundCoord3` で正規化（共通化）。
+- APIキー不要（秘密情報をフロントに出さない）。
+
+### 表示（`src/components/WeatherCard.jsx`）
+- 詳細画面でのみ遅延取得（一覧では取得しない）。表示判定は `decideWeatherDisplay`（共有）。
+- 全表示で共通注記「天気予報は参考情報です。開催・中止・内容変更については、必ず主催者の公式情報をご確認ください。」を表示。
+  - `municipality`: 「開催地の市区町村を基準にした参考予報です。」を追加
+  - `stale:true`: 「現在、最新の予報を取得できないため、前回取得した情報を表示しています。」を追加（バッジ「前回の情報」）
+- 出典＝天気予報 Open-Meteo／座標検索 国土地理院 をカード内に併記。
+- **Service Worker（`src/sw.js`）**: `/api/weather` は補助キャッシュのみ（NetworkFirst・`weather-cache-v1`・maxAge 10分・maxEntries 50）。主キャッシュはサーバー側(Redis+CDN)。長期間古い予報を返さず、障害時のみ短期フォールバック。サーバーの `stale:true` と SW由来の古い応答は別物（前者は本文フラグで判別）。
+
+### 管理画面で修正されたイベント
+- 場所/住所が変更されたら保存時に `weatherLocation: null` ＋ `weatherLocationNeedsUpdate: true` にして再ジオコーディング待ちにする（`api/admin/events.js`）。
+- 緯度経度の手動入力に対応（`weatherLocation` に numeric lat/lon を渡すと `accuracy:'manual'` で保存）。UI（「座標を再取得」ボタン・手動入力欄・現在の座標/精度表示）は別タスク。
 
 ## セキュリティ構成（2026-06-13導入）
 

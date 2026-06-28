@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { F, SectionTitle } from './Shared';
+import W from '../../shared/weather.cjs';
 
 // WMO weather code → 日本語名称 + 絵文字アイコン（Open-Meteo の weather_code に対応）
 const WMO = {
@@ -24,12 +25,6 @@ function describeCode(code) {
 function jstToday() {
   return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
 }
-function daysBetween(a, b) {
-  const da = Date.parse(a + 'T00:00:00Z');
-  const db = Date.parse(b + 'T00:00:00Z');
-  if (Number.isNaN(da) || Number.isNaN(db)) return NaN;
-  return Math.round((db - da) / 86400000);
-}
 function fmtFetched(iso) {
   try {
     return new Date(iso).toLocaleString('ja-JP', {
@@ -38,10 +33,11 @@ function fmtFetched(iso) {
   } catch { return ''; }
 }
 
-const FORECAST_MAX_DAYS = 16;
+// 天気予報は全表示で必ず出す共通注記
+const BASE_NOTE = '天気予報は参考情報です。開催・中止・内容変更については、必ず主催者の公式情報をご確認ください。';
 
-// 天気カードの外枠（状態表示も共通の枠を使う）
-function CardShell({ children, primary, heading }) {
+// カードの外枠
+function CardShell({ children, heading }) {
   return (
     <div style={{ padding: '6px 16px 14px' }}>
       <SectionTitle>{heading}</SectionTitle>
@@ -52,23 +48,38 @@ function CardShell({ children, primary, heading }) {
   );
 }
 
-// 注記＋出典（天気カード下部に常に表示）
-function Disclaimer({ primary }) {
+// 注記（複数あってもまとめて読みやすく）＋ 出典
+function Footnotes({ primary, extraNotes }) {
   return (
     <div style={{
       marginTop: 12, paddingTop: 10, borderTop: '1px solid var(--sep)',
       fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7, fontFamily: F.sans,
     }}>
-      <div>天気は参考情報であり、開催可否は公式情報を確認してください。</div>
-      <div style={{ marginTop: 4 }}>
-        出典: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer"
+      <ul style={{ margin: 0, paddingLeft: 16 }}>
+        <li>{BASE_NOTE}</li>
+        {(extraNotes || []).map((n, i) => <li key={i} style={{ marginTop: 3 }}>{n}</li>)}
+      </ul>
+      <div style={{ marginTop: 6 }}>
+        出典: 天気予報 <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer"
           style={{ color: primary, textDecoration: 'none' }}>Open-Meteo</a>
+        ／座標検索 <a href="https://www.gsi.go.jp/" target="_blank" rel="noopener noreferrer"
+          style={{ color: primary, textDecoration: 'none' }}>国土地理院</a>
       </div>
     </div>
   );
 }
 
-function StatLine({ label, value, primary }) {
+function Badge({ children, primary }) {
+  return (
+    <span style={{
+      display: 'inline-block', fontSize: 10, fontWeight: 700, fontFamily: F.mono,
+      padding: '3px 8px', borderRadius: 4, marginRight: 6, marginBottom: 6,
+      background: `${primary}12`, color: primary, letterSpacing: 1,
+    }}>{children}</span>
+  );
+}
+
+function StatLine({ label, value }) {
   return (
     <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '5px 0' }}>
       <span style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: F.sans }}>{label}</span>
@@ -77,24 +88,31 @@ function StatLine({ label, value, primary }) {
   );
 }
 
+function Message({ heading, text, primary, extraNotes }) {
+  return (
+    <CardShell heading={heading}>
+      <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.7, fontFamily: F.sans }}>{text}</div>
+      <Footnotes primary={primary} extraNotes={extraNotes} />
+    </CardShell>
+  );
+}
+
 /**
  * イベント詳細画面の天気カード。
- * - 開催日が今日から0〜16日以内のときのみ /api/weather を遅延取得する。
- * - 17日以上先 / 座標なし / API エラー / 終了済みはそれぞれ状態表示（API を呼ばない）。
+ * 表示判定は shared/weather.cjs の decideWeatherDisplay に集約（精度別制御・テスト共有）。
+ * - address/venue/manual: 通常の「開催日の天気予報」
+ * - municipality: 天気は出すが「開催地域の参考予報」バッジ＋注記
+ * - prefecture: API を呼ばず非表示メッセージ（既定。将来 allowPrefecture で許可可能）
+ * - 17日以上先 / 座標なし / 終了済み / APIエラー / stale もそれぞれ表示
  */
 export default function WeatherCard({ event, theme }) {
   const primary = theme?.primary || '#0b2545';
   const ev = event;
-
-  const loc = ev?.weatherLocation;
-  const hasCoords = !!(loc && typeof loc.latitude === 'number' && typeof loc.longitude === 'number');
   const today = jstToday();
-  const eventEnd = ev?.endDate || ev?.date;
-  const isEnded = !!ev?.ended || (eventEnd && eventEnd < today);
-  const daysAhead = ev?.date ? daysBetween(today, ev.date) : NaN;
-  const inRange = Number.isFinite(daysAhead) && daysAhead >= 0 && daysAhead <= FORECAST_MAX_DAYS;
-  const shouldFetch = !isEnded && hasCoords && inRange;
+  const decision = W.decideWeatherDisplay(ev || {}, today);
 
+  const shouldFetch = decision.status === 'forecast';
+  const loc = ev?.weatherLocation;
   const [state, setState] = useState({ status: 'idle', data: null });
 
   useEffect(() => {
@@ -113,57 +131,43 @@ export default function WeatherCard({ event, theme }) {
     return () => { cancelled = true; };
   }, [shouldFetch, loc?.latitude, loc?.longitude, ev?.date]);
 
-  // 終了済みは天気カードを出さない（API も呼ばない）
-  if (isEnded) return null;
+  // 終了済み → カード非表示
+  if (decision.status === 'ended') return null;
 
   // 座標なし
-  if (!hasCoords) {
-    return (
-      <CardShell heading="開催日の天気" primary={primary}>
-        <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.7, fontFamily: F.sans }}>
-          天気表示に必要な位置情報を取得できませんでした。
-        </div>
-        <Disclaimer primary={primary} />
-      </CardShell>
-    );
+  if (decision.status === 'no-coords') {
+    return <Message heading="開催日の天気" primary={primary}
+      text="天気表示に必要な位置情報を取得できませんでした。" />;
+  }
+
+  // 都道府県代表座標のみ → API を呼ばず非表示
+  if (decision.status === 'prefecture-blocked') {
+    return <Message heading="開催日の天気" primary={primary}
+      text="開催場所の詳細な位置を特定できないため、天気予報を表示できません。" />;
   }
 
   // 17日以上先（予報発表前）
-  if (Number.isFinite(daysAhead) && daysAhead > FORECAST_MAX_DAYS) {
-    return (
-      <CardShell heading="開催日の天気（予報発表前）" primary={primary}>
-        <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.7, fontFamily: F.sans }}>
-          天気予報は開催日の{FORECAST_MAX_DAYS}日前から表示されます。
-        </div>
-        <Disclaimer primary={primary} />
-      </CardShell>
-    );
+  if (decision.status === 'too-far') {
+    return <Message heading="開催日の天気（予報発表前）" primary={primary}
+      text={`天気予報は開催日の${W.FORECAST_MAX_DAYS}日前から表示されます。`} />;
   }
 
-  // 範囲内（0〜16日）。8〜16日前は「参考予報」、7日以内は「開催日の天気予報」
-  const isReference = daysAhead >= 8;
-  const heading = isReference ? '開催日の天気（参考予報）' : '開催日の天気予報';
+  // ── forecast ──
+  const heading = '開催日の天気予報';
 
   if (state.status === 'loading' || state.status === 'idle') {
     return (
-      <CardShell heading={heading} primary={primary}>
+      <CardShell heading={heading}>
         <div style={{ fontSize: 13, color: 'var(--text-muted)', fontFamily: F.sans }}>天気情報を取得しています…</div>
       </CardShell>
     );
   }
-
   if (state.status === 'error') {
-    return (
-      <CardShell heading={heading} primary={primary}>
-        <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.7, fontFamily: F.sans }}>
-          天気情報を取得できませんでした。
-        </div>
-        <Disclaimer primary={primary} />
-      </CardShell>
-    );
+    return <Message heading={heading} primary={primary} text="天気情報を取得できませんでした。" />;
   }
 
   const d = state.data || {};
+  const stale = !!d.stale;
   const [name, icon] = describeCode(d.weatherCode);
   const u = d.units || {};
   const tMax = typeof d.temperatureMax === 'number' ? `${Math.round(d.temperatureMax)}${u.temperature || '°C'}` : '—';
@@ -171,15 +175,19 @@ export default function WeatherCard({ event, theme }) {
   const pop  = typeof d.precipitationProbabilityMax === 'number' ? `${d.precipitationProbabilityMax}${u.precipitationProbability || '%'}` : '—';
   const wind = typeof d.windSpeedMax === 'number' ? `${Math.round(d.windSpeedMax)} ${u.windSpeed || 'km/h'}` : '—';
 
+  // バッジ・追加注記（複数あってもまとめて表示）
+  const extraNotes = [];
+  if (decision.isMunicipality) extraNotes.push('開催地の市区町村を基準にした参考予報です。');
+  if (stale) extraNotes.push('現在、最新の予報を取得できないため、前回取得した情報を表示しています。');
+
   return (
-    <CardShell heading={heading} primary={primary}>
-      {isReference && (
-        <div style={{
-          display: 'inline-block', fontSize: 10, fontWeight: 700, fontFamily: F.mono,
-          padding: '3px 8px', borderRadius: 4, marginBottom: 10,
-          background: `${primary}12`, color: primary, letterSpacing: 1,
-        }}>参考予報</div>
-      )}
+    <CardShell heading={heading}>
+      <div>
+        {decision.isMunicipality
+          ? <Badge primary={primary}>開催地域の参考予報</Badge>
+          : decision.isDistanceReference && <Badge primary={primary}>参考予報</Badge>}
+        {stale && <Badge primary={primary}>前回の情報</Badge>}
+      </div>
       {/* 天気アイコン + 名称 + 最高/最低気温 */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 6 }}>
         <div style={{ fontSize: 40, lineHeight: 1 }} aria-hidden="true">{icon}</div>
@@ -193,15 +201,15 @@ export default function WeatherCard({ event, theme }) {
       </div>
       {/* 降水確率・最大風速 */}
       <div style={{ borderTop: '1px solid var(--sep)', marginTop: 8, paddingTop: 4 }}>
-        <StatLine label="降水確率" value={pop} primary={primary} />
-        <StatLine label="最大風速" value={wind} primary={primary} />
+        <StatLine label="降水確率" value={pop} />
+        <StatLine label="最大風速" value={wind} />
       </div>
       {d.fetchedAt && (
         <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 6, fontFamily: F.mono, textAlign: 'right' }}>
           最終取得 {fmtFetched(d.fetchedAt)}
         </div>
       )}
-      <Disclaimer primary={primary} />
+      <Footnotes primary={primary} extraNotes={extraNotes} />
     </CardShell>
   );
 }

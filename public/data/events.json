@@ -16,10 +16,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 42.78923,
-        "longitude": 143.697037,
-        "label": "北海道浦幌町",
-        "accuracy": "venue"
+        "latitude": 43.062,
+        "longitude": 141.354,
+        "label": "北海道札幌市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:06.291+09:00"
       }
     },
     {
@@ -38,10 +40,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.59026,
-        "longitude": 134.381577,
-        "label": "鳥取県岩美町",
-        "accuracy": "venue"
+        "latitude": 43.062,
+        "longitude": 141.354,
+        "label": "北海道札幌市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:06.919+09:00"
       }
     },
     {
@@ -60,10 +64,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.59026,
-        "longitude": 134.381577,
-        "label": "鳥取県岩美町",
-        "accuracy": "venue"
+        "latitude": 43.062,
+        "longitude": 141.354,
+        "label": "北海道札幌市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:07.194+09:00"
       }
     },
     {
@@ -82,10 +88,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 43.01041,
-        "longitude": 141.695282,
-        "label": "北海道長沼町",
-        "accuracy": "venue"
+        "latitude": 43.062,
+        "longitude": 141.354,
+        "label": "北海道札幌市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:07.457+09:00"
       }
     },
     {
@@ -104,10 +112,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 43.19603,
-        "longitude": 141.77536,
-        "label": "北海道岩見沢市",
-        "accuracy": "venue"
+        "latitude": 43.062,
+        "longitude": 141.354,
+        "label": "北海道札幌市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:07.736+09:00"
       }
     },
     {
@@ -126,10 +136,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 42.821011,
-        "longitude": 141.651001,
-        "label": "北海道千歳市",
-        "accuracy": "municipality"
+        "latitude": 43.062,
+        "longitude": 141.354,
+        "label": "北海道札幌市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:08.001+09:00"
       }
     }
   ],
@@ -151,10 +163,12 @@
       "deadline": null,
       "source_type": "office_notice",
       "weatherLocation": {
-        "latitude": 43.771435,
-        "longitude": 142.365295,
+        "latitude": 43.771,
+        "longitude": 142.365,
         "label": "北海道旭川市",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:08.267+09:00"
       }
     }
   ],
@@ -175,10 +189,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 43.090778,
-        "longitude": 141.340973,
-        "label": "北海道札幌市",
-        "accuracy": "venue"
+        "latitude": 42.924,
+        "longitude": 143.196,
+        "label": "北海道帯広市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:08.533+09:00"
       }
     },
     {
@@ -197,10 +213,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 42.924175,
-        "longitude": 143.196228,
+        "latitude": 42.924,
+        "longitude": 143.196,
         "label": "北海道帯広市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:08.871+09:00"
       }
     },
     {
@@ -219,10 +237,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 42.924175,
-        "longitude": 143.196228,
+        "latitude": 42.924,
+        "longitude": 143.196,
         "label": "北海道帯広市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:08.871+09:00"
       }
     },
     {
@@ -242,10 +262,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 42.924175,
-        "longitude": 143.196228,
+        "latitude": 42.924,
+        "longitude": 143.196,
         "label": "北海道帯広市",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:09.137+09:00"
       }
     }
   ],
@@ -269,10 +291,12 @@
       "endDate": "2026-07-27",
       "endWeekday": "月",
       "weatherLocation": {
-        "latitude": 41.768688,
-        "longitude": 140.728943,
+        "latitude": 41.769,
+        "longitude": 140.729,
         "label": "北海道函館市",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:09.386+09:00"
       }
     }
   ],
@@ -293,10 +317,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 38.268578,
-        "longitude": 140.87207,
+        "latitude": 38.269,
+        "longitude": 140.872,
         "label": "宮城県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:09.635+09:00"
       }
     },
     {
@@ -315,10 +341,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 38.268578,
-        "longitude": 140.87207,
+        "latitude": 38.269,
+        "longitude": 140.872,
         "label": "宮城県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:09.635+09:00"
       }
     },
     {
@@ -337,10 +365,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 38.268578,
-        "longitude": 140.87207,
+        "latitude": 38.269,
+        "longitude": 140.872,
         "label": "宮城県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:09.635+09:00"
       }
     },
     {
@@ -359,10 +389,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 38.268578,
-        "longitude": 140.87207,
+        "latitude": 38.269,
+        "longitude": 140.872,
         "label": "宮城県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:09.635+09:00"
       }
     }
   ],
@@ -384,10 +416,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 39.702068,
-        "longitude": 141.154465,
+        "latitude": 39.702,
+        "longitude": 141.154,
         "label": "岩手県盛岡市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:09.914+09:00"
       }
     },
     {
@@ -406,10 +440,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 39.702068,
-        "longitude": 141.154465,
+        "latitude": 39.702,
+        "longitude": 141.154,
         "label": "岩手県盛岡市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:09.914+09:00"
       }
     },
     {
@@ -428,10 +464,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 39.703526,
-        "longitude": 141.152695,
+        "latitude": 39.704,
+        "longitude": 141.153,
         "label": "岩手県",
-        "accuracy": "prefecture"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:10.200+09:00"
       }
     },
     {
@@ -450,10 +488,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 39.702068,
-        "longitude": 141.154465,
+        "latitude": 39.702,
+        "longitude": 141.154,
         "label": "岩手県盛岡市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:09.914+09:00"
       }
     },
     {
@@ -472,10 +512,12 @@
       "ageRequirement": "中学生、保護者、教諭等",
       "deadline": "令和8年7月2日(木)まで",
       "weatherLocation": {
-        "latitude": 35.59026,
-        "longitude": 134.381577,
-        "label": "鳥取県岩美町",
-        "accuracy": "venue"
+        "latitude": 39.02,
+        "longitude": 141.633,
+        "label": "岩手県陸前高田市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:10.445+09:00"
       }
     },
     {
@@ -494,10 +536,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 40.271206,
-        "longitude": 141.30481,
+        "latitude": 40.271,
+        "longitude": 141.305,
         "label": "岩手県二戸郡",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:10.722+09:00"
       }
     },
     {
@@ -516,10 +560,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 39.703526,
-        "longitude": 141.152695,
+        "latitude": 39.704,
+        "longitude": 141.153,
         "label": "岩手県",
-        "accuracy": "prefecture"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:10.988+09:00"
       }
     },
     {
@@ -538,10 +584,12 @@
       "ageRequirement": "| 募集対象者等 | |",
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.59026,
-        "longitude": 134.381577,
-        "label": "鳥取県岩美町",
-        "accuracy": "venue"
+        "latitude": 39.02,
+        "longitude": 141.633,
+        "label": "岩手県陸前高田市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:11.255+09:00"
       }
     },
     {
@@ -560,10 +608,12 @@
       "ageRequirement": "| 岩手県内の33歳未満の自衛隊に興味のある方 |",
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.485832,
-        "longitude": 134.444153,
-        "label": "兵庫県新温泉町",
-        "accuracy": "venue"
+        "latitude": 39.704,
+        "longitude": 141.153,
+        "label": "基地（青森県八戸市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:11.519+09:00"
       }
     },
     {
@@ -583,10 +633,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 39.703526,
-        "longitude": 141.152695,
+        "latitude": 39.704,
+        "longitude": 141.153,
         "label": "岩手県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:11.802+09:00"
       }
     }
   ],
@@ -607,10 +659,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 38.240433,
-        "longitude": 140.363693,
+        "latitude": 38.24,
+        "longitude": 140.364,
         "label": "山形県",
-        "accuracy": "prefecture"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:12.051+09:00"
       }
     },
     {
@@ -629,10 +683,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 38.101845,
-        "longitude": 140.037781,
+        "latitude": 38.102,
+        "longitude": 140.038,
         "label": "山形県長井市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:12.333+09:00"
       }
     },
     {
@@ -651,10 +707,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 41.67178,
-        "longitude": 140.412903,
-        "label": "北海道木古内町",
-        "accuracy": "venue"
+        "latitude": 38.727,
+        "longitude": 139.827,
+        "label": "山形県鶴岡市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:12.616+09:00"
       }
     },
     {
@@ -673,10 +731,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 43.845978,
-        "longitude": 142.453735,
-        "label": "北海道旭川市",
-        "accuracy": "venue"
+        "latitude": 38.431,
+        "longitude": 140.391,
+        "label": "山形県東根市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:12.911+09:00"
       }
     },
     {
@@ -695,10 +755,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 43.03207,
-        "longitude": 141.761566,
-        "label": "北海道由仁町",
-        "accuracy": "venue"
+        "latitude": 38.255,
+        "longitude": 140.34,
+        "label": "山形県山形市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:13.172+09:00"
       }
     },
     {
@@ -717,10 +779,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 43.03207,
-        "longitude": 141.761566,
-        "label": "北海道由仁町",
-        "accuracy": "venue"
+        "latitude": 38.255,
+        "longitude": 140.34,
+        "label": "山形県山形市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:13.484+09:00"
       }
     },
     {
@@ -739,10 +803,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.880955,
-        "longitude": 136.33902,
-        "label": "福井県池田町",
-        "accuracy": "venue"
+        "latitude": 38.24,
+        "longitude": 140.364,
+        "label": "山形県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:13.749+09:00"
       }
     },
     {
@@ -761,10 +827,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 38.601078,
-        "longitude": 140.406845,
+        "latitude": 38.601,
+        "longitude": 140.407,
         "label": "山形県尾花沢市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:14.016+09:00"
       }
     },
     {
@@ -783,10 +851,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 38.483383,
-        "longitude": 140.380386,
+        "latitude": 38.483,
+        "longitude": 140.38,
         "label": "山形県村山市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:14.288+09:00"
       }
     },
     {
@@ -805,10 +875,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 38.483383,
-        "longitude": 140.380386,
+        "latitude": 38.483,
+        "longitude": 140.38,
         "label": "山形県村山市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:14.537+09:00"
       }
     },
     {
@@ -827,10 +899,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 37.921867,
-        "longitude": 140.116135,
+        "latitude": 37.922,
+        "longitude": 140.116,
         "label": "山形県米沢市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:14.786+09:00"
       }
     },
     {
@@ -849,10 +923,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 43.03207,
-        "longitude": 141.761566,
-        "label": "北海道由仁町",
-        "accuracy": "venue"
+        "latitude": 38.255,
+        "longitude": 140.34,
+        "label": "山形県山形市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:13.172+09:00"
       }
     },
     {
@@ -871,10 +947,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 38.240433,
-        "longitude": 140.363693,
+        "latitude": 38.24,
+        "longitude": 140.364,
         "label": "山形県",
-        "accuracy": "prefecture"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:15.083+09:00"
       }
     },
     {
@@ -893,10 +971,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 38.914639,
-        "longitude": 139.836548,
+        "latitude": 38.915,
+        "longitude": 139.837,
         "label": "山形県酒田市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:15.083+09:00"
       }
     },
     {
@@ -916,10 +996,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 38.240433,
-        "longitude": 140.363693,
+        "latitude": 38.24,
+        "longitude": 140.364,
         "label": "山形県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:15.368+09:00"
       }
     }
   ],
@@ -940,10 +1022,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 37.050453,
-        "longitude": 140.887726,
-        "label": "福島県いわき市",
-        "accuracy": "municipality"
+        "latitude": 37.75,
+        "longitude": 140.468,
+        "label": "いわき市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:15.637+09:00"
       }
     },
     {
@@ -962,10 +1046,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 37.76083,
-        "longitude": 140.474747,
-        "label": "福島県福島市",
-        "accuracy": "municipality"
+        "latitude": 37.75,
+        "longitude": 140.468,
+        "label": "福島市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:15.899+09:00"
       }
     },
     {
@@ -984,10 +1070,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 38.409859,
-        "longitude": 140.371384,
-        "label": "山形県東根市",
-        "accuracy": "municipality"
+        "latitude": 37.75,
+        "longitude": 140.468,
+        "label": "神町",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.166+09:00"
       }
     },
     {
@@ -1006,10 +1094,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.69389,
-        "longitude": 139.703613,
+        "latitude": 37.75,
+        "longitude": 140.468,
         "label": "東京都新宿区",
-        "accuracy": "municipality"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.414+09:00"
       }
     }
   ],
@@ -1031,10 +1121,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 39.718624,
-        "longitude": 140.102386,
+        "latitude": 39.719,
+        "longitude": 140.102,
         "label": "秋田県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
       }
     }
   ],
@@ -1053,10 +1145,12 @@
       "url": "https://www.mod.go.jp/pco/kanagawa/mado/hiratuka/hiratuka.html",
       "notes": null,
       "weatherLocation": {
-        "latitude": 36.155277,
-        "longitude": 139.86853,
-        "label": "茨城県八千代町",
-        "accuracy": "venue"
+        "latitude": 35.335,
+        "longitude": 139.35,
+        "label": "神奈川県平塚市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.920+09:00"
       }
     },
     {
@@ -1073,10 +1167,12 @@
       "url": "https://www.mod.go.jp/pco/kanagawa/mado/kawasaki/kawasaki.html",
       "notes": null,
       "weatherLocation": {
-        "latitude": 42.678802,
-        "longitude": 140.767303,
-        "label": "北海道真狩村",
-        "accuracy": "venue"
+        "latitude": 35.531,
+        "longitude": 139.703,
+        "label": "神奈川県川崎市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:17.181+09:00"
       }
     },
     {
@@ -1093,10 +1189,12 @@
       "url": "https://www.mod.go.jp/pco/kanagawa/mado/sagami/sagami.html",
       "notes": null,
       "weatherLocation": {
-        "latitude": 35.571388,
-        "longitude": 139.373337,
+        "latitude": 35.571,
+        "longitude": 139.373,
         "label": "神奈川県相模原市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:17.429+09:00"
       }
     },
     {
@@ -1113,10 +1211,12 @@
       "url": "https://www.mod.go.jp/pco/kanagawa/mado/ichigao/ichigao.html",
       "notes": null,
       "weatherLocation": {
-        "latitude": 34.438686,
-        "longitude": 135.77211,
-        "label": "奈良県高取町",
-        "accuracy": "venue"
+        "latitude": 35.448,
+        "longitude": 139.643,
+        "label": "神奈川県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:17.678+09:00"
       }
     },
     {
@@ -1133,10 +1233,12 @@
       "url": "https://www.mod.go.jp/pco/kanagawa/mado/yokohama/yokohama.html",
       "notes": null,
       "weatherLocation": {
-        "latitude": 41.083328,
-        "longitude": 141.247498,
-        "label": "神奈川県",
-        "accuracy": "venue"
+        "latitude": 35.45,
+        "longitude": 139.634,
+        "label": "神奈川県横浜市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:17.923+09:00"
       }
     },
     {
@@ -1153,10 +1255,12 @@
       "url": "https://www.mod.go.jp/pco/kanagawa/mado/atugi/atugi.html",
       "notes": null,
       "weatherLocation": {
-        "latitude": 35.443054,
-        "longitude": 139.362503,
+        "latitude": 35.443,
+        "longitude": 139.363,
         "label": "神奈川県厚木市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:18.200+09:00"
       }
     },
     {
@@ -1173,10 +1277,12 @@
       "url": "https://www.mod.go.jp/pco/kanagawa/kouho/event/event-kengaku.html",
       "notes": null,
       "weatherLocation": {
-        "latitude": 35.723259,
-        "longitude": 140.66864,
-        "label": "千葉県旭市",
-        "accuracy": "venue"
+        "latitude": 35.448,
+        "longitude": 139.643,
+        "label": "神奈川県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:18.454+09:00"
       }
     },
     {
@@ -1193,10 +1299,12 @@
       "url": "https://www.mod.go.jp/pco/kanagawa/mado/hiratuka/hiratuka.html",
       "notes": null,
       "weatherLocation": {
-        "latitude": 36.155277,
-        "longitude": 139.86853,
-        "label": "茨城県八千代町",
-        "accuracy": "venue"
+        "latitude": 35.335,
+        "longitude": 139.35,
+        "label": "神奈川県平塚市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.920+09:00"
       }
     },
     {
@@ -1213,10 +1321,12 @@
       "url": "https://www.mod.go.jp/pco/kanagawa/kouho/event/event-kengaku.html",
       "notes": null,
       "weatherLocation": {
-        "latitude": 35.723259,
-        "longitude": 140.66864,
-        "label": "千葉県旭市",
-        "accuracy": "venue"
+        "latitude": 35.448,
+        "longitude": 139.643,
+        "label": "神奈川県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:18.454+09:00"
       }
     }
   ],
@@ -1238,10 +1348,12 @@
       "ageRequirement": "高校生～32歳までの方及びその保護者様",
       "deadline": "なし",
       "weatherLocation": {
-        "latitude": 35.857033,
-        "longitude": 139.649017,
+        "latitude": 35.857,
+        "longitude": 139.649,
         "label": "埼玉県",
-        "accuracy": "prefecture"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:18.719+09:00"
       }
     },
     {
@@ -1260,10 +1372,12 @@
       "ageRequirement": "34歳迄の方（保護者の方も一緒に参加いただけます）",
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.89637,
-        "longitude": 139.799561,
+        "latitude": 35.896,
+        "longitude": 139.8,
         "label": "埼玉県越谷市",
-        "accuracy": "address"
+        "accuracy": "address",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:18.968+09:00"
       }
     },
     {
@@ -1282,10 +1396,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.857033,
-        "longitude": 139.649017,
+        "latitude": 35.857,
+        "longitude": 139.649,
         "label": "埼玉県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:19.230+09:00"
       }
     },
     {
@@ -1304,10 +1420,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.857033,
-        "longitude": 139.649017,
+        "latitude": 35.857,
+        "longitude": 139.649,
         "label": "埼玉県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:19.230+09:00"
       }
     },
     {
@@ -1326,10 +1444,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.857033,
-        "longitude": 139.649017,
+        "latitude": 35.857,
+        "longitude": 139.649,
         "label": "埼玉県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:19.230+09:00"
       }
     },
     {
@@ -1348,10 +1468,12 @@
       "ageRequirement": "17歳以上32歳以下",
       "deadline": "7月15日（水）",
       "weatherLocation": {
-        "latitude": 35.857033,
-        "longitude": 139.649017,
+        "latitude": 35.857,
+        "longitude": 139.649,
         "label": "埼玉県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:19.479+09:00"
       }
     },
     {
@@ -1370,10 +1492,12 @@
       "ageRequirement": "高校生",
       "deadline": "令和6年7月15日（水）",
       "weatherLocation": {
-        "latitude": 35.857033,
-        "longitude": 139.649017,
+        "latitude": 35.857,
+        "longitude": 139.649,
         "label": "埼玉県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:19.230+09:00"
       }
     },
     {
@@ -1392,10 +1516,12 @@
       "ageRequirement": "高校生以上で公務員の仕事に興味のある方",
       "deadline": "null",
       "weatherLocation": {
-        "latitude": 36.139412,
-        "longitude": 139.392044,
+        "latitude": 36.139,
+        "longitude": 139.392,
         "label": "埼玉県熊谷市",
-        "accuracy": "address"
+        "accuracy": "address",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:19.480+09:00"
       }
     },
     {
@@ -1414,10 +1540,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.857033,
-        "longitude": 139.649017,
+        "latitude": 35.857,
+        "longitude": 139.649,
         "label": "埼玉県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:19.230+09:00"
       }
     },
     {
@@ -1436,10 +1564,12 @@
       "ageRequirement": "大学生・短期大学生・専門学生",
       "deadline": "令和8年7月30日（木）",
       "weatherLocation": {
-        "latitude": 35.857033,
-        "longitude": 139.649017,
+        "latitude": 35.857,
+        "longitude": 139.649,
         "label": "埼玉県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:19.230+09:00"
       }
     }
   ],
@@ -1460,10 +1590,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.496037,
-        "longitude": 138.978714,
+        "latitude": 36.496,
+        "longitude": 138.979,
         "label": "群馬県渋川市",
-        "accuracy": "address"
+        "accuracy": "address",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:19.740+09:00"
       }
     },
     {
@@ -1482,10 +1614,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.318714,
-        "longitude": 139.021667,
+        "latitude": 36.319,
+        "longitude": 139.022,
         "label": "群馬県高崎市",
-        "accuracy": "address"
+        "accuracy": "address",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:19.977+09:00"
       }
     },
     {
@@ -1504,10 +1638,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.413738,
-        "longitude": 139.232452,
+        "latitude": 36.414,
+        "longitude": 139.232,
         "label": "群馬県桐生市",
-        "accuracy": "address"
+        "accuracy": "address",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:20.223+09:00"
       }
     },
     {
@@ -1526,10 +1662,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.163223,
-        "longitude": 139.054337,
+        "latitude": 36.163,
+        "longitude": 139.054,
         "label": "群馬県藤岡市",
-        "accuracy": "address"
+        "accuracy": "address",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:20.472+09:00"
       }
     },
     {
@@ -1548,10 +1686,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.570629,
-        "longitude": 138.809082,
+        "latitude": 36.571,
+        "longitude": 138.809,
         "label": "群馬県東吾妻町",
-        "accuracy": "address"
+        "accuracy": "address",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:20.704+09:00"
       }
     },
     {
@@ -1570,10 +1710,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.775787,
-        "longitude": 139.231995,
+        "latitude": 36.776,
+        "longitude": 139.232,
         "label": "群馬県片品村",
-        "accuracy": "address"
+        "accuracy": "address",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:20.952+09:00"
       }
     },
     {
@@ -1593,10 +1735,12 @@
       "deadline": "7月17日（金）",
       "source_type": "office_ocr",
       "weatherLocation": {
-        "latitude": 36.389462,
-        "longitude": 139.063461,
+        "latitude": 36.389,
+        "longitude": 139.063,
         "label": "群馬県前橋市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:21.202+09:00"
       }
     }
   ],
@@ -1618,10 +1762,12 @@
       "deadline": "令和6月15日まで",
       "source_type": "office_ocr",
       "weatherLocation": {
-        "latitude": 35.515518,
-        "longitude": 134.454926,
-        "label": "兵庫県新温泉町",
-        "accuracy": "municipality"
+        "latitude": 36.566,
+        "longitude": 139.884,
+        "label": "栃木県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:21.449+09:00"
       }
     },
     {
@@ -1641,10 +1787,12 @@
       "deadline": null,
       "source_type": "office_ocr",
       "weatherLocation": {
-        "latitude": 34.689095,
-        "longitude": 135.515732,
-        "label": "大阪府大阪市",
-        "accuracy": "venue"
+        "latitude": 36.566,
+        "longitude": 139.884,
+        "label": "栃木県石町",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:21.715+09:00"
       }
     }
   ],
@@ -1665,10 +1813,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.230785,
-        "longitude": 139.895737,
-        "label": "茨城県結城市",
-        "accuracy": "venue"
+        "latitude": 36.366,
+        "longitude": 140.472,
+        "label": "茨城県水戸市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:21.965+09:00"
       }
     },
     {
@@ -1687,10 +1837,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.341736,
-        "longitude": 140.446823,
+        "latitude": 36.342,
+        "longitude": 140.447,
         "label": "茨城県",
-        "accuracy": "prefecture"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:22.214+09:00"
       }
     },
     {
@@ -1709,10 +1861,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.457436,
-        "longitude": 140.486801,
+        "latitude": 36.457,
+        "longitude": 140.487,
         "label": "茨城県那珂郡",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:22.456+09:00"
       }
     },
     {
@@ -1731,10 +1885,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.365852,
-        "longitude": 140.471588,
+        "latitude": 36.366,
+        "longitude": 140.472,
         "label": "茨城県水戸市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:22.702+09:00"
       }
     },
     {
@@ -1753,10 +1909,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.39595,
-        "longitude": 140.541367,
+        "latitude": 36.396,
+        "longitude": 140.541,
         "label": "茨城県ひたちなか市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:22.953+09:00"
       }
     },
     {
@@ -1775,10 +1933,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.723259,
-        "longitude": 140.66864,
-        "label": "千葉県旭市",
-        "accuracy": "venue"
+        "latitude": 36.342,
+        "longitude": 140.447,
+        "label": "茨城県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:23.201+09:00"
       }
     },
     {
@@ -1797,10 +1957,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.341736,
-        "longitude": 140.446823,
+        "latitude": 36.342,
+        "longitude": 140.447,
         "label": "茨城県",
-        "accuracy": "prefecture"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:23.450+09:00"
       }
     }
   ],
@@ -1823,10 +1985,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 43.891171,
-        "longitude": 142.982086,
-        "label": "北海道上川町",
-        "accuracy": "venue"
+        "latitude": 37.148,
+        "longitude": 138.236,
+        "label": "新潟県上越市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:23.699+09:00"
       }
     },
     {
@@ -1846,10 +2010,12 @@
       "deadline": null,
       "source_type": "office_ocr",
       "weatherLocation": {
-        "latitude": 37.364952,
-        "longitude": 138.557999,
+        "latitude": 37.365,
+        "longitude": 138.558,
         "label": "新潟県柏崎市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:23.964+09:00"
       }
     },
     {
@@ -1869,10 +2035,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 37.947952,
-        "longitude": 139.327103,
+        "latitude": 37.948,
+        "longitude": 139.327,
         "label": "新潟県新発田市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:24.207+09:00"
       }
     },
     {
@@ -1892,10 +2060,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 40.513973,
-        "longitude": 141.49585,
-        "label": "青森県八戸市",
-        "accuracy": "venue"
+        "latitude": 37.365,
+        "longitude": 138.558,
+        "label": "新潟県柏崎市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:24.470+09:00"
       }
     }
   ],
@@ -1917,10 +2087,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.594604,
-        "longitude": 136.625671,
-        "label": "石川県",
-        "accuracy": "prefecture"
+        "latitude": 36.72,
+        "longitude": 136.707,
+        "label": "石川県かほく市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:24.717+09:00"
       }
     },
     {
@@ -1939,10 +2111,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.257664,
-        "longitude": 139.721995,
+        "latitude": 36.595,
+        "longitude": 136.626,
         "label": "石川県",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:24.980+09:00"
       }
     },
     {
@@ -1962,10 +2136,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 36.594604,
-        "longitude": 136.625671,
+        "latitude": 36.595,
+        "longitude": 136.626,
         "label": "石川県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:25.248+09:00"
       }
     }
   ],
@@ -1986,10 +2162,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.600555,
-        "longitude": 135.940552,
-        "label": "福井県三方郡",
-        "accuracy": "venue"
+        "latitude": 35.601,
+        "longitude": 135.941,
+        "label": "福井県美浜町",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:25.491+09:00"
       }
     },
     {
@@ -2008,10 +2186,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.065208,
-        "longitude": 136.221725,
-        "label": "福井県",
-        "accuracy": "prefecture"
+        "latitude": 36.065,
+        "longitude": 136.222,
+        "label": "オアリーナ（勝山市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:25.747+09:00"
       }
     },
     {
@@ -2031,10 +2211,12 @@
       "deadline": "7月1日（水）12時",
       "source_type": "office_ocr",
       "weatherLocation": {
-        "latitude": 43.244255,
-        "longitude": 141.562607,
-        "label": "北海道当別町",
-        "accuracy": "venue"
+        "latitude": 36.065,
+        "longitude": 136.222,
+        "label": "福井県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:25.987+09:00"
       }
     },
     {
@@ -2054,10 +2236,12 @@
       "deadline": "7月8日（水）",
       "source_type": "office_ocr",
       "weatherLocation": {
-        "latitude": 35.485832,
-        "longitude": 134.444153,
-        "label": "兵庫県新温泉町",
-        "accuracy": "venue"
+        "latitude": 36.065,
+        "longitude": 136.222,
+        "label": "福井県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:26.250+09:00"
       }
     }
   ],
@@ -2079,10 +2263,12 @@
       "deadline": null,
       "source_type": "office_ocr",
       "weatherLocation": {
-        "latitude": 35.59026,
-        "longitude": 134.381577,
-        "label": "鳥取県岩美町",
-        "accuracy": "venue"
+        "latitude": 35.664,
+        "longitude": 138.568,
+        "label": "山梨県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:26.498+09:00"
       }
     }
   ],
@@ -2103,10 +2289,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.6511,
-        "longitude": 138.307251,
-        "label": "長野県須坂市",
-        "accuracy": "municipality"
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:26.748+09:00"
       }
     },
     {
@@ -2125,10 +2313,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.651306,
-        "longitude": 138.180908,
+        "latitude": 36.651,
+        "longitude": 138.181,
         "label": "長野県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:26.996+09:00"
       }
     },
     {
@@ -2147,10 +2337,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.432167,
-        "longitude": 140.280212,
-        "label": "千葉県茂原市",
-        "accuracy": "venue"
+        "latitude": 35.635,
+        "longitude": 137.946,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:27.246+09:00"
       }
     },
     {
@@ -2169,10 +2361,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.723259,
-        "longitude": 140.66864,
-        "label": "千葉県旭市",
-        "accuracy": "venue"
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:27.489+09:00"
       }
     },
     {
@@ -2191,10 +2385,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.651306,
-        "longitude": 138.180908,
+        "latitude": 36.651,
+        "longitude": 138.181,
         "label": "長野県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:26.996+09:00"
       }
     },
     {
@@ -2213,10 +2409,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.039165,
-        "longitude": 138.114166,
+        "latitude": 36.039,
+        "longitude": 138.114,
         "label": "長野県諏訪市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:27.737+09:00"
       }
     },
     {
@@ -2235,10 +2433,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.651306,
-        "longitude": 138.180908,
+        "latitude": 36.651,
+        "longitude": 138.181,
         "label": "長野県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:26.996+09:00"
       }
     },
     {
@@ -2257,10 +2457,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 33.23481,
-        "longitude": 131.779755,
-        "label": "大分県大分市",
-        "accuracy": "venue"
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:27.986+09:00"
       }
     }
   ],
@@ -2282,10 +2484,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 34.976944,
-        "longitude": 138.383057,
+        "latitude": 34.977,
+        "longitude": 138.383,
         "label": "静岡県",
-        "accuracy": "prefecture"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.238+09:00"
       }
     },
     {
@@ -2304,10 +2508,12 @@
       "ageRequirement": "参加対象静岡県内にお住まいの 中学生以上～32歳までの女性 お子様のお母さま",
       "deadline": null,
       "weatherLocation": {
-        "latitude": 43.813843,
-        "longitude": 144.778305,
-        "label": "北海道斜里町",
-        "accuracy": "venue"
+        "latitude": 35.161,
+        "longitude": 138.676,
+        "label": "静岡県富士郡",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.503+09:00"
       }
     }
   ],
@@ -2329,10 +2535,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2352,10 +2560,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2375,10 +2585,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2398,10 +2610,12 @@
       "deadline": null,
       "source_type": "office_ocr",
       "weatherLocation": {
-        "latitude": 37.501484,
-        "longitude": 138.707901,
-        "label": "新潟県出雲崎町",
-        "accuracy": "venue"
+        "latitude": 34.769,
+        "longitude": 137.391,
+        "label": "愛知県豊橋市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:29.015+09:00"
       }
     },
     {
@@ -2421,10 +2635,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2444,10 +2660,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2467,10 +2685,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2490,10 +2710,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2513,10 +2735,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2536,10 +2760,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2559,10 +2785,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2582,10 +2810,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2605,10 +2835,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2628,10 +2860,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2651,10 +2885,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2674,10 +2910,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2697,10 +2935,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2720,10 +2960,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2743,10 +2985,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2766,10 +3010,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2789,10 +3035,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2812,10 +3060,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2835,10 +3085,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2858,10 +3110,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2881,10 +3135,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2904,10 +3160,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2927,10 +3185,12 @@
       "deadline": null,
       "source_type": "office_ocr",
       "weatherLocation": {
-        "latitude": 35.711559,
-        "longitude": 140.65123,
-        "label": "千葉県旭市",
-        "accuracy": "venue"
+        "latitude": 35.18,
+        "longitude": 136.907,
+        "label": "愛知県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:29.265+09:00"
       }
     },
     {
@@ -2950,10 +3210,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2973,10 +3235,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -2996,10 +3260,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3019,10 +3285,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3042,10 +3310,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3065,10 +3335,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3088,10 +3360,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3111,10 +3385,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3134,10 +3410,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3157,10 +3435,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3180,10 +3460,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3203,10 +3485,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3226,10 +3510,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3249,10 +3535,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3272,10 +3560,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3295,10 +3585,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3318,10 +3610,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3341,10 +3635,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3364,10 +3660,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3387,10 +3685,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3410,10 +3710,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3433,10 +3735,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3456,10 +3760,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3479,10 +3785,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3502,10 +3810,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3525,10 +3835,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3548,10 +3860,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3571,10 +3885,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3594,10 +3910,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3617,10 +3935,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3640,10 +3960,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3663,10 +3985,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3686,10 +4010,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3709,10 +4035,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3732,10 +4060,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3755,10 +4085,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3778,10 +4110,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3801,10 +4135,12 @@
       "deadline": null,
       "endDate": null,
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
       }
     },
     {
@@ -3824,10 +4160,12 @@
       "deadline": null,
       "source_type": "office_ocr",
       "weatherLocation": {
-        "latitude": 34.989376,
-        "longitude": 137.002304,
+        "latitude": 34.989,
+        "longitude": 137.002,
         "label": "愛知県刈谷市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:29.518+09:00"
       }
     },
     {
@@ -3847,10 +4185,12 @@
       "deadline": null,
       "source_type": "office_ocr",
       "weatherLocation": {
-        "latitude": 35.18021,
-        "longitude": 136.906586,
+        "latitude": 35.18,
+        "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:29.793+09:00"
       }
     },
     {
@@ -3870,10 +4210,12 @@
       "deadline": "null",
       "source_type": "office_ocr",
       "weatherLocation": {
-        "latitude": 34.954803,
-        "longitude": 137.173065,
+        "latitude": 34.955,
+        "longitude": 137.173,
         "label": "愛知県岡崎市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:30.023+09:00"
       }
     },
     {
@@ -3893,10 +4235,12 @@
       "deadline": "令和8年7月6日（月）",
       "source_type": "office_ocr",
       "weatherLocation": {
-        "latitude": 35.59026,
-        "longitude": 134.381577,
-        "label": "鳥取県岩美町",
-        "accuracy": "venue"
+        "latitude": 35.18,
+        "longitude": 136.907,
+        "label": "愛知県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:30.280+09:00"
       }
     }
   ],
@@ -3919,10 +4263,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.011669,
-        "longitude": 135.768112,
+        "latitude": 35.012,
+        "longitude": 135.768,
         "label": "京都府京都市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:30.519+09:00"
       }
     },
     {
@@ -3941,10 +4287,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.711559,
-        "longitude": 140.65123,
-        "label": "千葉県旭市",
-        "accuracy": "venue"
+        "latitude": 35.021,
+        "longitude": 135.756,
+        "label": "京都府",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:30.769+09:00"
       }
     },
     {
@@ -3964,10 +4312,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 35.02124,
-        "longitude": 135.755615,
+        "latitude": 35.021,
+        "longitude": 135.756,
         "label": "京都府",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:31.003+09:00"
       }
     },
     {
@@ -3987,10 +4337,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 35.02124,
-        "longitude": 135.755615,
+        "latitude": 35.021,
+        "longitude": 135.756,
         "label": "京都府",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:31.003+09:00"
       }
     }
   ],
@@ -4012,10 +4364,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 34.686344,
-        "longitude": 135.520035,
+        "latitude": 34.686,
+        "longitude": 135.52,
         "label": "大阪府",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:31.252+09:00"
       }
     },
     {
@@ -4035,10 +4389,12 @@
       "deadline": "6月29日（月）",
       "source_type": "office_ocr",
       "weatherLocation": {
-        "latitude": 35.986046,
-        "longitude": 140.313004,
-        "label": "茨城県美浦村",
-        "accuracy": "venue"
+        "latitude": 34.686,
+        "longitude": 135.52,
+        "label": "大阪府",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:31.498+09:00"
       }
     },
     {
@@ -4058,10 +4414,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 34.46059,
-        "longitude": 135.37088,
+        "latitude": 34.461,
+        "longitude": 135.371,
         "label": "大阪府岸和田市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:31.748+09:00"
       }
     },
     {
@@ -4081,10 +4439,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 34.686344,
-        "longitude": 135.520035,
+        "latitude": 34.686,
+        "longitude": 135.52,
         "label": "大阪府",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:31.252+09:00"
       }
     },
     {
@@ -4104,10 +4464,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 34.686344,
-        "longitude": 135.520035,
+        "latitude": 34.686,
+        "longitude": 135.52,
         "label": "大阪府",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:31.252+09:00"
       }
     },
     {
@@ -4127,10 +4489,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 34.686344,
-        "longitude": 135.520035,
+        "latitude": 34.686,
+        "longitude": 135.52,
         "label": "大阪府",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:31.252+09:00"
       }
     },
     {
@@ -4150,10 +4514,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 34.686344,
-        "longitude": 135.520035,
+        "latitude": 34.686,
+        "longitude": 135.52,
         "label": "大阪府",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:31.252+09:00"
       }
     },
     {
@@ -4173,10 +4539,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 34.46059,
-        "longitude": 135.37088,
+        "latitude": 34.461,
+        "longitude": 135.371,
         "label": "大阪府岸和田市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:31.748+09:00"
       }
     },
     {
@@ -4196,10 +4564,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 34.686344,
-        "longitude": 135.520035,
+        "latitude": 34.686,
+        "longitude": 135.52,
         "label": "大阪府",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:31.252+09:00"
       }
     },
     {
@@ -4219,10 +4589,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 34.46059,
-        "longitude": 135.37088,
+        "latitude": 34.461,
+        "longitude": 135.371,
         "label": "大阪府岸和田市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:31.748+09:00"
       }
     },
     {
@@ -4242,10 +4614,12 @@
       "deadline": "7月17日（金）",
       "source_type": "office_ocr",
       "weatherLocation": {
-        "latitude": 43.202141,
-        "longitude": 145.524216,
-        "label": "北海道根室市",
-        "accuracy": "venue"
+        "latitude": 34.686,
+        "longitude": 135.52,
+        "label": "大阪府",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:31.988+09:00"
       }
     },
     {
@@ -4265,10 +4639,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 34.686344,
-        "longitude": 135.520035,
+        "latitude": 34.686,
+        "longitude": 135.52,
         "label": "大阪府",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:31.252+09:00"
       }
     },
     {
@@ -4288,10 +4664,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 34.46059,
-        "longitude": 135.37088,
+        "latitude": 34.461,
+        "longitude": 135.371,
         "label": "大阪府岸和田市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:31.748+09:00"
       }
     },
     {
@@ -4311,10 +4689,12 @@
       "deadline": "7月27日（月）",
       "source_type": "office_ocr",
       "weatherLocation": {
-        "latitude": 37.582809,
-        "longitude": 140.366119,
-        "label": "福島県二本松市",
-        "accuracy": "venue"
+        "latitude": 34.694,
+        "longitude": 135.502,
+        "label": "大阪府大阪市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:32.249+09:00"
       }
     }
   ],
@@ -4336,10 +4716,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 35.553944,
-        "longitude": 139.186737,
-        "label": "神奈川県相模原市",
-        "accuracy": "venue"
+        "latitude": 34.691,
+        "longitude": 135.183,
+        "label": "兵庫県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:32.517+09:00"
       }
     },
     {
@@ -4359,10 +4741,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 35.553944,
-        "longitude": 139.186737,
-        "label": "神奈川県相模原市",
-        "accuracy": "venue"
+        "latitude": 34.691,
+        "longitude": 135.183,
+        "label": "兵庫県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:32.517+09:00"
       }
     },
     {
@@ -4382,10 +4766,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 35.553944,
-        "longitude": 139.186737,
-        "label": "神奈川県相模原市",
-        "accuracy": "venue"
+        "latitude": 34.691,
+        "longitude": 135.183,
+        "label": "兵庫県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:32.517+09:00"
       }
     }
   ],
@@ -4406,10 +4792,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 34.685272,
-        "longitude": 135.832855,
+        "latitude": 34.685,
+        "longitude": 135.833,
         "label": "奈良県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:32.748+09:00"
       }
     },
     {
@@ -4428,10 +4816,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 37.582809,
-        "longitude": 140.366119,
-        "label": "福島県二本松市",
-        "accuracy": "venue"
+        "latitude": 34.391,
+        "longitude": 135.79,
+        "label": "奈良県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:32.982+09:00"
       }
     },
     {
@@ -4450,10 +4840,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 34.883911,
-        "longitude": 135.41832,
-        "label": "兵庫県川西市",
-        "accuracy": "venue"
+        "latitude": 34.65,
+        "longitude": 135.783,
+        "label": "奈良県大和郡",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:33.260+09:00"
       }
     }
   ],
@@ -4475,10 +4867,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 33.88533,
-        "longitude": 132.856171,
+        "latitude": 33.885,
+        "longitude": 132.856,
         "label": "愛媛県松山市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:33.538+09:00"
       }
     }
   ],
@@ -4499,10 +4893,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.485832,
-        "longitude": 134.444153,
-        "label": "兵庫県新温泉町",
-        "accuracy": "venue"
+        "latitude": 34.34,
+        "longitude": 134.043,
+        "label": "香川県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:33.773+09:00"
       }
     },
     {
@@ -4521,10 +4917,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.764427,
-        "longitude": 136.713577,
-        "label": "石川県かほく市",
-        "accuracy": "venue"
+        "latitude": 34.343,
+        "longitude": 134.047,
+        "label": "香川県高松市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:34.021+09:00"
       }
     },
     {
@@ -4544,10 +4942,12 @@
       "deadline": "8月4日（月）",
       "source_type": "office_ocr",
       "weatherLocation": {
-        "latitude": 34.340111,
-        "longitude": 134.043289,
+        "latitude": 34.34,
+        "longitude": 134.043,
         "label": "香川県",
-        "accuracy": "prefecture"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:34.270+09:00"
       }
     }
   ],
@@ -4569,10 +4969,12 @@
       "deadline": null,
       "source_type": "office_notice",
       "weatherLocation": {
-        "latitude": 33.559723,
-        "longitude": 133.531113,
+        "latitude": 33.56,
+        "longitude": 133.531,
         "label": "高知県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:34.533+09:00"
       }
     }
   ],
@@ -4594,10 +4996,12 @@
       "deadline": null,
       "source_type": "office_ocr",
       "weatherLocation": {
-        "latitude": 34.065762,
-        "longitude": 134.55928,
-        "label": "徳島県",
-        "accuracy": "prefecture"
+        "latitude": 34.066,
+        "longitude": 134.559,
+        "label": "交流プラザ（徳島市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:34.767+09:00"
       }
     }
   ],
@@ -4619,10 +5023,12 @@
       "deadline": null,
       "source_type": "office_notice",
       "weatherLocation": {
-        "latitude": 35.503448,
-        "longitude": 134.238266,
+        "latitude": 35.503,
+        "longitude": 134.238,
         "label": "鳥取県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:35.015+09:00"
       }
     }
   ],
@@ -4644,10 +5050,12 @@
       "deadline": null,
       "source_type": "office_notice",
       "weatherLocation": {
-        "latitude": 35.472294,
-        "longitude": 133.050522,
+        "latitude": 35.472,
+        "longitude": 133.051,
         "label": "島根県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:35.265+09:00"
       }
     }
   ],
@@ -4668,10 +5076,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 34.584999,
-        "longitude": 133.771942,
+        "latitude": 34.585,
+        "longitude": 133.772,
         "label": "岡山県倉敷市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:35.499+09:00"
       }
     },
     {
@@ -4690,10 +5100,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.028557,
-        "longitude": 139.722137,
-        "label": "埼玉県宮代町",
-        "accuracy": "venue"
+        "latitude": 34.662,
+        "longitude": 133.935,
+        "label": "岡山県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:35.750+09:00"
       }
     },
     {
@@ -4713,10 +5125,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 34.661739,
-        "longitude": 133.935028,
+        "latitude": 34.662,
+        "longitude": 133.935,
         "label": "岡山県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       }
     },
     {
@@ -4736,10 +5150,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 34.661739,
-        "longitude": 133.935028,
+        "latitude": 34.662,
+        "longitude": 133.935,
         "label": "岡山県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       }
     },
     {
@@ -4759,10 +5175,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 34.661739,
-        "longitude": 133.935028,
+        "latitude": 34.662,
+        "longitude": 133.935,
         "label": "岡山県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       }
     },
     {
@@ -4782,10 +5200,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 34.661739,
-        "longitude": 133.935028,
+        "latitude": 34.662,
+        "longitude": 133.935,
         "label": "岡山県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       }
     },
     {
@@ -4805,10 +5225,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 34.661739,
-        "longitude": 133.935028,
+        "latitude": 34.662,
+        "longitude": 133.935,
         "label": "岡山県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       }
     },
     {
@@ -4828,10 +5250,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 34.661739,
-        "longitude": 133.935028,
+        "latitude": 34.662,
+        "longitude": 133.935,
         "label": "岡山県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       }
     },
     {
@@ -4851,10 +5275,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 34.661739,
-        "longitude": 133.935028,
+        "latitude": 34.662,
+        "longitude": 133.935,
         "label": "岡山県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       }
     },
     {
@@ -4874,10 +5300,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 34.661739,
-        "longitude": 133.935028,
+        "latitude": 34.662,
+        "longitude": 133.935,
         "label": "岡山県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       }
     },
     {
@@ -4897,10 +5325,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 34.661739,
-        "longitude": 133.935028,
+        "latitude": 34.662,
+        "longitude": 133.935,
         "label": "岡山県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       }
     },
     {
@@ -4920,10 +5350,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 34.661739,
-        "longitude": 133.935028,
+        "latitude": 34.662,
+        "longitude": 133.935,
         "label": "岡山県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       }
     }
   ],
@@ -4944,10 +5376,12 @@
       "ageRequirement": "高校生以上",
       "deadline": null,
       "weatherLocation": {
-        "latitude": 34.396557,
-        "longitude": 132.459641,
+        "latitude": 34.397,
+        "longitude": 132.46,
         "label": "広島県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.248+09:00"
       }
     },
     {
@@ -4966,10 +5400,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 34.396557,
-        "longitude": 132.459641,
+        "latitude": 34.397,
+        "longitude": 132.46,
         "label": "広島県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.248+09:00"
       }
     },
     {
@@ -4988,10 +5424,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 34.396557,
-        "longitude": 132.459641,
+        "latitude": 34.397,
+        "longitude": 132.46,
         "label": "広島県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.248+09:00"
       }
     },
     {
@@ -5010,10 +5448,12 @@
       "ageRequirement": "高校生以上（保護者同伴可）",
       "deadline": null,
       "weatherLocation": {
-        "latitude": 34.396557,
-        "longitude": 132.459641,
+        "latitude": 34.397,
+        "longitude": 132.46,
         "label": "広島県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.248+09:00"
       }
     },
     {
@@ -5032,10 +5472,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 34.396557,
-        "longitude": 132.459641,
+        "latitude": 34.397,
+        "longitude": 132.46,
         "label": "広島県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.248+09:00"
       }
     },
     {
@@ -5054,10 +5496,12 @@
       "ageRequirement": "高校生・専門学生・大学生又はそのご家族の方、公安系公務員に興味のある方、仕事内容や職場の雰囲気を知りたい方、なんとなく公務員がいいなと思っている方",
       "deadline": "null",
       "weatherLocation": {
-        "latitude": 34.396557,
-        "longitude": 132.459641,
+        "latitude": 34.397,
+        "longitude": 132.46,
         "label": "広島県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.248+09:00"
       }
     }
   ],
@@ -5079,10 +5523,12 @@
       "deadline": null,
       "source_type": "office_notice",
       "weatherLocation": {
-        "latitude": 34.186043,
-        "longitude": 131.470657,
+        "latitude": 34.186,
+        "longitude": 131.471,
         "label": "山口県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.480+09:00"
       }
     }
   ],
@@ -5104,10 +5550,12 @@
       "deadline": "7月8日（水）",
       "source_type": "office_ocr",
       "weatherLocation": {
-        "latitude": 35.257664,
-        "longitude": 139.721995,
+        "latitude": 33.606,
+        "longitude": 130.418,
         "label": "福岡県",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.747+09:00"
       }
     },
     {
@@ -5127,10 +5575,12 @@
       "deadline": "令和8年7月3日（金）",
       "source_type": "office_ocr",
       "weatherLocation": {
-        "latitude": 33.606388,
-        "longitude": 130.417969,
+        "latitude": 33.606,
+        "longitude": 130.418,
         "label": "福岡県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.993+09:00"
       }
     }
   ],
@@ -5151,10 +5601,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 33.249352,
-        "longitude": 130.298798,
+        "latitude": 33.249,
+        "longitude": 130.299,
         "label": "佐賀県",
-        "accuracy": "prefecture"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:37.226+09:00"
       }
     }
   ],
@@ -5175,10 +5627,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 32.750038,
-        "longitude": 129.867249,
+        "latitude": 32.75,
+        "longitude": 129.867,
         "label": "長崎県",
-        "accuracy": "prefecture"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:37.458+09:00"
       }
     },
     {
@@ -5197,10 +5651,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 33.17992,
-        "longitude": 129.715088,
+        "latitude": 33.18,
+        "longitude": 129.715,
         "label": "長崎県佐世保市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:37.690+09:00"
       }
     },
     {
@@ -5219,10 +5675,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 32.749527,
-        "longitude": 129.879807,
+        "latitude": 32.75,
+        "longitude": 129.88,
         "label": "長崎県長崎市",
-        "accuracy": "venue"
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:37.954+09:00"
       }
     },
     {
@@ -5242,10 +5700,12 @@
       "deadline": null,
       "source_type": "office_html",
       "weatherLocation": {
-        "latitude": 40.63768,
-        "longitude": 140.602371,
-        "label": "青森県黒石市",
-        "accuracy": "venue"
+        "latitude": 32.75,
+        "longitude": 129.88,
+        "label": "長崎県長崎市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:38.218+09:00"
       }
     }
   ],
@@ -5266,10 +5726,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 42.970818,
-        "longitude": 141.799377,
-        "label": "北海道由仁町",
-        "accuracy": "venue"
+        "latitude": 32.803,
+        "longitude": 130.708,
+        "label": "熊本県熊本市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:38.485+09:00"
       }
     },
     {
@@ -5288,10 +5750,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 42.970818,
-        "longitude": 141.799377,
-        "label": "北海道由仁町",
-        "accuracy": "venue"
+        "latitude": 32.803,
+        "longitude": 130.708,
+        "label": "熊本県熊本市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:38.734+09:00"
       }
     }
   ],
@@ -5313,10 +5777,12 @@
       "deadline": null,
       "source_type": "office_notice",
       "weatherLocation": {
-        "latitude": 33.238129,
-        "longitude": 131.61264,
+        "latitude": 33.238,
+        "longitude": 131.613,
         "label": "大分県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:38.983+09:00"
       }
     }
   ],
@@ -5338,10 +5804,12 @@
       "deadline": null,
       "source_type": "office_notice",
       "weatherLocation": {
-        "latitude": 31.911034,
-        "longitude": 131.423889,
+        "latitude": 31.911,
+        "longitude": 131.424,
         "label": "宮崎県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:39.231+09:00"
       }
     }
   ],
@@ -5363,10 +5831,12 @@
       "deadline": null,
       "source_type": "office_notice",
       "weatherLocation": {
-        "latitude": 31.560171,
-        "longitude": 130.558029,
+        "latitude": 31.56,
+        "longitude": 130.558,
         "label": "鹿児島県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:39.481+09:00"
       }
     }
   ],
@@ -5388,10 +5858,12 @@
       "deadline": null,
       "source_type": "office_notice",
       "weatherLocation": {
-        "latitude": 26.212444,
-        "longitude": 127.680923,
+        "latitude": 26.212,
+        "longitude": 127.681,
         "label": "沖縄県",
-        "accuracy": "prefecture"
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:39.717+09:00"
       }
     }
   ],

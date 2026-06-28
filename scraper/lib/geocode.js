@@ -3,27 +3,28 @@
 // 方針:
 // - 国土地理院（GSI）住所検索 API を使う（無料・APIキー不要・日本の住所/施設名に強い）。
 //   返却座標は [経度, 緯度] の順なので注意。
-// - 結果は scraper/geocode-cache.json にコミットして永続化し、同じ会場を毎回検索しない。
-//   ヒットしなかったクエリは null をキャッシュ（負のキャッシュ）して再問い合わせを防ぐ。
-//   ネットワークエラー時はキャッシュせず次回再試行する。
-// - 取得精度（accuracy）は address > venue > municipality > prefecture の順に試し、
-//   最初にヒットした段階を採用する。
+// - 精度（accuracy）は address > venue > municipality > prefecture の順に試し、最初のヒットを採用。
+// - 会場名だけのキャッシュは同名会場・住所変更で誤座標を再利用するため、キャッシュキーは
+//   pref + 正規化住所 + 正規化会場名（shared/weather.cjs の geocodeCacheKey）で生成し、
+//   住所/会場名が変わったら別キーで再取得する。
+// - 結果（weatherLocation）は scraper/geocode-cache.json にコミットして永続化。
+//   1回の実行内では同一 GSI クエリをメモ化して重複呼び出しを避ける。
 //
 // 出力（events.json の各イベントへ保存する weatherLocation）:
-//   { latitude, longitude, label, accuracy }
+//   { latitude, longitude, label, accuracy, source:'gsi', geocodedAt:ISO+09:00 }
 //   accuracy: 'address' | 'venue' | 'municipality' | 'prefecture'（手動入力は 'manual'）
 'use strict';
 
 const fs = require('fs');
 const path = require('path');
+const W = require('../../shared/weather.cjs');
 
 const CACHE_PATH = path.join(__dirname, '../geocode-cache.json');
 const GSI_URL = 'https://msearch.gsi.go.jp/address-search/AddressSearch?q=';
-// GSI へ連続アクセスする際の最小間隔（負荷をかけないよう礼儀的に空ける）
 const POLITE_DELAY_MS = 150;
 
-// pref キー → 都道府県名（prefecture フォールバック用）。
-// 北海道の4方面隊キーは都道府県では曖昧なので主要市名で代用する。
+// pref キー → 都道府県名（prefecture フォールバック・会場クエリの前置に使う）。
+// 北海道の4方面隊キーは主要市名で代用する。
 const PREF_JP = {
   sapporo: '北海道札幌市', asahikawa: '北海道旭川市', obihiro: '北海道帯広市', hakodate: '北海道函館市',
   miyagi: '宮城県', aomori: '青森県', iwate: '岩手県', yamagata: '山形県', fukushima: '福島県', akita: '秋田県',
@@ -46,7 +47,7 @@ function load() {
   return cache;
 }
 
-/** キャッシュをキー順にソートして書き出す（差分を読みやすく保つ） */
+/** キャッシュをキー順にソートして書き出す（差分を読みやすく保つ）。 */
 function save() {
   if (!cache) return;
   const sorted = {};
@@ -56,10 +57,9 @@ function save() {
 }
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-const round6 = n => Number(n.toFixed(6));
 
-/** GSI 住所検索。ヒットなしは null、ネットワーク/JSON エラーは throw（再試行のため）。 */
-async function gsiLookup(q) {
+/** GSI 住所検索（生）。ヒットなしは null、ネットワーク/JSON エラーは throw。 */
+async function gsiLookupRaw(q) {
   const res = await fetch(GSI_URL + encodeURIComponent(q), {
     headers: { 'User-Agent': 'jsdf-chiiki-events/1.0 (weather geocoding)' },
   });
@@ -67,41 +67,37 @@ async function gsiLookup(q) {
   const json = await res.json();
   const top = Array.isArray(json) && json[0];
   const coords = top && top.geometry && top.geometry.coordinates;
-  if (!Array.isArray(coords) || coords.length < 2) return null; // ヒットなし
+  if (!Array.isArray(coords) || coords.length < 2) return null;
   const [lon, lat] = coords;
   if (typeof lat !== 'number' || typeof lon !== 'number' || !isFinite(lat) || !isFinite(lon)) return null;
   return { lat, lon, title: (top.properties && top.properties.title) || q };
 }
 
 /**
- * キャッシュ付き検索。{lat,lon,title} か null を返す。
- * - ヒット/明確なヒットなし（空配列）→ キャッシュに保存
- * - ネットワーク等の一時エラー → キャッシュせず null（次回再試行）
+ * 1回の実行内で同一クエリの GSI 呼び出しをメモ化する lookup を作る。
+ * 一時エラー時は null を返す（メモ化しない＝次回再試行余地を残す）。
  */
-async function cachedLookup(q) {
-  const key = (q || '').trim();
-  if (!key) return null;
-  const c = load();
-  if (Object.prototype.hasOwnProperty.call(c, key)) return c[key]; // null（負のキャッシュ）も含む
-  let result = null;
-  try {
-    result = await gsiLookup(key);
-    c[key] = result; // ヒット・明確な無ヒットのみ保存
-  } catch (e) {
-    // 一時エラーはキャッシュしない（次回スクレイプで再試行）
-    return null;
-  }
-  await sleep(POLITE_DELAY_MS);
-  return result;
+function makeMemoLookup() {
+  const memo = new Map();
+  return async function lookup(q) {
+    const key = W.normalizeText(q);
+    if (!key) return null;
+    if (memo.has(key)) return memo.get(key);
+    let r = null;
+    try { r = await gsiLookupRaw(key); await sleep(POLITE_DELAY_MS); }
+    catch { return null; } // 一時エラーはメモ化しない
+    memo.set(key, r);
+    return r;
+  };
 }
 
-/** 「A・B」「A×B」のように複数会場が列挙される場合は先頭の会場名のみ使う */
+/** 「A・B」「A×B」のように複数会場が列挙される場合は先頭の会場名のみ。 */
 function pickVenue(place) {
   if (!place || typeof place !== 'string') return '';
   return place.replace(/×/g, '・').split(/[・/、，,]/)[0].trim();
 }
 
-/** 住所文字列から「都道府県＋市区町村」を抽出（municipality 検索・label 用） */
+/** 住所/会場文字列から「都道府県＋市区町村」を抽出（municipality 検索・label 用）。 */
 function extractPrefMuni(s) {
   if (!s || typeof s !== 'string') return '';
   const m = s.match(/((?:北海道|(?:京都|大阪)府|(?:東京)都|.{2,3}県))?\s*([^\s0-9０-９]{1,8}?[市区町村郡])/);
@@ -110,57 +106,139 @@ function extractPrefMuni(s) {
 }
 
 /**
- * 1イベントを weatherLocation へ変換。座標が取れなければ null。
- * address → venue → municipality → prefecture の順に試す。
+ * イベントの位置を解決する（純粋・lookupFn 注入でテスト可能）。
+ * address → venue → municipality → prefecture の順に試し、最初のヒットを採用。
+ * @param {object} ev
+ * @param {(q:string)=>Promise<{lat,lon,title}|null>} lookupFn
+ * @param {number} [now]
+ * @returns {Promise<weatherLocation|null>}
  */
-async function geocodeEvent(ev) {
+async function resolveLocation(ev, lookupFn, now = Date.now()) {
   if (!ev || typeof ev !== 'object') return null;
+  const pj = PREF_JP[ev.pref];
   const attempts = [];
   if (ev.address) attempts.push(['address', ev.address]);
   const venue = pickVenue(ev.place);
-  if (venue) attempts.push(['venue', venue]);
+  // 会場名は同名衝突を避けるため都道府県名を前置してから検索
+  if (venue) attempts.push(['venue', pj ? `${pj} ${venue}` : venue]);
   const muni = extractPrefMuni(ev.address || ev.place);
   if (muni) attempts.push(['municipality', muni]);
-  const pj = PREF_JP[ev.pref];
   if (pj) attempts.push(['prefecture', pj]);
 
   for (const [accuracy, q] of attempts) {
-    const r = await cachedLookup(q);
+    const r = await lookupFn(q);
     if (!r) continue;
-    const label = extractPrefMuni(r.title) || extractPrefMuni(q) || PREF_JP[ev.pref] || (r.title || q).slice(0, 20);
-    return { latitude: round6(r.lat), longitude: round6(r.lon), label, accuracy };
+    const label = extractPrefMuni(r.title) || extractPrefMuni(q) || pj || (r.title || q).slice(0, 20);
+    return {
+      latitude: W.roundCoord3(r.lat),
+      longitude: W.roundCoord3(r.lon),
+      label,
+      accuracy,
+      source: 'gsi',
+      geocodedAt: W.isoJst(now),
+    };
   }
   return null;
 }
 
 /**
  * events.json 形式（pref キー → イベント配列）の全イベントに weatherLocation を付与する。
- * - 終了済みイベント（終了日 < today）は天気を表示しないのでジオコーディングしない。
- * - キャッシュにより同一クエリは1回しか API を呼ばない。
+ * - 終了済み（終了日 < today）はジオコーディングしない。
+ * - キャッシュキーは pref+正規化住所+正規化会場名。住所/会場が変われば再取得。
+ * - 完了時に accuracy 別の品質集計をログ出力し、前回比で異常があれば GitHub Actions 警告。
  * @param {object} data    pref キー → イベント配列
  * @param {string} today   JST 今日 "YYYY-MM-DD"
  */
 async function geocodeAll(data, today) {
-  let added = 0, miss = 0, ended = 0;
+  const c = load();
+  const lookup = makeMemoLookup();
+  const counts = { address: 0, venue: 0, municipality: 0, prefecture: 0, manual: 0, missing: 0 };
+  let active = 0, endedSkipped = 0;
+
   for (const key of Object.keys(data)) {
     if (!Array.isArray(data[key])) continue;
     for (const ev of data[key]) {
       if (!ev || !ev.date) continue;
-      // 終了済みは天気を出さないためスキップ（無駄な API/キャッシュ生成を避ける）
-      if ((ev.endDate || ev.date) < today) { ended++; continue; }
-      // 手動入力で既に座標がある場合（accuracy: 'manual' 等）は尊重して上書きしない
-      if (ev.weatherLocation && typeof ev.weatherLocation.latitude === 'number') continue;
-      try {
-        const loc = await geocodeEvent(ev);
-        if (loc) { ev.weatherLocation = loc; added++; }
-        else { miss++; }
-      } catch (e) {
-        miss++;
+      if ((ev.endDate || ev.date) < today) { endedSkipped++; continue; }
+      active++;
+
+      // 手動座標（accuracy:'manual'）は尊重して上書きしない
+      if (ev.weatherLocation && ev.weatherLocation.accuracy === 'manual'
+          && typeof ev.weatherLocation.latitude === 'number') {
+        counts.manual++; continue;
+      }
+
+      const ckey = W.geocodeCacheKey(ev.pref, ev.address, ev.place);
+      let loc;
+      if (Object.prototype.hasOwnProperty.call(c, ckey)) {
+        loc = c[ckey]; // null（負のキャッシュ）も含む
+      } else {
+        try { loc = await resolveLocation(ev, lookup); }
+        catch { loc = null; }
+        c[ckey] = loc; // 結果（null 含む）を永続化
+      }
+
+      if (loc && typeof loc.latitude === 'number') {
+        ev.weatherLocation = loc;
+        counts[loc.accuracy] = (counts[loc.accuracy] || 0) + 1;
+      } else {
+        counts.missing++;
       }
     }
   }
+
   save();
-  console.log(`[geocode] 付与 ${added} 件 / 失敗 ${miss} 件 / 終了済みスキップ ${ended} 件（キャッシュ ${Object.keys(load()).length} 件）`);
+  logQuality(counts, active, today);
 }
 
-module.exports = { geocodeEvent, geocodeAll, load, save, PREF_JP };
+/** accuracy 別の品質集計ログ＋前回比の異常検知（GitHub Actions 警告）。 */
+function logQuality(counts, active, today) {
+  console.log('weatherLocation:');
+  for (const k of ['address', 'venue', 'municipality', 'prefecture', 'manual', 'missing']) {
+    console.log(`  ${k}: ${counts[k] || 0}`);
+  }
+  const ok = active - (counts.missing || 0);
+  const rate = active > 0 ? ok / active : 1;
+  console.log(`  （対象 ${active} 件 / 成功率 ${(rate * 100).toFixed(1)}%）`);
+
+  // 前回データ（上書き前の events.json）と比較して急変を警告
+  let prev = null;
+  try { prev = collectAccuracyCounts(JSON.parse(fs.readFileSync(path.join(__dirname, '../../public/data/events.json'), 'utf8')), today); }
+  catch { /* 初回など */ }
+
+  const warn = (msg) => console.warn(`::warning title=weather-geocode::${msg}`);
+  if ((counts.missing || 0) > 0) warn(`座標を取得できないイベントが ${counts.missing} 件あります`);
+  if (rate < 0.9) warn(`ジオコーディング成功率が低下しています（${(rate * 100).toFixed(1)}%）`);
+  if (prev) {
+    if ((counts.prefecture || 0) > (prev.prefecture || 0) + 20 && (counts.prefecture || 0) > (prev.prefecture || 0) * 1.5) {
+      warn(`prefecture 精度が急増しています（前回 ${prev.prefecture} → 今回 ${counts.prefecture}）`);
+    }
+    for (const k of ['address', 'venue']) {
+      if ((prev[k] || 0) >= 5 && (counts[k] || 0) < (prev[k] || 0) * 0.6) {
+        warn(`${k} 精度が大幅に減少しています（前回 ${prev[k]} → 今回 ${counts[k] || 0}）`);
+      }
+    }
+  }
+}
+
+/** events.json（pref→配列）の未終了イベントから accuracy 別件数を集計。 */
+function collectAccuracyCounts(data, today) {
+  const counts = { address: 0, venue: 0, municipality: 0, prefecture: 0, manual: 0, missing: 0 };
+  for (const key of Object.keys(data)) {
+    if (!Array.isArray(data[key])) continue;
+    for (const ev of data[key]) {
+      if (!ev || !ev.date) continue;
+      if ((ev.endDate || ev.date) < today) continue;
+      const a = ev.weatherLocation && ev.weatherLocation.accuracy;
+      if (a && counts[a] != null) counts[a]++;
+      else if (a) counts[a] = 1;
+      else counts.missing++;
+    }
+  }
+  return counts;
+}
+
+module.exports = {
+  geocodeAll, resolveLocation, collectAccuracyCounts,
+  PREF_JP, pickVenue, extractPrefMuni, makeMemoLookup, save, load,
+};

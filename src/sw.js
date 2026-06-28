@@ -35,14 +35,20 @@ registerRoute(
   })
 );
 
-// 天気予報（詳細画面の遅延取得）。サーバー側で Redis + CDN キャッシュ済み。
-// SW でも短時間キャッシュし、再表示・オフライン時のちらつきを抑える。
+// 天気予報（詳細画面の遅延取得）。主キャッシュはサーバー側（Redis + CDN）。
+// SW は補助的に「短期間」だけ保持し、再描画のちらつき抑制とネットワーク障害時の
+// フォールバックに限定する（長期間古い予報を返さない）。
+// NetworkFirst なので通常は常に最新を取りに行き、失敗時のみ短期キャッシュを返す。
+// 古い予報の混乱を避けるため maxAgeSeconds は短く（10分）、件数も制限する。
+// キャッシュ名にバージョンを付け、仕様変更時に確実に作り直す。
+// ※サーバー応答の stale:true（前回正常データ）と、SW由来の古い応答は別物。
+//   前者は本文の stale フラグで判別でき、画面に「前回の情報」と明示される。
 registerRoute(
   ({ url }) => url.pathname === '/api/weather',
   new NetworkFirst({
-    cacheName: 'weather-cache',
-    plugins: [new ExpirationPlugin({ maxEntries: 100, maxAgeSeconds: 3600 })],
-    networkTimeoutSeconds: 8,
+    cacheName: 'weather-cache-v1',
+    plugins: [new ExpirationPlugin({ maxEntries: 50, maxAgeSeconds: 600, purgeOnQuotaError: true })],
+    networkTimeoutSeconds: 6,
   })
 );
 
