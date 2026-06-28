@@ -107,6 +107,7 @@ OCRの優先順は、無料ローカルOCR（Tesseract → RapidOCR）を先に�
 | `source_type` | 自動 | `office_html`/`office_ocr`/`office_notice` 等 | 取得経路。 |
 | `imageUrl` | — | URL | チラシ画像。 |
 | `status` | 手動のみ | `draft`/`published`/`closed`/`cancelled` | 手動イベント（`manual-…`）のみ。スクレイプ品は持たない。 |
+| `weatherLocation` | 自動 | `{latitude,longitude,label,accuracy}` | 天気予報用の座標。`writeOutput` 内で `scraper/lib/geocode.js`（国土地理院API）が付与。`accuracy`: `address`/`venue`/`municipality`/`prefecture`（手動入力は `manual`）。下記「天気予報」参照。 |
 
 ### タイトル（title）
 **整形（`cleanEventTitle`）**: 以下を除去/修復してから採用する。
@@ -202,6 +203,14 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - **都道府県 emblem**: `regionMap.js` の PREFECTURE_INFO と REGIONS 両方に同じ値が必要（全50件ユニーク）
 - **テーマ**: CSS 変数 `var(--bg)` / `var(--text)` / `var(--card)` / `var(--border)` でライト/ダーク切替
 - **プッシュ通知**: ntfy.sh トピック `jsdf-chiiki-events-7928`
+
+## 天気予報（イベント詳細）
+
+イベント詳細画面の「開催日時」と「開催場所」の間に、開催日の天気予報カードを表示する。
+
+- **ジオコーディング（スクレイプ時）**: `scraper/lib/geocode.js` が国土地理院（GSI）住所検索APIで `address → venue（会場名）→ municipality → prefecture` の順に座標化し、`writeOutput` 内で各イベントへ `weatherLocation`（`{latitude,longitude,label,accuracy}`）を付与。終了済みイベントは付与しない。結果は **`scraper/geocode-cache.json`（コミット対象）** にキャッシュし同一会場を再検索しない。GSI返却は `[経度,緯度]` の順なので注意。
+- **天気API**: `/api/weather.js`（Vercel Function）。入力 `latitude/longitude/date`。検証＝数値・日本範囲・`YYYY-MM-DD`・今日(JST)から0〜16日。Open-Meteo の daily（`weather_code`/`temperature_2m_max`/`temperature_2m_min`/`precipitation_probability_max`/`wind_speed_10m_max`、timezone `Asia/Tokyo`）を取得。**キャッシュ二段＝Upstash Redis（`weather:{lat3}:{lon3}:{date}`）+ CDN `s-maxage`**。TTL: 0-2日=1h / 3-7日=6h / 8-16日=12h。APIキーは不要（秘密情報をフロントに出さない）。
+- **表示（`src/components/WeatherCard.jsx`）**: 詳細画面でのみ遅延取得（一覧では取得しない）。状態＝17日以上先「予報発表前」/ 座標なし / APIエラー / 8-16日「参考予報」/ 0-7日「開催日の天気予報」。Open-Meteo 出典リンクと「天気は参考情報であり開催可否は公式情報を確認」の注記を必ず併記。SW（`src/sw.js`）で `/api/weather` を NetworkFirst 短期キャッシュ。
 
 ## セキュリティ構成（2026-06-13導入）
 
