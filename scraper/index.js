@@ -1610,10 +1610,47 @@ async function fetchKanagawa(context) {
 }
 
 /**
- * 東京地本ページを取得・パース
+ * 東京地本イベントを取得・パース（2026年新サイト構造）。
+ * 旧 /pco/tokyo/<office>/event.html は廃止(404)。現在のイベントは
+ * event2/calendar.js の `const EVENTS` に集約されているため、これを取得して解析する。
+ * 取得は素の fetch（ブラウザUA）→失敗時 Playwright(同一コンテキストのcf_clearance活用)。
  */
 async function fetchTokyo(context) {
-  return fetchHtmlPref(context, '東京', URLS.tokyo, parseTokyo);
+  const { parseTokyoCalendar, CALENDAR_URL } = require('./parsers/tokyoCalendar');
+  console.log(`[東京] アクセス: ${CALENDAR_URL}`);
+
+  let js = '';
+  try {
+    const res = await fetch(CALENDAR_URL, {
+      headers: {
+        'User-Agent':      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'Accept':          '*/*',
+        'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
+        'Referer':         'https://www.mod.go.jp/pco/tokyo/event2/index.html',
+      },
+    });
+    if (res.ok) js = await res.text();
+  } catch (e) {
+    console.warn(`[東京] fetch 失敗: ${e.message} → Playwright にフォールバック`);
+  }
+
+  if (!js) {
+    const page = await context.newPage();
+    try {
+      await page.goto('https://www.mod.go.jp/pco/tokyo/event2/index.html', { waitUntil: 'domcontentloaded', timeout: 30_000 });
+      js = await page.evaluate(async (u) => {
+        try { const r = await fetch(u); return r.ok ? await r.text() : ''; } catch { return ''; }
+      }, CALENDAR_URL);
+    } finally {
+      await page.close();
+    }
+  }
+
+  const events = parseTokyoCalendar(js);
+  console.log(`[東京] ${events.length} 件取得 (calendar.js)`);
+  // 0件は構造変化/取得失敗の可能性 → 例外にして前回データを維持（誤って空にしない）
+  if (events.length === 0) throw new Error('東京 calendar.js から 0 件（取得失敗 or 構造変化）');
+  return events;
 }
 
 /**
@@ -2685,11 +2722,8 @@ const KANTO_OFFICE_URLS = {
     'https://www.mod.go.jp/pco/saitama/office/kumagaya-office.html',
     'https://www.mod.go.jp/pco/saitama/office/chichibu-office.html',
   ],
-  tokyo: [
-    'oota', 'kita', 'shinkoiwa', 'taitou', 'adachi', 'koutou', 'shibuya',
-    'toshima', 'kouenji', 'setagaya', 'minato', 'nerima', 'tachikawa',
-    'fussa', 'fuchu', 'kokubunji', 'nishitokyo', 'hachiouji', 'machida',
-  ].map(s => `https://www.mod.go.jp/pco/tokyo/${s}/event.html`),
+  // 東京の旧 /pco/tokyo/<office>/event.html は廃止(404)。イベントは fetchTokyo が
+  // event2/calendar.js から取得するため、ここでの巡回対象からは除外する。
   kanagawa: [
     'yokosuka', 'atugi', 'kamiooka', 'kawasaki', 'ichigao', 'mizo',
     'fujisawa', 'chuou', 'yokohama', 'hiratuka', 'sagami', 'odawara',

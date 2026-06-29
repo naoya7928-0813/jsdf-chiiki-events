@@ -5,6 +5,12 @@
  */
 export const UPDATE_NOTES = [
   {
+    date:    '2026-06-29',
+    version: '1.17.33',
+    type:    'feature',
+    content: '東京都のイベント情報の収集を復旧しました（東京地本サイトのリニューアルに対応）。各募集案内所・事務所の見学・体験・説明会などを再び掲載します。',
+  },
+  {
     date:    '2026-06-28',
     version: '1.16.33',
     type:    'feature',
