@@ -47,3 +47,34 @@ test('parseCookies / getSessionToken', () => {
   assert.equal(S.getSessionToken({ headers: { cookie: 'jsdf_admin_session=abc' } }), 'abc');
   assert.equal(S.getSessionToken({ headers: {} }), '');
 });
+
+// ── CSRF判定（#4） ──────────────────────────────────────────────
+const csrf = (o) => S.csrfDecision(o);
+test('csrfDecision: GET/HEAD/OPTIONS は対象外', () => {
+  for (const method of ['GET', 'HEAD', 'OPTIONS']) {
+    assert.equal(csrf({ method, origin: '', isAllowedOrigin: false }).ok, true);
+  }
+});
+test('csrfDecision: 同一オリジンのPOSTは許可', () => {
+  assert.deepEqual(csrf({ method: 'POST', origin: 'https://self', isAllowedOrigin: true, secFetchSite: 'same-origin' }), { ok: true });
+});
+test('csrfDecision: 外部OriginのPOSTは拒否', () => {
+  const d = csrf({ method: 'POST', origin: 'https://evil.example', isAllowedOrigin: false });
+  assert.equal(d.ok, false); assert.equal(d.reason, 'origin_not_allowed');
+});
+test('csrfDecision: Sec-Fetch-Site cross-site は拒否', () => {
+  const d = csrf({ method: 'POST', origin: 'https://self', isAllowedOrigin: true, secFetchSite: 'cross-site' });
+  assert.equal(d.ok, false); assert.match(d.reason, /sec_fetch_site_cross-site/);
+});
+test('csrfDecision: Origin欠落のブラウザ書込みは拒否', () => {
+  const d = csrf({ method: 'POST', origin: '', isAllowedOrigin: false, internalSecretOk: false });
+  assert.equal(d.ok, false); assert.equal(d.reason, 'origin_missing');
+});
+test('csrfDecision: Origin欠落でも内部シークレット一致なら許可（非ブラウザ正当経路）', () => {
+  assert.equal(csrf({ method: 'POST', origin: '', internalSecretOk: true }).ok, true);
+});
+test('csrfDecision: PATCH/PUT/DELETE も対象', () => {
+  for (const method of ['PATCH', 'PUT', 'DELETE']) {
+    assert.equal(csrf({ method, origin: '', internalSecretOk: false }).ok, false);
+  }
+});

@@ -99,7 +99,38 @@ function getSessionToken(req) {
   return cookies[COOKIE_NAME] || '';
 }
 
+// ── CSRF（同一オリジン）判定（純粋・テスト可能） ────────────────
+// 状態変更メソッドのみ対象。GET/HEAD/OPTIONS は対象外（プリフライトを壊さない）。
+const STATE_CHANGING = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
+
+/**
+ * CSRF判定（純粋）。I/O や許可リストは呼び出し側が解決して渡す。
+ * @param {object} a
+ *   method            HTTPメソッド
+ *   origin            Origin ヘッダ（無ければ falsy）
+ *   secFetchSite      Sec-Fetch-Site ヘッダ（無ければ falsy）
+ *   isAllowedOrigin   origin が自サイト許可originと完全一致なら true
+ *   internalSecretOk  Origin欠落を許す正当な非ブラウザ経路（専用シークレット一致）なら true
+ * @returns {{ok:true} | {ok:false, reason:string}}
+ */
+function csrfDecision({ method, origin, secFetchSite, isAllowedOrigin, internalSecretOk }) {
+  const m = String(method || 'GET').toUpperCase();
+  if (!STATE_CHANGING.has(m)) return { ok: true };
+  if (origin) {
+    if (!isAllowedOrigin) return { ok: false, reason: 'origin_not_allowed' };
+  } else if (!internalSecretOk) {
+    // ブラウザ由来の状態変更で Origin 欠落は原則拒否
+    return { ok: false, reason: 'origin_missing' };
+  }
+  // Sec-Fetch-Site があるなら same-origin 必須（cross-site/same-site は拒否）
+  if (secFetchSite && String(secFetchSite).toLowerCase() !== 'same-origin') {
+    return { ok: false, reason: 'sec_fetch_site_' + String(secFetchSite).toLowerCase() };
+  }
+  return { ok: true };
+}
+
 module.exports = {
   hashPassword, verifyPassword, timingSafeEqualStr, newToken, newRequestId,
   COOKIE_NAME, serializeSessionCookie, clearSessionCookie, parseCookies, getSessionToken,
+  STATE_CHANGING, csrfDecision,
 };

@@ -2,7 +2,7 @@
 //   成功: Set-Cookie(jsdf_admin_session) ＋ {ok, account, pref, label}
 //   失敗: 401（監査ログに失敗を記録）
 // パスワードは平文/scrypt 両対応（移行期）。後方互換: x-admin-secret も受理。
-import { checkOrigin, noStore, rateLimit, verifyCredentials, startSession, writeAudit } from '../_security.js';
+import { checkOrigin, noStore, requireSameOrigin, rateLimit, verifyCredentials, startSession, writeAudit } from '../_security.js';
 import authz from '../../shared/authz.cjs';
 
 export default async function handler(req, res) {
@@ -11,6 +11,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-admin-user, x-admin-pass, x-admin-secret');
   if (req.method === 'OPTIONS') return res.status(204).end();
+  if (!await requireSameOrigin(req, res)) return; // CSRF: 状態変更は同一オリジンのみ
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   if (!await rateLimit(req, res, 'admin-login', 10, 600)) return; // 10回/10分/IP
   if (!process.env.ADMIN_ACCOUNTS_B64 && !process.env.ADMIN_SECRET) return res.status(503).json({ error: 'admin not configured' });

@@ -1,7 +1,7 @@
 // GET /api/admin/history  – 監査履歴（追記専用・削除不可）。
 //   閲覧には audit:read 権限が必要。スコープ付きは自分の地本のみ。
 // ※ 監査証跡のため DELETE は廃止（開発環境のみ ENABLE_AUDIT_DELETE=true で許可）。
-import { checkOrigin, noStore, rateLimit, requireAuth, hasPermission, canManageScope, redis, writeAudit } from '../_security.js';
+import { checkOrigin, noStore, requireSameOrigin, rateLimit, requireAuth, hasPermission, canManageScope, redis, writeAudit } from '../_security.js';
 
 const HKEY = 'manual:history';
 
@@ -16,6 +16,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-admin-user, x-admin-pass, x-admin-secret');
   if (req.method === 'OPTIONS') return res.status(204).end();
+  if (!await requireSameOrigin(req, res)) return; // CSRF: 状態変更は同一オリジンのみ
   if (!await rateLimit(req, res, 'admin-history', 60, 600)) return;
   const account = await requireAuth(req, res);
   if (!account) return;

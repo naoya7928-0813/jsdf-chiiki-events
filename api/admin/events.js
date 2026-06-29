@@ -6,7 +6,7 @@
 // 認証は x-admin-user/x-admin-pass（または後方互換の x-admin-secret）。
 // 地本スコープ: pref!=='*' のアカウントは自分の地本のみ操作可。
 // 保存先は Upstash Redis hash `manual:events`（field=id, value=JSON）。
-import { checkOrigin, noStore, rateLimit, requireAuth, hasPermission, canManageScope, canPublish, redis, cleanText, writeAudit } from '../_security.js';
+import { checkOrigin, noStore, requireSameOrigin, rateLimit, requireAuth, hasPermission, canManageScope, canPublish, redis, cleanText, writeAudit } from '../_security.js';
 import W from '../../shared/weather.cjs';
 
 const KEY = 'manual:events';
@@ -111,6 +111,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PATCH, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-admin-user, x-admin-pass, x-admin-secret, x-admin-staff');
   if (req.method === 'OPTIONS') return res.status(204).end();
+  if (!await requireSameOrigin(req, res)) return; // CSRF: 状態変更は同一オリジンのみ
 
   if (!await rateLimit(req, res, 'admin-events', 80, 600)) return;
   const account = await requireAuth(req, res);

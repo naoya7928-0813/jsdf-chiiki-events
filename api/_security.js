@@ -47,6 +47,41 @@ export function noStore(res) {
   res.setHeader('Expires', '0');
 }
 
+/**
+ * CSRF多層防御: 状態変更（POST/PUT/PATCH/DELETE）は同一オリジン由来のみ許可する。
+ * - Origin が許可originと完全一致を要求
+ * - Sec-Fetch-Site があれば same-origin を要求（cross-site等は拒否）
+ * - Origin 欠落は原則拒否。正当な非ブラウザ経路は INTERNAL_API_SECRET（x-internal-secret）で明示分離
+ * - GET/HEAD/OPTIONS は対象外（CORSプリフライトを壊さない）。SameSite=Strict Cookie と併用。
+ * 失敗時は 403（内部情報を含めない）＋ 監査ログ（denied）を記録して false。
+ */
+export async function requireSameOrigin(req, res) {
+  const origin = req.headers.origin;
+  const sec = req.headers['x-internal-secret'];
+  const internalSecretOk = !!(process.env.INTERNAL_API_SECRET && sec &&
+    secretEquals(String(sec), process.env.INTERNAL_API_SECRET));
+  const decision = sessionUtil.csrfDecision({
+    method: req.method,
+    origin,
+    secFetchSite: req.headers['sec-fetch-site'],
+    isAllowedOrigin: !!(origin && ALLOWED_ORIGINS.has(origin)),
+    internalSecretOk,
+  });
+  if (decision.ok) return true;
+
+  const requestId = sessionUtil.newRequestId();
+  let actor = null;
+  try { const r = await authenticate(req); actor = r && r.account; } catch { /* ベストエフォート */ }
+  await writeAudit(actor, {
+    requestId,
+    action: 'csrf.denied',
+    result: 'denied',
+    note: `${(req.method || '').toUpperCase()} ${req.url || ''} reason=${decision.reason}`,
+  });
+  res.status(403).json({ error: 'Forbidden' });
+  return false;
+}
+
 /** 正規の Web Push サービスの endpoint かを検証する（Redis汚染防止） */
 export function isValidPushEndpoint(endpoint) {
   if (typeof endpoint !== 'string' || endpoint.length > 1024) return false;
