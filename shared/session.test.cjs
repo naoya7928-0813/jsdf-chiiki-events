@@ -78,3 +78,28 @@ test('csrfDecision: PATCH/PUT/DELETE も対象', () => {
     assert.equal(csrf({ method, origin: '', internalSecretOk: false }).ok, false);
   }
 });
+
+// ── セッション有効性 / sessionVersion（#3） ─────────────────────
+const TTL = { absTtl: 8 * 3600, idleTtl: 3600 };
+const now = 1_800_000_000_000;
+const sess = (over = {}) => ({ createdAt: now - 1000, lastSeen: now - 1000, sv: 1, ...over });
+const account = (over = {}) => ({ enabled: true, sessionVersion: 1, ...over });
+
+test('sessionStillValid: 同一versionは有効', () => {
+  assert.equal(S.sessionStillValid(sess(), account(), now, TTL), true);
+});
+test('sessionStillValid: version不一致は無効', () => {
+  assert.equal(S.sessionStillValid(sess({ sv: 1 }), account({ sessionVersion: 2 }), now, TTL), false);
+});
+test('sessionStillValid: 旧セッション(sv未設定)はv1扱い→v1アカウントで有効', () => {
+  assert.equal(S.sessionStillValid(sess({ sv: undefined }), account({ sessionVersion: 1 }), now, TTL), true);
+  // 旧セッション(v1) vs version上げ済み(v2) は無効
+  assert.equal(S.sessionStillValid(sess({ sv: undefined }), account({ sessionVersion: 2 }), now, TTL), false);
+});
+test('sessionStillValid: 無効アカウントは拒否', () => {
+  assert.equal(S.sessionStillValid(sess(), account({ enabled: false }), now, TTL), false);
+});
+test('sessionStillValid: 絶対期限・無操作失効', () => {
+  assert.equal(S.sessionStillValid(sess({ createdAt: now - 9 * 3600 * 1000 }), account(), now, TTL), false); // 絶対期限超過
+  assert.equal(S.sessionStillValid(sess({ lastSeen: now - 2 * 3600 * 1000 }), account(), now, TTL), false);  // 無操作超過
+});

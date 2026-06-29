@@ -129,8 +129,28 @@ function csrfDecision({ method, origin, secFetchSite, isAllowedOrigin, internalS
   return { ok: true };
 }
 
+/**
+ * セッションがまだ有効か（純粋）。redis から読んだ session データと、再解決した
+ * アカウントを突き合わせる。無効化・絶対期限・無操作失効・sessionVersion不一致を判定。
+ * @param {object} data    セッションデータ { createdAt, lastSeen, sv? }
+ * @param {object} account 設定から再解決したアカウント（enabled/sessionVersion 等）
+ * @param {number} now     現在時刻(ms)
+ * @param {object} ttl     { absTtl, idleTtl }（秒）
+ */
+function sessionStillValid(data, account, now, { absTtl, idleTtl }) {
+  if (!data || !account) return false;
+  if (account.enabled === false) return false;                 // 無効化で即失効
+  if (now - data.createdAt > absTtl * 1000) return false;      // 絶対期限
+  if (now - data.lastSeen > idleTtl * 1000) return false;      // 無操作失効
+  // sessionVersion 照合（未指定の旧セッション/旧アカウントは 1 とみなす）
+  const sv = Number(data.sv != null ? data.sv : 1);
+  const acctSv = Number(account.sessionVersion != null ? account.sessionVersion : 1);
+  if (sv !== acctSv) return false;
+  return true;
+}
+
 module.exports = {
   hashPassword, verifyPassword, timingSafeEqualStr, newToken, newRequestId,
   COOKIE_NAME, serializeSessionCookie, clearSessionCookie, parseCookies, getSessionToken,
-  STATE_CHANGING, csrfDecision,
+  STATE_CHANGING, csrfDecision, sessionStillValid,
 };

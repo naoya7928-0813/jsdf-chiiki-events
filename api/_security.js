@@ -200,7 +200,8 @@ const SESSION_SECURE  = process.env.SESSION_INSECURE !== 'true';           // �
 export async function startSession(res, account) {
   const token = sessionUtil.newToken();
   const now = Date.now();
-  const data = { userId: account.userId, user: account.user, createdAt: now, lastSeen: now };
+  // sv にログイン時点の sessionVersion を刻む。アカウント側で値が変われば既存セッションは失効する。
+  const data = { userId: account.userId, user: account.user, createdAt: now, lastSeen: now, sv: account.sessionVersion };
   try { await redis.set(SESSION_PREFIX + token, JSON.stringify(data), { ex: SESSION_ABS_TTL }); }
   catch { return false; }
   res.setHeader('Set-Cookie', sessionUtil.serializeSessionCookie(token, { maxAge: SESSION_ABS_TTL, secure: SESSION_SECURE }));
@@ -222,12 +223,12 @@ async function resolveSession(req) {
   try { const raw = await redis.get(SESSION_PREFIX + token); if (!raw) return null; data = typeof raw === 'string' ? JSON.parse(raw) : raw; }
   catch { return null; }
   const now = Date.now();
-  if (now - data.createdAt > SESSION_ABS_TTL * 1000 || now - data.lastSeen > SESSION_IDLE * 1000) {
+  // アカウントを設定から再解決し、無効化・絶対期限・無操作失効・sessionVersion不一致を判定
+  const acc = loadAccounts().find(a => a.userId === data.userId);
+  if (!acc || !sessionUtil.sessionStillValid(data, acc, now, { absTtl: SESSION_ABS_TTL, idleTtl: SESSION_IDLE })) {
     try { await redis.del(SESSION_PREFIX + token); } catch { /* noop */ }
     return null;
   }
-  const acc = loadAccounts().find(a => a.userId === data.userId);
-  if (!acc || acc.enabled === false) { try { await redis.del(SESSION_PREFIX + token); } catch { /* noop */ } return null; }
   data.lastSeen = now;
   try { await redis.set(SESSION_PREFIX + token, JSON.stringify(data), { ex: SESSION_ABS_TTL }); } catch { /* noop */ }
   return acc;

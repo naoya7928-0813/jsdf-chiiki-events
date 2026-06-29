@@ -56,12 +56,16 @@ JSON 配列を base64 化して設定。各要素:
   "office": "shibuya",
   "role": "office_manager",
   "displayId": "OP-0042",
-  "enabled": true
+  "enabled": true,
+  "sessionVersion": 1
 }
 ```
 - `pass` のハッシュ生成: `node -e "console.log(require('./shared/session.cjs').hashPassword('パスワード'))"`
 - base64 化: `node -e "console.log(Buffer.from(require('fs').readFileSync('accounts.json','utf8')).toString('base64'))"`
 - 反映後はデプロイが必要。`enabled:false` で停止（既存セッションも次回検証で失効）。
+- **`sessionVersion`（既定1）**: パスワード変更や権限・地本・事務所の変更で既存セッションを
+  即失効させたいときは、この値を **+1** して再デプロイする（古い版のセッションは次の操作で401）。
+  **パスワード変更時は必ず `sessionVersion` を増やすこと**（漏洩パスワードでの居座りを防ぐ）。
 
 > GitHub Actions（scrape.yml / deploy.yml）は `ADMIN_SECRET` / `ADMIN_ACCOUNTS_B64` を `vercel -e` で注入します。GitHub Secrets に登録すること。
 

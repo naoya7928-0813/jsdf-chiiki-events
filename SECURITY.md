@@ -9,6 +9,9 @@
 ## 認証（Authentication）
 - 管理者はアカウント（ユーザー名＋パスワード）でログイン。成功時に**サーバー側セッション**を発行し、**HttpOnly / Secure / SameSite=Strict / Path=/ / 有効期限付き Cookie** で保持する（`shared/session.cjs`、`api/admin/login.js`）。
 - セッションは Upstash Redis に保存。**絶対有効期間**（`ADMIN_SESSION_TTL`、既定8h）と**無操作失効**（`ADMIN_SESSION_IDLE`、既定60分）を持つ。ログアウト（`/api/admin/logout`）・アカウント無効化で即時失効。
+- **`sessionVersion`**: アカウントに版番号を持たせ、ログイン時にセッションへ刻む。値を上げると古い版のセッションは次の操作で失効する。**パスワード変更時は必ず +1**（漏洩パスワードでの居座りを防ぐ。運用は OPERATIONS.md / DEPLOY.md）。
+- 管理APIの応答は **`Cache-Control: no-store, private`**（成功/エラー問わず）でキャッシュ禁止。
+- 状態変更APIは **CSRF多層防御**（Origin完全一致＋`Sec-Fetch-Site: same-origin`＋SameSite=Strict。Origin欠落のブラウザ書込みは403、正当な非ブラウザ経路は `INTERNAL_API_SECRET` で分離）。
 - パスワードは **scrypt**（`scrypt$N$salt$hash`）で保存可能。平文は移行期のみ `LEGACY_PLAINTEXT_PASSWORDS=true` で許容。
 - クライアントはパスワードを localStorage に保存しない（非機密のアカウント情報のみ）。
 

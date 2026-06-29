@@ -20,6 +20,10 @@ test('normalizeAccount: user/pass 欠落は null', () => {
   assert.equal(acc({ user: 'u' }), null);
   assert.equal(acc(null), null);
 });
+test('normalizeAccount: sessionVersion は既定1・指定値を採用', () => {
+  assert.equal(acc({ user: 'u', pass: 'p', pref: 'tokyo' }).sessionVersion, 1);
+  assert.equal(acc({ user: 'u', pass: 'p', pref: 'tokyo', sessionVersion: 5 }).sessionVersion, 5);
+});
 
 test('hasPermission: ロール別の権限', () => {
   const editor = acc({ user: 'e', pass: 'p', pref: 'tokyo', role: 'office_editor' });

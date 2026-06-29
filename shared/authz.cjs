@@ -50,6 +50,9 @@ function normalizeAccount(raw) {
     displayId: String(raw.displayId || raw.user), // 通常画面に出す仮名ID
     permissions,
     enabled: raw.enabled !== false,               // 既定 true。false で無効化
+    // セッション版番号。パスワード変更/権限変更時に増やすと既存セッションを即失効できる。
+    // 未指定（既存アカウント）は 1 として扱う。
+    sessionVersion: Number.isFinite(Number(raw.sessionVersion)) ? Number(raw.sessionVersion) : 1,
     label: String(raw.label || raw.displayId || raw.user),
     // 後方互換: 既存コードは account.pref を参照する
     pref: organization,

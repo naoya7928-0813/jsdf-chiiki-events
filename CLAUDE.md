@@ -281,6 +281,9 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 
 ### 管理者認証・認可（2026-06-28 強化。詳細は SECURITY.md / OPERATIONS.md）
 - **認証**: ログイン成功で**サーバー側セッション**を発行し HttpOnly/Secure/SameSite=Strict Cookie で保持（`shared/session.cjs`・`api/admin/login.js`・`logout.js`）。セッションは Redis 保存・絶対期限/無操作失効・アカウント無効化で失効。パスワードは **scrypt** 対応（平文は移行期のみ `LEGACY_PLAINTEXT_PASSWORDS=true`）。クライアントはパスワードを保存しない。
+- **sessionVersion**: アカウントの版番号をセッションへ刻み、毎リクエスト照合。値を上げると旧セッションは失効。**パスワード変更時は必ず +1**（`sessionStillValid`）。
+- **キャッシュ禁止**: 全 `/api/admin/*` は `noStore()` で `Cache-Control: no-store, private`（成功/エラー問わず）。
+- **CSRF多層防御**: 状態変更(POST/PUT/PATCH/DELETE)は `requireSameOrigin`＝Origin完全一致＋`Sec-Fetch-Site: same-origin`要求、cross-site/Origin欠落は403。非ブラウザ正当経路は `INTERNAL_API_SECRET`(x-internal-secret)で分離。判定の純粋関数は `shared/session.cjs` の `csrfDecision`。
 - **認可（RBAC・deny-by-default）**: `shared/authz.cjs`。ロール `office_editor`/`office_manager`/`pco_admin`/`national_admin`/`auditor`/`system_admin`。権限・スコープは**サーバーの認証済みアカウントからのみ**判定。クライアント送信の `pref`・個人番号・role は信用しない（旧 `x-admin-staff` 方式は廃止＝`ENABLE_DEV_STAFF` で開発時のみ）。
 - **IDOR対策**: イベント/オーバーライドの所属地本は**サーバー側で実データから解決**（手動イベントは Redis、スクレイプは events.json）して判定。存在しない対象は拒否。`/api/admin/overrides` の GET/POST/DELETE もスコープ強制。
 - **監査ログ（追記専用）**: `writeAudit`（`manual:history`）。操作・ログイン成功/失敗・権限拒否を requestId/操作者(displayId)/地本/事務所/対象/result/変更前後付きで記録。**削除APIは廃止**（history DELETE は405）。
@@ -291,8 +294,9 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - deploy.yml / scrape.yml で `npm test` ＋ このチェックが通った場合のみデプロイ。
 
 ### 主な環境変数（Vercel / GitHub Secrets）
-- 認証: `ADMIN_ACCOUNTS_B64`（base64 JSON配列: `{user,pass,organization|pref,office,role,displayId,enabled}`）, `ADMIN_SECRET`（後方互換の単一PW）
+- 認証: `ADMIN_ACCOUNTS_B64`（base64 JSON配列: `{user,pass,organization|pref,office,role,displayId,enabled,sessionVersion}`）, `ADMIN_SECRET`（後方互換の単一PW）
 - セッション: `ADMIN_SESSION_TTL`(既定28800), `ADMIN_SESSION_IDLE`(既定3600), `SESSION_INSECURE`(ローカルHTTP検証のみ true)
+- CSRF: `INTERNAL_API_SECRET`（任意。非ブラウザ正当経路が Origin 無しで状態変更する場合のみ）
 - 移行フラグ: `LEGACY_PLAINTEXT_PASSWORDS`(既定true→正式運用前 false), `LEGACY_HEADER_AUTH`(既定true→正式運用前 false), `ENABLE_DEV_STAFF`(既定false)
 - 監査: `AUDIT_MAX`(既定5000)
 - 既存: `KV_REST_API_URL`/`KV_REST_API_TOKEN`(Upstash), `NOTIFY_SECRET`, `NTFY_BUG_TOPIC`, `NTFY_ADMIN_TOPIC`, `VERCEL_*`, OCR各種, `SITE_URL`

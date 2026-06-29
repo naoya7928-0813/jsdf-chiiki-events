@@ -11,12 +11,14 @@ jsdf-chiiki-events（自衛隊地本イベント情報・非公式）の日常�
 
 ## 2. アカウント・権限
 - アカウントは `ADMIN_ACCOUNTS_B64`（base64 のJSON配列）で管理。各要素:
-  `{ "user", "pass", "organization", "office", "role", "displayId", "enabled" }`
+  `{ "user", "pass", "organization", "office", "role", "displayId", "enabled", "sessionVersion" }`
   - `role`: `office_editor` / `office_manager` / `pco_admin` / `national_admin` / `auditor` / `system_admin`
   - `pass`: scrypt ハッシュ推奨（生成: `node -e "console.log(require('./shared/session.cjs').hashPassword('パスワード'))"`）
   - `displayId`: 通常画面に出す仮名（氏名は入れない）。実利用者との対応表は別管理（監査時のみ参照）。
   - 停止: `"enabled": false` にして再デプロイ（既存セッションも次回検証で失効）。
+  - `sessionVersion`（既定1）: 既存セッションを即失効させたいとき +1。
 - 反映: `ADMIN_ACCOUNTS_B64` を更新 → デプロイ。
+- **パスワード変更時**: 新パスワードを scrypt 化して `pass` を差し替え、**必ず `sessionVersion` を +1**（旧端末のログインを即失効）→ デプロイ。
 - **担当者異動**: 旧アカウントを `enabled:false`、新アカウントを追加。対応表を更新。
 
 ## 3. スクレイピング失敗・イベント数急減
