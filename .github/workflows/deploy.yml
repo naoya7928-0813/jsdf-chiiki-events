@@ -40,9 +40,12 @@ jobs:
       - name: 依存パッケージをインストール
         run: npm ci
 
-      # テストとデータ品質チェックが成功した場合のみデプロイする
+      # テスト・ビルド・データ品質チェックが成功した場合のみデプロイする
       - name: テスト
         run: npm test
+
+      - name: ビルド（デプロイ前ゲート）
+        run: npm run build
 
       - name: データ品質チェック（エラーでデプロイ停止）
         run: node scripts/check-data-quality.mjs
