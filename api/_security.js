@@ -147,7 +147,8 @@ export function requireAdmin(req, res) {
 //   { user, pass, organization|pref, office, role, displayId, permissions, enabled, label }。
 //   後方互換: role 未指定は pref から導出（'*'→national_admin、他→pco_admin）。pass は
 //   平文 or "scrypt$..." ハッシュ（session.cjs で検証）。
-// 後方互換: ADMIN_SECRET（パスワードのみ）は user 'admin' / national_admin として受理。
+// 後方互換: ADMIN_SECRET（パスワードのみ）は **LEGACY_ADMIN_SECRET=true の時のみ**
+//   user 'admin' / national_admin として受理（既定は無効）。正式運用では ADMIN_SECRET を削除する。
 function loadAccounts() {
   const out = [];
   try {
@@ -160,20 +161,25 @@ function loadAccounts() {
   return out;
 }
 
-const ALLOW_PLAINTEXT    = process.env.LEGACY_PLAINTEXT_PASSWORDS !== 'false'; // 移行期は平文パスワード許可
-const LEGACY_HEADER_AUTH = process.env.LEGACY_HEADER_AUTH !== 'false';         // 移行期はヘッダ認証許可
+// 移行フラグは呼び出し時に評価する（運用での切替・テストを容易にするため）。
+const allowPlaintext   = () => process.env.LEGACY_PLAINTEXT_PASSWORDS !== 'false'; // 既定: 許可
+const allowHeaderAuth  = () => process.env.LEGACY_HEADER_AUTH !== 'false';         // 既定: 許可
+// ADMIN_SECRET（任意ユーザー名＋共通PWで national_admin になる旧経路）は既定で無効。
+// 移行時に LEGACY_ADMIN_SECRET=true を明示した場合のみ許可する。正式運用では ADMIN_SECRET 自体を削除する。
+const allowAdminSecret = () => process.env.LEGACY_ADMIN_SECRET === 'true';
 
 /** user/pass を検証してアカウントを返す（平文/scrypt両対応・無効アカウントは拒否）。 */
 export function verifyCredentials(user, pass) {
   if (!user || !pass) return null;
   for (const a of loadAccounts()) {
     if (a.user === String(user) && a.enabled !== false &&
-        sessionUtil.verifyPassword(String(pass), a.pass, { allowPlaintext: ALLOW_PLAINTEXT })) {
+        sessionUtil.verifyPassword(String(pass), a.pass, { allowPlaintext: allowPlaintext() })) {
       return a;
     }
   }
-  if (process.env.ADMIN_SECRET && secretEquals(String(pass), process.env.ADMIN_SECRET)) {
-    return authz.normalizeAccount({ user: 'admin', pass: process.env.ADMIN_SECRET, pref: '*', label: '全国管理' });
+  // 旧共通管理者（ADMIN_SECRET）は LEGACY_ADMIN_SECRET=true の時のみ
+  if (allowAdminSecret() && process.env.ADMIN_SECRET && secretEquals(String(pass), process.env.ADMIN_SECRET)) {
+    return authz.normalizeAccount({ user: 'admin', pass: process.env.ADMIN_SECRET, pref: '*', label: '全国管理（移行用）' });
   }
   return null;
 }
@@ -184,8 +190,8 @@ export function resolveAccount(req) {
   const pass = req.headers['x-admin-pass'] || req.body?.pass;
   if (user && pass) { const a = verifyCredentials(user, pass); if (a) return a; }
   const secret = req.headers['x-admin-secret'] || req.body?.secret;
-  if (secret && process.env.ADMIN_SECRET && secretEquals(String(secret), process.env.ADMIN_SECRET)) {
-    return authz.normalizeAccount({ user: 'admin', pass: process.env.ADMIN_SECRET, pref: '*', label: '全国管理' });
+  if (allowAdminSecret() && secret && process.env.ADMIN_SECRET && secretEquals(String(secret), process.env.ADMIN_SECRET)) {
+    return authz.normalizeAccount({ user: 'admin', pass: process.env.ADMIN_SECRET, pref: '*', label: '全国管理（移行用）' });
   }
   return null;
 }
@@ -238,7 +244,7 @@ async function resolveSession(req) {
 export async function authenticate(req) {
   const acc = await resolveSession(req);
   if (acc) return { account: acc, via: 'session' };
-  if (LEGACY_HEADER_AUTH) { const a = resolveAccount(req); if (a) return { account: a, via: 'header' }; }
+  if (allowHeaderAuth()) { const a = resolveAccount(req); if (a) return { account: a, via: 'header' }; }
   return null;
 }
 

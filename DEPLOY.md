@@ -41,6 +41,7 @@ Vercel プロジェクト設定 → Environment Variables（Production / Preview
 | `ADMIN_SESSION_TTL`(既定28800) / `ADMIN_SESSION_IDLE`(既定3600) | セッション絶対期限/無操作失効（秒） |
 | `LEGACY_PLAINTEXT_PASSWORDS`(既定true) | 平文パスワード許可（**正式運用前に false**） |
 | `LEGACY_HEADER_AUTH`(既定true) | ヘッダ認証の後方互換（**正式運用前に false**） |
+| `LEGACY_ADMIN_SECRET`(既定false) | 旧 `ADMIN_SECRET`（任意ユーザー名＋共通PWで national_admin）の許可。**既定で無効**。移行時のみ `true`。正式運用では本フラグを設定せず `ADMIN_SECRET` 自体を削除 |
 | `ENABLE_DEV_STAFF`(既定false) | 旧個人番号(001/002/003)を開発時のみ有効化 |
 | `AUDIT_MAX`(既定5000) | 監査ログ保持件数 |
 | `SITE_URL` | オーバーライド所属解決の events.json 取得元（既定は本番URL） |
@@ -91,6 +92,8 @@ JSON 配列を base64 化して設定。各要素:
 ## 正式試験運用前チェックリスト
 - [ ] 全管理アカウントを scrypt ハッシュ化し `LEGACY_PLAINTEXT_PASSWORDS=false`
 - [ ] `LEGACY_HEADER_AUTH=false`（セッション認証のみに）
+- [ ] `LEGACY_ADMIN_SECRET` を設定せず（無効）、`ADMIN_SECRET` 環境変数自体を削除
+- [ ] office ロールのアカウントに `office` を設定（未設定だと deny-by-default で操作不可。pco_admin が office を割当）
 - [ ] `ENABLE_DEV_STAFF` 未設定（旧個人番号を無効）
 - [ ] 本番用 Upstash / ntfy / 管理アカウントを開発用と分離
 - [ ] `NTFY_BUG_TOPIC` / VAPID / `NOTIFY_SECRET` を設定

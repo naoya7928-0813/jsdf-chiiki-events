@@ -294,10 +294,10 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - deploy.yml / scrape.yml で `npm test` ＋ このチェックが通った場合のみデプロイ。
 
 ### 主な環境変数（Vercel / GitHub Secrets）
-- 認証: `ADMIN_ACCOUNTS_B64`（base64 JSON配列: `{user,pass,organization|pref,office,role,displayId,enabled,sessionVersion}`）, `ADMIN_SECRET`（後方互換の単一PW）
+- 認証: `ADMIN_ACCOUNTS_B64`（base64 JSON配列: `{user,pass,organization|pref,office,role,displayId,enabled,sessionVersion}`）, `ADMIN_SECRET`（旧共通PW・既定無効。`LEGACY_ADMIN_SECRET=true` の時のみ有効。office ロールは `office` 必須＝未設定だと deny-by-default で操作不可）
 - セッション: `ADMIN_SESSION_TTL`(既定28800), `ADMIN_SESSION_IDLE`(既定3600), `SESSION_INSECURE`(ローカルHTTP検証のみ true)
 - CSRF: `INTERNAL_API_SECRET`（任意。非ブラウザ正当経路が Origin 無しで状態変更する場合のみ）
-- 移行フラグ: `LEGACY_PLAINTEXT_PASSWORDS`(既定true→正式運用前 false), `LEGACY_HEADER_AUTH`(既定true→正式運用前 false), `ENABLE_DEV_STAFF`(既定false)
+- 移行フラグ: `LEGACY_PLAINTEXT_PASSWORDS`(既定true→正式運用前 false), `LEGACY_HEADER_AUTH`(既定true→正式運用前 false), `LEGACY_ADMIN_SECRET`(既定false。ADMIN_SECRET経路を使う移行時のみtrue), `ENABLE_DEV_STAFF`(既定false)
 - 監査: `AUDIT_MAX`(既定5000)
 - 既存: `KV_REST_API_URL`/`KV_REST_API_TOKEN`(Upstash), `NOTIFY_SECRET`, `NTFY_BUG_TOPIC`, `NTFY_ADMIN_TOPIC`, `VERCEL_*`, OCR各種, `SITE_URL`
 

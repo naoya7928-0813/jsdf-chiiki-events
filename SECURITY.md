@@ -13,6 +13,8 @@
 - 管理APIの応答は **`Cache-Control: no-store, private`**（成功/エラー問わず）でキャッシュ禁止。
 - 状態変更APIは **CSRF多層防御**（Origin完全一致＋`Sec-Fetch-Site: same-origin`＋SameSite=Strict。Origin欠落のブラウザ書込みは403、正当な非ブラウザ経路は `INTERNAL_API_SECRET` で分離）。
 - パスワードは **scrypt**（`scrypt$N$salt$hash`）で保存可能。平文は移行期のみ `LEGACY_PLAINTEXT_PASSWORDS=true` で許容。
+- 旧共通管理者 `ADMIN_SECRET`（任意ユーザー名＋共通PWで national_admin）は **既定で無効**。移行時に `LEGACY_ADMIN_SECRET=true` を明示した場合のみ有効。正式運用では `ADMIN_SECRET` を削除する。
+- 事務所(office)ロールは **deny-by-default**：account/target 双方の office が一致する場合のみ操作可。office 未設定イベントは pco_admin 以上のみ（pco_admin が office を割当）。
 - クライアントはパスワードを localStorage に保存しない（非機密のアカウント情報のみ）。
 
 ## 認可（Authorization）— RBAC・deny-by-default
