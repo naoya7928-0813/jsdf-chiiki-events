@@ -80,9 +80,12 @@ function isNational(account) {
 
 /**
  * 対象（{ pref, office }）を操作できるスコープか（純粋・deny-by-default）。
- * - 全国管理: 何でも可
- * - それ以外: organization（地本）が一致必須
- * - 事務所ロール（office_editor/office_manager）は、対象に office があれば自分の office と一致必須
+ * - national_admin（または organization '*'）: 全国どこでも可
+ * - pco_admin: 自分の地本（organization）全体（office 不問）
+ * - office_editor / office_manager: **deny-by-default**。account.office と target.office が
+ *   どちらも存在し、完全一致したときのみ許可（どちらか欠落なら拒否）。
+ *   → office を持たないイベント（多くのスクレイプイベント・移行前の手動イベント）は
+ *     office ロールには操作させず、pco_admin 以上が office を割り当てて運用する。
  */
 function canManageScope(account, target) {
   if (!account || account.enabled === false) return false;
@@ -90,7 +93,11 @@ function canManageScope(account, target) {
   if (!target || !target.pref) return false;
   if (account.organization !== target.pref) return false;
   const officeScoped = account.role === 'office_editor' || account.role === 'office_manager';
-  if (officeScoped && account.office && target.office && account.office !== target.office) return false;
+  if (officeScoped) {
+    // 双方の office が存在し完全一致のときのみ許可（欠落は拒否）
+    if (!account.office || !target.office) return false;
+    if (account.office !== target.office) return false;
+  }
   return true;
 }
 

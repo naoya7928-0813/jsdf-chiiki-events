@@ -27,7 +27,7 @@ async function loadEventsMap(req) {
       const data = await r.json();
       for (const k of Object.keys(data)) {
         if (!Array.isArray(data[k])) continue;
-        for (const ev of data[k]) if (ev && ev.id) map.set(ev.id, ev.pref || k);
+        for (const ev of data[k]) if (ev && ev.id) map.set(ev.id, { pref: ev.pref || k, office: ev.office || '' });
       }
     }
   } catch { /* 取得失敗時は空マップ（手動イベントのみ解決可） */ }
@@ -35,11 +35,16 @@ async function loadEventsMap(req) {
   return map;
 }
 
-/** 対象イベントの所属地本をサーバー側で解決（手動イベント→events.json の順）。未知は null。 */
-async function resolveEventPref(req, id) {
+/**
+ * 対象イベントの所属（地本・事務所）をサーバー側で解決（手動イベント→events.json の順）。
+ * 未知は null。スクレイプイベントは office を持たないことが多く、その場合 office='' を返す
+ * （= office ロールは canManageScope の deny-by-default で 403、pco_admin 以上のみ操作可能）。
+ * @returns {{pref:string, office:string}|null}
+ */
+async function resolveEventScope(req, id) {
   try {
     const raw = await redis.hget(MKEY, id);
-    if (raw) { const ev = typeof raw === 'string' ? JSON.parse(raw) : raw; return ev.pref || null; }
+    if (raw) { const ev = typeof raw === 'string' ? JSON.parse(raw) : raw; return { pref: ev.pref || '', office: ev.office || '' }; }
   } catch { /* noop */ }
   const map = await loadEventsMap(req);
   return map.get(id) || null;
@@ -87,9 +92,11 @@ export default async function handler(req, res) {
       if (all) {
         for (const [id, v] of Object.entries(all)) {
           const rec = typeof v === 'string' ? JSON.parse(v) : v;
-          // 記録された pref（無い旧データはサーバー側で解決）でスコープ判定
-          const pref = rec._pref || await resolveEventPref(req, id);
-          if (canManageScope(account, { pref })) overrides[id] = rec;
+          // 記録された pref/office（無い旧データはサーバー側で解決）でスコープ判定
+          const scope = (rec._pref !== undefined)
+            ? { pref: rec._pref, office: rec._office || '' }
+            : (await resolveEventScope(req, id)) || {};
+          if (canManageScope(account, { pref: scope.pref, office: scope.office })) overrides[id] = rec;
         }
       }
       return res.status(200).json({ overrides });
@@ -101,20 +108,20 @@ export default async function handler(req, res) {
     if (!hasPermission(account, 'event:override')) { await writeAudit(account, { action: 'override.save', result: 'denied', note: '権限不足' }); return res.status(403).json({ error: '権限がありません' }); }
     const id = String(req.body?.id || '').trim();
     if (!id) return res.status(400).json({ error: 'id is required' });
-    const ownerPref = await resolveEventPref(req, id);
-    if (!ownerPref) return res.status(404).json({ error: '対象イベントが見つかりません' });
-    if (!canManageScope(account, { pref: ownerPref })) {
-      await writeAudit(account, { action: 'override.save', result: 'denied', targetId: id, organization: ownerPref, note: '担当外イベント' });
-      return res.status(403).json({ error: '担当地本のイベントのみ修正できます' });
+    const scope = await resolveEventScope(req, id);
+    if (!scope || !scope.pref) return res.status(404).json({ error: '対象イベントが見つかりません' });
+    if (!canManageScope(account, { pref: scope.pref, office: scope.office })) {
+      await writeAudit(account, { action: 'override.save', result: 'denied', targetId: id, organization: scope.pref, office: scope.office, note: '担当外イベント（office不一致/未割当を含む）' });
+      return res.status(403).json({ error: '担当範囲のイベントのみ修正できます' });
     }
     const built = buildPatch(req.body?.patch);
     if (built.error) return res.status(400).json({ error: built.error });
     try {
       const prevRaw = await redis.hget(OKEY, id);
       const before = prevRaw ? (typeof prevRaw === 'string' ? JSON.parse(prevRaw) : prevRaw) : null;
-      const record = { ...built.patch, _pref: ownerPref, _by: account.displayId, _at: new Date().toISOString() };
+      const record = { ...built.patch, _pref: scope.pref, _office: scope.office, _by: account.displayId, _at: new Date().toISOString() };
       await redis.hset(OKEY, { [id]: JSON.stringify(record) });
-      await writeAudit(account, { action: 'override.save', result: 'success', targetId: id, organization: ownerPref, title: built.patch.title || '', before, after: record, note: '一覧イベントを上書き修正' });
+      await writeAudit(account, { action: 'override.save', result: 'success', targetId: id, organization: scope.pref, office: scope.office, title: built.patch.title || '', before, after: record, note: '一覧イベントを上書き修正' });
       return res.status(200).json({ ok: true });
     } catch (err) { console.error('[overrides] POST', err); return res.status(500).json({ error: 'failed to save' }); }
   }
@@ -128,13 +135,15 @@ export default async function handler(req, res) {
       const prevRaw = await redis.hget(OKEY, id);
       if (!prevRaw) return res.status(404).json({ error: '対象の上書きが見つかりません' });
       const before = typeof prevRaw === 'string' ? JSON.parse(prevRaw) : prevRaw;
-      const ownerPref = before._pref || await resolveEventPref(req, id);
-      if (!canManageScope(account, { pref: ownerPref })) {
-        await writeAudit(account, { action: 'override.clear', result: 'denied', targetId: id, organization: ownerPref, note: '担当外イベント' });
-        return res.status(403).json({ error: '担当地本のイベントのみ操作できます' });
+      const scope = (before._pref !== undefined)
+        ? { pref: before._pref, office: before._office || '' }
+        : (await resolveEventScope(req, id)) || {};
+      if (!canManageScope(account, { pref: scope.pref, office: scope.office })) {
+        await writeAudit(account, { action: 'override.clear', result: 'denied', targetId: id, organization: scope.pref, office: scope.office, note: '担当外イベント（office不一致/未割当を含む）' });
+        return res.status(403).json({ error: '担当範囲のイベントのみ操作できます' });
       }
       await redis.hdel(OKEY, id);
-      await writeAudit(account, { action: 'override.clear', result: 'success', targetId: id, organization: ownerPref, before, note: '上書きを取り消し' });
+      await writeAudit(account, { action: 'override.clear', result: 'success', targetId: id, organization: scope.pref, office: scope.office, before, note: '上書きを取り消し' });
       return res.status(200).json({ ok: true });
     } catch (err) { console.error('[overrides] DELETE', err); return res.status(500).json({ error: 'failed to delete' }); }
   }

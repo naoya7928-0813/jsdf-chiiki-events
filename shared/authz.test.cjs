@@ -59,11 +59,28 @@ test('canManageScope: 地本は自地本のみ（deny-by-default）', () => {
   assert.equal(A.canManageScope(pco, {}), false);        // pref 不明は拒否
   assert.equal(A.canManageScope(pco, null), false);
 });
-test('canManageScope: 事務所ロールは自事務所のみ（対象に office があるとき）', () => {
+test('canManageScope: 事務所ロールは deny-by-default（双方officeが一致時のみ）', () => {
   const mgr = acc({ user: 'm', pass: 'p', pref: 'tokyo', office: 'shibuya', role: 'office_manager' });
-  assert.equal(A.canManageScope(mgr, { pref: 'tokyo', office: 'shibuya' }), true);
-  assert.equal(A.canManageScope(mgr, { pref: 'tokyo', office: 'shinjuku' }), false);
-  assert.equal(A.canManageScope(mgr, { pref: 'tokyo' }), true); // 事務所指定なしは地本一致で可
+  const ed  = acc({ user: 'e', pass: 'p', pref: 'tokyo', office: 'shibuya', role: 'office_editor' });
+  assert.equal(A.canManageScope(mgr, { pref: 'tokyo', office: 'shibuya' }), true);  // 自office一致
+  assert.equal(A.canManageScope(ed,  { pref: 'tokyo', office: 'shibuya' }), true);
+  assert.equal(A.canManageScope(mgr, { pref: 'tokyo', office: 'shinjuku' }), false); // 別office拒否
+  assert.equal(A.canManageScope(mgr, { pref: 'tokyo' }), false);                     // target.office欠落→拒否
+  assert.equal(A.canManageScope(mgr, { pref: 'tokyo', office: '' }), false);         // 空office→拒否
+  // account.office 欠落の office ロールは何も操作できない
+  const noOff = acc({ user: 'm2', pass: 'p', pref: 'tokyo', role: 'office_manager' });
+  assert.equal(A.canManageScope(noOff, { pref: 'tokyo', office: 'shibuya' }), false);
+});
+test('canManageScope: pco_admin は同一pref全体（office不問・他prefは拒否）', () => {
+  const pco = acc({ user: 'p', pass: 'p', pref: 'tokyo', role: 'pco_admin' });
+  assert.equal(A.canManageScope(pco, { pref: 'tokyo' }), true);                  // office不明でも可
+  assert.equal(A.canManageScope(pco, { pref: 'tokyo', office: 'shibuya' }), true);
+  assert.equal(A.canManageScope(pco, { pref: 'osaka', office: 'x' }), false);    // 他pref拒否
+});
+test('canManageScope: national_admin は office不明でも可', () => {
+  const nat = acc({ user: 'n', pass: 'p', pref: '*' });
+  assert.equal(A.canManageScope(nat, { pref: 'tokyo' }), true);
+  assert.equal(A.canManageScope(nat, { pref: 'osaka', office: 'y' }), true);
 });
 test('canManageScope: 対象に role を混ぜても権限昇格しない', () => {
   const pco = acc({ user: 'p', pass: 'p', pref: 'tokyo' });
