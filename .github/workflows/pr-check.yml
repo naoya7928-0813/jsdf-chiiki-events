@@ -1,0 +1,42 @@
+name: PR Check
+
+# master 向け Pull Request の検証のみを行う。
+# デプロイ・スクレイピング・データコミット・通知送信は一切行わない。
+on:
+  pull_request:
+    branches:
+      - master
+
+# 必要最小限の権限（読み取りのみ）
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: テスト・ビルド・品質・監査
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Node.js 22 をセットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: 依存パッケージをインストール
+        run: npm ci
+
+      - name: テスト
+        run: npm test
+
+      - name: ビルド
+        run: npm run build
+
+      - name: データ品質チェック
+        run: node scripts/check-data-quality.mjs
+
+      - name: 依存関係の脆弱性監査（本番依存のみ）
+        run: npm audit --omit=dev

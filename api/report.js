@@ -6,10 +6,9 @@
 //
 import { checkOrigin, rateLimit } from './_security.js';
 
-// 既定トピックは「すでに公開済み」の旧トピック（フォールバック）。
-// 完全にローテーションするには Vercel 環境変数 NTFY_BUG_TOPIC に
-// 新しい値を設定すること（その値はコミットされず露出しない）。
-const DEFAULT_TOPIC = 'jsdf-chiiki-events-bug-7928';
+// 通知先トピックは必ずサーバー環境変数 NTFY_BUG_TOPIC のみで扱う。
+// 固定のフォールバックトピックは持たない（公開リポジトリ・バンドルに出さない）。
+// 未設定時は安全側に倒して 503 で失敗する（旧トピックへ漏らさない）。
 
 // 除去対象の文字かを「コードポイント」で判定する（ソースに生の制御文字を置かない）。
 // タブ(9)・改行(10)は残す。表示崩れ・通知破損・なりすましの原因になるものを除く:
@@ -75,7 +74,11 @@ export default async function handler(req, res) {
   // 優先度は 1〜5 に丸める
   const priority = Math.min(5, Math.max(1, Number.isInteger(body.priority) ? body.priority : 3));
 
-  const topic = process.env.NTFY_BUG_TOPIC || DEFAULT_TOPIC;
+  const topic = process.env.NTFY_BUG_TOPIC;
+  if (!topic) {
+    console.error('[report] NTFY_BUG_TOPIC 未設定のため受け付けません');
+    return res.status(503).json({ error: 'report endpoint not configured' });
+  }
 
   try {
     const r = await fetch('https://ntfy.sh', {

@@ -1,215 +1,101 @@
-# デプロイ手順書
+# デプロイ手順（DEPLOY.md）
 
-## 前提条件
+本プロジェクトは **Vercel**（フロント＋`/api/*` サーバー機能）と **GitHub Actions**（スクレイピング・自動デプロイ）、**Upstash Redis**（管理データ・セッション・キャッシュ・レート制限）で構成されます。
+※ 旧構成（Google Apps Script）は廃止済みです。
 
-| ツール | バージョン |
-|--------|-----------|
-| Node.js | 20 以上 |
-| npm | 10 以上 |
-| Git | 任意 |
-| Vercel CLI（任意） | `npm i -g vercel` |
-
----
-
-## Step 1 — リポジトリを GitHub に作成・プッシュ
-
-```bash
-# プロジェクトディレクトリへ移動
-cd jsdf-chiiki-events
-
-# Git 初期化
-git init
-git add .
-git commit -m "initial commit"
-
-# GitHub でリポジトリを作成してから以下を実行
-git remote add origin https://github.com/YOUR_USERNAME/jsdf-chiiki-events.git
-git branch -M main
-git push -u origin main
+## アーキテクチャ概要
+```
+GitHub Actions (scrape.yml, 1日3回)
+  └ scraper/index.js → public/data/events.json 生成
+       → npm test + データ品質チェック（ゲート）→ commit/push → Vercel デプロイ
+deploy.yml (src/public/api 等の push)
+  └ npm ci → npm test → データ品質チェック → vercel --prod
+Vercel
+  ├ 静的: dist/ + /data/events.json
+  └ Functions: /api/*（Upstash Redis を利用）
 ```
 
----
+## ブランチ / デプロイ
+- 単一 `master` ブランチ運用（**ブランチ保護**: force-push・削除禁止）。
+- `master` への push（`src/ public/ api/ scripts/ index.html vite.config.js vercel.json package.json`）で `deploy.yml` が発火。
+- 手動デプロイ: `gh workflow run deploy.yml`。
+- デプロイは **`npm test` ＋ `node scripts/check-data-quality.mjs` が成功した場合のみ**実行。
 
-## Step 2 — Google Apps Script を準備・デプロイ
+## Vercel 環境変数
+Vercel プロジェクト設定 → Environment Variables（Production / Preview / Development を適切に分離）。
 
-### 2-1. GAS プロジェクトを作成
+### 必須
+| 変数 | 用途 |
+|---|---|
+| `KV_REST_API_URL` / `KV_REST_API_TOKEN` | Upstash Redis（Vercel-Upstash 連携で自動設定） |
+| `ADMIN_ACCOUNTS_B64` | 管理者アカウント（base64 の JSON 配列。下記） |
+| `NOTIFY_SECRET` | `/api/notify` 認証（スクレイパーからの通知送信） |
+| `NTFY_BUG_TOPIC` | 誤情報報告の ntfy トピック（未設定だと `/api/report` は503） |
+| `NTFY_ADMIN_TOPIC` | 運営者向けアラート（GitHub Actions から使用） |
+| `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` | Web Push（`npx web-push generate-vapid-keys` で生成） |
 
-1. [script.google.com](https://script.google.com) にアクセス
-2. 「新しいプロジェクト」→ プロジェクト名を `地本イベント` などに設定
+### 任意（OCR・移行・調整）
+| 変数 | 用途 |
+|---|---|
+| `GROQ_API_KEY` / `GEMINI_API_KEY` / `MISTRAL_API_KEY` / `OCR_SPACE_API_KEY` | 多段OCR（無ければローカルOCRのみ） |
+| `ADMIN_SESSION_TTL`(既定28800) / `ADMIN_SESSION_IDLE`(既定3600) | セッション絶対期限/無操作失効（秒） |
+| `LEGACY_PLAINTEXT_PASSWORDS`(既定true) | 平文パスワード許可（**正式運用前に false**） |
+| `LEGACY_HEADER_AUTH`(既定true) | ヘッダ認証の後方互換（**正式運用前に false**） |
+| `LEGACY_ADMIN_SECRET`(既定false) | 旧 `ADMIN_SECRET`（任意ユーザー名＋共通PWで national_admin）の許可。**既定で無効**。移行時のみ `true`。正式運用では本フラグを設定せず `ADMIN_SECRET` 自体を削除 |
+| `ENABLE_DEV_STAFF`(既定false) | 旧個人番号(001/002/003)を開発時のみ有効化 |
+| `AUDIT_MAX`(既定5000) | 監査ログ保持件数 |
+| `SITE_URL` | オーバーライド所属解決の events.json 取得元（既定は本番URL） |
+| `SESSION_INSECURE` | ローカルHTTP検証時のみ true（Secure属性を外す） |
 
-### 2-2. doGet を実装
-
-```javascript
-function doGet(e) {
-  const sheet = SpreadsheetApp.openById('YOUR_SPREADSHEET_ID');
-  // スプレッドシートからデータを取得する処理を実装
-  // （下記のサンプルはハードコードの例）
-
-  const data = {
-    kanagawa: [
-      {
-        id: "k-01",
-        date: "2026-04-25",
-        weekday: "土",
-        title: "自衛官候補生 募集説明会",
-        place: "横浜地域事務所",
-        address: "横浜市中区山下町1-2",
-        time: "13:30 – 15:30",
-        category: "説明会",
-        tag: "要予約",
-        url: ""
-      }
-      // ... 続く
-    ],
-    tokyo: [
-      // ... 東京地本のイベント
-    ],
-    updatedAt: Utilities.formatDate(new Date(), 'JST', 'yyyy/MM/dd HH:mm')
-  };
-
-  return ContentService
-    .createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON);
+### 管理者アカウント（`ADMIN_ACCOUNTS_B64`）
+JSON 配列を base64 化して設定。各要素:
+```json
+{
+  "user": "tokyo-shibuya",
+  "pass": "scrypt$16384$....$....",
+  "organization": "tokyo",
+  "office": "shibuya",
+  "role": "office_manager",
+  "displayId": "OP-0042",
+  "enabled": true,
+  "sessionVersion": 1
 }
 ```
+- `pass` のハッシュ生成: `node -e "console.log(require('./shared/session.cjs').hashPassword('パスワード'))"`
+- base64 化: `node -e "console.log(Buffer.from(require('fs').readFileSync('accounts.json','utf8')).toString('base64'))"`
+- 反映後はデプロイが必要。`enabled:false` で停止（既存セッションも次回検証で失効）。
+- **`sessionVersion`（既定1）**: パスワード変更や権限・地本・事務所の変更で既存セッションを
+  即失効させたいときは、この値を **+1** して再デプロイする（古い版のセッションは次の操作で401）。
+  **パスワード変更時は必ず `sessionVersion` を増やすこと**（漏洩パスワードでの居座りを防ぐ）。
 
-### 2-3. ウェブアプリとしてデプロイ
+> GitHub Actions（scrape.yml / deploy.yml）は `ADMIN_SECRET` / `ADMIN_ACCOUNTS_B64` を `vercel -e` で注入します。GitHub Secrets に登録すること。
 
-1. GAS エディタ → 「デプロイ」→「新しいデプロイ」
-2. 種類：「ウェブアプリ」
-3. 次のユーザーとして実行：「自分」
-4. アクセスできるユーザー：「全員」
-5. 「デプロイ」→ 表示される URL をコピー（Step 4 で使用）
+## GitHub Secrets
+`VERCEL_TOKEN`（改行混入に注意・CLIで除去済み）, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `ADMIN_ACCOUNTS_B64`, `ADMIN_SECRET`(任意), `NTFY_BUG_TOPIC`, `NTFY_ADMIN_TOPIC`, OCR各種キー。
 
-> **URL の形式**:  
-> `https://script.google.com/macros/s/AKfycb.../exec`
+## 本番 / 開発の分離
+- Vercel の Production と Preview/Development で環境変数を分ける。開発・検証には**本番とは別の** Upstash DB / ntfy トピック / 管理アカウントを使うこと。
+- ローカル検証は `vite dev` + 必要に応じて `vercel dev`（Functions 実行）。Cookie の Secure を外すには `SESSION_INSECURE=true`。
 
----
+## バックアップ・復旧
+- **events.json**: Git 履歴が実質バックアップ。復元: `git show <正常コミット>:public/data/events.json > public/data/events.json` → `node scripts/generate-events-html.mjs` → commit/push。
+- **管理データ（Redis）**: 管理画面の CSV/JSON 出力で定期取得。Upstash のバックアップ機能も検討。
+- **監査履歴**: 追記専用（`manual:history`）。長期保全は外部転送を今後整備。
 
-## Step 3 — Vercel にプロジェクトをインポート
+## シークレットローテーション手順
+1. 新しい値を生成（VAPID 再生成、パスワード scrypt 再ハッシュ、トークン再発行）。
+2. Vercel 環境変数 / GitHub Secrets を更新。
+3. 再デプロイ（`gh workflow run deploy.yml`）。
+4. 旧値を失効（ntfy トピック変更、漏洩トークンの無効化、該当アカウント `enabled:false`）。
+5. 影響確認（ログイン・通知・報告）。監査履歴に記録が残ることを確認。
 
-### 方法A: Vercel ダッシュボード（推奨）
-
-1. [vercel.com/new](https://vercel.com/new) にアクセス
-2. GitHub リポジトリ `jsdf-chiiki-events` を選択
-3. Framework Preset: **Vite** が自動検出されます
-4. **「Deploy」は押さずに** 次のステップへ（環境変数を先に設定）
-
-### 方法B: Vercel CLI
-
-```bash
-npm install -g vercel
-vercel login
-vercel
-```
-
----
-
-## Step 4 — 環境変数を設定
-
-### Vercel ダッシュボードから設定
-
-1. Vercel プロジェクトページ → **Settings** → **Environment Variables**
-2. 以下を追加:
-
-| Key | Value | Environment |
-|-----|-------|-------------|
-| `GAS_URL` | `https://script.google.com/macros/s/.../exec` | Production, Preview, Development |
-
-3. 「Save」
-
-### ローカル開発時
-
-```bash
-cp .env.example .env.local
-# .env.local を編集:
-# GAS_URL=https://script.google.com/macros/s/.../exec
-```
-
----
-
-## Step 5 — ビルド & デプロイ
-
-### Vercel ダッシュボードから（自動）
-
-環境変数設定後、「Deploy」ボタンを押すだけ。
-
-以降は `git push origin main` するたびに自動デプロイされます。
-
-### 手動デプロイ
-
-```bash
-# 依存パッケージをインストール
-npm install
-
-# ビルド（アイコン生成 → Vite ビルド の順で実行）
-npm run build
-
-# Vercel CLI でデプロイ
-vercel --prod
-```
-
----
-
-## Step 6 — PWA をiPhoneのホーム画面に追加
-
-1. iPhone の Safari でデプロイ先 URL を開く
-2. 画面下部の「共有」ボタン（□↑）をタップ
-3. 「ホーム画面に追加」をタップ
-4. 名前を確認して「追加」
-
-これでアプリアイコンがホーム画面に表示され、タップするとフルスクリーンのアプリ風表示になります。
-
----
-
-## GAS URL の差し替え手順
-
-GAS を再デプロイして URL が変わった場合:
-
-1. Vercel ダッシュボード → **Settings** → **Environment Variables**
-2. `GAS_URL` の値を新しい URL に更新
-3. Vercel ダッシュボード → **Deployments** → 最新デプロイを「Redeploy」
-
-> コードの変更は**不要**です。環境変数の更新のみで反映されます。
-
----
-
-## トラブルシューティング
-
-### データが表示されない（サンプルデータが表示される）
-
-- `GAS_URL` が正しく設定されているか確認
-- GAS のデプロイ設定で「アクセスできるユーザー：全員」になっているか確認
-- Vercel のデプロイログ（`/api/events` のレスポンス）を確認
-
-### ビルドでアイコン生成に失敗する
-
-```bash
-# sharp の再インストール
-npm rebuild sharp
-npm run build
-```
-
-### PWA が更新されない
-
-- ブラウザのサービスワーカーをリセット:  
-  Safari：設定 → Safari → 詳細 → Webサイトデータを削除  
-  Chrome：DevTools → Application → Service Workers → Unregister
-
-### CORS エラーが出る
-
-Vercel 関数 (`/api/events`) を経由しているため通常は発生しません。  
-GAS に直接アクセスしている場合は `/api/events` 経由に変更してください。
-
----
-
-## デプロイ後の確認チェックリスト
-
-- [ ] トップページが表示される
-- [ ] 神奈川 / 東京 タブが切り替わる
-- [ ] イベントカードをタップして詳細画面が開く
-- [ ] 設定画面でカラーテーマが変更できる
-- [ ] iPhone Safari で「ホーム画面に追加」できる
-- [ ] ホーム画面アイコンからアプリ風表示で起動する
-- [ ] 5分待つとデータが自動更新される（更新日時が変わる）
-- [ ] オフライン状態でも画面が表示される（Service Worker キャッシュ）
+## 正式試験運用前チェックリスト
+- [ ] 全管理アカウントを scrypt ハッシュ化し `LEGACY_PLAINTEXT_PASSWORDS=false`
+- [ ] `LEGACY_HEADER_AUTH=false`（セッション認証のみに）
+- [ ] `LEGACY_ADMIN_SECRET` を設定せず（無効）、`ADMIN_SECRET` 環境変数自体を削除
+- [ ] office ロールのアカウントに `office` を設定（未設定だと deny-by-default で操作不可。pco_admin が office を割当）
+- [ ] `ENABLE_DEV_STAFF` 未設定（旧個人番号を無効）
+- [ ] 本番用 Upstash / ntfy / 管理アカウントを開発用と分離
+- [ ] `NTFY_BUG_TOPIC` / VAPID / `NOTIFY_SECRET` を設定
+- [ ] master ブランチ保護・PR必須・本番デプロイ承認の検討
+- [ ] `npm test` と `node scripts/check-data-quality.mjs` がCIで通る

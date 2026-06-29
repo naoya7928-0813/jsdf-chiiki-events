@@ -6,21 +6,11 @@
 // 認証は x-admin-user/x-admin-pass（または後方互換の x-admin-secret）。
 // 地本スコープ: pref!=='*' のアカウントは自分の地本のみ操作可。
 // 保存先は Upstash Redis hash `manual:events`（field=id, value=JSON）。
-import { checkOrigin, rateLimit, requireAccount, canManagePref, redis, cleanText, resolveStaff, whoOf } from '../_security.js';
+import { checkOrigin, noStore, requireSameOrigin, rateLimit, requireAuth, hasPermission, canManageScope, canPublish, redis, cleanText, writeAudit } from '../_security.js';
 import W from '../../shared/weather.cjs';
 
 const KEY = 'manual:events';
-const HKEY = 'manual:history';
 const MAX_EVENTS = 500;
-
-// 変更履歴を Redis リストに追記（最新300件保持）
-async function logHistory(account, action, ev, note = '') {
-  try {
-    const entry = { at: new Date().toISOString(), user: account.user, action, id: ev.id, pref: ev.pref, title: ev.title, note };
-    await redis.lpush(HKEY, JSON.stringify(entry));
-    await redis.ltrim(HKEY, 0, 299);
-  } catch { /* 履歴失敗は本処理を妨げない */ }
-}
 
 const PREFS = new Set([
   'sapporo','asahikawa','obihiro','hakodate','aomori','iwate','miyagi','akita','yamagata','fukushima',
@@ -107,7 +97,8 @@ function buildEvent(input, account) {
       ...weather,
       status,
       source_type: 'manual',
-      createdBy: account.user,
+      office: account.office || '',          // 事務所スコープ（権限判定・監査用）
+      createdBy: account.displayId,          // 仮名ID（氏名は保存しない）
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     },
@@ -115,43 +106,49 @@ function buildEvent(input, account) {
 }
 
 export default async function handler(req, res) {
+  noStore(res); // 管理APIはキャッシュ禁止（成功/エラー問わず）
   if (!checkOrigin(req, res)) return;
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PATCH, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-admin-user, x-admin-pass, x-admin-secret, x-admin-staff');
   if (req.method === 'OPTIONS') return res.status(204).end();
+  if (!await requireSameOrigin(req, res)) return; // CSRF: 状態変更は同一オリジンのみ
 
   if (!await rateLimit(req, res, 'admin-events', 80, 600)) return;
-  const account = requireAccount(req, res);
+  const account = await requireAuth(req, res);
   if (!account) return;
-  const staff = resolveStaff(req);            // 個人番号（仮）。担当官名・権限
-  const who = whoOf(account, staff);          // createdBy/updatedBy 表記
 
-  // ── 一覧（担当地本のみ。* は全件） ──
+  // ── 一覧（自分の管理範囲のみ。deny-by-default） ──
   if (req.method === 'GET') {
     try {
       let events = await readAll();
-      if (account.pref !== '*') events = events.filter(e => e.pref === account.pref);
+      events = events.filter(e => canManageScope(account, { pref: e.pref, office: e.office }));
       events.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
-      return res.status(200).json({ events, account: { pref: account.pref, label: account.label } });
+      return res.status(200).json({ events, account: { organization: account.organization, office: account.office, role: account.role, label: account.label } });
     } catch (err) { console.error('[admin/events] GET', err); return res.status(500).json({ error: 'failed to list' }); }
   }
 
-  // ── 追加（個人番号 001=所長 のみ可） ──
+  // ── 追加（event:create 権限が必要。公開は event:publish が必要） ──
   if (req.method === 'POST') {
-    if (!staff || !staff.addDelete) return res.status(403).json({ error: 'この個人番号ではイベントを追加できません（所長のみ可）' });
+    if (!hasPermission(account, 'event:create')) { await writeAudit(account, { action: 'event.create', result: 'denied', note: '権限不足' }); return res.status(403).json({ error: 'イベントを追加する権限がありません' }); }
     const built = buildEvent(req.body?.event, account);
     if (built.error) return res.status(400).json({ error: built.error });
-    built.event.createdBy = who; built.event.updatedBy = who; // 担当官名を記録
+    // 公開で登録するには公開権限が必要（office_editor は下書きのみ）
+    if (built.event.status === 'published' && !canPublish(account)) {
+      await writeAudit(account, { action: 'event.create', result: 'denied', note: '公開権限なし' });
+      return res.status(403).json({ error: '公開する権限がありません（下書きで保存してください）' });
+    }
+    built.event.updatedBy = account.displayId;
     try {
       if (await redis.hlen(KEY) >= MAX_EVENTS) return res.status(409).json({ error: '登録上限に達しています' });
       await redis.hset(KEY, { [built.event.id]: JSON.stringify(built.event) });
-      await logHistory({ user: who, pref: account.pref }, 'add', built.event, built.event.status === 'published' ? '公開で登録' : '下書きで登録');
+      await writeAudit(account, { action: 'event.create', result: 'success', targetId: built.event.id, organization: built.event.pref, office: built.event.office, title: built.event.title, after: built.event, note: built.event.status === 'published' ? '公開で登録' : '下書きで登録' });
       return res.status(200).json({ ok: true, event: built.event });
     } catch (err) { console.error('[admin/events] POST', err); return res.status(500).json({ error: 'failed to save' }); }
   }
 
-  // ── 部分更新（公開状態の切替など） ──
+  // ── 部分更新（公開状態の切替など。event:update 権限＋スコープ必須） ──
   if (req.method === 'PATCH') {
+    if (!hasPermission(account, 'event:update')) { await writeAudit(account, { action: 'event.update', result: 'denied', note: '権限不足' }); return res.status(403).json({ error: '編集する権限がありません' }); }
     const id = String(req.body?.id || '').trim();
     const patch = req.body?.patch || {};
     if (!id) return res.status(400).json({ error: 'id is required' });
@@ -159,12 +156,22 @@ export default async function handler(req, res) {
       const raw = await redis.hget(KEY, id);
       if (!raw) return res.status(404).json({ error: 'not found' });
       const ev = typeof raw === 'string' ? JSON.parse(raw) : raw;
-      if (!canManagePref(account, ev.pref)) return res.status(403).json({ error: '権限がありません' });
+      // 所属（pref/office）はサーバー側の保存値で判定（クライアントを信用しない）
+      if (!canManageScope(account, { pref: ev.pref, office: ev.office })) {
+        await writeAudit(account, { action: 'event.update', result: 'denied', targetId: id, organization: ev.pref, note: '担当外イベント' });
+        return res.status(403).json({ error: '権限がありません' });
+      }
+      const before = JSON.parse(JSON.stringify(ev)); // 監査用に変更前を保持
       // 場所・住所の変更で既存座標が不正確になるため、変更検知用に編集前の値を控える
       const beforeLoc = { place: ev.place || '', address: ev.address || '' };
       // 許可された項目のみ更新（既存イベントの編集に対応。※手動イベントは通知対象外）
       if (patch.status !== undefined) {
         if (!STATUSES.has(patch.status)) return res.status(400).json({ error: 'status が不正です' });
+        // 公開へ遷移するには公開権限が必要
+        if (patch.status === 'published' && !canPublish(account)) {
+          await writeAudit(account, { action: 'event.update', result: 'denied', targetId: id, organization: ev.pref, note: '公開権限なし' });
+          return res.status(403).json({ error: '公開する権限がありません' });
+        }
         ev.status = patch.status;
       }
       // 文字項目（cleanText + 長さ上限）
@@ -200,31 +207,31 @@ export default async function handler(req, res) {
         ev.weatherLocationNeedsUpdate = true;
       }
       ev.updatedAt = new Date().toISOString();
-      ev.updatedBy = who;  // 編集した担当官（裏側のみ・公開には出さない）
+      ev.updatedBy = account.displayId;  // 編集した操作者（仮名・公開には出さない）
       await redis.hset(KEY, { [id]: JSON.stringify(ev) });
       const note = patch.status !== undefined
         ? `状態→${({ draft: '下書き', published: '公開', closed: '締切', cancelled: '中止' })[ev.status] || ev.status}`
         : '内容を編集';
-      await logHistory({ user: who, pref: account.pref }, patch.status !== undefined ? 'status' : 'update', ev, note);
+      await writeAudit(account, { action: 'event.update', result: 'success', targetId: id, organization: ev.pref, office: ev.office, title: ev.title, before, after: ev, note });
       return res.status(200).json({ ok: true, event: ev });
     } catch (err) { console.error('[admin/events] PATCH', err); return res.status(500).json({ error: 'failed to update' }); }
   }
 
-  // ── 削除（個人番号 001=所長 のみ可） ──
+  // ── 削除（event:delete 権限＋スコープ必須） ──
   if (req.method === 'DELETE') {
-    if (!staff || !staff.addDelete) return res.status(403).json({ error: 'この個人番号ではイベントを削除できません（所長のみ可）' });
+    if (!hasPermission(account, 'event:delete')) { await writeAudit(account, { action: 'event.delete', result: 'denied', note: '権限不足' }); return res.status(403).json({ error: 'イベントを削除する権限がありません' }); }
     const id = String(req.body?.id || '').trim();
     if (!id) return res.status(400).json({ error: 'id is required' });
     try {
       const raw = await redis.hget(KEY, id);
-      let deleted = { id, pref: '', title: '' };
-      if (raw) {
-        const ev = typeof raw === 'string' ? JSON.parse(raw) : raw;
-        if (!canManagePref(account, ev.pref)) return res.status(403).json({ error: '権限がありません' });
-        deleted = ev;
+      if (!raw) return res.status(404).json({ error: 'not found' });
+      const ev = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      if (!canManageScope(account, { pref: ev.pref, office: ev.office })) {
+        await writeAudit(account, { action: 'event.delete', result: 'denied', targetId: id, organization: ev.pref, note: '担当外イベント' });
+        return res.status(403).json({ error: '権限がありません' });
       }
       await redis.hdel(KEY, id);
-      await logHistory({ user: who, pref: account.pref }, 'delete', deleted, '削除');
+      await writeAudit(account, { action: 'event.delete', result: 'success', targetId: id, organization: ev.pref, office: ev.office, title: ev.title, before: ev, note: '削除' });
       return res.status(200).json({ ok: true });
     } catch (err) { console.error('[admin/events] DELETE', err); return res.status(500).json({ error: 'failed to delete' }); }
   }

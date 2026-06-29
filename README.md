@@ -1,18 +1,22 @@
-# 自衛隊地本イベント情報アプリ
+# 自衛隊地本イベント情報アプリ（非公式）
 
-自衛隊地方協力本部（神奈川・東京）のイベント情報を表示するモバイルWebアプリです。  
-GitHub Actions がイベントサイトを定期スクレイピングし、Vercel で静的配信します。
+全国47都道府県の自衛隊地方協力本部（地本）・募集案内所のイベント情報を集約して表示する
+モバイル Web アプリ（PWA）です。GitHub Actions が各地本サイトを1日3回スクレイピングし、
+Vercel で配信します。
+
+> ⚠️ 本プロジェクトは**有志による非公式サービス**です。防衛省・自衛隊および各地方協力本部
+> とは関係ありません。開催可否・申込方法等は必ず公式情報をご確認ください。
 
 ## 機能
 
-- **神奈川地本 / 東京地本** タブ切替
-- **通知一覧** — 未読バッジ付きイベントお知らせ
-- **お気に入り** — スター登録 + 一覧画面
-- **検索** — タイトル・場所・カテゴリで絞り込み
-- **5分ごと自動リフレッシュ**（バックグラウンド復帰時も更新）
-- **PWA 対応** — iPhone ホーム画面追加でアプリ風表示
-- **ダークモード** — システム設定連動 or 手動切替
-- **陸自 / 海自 / 空自** カラーテーマ切替
+- **全国47都道府県＋募集案内所（全国314拠点）** のイベント集約
+- **地図ホーム / 都道府県別一覧 / イベント詳細**
+- **開催日の天気予報**（詳細画面・Open-Meteo＋国土地理院ジオコーディング、精度別表示）
+- **お気に入り・申請済み・通知（Web Push）・誤情報報告**
+- **イベント名の自動整形・品質防御**（住所/OCR断片/年ズレ/重複の除外）
+- **公開PWA と 運営用PWA（管理画面）の分離**（`/admin.html`）
+- **管理画面**: イベント追加・編集・削除・下書き・公開・上書き修正（RBAC・監査ログ）
+- **5分ごと自動更新・ダークモード・陸/海/空 カラーテーマ・PWA インストール**
 
 ## 技術スタック
 
@@ -20,10 +24,22 @@ GitHub Actions がイベントサイトを定期スクレイピングし、Verce
 |------|------|
 | フロントエンド | React 18 + Vite 6 |
 | PWA | vite-plugin-pwa + Workbox |
-| スクレイパー | Playwright (Chromium) + Cheerio |
-| データ配信 | Vercel 静的ファイル（`/data/events.json`） |
-| 自動更新 | GitHub Actions（1日3回スケジュール実行） |
+| スクレイパー | Playwright (Chromium) + Cheerio + 多段OCR |
+| サーバー機能 | Vercel Functions（`/api/*`） |
+| データストア | 静的 `/data/events.json` + Upstash Redis（管理データ・セッション・キャッシュ） |
+| 自動更新 | GitHub Actions（1日3回。`npm test`＋データ品質チェックをデプロイ前ゲート） |
 | デプロイ | Vercel |
+
+## ドキュメント
+- [DEPLOY.md](./DEPLOY.md) — デプロイ・環境変数・シークレットローテーション
+- [OPERATIONS.md](./OPERATIONS.md) — 日常運用・障害対応・バックアップ
+- [SECURITY.md](./SECURITY.md) — 認証・認可・監査・既知の制約
+- [DATA_SOURCES.md](./DATA_SOURCES.md) / [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md) — 出典・ライセンス
+- [CLAUDE.md](./CLAUDE.md) — 詳細仕様（イベントカード正準・天気・セキュリティ）
+
+## 主な API（`/api/*`）
+- `weather`（天気）, `manual-events`（手動イベント公開）, `subscribe`/`notify`（通知）, `report`（誤情報報告）
+- 管理（要認証・RBAC）: `admin/login`, `admin/logout`, `admin/events`, `admin/overrides`, `admin/history`
 
 ## ディレクトリ構成
 
@@ -148,4 +164,6 @@ npx vercel --prod
 
 ## ライセンス
 
-MIT
+自作コードは MIT（[LICENSE](./LICENSE)）。イベント情報（防衛省・自衛隊の公開情報）、
+国土地理院の座標、Open-Meteo の気象データ等は本ライセンスの対象外で、各出典の条件に従います。
+詳細は [DATA_SOURCES.md](./DATA_SOURCES.md) / [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md)。
