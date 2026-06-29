@@ -36,6 +36,17 @@ export function checkOrigin(req, res) {
   return true;
 }
 
+/**
+ * 管理APIの応答をキャッシュさせない（ブラウザ・CDN・中継）。
+ * 成功/エラー（401/403/405/500等）問わず付与するため、各管理ハンドラの先頭で呼ぶ。
+ * 別アカウントへ前の管理データが表示される事故やオフライン残存を防ぐ。
+ */
+export function noStore(res) {
+  res.setHeader('Cache-Control', 'no-store, private');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+}
+
 /** 正規の Web Push サービスの endpoint かを検証する（Redis汚染防止） */
 export function isValidPushEndpoint(endpoint) {
   if (typeof endpoint !== 'string' || endpoint.length > 1024) return false;

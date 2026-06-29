@@ -6,7 +6,7 @@
 //
 // 重要（IDOR対策）: 対象イベントの所属地本はクライアントの pref を信用せず、
 // サーバー側で実データ（Redis 手動イベント / events.json）から解決して権限判定する。
-import { checkOrigin, rateLimit, requireAuth, hasPermission, canManageScope, redis, cleanText, writeAudit } from '../_security.js';
+import { checkOrigin, noStore, rateLimit, requireAuth, hasPermission, canManageScope, redis, cleanText, writeAudit } from '../_security.js';
 
 const OKEY = 'manual:overrides';
 const MKEY = 'manual:events';
@@ -68,6 +68,7 @@ function buildPatch(input) {
 }
 
 export default async function handler(req, res) {
+  noStore(res); // 管理APIはキャッシュ禁止（成功/エラー問わず）
   if (!checkOrigin(req, res)) return;
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-admin-user, x-admin-pass, x-admin-secret');

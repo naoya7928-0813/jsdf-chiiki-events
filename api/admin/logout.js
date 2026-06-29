@@ -1,7 +1,8 @@
 // POST /api/admin/logout  – サーバー側セッションを失効し Cookie を削除する。
-import { checkOrigin, authenticate, endSession, writeAudit } from '../_security.js';
+import { checkOrigin, noStore, authenticate, endSession, writeAudit } from '../_security.js';
 
 export default async function handler(req, res) {
+  noStore(res); // 管理APIはキャッシュ禁止（成功/エラー問わず）
   if (!checkOrigin(req, res)) return;
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   if (req.method === 'OPTIONS') return res.status(204).end();

@@ -2,10 +2,11 @@
 //   成功: Set-Cookie(jsdf_admin_session) ＋ {ok, account, pref, label}
 //   失敗: 401（監査ログに失敗を記録）
 // パスワードは平文/scrypt 両対応（移行期）。後方互換: x-admin-secret も受理。
-import { checkOrigin, rateLimit, verifyCredentials, startSession, writeAudit } from '../_security.js';
+import { checkOrigin, noStore, rateLimit, verifyCredentials, startSession, writeAudit } from '../_security.js';
 import authz from '../../shared/authz.cjs';
 
 export default async function handler(req, res) {
+  noStore(res); // 管理APIはキャッシュ禁止（成功/エラー問わず）
   if (!checkOrigin(req, res)) return;
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-admin-user, x-admin-pass, x-admin-secret');
