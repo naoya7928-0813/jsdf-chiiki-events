@@ -1,0 +1,113 @@
+'use strict';
+const { test } = require('node:test');
+const assert = require('node:assert');
+const P = require('./pastEvents.cjs');
+const A = require('./authz.cjs');
+
+const TODAY = '2026-06-30';
+const acc = (raw) => A.normalizeAccount(raw);
+const scope = A.canManageScope;
+
+// ── 日付判定 ────────────────────────────────────────────────────
+test('isPastEvent: date 昨日は過去 / 今日・未来は過去でない', () => {
+  assert.equal(P.isPastEvent({ date: '2026-06-29' }, TODAY), true);
+  assert.equal(P.isPastEvent({ date: '2026-06-30' }, TODAY), false); // 今日は過去にしない
+  assert.equal(P.isPastEvent({ date: '2026-07-05' }, TODAY), false);
+});
+test('isPastEvent: endDate 基準（昨日=過去 / 今日=過去でない）', () => {
+  assert.equal(P.isPastEvent({ date: '2026-06-20', endDate: '2026-06-29' }, TODAY), true);
+  assert.equal(P.isPastEvent({ date: '2026-06-20', endDate: '2026-06-30' }, TODAY), false); // 開催日過去でも終了日が今日
+});
+test('isPastEvent: 不正日付は安全に false', () => {
+  assert.equal(P.isPastEvent({ date: '2026-13-40' }, TODAY), false);
+  assert.equal(P.isPastEvent({ date: '' }, TODAY), false);
+  assert.equal(P.isPastEvent({ date: '2026-06-29' }, 'bad'), false);
+});
+
+// ── クエリ検証 ─────────────────────────────────────────────────
+test('validatePastQuery: 既定値', () => {
+  const r = P.validatePastQuery({});
+  assert.equal(r.ok, true);
+  assert.deepEqual({ limit: r.value.limit, offset: r.value.offset }, { limit: 50, offset: 0 });
+});
+test('validatePastQuery: 不正日付/limit/offset/status は400', () => {
+  assert.equal(P.validatePastQuery({ from: '2026-02-30' }).status, 400);
+  assert.equal(P.validatePastQuery({ to: '2026/01/01' }).status, 400);
+  assert.equal(P.validatePastQuery({ from: '2026-06-10', to: '2026-06-01' }).status, 400);
+  assert.equal(P.validatePastQuery({ limit: 0 }).status, 400);
+  assert.equal(P.validatePastQuery({ limit: 101 }).status, 400);
+  assert.equal(P.validatePastQuery({ limit: 'x' }).status, 400);
+  assert.equal(P.validatePastQuery({ offset: -1 }).status, 400);
+  assert.equal(P.validatePastQuery({ status: 'foo' }).status, 400);
+});
+test('validatePastQuery: 上限100', () => {
+  assert.equal(P.validatePastQuery({ limit: 100 }).ok, true);
+});
+
+// ── データ統合・認可・ページング ────────────────────────────────
+const scrapeData = {
+  tokyo: [
+    { id: 's1', pref: 'tokyo', date: '2026-06-29', title: '過去スクレイプ', place: 'X' },
+    { id: 's2', pref: 'tokyo', date: '2026-07-10', title: '未来スクレイプ' },
+  ],
+  osaka: [{ id: 's3', pref: 'osaka', date: '2026-06-25', title: '大阪過去' }],
+  updatedAt: '2026/06/30 20:00',
+};
+const manualEvents = [
+  { id: 'manual-tokyo-1', pref: 'tokyo', office: 'shibuya', date: '2026-06-28', title: '渋谷手動過去', status: 'published', source_type: 'manual', updatedAt: '2026-06-28T00:00:00Z' },
+  { id: 'manual-tokyo-2', pref: 'tokyo', office: 'shinjuku', date: '2026-06-27', title: '新宿手動過去', status: 'draft', source_type: 'manual' },
+];
+const overrides = { s1: { title: '上書き後タイトル', _at: '2026-06-29T10:00:00Z' } };
+
+const build = (account, q = {}) => P.buildPastEvents({
+  manualEvents, scrapeData, overrides, account,
+  query: P.validatePastQuery(q).value, today: TODAY, canManageScope: scope,
+});
+
+test('national_admin: 全国の過去のみ（未来s2は除外）・override反映・source種別', () => {
+  const r = build(acc({ user: 'n', pass: 'p', pref: '*' }));
+  const ids = r.events.map(e => e.id);
+  assert.deepEqual(ids, ['s1', 'manual-tokyo-1', 'manual-tokyo-2', 's3']); // effectiveDate 降順
+  assert.equal(r.total, 4);
+  assert.ok(!ids.includes('s2')); // 未来は対象外
+  const s1 = r.events.find(e => e.id === 's1');
+  assert.equal(s1.title, '上書き後タイトル'); // override 反映
+  assert.equal(s1.source, 'scrape');
+  assert.equal(r.events.find(e => e.id === 'manual-tokyo-1').source, 'manual');
+});
+test('pco_admin(tokyo): 自地本のみ（他地本s3除外・office不明s1は閲覧可）', () => {
+  const r = build(acc({ user: 'p', pass: 'p', pref: 'tokyo', role: 'pco_admin' }));
+  const ids = r.events.map(e => e.id).sort();
+  assert.deepEqual(ids, ['manual-tokyo-1', 'manual-tokyo-2', 's1']);
+  assert.ok(!ids.includes('s3'));
+});
+test('office_manager(tokyo/shibuya): 自officeのみ（別office・office不明は非表示）', () => {
+  const r = build(acc({ user: 'm', pass: 'p', pref: 'tokyo', office: 'shibuya', role: 'office_manager' }));
+  assert.deepEqual(r.events.map(e => e.id), ['manual-tokyo-1']); // shibuya のみ。s1(office不明)・manual2(shinjuku) 除外
+});
+test('クライアントの pref/office 改変では拡大しない（pco他地本フィルタ→空）', () => {
+  // pco(tokyo) が pref=osaka を要求しても、スコープ後に絞り込むため自地本外は出ない
+  const r = build(acc({ user: 'p', pass: 'p', pref: 'tokyo', role: 'pco_admin' }), { pref: 'osaka' });
+  assert.equal(r.total, 0);
+});
+test('status / q / 期間フィルタ', () => {
+  const nat = acc({ user: 'n', pass: 'p', pref: '*' });
+  assert.deepEqual(build(nat, { status: 'published' }).events.map(e => e.id), ['manual-tokyo-1']);
+  assert.deepEqual(build(nat, { q: '新宿' }).events.map(e => e.id), ['manual-tokyo-2']);
+  assert.deepEqual(build(nat, { from: '2026-06-28' }).events.map(e => e.id), ['s1', 'manual-tokyo-1']);
+});
+test('ページング（limit/offset/hasMore）', () => {
+  const nat = acc({ user: 'n', pass: 'p', pref: '*' });
+  const p1 = build(nat, { limit: 2, offset: 0 });
+  assert.deepEqual(p1.events.map(e => e.id), ['s1', 'manual-tokyo-1']);
+  assert.equal(p1.hasMore, true);
+  const p2 = build(nat, { limit: 2, offset: 2 });
+  assert.deepEqual(p2.events.map(e => e.id), ['manual-tokyo-2', 's3']);
+  assert.equal(p2.hasMore, false);
+});
+test('ID保持・重複なし', () => {
+  const r = build(acc({ user: 'n', pass: 'p', pref: '*' }));
+  const ids = r.events.map(e => e.id);
+  assert.equal(new Set(ids).size, ids.length);
+  assert.ok(ids.every(Boolean));
+});
