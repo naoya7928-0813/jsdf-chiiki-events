@@ -67,8 +67,9 @@ export default function PastEventsPanel({ adminFetch, account, primary }) {
           <div style={label}>タイトル・会場で検索</div>
           <input value={q} onChange={e => setQ(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') search(); }} placeholder="キーワード" style={input} />
         </div>
-        <div><div style={label}>開始（以降）</div><input type="date" value={from} onChange={e => setFrom(e.target.value)} style={input} /></div>
-        <div><div style={label}>終了（以前）</div><input type="date" value={to} onChange={e => setTo(e.target.value)} style={input} /></div>
+        {/* 開始・終了は横並びだと日付入力が重なるため、それぞれ全幅で上下に分ける */}
+        <div style={{ gridColumn: '1 / -1' }}><div style={label}>開始（以降）</div><input type="date" value={from} onChange={e => setFrom(e.target.value)} style={{ ...input, minWidth: 0 }} /></div>
+        <div style={{ gridColumn: '1 / -1' }}><div style={label}>終了（以前）</div><input type="date" value={to} onChange={e => setTo(e.target.value)} style={{ ...input, minWidth: 0 }} /></div>
         <div>
           <div style={label}>状態</div>
           <select value={status} onChange={e => setStatus(e.target.value)} style={input}>
