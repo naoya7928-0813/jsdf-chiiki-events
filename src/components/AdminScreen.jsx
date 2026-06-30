@@ -3,6 +3,7 @@ import { ScreenHeader, F } from './Shared';
 import { PREFECTURE_INFO } from '../data/regionMap';
 import { fetchOfficesData } from '../hooks/useOffices';
 import { facilitiesForPref, AGE_OPTIONS } from '../data/jsdfFacilities';
+import PastEventsPanel from './PastEventsPanel';
 
 /**
  * 運営者管理画面。
@@ -255,17 +256,18 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const prefLabel = isScoped ? (PREFECTURE_INFO[org]?.label || org) : '全国';
   // 追加修正ページ＝公開系（下書き以外）、下書き確認ページ＝下書きのみ。重複を避けて分離。
   const shown = filter === 'draft' ? list.filter(e => e.status === 'draft') : list.filter(e => e.status !== 'draft');
+  const isPastView = filter === 'past';
   // 下書き確認ページでは登録フォームを出さない（編集時のみ表示）。追加修正ページは常時表示。
-  const showForm = filter !== 'draft' || !!editingId;
+  const showForm = (filter === 'all') || !!editingId; // 'draft'・'past' ではフォームを出さない（編集時を除く）
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)', fontFamily: F.sans }}>
-      <ScreenHeader primary={primary} title={editingId ? '編集' : (filter === 'draft' ? '下書き確認' : 'イベント追加・修正')} subtitle="ADMIN"
+      <ScreenHeader primary={primary} title={editingId ? '編集' : (filter === 'draft' ? '下書き確認' : filter === 'past' ? '過去イベント' : 'イベント追加・修正')} subtitle="ADMIN"
         onBack={(editingId && !fromDetail) ? cancelEdit : onBack}
         trailing={<button onClick={logout} style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', borderRadius: 8, fontSize: 12, padding: '6px 10px', cursor: 'pointer' }}>ログアウト</button>} />
       {/* タブ（追加・修正／下書き）。1ページで全機能にアクセス */}
       {showTabs && !editingId && (
         <div style={{ display: 'flex', gap: 8, padding: '10px 16px 0', flexShrink: 0 }}>
-          {[['all', 'イベント追加・修正'], ['draft', '下書き']].map(([v, jp]) => {
+          {[['all', '現在・今後'], ['draft', '下書き'], ['past', '過去イベント']].map(([v, jp]) => {
             const on = filter === v;
             return (
               <button key={v} onClick={() => setFilter(v)} style={{
@@ -395,7 +397,11 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         )}
         </>)}
 
-        {/* 一覧 + 出力 + 履歴 */}
+        {/* 過去イベント（閲覧専用。「現在・今後」「監査履歴」とは別画面） */}
+        {isPastView && <PastEventsPanel adminFetch={adminFetch} account={account} primary={primary} />}
+
+        {/* 一覧 + 出力 + 履歴（現在・今後／下書き） */}
+        {!isPastView && (<>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', flex: 1 }}>{filter === 'draft' ? '下書き一覧' : '公開中のイベント'}（{shown.length}）</div>
           <button onClick={exportCSV} disabled={!list.length} style={miniOut(primary)}>CSV</button>
@@ -438,6 +444,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
               </div>
             </div>
           ))}
+        </>)}
       </div>
     </div>
   );

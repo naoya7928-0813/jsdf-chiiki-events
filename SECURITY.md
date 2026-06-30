@@ -21,6 +21,7 @@
 - ロール: `office_editor`（自事務所の下書き作成・編集）/ `office_manager`（自事務所の追加・編集・削除・公開・上書き）/ `pco_admin`（自地本全体＋監査閲覧）/ `national_admin`（全国）/ `auditor`（監査閲覧のみ）/ `system_admin`（設定管理）。
 - 権限・スコープはすべて**サーバー側の認証済みアカウント**から解決。クライアント送信の `pref`・個人番号・role は権限判定に使わない。
 - イベント／オーバーライドの所属地本は**サーバー側で実データから解決**して判定（IDOR 対策）。存在しない対象は拒否。
+- **過去イベント閲覧**（`GET /api/admin/past-events`）も同じ `canManageScope` で範囲を限定（閲覧専用・`no-store`）。office ロールは自office一致のみ（スクレイプは office 欄が無いため pco_admin 以上のみ）、pco=自地本、national=全国。監査ログ閲覧権限とは別（過去イベント≠監査ログ）。
 
 ## 監査ログ（追記専用）
 - 管理操作・ログイン成功/失敗・権限拒否を `manual:history` に追記（`writeAudit`）。記録項目: 日時・requestId・操作者(仮名 displayId)・accountId・地本・事務所・action・対象ID・result・変更前後。

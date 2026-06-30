@@ -289,6 +289,16 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - **監査ログ（追記専用）**: `writeAudit`（`manual:history`）。操作・ログイン成功/失敗・権限拒否を requestId/操作者(displayId)/地本/事務所/対象/result/変更前後付きで記録。**削除APIは廃止**（history DELETE は405）。
 - **新APIを足すときは必ず `requireAuth` → `hasPermission`/`canManageScope` → `writeAudit` の順を通すこと。**
 
+### 過去イベント閲覧（管理・閲覧専用）
+- `GET /api/admin/past-events`（`shared/pastEvents.cjs` に純粋ロジック集約）。**過去イベント＝`effectiveDate(endDate||date) < 今日(Asia/Tokyo)`**。
+- **監査ログ（`manual:history`）・削除済みイベント・将来/開催中イベントとは区別**する。削除済みは含めない（本体が無いため。削除痕跡は監査履歴で確認）。
+- データ源を統合: 手動イベント（Redis `manual:events`）＋スクレイプ（`events.json`）＋override 反映。**ID重複は手動を優先**。
+- 認可は `canManageScope`（deny-by-default）。office ロールは自office一致のみ（**スクレイプは office 欄が無いため pco_admin 以上のみ閲覧可**）。pco_admin=自地本/national=全国。**クライアントの pref/office では拡大不可**（サーバーの実データで判定）。
+- クエリ: `from/to/status/q/office/pref/limit(既定50・最大100)/offset`。不正日付/limit は 400・新しい順・`no-store`・GET のため状態変更CSRFは適用しない。
+- **保存方式の制約**: `events.json` は終了後約7日（`ENDED_KEEP_DAYS`）で削除されるため、それ以前のスクレイプ過去イベントは残らない。**完全な永久アーカイブではない**（応答 `note` で明示）。手動イベントは削除まで残る。
+- UI: 運営画面に「現在・今後／下書き／**過去イベント**」タブ（`src/components/PastEventsPanel.jsx`、閲覧専用）。監査履歴は別表示。
+- 将来のイベントID移行・恒久アーカイブ設計とは別課題（本機能は現存データの閲覧のみ）。
+
 ### データ品質ゲート（CI）
 - `shared/dataQuality.cjs` + `scripts/check-data-quality.mjs`。ID重複/構造破損/不正・非実在日付/endDate<date/タイトル欠落/pref-キー不一致/座標範囲/accuracy値/手動-スクレイプID衝突/総数異常減少を**エラー（デプロイ停止）**、長すぎるタイトル・会場欠落・URL形式・OCR疑い等を**警告**として検出。
 - deploy.yml / scrape.yml で `npm test` ＋ このチェックが通った場合のみデプロイ。
