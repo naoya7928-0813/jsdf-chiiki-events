@@ -123,10 +123,14 @@ function buildPastEvents({ manualEvents = [], scrapeData = {}, overrides = {}, a
     if (ev && ev.id) byId.set(ev.id, { ...ev, source_type: 'manual' });
   }
 
-  let list = [...byId.values()]
-    .filter(ev => isPastEvent(ev, today))                                  // 過去のみ
-    .filter(ev => canManageScope(account, { pref: ev.pref, office: ev.office })) // スコープ（サーバー解決）
-    .filter(ev => matchFilters(ev, query));                               // 絞り込み
+  // 過去 → スコープ（サーバー解決）まで絞ったのが「自分の権限範囲の過去イベント」。
+  // scopeCount は呼び出し元アカウント自身の範囲の件数であり、権限外情報の漏洩ではない。
+  const inScope = [...byId.values()]
+    .filter(ev => isPastEvent(ev, today))                                        // 過去のみ
+    .filter(ev => canManageScope(account, { pref: ev.pref, office: ev.office })); // スコープ
+  const scopeCount = inScope.length;
+
+  let list = inScope.filter(ev => matchFilters(ev, query));                     // 絞り込み
 
   // 新しい順（effectiveDate desc、同日は updatedAt desc）
   list.sort((a, b) => {
@@ -137,7 +141,7 @@ function buildPastEvents({ manualEvents = [], scrapeData = {}, overrides = {}, a
 
   const total = list.length;
   const events = list.slice(query.offset, query.offset + query.limit).map(toView);
-  return { events, total, limit: query.limit, offset: query.offset, hasMore: query.offset + query.limit < total };
+  return { events, total, scopeCount, limit: query.limit, offset: query.offset, hasMore: query.offset + query.limit < total };
 }
 
 module.exports = { effectiveDate, isPastEvent, validatePastQuery, matchFilters, buildPastEvents, toView, STATUSES };

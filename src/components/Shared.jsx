@@ -215,6 +215,29 @@ export function ErrorBanner({ message }) {
   );
 }
 
+// ─── 状態バッジ（中止 / 受付終了） ───────────────────────────
+// スクレイパー/運営が付与した status を利用者に明確に表示する。
+//   cancelled → 「中止」（赤・目立つ）
+//   closed    → 「受付終了」（オレンジ）
+// published / 未設定は何も表示しない（通常イベント）。size='sm' は一覧カード用。
+const STATUS_BADGE = {
+  cancelled: { label: '中止', bg: '#dc2626' },
+  closed:    { label: '受付終了', bg: '#b45309' },
+};
+export function StatusBadge({ status, size = 'sm' }) {
+  const s = STATUS_BADGE[status];
+  if (!s) return null;
+  const pad = size === 'lg' ? '3px 10px' : '2px 7px';
+  const fs = size === 'lg' ? 11 : 10;
+  return (
+    <span style={{
+      fontSize: fs, fontWeight: 700, padding: pad, borderRadius: 3,
+      background: s.bg, color: '#fff', letterSpacing: 0.5, flexShrink: 0,
+      fontFamily: F.sans,
+    }}>{s.label}</span>
+  );
+}
+
 // ─── セクションタイトル（詳細画面用） ───────────────────────
 export function SectionTitle({ children }) {
   return (

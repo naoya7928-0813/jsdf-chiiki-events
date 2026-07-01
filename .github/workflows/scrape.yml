@@ -27,6 +27,19 @@ on:
         required: false
         default: ''
 
+# ── 同時実行防止 ──────────────────────────────────────────────
+# 定期(schedule 3種)と手動(workflow_dispatch)は同じ events.json / 静的HTML /
+# geocode-cache / master / Vercel本番 を更新する。1本の実行が約60分以上かかるため、
+# 重なると同時 commit/push（non-fast-forward）や二重デプロイ・二重通知の恐れがある。
+#   group: ブランチや trigger に依存しない固定文字列にする（${{ github.ref }} 等を
+#          入れると枠が分かれて同時実行を許してしまうため入れない）。
+#   cancel-in-progress: false … 実行中ジョブは絶対に中断しない（commit/rebase/push/
+#          deploy/通知の途中でキャンセルしない）。後から来たジョブは待機列に入る。
+# データを変更しない PR Check(pr-check.yml) は別グループのため巻き込まれない。
+concurrency:
+  group: scrape-data-update
+  cancel-in-progress: false
+
 jobs:
   scrape:
     name: イベントデータ取得

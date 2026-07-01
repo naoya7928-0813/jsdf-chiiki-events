@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { ICO } from './Icons';
-import { Emblem, F, splitDate, SectionTitle, iconBtnStyle } from './Shared';
+import { Emblem, F, splitDate, SectionTitle, iconBtnStyle, StatusBadge } from './Shared';
 import { REGION_HQ, REGION_SOURCE } from '../config';
 import WeatherCard from './WeatherCard';
 
@@ -143,6 +143,8 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            {/* 中止/受付終了を最優先で表示 */}
+            <StatusBadge status={ev.status} size="lg" />
             {ev.ended && (
               <div style={{ display: 'inline-block', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 3, background: '#fff', color: '#6b7280', letterSpacing: 1 }}>終了済み</div>
             )}

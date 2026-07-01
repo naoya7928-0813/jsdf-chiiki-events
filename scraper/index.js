@@ -36,6 +36,8 @@ const geocode             = require('./lib/geocode');
 const { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } = require('../shared/officeTitle.cjs');
 // イベント名の品質管理（検証済み修正・整形・junk判定・年ズレ判定・重複統合）。最終出力の防御に使う
 const { applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, isJunkOrStubTitle, isStaleDatedEvent, dedupEvents } = require('../shared/titleQuality.cjs');
+// 受付終了/中止の状態判定・締切日解決（誤判定防止つき。shared/eventStatus.cjs）
+const eventStatus = require('../shared/eventStatus.cjs');
 
 const { chromium } = require('playwright-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
@@ -4398,6 +4400,52 @@ async function writeOutput(data) {
     });
   }
   if (removedCount > 0) console.log(`[フィルタ] 過去イベント ${removedCount} 件を削除`);
+
+  // ── 受付終了/中止の状態・締切日を付与（誤判定防止つき） ─────────────
+  // タイトル・備考の文言と締切日から status(closed/cancelled)・deadlineDate を導出する。
+  // published（通常）は状態フィールドを付けない＝後方互換＆データ量を抑える。
+  // 前回 events.json の status を読み、cancelled/closed の粘着性を維持（文言消失で復活させない）。
+  const prevStatusById = new Map();
+  try {
+    if (fs.existsSync(OUTPUT_PATH)) {
+      const prev = JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8'));
+      for (const k of Object.keys(prev)) {
+        if (!Array.isArray(prev[k])) continue;
+        for (const e of prev[k]) if (e && e.id && e.status) prevStatusById.set(e.id, e.status);
+      }
+    }
+  } catch (e) { console.warn('[status] 前回 events.json の読み込みに失敗:', e.message); }
+
+  let closedCount = 0, cancelledCount = 0, deadlineDateCount = 0, lowConfCount = 0;
+  const statusSourceOf = (ev) => {
+    const s = String(ev.source_type || '');
+    if (s.startsWith('office_ocr')) return 'ocr';
+    if (s === 'tokyo_calendar' || s === 'calendar') return 'calendar';
+    if (s.startsWith('office')) return 'html';
+    return 'html';
+  };
+  for (const key of Object.keys(data)) {
+    if (!Array.isArray(data[key])) continue;
+    for (const ev of data[key]) {
+      const text = [ev.title, ev.notes, ev.place].filter(Boolean).join('\n');
+      const derived = eventStatus.deriveStatus({
+        text, deadline: ev.deadline || '', eventDate: ev.date || '', endDate: ev.endDate || '', today,
+      });
+      // 機械判定可能な締切日（原文 deadline は保持）
+      if (derived.deadlineDate) { ev.deadlineDate = derived.deadlineDate; deadlineDateCount++; }
+      // 前回状態との統合（cancelled/closed は復活させない）
+      const merged = eventStatus.mergeStatus(prevStatusById.get(ev.id) || '', derived);
+      if (merged.status === 'closed' || merged.status === 'cancelled') {
+        ev.status = merged.status;
+        ev.statusReason = merged.statusReason || derived.statusReason || '';
+        ev.statusSource = merged.sticky ? (prevStatusById.get(ev.id) ? 'previous' : statusSourceOf(ev)) : statusSourceOf(ev);
+        ev.statusUpdatedAt = today;
+        if (merged.status === 'closed') closedCount++; else cancelledCount++;
+        if (derived.confidence === 'low') lowConfCount++;
+      }
+    }
+  }
+  console.log(`[status] closed:${closedCount} cancelled:${cancelledCount} deadlineDate:${deadlineDateCount}${lowConfCount ? ` (低信頼:${lowConfCount})` : ''}`);
 
   // 全県横断でイベントIDの重複（ハッシュ衝突）を一意化（お気に入りの誤連動防止・CI品質ゲート対応）
   try {

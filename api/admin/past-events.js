@@ -15,19 +15,25 @@ import past from '../../shared/pastEvents.cjs';
 const MKEY = 'manual:events';
 const OKEY = 'manual:overrides';
 
-// events.json（スクレイプイベント）の短期キャッシュ
-let scrapeCache = { at: 0, data: null };
+// events.json（スクレイプイベント）の短期キャッシュ。
+// 取得成否(ok)も返し、「取得失敗（データ不明）」と「取得成功だが空」を区別する。
+let scrapeCache = { at: 0, data: null, ok: false };
 async function loadScrape(req) {
   const now = Date.now();
-  if (scrapeCache.data && now - scrapeCache.at < 60000) return scrapeCache.data;
+  if (scrapeCache.data && now - scrapeCache.at < 60000) return { data: scrapeCache.data, ok: scrapeCache.ok };
   const base = process.env.SITE_URL || (req.headers.host ? `https://${req.headers.host}` : 'https://jsdf-chiiki-events.vercel.app');
   let data = {};
+  let ok = false;
   try {
     const r = await fetch(`${base}/data/events.json`, { signal: AbortSignal.timeout(5000) });
-    if (r.ok) data = await r.json();
-  } catch { /* 取得失敗時は手動イベントのみ */ }
-  scrapeCache = { at: now, data };
-  return data;
+    if (r.ok) { data = await r.json(); ok = true; }
+    else console.error(`[past-events] events.json 取得が非200: ${r.status} ${base}/data/events.json`);
+  } catch (e) {
+    // 取得失敗は握りつぶさずサーバーログに残す（原因識別のため）。認証情報は出さない。
+    console.error(`[past-events] events.json 取得失敗: ${e && e.name === 'TimeoutError' ? 'timeout(5s)' : (e && e.message) || 'error'}`);
+  }
+  scrapeCache = { at: now, data, ok };
+  return { data, ok };
 }
 
 export default async function handler(req, res) {
@@ -59,16 +65,40 @@ export default async function handler(req, res) {
     const o = await redis.hgetall(OKEY);
     if (o) for (const [id, val] of Object.entries(o)) overrides[id] = typeof val === 'string' ? JSON.parse(val) : val;
   } catch { /* ignore */ }
-  const scrapeData = await loadScrape(req);
+  const { data: scrapeData, ok: scrapeOk } = await loadScrape(req);
 
   const result = past.buildPastEvents({
     manualEvents, scrapeData, overrides,
     account, query: v.value, today, canManageScope,
   });
 
+  // 空一覧の理由を分類する（権限外の件数・名称は一切返さない）。
+  // - data_unavailable: スクレイプ取得失敗かつ手動イベントも無い＝データ不明（黙って空にしない）
+  // - filtered_empty  : 自分の範囲に過去イベントはあるが、検索条件に一致しない
+  // - empty_scope     : 自分の権限範囲（事務所/地本）に過去イベントが無い
+  // - ok              : 表示対象あり
+  const officeScoped = account.role === 'office_editor' || account.role === 'office_manager';
+  let reason = 'ok';
+  if (result.total === 0) {
+    if (!scrapeOk && manualEvents.length === 0) reason = 'data_unavailable';
+    else if (result.scopeCount > 0) reason = 'filtered_empty';
+    else reason = 'empty_scope';
+  }
+
   return res.status(200).json({
-    ...result,
+    events: result.events,
+    total: result.total,
+    limit: result.limit,
+    offset: result.offset,
+    hasMore: result.hasMore,
+    reason,
+    scope: officeScoped ? 'office' : (past_isNational(account) ? 'national' : 'pref'),
     // 保存方式上の制約を明示（完全な永久アーカイブではない）
     note: '現在保存されている過去イベントを表示しています。取得元から削除され、システム内にも保存されていないイベントは表示されない場合があります。',
   });
+}
+
+// national 判定（表示メッセージ分岐用。権限判定は canManageScope が本体）。
+function past_isNational(account) {
+  return account && (account.role === 'national_admin' || (account.organization ?? account.pref) === '*');
 }

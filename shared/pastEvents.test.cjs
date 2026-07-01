@@ -111,3 +111,22 @@ test('ID保持・重複なし', () => {
   assert.equal(new Set(ids).size, ids.length);
   assert.ok(ids.every(Boolean));
 });
+
+// ── scopeCount（空一覧の理由分類の根拠。自分の範囲の件数＝漏洩ではない） ──
+test('scopeCount: 自分の権限範囲の過去イベント件数（フィルタ前）', () => {
+  assert.equal(build(acc({ user: 'n', pass: 'p', pref: '*' })).scopeCount, 4); // 全国
+  assert.equal(build(acc({ user: 'p', pass: 'p', pref: 'tokyo', role: 'pco_admin' })).scopeCount, 3);
+  assert.equal(build(acc({ user: 'm', pass: 'p', pref: 'tokyo', office: 'shibuya', role: 'office_manager' })).scopeCount, 1);
+});
+test('scopeCount>0 だが filter で total=0 → filtered_empty の根拠', () => {
+  // pco(tokyo) が osaka を要求：範囲には3件あるが条件一致0 → filtered_empty
+  const r = build(acc({ user: 'p', pass: 'p', pref: 'tokyo', role: 'pco_admin' }), { pref: 'osaka' });
+  assert.equal(r.scopeCount, 3);
+  assert.equal(r.total, 0);
+});
+test('scopeCount=0 → empty_scope の根拠（範囲に過去イベントなし）', () => {
+  // office_manager(tokyo/nerima)：一致office無し → 0
+  const r = build(acc({ user: 'x', pass: 'p', pref: 'tokyo', office: 'nerima', role: 'office_manager' }));
+  assert.equal(r.scopeCount, 0);
+  assert.equal(r.total, 0);
+});

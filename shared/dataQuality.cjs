@@ -4,6 +4,10 @@
 
 const { isRealDate } = require('./weather.cjs');
 const { isJunkOrStubTitle } = require('./titleQuality.cjs');
+const { STATUS_VALUES } = require('./eventStatus.cjs');
+
+// 内部 office ID の許容形式（小文字英数・ハイフン）。表示名や日本語は不可。
+const OFFICE_ID_RE = /^[a-z0-9][a-z0-9-]{0,39}$/;
 
 // events.json の正規キー（北海道は4方面隊キー）。pref フィールドとキーの一致を検証する。
 const PREF_KEYS = new Set([
@@ -88,6 +92,40 @@ function validateEventsData(data, opts = {}) {
 
       // 会場情報（警告）
       if (!ev.place || !String(ev.place).trim()) warnings.push(`${loc} 会場情報(place)がありません`);
+
+      // status（受付終了/中止）— 許可値・根拠・整合
+      if (ev.status != null && ev.status !== '') {
+        if (!STATUS_VALUES.has(ev.status)) {
+          errors.push(`${loc} status が不正: "${ev.status}"（許可: published/closed/cancelled/draft）`);
+        }
+        if (ev.status === 'cancelled' && !(ev.statusReason && String(ev.statusReason).trim())) {
+          warnings.push(`${loc} cancelled なのに statusReason が空です`);
+        }
+        if (ev.status === 'closed' && !(ev.statusReason && String(ev.statusReason).trim())) {
+          warnings.push(`${loc} closed なのに statusReason（根拠）が空です`);
+        }
+        if (ev.statusSource === 'ocr') {
+          warnings.push(`${loc} OCR由来の状態(${ev.status})です。一次ソース照合を推奨`);
+        }
+      }
+
+      // deadlineDate（機械判定用の締切日）— ISO 実在日・開催日との整合
+      if (ev.deadlineDate != null && ev.deadlineDate !== '') {
+        if (!DATE_RE.test(String(ev.deadlineDate)) || !isRealDate(String(ev.deadlineDate))) {
+          errors.push(`${loc} deadlineDate が不正（ISO実在日ではない）: "${ev.deadlineDate}"`);
+        } else {
+          const eff = (ev.endDate && isRealDate(ev.endDate)) ? ev.endDate : ev.date;
+          // 締切が開催（終了）日より後は不自然（警告）
+          if (isRealDate(eff) && ev.deadlineDate > eff) {
+            warnings.push(`${loc} deadlineDate(${ev.deadlineDate}) が開催日(${eff})より後です`);
+          }
+        }
+      }
+
+      // office（内部ID）— 形式検証（表示名・日本語混入を防ぐ）
+      if (ev.office != null && ev.office !== '' && !OFFICE_ID_RE.test(String(ev.office))) {
+        errors.push(`${loc} office が内部ID形式ではありません: "${ev.office}"`);
+      }
 
       // weatherLocation（座標範囲・accuracy）
       const wl = ev.weatherLocation;
