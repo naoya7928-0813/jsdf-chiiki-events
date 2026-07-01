@@ -98,7 +98,9 @@ jobs:
       # ── スクレイピング実行 ────────────────────────────────────
       - name: イベントデータをスクレイピング
         working-directory: scraper
-        run: node index.js
+        run: |
+          echo "STAGE=scrape" >> "$GITHUB_ENV"
+          node index.js
         env:
           GROQ_API_KEY:     ${{ secrets.GROQ_API_KEY }}
           GEMINI_API_KEY:   ${{ secrets.GEMINI_API_KEY }}
@@ -112,79 +114,146 @@ jobs:
       # ── データ健全性チェック（スクレイプ成功でも取得結果が異常なら警告）──
       - name: データ健全性チェック
         run: |
+          echo "STAGE=health_check" >> "$GITHUB_ENV"
           count_json() { node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{const d=JSON.parse(s);let n=0;for(const k of Object.keys(d))if(Array.isArray(d[k]))n+=d[k].length;console.log(n)}catch{console.log(-1)}})"; }
           NEW=$(cat public/data/events.json | count_json)
           OLD=$(git show HEAD:public/data/events.json 2>/dev/null | count_json)
           echo "前回:${OLD} 今回:${NEW}"
+          echo "TOTAL_EVENTS=${NEW}" >> "$GITHUB_ENV"
+          echo "PREV_EVENTS=${OLD:-0}" >> "$GITHUB_ENV"
           ALERT=""
           if [ "$NEW" -lt 50 ]; then ALERT="総イベント数が異常に少ない（${NEW}件）"; fi
           if [ "${OLD:-0}" -gt 0 ] && [ "$NEW" -lt $((OLD * 60 / 100)) ]; then ALERT="総イベント数が前回比で急減（${OLD}→${NEW}件）"; fi
           if [ -n "$ALERT" ]; then
             echo "::warning::${ALERT}"
-            curl -s \
+            echo "HEALTH_ALERT=${ALERT}" >> "$GITHUB_ENV"
+            curl -sS --fail-with-body --retry 3 --retry-all-errors --connect-timeout 10 --max-time 30 \
               -H "Title: ⚠️ データ健全性アラート" \
               -H "Tags: warning" \
               -H "Priority: high" \
               -H "Content-Type: text/plain; charset=utf-8" \
               -d "${ALERT}。スクレイプは成功扱いですが、取得結果に異常の可能性があります。 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-              https://ntfy.sh/${{ secrets.NTFY_ADMIN_TOPIC }} || true
+              "https://ntfy.sh/${{ secrets.NTFY_ADMIN_TOPIC }}" \
+              || echo "::warning::管理者通知（健全性アラート）の送信に失敗しました（本来の処理には影響しません）"
           fi
 
       # ── イベント名の品質チェック（表記ゆれ・記載エラーの疑いを警告）──
       - name: イベント名の品質チェック
         run: |
+          echo "STAGE=title_check" >> "$GITHUB_ENV"
           if ! OUTPUT=$(node scripts/check-event-titles.mjs); then
             echo "$OUTPUT"
             echo "::warning::イベント名に要確認項目があります"
-            curl -s \
+            WARN=$(printf '%s\n' "$OUTPUT" | grep -ciE "確認|warning|要|⚠" || true)
+            echo "TITLE_WARNINGS=${WARN:-0}" >> "$GITHUB_ENV"
+            curl -sS --fail-with-body --retry 3 --retry-all-errors --connect-timeout 10 --max-time 30 \
               -H "Title: 📝 イベント名 要確認" \
               -H "Tags: memo" \
               -H "Priority: default" \
               -H "Content-Type: text/plain; charset=utf-8" \
               -d "$(echo "$OUTPUT" | tail -20)" \
-              https://ntfy.sh/${{ secrets.NTFY_ADMIN_TOPIC }} || true
+              "https://ntfy.sh/${{ secrets.NTFY_ADMIN_TOPIC }}" \
+              || echo "::warning::管理者通知（イベント名 要確認）の送信に失敗しました（本来の処理には影響しません）"
           else
             echo "$OUTPUT"
+            echo "TITLE_WARNINGS=0" >> "$GITHUB_ENV"
           fi
 
       # ── データ品質チェック（構造破損・ID重複・不正日付・座標範囲等。エラーでデプロイ停止）──
       - name: データ品質チェック（必須）
-        run: node scripts/check-data-quality.mjs
+        run: |
+          echo "STAGE=data_quality" >> "$GITHUB_ENV"
+          node scripts/check-data-quality.mjs
+          echo "DATA_QUALITY_RESULT=合格" >> "$GITHUB_ENV"
 
       # ── 変更があればコミット & プッシュ ──────────────────────
       - name: 変更をコミット & プッシュ
         id: commit
         run: |
+          echo "STAGE=commit" >> "$GITHUB_ENV"
           git config core.autocrlf false
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add public/data/events.json public/events.html public/events/ public/sitemap.xml
+          # コミット対象を全てステージする。
+          # ※ scraper/geocode-cache.json は「コミット対象」の追跡ファイルで、スクレイプ毎に
+          #   書き換わる。これを add し忘れると未ステージの追跡変更として残り、後続の
+          #   `git rebase` が "cannot rebase: You have unstaged changes" で失敗していた
+          #   （2026-06-28 の天気/ジオコーディング機能導入以降、毎回 push 前に停止）。
+          git add public/data/events.json public/events.html public/events/ public/sitemap.xml scraper/geocode-cache.json
 
+          # 公開データ（events.json / events.html / sitemap.xml）が変わった時のみ
+          # コミット＆デプロイ対象とする（geocode-cache 単独の変化ではデプロイしない）。
           EVENTS_STATUS=$(git status --porcelain public/data/events.json public/events.html public/sitemap.xml)
 
           if [ -z "$EVENTS_STATUS" ]; then
             echo "データに変更がありませんでした。コミットをスキップします。"
             echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
-            git commit -m "chore: update events data [skip ci]"
-            # 生成データは常に最新を正とするため、rebase 競合時は本コミット側を採用(-X theirs)。
-            # origin が進んでいても確実に push できるよう数回リトライする。
-            PUSHED=0
-            for i in 1 2 3 4 5; do
-              git fetch origin master || true
-              if git rebase -X theirs origin/master && git push; then
-                PUSHED=1; break
-              fi
-              git rebase --abort 2>/dev/null || true
-              echo "push リトライ $i"; sleep $((5 * i))
-            done
-            if [ "$PUSHED" != "1" ]; then
-              echo "push に失敗しました"; exit 1
-            fi
-            echo "events.json を更新しました。"
-            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "COMMIT_RESULT=変更なし（スキップ）" >> "$GITHUB_ENV"
+            echo "PUSH_RESULT=スキップ" >> "$GITHUB_ENV"
+            exit 0
           fi
+
+          if ! git commit -m "chore: update events data [skip ci]"; then
+            echo "::error::git commit に失敗しました"
+            echo "COMMIT_RESULT=失敗" >> "$GITHUB_ENV"
+            exit 1
+          fi
+          echo "COMMIT_RESULT=成功" >> "$GITHUB_ENV"
+
+          # ── push ─────────────────────────────────────────────────
+          # 生成データは常に最新を正とするため rebase 競合は本コミット側を採用(-X theirs)。
+          # 失敗原因を区別し、恒久的な拒否（ブランチ保護/権限）は再試行せず即終了、
+          # 一時的な通信障害・非fast-forward（他 push との競合）のみ再試行する。
+          echo "STAGE=push" >> "$GITHUB_ENV"
+          PUSHED=0
+          ATTEMPTS=3
+          for i in $(seq 1 "$ATTEMPTS"); do
+            # fetch: 一時的な通信障害はリトライ対象
+            if ! git fetch origin master; then
+              echo "::warning::git fetch に失敗（試行 ${i}/${ATTEMPTS}）。通信の一時障害の可能性。再試行します。"
+              sleep $((5 * i)); continue
+            fi
+
+            # rebase: 未ステージ変更が残っても停止しないよう autostash を有効化（多層防御）
+            if ! git -c rebase.autoStash=true rebase -X theirs origin/master; then
+              echo "::warning::rebase に失敗（試行 ${i}/${ATTEMPTS}）。中断してやり直します。"
+              git rebase --abort 2>/dev/null || true
+              sleep $((5 * i)); continue
+            fi
+
+            # push: 標準エラーを捕捉して原因を判別（認証情報は出力されない）
+            if PUSH_ERR=$(git push origin HEAD:master 2>&1); then
+              PUSHED=1; break
+            fi
+            echo "リモート応答:"; printf '%s\n' "$PUSH_ERR"
+
+            # ブランチ保護 / ルール / 権限による拒否 → 再試行しても解決しないため即終了
+            if printf '%s' "$PUSH_ERR" | grep -qiE "protected branch|GH006|push declined|repository rule|required status|not authorized|permission to|denied|403"; then
+              echo "::error::ブランチ保護またはルール/権限により push が拒否されました。リトライせず終了します。"
+              echo "PUSH_RESULT=拒否（ブランチ保護/ルール/権限）" >> "$GITHUB_ENV"
+              exit 1
+            fi
+
+            # non-fast-forward（他の push と競合）→ fetch/rebase からやり直し
+            if printf '%s' "$PUSH_ERR" | grep -qiE "non-fast-forward|fetch first|rejected|stale info"; then
+              echo "::warning::non-fast-forward（他 push と競合。試行 ${i}/${ATTEMPTS}）。fetch/rebase からやり直します。"
+              sleep $((5 * i)); continue
+            fi
+
+            # それ以外（一時的な通信障害等）→ 再試行
+            echo "::warning::push が一時的に失敗（試行 ${i}/${ATTEMPTS}）。再試行します。"
+            sleep $((5 * i))
+          done
+
+          if [ "$PUSHED" != "1" ]; then
+            echo "::error::push に失敗しました（${ATTEMPTS} 回試行）"
+            echo "PUSH_RESULT=失敗" >> "$GITHUB_ENV"
+            exit 1
+          fi
+          echo "events.json を更新しました。"
+          echo "PUSH_RESULT=成功" >> "$GITHUB_ENV"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
 
       # ── Vercel に本番デプロイ ─────────────────────────────
       - name: Vercel に本番デプロイ
@@ -194,12 +263,18 @@ jobs:
         # トークンは別名 env で受け取り改行を除去してから --token に渡す
         # （VERCEL_TOKEN シークレットに改行が混入しており CLI が拒否するため）
         run: |
+          echo "STAGE=deploy" >> "$GITHUB_ENV"
           CLEAN_TOKEN=$(printf '%s' "$VTOKEN" | tr -d '\r\n')
           ARGS=""
           if [ -n "$NTFY_BUG_TOPIC" ]; then ARGS="$ARGS -e NTFY_BUG_TOPIC=$NTFY_BUG_TOPIC"; fi
           if [ -n "$ADMIN_SECRET" ];   then ARGS="$ARGS -e ADMIN_SECRET=$ADMIN_SECRET"; fi
           if [ -n "$ADMIN_ACCOUNTS_B64" ]; then ARGS="$ARGS -e ADMIN_ACCOUNTS_B64=$ADMIN_ACCOUNTS_B64"; fi
-          npx vercel --prod --token "$CLEAN_TOKEN" $ARGS
+          if ! npx vercel --prod --token "$CLEAN_TOKEN" $ARGS; then
+            echo "::error::Vercel デプロイに失敗しました"
+            echo "DEPLOY_RESULT=失敗" >> "$GITHUB_ENV"
+            exit 1
+          fi
+          echo "DEPLOY_RESULT=成功" >> "$GITHUB_ENV"
         env:
           VTOKEN:            ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
@@ -216,6 +291,7 @@ jobs:
       - name: プッシュ通知を送信
         if: steps.commit.outputs.changed == 'true'
         run: |
+          echo "STAGE=notification" >> "$GITHUB_ENV"
           cat > /tmp/check_notify.js << 'JSEOF'
           'use strict';
           const { execSync } = require('child_process');
@@ -327,14 +403,17 @@ jobs:
             TOTAL=$(node -p "require('/tmp/notify_data.json').total")
             REGION_NAMES=$(node -p "require('/tmp/notify_data.json').regionNames")
 
-            # 全地区トピックへ送信
-            curl -s \
+            # 全地区トピックへ送信（push/deploy は成功済み。通知の一時失敗で
+            # ジョブ全体を失敗させ誤った失敗メールを出さないよう、失敗は警告に留める）
+            NOTIFY_WARN=0
+            curl -sS --retry 3 --retry-all-errors --connect-timeout 10 --max-time 30 \
               -H "Title: 自衛隊地本イベント情報 新着" \
               -H "Tags: mega,jp" \
               -H "Priority: default" \
               -d "新着イベントが${TOTAL}件追加されました（${REGION_NAMES}）。アプリを確認してください。" \
-              https://ntfy.sh/${{ secrets.NTFY_TOPIC }}
-            echo "[通知] 全地区送信完了（新着 ${TOTAL}件 / ${REGION_NAMES}）"
+              "https://ntfy.sh/${{ secrets.NTFY_TOPIC }}" \
+              && echo "[通知] 全地区送信完了（新着 ${TOTAL}件 / ${REGION_NAMES}）" \
+              || { NOTIFY_WARN=1; echo "::warning::全地区への新着通知の送信に失敗しました（データ更新自体は成功しています）"; }
 
             # 地区別トピックへ送信
             node -e "
@@ -343,26 +422,77 @@ jobs:
                 process.stdout.write(id + '\t' + r.label + '\t' + r.count + '\t' + r.sample + '\n');
               }
             " | while IFS=$'\t' read -r REGION_ID REGION_LABEL COUNT SAMPLE; do
-              curl -s \
+              curl -sS --retry 3 --retry-all-errors --connect-timeout 10 --max-time 30 \
                 -H "Title: 自衛隊地本イベント情報 新着（${REGION_LABEL}）" \
                 -H "Tags: mega,jp" \
                 -H "Priority: default" \
                 -d "${REGION_LABEL}に新着${COUNT}件（${SAMPLE}）追加されました。" \
-                https://ntfy.sh/${{ secrets.NTFY_TOPIC }}-${REGION_ID}
-              echo "[通知] ${REGION_LABEL}送信完了（${COUNT}件）"
+                "https://ntfy.sh/${{ secrets.NTFY_TOPIC }}-${REGION_ID}" \
+                && echo "[通知] ${REGION_LABEL}送信完了（${COUNT}件）" \
+                || echo "::warning::${REGION_LABEL}への新着通知の送信に失敗しました（データ更新自体は成功しています）"
             done
+            if [ "${NOTIFY_WARN:-0}" = "1" ]; then
+              echo "NOTIFY_RESULT=一部送信失敗（警告。新着 ${TOTAL}件）" >> "$GITHUB_ENV"
+            else
+              echo "NOTIFY_RESULT=送信済み（新着 ${TOTAL}件）" >> "$GITHUB_ENV"
+            fi
           else
             echo "[通知] 送信スキップ"
+            echo "NOTIFY_RESULT=新着なし（スキップ）" >> "$GITHUB_ENV"
           fi
 
-      # ── スクレイプ失敗を管理者に通知 ──────────────────────
-      - name: スクレイプ失敗を管理者に通知
+      # ── 失敗段階を特定して管理者に通知 ──────────────────────
+      # 一律の「スクレイピング失敗」ではなく、実際に停止した段階を表示する。
+      - name: 失敗を管理者に通知
         if: failure()
         run: |
-          curl -s \
-            -H "Title: ⚠️ スクレイピング失敗" \
+          case "${STAGE:-unknown}" in
+            scrape)        LABEL="データ取得失敗" ;;
+            health_check)  LABEL="データ健全性チェック失敗" ;;
+            title_check)   LABEL="イベント名チェック失敗" ;;
+            data_quality)  LABEL="必須データ品質チェック失敗" ;;
+            commit)        LABEL="Git commit失敗" ;;
+            push)          LABEL="GitHub push失敗" ;;
+            deploy)        LABEL="Vercel deploy失敗" ;;
+            notification)  LABEL="通知配信の警告/失敗" ;;
+            *)             LABEL="不明な段階での失敗" ;;
+          esac
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          echo "::error::失敗段階: ${STAGE:-unknown}（${LABEL}）"
+          curl -sS --fail-with-body --retry 3 --retry-all-errors --connect-timeout 10 --max-time 30 \
+            -H "Title: ⚠️ 自動更新ジョブ失敗: ${LABEL}" \
             -H "Tags: warning" \
             -H "Priority: high" \
             -H "Content-Type: text/plain; charset=utf-8" \
-            -d "スクレイピングジョブが失敗しました。GitHub Actions のログを確認してください。 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-            https://ntfy.sh/${{ secrets.NTFY_ADMIN_TOPIC }}
+            -d "自動更新ジョブが「${LABEL}」段階で失敗しました（stage=${STAGE:-unknown}）。ログを確認してください。 ${RUN_URL}" \
+            "https://ntfy.sh/${{ secrets.NTFY_ADMIN_TOPIC }}" \
+            || echo "::warning::管理者への失敗通知の送信に失敗しました（元の障害原因は上記 stage を参照）"
+
+      # ── 実行サマリを $GITHUB_STEP_SUMMARY に出力（成功/失敗いずれも） ──
+      - name: 実行サマリを出力
+        if: always()
+        run: |
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          if [ "${{ job.status }}" = "success" ]; then
+            FINAL="✅ 成功"
+          else
+            FINAL="❌ 失敗（最終段階: ${STAGE:-unknown}）"
+          fi
+          {
+            echo "## スクレイピング & データ更新 実行サマリ"
+            echo ""
+            echo "| 項目 | 結果 |"
+            echo "| --- | --- |"
+            echo "| スクレイピング | ${TOTAL_EVENTS:+成功（${TOTAL_EVENTS} 件取得）}${TOTAL_EVENTS:-未到達 or 失敗} |"
+            echo "| イベント総数 | ${TOTAL_EVENTS:-N/A} 件（前回 ${PREV_EVENTS:-N/A} 件） |"
+            echo "| データ健全性 | ${HEALTH_ALERT:-異常なし} |"
+            echo "| 品質警告数（イベント名） | ${TITLE_WARNINGS:-0} 件 |"
+            echo "| 必須品質チェック | ${DATA_QUALITY_RESULT:-未実行/失敗} |"
+            echo "| commit | ${COMMIT_RESULT:-未実行} |"
+            echo "| push | ${PUSH_RESULT:-未実行} |"
+            echo "| deploy | ${DEPLOY_RESULT:-スキップ/未実行} |"
+            echo "| 通知 | ${NOTIFY_RESULT:-スキップ/未実行} |"
+            echo "| **最終ステータス** | **${FINAL}** |"
+            echo ""
+            echo "対象 Run: ${RUN_URL}"
+          } >> "$GITHUB_STEP_SUMMARY"
