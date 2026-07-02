@@ -26,7 +26,15 @@ function toHalfAlnum(s) {
 function cleanEventTitle(raw) {
   if (!raw) return raw;
   let t = String(raw).replace(/\s+/g, ' ').trim();
+  // 画像キャプション「（クリックで拡大します。）」の混入（前後どこでも。新潟等）
+  t = t.replace(/[（(]?クリックで拡大します。?[）)]?/g, ' ').replace(/\s+/g, ' ').trim();
   t = t.replace(/^イベント情報\s*/, '');           // 見出し「イベント情報」の巻き込み
+  // 先頭の孤立した閉じ括弧断片「艦艇広報】 ○○」「見学】○○」（開き括弧が欠落した見出しタグ残骸）
+  t = t.replace(/^[^【】]{1,6}】\s*/, '');
+  // 先頭の波ダッシュ断片「～ YAMACHI BASE」（本文の途中から切れたもの）
+  t = t.replace(/^[~〜～\s]+/, '');
+  // 先頭のバッジ語の連なり「イベント事前予約制無 料 ○○説明会」（開催条件バッジがタイトルに巻き込まれたもの）
+  t = t.replace(/^(?:(?:イベント|事前予約制|予約制|予約不要|入場無料|参加無料|無\s*料)\s*){2,}/, '');
   // 「更新情報New」「新着情報」等の更新バッジ接頭辞（office_html がトピック一覧の
   // 見出しごと拾ったもの。例:「更新情報new 公務員合同説明会…」）
   t = t.replace(/^(?:更新情報|新着情報|最新情報|更新|お知らせ)\s*(?:new|ＮＥＷ|新着)?[\s!！:：・]*/i, '');
@@ -36,6 +44,7 @@ function cleanEventTitle(raw) {
   // 「NEW6/14&7/11 」「NEW＼」のような新着マーク＋日付断片・装飾
   t = t.replace(/^(?:NEW|ＮＥＷ|新着)(?=[\s\d０-９!！/／&＆＼\\])[!！]*[\s\d０-９/／&＆.．＼\\]*/, '');
   t = t.replace(/^\d\s*(?=[ァ-ヶ])/, '');          // 「1オンライン説明会」等のページ番号残骸
+  t = t.replace(/^\d\s+(?=20\d{2})/, '');          // 「2 2026サマーキャンプ」等の先頭連番残骸
   // 複数イベントが「○○説明会in広島の ○○説明会inふくやまの ○○ガイダンスのご案内」の
   // ように連結したもの → 先頭イベントのみ残す（イベント語が2回以上 かつ 「の␣」連結時）
   if ((t.match(/説明会|ガイダンス|相談会|フェア|見学会/g) || []).length >= 2
@@ -43,6 +52,19 @@ function cleanEventTitle(raw) {
     t = t.replace(/((?:説明会|ガイダンス|相談会|フェア|見学会)(?:in[^\sの]+)?)の\s.*$/, '$1');
   }
   t = t.replace(/\s*参加費\s*無料[!！]*$/, '');    // 末尾の宣伝文句
+  // 末尾のCTA誘導「ご応募はコチラ」「お申し込みはこちら」
+  t = t.replace(/\s*(?:ご|お)?(?:応募|申し?込み?)は?(?:こちら|コチラ)[!！]*$/, '');
+  // 末尾の「のお知らせ」「のご案内」（告知ページ見出しの残り。イベント名としては冗長）
+  t = t.replace(/\s*の(?:お知らせ|ご案内)$/, '');
+  // 末尾の文書件名「○○募集の件」「○○参加募集の件」（PDFリンク文言の巻き込み）
+  t = t.replace(/\s*(?:参加|開催)?募集の件$/, '').replace(/\s*の件$/, '');
+  // 末尾のファイル名残骸「…（秋田港）-26[PDF」「…（能代港）-5」（閉じ括弧直後のみ。TC-90等の型番は残す）
+  t = t.replace(/(?<=[）)])\s*[-－]\d{1,2}(?:\[[A-Za-z]*)?$/, '');
+  // 破損した日付範囲括弧「○○の （～31キオクシアアイーナ）」（開始日が欠けた期間表記の残骸）
+  t = t.replace(/\s*の?\s*[（(]\s*[~〜～][^）)]*[）)]\s*$/, '');
+  // カレンダーの複数項目連結「公務員合同説明会 平日～令和７年度柏崎入隊激励会」
+  // → 後続の別項目（～令和N年度…）を切り落とす（激励会・入隊等の行事語を伴う場合のみ）
+  t = t.replace(/\s*\S{0,4}[~〜～]令和[\d０-９元]{1,3}年度\S*(?:激励会|入隊|式典|説明会|見学|まつり).*$/, '');
   t = t.replace(/[\u{1F000}-\u{1FAFF}\u{2700}-\u{27BF}\u{FE0F}\u{1F3FB}-\u{1F3FF}]+\s*$/u, ''); // 末尾の絵文字
   // 「○○！！ 会場名…」のように本文(！/！！)の後ろへ空白区切りで会場名が連結した
   // ものを切り落とす（例:「公務員合同説明会の！！ 帯広とかちプラザ… ～」）。
@@ -74,11 +96,25 @@ function isJunkOrStubTitle(title) {
   if (/\d{2,4}[-－]\d{3,4}[-－]\d{4}/.test(t)) return true; // 電話番号
   if (/及び定員|提出書類|応募方法|様式第|試験期日|受験案内/.test(t)) return true; // 様式・受験案内の断片
   if (/タイトル不明/.test(t))                  return true; // OCRフォールバックの残骸
+  if (/^乗艦受付|受付時刻$/.test(t))           return true; // 艦艇公開ページの受付時刻ラベル行
+  if (/最大射程|発射速度|排水量|巡航速度/.test(t)) return true; // 装備スペック表の行（イベント名ではない）
+  if (/^\S{0,12}上空を(?:航過|通過)$/.test(t)) return true; // 飛行経路の述語断片（「宮古港上空を航過」）
+  if (/^\S{1,6}地本公式$/.test(t))             return true; // サイト名ラベル（「岩手地本公式」）
+  if (/^内\s*容\s/.test(t))                    return true; // 様式のラベル行（「内 容 職業概要説明…」）
+  // 主催組織名のみ（イベント種別なし。「二戸地区広域行政事務組合消防本部」等）
+  if (/(?:消防本部|行政事務組合|市役所|町役場)$/.test(t)
+      && !/説明会|見学|体験|まつり|祭|フェア|フェスタ|コンサート|ガイダンス|相談会/.test(t)) return true;
+  // 採用試験日程表の行が平坦化されたもの（「医科・歯科幹部 第1回採用試験 第2回採用試験」）
+  if (/第[1１一]回採用試験.*第[2２二]回採用試験/.test(t)) return true;
+  // 海自の阪神基地隊が「航空自衛隊」と連結された矛盾タイトル（隣接項目の平坦化事故）
+  if (/航空自衛隊\s*阪神基地隊/.test(t))       return true;
+  // 教育機関名のみ（種別なし。「防衛医科大学校」単独等。説明会・オープンキャンパス付きは通す）
+  if (/^(?:防衛医科大学校|防衛大学校|(?:陸上自衛隊)?高等工科学校)$/.test(t)) return true;
   // 募集種目名のみ（受験案内PDFのOCR。例:「一般曹候補生」「幹部候補生・幹部候補曹」）
   if (/^(?:一般曹候補生|自衛官候補生|幹部候補生|予備自衛官補?|医科・?歯科幹部|技術曹|貸費学生)(?:[・,、][一-鿿ァ-ヶa-zA-Z・]{0,15})?$/.test(t)) return true;
   // 住所の混入（「○丁目35-8」等。県名なしの「德島市…」形式は従来の住所ルールを素通りした）
   if (/丁目[\d０-９]{1,3}[-－‐][\d０-９]/.test(t)) return true;
-  if (/入札公告|オープンカウンター|実施要領|仕様書/.test(t)) return true; // 調達・契約文書（イベントではない）
+  if (/入札公告|オープンカウンター|実施要領|仕様書|契約担当官/.test(t)) return true; // 調達・契約文書（イベントではない）
   if (/チラシを参照|参照願います/.test(t))      return true; // 注記文の混入
   // リンク文言の単独タイトル（「ダウンロード」「こちら」等）
   if (/^(?:ダウンロード|詳細|詳しくは|こちら|チラシ[\d０-９]*|PDF|画像|リンク)$/i.test(t)) return true;
@@ -94,8 +130,9 @@ function isJunkOrStubTitle(title) {
   // （OCRがチラシ最上部の部隊名だけを拾ったもの。例:「海上自衛隊」「自衛隊仙台病院」）
   // ※ 実在イベントの場合は VERIFIED_OVERRIDES でチラシ照合済みの正式名を登録して救済する
   if (/^(?:陸上|海上|航空)?自衛隊(?:[一-鿿ァ-ヶー]{2,8}(?:病院|救難隊|音楽隊|基地|部隊|駐屯地))?$/.test(t)) return true;
-  // 助詞・読点で終わる文の断片（タイトルの途中切れ。例:「最新の」「○○について、」）
+  // 助詞・読点で終わる文の断片（タイトルの途中切れ。例:「最新の」「○○について、」「○○（２回目）から」）
   if (/[をがはにへとの、]$/.test(t))           return true;
+  if (/(?:から|より)$/.test(t))                return true;
   // 日本語がほぼ無い断片（例:「1 R.22〜＃2 R.24」）。英語タイトルは許容
   const jp = (t.match(/[぀-ヿ㐀-䶿一-鿿]/g) || []).length;
   if (jp < 3 && !/[A-Za-z]{4,}/.test(t))       return true;
@@ -146,10 +183,14 @@ function isStaleDatedEvent(ev) {
 function normForDedup(s) {
   let t = toHalfAlnum(s);
   t = t.replace(/[（(][^）)]*[）)]/g, '');
+  // ［艦艇広報］【見学】等の見出しタグ（全角/半角角括弧・隅付き括弧）も除去して比較する
+  t = t.replace(/[［\[【][^］\]】]*[］\]】]/g, '');
   t = t.replace(/[\s　・|｜/／&＆!！?？.。、,，:：~〜～\-－]/g, '');
   // 「陸上自衛隊体験型説明会in陸上自衛隊信太山駐屯地」と「体験型説明会in信太山駐屯地」
   // のような軍種名の有無による表記ゆれを同一視する
   t = t.replace(/陸上自衛隊|海上自衛隊|航空自衛隊|自衛隊/g, '');
+  // 「○○駐屯地見学会」と「○○駐屯地部隊見学会」の表記ゆれを同一視する
+  t = t.replace(/部隊見学/g, '見学');
   return t;
 }
 
@@ -160,12 +201,19 @@ function normForDedup(s) {
  * ※ 同名でも場所が異なるイベント（例: 同日の説明会を複数事務所で開催）は残す。
  * 重複時は情報量の多い方（場所・時間・備考あり）を残す。
  */
+/** URL のファイル名（拡張子なし・小文字）。同一チラシの jpg/pdf 版を同一視するための鍵 */
+function urlBasename(u) {
+  const m = String(u || '').match(/\/([^/?#]+)\.(?:pdf|jpe?g|png|gif|webp)(?:[?#]|$)/i);
+  return m ? m[1].toLowerCase() : '';
+}
+
 function dedupEvents(list) {
   const kept = [];
   const score = e => String(e.title || '').length
     + (e.place ? 5 : 0) + (e.time ? 3 : 0) + (e.notes ? 1 : 0);
   for (const ev of list) {
     const n = normForDedup(ev.title || '');
+    const ub = urlBasename(ev.url);
     let merged = false;
     for (let i = 0; i < kept.length; i++) {
       const k = kept[i];
@@ -174,15 +222,20 @@ function dedupEvents(list) {
       const contained = !sameTitle && k.n.length >= 8 && n.length >= 8
         && (k.n.includes(n) || n.includes(k.n));
       if (!sameTitle && !contained) continue;
-      const pk = normForDedup(k.ev.place || '');
-      const pe = normForDedup(ev.place || '');
-      // 場所が両方あり、かつ別物なら別イベント
-      if (pk && pe && pk !== pe && !pk.includes(pe) && !pe.includes(pk)) continue;
-      if (score(ev) > score(k.ev)) kept[i] = { ev, n };
+      // 同名・同日で、同一ソースファイル（チラシの jpg/pdf 版違い等）なら
+      // 場所欄の書き方（実会場名 vs 事務所名）が違っても同一イベントとして統合する
+      const sameAsset = sameTitle && ub && ub === k.ub;
+      if (!sameAsset) {
+        const pk = normForDedup(k.ev.place || '');
+        const pe = normForDedup(ev.place || '');
+        // 場所が両方あり、かつ別物なら別イベント
+        if (pk && pe && pk !== pe && !pk.includes(pe) && !pe.includes(pk)) continue;
+      }
+      if (score(ev) > score(k.ev)) kept[i] = { ev, n, ub };
       merged = true;
       break;
     }
-    if (!merged) kept.push({ ev, n });
+    if (!merged) kept.push({ ev, n, ub });
   }
   return kept.map(k => k.ev);
 }

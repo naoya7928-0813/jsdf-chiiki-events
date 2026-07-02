@@ -86,6 +86,14 @@ function esc(s) {
     .replace(/"/g, '&quot;');
 }
 
+// <script type="application/ld+json"> へ埋め込む JSON の無害化。
+// JSON.stringify は "<" をエスケープしないため、スクレイプ由来のタイトルに
+// "</script>" が含まれるとタグが破壊される（格納型XSSベクトル）。
+// "<" を < に置換すれば JSON としては等価のままタグ終端を防げる。
+function jsonLdSafe(obj) {
+  return JSON.stringify(obj).replace(/</g, '\\u003c');
+}
+
 // クローラー向けHTMLの軽量化: タグ間の純粋な空白（インデント/改行）だけを除去する。
 // <script>(JSON-LD)・<style> ブロックは中身を保護し、その外側だけを圧縮する
 // （JSON値に ">  <" 等が含まれても壊さないため）。
@@ -275,7 +283,7 @@ const sections = Object.entries(byPref).map(([label, events]) => {
 }).join('\n\n');
 
 // JSON-LD は整形(インデント)不要。クローラーは圧縮JSONも同等に解釈するため非整形で出力し軽量化。
-const allJsonLd = JSON.stringify(
+const allJsonLd = jsonLdSafe(
   allEvents.map(ev => toEventSchema(ev, ev.prefLabel))
 );
 
@@ -363,7 +371,7 @@ for (const [prefKey, prefLabel] of Object.entries(PREF_LABELS)) {
   if (hasEvents) {
     for (const ev of events) schemas.push(toEventSchema(ev, prefLabel));
   }
-  const prefJsonLd = JSON.stringify(schemas);
+  const prefJsonLd = jsonLdSafe(schemas);
 
   const countNote = hasEvents
     ? `説明会・体験イベント・駐屯地一般公開・記念行事など ${events.length} 件を掲載`
@@ -472,7 +480,7 @@ const GUIDE_FAQ = [
     a: '本サイトは全国の地方協力本部・募集案内所の公式サイトを1日3回自動巡回し、最新のイベント情報を都道府県別に更新しています。ただし公式の中止・変更・延期が即時に反映されない場合があります。参加前には必ず各イベントの公式ページで最新情報をご確認ください。' },
 ];
 
-const guideJsonLd = JSON.stringify([
+const guideJsonLd = jsonLdSafe([
   { '@context': 'https://schema.org', '@type': 'FAQPage',
     mainEntity: GUIDE_FAQ.map(f => ({ '@type': 'Question', name: f.q,
       acceptedAnswer: { '@type': 'Answer', text: f.a } })) },

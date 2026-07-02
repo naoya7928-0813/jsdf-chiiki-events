@@ -112,8 +112,8 @@ test('cleanEventTitle: 複数イベントの連結は先頭イベントのみ残
   assert.equal(
     cleanEventTitle('第１回公安系公務員合同説明会in広島の 公安系公務員合同説明会inふくやまの 公安職公務員ガイダンスのご案内'),
     '第１回公安系公務員合同説明会in広島');
-  // 単独イベント（イベント語1回）は連結扱いしない
-  assert.equal(cleanEventTitle('公務員合同説明会のご案内'), '公務員合同説明会のご案内');
+  // 単独イベント（イベント語1回）は連結扱いしない（※末尾「のご案内」は2026-07-02から除去仕様）
+  assert.equal(cleanEventTitle('公務員合同説明会のご案内'), '公務員合同説明会');
 });
 
 test('isJunkOrStubTitle: 不正タイトルを検出する', () => {
@@ -225,4 +225,116 @@ test('dedupEvents: 同一イベントは統合し、場所違いの同名イベ�
   ]);
   assert.equal(f.length, 1);
   assert.equal(f[0].title, '陸上自衛隊 高等工科学校 オンライン説明会');
+});
+
+// ── 2026-07-02 全件監査で検出した新パターン ─────────────────────────
+
+test('cleanEventTitle: 画像キャプション「クリックで拡大します。）」の混入除去（新潟）', () => {
+  assert.equal(cleanEventTitle('クリックで拡大します。） 自衛隊就職説明会'), '自衛隊就職説明会');
+  assert.equal(cleanEventTitle('新発田駐屯地夏まつり （クリックで拡大します。）'), '新発田駐屯地夏まつり');
+});
+
+test('cleanEventTitle: 先頭の孤立閉じ括弧「艦艇広報】」「見学】」を除去（大阪）', () => {
+  assert.equal(cleanEventTitle('艦艇広報】 海上自衛隊 阪神基地隊サマーフェスタ2026'), '海上自衛隊 阪神基地隊サマーフェスタ2026');
+  assert.equal(cleanEventTitle('見学】夏休み特別企画第一弾 海上自衛隊 舞鶴基地'), '夏休み特別企画第一弾 海上自衛隊 舞鶴基地');
+  // 正常な【…】付きタイトルは変更しない
+  assert.equal(cleanEventTitle('【伊那市】自衛隊採用説明会'), '【伊那市】自衛隊採用説明会');
+});
+
+test('cleanEventTitle: 先頭の波ダッシュ断片を除去（山形）', () => {
+  assert.equal(cleanEventTitle('～ YAMACHI BASE（ヤマチベース）'), 'YAMACHI BASE（ヤマチベース）');
+});
+
+test('cleanEventTitle: 先頭のバッジ語連なり＋末尾CTAを除去（石川）', () => {
+  assert.equal(cleanEventTitle('イベント事前予約制無 料 公安系公務員合同職場見学会 ご応募はコチラ'),
+    '公安系公務員合同職場見学会');
+  // 「イベント」単独で始まる正常タイトルは変更しない（連なり2語以上のみ除去）
+  assert.equal(cleanEventTitle('イベント盛りだくさんの夏まつり'), 'イベント盛りだくさんの夏まつり');
+});
+
+test('cleanEventTitle: 先頭連番＋文書件名「募集の件」を除去（福島）', () => {
+  assert.equal(cleanEventTitle('2 2026サマーキャンプ(神町駐屯地)参加募集の件'), '2026サマーキャンプ(神町駐屯地)');
+  assert.equal(cleanEventTitle('2026航空学生説明会募集の件'), '2026航空学生説明会');
+  assert.equal(cleanEventTitle('2026秋季インターンシップ(市ヶ谷・入間)参加募集の件'), '2026秋季インターンシップ(市ヶ谷・入間)');
+});
+
+test('cleanEventTitle: 末尾「のお知らせ」「のご案内」を除去（旭川・広島）', () => {
+  assert.equal(cleanEventTitle('艦艇広報 護衛艦「きりさめ」「あさぎり」一般公開のお知らせ'),
+    '艦艇広報 護衛艦「きりさめ」「あさぎり」一般公開');
+  assert.equal(cleanEventTitle('第１回公安系公務員合同説明会ｉｎ広島のお知らせ'), '第１回公安系公務員合同説明会ｉｎ広島');
+  assert.equal(cleanEventTitle('公安職公務員ガイダンスのご案内'), '公安職公務員ガイダンス');
+});
+
+test('cleanEventTitle: 閉じ括弧直後のファイル名残骸を除去・型番は残す（秋田）', () => {
+  assert.equal(cleanEventTitle('多用途支援艦すおう一般公開（秋田港）-26[PDF'), '多用途支援艦すおう一般公開（秋田港）');
+  assert.equal(cleanEventTitle('多用途支援艦ひうち一般公開（能代港）-5'), '多用途支援艦ひうち一般公開（能代港）');
+  // 型番の「-90」等は閉じ括弧直後ではないため残す
+  assert.equal(cleanEventTitle('体験搭乗 練習機TC－90'), '体験搭乗 練習機TC－90');
+});
+
+test('cleanEventTitle: 破損した日付範囲括弧「の （～31…）」を除去（岩手）', () => {
+  assert.equal(cleanEventTitle('2026自衛隊サテライトブースの （～31キオクシアアイーナ）'), '2026自衛隊サテライトブース');
+});
+
+test('cleanEventTitle: カレンダー複数項目の連結を先頭項目に切り詰め（新潟）', () => {
+  assert.equal(cleanEventTitle('公務員合同説明会 平日～令和７年度柏崎入隊激励会'), '公務員合同説明会');
+});
+
+test('isJunkOrStubTitle: 艦艇公開ページの表の行・ラベル行を除外（岩手）', () => {
+  assert.equal(isJunkOrStubTitle('乗艦受付時刻'), true);
+  assert.equal(isJunkOrStubTitle('最大発射速度:30発／分、最大射程約:5,600m'), true);
+  assert.equal(isJunkOrStubTitle('宮古港上空を航過'), true);
+  assert.equal(isJunkOrStubTitle('岩手地本公式'), true);
+  assert.equal(isJunkOrStubTitle('内 容 職業概要説明・採用試験説明'), true);
+  // 正常な艦艇イベントは通す
+  assert.equal(isJunkOrStubTitle('海上自衛隊艦艇一般公開'), false);
+});
+
+test('isJunkOrStubTitle: 主催組織名のみ・調達文書・試験日程行を除外', () => {
+  assert.equal(isJunkOrStubTitle('二戸地区広域行政事務組合消防本部'), true);
+  assert.equal(isJunkOrStubTitle('分任契約担当官'), true);
+  assert.equal(isJunkOrStubTitle('医科・歯科幹部 第1回採用試験 第2回採用試験'), true);
+  assert.equal(isJunkOrStubTitle('技術曹 第1回採用試験 第2回採用試験 (海)'), true);
+  // 消防含みでもイベント語があれば通す
+  assert.equal(isJunkOrStubTitle('警察・消防・自衛隊合同職業説明会(名取）'), false);
+});
+
+test('isJunkOrStubTitle: 矛盾連結・学校名のみ・「から」終わりを除外', () => {
+  assert.equal(isJunkOrStubTitle('見学】夏休み特別企画第二弾 航空自衛隊 阪神基地隊サマーフェスタ2026'), true);
+  assert.equal(isJunkOrStubTitle('防衛医科大学校'), true);
+  assert.equal(isJunkOrStubTitle('令和８年度 キャリア採用幹部（２回目）から'), true);
+  // 種別付きの学校イベントは通す
+  assert.equal(isJunkOrStubTitle('防衛大学校 Open Campus'), false);
+  assert.equal(isJunkOrStubTitle('防衛医科大学校説明会'), false);
+});
+
+test('dedupEvents: ［艦艇広報］タグ・「部隊見学会」表記ゆれを統合（秋田・埼玉）', () => {
+  // ［艦艇広報］全角角括弧タグの有無 → 統合
+  const a = dedupEvents([
+    { date: '2026-07-25', title: '［艦艇広報］多用途支援艦すおう一般公開(秋田港)', place: '' },
+    { date: '2026-07-25', title: '多用途支援艦すおう一般公開（秋田港）', place: '秋田港' },
+  ]);
+  assert.equal(a.length, 1);
+  // 「見学会」vs「部隊見学会」 → 統合
+  const b = dedupEvents([
+    { date: '2026-07-25', title: '陸上自衛隊松戸駐屯地見学会', place: '' },
+    { date: '2026-07-25', title: '陸上自衛隊松戸駐屯地部隊見学会', place: '' },
+  ]);
+  assert.equal(b.length, 1);
+});
+
+test('dedupEvents: 同名・同日・同一チラシ(jpg/pdf版違い)は場所表記が違っても統合（新潟）', () => {
+  const a = dedupEvents([
+    { date: '2026-07-18', title: '公務員合同説明会', place: '柏崎市役所1F 多目的室', time: '13:00～16:00',
+      url: 'https://www.mod.go.jp/pco/niigata/images/honbu/8.7.18kashiwazakisetumei.jpg' },
+    { date: '2026-07-18', title: '公務員合同説明会', place: '柏崎地域事務所',
+      url: 'https://www.mod.go.jp/pco/niigata/files/honbu/8.7.18kashiwazakisetumei.pdf' },
+    // 別ソース・別会場の同名イベント（上越）は残す
+    { date: '2026-07-18', title: '公務員合同説明会', place: '上越地域事務所',
+      url: 'https://www.mod.go.jp/pco/niigata/HP/setumeikai.html' },
+  ]);
+  assert.equal(a.length, 2);
+  // 情報量の多い方（実会場＋時間あり）が残る
+  assert.ok(a.some(e => e.place === '柏崎市役所1F 多目的室'));
+  assert.ok(a.some(e => e.place === '上越地域事務所'));
 });

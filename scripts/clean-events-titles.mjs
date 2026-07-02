@@ -1,12 +1,13 @@
 /**
- * clean-events-titles.mjs（手動データクリーニング・一回限り）
+ * clean-events-titles.mjs（手動データクリーニング）
  *
- * 既存の public/data/events.json に対して、フロント(useEvents)/スクレイパーと同じ
- * タイトル整形・非イベント除外を直接適用して上書きする。
+ * 既存の public/data/events.json に対して、スクレイパーの writeOutput と同じ
+ * titleQuality フルパイプライン（検証済み修正→整形→不正除外→年ズレ除外→重複統合）
+ * ＋募集案内所イベントの office 整形を直接適用して上書きする。
  * 次回スクレイプを待たずに、表示・通知・events.json 本体を綺麗にするためのもの。
  *
  *   node scripts/clean-events-titles.mjs        # 適用して上書き
- *   node scripts/clean-events-titles.mjs --dry  # 集計のみ
+ *   node scripts/clean-events-titles.mjs --dry  # 差分表示のみ
  */
 import fs from 'fs';
 import path from 'path';
@@ -17,38 +18,56 @@ const FILE = path.join(ROOT, 'public/data/events.json');
 const DRY = process.argv.includes('--dry');
 
 const isOffice = ev => typeof ev?.source_type === 'string' && ev.source_type.startsWith('office');
-// 整形・非イベント判定は共通モジュールに一本化
+// 整形・非イベント判定は共通モジュールに一本化（writeOutput と同一経路）
 import { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } from '../shared/officeTitle.cjs';
+import {
+  applyVerifiedOverrides, cleanEventTitle, cleanPlaceText,
+  isJunkOrStubTitle, isStaleDatedEvent, dedupEvents,
+} from '../shared/titleQuality.cjs';
 
 const data = JSON.parse(fs.readFileSync(FILE, 'utf8'));
-let dropped = 0, changed = 0, placeChanged = 0, total = 0;
+let dropped = 0, changed = 0, placeChanged = 0, total = 0, dedupedCount = 0;
 const samples = [];
+const droppedList = [];
 
 for (const k of Object.keys(data)) {
   if (!Array.isArray(data[k])) continue;
   const next = [];
-  for (const ev of data[k]) {
+  for (const raw of data[k]) {
     total++;
-    const cleaned = isOffice(ev) ? stripTrailingCta(cleanOfficeTitle(ev.title)) : stripTrailingCta(ev.title);
-    // 非イベント or 整形しても中身が残らない（救済不能）募集案内所イベントは除外
-    if (isOffice(ev) && (officeIsJunk(ev.title) || officeIsJunk(cleaned)
-        || cleaned === '募集案内所イベント' || cleaned.replace(/[\s　]/g, '').length < 4)) { dropped++; continue; }
-    if (cleaned !== ev.title) {
-      if (samples.length < 25) samples.push(`[${k}] ${ev.title}\n      → ${cleaned}`);
-      ev.title = cleaned;
+    // 1) チラシ照合済みの検証修正 → 2) 全経路共通整形 → 3) office 系は追加整形
+    const ev = applyVerifiedOverrides(raw);
+    let cleaned = cleanEventTitle(ev.title);
+    cleaned = isOffice(ev) ? stripTrailingCta(cleanOfficeTitle(cleaned)) : stripTrailingCta(cleaned);
+    // 4) 不正・スタブ・年ズレは除外（office 系は officeIsJunk も併用）
+    const junk = !ev.date || !cleaned
+      || isJunkOrStubTitle(cleaned)
+      || isStaleDatedEvent({ ...ev, title: cleaned })
+      || (isOffice(ev) && (officeIsJunk(ev.title) || officeIsJunk(cleaned)
+          || cleaned === '募集案内所イベント' || cleaned.replace(/[\s　]/g, '').length < 4));
+    if (junk) { dropped++; droppedList.push(`[${k}] ${ev.title}`); continue; }
+    const out = { ...ev };
+    if (cleaned !== raw.title) {
+      if (samples.length < 40) samples.push(`[${k}] ${raw.title}\n      → ${cleaned}`);
+      out.title = cleaned;
       changed++;
     }
-    // 募集案内所イベントは場所欄も整形（「時間／…場所／会場」→会場名）
-    if (isOffice(ev) && ev.place) {
-      const cp = cleanOfficePlace(ev.place);
-      if (cp !== ev.place) { ev.place = cp; placeChanged++; }
-    }
-    next.push(ev);
+    // 場所欄の整形（全経路共通 + office 系）
+    const cp = isOffice(ev) ? cleanOfficePlace(cleanPlaceText(ev.place)) : cleanPlaceText(ev.place);
+    if ((cp || '') !== (ev.place || '')) { out.place = cp; placeChanged++; }
+    next.push(out);
   }
-  data[k] = next;
+  // 5) 重複統合（同一地本・同日・名称一致/包含・場所両立のみ）
+  const merged = dedupEvents(next);
+  dedupedCount += next.length - merged.length;
+  data[k] = merged;
 }
 
-console.log(`総数:${total} 除外:${dropped} タイトル変更:${changed} 場所変更:${placeChanged}`);
+console.log(`総数:${total} 除外:${dropped} タイトル変更:${changed} 場所変更:${placeChanged} 重複統合:${dedupedCount}`);
+if (droppedList.length) {
+  console.log('--- 除外 ---');
+  droppedList.forEach(s => console.log('  ' + s));
+}
 console.log('--- 変更サンプル ---');
 samples.forEach(s => console.log('  ' + s));
 
