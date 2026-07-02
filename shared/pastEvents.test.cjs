@@ -130,3 +130,38 @@ test('scopeCount=0 → empty_scope の根拠（範囲に過去イベントなし
   assert.equal(r.scopeCount, 0);
   assert.equal(r.total, 0);
 });
+
+// ── アーカイブ併合（events.json から7日超で外れた過去イベント） ──
+const archiveEvents = [
+  // ずっと昔の過去イベント（events.json には無い＝アーカイブのみ）
+  { id: 'a1', pref: 'tokyo', office: '', date: '2026-01-15', title: '昔の東京過去', place: '会館', source_type: 'scrape' },
+  { id: 'a2', pref: 'osaka', date: '2026-02-20', title: '昔の大阪過去', source_type: 'scrape' },
+  // events.json にも同IDが残っている（新しい方=events.json を優先すべき）
+  { id: 's1', pref: 'tokyo', date: '2026-06-29', title: 'アーカイブ側の古いタイトル', source_type: 'scrape' },
+];
+const buildA = (account, q = {}) => P.buildPastEvents({
+  manualEvents, scrapeData, archiveEvents, overrides, account,
+  query: P.validatePastQuery(q).value, today: TODAY, canManageScope: scope,
+});
+
+test('archive: national はアーカイブの過去イベントも閲覧できる', () => {
+  const ids = buildA(acc({ user: 'n', pass: 'p', pref: '*' })).events.map(e => e.id).sort();
+  // s1,s3,manual1,manual2（既存）＋ a1,a2（アーカイブ）。未来 s2 は除外
+  assert.deepEqual(ids, ['a1', 'a2', 'manual-tokyo-1', 'manual-tokyo-2', 's1', 's3']);
+});
+
+test('archive: 同ID(s1)は events.json 側（新しい方）を優先し override も反映', () => {
+  const r = buildA(acc({ user: 'n', pass: 'p', pref: '*' }));
+  const s1 = r.events.find(e => e.id === 's1');
+  assert.equal(s1.title, '上書き後タイトル'); // アーカイブの古いタイトルではなく override 適用後
+});
+
+test('archive: pco(osaka) は自地本のアーカイブのみ（a1東京は除外）', () => {
+  const ids = buildA(acc({ user: 'p', pass: 'p', pref: 'osaka', role: 'pco_admin' })).events.map(e => e.id).sort();
+  assert.deepEqual(ids, ['a2', 's3']);
+});
+
+test('archive: 期間フィルタはアーカイブにも効く', () => {
+  const ids = buildA(acc({ user: 'n', pass: 'p', pref: '*' }), { to: '2026-03-01' }).events.map(e => e.id).sort();
+  assert.deepEqual(ids, ['a1', 'a2']); // 2026-03-01 以前のみ
+});

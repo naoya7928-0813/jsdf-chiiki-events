@@ -105,6 +105,12 @@ const { toHalfWidth, reiwaToAD, reiwaNum, resolveYearByWeekday, HEISEI_BASE, pad
 // ── 設定 ─────────────────────────────────────────────────────
 const OUTPUT_PATH = path.join(__dirname, '../public/data/events.json');
 const OFFICES_PATH = path.join(__dirname, '../public/data/offices.json');
+// 過去イベントの恒久ログ（events.json は終了7日で削除するため、退避先として git 管理でコミット）。
+// 運営サイトの「過去イベント」から終了後もずっと閲覧できるようにする。
+const ARCHIVE_PATH = path.join(__dirname, '../public/data/events-archive.json');
+// 保持設定（環境変数で調整可）。既定: 開催日が約2年以内、かつ最大2万件。
+const ARCHIVE_RETENTION_DAYS = Number.parseInt(process.env.ARCHIVE_RETENTION_DAYS || '', 10) || 730;
+const ARCHIVE_MAX = Number.parseInt(process.env.ARCHIVE_MAX || '', 10) || 20000;
 
 const URLS = {
   // 北海道地本（札幌は複数サブページ）
@@ -4359,6 +4365,7 @@ async function writeOutput(data) {
   const today = jstNow.toISOString().slice(0, 10); // "YYYY-MM-DD"
   const cutoff = new Date(jstNow.getTime() - ENDED_KEEP_DAYS * 86400000).toISOString().slice(0, 10);
   let removedCount = 0;
+  const agedOut = []; // 終了7日超で events.json から外す“有効な”イベント → アーカイブへ退避
   // ★ ここが全イベントカードの最終整形・検証ゲート。各フィールドの書式・記述ルールの
   //    正準は CLAUDE.md「イベントカード記述ルール（正準仕様）」。実装は shared/titleQuality.cjs
   //    （+ 募集案内所は shared/officeTitle.cjs、カテゴリ/タグ/曜日は parsers/utils.js）。
@@ -4377,13 +4384,15 @@ async function writeOutput(data) {
     });
     data[key] = data[key].filter(ev => {
       if (!ev.date) return false;
-      if ((ev.endDate || ev.date) < cutoff) return false; // 終了から1週間を過ぎたものだけ削除
       // タイトルが「お知らせ」のみ等、内容のないゴミデータを除外
       if (!ev.title || /^お知らせ$/.test(ev.title.trim())) return false;
       // OCR残骸・申し込み案内・住所混入・中身なしスタブを除外（全経路の最終防御）
       if (isJunkOrStubTitle(ev.title)) return false;
       // 過去年のイベントが現在年の日付で再登録されたもの（年ズレ）を除外
       if (isStaleDatedEvent(ev)) return false;
+      // ここまで通過＝有効なイベント。終了から1週間超は events.json から外し、
+      // アーカイブへ退避する（運営「過去イベント」で終了後もずっと閲覧できるように）。
+      if ((ev.endDate || ev.date) < cutoff) { agedOut.push(ev); return false; }
       return true;
     });
     // 同一（日付×名称×場所）の重複を統合。場所違いの同名イベントは残る
@@ -4462,6 +4471,10 @@ async function writeOutput(data) {
     console.warn('[geocode] ジオコーディングに失敗しました:', e.message);
   }
 
+  // ── 過去イベントのアーカイブ（events.json から外れた有効イベントを恒久保存） ──
+  try { archivePastEvents(agedOut, today); }
+  catch (e) { console.warn('[アーカイブ] 退避に失敗:', e.message); }
+
   fs.writeFileSync(OUTPUT_PATH, JSON.stringify(data, null, 2), 'utf8');
   console.log(`[出力] ${OUTPUT_PATH}`);
   console.log(`  札幌:   ${(data.sapporo   ?? []).length} 件`);
@@ -4523,6 +4536,53 @@ async function writeOutput(data) {
   } catch (e) {
     console.warn('[警告] events.html 生成に失敗しました:', e.message);
   }
+}
+
+/**
+ * events.json から外れた（終了7日超の）有効イベントを恒久アーカイブへ退避する。
+ * - 保存先 public/data/events-archive.json（git コミット。運営「過去イベント」が閲覧）。
+ * - id で upsert（同一イベントの再退避は最新で上書き）。
+ * - 保持: 開催日が ARCHIVE_RETENTION_DAYS 以内、かつ最大 ARCHIVE_MAX 件（新しい順）。
+ * - 天気座標など表示に不要な大きいフィールドは載せない（サイズ抑制）。
+ */
+function archivePastEvents(agedOut, today) {
+  if (!Array.isArray(agedOut) || agedOut.length === 0) return;
+
+  let archive = { updatedAt: '', events: [] };
+  try {
+    if (fs.existsSync(ARCHIVE_PATH)) {
+      const parsed = JSON.parse(fs.readFileSync(ARCHIVE_PATH, 'utf8'));
+      if (parsed && Array.isArray(parsed.events)) archive = parsed;
+    }
+  } catch (e) { console.warn('[アーカイブ] 既存読み込み失敗（新規作成）:', e.message); }
+
+  // 保存する項目（運営一覧に必要な最小限。weatherLocation 等は除外）
+  const pick = (e) => ({
+    id: e.id, pref: e.pref, office: e.office || '',
+    date: e.date, endDate: e.endDate || '',
+    title: e.title || '', place: e.place || '', url: e.url || '',
+    category: e.category || '', status: e.status || '',
+    source_type: e.source_type || '', archivedAt: today,
+  });
+
+  const byId = new Map(archive.events.map(e => [e.id, e]));
+  let added = 0;
+  for (const e of agedOut) {
+    if (!e || !e.id || !e.date) continue;
+    if (!byId.has(e.id)) added++;
+    byId.set(e.id, pick(e)); // 再退避時は最新で上書き
+  }
+
+  // 保持: 開催日(実効日)が RETENTION_DAYS 以内のみ。新しい順に上限件数。
+  const minDate = new Date(Date.now() + 9 * 3600 * 1000 - ARCHIVE_RETENTION_DAYS * 86400000)
+    .toISOString().slice(0, 10);
+  const eff = (e) => e.endDate || e.date || '';
+  let events = [...byId.values()].filter(e => eff(e) >= minDate);
+  events.sort((a, b) => (eff(a) < eff(b) ? 1 : eff(a) > eff(b) ? -1 : 0)); // 新しい順
+  if (events.length > ARCHIVE_MAX) events = events.slice(0, ARCHIVE_MAX);
+
+  fs.writeFileSync(ARCHIVE_PATH, JSON.stringify({ updatedAt: today, events }, null, 2), 'utf8');
+  console.log(`[アーカイブ] 過去イベント退避: 新規 ${added} 件 / 保持 ${events.length} 件 → ${ARCHIVE_PATH}`);
 }
 
 // ── 新規イベント検出 → Web Push 通知 ─────────────────────────

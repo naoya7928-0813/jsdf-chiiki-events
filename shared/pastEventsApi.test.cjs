@@ -61,7 +61,7 @@ test('認証あり: 過去イベントのみ返す（本日分は除外）＋not
   assert.ok(ids.includes('p1'));
   assert.ok(!ids.includes('f1')); // 本日は過去でない
   assert.equal(res.headers['cache-control'], 'no-store, private');
-  assert.match(res.body.note, /現在保存されている過去イベント/);
+  assert.match(res.body.note, /アーカイブ/);
   assert.equal(typeof res.body.total, 'number');
 });
 test('不正limitは400', async () => {

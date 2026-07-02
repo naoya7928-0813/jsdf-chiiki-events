@@ -36,6 +36,25 @@ async function loadScrape(req) {
   return { data, ok };
 }
 
+// 過去イベントの恒久アーカイブ（events.json から7日で外れた後もここで閲覧できる）。
+// public/data/events-archive.json をフェッチ（events.json と同経路・短期キャッシュ）。
+let archiveCache = { at: 0, events: null };
+async function loadArchive(req) {
+  const now = Date.now();
+  if (archiveCache.events && now - archiveCache.at < 60000) return archiveCache.events;
+  const base = process.env.SITE_URL || (req.headers.host ? `https://${req.headers.host}` : 'https://jsdf-chiiki-events.vercel.app');
+  let events = [];
+  try {
+    const r = await fetch(`${base}/data/events-archive.json`, { signal: AbortSignal.timeout(5000) });
+    if (r.ok) { const j = await r.json(); if (Array.isArray(j?.events)) events = j.events; }
+    else if (r.status !== 404) console.error(`[past-events] archive 取得が非200: ${r.status}`);
+  } catch (e) {
+    console.error(`[past-events] archive 取得失敗: ${e && e.name === 'TimeoutError' ? 'timeout(5s)' : (e && e.message) || 'error'}`);
+  }
+  archiveCache = { at: now, events };
+  return events;
+}
+
 export default async function handler(req, res) {
   noStore(res); // 管理APIはキャッシュ禁止（成功/エラー問わず）
   if (!checkOrigin(req, res)) return;
@@ -66,9 +85,10 @@ export default async function handler(req, res) {
     if (o) for (const [id, val] of Object.entries(o)) overrides[id] = typeof val === 'string' ? JSON.parse(val) : val;
   } catch { /* ignore */ }
   const { data: scrapeData, ok: scrapeOk } = await loadScrape(req);
+  const archiveEvents = await loadArchive(req); // 恒久アーカイブ（7日超の過去イベント）
 
   const result = past.buildPastEvents({
-    manualEvents, scrapeData, overrides,
+    manualEvents, scrapeData, archiveEvents, overrides,
     account, query: v.value, today, canManageScope,
   });
 
@@ -93,8 +113,8 @@ export default async function handler(req, res) {
     hasMore: result.hasMore,
     reason,
     scope: officeScoped ? 'office' : (past_isNational(account) ? 'national' : 'pref'),
-    // 保存方式上の制約を明示（完全な永久アーカイブではない）
-    note: '現在保存されている過去イベントを表示しています。取得元から削除され、システム内にも保存されていないイベントは表示されない場合があります。',
+    // 保存方式の説明（アーカイブ導入後）
+    note: '終了したイベントはアーカイブに保存され、後からも確認できます（この機能の運用開始より前に終了・削除されたイベントは含まれない場合があります）。',
   });
 }
 

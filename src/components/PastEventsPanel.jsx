@@ -62,7 +62,7 @@ export default function PastEventsPanel({ adminFetch, account, primary }) {
     <div>
       <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 6 }}>過去イベント（閲覧専用）</div>
       <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 12 }}>
-        終了したイベントを確認できます（監査履歴・削除済みイベントとは別です）。現在保存されているデータのみ表示します。
+        終了したイベントを確認できます（監査履歴・削除済みイベントとは別です）。終了後はアーカイブに保存され、後からも確認できます。
       </div>
 
       {/* 絞り込み */}
@@ -106,7 +106,7 @@ export default function PastEventsPanel({ adminFetch, account, primary }) {
               ? '検索条件に一致する過去イベントはありません。条件を変えて再検索してください。'
               : officeScoped
                 ? '担当事務所に紐づく過去イベントはありません。中央で掲載されたイベントの担当割り当ては、地本管理者にご相談ください。'
-                : '権限範囲内に、保存されている過去イベントはありません。（終了後しばらく経過したイベントは保存対象外です）'}
+                : '権限範囲内に、保存されている過去イベントはまだありません。（この機能の運用開始より前に終了したイベントは含まれない場合があります）'}
         </div>
       )}
 

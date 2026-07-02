@@ -193,7 +193,7 @@ jobs:
           #   書き換わる。これを add し忘れると未ステージの追跡変更として残り、後続の
           #   `git rebase` が "cannot rebase: You have unstaged changes" で失敗していた
           #   （2026-06-28 の天気/ジオコーディング機能導入以降、毎回 push 前に停止）。
-          git add public/data/events.json public/events.html public/events/ public/sitemap.xml scraper/geocode-cache.json
+          git add public/data/events.json public/data/events-archive.json public/events.html public/events/ public/sitemap.xml scraper/geocode-cache.json
 
           # 公開データ（events.json / events.html / sitemap.xml）が変わった時のみ
           # コミット＆デプロイ対象とする（geocode-cache 単独の変化ではデプロイしない）。
