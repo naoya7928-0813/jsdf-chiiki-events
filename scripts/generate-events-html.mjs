@@ -297,6 +297,7 @@ const mainHtml = `<!DOCTYPE html>
   <meta name="keywords" content="自衛隊 イベント,地方協力本部,地本,自衛隊説明会,駐屯地 一般公開,自衛隊記念行事,体験搭乗,陸上自衛隊,海上自衛隊,航空自衛隊,自衛官募集,自衛隊 体験,記念行事" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="${SITE_URL}/events.html" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
   <meta property="og:title" content="自衛隊地本イベント一覧" />
   <meta property="og:description" content="全国の自衛隊地方協力本部のイベント情報。開催日・会場・カテゴリを掲載。" />
   <meta property="og:url" content="${SITE_URL}/events.html" />
@@ -396,6 +397,7 @@ for (const [prefKey, prefLabel] of Object.entries(PREF_LABELS)) {
   <meta name="keywords" content="${esc(prefLabel)} 自衛隊 イベント,自衛隊 説明会 ${esc(prefLabel)},${esc(prefLabel)}地方協力本部,${esc(prefLabel)}地本,駐屯地 一般公開 ${esc(prefLabel)},記念行事,体験搭乗,自衛官募集 ${esc(prefLabel)}" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="${SITE_URL}/events/${prefKey}.html" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
   <meta property="og:title" content="${esc(prefLabel)}の自衛隊イベント情報【非公式まとめ】" />
   <meta property="og:description" content="${esc(prefLabel)}地方協力本部の自衛隊イベント情報。開催日・会場・カテゴリを掲載。" />
   <meta property="og:url" content="${SITE_URL}/events/${prefKey}.html" />
@@ -501,6 +503,7 @@ const guideHtml = `<!DOCTYPE html>
   <meta name="keywords" content="自衛隊 説明会 流れ,自衛隊 説明会 持ち物,自衛隊 説明会 服装,自衛隊 体験搭乗 申し込み,駐屯地 一般公開 楽しみ方,自衛官候補生 年齢,自衛隊 イベント 申込,地方協力本部" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="${SITE_URL}/guide.html" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
   <meta property="og:title" content="自衛隊イベント参加ガイド【非公式】" />
   <meta property="og:description" content="説明会の流れ・持ち物・申込の要否、体験搭乗の探し方、採用区分と年齢の目安をまとめた参加ガイド。" />
   <meta property="og:url" content="${SITE_URL}/guide.html" />

@@ -6,6 +6,12 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-07-02',
+    version: '1.17.36',
+    type:    'fix',
+    content: '表示の安定性を改善しました（軽微な修正）。',
+  },
+  {
+    date:    '2026-07-02',
     version: '1.17.35',
     type:    'fix',
     content: 'イベント名の表示を改善しました（軽微な修正）。',

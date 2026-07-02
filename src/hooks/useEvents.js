@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { API_URL, REFRESH_INTERVAL_MS } from '../config';
 // 募集案内所イベントの整形・非イベント判定は共通モジュールに一本化（scraper/スクリプトと共有）
 import { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } from '../../shared/officeTitle.cjs';
@@ -174,7 +174,11 @@ export function useEvents(autoMode = true) {
   }, [fetchEvents, autoMode]);
 
   // ── JST 深夜0時タイマー：日付が変わったら自動でフィルター更新 ─
+  // 発火後は必ず翌日の0時を再スケジュールする（連鎖）。以前は初回の1回しか
+  // 発火せず、アプリを2日以上開きっぱなしにすると2日目以降の日付切り替えが
+  // 行われない（終了イベントが残り続ける）バグがあった。
   useEffect(() => {
+    let t;
     function scheduleNext() {
       const now              = Date.now();
       const jstMs            = now + 9 * 3600 * 1000;
@@ -183,18 +187,23 @@ export function useEvents(autoMode = true) {
       const nextMidnightUTC  = todayMidnightJST + 86400000 - 9 * 3600 * 1000;
       const delay            = Math.max(nextMidnightUTC - now, 1000);
 
-      return setTimeout(() => {
+      t = setTimeout(() => {
         setJstDate(jstToday()); // フィルター日付を翌日に更新 → 当日終了イベントが消える
         fetchEvents();          // サーバーからも最新データを取得
+        scheduleNext();         // 翌日の0時を再スケジュール（毎日繰り返す）
       }, delay);
     }
 
-    const t = scheduleNext();
+    scheduleNext();
     return () => clearTimeout(t);
   }, [fetchEvents]);
 
-  // rawData × jstDate でフィルターを掛けて返す
-  const events = rawData ? filterPastEvents(rawData, jstDate) : EMPTY;
+  // rawData × jstDate でフィルターを掛けて返す（全件の整形・除外を伴うためメモ化。
+  // 以前は毎レンダーで全イベントを再正規化しており、オブジェクト識別も毎回変わっていた）
+  const events = useMemo(
+    () => (rawData ? filterPastEvents(rawData, jstDate) : EMPTY),
+    [rawData, jstDate]
+  );
 
   return {
     events,
