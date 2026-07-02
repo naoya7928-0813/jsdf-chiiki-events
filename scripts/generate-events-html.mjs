@@ -78,6 +78,41 @@ for (const ev of allEvents) {
   byPrefKey[ev.prefKey].push(ev);
 }
 
+// ── 募集案内所・地域事務所（県ページの固有コンテンツ） ──────────────
+// イベント0件の県ページがテンプレ文のみの薄い内容（実質同一ページ）になり
+// Google に「クロール済み・インデックス未登録」とされるのを防ぐため、
+// 県ごとに固有の実データ（地本・案内所の所在地一覧）を掲載する。
+const OFFICES_JSON = join(__dirname, '../public/data/offices.json');
+const officesByPref = {};
+try {
+  const od = JSON.parse(readFileSync(OFFICES_JSON, 'utf8'));
+  for (const o of od.offices || []) {
+    if (!o.pref || !o.name) continue;
+    (officesByPref[o.pref] ||= []).push(o);
+  }
+} catch { /* offices.json が無くてもページ生成は続行 */ }
+
+/** 県内の地本本部・募集案内所一覧セクション（無ければ空文字） */
+function officeSection(prefKey, prefLabel) {
+  const list = officesByPref[prefKey] || [];
+  if (!list.length) return '';
+  // 本部（hq）→ 案内所・事務所（名称順）
+  const hq = list.filter(o => o.type === 'hq');
+  const rec = list.filter(o => o.type !== 'hq')
+    .sort((a, b) => String(a.name).localeCompare(String(b.name), 'ja'));
+  const row = (o) => {
+    const tel = o.tel ? `　TEL: <a href="tel:${esc(String(o.tel).replace(/[^\d+-]/g, ''))}">${esc(o.tel)}</a>` : '';
+    const link = o.url && /^https?:\/\//.test(o.url) && o.hasOfficialPage !== false
+      ? `　<a href="${esc(o.url)}" target="_blank" rel="noopener noreferrer">公式ページ</a>` : '';
+    return `    <li><strong>${esc(o.name)}</strong>${o.address ? `<br />${esc(o.address)}` : ''}${tel}${link}</li>`;
+  };
+  return `  <h2>${esc(prefLabel)}の自衛隊 募集案内所・地域事務所</h2>
+  <p class="meta">イベントの申込方法の確認や自衛官採用の相談は、最寄りの募集案内所・地域事務所でも受け付けています（受付時間等は各所へお問い合わせください）。</p>
+  <ul>
+${[...hq, ...rec].map(row).join('\n')}
+  </ul>`;
+}
+
 function esc(s) {
   return String(s ?? '')
     .replace(/&/g, '&amp;')
@@ -374,9 +409,11 @@ for (const [prefKey, prefLabel] of Object.entries(PREF_LABELS)) {
   }
   const prefJsonLd = jsonLdSafe(schemas);
 
+  const officeCount = (officesByPref[prefKey] || []).length;
+  const officeNote = officeCount > 0 ? `県内の募集案内所・地域事務所 ${officeCount} か所の連絡先も掲載。` : '';
   const countNote = hasEvents
-    ? `説明会・体験イベント・駐屯地一般公開・記念行事など ${events.length} 件を掲載`
-    : '説明会・体験イベント・駐屯地一般公開・記念行事などの情報を掲載';
+    ? `説明会・体験イベント・駐屯地一般公開・記念行事など ${events.length} 件を掲載。${officeNote}`
+    : `説明会・体験イベント・駐屯地一般公開・記念行事などの情報を掲載。${officeNote}`;
 
   const eventBlock = hasEvents
     ? `  <p class="meta">最終更新：${esc(updatedAt)}　／　${events.length} 件掲載</p>
@@ -433,6 +470,7 @@ ${prefJsonLd}
 ${prefEvergreen(prefLabel)}
   <h2>${esc(prefLabel)}の開催予定・最新イベント</h2>
 ${eventBlock}
+${officeSection(prefKey, prefLabel)}
   ${regionNav(prefKey)}
   <section class="natidx" style="margin-top:2.5em">
     <h2>全国の自衛隊地本イベント（都道府県別）</h2>
@@ -558,13 +596,18 @@ console.log('[generate-events-html] guide.html を生成');
 
 // ── sitemap.xml を更新 ──────────────────────────────────────────
 // 全都道府県ページを掲載。非ページの events.json は含めない（インデックス未登録の原因）。
+// イベントの有無で priority / changefreq を出し分け、クロール資源を有効ページへ誘導する
+// （0件県は事務所一覧が主コンテンツ＝更新頻度が低いので monthly / 低priority）。
 
-const prefUrls = Object.keys(PREF_LABELS).map(k => `  <url>
+const prefUrls = Object.keys(PREF_LABELS).map(k => {
+  const has = (byPrefKey[k] ?? []).length > 0;
+  return `  <url>
     <loc>${SITE_URL}/events/${k}.html</loc>
     <lastmod>${lastmod}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>`).join('\n');
+    <changefreq>${has ? 'daily' : 'monthly'}</changefreq>
+    <priority>${has ? '0.8' : '0.4'}</priority>
+  </url>`;
+}).join('\n');
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
