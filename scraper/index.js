@@ -35,7 +35,7 @@ const geocode             = require('./lib/geocode');
 // 募集案内所イベントのタイトル整形・非イベント判定（フロント/スクリプトと共通）
 const { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } = require('../shared/officeTitle.cjs');
 // イベント名の品質管理（検証済み修正・整形・junk判定・年ズレ判定・重複統合）。最終出力の防御に使う
-const { applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, isJunkOrStubTitle, isStaleDatedEvent, dedupEvents } = require('../shared/titleQuality.cjs');
+const { applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, cleanTimeText, cleanDeadlineText, isJunkOrStubTitle, isStaleDatedEvent, dedupEvents } = require('../shared/titleQuality.cjs');
 
 const { chromium } = require('playwright-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
@@ -790,7 +790,12 @@ let geminiQuotaExhausted = false;
 /** OCR結果フィールドを安全に文字列化してtrimする（非文字列・nullも許容） */
 function safeStr(v) {
   if (!v) return '';
-  if (typeof v === 'string') return v.trim();
+  if (typeof v === 'string') {
+    const t = v.trim();
+    // OCR/LLM が JSON の null を文字列 "null"/"undefined" として返すことがある → 空扱い
+    if (/^(null|undefined)$/i.test(t)) return '';
+    return t;
+  }
   if (Array.isArray(v)) return v.map(safeStr).filter(Boolean).join(' ').trim();
   return String(v).trim();
 }
@@ -4353,8 +4358,10 @@ async function writeOutput(data) {
       const fixed = applyVerifiedOverrides(ev);
       return {
         ...fixed,
-        title: cleanEventTitle(fixed.title),
-        place: cleanPlaceText(fixed.place),
+        title:    cleanEventTitle(fixed.title),
+        place:    cleanPlaceText(fixed.place),
+        time:     cleanTimeText(fixed.time),
+        deadline: cleanDeadlineText(fixed.deadline) || null,
       };
     });
     data[key] = data[key].filter(ev => {

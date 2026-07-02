@@ -21,12 +21,12 @@ const isOffice = ev => typeof ev?.source_type === 'string' && ev.source_type.sta
 // 整形・非イベント判定は共通モジュールに一本化（writeOutput と同一経路）
 import { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } from '../shared/officeTitle.cjs';
 import {
-  applyVerifiedOverrides, cleanEventTitle, cleanPlaceText,
+  applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, cleanTimeText, cleanDeadlineText,
   isJunkOrStubTitle, isStaleDatedEvent, dedupEvents,
 } from '../shared/titleQuality.cjs';
 
 const data = JSON.parse(fs.readFileSync(FILE, 'utf8'));
-let dropped = 0, changed = 0, placeChanged = 0, total = 0, dedupedCount = 0;
+let dropped = 0, changed = 0, placeChanged = 0, fieldChanged = 0, total = 0, dedupedCount = 0;
 const samples = [];
 const droppedList = [];
 
@@ -57,6 +57,11 @@ for (const k of Object.keys(data)) {
     // 場所欄の整形（全経路共通 + office 系）
     const cp = isOffice(ev) ? cleanOfficePlace(cleanPlaceText(ev.place)) : cleanPlaceText(ev.place);
     if ((cp || '') !== (ev.place || '')) { out.place = cp; placeChanged++; }
+    // 時間・締切の書式整形（"null"・時分表記・英語表記など）
+    const ct = cleanTimeText(ev.time);
+    if ((ct || '') !== (ev.time || '')) { out.time = ct; fieldChanged++; }
+    const cd = cleanDeadlineText(ev.deadline) || null;
+    if ((cd || null) !== (ev.deadline || null)) { out.deadline = cd; fieldChanged++; }
     next.push(out);
   }
   // 5) 重複統合（同一地本・同日・名称一致/包含・場所両立のみ）
@@ -65,7 +70,7 @@ for (const k of Object.keys(data)) {
   data[k] = merged;
 }
 
-console.log(`総数:${total} 除外:${dropped} タイトル変更:${changed} 場所変更:${placeChanged} 重複統合:${dedupedCount}`);
+console.log(`総数:${total} 除外:${dropped} タイトル変更:${changed} 場所変更:${placeChanged} 時間/締切変更:${fieldChanged} 重複統合:${dedupedCount}`);
 if (droppedList.length) {
   console.log('--- 除外 ---');
   droppedList.forEach(s => console.log('  ' + s));

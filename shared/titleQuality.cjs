@@ -302,27 +302,92 @@ function applyVerifiedOverrides(ev) {
   return out;
 }
 
+/** 文字列フィールドが実質空か（OCR/JSONが文字列 "null" 等を返すことがある） */
+function isEmptyFieldText(v) {
+  return v == null || /^(null|undefined|なし|未定|不明|-|ー|―|—)$/i.test(String(v).trim());
+}
+
 /**
  * 「場所」欄のゴミを整形する。
  * - OCRがMarkdown表で返した「| 会場名 |」のパイプ残骸を除去
  * - 巡回元の事務所リスト（「A事務所・B事務所 ほか1拠点」等）は会場ではないため
  *   空にする（誤った場所を出すより空欄の方が良い）
+ * - ジオコーダの整形住所が混入した「会場名, 日本、〒123-4567 住所…」→ 会場名だけにする
+ * - 「・○○見学・△△体験…」のように活動内容の羅列で会場語を含まないものは会場ではない → 空
  */
 function cleanPlaceText(raw) {
-  if (!raw) return '';
+  if (isEmptyFieldText(raw)) return '';
   let p = String(raw).replace(/\s+/g, ' ').trim();
   p = p.replace(/^[|｜\s]+|[|｜\s]+$/g, '').trim(); // Markdown表残骸
+  // ジオコーダの整形住所サフィックス（「, 日本、〒…」「〒123-4567 住所」）を除去
+  p = p.replace(/[,、]\s*日本[,、].*$/, '').trim();
+  p = p.replace(/[,、]?\s*〒\s*\d{3}-?\d{0,4}.*$/, '').trim();
   if (/ほか\d+拠点$/.test(p)) return '';            // 巡回元事務所リスト
   // 複数の事務所・案内所の列挙も巡回元リスト（実会場は通常1つ）
   const officeCount = (p.match(/事務所|案内所|出張所|分駐所/g) || []).length;
   if (officeCount >= 2 && /・/.test(p)) return '';
+  // 先頭「・」で始まる活動内容の羅列（会場を示す語が無い）は会場ではない
+  const VENUE_KW = /会場|駐屯地|基地|分屯|港|駅|公園|ホール|センター|会館|プラザ|体育館|アリーナ|庁舎|大学|学校|モール|広場|グラウンド|市役所|町役場|役場|神社|寺|城|イオン|ドーム|スタジアム|球場|美術館|博物館|図書館/;
+  if (/^・/.test(p) && !VENUE_KW.test(p)) return '';
   return p;
+}
+
+/**
+ * 「時間」欄を正準形 `HH:MM～HH:MM`（波ダッシュ ～ 統一）へ整形する。
+ * - 「N時M分」「N時」「N時半」「午前/午後」「HHMM（4桁）」「から」「-/〜/~」を変換
+ * - 受付/開場/※注記や、時刻(数字)を含まないラベル断片（「一般公開時間」「開」）は除去
+ * - 不明・"null" 等は空。複数部制・複数日の表記は構造を保ったまま区切り/注記のみ整える
+ */
+function cleanTimeText(raw) {
+  if (isEmptyFieldText(raw)) return '';
+  let t = String(raw).trim();
+  if (/^終日$/.test(t)) return '終日';                 // 正準値（終日開催）
+  if (!/\d/.test(t)) return '';                       // 時刻情報なし（ラベル/断片）
+  t = t.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0)); // 全角数字→半角
+  // 受付・開場・開演の補足（括弧・…以降・※以降）を除去
+  t = t.replace(/[（(][^）)]*(?:受付|開場|開演)[^）)]*[）)]/g, '');
+  t = t.replace(/[…‥][^、,]*受付[^、,]*/g, '');
+  t = t.replace(/\s*※.*$/, '');
+  // 午前/午後（午後N時→(N%12)+12時）
+  t = t.replace(/午前\s*(\d{1,2})\s*時/g, (m, h) => `${h}時`);
+  t = t.replace(/午後\s*(\d{1,2})\s*時/g, (m, h) => `${(Number(h) % 12) + 12}時`);
+  // 「N時M分」「N時半」「N時」→ HH:MM
+  t = t.replace(/(\d{1,2})\s*時\s*(\d{1,2})\s*分/g, (m, h, mm) => `${h}:${mm.padStart(2, '0')}`);
+  t = t.replace(/(\d{1,2})\s*時半/g, (m, h) => `${h}:30`);
+  t = t.replace(/(\d{1,2})\s*時/g, (m, h) => `${h}:00`);
+  t = t.replace(/\s*から\s*/g, '～');                  // 「14:00から16:00」
+  // 区切り（波ダッシュ・チルダ・各種ハイフン）→ ～
+  t = t.replace(/[〜~－―—]/g, '～').replace(/(?<=\d)\s*-\s*(?=\d)/g, '～');
+  // 4桁 HHMM（前後が数字/コロンでない）→ HH:MM
+  t = t.replace(/(?<![\d:])(\d{2})(\d{2})(?![\d:])/g, (m, h, mm) => (Number(h) <= 23 && Number(mm) <= 59) ? `${h}:${mm}` : m);
+  // H:MM → 0H:MM（時を2桁化）
+  t = t.replace(/(?<![\d:])(\d):(\d{2})/g, '0$1:$2');
+  t = t.replace(/\s+/g, ' ').replace(/\s*～\s*/g, '～').trim();
+  t = t.replace(/^[、,～\s]+|[、,\s]+$/g, '').trim();
+  return t;
+}
+
+const EN_WEEKDAY = { sun: '日', mon: '月', tue: '火', wed: '水', thu: '木', fri: '金', sat: '土' };
+
+/**
+ * 「締切」欄を整形する。"null" 等は空、英語表記「7/8 wed.」→「7月8日（水）」。
+ * 日付の推測（年補完等）はしない（原文の体裁だけ整える）。
+ */
+function cleanDeadlineText(raw) {
+  if (isEmptyFieldText(raw)) return '';
+  const s = String(raw).trim();
+  const m = s.match(/^(\d{1,2})\/(\d{1,2})\s*(sun|mon|tue|wed|thu|fri|sat)?\.?$/i);
+  if (m) return `${+m[1]}月${+m[2]}日${m[3] ? `（${EN_WEEKDAY[m[3].toLowerCase()]}）` : ''}`;
+  return s;
 }
 
 module.exports = {
   applyVerifiedOverrides,
   cleanEventTitle,
   cleanPlaceText,
+  cleanTimeText,
+  cleanDeadlineText,
+  isEmptyFieldText,
   isJunkOrStubTitle,
   isStaleDatedEvent,
   dedupEvents,

@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { API_URL, REFRESH_INTERVAL_MS } from '../config';
 // 募集案内所イベントの整形・非イベント判定は共通モジュールに一本化（scraper/スクリプトと共有）
 import { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } from '../../shared/officeTitle.cjs';
+// 時間・締切・場所の書式整形（旧データ／CDN・SWキャッシュ由来の "null" 等への防御）
+import { cleanTimeText, cleanDeadlineText, cleanPlaceText } from '../../shared/titleQuality.cjs';
 
 const EMPTY = { updatedAt: null };
 
@@ -38,8 +40,9 @@ function normalizeEvent(ev) {
   return {
     ...ev,
     title,
-    place:    str(ev.place),
-    time:     str(ev.time),
+    place:    cleanPlaceText(str(ev.place)),
+    time:     cleanTimeText(ev.time),
+    deadline: cleanDeadlineText(ev.deadline) || undefined,
     category: str(ev.category),
     tag:      str(ev.tag),
     url:      str(ev.url),

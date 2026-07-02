@@ -7,7 +7,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
-  applyVerifiedOverrides, cleanEventTitle, cleanPlaceText,
+  applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, cleanTimeText, cleanDeadlineText,
   isJunkOrStubTitle, isStaleDatedEvent, dedupEvents,
 } = require('./titleQuality.cjs');
 
@@ -359,4 +359,45 @@ test('cleanEventTitle: 「〜説明会同日」の切れ端を整形（香川）
   assert.equal(cleanEventTitle('4種説明会同日'), '4種説明会');
   // 「同日」を含む正規の文言は変えない
   assert.equal(cleanEventTitle('同日開催の説明会もあります'), '同日開催の説明会もあります');
+});
+
+test('cleanTimeText: 時分/午前午後/4桁/区切りを HH:MM～HH:MM に正規化', () => {
+  assert.equal(cleanTimeText('14時から16時'), '14:00～16:00');
+  assert.equal(cleanTimeText('10時00分～15時00分'), '10:00～15:00');
+  assert.equal(cleanTimeText('午前9時～午後4時'), '09:00～16:00');
+  assert.equal(cleanTimeText('1400〜1600'), '14:00～16:00');
+  assert.equal(cleanTimeText('0900～1630'), '09:00～16:30');
+  assert.equal(cleanTimeText('10:00-15:00'), '10:00～15:00');
+  assert.equal(cleanTimeText('08:30~17:00'), '08:30～17:00');
+  assert.equal(cleanTimeText('13時半～16時'), '13:30～16:00');
+  // 受付/開場/※注記は除去
+  assert.equal(cleanTimeText('18:00～19:45(開場17:00)'), '18:00～19:45');
+  assert.equal(cleanTimeText('10:00～18:00 ※金曜日のみ12:00～'), '10:00～18:00');
+  assert.equal(cleanTimeText('13時30分～16時30分…受付13時～'), '13:30～16:30');
+  // ラベル/断片/null は空
+  assert.equal(cleanTimeText('一般公開時間'), '');
+  assert.equal(cleanTimeText('開'), '');
+  assert.equal(cleanTimeText('null'), '');
+  assert.equal(cleanTimeText(null), '');
+  // 既に正準なものは維持
+  assert.equal(cleanTimeText('10:00～12:00'), '10:00～12:00');
+  assert.equal(cleanTimeText('終日'), '終日');
+});
+
+test('cleanDeadlineText: "null" は空・英語表記を日本語化・正規は維持', () => {
+  assert.equal(cleanDeadlineText('null'), '');
+  assert.equal(cleanDeadlineText(null), '');
+  assert.equal(cleanDeadlineText('7/8 wed.'), '7月8日（水）');
+  assert.equal(cleanDeadlineText('7月10日（金）'), '7月10日（金）');
+  assert.equal(cleanDeadlineText('令和8年7月2日(木)まで'), '令和8年7月2日(木)まで');
+});
+
+test('cleanPlaceText: ジオコーダ住所サフィックス除去・活動羅列は空', () => {
+  assert.equal(cleanPlaceText('メセナホール, 日本、〒382-0098 長野県須坂市墨坂南4丁目5−1'), 'メセナホール');
+  assert.equal(cleanPlaceText('イオンモール松本 「風庭」エリア, 日本、〒390-8560 長野県松本市中央4丁目9−51'), 'イオンモール松本 「風庭」エリア');
+  assert.equal(cleanPlaceText('・Ｆ－２戦闘機見学・救難隊の見学・体験喫食 等（食事代５１４円ご負担いただきます）'), '');
+  assert.equal(cleanPlaceText('null'), '');
+  // 会場語を含む正規の会場は維持
+  assert.equal(cleanPlaceText('留萌港'), '留萌港');
+  assert.equal(cleanPlaceText('かが交流プラザさくら'), 'かが交流プラザさくら');
 });
