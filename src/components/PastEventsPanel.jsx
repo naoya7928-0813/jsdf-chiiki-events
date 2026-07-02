@@ -6,7 +6,8 @@ import { PREFECTURE_INFO } from '../data/regionMap';
 // 「現在・今後のイベント」「監査履歴」とは別の画面として、終了済みイベントを権限範囲内で確認する。
 // 権限・スコープはサーバー側（/api/admin/past-events）で強制。ここでの絞り込みは表示の補助のみ。
 
-const STATUS_LABEL = { published: '公開中', draft: '下書き', closed: '締切', cancelled: '中止' };
+// closed は「受付終了」（公開側 StatusBadge・状態モデルと表記統一。申込締切の日付欄とは別）
+const STATUS_LABEL = { published: '公開中', draft: '下書き', closed: '受付終了', cancelled: '中止' };
 const STATUS_COLOR = { published: '#16a34a', draft: '#888', closed: '#b45309', cancelled: '#ef4444' };
 const PAGE = 50;
 

@@ -14,7 +14,9 @@ import PastEventsPanel from './PastEventsPanel';
 
 const CATEGORIES = ['説明会', '採用イベント', '一般公開', '艦艇公開', '体験', '演奏会', '記念行事', '広報活動', '地域参加'];
 const APPLY_OPTS = ['', '要予約', '予約不要', '事前申込制', '入場無料', '要問合せ'];
-const STATUS_LABEL = { draft: '下書き', published: '公開中', closed: '締切', cancelled: '中止' };
+// closed は「受付終了」（申込・受付が終了。イベント自体は開催予定/済み）。公開側 StatusBadge・
+// 状態モデル(CLAUDE.md)と表記を統一する。※ 申込締切の「日付」欄(申込締切)とは別概念。
+const STATUS_LABEL = { draft: '下書き', published: '公開中', closed: '受付終了', cancelled: '中止' };
 const STATUS_COLOR = { draft: '#888', published: '#16a34a', closed: '#b45309', cancelled: '#ef4444' };
 const ACTION_LABEL = {
   add: '登録', update: '編集', status: '状態変更', delete: '削除', override: '上書き修正', 'override-clear': '上書き取消',
@@ -438,7 +440,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
                 <Mini onClick={() => startEdit(ev)} color={primary}>編集</Mini>
                 {ev.status !== 'published' && <Mini onClick={() => setStatus(ev.id, 'published')} color="#16a34a">公開</Mini>}
                 {ev.status === 'published' && <Mini onClick={() => setStatus(ev.id, 'draft')} color="#888">下書きへ</Mini>}
-                {ev.status !== 'closed' && <Mini onClick={() => setStatus(ev.id, 'closed')} color="#b45309">締切</Mini>}
+                {ev.status !== 'closed' && <Mini onClick={() => setStatus(ev.id, 'closed')} color="#b45309">受付終了</Mini>}
                 {ev.status !== 'cancelled' && <Mini onClick={() => setStatus(ev.id, 'cancelled')} color="#ef4444">中止</Mini>}
                 {canAddDelete && <Mini onClick={() => remove(ev.id)} color="#ef4444" outline>削除</Mini>}
               </div>
