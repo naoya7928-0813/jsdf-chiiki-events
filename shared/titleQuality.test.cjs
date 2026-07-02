@@ -338,3 +338,25 @@ test('dedupEvents: 同名・同日・同一チラシ(jpg/pdf版違い)は場所�
   assert.ok(a.some(e => e.place === '柏崎市役所1F 多目的室'));
   assert.ok(a.some(e => e.place === '上越地域事務所'));
 });
+
+test('isJunkOrStubTitle: 旧「公式確認」スタブのタイトルを除外（2026-07-02 生成廃止）', () => {
+  assert.equal(isJunkOrStubTitle('自衛隊山梨地方協力本部のイベント情報'), true);
+  assert.equal(isJunkOrStubTitle('自衛隊岐阜地方協力本部のイベント情報'), true);
+  assert.equal(isJunkOrStubTitle('自衛隊島根地方協力本部のイベント情報'), true);
+  // 地方協力本部が主催として含まれるだけの正規イベント名は通す
+  assert.equal(isJunkOrStubTitle('東京地方協力本部 説明会'), false);
+  assert.equal(isJunkOrStubTitle('自衛隊山梨地方協力本部 夏まつり広報ブース'), false);
+});
+
+test('isJunkOrStubTitle: 採用試験の試験日そのものは除外・試験説明会は通す', () => {
+  assert.equal(isJunkOrStubTitle('公安系公務員採用試験'), true);
+  assert.equal(isJunkOrStubTitle('一般曹候補生採用試験'), true);
+  assert.equal(isJunkOrStubTitle('自衛官採用試験説明会'), false);
+  assert.equal(isJunkOrStubTitle('採用試験対策セミナー'), false);
+});
+
+test('cleanEventTitle: 「〜説明会同日」の切れ端を整形（香川）', () => {
+  assert.equal(cleanEventTitle('4種説明会同日'), '4種説明会');
+  // 「同日」を含む正規の文言は変えない
+  assert.equal(cleanEventTitle('同日開催の説明会もあります'), '同日開催の説明会もあります');
+});

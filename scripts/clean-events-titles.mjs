@@ -40,7 +40,9 @@ for (const k of Object.keys(data)) {
     let cleaned = cleanEventTitle(ev.title);
     cleaned = isOffice(ev) ? stripTrailingCta(cleanOfficeTitle(cleaned)) : stripTrailingCta(cleaned);
     // 4) 不正・スタブ・年ズレは除外（office 系は officeIsJunk も併用）
+    // office_notice=旧「公式確認」スタブ（偽の開催日を持つ疑似イベント。生成廃止済み）
     const junk = !ev.date || !cleaned
+      || ev.source_type === 'office_notice'
       || isJunkOrStubTitle(cleaned)
       || isStaleDatedEvent({ ...ev, title: cleaned })
       || (isOffice(ev) && (officeIsJunk(ev.title) || officeIsJunk(cleaned)

@@ -89,6 +89,11 @@ function validateEventsData(data, opts = {}) {
       // 会場情報（警告）
       if (!ev.place || !String(ev.place).trim()) warnings.push(`${loc} 会場情報(place)がありません`);
 
+      // 「公式確認」スタブ（office_notice）の混入（2026-07-02 生成廃止。偽の開催日を持つ疑似イベント）
+      if (ev.source_type === 'office_notice') {
+        warnings.push(`${loc} 廃止済みの office_notice スタブが混入: "${(ev.title || '').slice(0, 30)}"`);
+      }
+
       // weatherLocation（座標範囲・accuracy）
       const wl = ev.weatherLocation;
       if (wl) {

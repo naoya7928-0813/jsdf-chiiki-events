@@ -6,6 +6,12 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-07-02',
+    version: '1.17.37',
+    type:    'fix',
+    content: '「自衛隊○○地方協力本部のイベント情報」という仮のカードが表示される問題を修正しました。',
+  },
+  {
+    date:    '2026-07-02',
     version: '1.17.36',
     type:    'fix',
     content: '表示の安定性を改善しました（軽微な修正）。',

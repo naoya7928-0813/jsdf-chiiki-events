@@ -3274,24 +3274,15 @@ async function scrapeOfficeAssets(withFreshContext) {
      * @param {string} sourceUrl - スタブの url に使うページURL
      * @param {string} pref
      */
-    // 既にこの地本でスタブ追加済みか追跡（地本ごとにスタブ1件のみ）
-    const hqStubAdded = new Set();
-
     // 全アセットを試してから成否を判断
     async function processAssets(assets, sourceUrl, pref) {
       const prefCode = (pref || 'xx').slice(0, 2);
       let foundAtLeastOne = false;
-      let bestOcrTitle    = null; // 日付なしでもタイトルが取れた場合に使用
 
       for (const asset of assets) {
         const ocr    = await ocrFlyerFull(asset.url);
         await sleep(2000);
         const parsed = ocr ? parseOcrDate(ocr.date) : null;
-
-        // OCRでタイトルが取れた場合は記録しておく（日付なしでもスタブで活用）
-        if (ocr?.title && !bestOcrTitle) {
-          bestOcrTitle = fixOcrTitle(safeStr(ocr.title));
-        }
 
         if (parsed && !isPast(parsed.dateStr)) {
           const title = (ocr.title && fixOcrTitle(safeStr(ocr.title))) || asset.text || asset.linkText || '(タイトル不明)';
@@ -3317,31 +3308,14 @@ async function scrapeOfficeAssets(withFreshContext) {
         }
       }
 
-      // 全アセット処理後、1件も成功せず かつ 地本スタブ未追加の場合のみスタブ1件
-      if (!foundAtLeastOne && !hqStubAdded.has(pref)) {
-        hqStubAdded.add(pref);
-        // OCRでタイトルが取れていればそれを使う（注記はnotesに記載するためタイトルには含めない）
-        const stubTitle = bestOcrTitle
-          ? bestOcrTitle
-          : `${hq.name}のイベント情報`;
-        allEvents.push({
-          id:          `${prefCode}-ref-${titleHash(hq.url, pref)}`,
-          pref,
-          date:        todayJST,
-          weekday:     calcWeekday(todayJST),
-          title:       stubTitle,
-          place:       '',
-          address:     '',
-          time:        '',
-          category:    '広報活動',
-          tag:         '',
-          url:         sourceUrl,
-          notes:       'チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。',
-          ageRequirement: null,
-          deadline:       null,
-          source_type: 'office_notice',
-        });
-        console.log(`    ⚠ 公式ページ参照スタブ: ${sourceUrl.split('/').slice(-2).join('/')}`);
+      // ※ 以前はここで「${hq.name}のイベント情報」等の公式ページ参照スタブ
+      //   （source_type: office_notice, date=当日）を生成していたが、廃止した。
+      //   偽の開催日（毎回スクレイプ当日）を持つ疑似イベントが「本日開催」と
+      //   誤表示され、実イベントと紛らわしいため（2026-07-02 ユーザー報告）。
+      //   イベントが取得できない地本は素直に0件とし、公式サイトへの誘導は
+      //   UI/静的ページ（県ページの事務所一覧）が担う。
+      if (!foundAtLeastOne) {
+        console.log(`    - 日付付きイベントなし: ${sourceUrl.split('/').slice(-2).join('/')}`);
       }
     }
 
@@ -4396,10 +4370,10 @@ async function writeOutput(data) {
     });
     // 同一（日付×名称×場所）の重複を統合。場所違いの同名イベントは残る
     data[key] = dedupEvents(data[key]);
-    // 実イベントがある地本では「公式確認」スタブ（office_notice）を出さない
-    if (data[key].some(e => e.source_type !== 'office_notice')) {
-      data[key] = data[key].filter(e => e.source_type !== 'office_notice');
-    }
+    // 「公式確認」スタブ（office_notice）は常時除外（2026-07-02 生成自体を廃止。
+    // 偽の開催日を持つ疑似イベントのため、前回データ維持や旧コミットの定期実行から
+    // 混入しても必ずここで落とす）
+    data[key] = data[key].filter(e => e.source_type !== 'office_notice');
     removedCount += before - data[key].length;
     // 曜日をカレンダーデータで上書き
     data[key].forEach(ev => {

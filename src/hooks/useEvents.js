@@ -67,6 +67,9 @@ function filterPastEvents(rawData, today) {
     if (!Array.isArray(v)) { out[k] = v; continue; }
     out[k] = v
       .map(normalizeEvent)
+      // 「公式確認」スタブ（office_notice）は表示しない。偽の開催日（スクレイプ当日）で
+      // 「本日開催」と誤表示されるため生成を廃止済み。CDN/SWキャッシュの旧データ防御。
+      .filter(ev => ev && ev.source_type !== 'office_notice')
       .filter(ev => ev && (ev.endDate || ev.date) >= cutoff)
       .map(ev => ({ ...ev, ended: (ev.endDate || ev.date) < today }))
       // 募集案内所イベントのうち、整形しても綺麗にならない非イベント（過去報告・制度説明・
