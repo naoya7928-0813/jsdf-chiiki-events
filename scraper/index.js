@@ -4365,7 +4365,6 @@ async function writeOutput(data) {
   const today = jstNow.toISOString().slice(0, 10); // "YYYY-MM-DD"
   const cutoff = new Date(jstNow.getTime() - ENDED_KEEP_DAYS * 86400000).toISOString().slice(0, 10);
   let removedCount = 0;
-  const agedOut = []; // 終了7日超で events.json から外す“有効な”イベント → アーカイブへ退避
   // ★ ここが全イベントカードの最終整形・検証ゲート。各フィールドの書式・記述ルールの
   //    正準は CLAUDE.md「イベントカード記述ルール（正準仕様）」。実装は shared/titleQuality.cjs
   //    （+ 募集案内所は shared/officeTitle.cjs、カテゴリ/タグ/曜日は parsers/utils.js）。
@@ -4384,15 +4383,13 @@ async function writeOutput(data) {
     });
     data[key] = data[key].filter(ev => {
       if (!ev.date) return false;
+      if ((ev.endDate || ev.date) < cutoff) return false; // 終了から1週間を過ぎたものだけ削除
       // タイトルが「お知らせ」のみ等、内容のないゴミデータを除外
       if (!ev.title || /^お知らせ$/.test(ev.title.trim())) return false;
       // OCR残骸・申し込み案内・住所混入・中身なしスタブを除外（全経路の最終防御）
       if (isJunkOrStubTitle(ev.title)) return false;
       // 過去年のイベントが現在年の日付で再登録されたもの（年ズレ）を除外
       if (isStaleDatedEvent(ev)) return false;
-      // ここまで通過＝有効なイベント。終了から1週間超は events.json から外し、
-      // アーカイブへ退避する（運営「過去イベント」で終了後もずっと閲覧できるように）。
-      if ((ev.endDate || ev.date) < cutoff) { agedOut.push(ev); return false; }
       return true;
     });
     // 同一（日付×名称×場所）の重複を統合。場所違いの同名イベントは残る
@@ -4471,9 +4468,30 @@ async function writeOutput(data) {
     console.warn('[geocode] ジオコーディングに失敗しました:', e.message);
   }
 
-  // ── 過去イベントのアーカイブ（events.json から外れた有効イベントを恒久保存） ──
-  try { archivePastEvents(agedOut, today); }
-  catch (e) { console.warn('[アーカイブ] 退避に失敗:', e.message); }
+  // ── 過去イベントのアーカイブ（終了したイベントを恒久保存） ──────────
+  // 候補は「前回 events.json の過去イベント」＋「今回の出力に残る終了済みイベント」。
+  //   - 前回分: この時点で OUTPUT_PATH はまだ前回の内容（上書き前）。掲載元が終了直後に
+  //     イベントを削除しても、前回ファイルに居た時点の姿で必ず退避される（取りこぼし防止）。
+  //   - 今回分: status 導出後なので受付終了/中止も反映される。同一IDは今回分（後着）が優先。
+  // upsert のため毎回実行しても冪等。失敗しても本処理（events.json 出力）は妨げない。
+  try {
+    const candidates = [];
+    const isPastEv = (e) => e && e.id && e.date && (e.endDate || e.date) < today;
+    try {
+      if (fs.existsSync(OUTPUT_PATH)) {
+        const prevOut = JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8'));
+        for (const k of Object.keys(prevOut)) {
+          if (!Array.isArray(prevOut[k])) continue;
+          for (const e of prevOut[k]) if (isPastEv(e)) candidates.push(e);
+        }
+      }
+    } catch (e) { console.warn('[アーカイブ] 前回 events.json 読み込み失敗:', e.message); }
+    for (const k of Object.keys(data)) {
+      if (!Array.isArray(data[k])) continue;
+      for (const e of data[k]) if (isPastEv(e)) candidates.push(e);
+    }
+    archivePastEvents(candidates, today);
+  } catch (e) { console.warn('[アーカイブ] 退避に失敗:', e.message); }
 
   fs.writeFileSync(OUTPUT_PATH, JSON.stringify(data, null, 2), 'utf8');
   console.log(`[出力] ${OUTPUT_PATH}`);
@@ -4539,14 +4557,15 @@ async function writeOutput(data) {
 }
 
 /**
- * events.json から外れた（終了7日超の）有効イベントを恒久アーカイブへ退避する。
+ * 終了したイベント（候補=前回 events.json＋今回出力の過去イベント）を恒久アーカイブへ退避する。
  * - 保存先 public/data/events-archive.json（git コミット。運営「過去イベント」が閲覧）。
- * - id で upsert（同一イベントの再退避は最新で上書き）。
+ * - id で upsert（再退避は最新で上書き＝毎回実行しても冪等）。
+ * - 品質防御: 不正タイトル・office_notice スタブは持ち込まない。
  * - 保持: 開催日が ARCHIVE_RETENTION_DAYS 以内、かつ最大 ARCHIVE_MAX 件（新しい順）。
  * - 天気座標など表示に不要な大きいフィールドは載せない（サイズ抑制）。
  */
-function archivePastEvents(agedOut, today) {
-  if (!Array.isArray(agedOut) || agedOut.length === 0) return;
+function archivePastEvents(candidates, today) {
+  if (!Array.isArray(candidates) || candidates.length === 0) return;
 
   let archive = { updatedAt: '', events: [] };
   try {
@@ -4567,8 +4586,12 @@ function archivePastEvents(agedOut, today) {
 
   const byId = new Map(archive.events.map(e => [e.id, e]));
   let added = 0;
-  for (const e of agedOut) {
+  for (const e of candidates) {
     if (!e || !e.id || !e.date) continue;
+    // 品質防御: 旧ルール時代の不正タイトルや「公式確認」スタブ（date=スクレイプ当日の
+    // 疑似イベント）を過去ログに持ち込まない
+    if (e.source_type === 'office_notice') continue;
+    if (!e.title || isJunkOrStubTitle(e.title)) continue;
     if (!byId.has(e.id)) added++;
     byId.set(e.id, pick(e)); // 再退避時は最新で上書き
   }

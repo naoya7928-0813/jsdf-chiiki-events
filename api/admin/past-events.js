@@ -84,8 +84,9 @@ export default async function handler(req, res) {
     const o = await redis.hgetall(OKEY);
     if (o) for (const [id, val] of Object.entries(o)) overrides[id] = typeof val === 'string' ? JSON.parse(val) : val;
   } catch { /* ignore */ }
-  const { data: scrapeData, ok: scrapeOk } = await loadScrape(req);
-  const archiveEvents = await loadArchive(req); // 恒久アーカイブ（7日超の過去イベント）
+  // events.json とアーカイブは独立した静的ファイルなので並列取得（携帯での応答短縮）
+  const [{ data: scrapeData, ok: scrapeOk }, archiveEvents] =
+    await Promise.all([loadScrape(req), loadArchive(req)]);
 
   const result = past.buildPastEvents({
     manualEvents, scrapeData, archiveEvents, overrides,
