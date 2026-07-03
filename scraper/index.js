@@ -35,7 +35,7 @@ const geocode             = require('./lib/geocode');
 // 募集案内所イベントのタイトル整形・非イベント判定（フロント/スクリプトと共通）
 const { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } = require('../shared/officeTitle.cjs');
 // イベント名の品質管理（検証済み修正・整形・junk判定・年ズレ判定・重複統合）。最終出力の防御に使う
-const { applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, isJunkOrStubTitle, isStaleDatedEvent, dedupEvents } = require('../shared/titleQuality.cjs');
+const { applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, cleanTimeText, cleanDeadlineText, isJunkOrStubTitle, isStaleDatedEvent, dedupEvents } = require('../shared/titleQuality.cjs');
 
 const { chromium } = require('playwright-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
@@ -790,7 +790,12 @@ let geminiQuotaExhausted = false;
 /** OCR結果フィールドを安全に文字列化してtrimする（非文字列・nullも許容） */
 function safeStr(v) {
   if (!v) return '';
-  if (typeof v === 'string') return v.trim();
+  if (typeof v === 'string') {
+    const t = v.trim();
+    // OCR/LLM が JSON の null を文字列 "null"/"undefined" として返すことがある → 空扱い
+    if (/^(null|undefined)$/i.test(t)) return '';
+    return t;
+  }
   if (Array.isArray(v)) return v.map(safeStr).filter(Boolean).join(' ').trim();
   return String(v).trim();
 }
@@ -851,13 +856,23 @@ async function callGeminiOcr(parts, label = 'PDF-OCR') {
   return null;
 }
 
+// ── OCR 共通ルール（全プロンプトの title / deadline 定義に埋め込む） ──
+// 2026-07-02 の全件監査で OCR 由来の不良タイトル（部隊名のみ・受付時刻・装備スペック・
+// 調達文書等）が多数見つかったため、抽出段階でも抑止する（最終防御は titleQuality）。
+const OCR_TITLE_RULE = 'に書かれた正確なイベント名。'
+  + '部隊名・学校名・組織名だけを返さない（例:「海上自衛隊」「防衛医科大学校」は不可。種別まで含めて「防衛医科大学校 説明会」のように）。'
+  + '受付時間・装備の性能諸元・住所・電話番号・「詳細はこちら」等の案内文・入札/契約などの調達文書の件名はイベント名ではない。'
+  + 'イベント名が読み取れない場合はnull';
+const OCR_DEADLINE_RULE = '応募締切日（例: 4月24日（金））。'
+  + '「定員に達し次第締切」等の条件文のみで具体的な日付がない場合はnull';
+
 const OCR_PROMPT = `この自衛隊イベントのポスター画像から情報を抽出してください。
 以下のJSONのみを返してください（説明文不要）。該当情報がない項目はnullにしてください。
 {
-  "title": "ポスターに書かれた正確なイベント名",
+  "title": "ポスター${OCR_TITLE_RULE}",
   "time": "開催時間（例: 10:00～16:00）",
   "ageRequirement": "参加資格・対象者を簡潔に（例: 中学生以上33歳未満、日本国籍を有する方）",
-  "deadline": "応募締切日（例: 4月24日（金））",
+  "deadline": "${OCR_DEADLINE_RULE}",
   "notes": "定員・抽選有無・注意事項など重要事項のみ50文字以内で簡潔に",
   "url": "画像内のQRコードが指すURL（QRコードがなければnull）"
 }`;
@@ -941,11 +956,11 @@ function fixOcrTitle(title) {
 const PDF_OCR_PROMPT = `この自衛隊イベントのPDFから情報を抽出してください。
 以下のJSONのみを返してください（説明文不要）。該当情報がない項目はnullにしてください。
 {
-  "title": "PDFに書かれた正確なイベント名",
+  "title": "PDF${OCR_TITLE_RULE}",
   "place": "開催場所・会場名（施設名・住所など）",
   "time": "開催時間（例: 10:00～16:00）",
   "ageRequirement": "参加資格・対象者を簡潔に（例: 18歳〜32歳未満、日本国籍を有する方）",
-  "deadline": "応募締切日（例: 4月24日（金））",
+  "deadline": "${OCR_DEADLINE_RULE}",
   "notes": "定員・抽選有無・注意事項など重要事項のみ50文字以内で簡潔に"
 }`;
 
@@ -1088,12 +1103,12 @@ async function enrichWithPdfOcr(events) {
 const FLYER_OCR_PROMPT = `この自衛隊イベントのチラシ（PDF・画像）から情報を抽出してください。
 以下のJSONのみを返してください（説明文不要）。該当情報がない項目はnullにしてください。
 {
-  "title": "チラシに書かれた正確なイベント名",
+  "title": "チラシ${OCR_TITLE_RULE}",
   "date": "開催日（「令和X年Y月Z日（曜日）」の形式で。例: 令和8年6月15日（日））",
   "place": "開催場所・会場名（施設名のみ、住所不要）",
   "time": "開催時間（例: 10:00～16:00）",
   "ageRequirement": "参加資格・対象者を簡潔に（例: 18歳〜32歳未満）",
-  "deadline": "応募締切日（例: 6月1日（日））",
+  "deadline": "${OCR_DEADLINE_RULE}",
   "notes": "定員・抽選有無・注意事項など重要事項のみ50文字以内"
 }`;
 
@@ -1295,12 +1310,12 @@ async function enrichFromFlyer(events, prefLabel) {
 const OCR_PROMPT_FULL = `この自衛隊イベントのポスター画像から情報を抽出してください。
 以下のJSONのみを返してください（説明文不要）。該当情報がない項目はnullにしてください。
 {
-  "title": "ポスターに書かれた正確なイベント名",
+  "title": "ポスター${OCR_TITLE_RULE}",
   "date": "開催日（「令和X年Y月Z日（曜日）」の形式で。例: 令和8年5月19日（火））",
   "place": "開催場所・見学先の名称",
   "time": "開催時間（例: 10:00～16:00）",
   "ageRequirement": "参加資格・対象者を簡潔に（例: 中学生以上33歳未満、日本国籍を有する方）",
-  "deadline": "応募締切日（例: 4月24日（金））",
+  "deadline": "${OCR_DEADLINE_RULE}",
   "notes": "定員・抽選有無・注意事項など重要事項のみ50文字以内で簡潔に"
 }`;
 
@@ -3264,24 +3279,15 @@ async function scrapeOfficeAssets(withFreshContext) {
      * @param {string} sourceUrl - スタブの url に使うページURL
      * @param {string} pref
      */
-    // 既にこの地本でスタブ追加済みか追跡（地本ごとにスタブ1件のみ）
-    const hqStubAdded = new Set();
-
     // 全アセットを試してから成否を判断
     async function processAssets(assets, sourceUrl, pref) {
       const prefCode = (pref || 'xx').slice(0, 2);
       let foundAtLeastOne = false;
-      let bestOcrTitle    = null; // 日付なしでもタイトルが取れた場合に使用
 
       for (const asset of assets) {
         const ocr    = await ocrFlyerFull(asset.url);
         await sleep(2000);
         const parsed = ocr ? parseOcrDate(ocr.date) : null;
-
-        // OCRでタイトルが取れた場合は記録しておく（日付なしでもスタブで活用）
-        if (ocr?.title && !bestOcrTitle) {
-          bestOcrTitle = fixOcrTitle(safeStr(ocr.title));
-        }
 
         if (parsed && !isPast(parsed.dateStr)) {
           const title = (ocr.title && fixOcrTitle(safeStr(ocr.title))) || asset.text || asset.linkText || '(タイトル不明)';
@@ -3307,31 +3313,14 @@ async function scrapeOfficeAssets(withFreshContext) {
         }
       }
 
-      // 全アセット処理後、1件も成功せず かつ 地本スタブ未追加の場合のみスタブ1件
-      if (!foundAtLeastOne && !hqStubAdded.has(pref)) {
-        hqStubAdded.add(pref);
-        // OCRでタイトルが取れていればそれを使う（注記はnotesに記載するためタイトルには含めない）
-        const stubTitle = bestOcrTitle
-          ? bestOcrTitle
-          : `${hq.name}のイベント情報`;
-        allEvents.push({
-          id:          `${prefCode}-ref-${titleHash(hq.url, pref)}`,
-          pref,
-          date:        todayJST,
-          weekday:     calcWeekday(todayJST),
-          title:       stubTitle,
-          place:       '',
-          address:     '',
-          time:        '',
-          category:    '広報活動',
-          tag:         '',
-          url:         sourceUrl,
-          notes:       'チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。',
-          ageRequirement: null,
-          deadline:       null,
-          source_type: 'office_notice',
-        });
-        console.log(`    ⚠ 公式ページ参照スタブ: ${sourceUrl.split('/').slice(-2).join('/')}`);
+      // ※ 以前はここで「${hq.name}のイベント情報」等の公式ページ参照スタブ
+      //   （source_type: office_notice, date=当日）を生成していたが、廃止した。
+      //   偽の開催日（毎回スクレイプ当日）を持つ疑似イベントが「本日開催」と
+      //   誤表示され、実イベントと紛らわしいため（2026-07-02 ユーザー報告）。
+      //   イベントが取得できない地本は素直に0件とし、公式サイトへの誘導は
+      //   UI/静的ページ（県ページの事務所一覧）が担う。
+      if (!foundAtLeastOne) {
+        console.log(`    - 日付付きイベントなし: ${sourceUrl.split('/').slice(-2).join('/')}`);
       }
     }
 
@@ -4369,8 +4358,10 @@ async function writeOutput(data) {
       const fixed = applyVerifiedOverrides(ev);
       return {
         ...fixed,
-        title: cleanEventTitle(fixed.title),
-        place: cleanPlaceText(fixed.place),
+        title:    cleanEventTitle(fixed.title),
+        place:    cleanPlaceText(fixed.place),
+        time:     cleanTimeText(fixed.time),
+        deadline: cleanDeadlineText(fixed.deadline) || null,
       };
     });
     data[key] = data[key].filter(ev => {
@@ -4386,10 +4377,10 @@ async function writeOutput(data) {
     });
     // 同一（日付×名称×場所）の重複を統合。場所違いの同名イベントは残る
     data[key] = dedupEvents(data[key]);
-    // 実イベントがある地本では「公式確認」スタブ（office_notice）を出さない
-    if (data[key].some(e => e.source_type !== 'office_notice')) {
-      data[key] = data[key].filter(e => e.source_type !== 'office_notice');
-    }
+    // 「公式確認」スタブ（office_notice）は常時除外（2026-07-02 生成自体を廃止。
+    // 偽の開催日を持つ疑似イベントのため、前回データ維持や旧コミットの定期実行から
+    // 混入しても必ずここで落とす）
+    data[key] = data[key].filter(e => e.source_type !== 'office_notice');
     removedCount += before - data[key].length;
     // 曜日をカレンダーデータで上書き
     data[key].forEach(ev => {

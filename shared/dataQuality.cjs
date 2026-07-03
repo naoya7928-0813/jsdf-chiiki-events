@@ -89,6 +89,26 @@ function validateEventsData(data, opts = {}) {
       // 会場情報（警告）
       if (!ev.place || !String(ev.place).trim()) warnings.push(`${loc} 会場情報(place)がありません`);
 
+      // 「公式確認」スタブ（office_notice）の混入（2026-07-02 生成廃止。偽の開催日を持つ疑似イベント）
+      if (ev.source_type === 'office_notice') {
+        warnings.push(`${loc} 廃止済みの office_notice スタブが混入: "${(ev.title || '').slice(0, 30)}"`);
+      }
+
+      // 文字列 "null"/"undefined"（OCR/LLM が JSON null を文字列で返したもの）
+      for (const f of ['place', 'time', 'deadline', 'address', 'ageRequirement', 'notes']) {
+        if (typeof ev[f] === 'string' && /^(null|undefined)$/i.test(ev[f].trim())) {
+          warnings.push(`${loc} ${f} が文字列 "${ev[f]}" になっています（空にすべき）`);
+        }
+      }
+      // time の書式（正準は HH:MM～HH:MM／HH:MM／終日。複数部制・複数日は許容）
+      if (ev.time && /時|分|から|午前|午後/.test(String(ev.time))) {
+        warnings.push(`${loc} time が未整形（時分表記）: "${String(ev.time).slice(0, 30)}"`);
+      }
+      // place に住所/郵便番号が混入
+      if (ev.place && /〒\s*\d|,\s*日本[、,]/.test(String(ev.place))) {
+        warnings.push(`${loc} place に住所/郵便番号が混入: "${String(ev.place).slice(0, 30)}"`);
+      }
+
       // weatherLocation（座標範囲・accuracy）
       const wl = ev.weatherLocation;
       if (wl) {

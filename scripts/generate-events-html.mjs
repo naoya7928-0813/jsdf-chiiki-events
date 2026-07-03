@@ -78,12 +78,55 @@ for (const ev of allEvents) {
   byPrefKey[ev.prefKey].push(ev);
 }
 
+// ── 募集案内所・地域事務所（県ページの固有コンテンツ） ──────────────
+// イベント0件の県ページがテンプレ文のみの薄い内容（実質同一ページ）になり
+// Google に「クロール済み・インデックス未登録」とされるのを防ぐため、
+// 県ごとに固有の実データ（地本・案内所の所在地一覧）を掲載する。
+const OFFICES_JSON = join(__dirname, '../public/data/offices.json');
+const officesByPref = {};
+try {
+  const od = JSON.parse(readFileSync(OFFICES_JSON, 'utf8'));
+  for (const o of od.offices || []) {
+    if (!o.pref || !o.name) continue;
+    (officesByPref[o.pref] ||= []).push(o);
+  }
+} catch { /* offices.json が無くてもページ生成は続行 */ }
+
+/** 県内の地本本部・募集案内所一覧セクション（無ければ空文字） */
+function officeSection(prefKey, prefLabel) {
+  const list = officesByPref[prefKey] || [];
+  if (!list.length) return '';
+  // 本部（hq）→ 案内所・事務所（名称順）
+  const hq = list.filter(o => o.type === 'hq');
+  const rec = list.filter(o => o.type !== 'hq')
+    .sort((a, b) => String(a.name).localeCompare(String(b.name), 'ja'));
+  const row = (o) => {
+    const tel = o.tel ? `　TEL: <a href="tel:${esc(String(o.tel).replace(/[^\d+-]/g, ''))}">${esc(o.tel)}</a>` : '';
+    const link = o.url && /^https?:\/\//.test(o.url) && o.hasOfficialPage !== false
+      ? `　<a href="${esc(o.url)}" target="_blank" rel="noopener noreferrer">公式ページ</a>` : '';
+    return `    <li><strong>${esc(o.name)}</strong>${o.address ? `<br />${esc(o.address)}` : ''}${tel}${link}</li>`;
+  };
+  return `  <h2>${esc(prefLabel)}の自衛隊 募集案内所・地域事務所</h2>
+  <p class="meta">イベントの申込方法の確認や自衛官採用の相談は、最寄りの募集案内所・地域事務所でも受け付けています（受付時間等は各所へお問い合わせください）。</p>
+  <ul>
+${[...hq, ...rec].map(row).join('\n')}
+  </ul>`;
+}
+
 function esc(s) {
   return String(s ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+// <script type="application/ld+json"> へ埋め込む JSON の無害化。
+// JSON.stringify は "<" をエスケープしないため、スクレイプ由来のタイトルに
+// "</script>" が含まれるとタグが破壊される（格納型XSSベクトル）。
+// "<" を < に置換すれば JSON としては等価のままタグ終端を防げる。
+function jsonLdSafe(obj) {
+  return JSON.stringify(obj).replace(/</g, '\\u003c');
 }
 
 // クローラー向けHTMLの軽量化: タグ間の純粋な空白（インデント/改行）だけを除去する。
@@ -275,7 +318,7 @@ const sections = Object.entries(byPref).map(([label, events]) => {
 }).join('\n\n');
 
 // JSON-LD は整形(インデント)不要。クローラーは圧縮JSONも同等に解釈するため非整形で出力し軽量化。
-const allJsonLd = JSON.stringify(
+const allJsonLd = jsonLdSafe(
   allEvents.map(ev => toEventSchema(ev, ev.prefLabel))
 );
 
@@ -289,6 +332,7 @@ const mainHtml = `<!DOCTYPE html>
   <meta name="keywords" content="自衛隊 イベント,地方協力本部,地本,自衛隊説明会,駐屯地 一般公開,自衛隊記念行事,体験搭乗,陸上自衛隊,海上自衛隊,航空自衛隊,自衛官募集,自衛隊 体験,記念行事" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="${SITE_URL}/events.html" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
   <meta property="og:title" content="自衛隊地本イベント一覧" />
   <meta property="og:description" content="全国の自衛隊地方協力本部のイベント情報。開催日・会場・カテゴリを掲載。" />
   <meta property="og:url" content="${SITE_URL}/events.html" />
@@ -363,11 +407,13 @@ for (const [prefKey, prefLabel] of Object.entries(PREF_LABELS)) {
   if (hasEvents) {
     for (const ev of events) schemas.push(toEventSchema(ev, prefLabel));
   }
-  const prefJsonLd = JSON.stringify(schemas);
+  const prefJsonLd = jsonLdSafe(schemas);
 
+  const officeCount = (officesByPref[prefKey] || []).length;
+  const officeNote = officeCount > 0 ? `県内の募集案内所・地域事務所 ${officeCount} か所の連絡先も掲載。` : '';
   const countNote = hasEvents
-    ? `説明会・体験イベント・駐屯地一般公開・記念行事など ${events.length} 件を掲載`
-    : '説明会・体験イベント・駐屯地一般公開・記念行事などの情報を掲載';
+    ? `説明会・体験イベント・駐屯地一般公開・記念行事など ${events.length} 件を掲載。${officeNote}`
+    : `説明会・体験イベント・駐屯地一般公開・記念行事などの情報を掲載。${officeNote}`;
 
   const eventBlock = hasEvents
     ? `  <p class="meta">最終更新：${esc(updatedAt)}　／　${events.length} 件掲載</p>
@@ -388,6 +434,7 @@ for (const [prefKey, prefLabel] of Object.entries(PREF_LABELS)) {
   <meta name="keywords" content="${esc(prefLabel)} 自衛隊 イベント,自衛隊 説明会 ${esc(prefLabel)},${esc(prefLabel)}地方協力本部,${esc(prefLabel)}地本,駐屯地 一般公開 ${esc(prefLabel)},記念行事,体験搭乗,自衛官募集 ${esc(prefLabel)}" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="${SITE_URL}/events/${prefKey}.html" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
   <meta property="og:title" content="${esc(prefLabel)}の自衛隊イベント情報【非公式まとめ】" />
   <meta property="og:description" content="${esc(prefLabel)}地方協力本部の自衛隊イベント情報。開催日・会場・カテゴリを掲載。" />
   <meta property="og:url" content="${SITE_URL}/events/${prefKey}.html" />
@@ -423,6 +470,7 @@ ${prefJsonLd}
 ${prefEvergreen(prefLabel)}
   <h2>${esc(prefLabel)}の開催予定・最新イベント</h2>
 ${eventBlock}
+${officeSection(prefKey, prefLabel)}
   ${regionNav(prefKey)}
   <section class="natidx" style="margin-top:2.5em">
     <h2>全国の自衛隊地本イベント（都道府県別）</h2>
@@ -472,7 +520,7 @@ const GUIDE_FAQ = [
     a: '本サイトは全国の地方協力本部・募集案内所の公式サイトを1日3回自動巡回し、最新のイベント情報を都道府県別に更新しています。ただし公式の中止・変更・延期が即時に反映されない場合があります。参加前には必ず各イベントの公式ページで最新情報をご確認ください。' },
 ];
 
-const guideJsonLd = JSON.stringify([
+const guideJsonLd = jsonLdSafe([
   { '@context': 'https://schema.org', '@type': 'FAQPage',
     mainEntity: GUIDE_FAQ.map(f => ({ '@type': 'Question', name: f.q,
       acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
@@ -493,6 +541,7 @@ const guideHtml = `<!DOCTYPE html>
   <meta name="keywords" content="自衛隊 説明会 流れ,自衛隊 説明会 持ち物,自衛隊 説明会 服装,自衛隊 体験搭乗 申し込み,駐屯地 一般公開 楽しみ方,自衛官候補生 年齢,自衛隊 イベント 申込,地方協力本部" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="${SITE_URL}/guide.html" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
   <meta property="og:title" content="自衛隊イベント参加ガイド【非公式】" />
   <meta property="og:description" content="説明会の流れ・持ち物・申込の要否、体験搭乗の探し方、採用区分と年齢の目安をまとめた参加ガイド。" />
   <meta property="og:url" content="${SITE_URL}/guide.html" />
@@ -547,13 +596,18 @@ console.log('[generate-events-html] guide.html を生成');
 
 // ── sitemap.xml を更新 ──────────────────────────────────────────
 // 全都道府県ページを掲載。非ページの events.json は含めない（インデックス未登録の原因）。
+// イベントの有無で priority / changefreq を出し分け、クロール資源を有効ページへ誘導する
+// （0件県は事務所一覧が主コンテンツ＝更新頻度が低いので monthly / 低priority）。
 
-const prefUrls = Object.keys(PREF_LABELS).map(k => `  <url>
+const prefUrls = Object.keys(PREF_LABELS).map(k => {
+  const has = (byPrefKey[k] ?? []).length > 0;
+  return `  <url>
     <loc>${SITE_URL}/events/${k}.html</loc>
     <lastmod>${lastmod}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>`).join('\n');
+    <changefreq>${has ? 'daily' : 'monthly'}</changefreq>
+    <priority>${has ? '0.8' : '0.4'}</priority>
+  </url>`;
+}).join('\n');
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
