@@ -401,3 +401,32 @@ test('cleanPlaceText: ジオコーダ住所サフィックス除去・活動羅�
   assert.equal(cleanPlaceText('留萌港'), '留萌港');
   assert.equal(cleanPlaceText('かが交流プラザさくら'), 'かが交流プラザさくら');
 });
+
+// ── 検疫（isSuspiciousTitle）: 新種ゴミの公開保留（2026-07-03 岩手事故の再発防止） ──
+const { isSuspiciousTitle } = require('./titleQuality.cjs');
+
+test('isSuspiciousTitle: 表の行・ラベル・組織名・スペック・述語断片を検疫する', () => {
+  const suspicious = [
+    '乗艦受付時刻',                              // ラベル語終わり（岩手・実例）
+    '最大発射速度:30発／分、最大射程約:5,600m',   // 装備スペック（岩手・実例）
+    '宮古港上空を航過',                          // 述語断片（岩手・実例）
+    '岩手地本公式',                              // 「公式」ラベル（岩手・実例）
+    '二戸地区広域行政事務組合消防本部',           // 組織名のみ（岩手・実例）
+    '集合場所までのアクセス',                    // ラベル語終わり（新種想定）
+    '駐車場のご案内図',                          // 〃
+    'participants 定員',                        // 〃
+  ];
+  for (const t of suspicious) assert.equal(isSuspiciousTitle(t), true, `検疫すべき: ${t}`);
+});
+
+test('isSuspiciousTitle: イベント語を含む・固有名の正規イベントは検疫しない', () => {
+  const legit = [
+    // イベント語あり
+    '自衛隊職場体験（岩手駐屯地）', '海上自衛隊八戸航空基地見学', '公務員合同説明会',
+    '第４１回ファミリーコンサート', '千歳のまちの航空祭', 'ヘリコプター体験搭乗',
+    // イベント語なしの固有名イベント（誤検疫させない）
+    '県民の日', 'つばめのチカラ', '新潟「セリカday」', 'ＹＡＭＡＣＨＩ ＢＡＳＥ ｉｎ酒田',
+    '【駒ケ根市】KOMA夏', '群馬パーツショー', 'PREMIUM TOUR 2026', '自衛隊を「知る」「感じる」',
+  ];
+  for (const t of legit) assert.equal(isSuspiciousTitle(t), false, `公開すべき: ${t}`);
+});
