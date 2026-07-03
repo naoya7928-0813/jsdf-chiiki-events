@@ -348,33 +348,7 @@
       }
     }
   ],
-  "aomori": [
-    {
-      "id": "ao-ref-sza3a",
-      "pref": "aomori",
-      "date": "2026-07-03",
-      "weekday": "金",
-      "title": "令和7年度自衛官等採用案内",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/aomori/",
-      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_notice",
-      "weatherLocation": {
-        "latitude": 40.825,
-        "longitude": 140.741,
-        "label": "青森県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-07-02T08:50:34.431+09:00"
-      }
-    }
-  ],
+  "aomori": [],
   "iwate": [
     {
       "id": "iw-20260704-omowv",
@@ -2199,33 +2173,7 @@
       }
     }
   ],
-  "chiba": [
-    {
-      "id": "ch-ref-ln45y",
-      "pref": "chiba",
-      "date": "2026-07-03",
-      "weekday": "金",
-      "title": "令和8年度自衛官等採用案内",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/chiba/",
-      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_notice",
-      "weatherLocation": {
-        "latitude": 35.605,
-        "longitude": 140.123,
-        "label": "千葉県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-07-02T08:50:38.569+09:00"
-      }
-    }
-  ],
+  "chiba": [],
   "niigata": [
     {
       "id": "ni-20260704-o4dtg",
@@ -2550,33 +2498,7 @@
       }
     }
   ],
-  "yamanashi": [
-    {
-      "id": "ya-ref-dvpw6",
-      "pref": "yamanashi",
-      "date": "2026-07-03",
-      "weekday": "金",
-      "title": "自衛隊山梨地方協力本部のイベント情報",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/yamanashi/",
-      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_notice",
-      "weatherLocation": {
-        "latitude": 35.664,
-        "longitude": 138.568,
-        "label": "山梨県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-07-02T15:00:01.957+09:00"
-      }
-    }
-  ],
+  "yamanashi": [],
   "nagano": [
     {
       "id": "na-20260703-pzh54",
@@ -4702,6 +4624,78 @@
       }
     },
     {
+      "id": "ky-set-20260711-ylveo",
+      "pref": "kyoto",
+      "date": "2026-07-11",
+      "weekday": "土",
+      "title": "自衛官 就職・進学説明会",
+      "place": "河原町募集案内所",
+      "address": "",
+      "time": "10:00～11:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
+      "notes": "担当: 河原町募集案内所",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.021,
+        "longitude": 135.756,
+        "label": "京都府河原町",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-03T14:54:07.525+09:00"
+      }
+    },
+    {
+      "id": "ky-set-20260713-la5uv",
+      "pref": "kyoto",
+      "date": "2026-07-13",
+      "weekday": "月",
+      "title": "自衛官 就職・進学説明会",
+      "place": "ハローワーク西陣 烏丸御池庁舎",
+      "address": "",
+      "time": "9:00～12:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
+      "notes": "担当: 河原町募集案内所",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.021,
+        "longitude": 135.756,
+        "label": "京都府",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-03T14:54:08.279+09:00"
+      }
+    },
+    {
+      "id": "ky-set-20260715-7c03c",
+      "pref": "kyoto",
+      "date": "2026-07-15",
+      "weekday": "水",
+      "title": "自衛官 就職・進学説明会",
+      "place": "ハローワーク西陣",
+      "address": "",
+      "time": "13:30～16:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
+      "notes": "担当: 河原町募集案内所",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.021,
+        "longitude": 135.756,
+        "label": "京都府",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-03T14:54:08.644+09:00"
+      }
+    },
+    {
       "id": "ky-set-20260721-h0ypv",
       "pref": "kyoto",
       "date": "2026-07-21",
@@ -5127,7 +5121,33 @@
       }
     }
   ],
-  "hyogo": [],
+  "hyogo": [
+    {
+      "id": "hy-ref-kvjp2",
+      "pref": "hyogo",
+      "date": "2026-07-03",
+      "weekday": "金",
+      "title": "自衛隊総合募集案内",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/hyogo/",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_notice",
+      "weatherLocation": {
+        "latitude": 34.691,
+        "longitude": 135.183,
+        "label": "兵庫県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-07-02T15:00:02.899+09:00"
+      }
+    }
+  ],
   "nara": [
     {
       "id": "na-20260825-op2gf",
@@ -5352,7 +5372,33 @@
       }
     }
   ],
-  "kochi": [],
+  "kochi": [
+    {
+      "id": "ko-ref-9hhrq",
+      "pref": "kochi",
+      "date": "2026-07-03",
+      "weekday": "金",
+      "title": "令和8年度 自衛官等 採用試験予定",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kochi/",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_notice",
+      "weatherLocation": {
+        "latitude": 33.56,
+        "longitude": 133.531,
+        "label": "高知県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:34.533+09:00"
+      }
+    }
+  ],
   "tokushima": [
     {
       "id": "to-off-20260704-kvs5z",
@@ -5380,8 +5426,60 @@
       }
     }
   ],
-  "tottori": [],
-  "shimane": [],
+  "tottori": [
+    {
+      "id": "to-ref-b3xna",
+      "pref": "tottori",
+      "date": "2026-07-03",
+      "weekday": "金",
+      "title": "第69回自衛隊音楽演奏会",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tottori/content/00-saiyou/recruit.html",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_notice",
+      "weatherLocation": {
+        "latitude": 35.503,
+        "longitude": 134.238,
+        "label": "鳥取県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:35.015+09:00"
+      }
+    }
+  ],
+  "shimane": [
+    {
+      "id": "sh-ref-nfvfa",
+      "pref": "shimane",
+      "date": "2026-07-03",
+      "weekday": "金",
+      "title": "自衛隊島根地方協力本部のイベント情報",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/shimane/recruit/exam.html",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_notice",
+      "weatherLocation": {
+        "latitude": 35.472,
+        "longitude": 133.051,
+        "label": "島根県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:35.265+09:00"
+      }
+    }
+  ],
   "okayama": [
     {
       "id": "ok-20260704-cxkqq",
@@ -5453,6 +5551,30 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-02T08:50:43.717+09:00"
+      }
+    },
+    {
+      "id": "ok-20260718-59qdu",
+      "pref": "okayama",
+      "date": "2026-07-18",
+      "weekday": "土",
+      "title": "自衛隊×イコットニコット",
+      "place": "イコットニコット",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 34.662,
+        "longitude": 133.935,
+        "label": "岡山県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-02T08:50:46.282+09:00"
       }
     },
     {
@@ -5621,6 +5743,30 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-02T08:50:45.555+09:00"
+      }
+    },
+    {
+      "id": "ok-20260805-raws8",
+      "pref": "okayama",
+      "date": "2026-08-05",
+      "weekday": "水",
+      "title": "艦艇一般公開",
+      "place": "玉野市宇野港第一突堤",
+      "address": "",
+      "time": "",
+      "category": "一般公開",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 34.49,
+        "longitude": 133.947,
+        "label": "岡山県玉野市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-03T14:54:09.018+09:00"
       }
     },
     {
@@ -5916,7 +6062,33 @@
       }
     }
   ],
-  "yamaguchi": [],
+  "yamaguchi": [
+    {
+      "id": "ya-ref-d6646",
+      "pref": "yamaguchi",
+      "date": "2026-07-03",
+      "weekday": "金",
+      "title": "第50回自衛隊音楽演奏会",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/yamaguchi/kitievent.html",
+      "notes": "チラシ等からの自動取得ができませんでした。詳細は公式ページをご確認ください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_notice",
+      "weatherLocation": {
+        "latitude": 34.186,
+        "longitude": 131.471,
+        "label": "山口県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.480+09:00"
+      }
+    }
+  ],
   "fukuoka": [
     {
       "id": "fu-off-20260808-bjxbc",
@@ -6046,6 +6218,30 @@
   ],
   "kumamoto": [
     {
+      "id": "km-20260711-2zjol",
+      "pref": "kumamoto",
+      "date": "2026-07-11",
+      "weekday": "土",
+      "title": "公務員合同就職フェス",
+      "place": "熊本城ホール1階 展示ホール",
+      "address": "",
+      "time": "13時00分～16時30分",
+      "category": "採用イベント",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kumamoto/event/index.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 32.803,
+        "longitude": 130.708,
+        "label": "熊本県熊本市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:38.734+09:00"
+      }
+    },
+    {
       "id": "km-20260725-dm9d0",
       "pref": "kumamoto",
       "date": "2026-07-25",
@@ -6070,16 +6266,16 @@
       }
     },
     {
-      "id": "km-20260711-2zjol",
+      "id": "km-20260808-apzd8",
       "pref": "kumamoto",
-      "date": "2026-07-11",
+      "date": "2026-08-08",
       "weekday": "土",
-      "title": "公務員合同就職フェス",
-      "place": "熊本城ホール1階 展示ホール",
+      "title": "陸上自衛隊高等工科学校説明会",
+      "place": "熊本地方合同庁舎A棟",
       "address": "",
-      "time": "13時00分～16時30分",
-      "category": "採用イベント",
-      "tag": "",
+      "time": "10時30分～13時30分",
+      "category": "説明会",
+      "tag": "学生向け",
       "url": "https://www.mod.go.jp/pco/kumamoto/event/index.html",
       "notes": null,
       "ageRequirement": null,
@@ -6090,13 +6286,86 @@
         "label": "熊本県熊本市",
         "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:38.734+09:00"
+        "geocodedAt": "2026-06-28T22:18:38.485+09:00"
+      }
+    },
+    {
+      "id": "km-20260809-g90hb",
+      "pref": "kumamoto",
+      "date": "2026-08-09",
+      "weekday": "日",
+      "title": "防衛大学校説明会",
+      "place": "熊本地方合同庁舎B棟",
+      "address": "",
+      "time": "9時30分～12時40分",
+      "category": "説明会",
+      "tag": "学生向け",
+      "url": "https://www.mod.go.jp/pco/kumamoto/event/index.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 32.803,
+        "longitude": 130.708,
+        "label": "熊本県熊本市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-03T14:54:09.378+09:00"
+      }
+    },
+    {
+      "id": "km-20260809-b1elr",
+      "pref": "kumamoto",
+      "date": "2026-08-09",
+      "weekday": "日",
+      "title": "航空学生説明会",
+      "place": "熊本地方合同庁舎B棟",
+      "address": "",
+      "time": "13時30分～17時00分",
+      "category": "説明会",
+      "tag": "学生向け",
+      "url": "https://www.mod.go.jp/pco/kumamoto/event/index.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 32.803,
+        "longitude": 130.708,
+        "label": "熊本県熊本市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-03T14:54:09.378+09:00"
       }
     }
   ],
   "oita": [],
   "miyazaki": [],
-  "kagoshima": [],
+  "kagoshima": [
+    {
+      "id": "ks-20260726-ptf17",
+      "pref": "kagoshima",
+      "date": "2026-07-26",
+      "weekday": "日",
+      "title": "2026 自衛隊みなと祭り",
+      "place": "鹿児島本港・北ふ頭1号岸壁",
+      "address": "",
+      "time": "9:00～16:00",
+      "category": "地域参加",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kagoshima/event/index.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 31.597,
+        "longitude": 130.557,
+        "label": "鹿児島県鹿児島郡",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-03T14:54:09.750+09:00"
+      }
+    }
+  ],
   "okinawa": [],
-  "updatedAt": "2026/07/03 08:23"
+  "updatedAt": "2026/07/03 14:54"
 }
