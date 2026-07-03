@@ -1404,6 +1404,31 @@
         "source": "gsi",
         "geocodedAt": "2026-07-02T08:50:36.640+09:00"
       }
+    },
+    {
+      "id": "to-off-20260910-i07ot",
+      "pref": "tokyo",
+      "date": "2026-09-10",
+      "weekday": "木",
+      "title": "任期付自衛官の募集要项",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tokyo/saiyou/bosyuannai/0704_ninkituki.pdf",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 35.69,
+        "longitude": 139.692,
+        "label": "東京都",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-07-04T08:19:18.955+09:00"
+      }
     }
   ],
   "saitama": [
@@ -1779,7 +1804,7 @@
       "date": "2026-07-18",
       "weekday": "土",
       "title": "西那須野ふれあいまつり",
-      "place": "JR西那須野駅西口駅前、駅前通り、要町通り、桜通り、水源通り、市営西大和駐車場、",
+      "place": "JR西那須野駅西口駅前、駅前通り、要町通り、桜通り、水源通り、市営西大和駐車場、歩行者天国",
       "address": "",
       "time": "15:00～21:00",
       "category": "地域参加",
@@ -1795,7 +1820,7 @@
         "label": "栃木県",
         "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-07-03T20:01:30.261+09:00"
+        "geocodedAt": "2026-06-28T22:18:21.449+09:00"
       }
     }
   ],
@@ -2296,30 +2321,6 @@
   ],
   "yamanashi": [],
   "nagano": [
-    {
-      "id": "na-20260703-pzh54",
-      "pref": "nagano",
-      "date": "2026-07-03",
-      "weekday": "金",
-      "title": "ふれあいコンサートin須坂",
-      "place": "メセナホール",
-      "address": "",
-      "time": "",
-      "category": "演奏会",
-      "tag": "",
-      "url": "",
-      "notes": "陸上自衛隊 第12音楽隊が須坂市に来ます！ 開場：17：30 開演：18：30 入場無料 ※ご来場多数の場合は、入場を制限させていただく場合があります。 お問い合わせ先：須坂商工会議所 TEL:026-245-0031",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-03T20:01:30.619+09:00"
-      }
-    },
     {
       "id": "na-20260705-563cx",
       "pref": "nagano",
@@ -5484,30 +5485,6 @@
   ],
   "hiroshima": [
     {
-      "id": "hi-20260703-cyzo4",
-      "pref": "hiroshima",
-      "date": "2026-07-03",
-      "weekday": "金",
-      "title": "公務員合同説明会ｉｎふくやま",
-      "place": "",
-      "address": "",
-      "time": "13:00～20:00",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/hiroshima/events/3620/",
-      "notes": "事前申込不要、グッズプレゼント",
-      "ageRequirement": "高校生以上",
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 34.397,
-        "longitude": 132.46,
-        "label": "広島県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      }
-    },
-    {
       "id": "hi-20260704-ht099",
       "pref": "hiroshima",
       "date": "2026-07-04",
@@ -5907,5 +5884,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/03 20:01"
+  "updatedAt": "2026/07/04 08:19"
 }
