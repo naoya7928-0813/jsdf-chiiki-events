@@ -173,30 +173,6 @@
   ],
   "obihiro": [
     {
-      "id": "ob-20260704-c5hts",
-      "pref": "obihiro",
-      "date": "2026-07-04",
-      "weekday": "土",
-      "title": "第４１回ファミリーコンサート",
-      "place": "北ガス市民ホール （北見市民会館）大ホール 全席指定席 入場無料！！",
-      "address": "",
-      "time": "",
-      "category": "体験",
-      "tag": "家族向け",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 42.924,
-        "longitude": 143.196,
-        "label": "北海道帯広市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:08.533+09:00"
-      }
-    },
-    {
       "id": "ob-20260711-q7z5j",
       "pref": "obihiro",
       "date": "2026-07-11",
@@ -2346,30 +2322,6 @@
       }
     },
     {
-      "id": "na-20260718-hm0w8",
-      "pref": "nagano",
-      "date": "2026-07-18",
-      "weekday": "土",
-      "title": "【松本市】公務員合同説明会",
-      "place": "イオンモール松本 「風庭」エリア",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "場所：イオンモール松本 風庭２F イオンホール 時間：１１：００～１６：００ (１５：４０受付終了) 内容：「公務員ってなにしてるの？」その疑問を解決！ 自衛隊、防衛省職員、長野県警、北アルプス消防、木曽広域消防、松本市役所、安曇野市役所、大町市役所 合同により、公務員の仕事内容、生活、ワークライフバランス、待遇等わかりやすく説明させていただきます。",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-03T20:01:30.984+09:00"
-      }
-    },
-    {
       "id": "na-20260718-uimr5",
       "pref": "nagano",
       "date": "2026-07-18",
@@ -2391,6 +2343,30 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-03T20:01:31.351+09:00"
+      }
+    },
+    {
+      "id": "na-20260718-hm0w8",
+      "pref": "nagano",
+      "date": "2026-07-18",
+      "weekday": "土",
+      "title": "【松本市】公務員合同説明会",
+      "place": "イオンモール松本 「風庭」エリア",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "場所：イオンモール松本 風庭２F イオンホール 時間：１１：００～１６：００ (１５：４０受付終了) 内容：「公務員ってなにしてるの？」その疑問を解決！ 自衛隊、防衛省職員、長野県警、北アルプス消防、木曽広域消防、松本市役所、安曇野市役所、大町市役所 合同により、公務員の仕事内容、生活、ワークライフバランス、待遇等わかりやすく説明させていただきます。",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-03T20:01:30.984+09:00"
       }
     },
     {
@@ -5884,5 +5860,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/04 08:19"
+  "updatedAt": "2026/07/04 14:48"
 }
