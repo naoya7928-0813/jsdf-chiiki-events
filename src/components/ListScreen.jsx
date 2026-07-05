@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { ICO } from './Icons';
-import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle } from './Shared';
+import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle, StatusBadge } from './Shared';
 import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, matchesTag, APPLIED_TAG_ID, ENDED_TAG_ID } from './FilterBar';
 import { daysUntil, deadlineDaysUntil, daysLabel, daysColor } from '../utils/date';
 import { REGIONS, SUPPORTED_PREFECTURES, PREFECTURE_INFO } from '../data/regionMap';
@@ -575,6 +575,8 @@ export default function ListScreen({
                         {/* テキスト */}
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', gap: 6, marginBottom: 5, flexWrap: 'wrap', alignItems: 'center' }}>
+                            {/* 中止/受付終了は終了済みより優先して目立たせる */}
+                            <StatusBadge status={ev.status} size="sm" />
                             {ev.ended && (
                               <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3, background: '#6b7280', color: '#fff', letterSpacing: 0.5, flexShrink: 0 }}>終了済み</span>
                             )}

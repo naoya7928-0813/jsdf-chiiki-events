@@ -111,3 +111,97 @@ test('ID保持・重複なし', () => {
   assert.equal(new Set(ids).size, ids.length);
   assert.ok(ids.every(Boolean));
 });
+
+// ── scopeCount（空一覧の理由分類の根拠。自分の範囲の件数＝漏洩ではない） ──
+test('scopeCount: 自分の権限範囲の過去イベント件数（フィルタ前）', () => {
+  assert.equal(build(acc({ user: 'n', pass: 'p', pref: '*' })).scopeCount, 4); // 全国
+  assert.equal(build(acc({ user: 'p', pass: 'p', pref: 'tokyo', role: 'pco_admin' })).scopeCount, 3);
+  assert.equal(build(acc({ user: 'm', pass: 'p', pref: 'tokyo', office: 'shibuya', role: 'office_manager' })).scopeCount, 1);
+});
+test('scopeCount>0 だが filter で total=0 → filtered_empty の根拠', () => {
+  // pco(tokyo) が osaka を要求：範囲には3件あるが条件一致0 → filtered_empty
+  const r = build(acc({ user: 'p', pass: 'p', pref: 'tokyo', role: 'pco_admin' }), { pref: 'osaka' });
+  assert.equal(r.scopeCount, 3);
+  assert.equal(r.total, 0);
+});
+test('scopeCount=0 → empty_scope の根拠（範囲に過去イベントなし）', () => {
+  // office_manager(tokyo/nerima)：一致office無し → 0
+  const r = build(acc({ user: 'x', pass: 'p', pref: 'tokyo', office: 'nerima', role: 'office_manager' }));
+  assert.equal(r.scopeCount, 0);
+  assert.equal(r.total, 0);
+});
+
+// ── アーカイブ併合（events.json から7日超で外れた過去イベント） ──
+const archiveEvents = [
+  // ずっと昔の過去イベント（events.json には無い＝アーカイブのみ）
+  { id: 'a1', pref: 'tokyo', office: '', date: '2026-01-15', title: '昔の東京過去', place: '会館', source_type: 'scrape' },
+  { id: 'a2', pref: 'osaka', date: '2026-02-20', title: '昔の大阪過去', source_type: 'scrape' },
+  // events.json にも同IDが残っている（新しい方=events.json を優先すべき）
+  { id: 's1', pref: 'tokyo', date: '2026-06-29', title: 'アーカイブ側の古いタイトル', source_type: 'scrape' },
+];
+const buildA = (account, q = {}) => P.buildPastEvents({
+  manualEvents, scrapeData, archiveEvents, overrides, account,
+  query: P.validatePastQuery(q).value, today: TODAY, canManageScope: scope,
+});
+
+test('archive: national はアーカイブの過去イベントも閲覧できる', () => {
+  const ids = buildA(acc({ user: 'n', pass: 'p', pref: '*' })).events.map(e => e.id).sort();
+  // s1,s3,manual1,manual2（既存）＋ a1,a2（アーカイブ）。未来 s2 は除外
+  assert.deepEqual(ids, ['a1', 'a2', 'manual-tokyo-1', 'manual-tokyo-2', 's1', 's3']);
+});
+
+test('archive: 同ID(s1)は events.json 側（新しい方）を優先し override も反映', () => {
+  const r = buildA(acc({ user: 'n', pass: 'p', pref: '*' }));
+  const s1 = r.events.find(e => e.id === 's1');
+  assert.equal(s1.title, '上書き後タイトル'); // アーカイブの古いタイトルではなく override 適用後
+});
+
+test('archive: pco(osaka) は自地本のアーカイブのみ（a1東京は除外）', () => {
+  const ids = buildA(acc({ user: 'p', pass: 'p', pref: 'osaka', role: 'pco_admin' })).events.map(e => e.id).sort();
+  assert.deepEqual(ids, ['a2', 's3']);
+});
+
+test('archive: 期間フィルタはアーカイブにも効く', () => {
+  const ids = buildA(acc({ user: 'n', pass: 'p', pref: '*' }), { to: '2026-03-01' }).events.map(e => e.id).sort();
+  assert.deepEqual(ids, ['a1', 'a2']); // 2026-03-01 以前のみ
+});
+
+// ── 回帰: アーカイブ×検疫の同時動作（統合PR） ─────────────────────
+// 検疫（isSuspiciousTitle）で公開を止めたイベントや不正タイトルが、
+// アーカイブ経由で過去ログ・運営「過去イベント」に紛れ込まないこと。
+const TQ = require('./titleQuality.cjs');
+
+test('isArchivableEvent: 正常な過去イベントは退避可・検疫/不正/スタブは退避不可', () => {
+  // 正常（退避可）
+  assert.equal(TQ.isArchivableEvent({ id: 'x1', date: '2026-06-20', title: '自衛隊職場体験（岩手駐屯地）' }), true);
+  assert.equal(TQ.isArchivableEvent({ id: 'x2', date: '2026-06-21', title: '県民の日' }), true); // イベント語なし固有名
+  // 検疫対象（疑わしい）は退避不可 … 公開を止めたものを過去ログに残さない
+  assert.equal(TQ.isArchivableEvent({ id: 'q1', date: '2026-06-22', title: '乗艦受付時刻' }), false);
+  assert.equal(TQ.isArchivableEvent({ id: 'q2', date: '2026-06-23', title: '宮古港上空を航過' }), false);
+  // 確実な不正（junk）は退避不可
+  assert.equal(TQ.isArchivableEvent({ id: 'j1', date: '2026-06-24', title: '一般曹候補生' }), false);
+  // office_notice スタブは退避不可
+  assert.equal(TQ.isArchivableEvent({ id: 's1', date: '2026-06-25', title: '説明会', source_type: 'office_notice' }), false);
+  // id/date/title 欠落は退避不可
+  assert.equal(TQ.isArchivableEvent({ id: '', date: '2026-06-25', title: 'x' }), false);
+  assert.equal(TQ.isArchivableEvent({ id: 'a', date: '', title: 'x' }), false);
+});
+
+test('回帰: 検疫対象を isArchivableEvent で弾いた後のアーカイブは過去タブに正しく併合される', () => {
+  // アーカイブ候補（前回events.json相当）に検疫対象が混ざっているケース
+  const candidates = [
+    { id: 'ok1', pref: 'tokyo', date: '2026-05-10', title: '練馬駐屯地見学', place: 'X' },
+    { id: 'bad1', pref: 'tokyo', date: '2026-05-11', title: '乗艦受付時刻' },      // 検疫対象
+    { id: 'bad2', pref: 'tokyo', date: '2026-05-12', title: '岩手地本公式' },      // 検疫対象
+  ];
+  const archived = candidates.filter(TQ.isArchivableEvent);
+  assert.deepEqual(archived.map(e => e.id), ['ok1']); // 検疫対象は退避されない
+  // 退避されたアーカイブが過去タブ（buildPastEvents）に出る
+  const r = P.buildPastEvents({
+    manualEvents: [], scrapeData: { updatedAt: 'x' }, archiveEvents: archived, overrides: {},
+    account: acc({ user: 'n', pass: 'p', pref: '*' }),
+    query: P.validatePastQuery({}).value, today: TODAY, canManageScope: scope,
+  });
+  assert.deepEqual(r.events.map(e => e.id), ['ok1']);
+  assert.ok(!r.events.some(e => /受付時刻|公式$/.test(e.title))); // 検疫対象が紛れていない
+});

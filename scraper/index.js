@@ -35,7 +35,9 @@ const geocode             = require('./lib/geocode');
 // 募集案内所イベントのタイトル整形・非イベント判定（フロント/スクリプトと共通）
 const { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } = require('../shared/officeTitle.cjs');
 // イベント名の品質管理（検証済み修正・整形・junk判定・年ズレ判定・重複統合）。最終出力の防御に使う
-const { applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, cleanTimeText, cleanDeadlineText, isJunkOrStubTitle, isSuspiciousTitle, isStaleDatedEvent, dedupEvents } = require('../shared/titleQuality.cjs');
+const { applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, cleanTimeText, cleanDeadlineText, isJunkOrStubTitle, isSuspiciousTitle, isStaleDatedEvent, dedupEvents, isArchivableEvent } = require('../shared/titleQuality.cjs');
+// 受付終了/中止の状態判定・締切日解決（誤判定防止つき。shared/eventStatus.cjs）
+const eventStatus = require('../shared/eventStatus.cjs');
 
 const { chromium } = require('playwright-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
@@ -106,6 +108,12 @@ const OFFICES_PATH = path.join(__dirname, '../public/data/offices.json');
 // 検疫: 「疑わしい」タイトルのイベントを公開せず隔離する先（git コミット・管理者レビュー用）。
 // 新種のゴミパターンがルール追加まで公開され続けた事故（2026-07-03 岩手）の再発防止。
 const QUARANTINE_PATH = path.join(__dirname, '../public/data/events-quarantine.json');
+// 過去イベントの恒久ログ（events.json は終了7日で削除するため、退避先として git 管理でコミット）。
+// 運営サイトの「過去イベント」から終了後もずっと閲覧できるようにする。
+const ARCHIVE_PATH = path.join(__dirname, '../public/data/events-archive.json');
+// 保持設定（環境変数で調整可）。既定: 開催日が約2年以内、かつ最大2万件。
+const ARCHIVE_RETENTION_DAYS = Number.parseInt(process.env.ARCHIVE_RETENTION_DAYS || '', 10) || 730;
+const ARCHIVE_MAX = Number.parseInt(process.env.ARCHIVE_MAX || '', 10) || 20000;
 
 const URLS = {
   // 北海道地本（札幌は複数サブページ）
@@ -3277,7 +3285,7 @@ async function scrapeOfficeAssets(withFreshContext) {
     await sleep(BETWEEN_PAGES_MS);
 
     /**
-     * アセット群に対してOCRを実行し、成功イベント or 公式ページ参照スタブを生成する。
+     * アセット群に対してOCRを実行し、日付付きイベントを生成する。
      * @param {Array} assets - sortByPriority 済みアセット配列
      * @param {string} sourceUrl - スタブの url に使うページURL
      * @param {string} pref
@@ -3361,7 +3369,7 @@ async function scrapeOfficeAssets(withFreshContext) {
     await sleep(BETWEEN_PAGES_MS);
   }
 
-  console.log(`[OfficeOCR] 合計 ${allEvents.length} 件（OCR成功 + 公式ページ参照スタブ含む）`);
+  console.log(`[OfficeOCR] 合計 ${allEvents.length} 件`);
   return { events: allEvents, exploredHqPrefs };
 }
 
@@ -4413,6 +4421,52 @@ async function writeOutput(data) {
     }
   } catch (e) { console.warn('[検疫] 書き出しに失敗:', e.message); }
 
+  // ── 受付終了/中止の状態・締切日を付与（誤判定防止つき） ─────────────
+  // タイトル・備考の文言と締切日から status(closed/cancelled)・deadlineDate を導出する。
+  // published（通常）は状態フィールドを付けない＝後方互換＆データ量を抑える。
+  // 前回 events.json の status を読み、cancelled/closed の粘着性を維持（文言消失で復活させない）。
+  const prevStatusById = new Map();
+  try {
+    if (fs.existsSync(OUTPUT_PATH)) {
+      const prev = JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8'));
+      for (const k of Object.keys(prev)) {
+        if (!Array.isArray(prev[k])) continue;
+        for (const e of prev[k]) if (e && e.id && e.status) prevStatusById.set(e.id, e.status);
+      }
+    }
+  } catch (e) { console.warn('[status] 前回 events.json の読み込みに失敗:', e.message); }
+
+  let closedCount = 0, cancelledCount = 0, deadlineDateCount = 0, lowConfCount = 0;
+  const statusSourceOf = (ev) => {
+    const s = String(ev.source_type || '');
+    if (s.startsWith('office_ocr')) return 'ocr';
+    if (s === 'tokyo_calendar' || s === 'calendar') return 'calendar';
+    if (s.startsWith('office')) return 'html';
+    return 'html';
+  };
+  for (const key of Object.keys(data)) {
+    if (!Array.isArray(data[key])) continue;
+    for (const ev of data[key]) {
+      const text = [ev.title, ev.notes, ev.place].filter(Boolean).join('\n');
+      const derived = eventStatus.deriveStatus({
+        text, deadline: ev.deadline || '', eventDate: ev.date || '', endDate: ev.endDate || '', today,
+      });
+      // 機械判定可能な締切日（原文 deadline は保持）
+      if (derived.deadlineDate) { ev.deadlineDate = derived.deadlineDate; deadlineDateCount++; }
+      // 前回状態との統合（cancelled/closed は復活させない）
+      const merged = eventStatus.mergeStatus(prevStatusById.get(ev.id) || '', derived);
+      if (merged.status === 'closed' || merged.status === 'cancelled') {
+        ev.status = merged.status;
+        ev.statusReason = merged.statusReason || derived.statusReason || '';
+        ev.statusSource = merged.sticky ? (prevStatusById.get(ev.id) ? 'previous' : statusSourceOf(ev)) : statusSourceOf(ev);
+        ev.statusUpdatedAt = today;
+        if (merged.status === 'closed') closedCount++; else cancelledCount++;
+        if (derived.confidence === 'low') lowConfCount++;
+      }
+    }
+  }
+  console.log(`[status] closed:${closedCount} cancelled:${cancelledCount} deadlineDate:${deadlineDateCount}${lowConfCount ? ` (低信頼:${lowConfCount})` : ''}`);
+
   // 全県横断でイベントIDの重複（ハッシュ衝突）を一意化（お気に入りの誤連動防止・CI品質ゲート対応）
   try {
     const { uniquifyIds } = require('../shared/dataQuality.cjs');
@@ -4427,6 +4481,31 @@ async function writeOutput(data) {
   } catch (e) {
     console.warn('[geocode] ジオコーディングに失敗しました:', e.message);
   }
+
+  // ── 過去イベントのアーカイブ（終了したイベントを恒久保存） ──────────
+  // 候補は「前回 events.json の過去イベント」＋「今回の出力に残る終了済みイベント」。
+  //   - 前回分: この時点で OUTPUT_PATH はまだ前回の内容（上書き前）。掲載元が終了直後に
+  //     イベントを削除しても、前回ファイルに居た時点の姿で必ず退避される（取りこぼし防止）。
+  //   - 今回分: status 導出後なので受付終了/中止も反映される。同一IDは今回分（後着）が優先。
+  // upsert のため毎回実行しても冪等。失敗しても本処理（events.json 出力）は妨げない。
+  try {
+    const candidates = [];
+    const isPastEv = (e) => e && e.id && e.date && (e.endDate || e.date) < today;
+    try {
+      if (fs.existsSync(OUTPUT_PATH)) {
+        const prevOut = JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8'));
+        for (const k of Object.keys(prevOut)) {
+          if (!Array.isArray(prevOut[k])) continue;
+          for (const e of prevOut[k]) if (isPastEv(e)) candidates.push(e);
+        }
+      }
+    } catch (e) { console.warn('[アーカイブ] 前回 events.json 読み込み失敗:', e.message); }
+    for (const k of Object.keys(data)) {
+      if (!Array.isArray(data[k])) continue;
+      for (const e of data[k]) if (isPastEv(e)) candidates.push(e);
+    }
+    archivePastEvents(candidates, today);
+  } catch (e) { console.warn('[アーカイブ] 退避に失敗:', e.message); }
 
   fs.writeFileSync(OUTPUT_PATH, JSON.stringify(data, null, 2), 'utf8');
   console.log(`[出力] ${OUTPUT_PATH}`);
@@ -4489,6 +4568,56 @@ async function writeOutput(data) {
   } catch (e) {
     console.warn('[警告] events.html 生成に失敗しました:', e.message);
   }
+}
+
+/**
+ * 終了したイベント（候補=前回 events.json＋今回出力の過去イベント）を恒久アーカイブへ退避する。
+ * - 保存先 public/data/events-archive.json（git コミット。運営「過去イベント」が閲覧）。
+ * - id で upsert（再退避は最新で上書き＝毎回実行しても冪等）。
+ * - 品質防御: 不正タイトル・office_notice スタブは持ち込まない。
+ * - 保持: 開催日が ARCHIVE_RETENTION_DAYS 以内、かつ最大 ARCHIVE_MAX 件（新しい順）。
+ * - 天気座標など表示に不要な大きいフィールドは載せない（サイズ抑制）。
+ */
+function archivePastEvents(candidates, today) {
+  if (!Array.isArray(candidates) || candidates.length === 0) return;
+
+  let archive = { updatedAt: '', events: [] };
+  try {
+    if (fs.existsSync(ARCHIVE_PATH)) {
+      const parsed = JSON.parse(fs.readFileSync(ARCHIVE_PATH, 'utf8'));
+      if (parsed && Array.isArray(parsed.events)) archive = parsed;
+    }
+  } catch (e) { console.warn('[アーカイブ] 既存読み込み失敗（新規作成）:', e.message); }
+
+  // 保存する項目（運営一覧に必要な最小限。weatherLocation 等は除外）
+  const pick = (e) => ({
+    id: e.id, pref: e.pref, office: e.office || '',
+    date: e.date, endDate: e.endDate || '',
+    title: e.title || '', place: e.place || '', url: e.url || '',
+    category: e.category || '', status: e.status || '',
+    source_type: e.source_type || '', archivedAt: today,
+  });
+
+  const byId = new Map(archive.events.map(e => [e.id, e]));
+  let added = 0;
+  for (const e of candidates) {
+    // 品質防御は shared/titleQuality の isArchivableEvent に一本化
+    // （不正タイトル・office_notice スタブ・検疫対象＝疑わしいタイトルを過去ログへ持ち込まない）
+    if (!isArchivableEvent(e)) continue;
+    if (!byId.has(e.id)) added++;
+    byId.set(e.id, pick(e)); // 再退避時は最新で上書き
+  }
+
+  // 保持: 開催日(実効日)が RETENTION_DAYS 以内のみ。新しい順に上限件数。
+  const minDate = new Date(Date.now() + 9 * 3600 * 1000 - ARCHIVE_RETENTION_DAYS * 86400000)
+    .toISOString().slice(0, 10);
+  const eff = (e) => e.endDate || e.date || '';
+  let events = [...byId.values()].filter(e => eff(e) >= minDate);
+  events.sort((a, b) => (eff(a) < eff(b) ? 1 : eff(a) > eff(b) ? -1 : 0)); // 新しい順
+  if (events.length > ARCHIVE_MAX) events = events.slice(0, ARCHIVE_MAX);
+
+  fs.writeFileSync(ARCHIVE_PATH, JSON.stringify({ updatedAt: today, events }, null, 2), 'utf8');
+  console.log(`[アーカイブ] 過去イベント退避: 新規 ${added} 件 / 保持 ${events.length} 件 → ${ARCHIVE_PATH}`);
 }
 
 // ── 新規イベント検出 → Web Push 通知 ─────────────────────────

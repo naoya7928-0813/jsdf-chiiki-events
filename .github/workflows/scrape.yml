@@ -27,6 +27,19 @@ on:
         required: false
         default: ''
 
+# ── 同時実行防止 ──────────────────────────────────────────────
+# 定期(schedule 3種)と手動(workflow_dispatch)は同じ events.json / 静的HTML /
+# geocode-cache / master / Vercel本番 を更新する。1本の実行が約60分以上かかるため、
+# 重なると同時 commit/push（non-fast-forward）や二重デプロイ・二重通知の恐れがある。
+#   group: ブランチや trigger に依存しない固定文字列にする（${{ github.ref }} 等を
+#          入れると枠が分かれて同時実行を許してしまうため入れない）。
+#   cancel-in-progress: false … 実行中ジョブは絶対に中断しない（commit/rebase/push/
+#          deploy/通知の途中でキャンセルしない）。後から来たジョブは待機列に入る。
+# データを変更しない PR Check(pr-check.yml) は別グループのため巻き込まれない。
+concurrency:
+  group: scrape-data-update
+  cancel-in-progress: false
+
 jobs:
   scrape:
     name: イベントデータ取得
@@ -204,18 +217,26 @@ jobs:
           #   書き換わる。これを add し忘れると未ステージの追跡変更として残り、後続の
           #   `git rebase` が "cannot rebase: You have unstaged changes" で失敗していた
           #   （2026-06-28 の天気/ジオコーディング機能導入以降、毎回 push 前に停止）。
-          git add public/data/events.json public/data/events-quarantine.json public/events.html public/events/ public/sitemap.xml scraper/geocode-cache.json
+          git add public/data/events.json public/data/events-archive.json public/data/events-quarantine.json public/events.html public/events/ public/sitemap.xml scraper/geocode-cache.json
 
-          # 公開データ（events.json / events.html / sitemap.xml）が変わった時のみ
-          # コミット＆デプロイ対象とする（geocode-cache 単独の変化ではデプロイしない）。
-          EVENTS_STATUS=$(git status --porcelain public/data/events.json public/events.html public/sitemap.xml)
+          # 変更判定は「ステージ済み差分」で行う（個別ファイル列挙だと archive/quarantine 等の
+          # 追加ファイルの検知漏れが起きるため）。デプロイ要否は public/ 配下の変更有無で決める
+          # （geocode-cache 単独の変化はコミットのみ・デプロイなし）。
+          STAGED=$(git diff --cached --name-only)
 
-          if [ -z "$EVENTS_STATUS" ]; then
+          if [ -z "$STAGED" ]; then
             echo "データに変更がありませんでした。コミットをスキップします。"
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "COMMIT_RESULT=変更なし（スキップ）" >> "$GITHUB_ENV"
             echo "PUSH_RESULT=スキップ" >> "$GITHUB_ENV"
             exit 0
+          fi
+          echo "ステージ済みの変更:"; printf '%s\n' "$STAGED"
+          if printf '%s\n' "$STAGED" | grep -q '^public/'; then
+            DEPLOY_NEEDED=true
+          else
+            DEPLOY_NEEDED=false
+            echo "public/ 配下の変更なし（geocode-cache のみ）。コミットのみ行いデプロイはスキップします。"
           fi
 
           if ! git commit -m "chore: update events data [skip ci]"; then
@@ -275,9 +296,10 @@ jobs:
             echo "PUSH_RESULT=失敗" >> "$GITHUB_ENV"
             exit 1
           fi
-          echo "events.json を更新しました。"
+          echo "イベントデータを更新しました。"
           echo "PUSH_RESULT=成功" >> "$GITHUB_ENV"
-          echo "changed=true" >> "$GITHUB_OUTPUT"
+          # デプロイ・通知は public/ 配下（公開データ）が変わった場合のみ発火させる
+          echo "changed=${DEPLOY_NEEDED}" >> "$GITHUB_OUTPUT"
 
       # ── Vercel に本番デプロイ ─────────────────────────────
       - name: Vercel に本番デプロイ

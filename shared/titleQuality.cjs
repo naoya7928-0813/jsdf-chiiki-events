@@ -194,6 +194,23 @@ function isSuspiciousTitle(title) {
 }
 
 /**
+ * 過去イベントアーカイブへ退避してよいイベントか（アーカイブ×検疫の統合ポイント）。
+ * アーカイブ候補は「前回 events.json」からも収集されるため、検疫導入前の旧データや
+ * 旧ルール時代の不正タイトルが混ざり得る。公開と同じ品質基準で退避を判定する:
+ *   - id/date/title が無いものは不可
+ *   - office_notice（偽日付スタブ・生成廃止済み）は不可
+ *   - isJunkOrStubTitle（確実な不正）は不可
+ *   - isSuspiciousTitle（検疫対象＝疑わしい）は不可 … 公開を止めたものを過去ログに残さない
+ */
+function isArchivableEvent(ev) {
+  if (!ev || !ev.id || !ev.date || !ev.title) return false;
+  if (ev.source_type === 'office_notice') return false;
+  if (isJunkOrStubTitle(ev.title)) return false;
+  if (isSuspiciousTitle(ev.title)) return false;
+  return true;
+}
+
+/**
  * 過去年のイベントが現在年の日付で再登録されたものか判定する。
  * 例: サイトに残る2024年の実績一覧を年なし日付として拾い、
  *     現在年(2026)で補完してしまったケース。
@@ -437,6 +454,7 @@ module.exports = {
   isEmptyFieldText,
   isJunkOrStubTitle,
   isSuspiciousTitle,
+  isArchivableEvent,
   isStaleDatedEvent,
   dedupEvents,
   normForDedup,
