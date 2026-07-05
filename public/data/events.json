@@ -1957,30 +1957,6 @@
   "yamanashi": [],
   "nagano": [
     {
-      "id": "na-20260718-hm0w8",
-      "pref": "nagano",
-      "date": "2026-07-18",
-      "weekday": "土",
-      "title": "【松本市】公務員合同説明会",
-      "place": "イオンモール松本 「風庭」エリア",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "場所：イオンモール松本 風庭２F イオンホール 時間：１１：００～１６：００ (１５：４０受付終了) 内容：「公務員ってなにしてるの？」その疑問を解決！ 自衛隊、防衛省職員、長野県警、北アルプス消防、木曽広域消防、松本市役所、安曇野市役所、大町市役所 合同により、公務員の仕事内容、生活、ワークライフバランス、待遇等わかりやすく説明させていただきます。",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-03T20:01:30.984+09:00"
-      }
-    },
-    {
       "id": "na-20260718-uimr5",
       "pref": "nagano",
       "date": "2026-07-18",
@@ -2002,6 +1978,30 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-03T20:01:31.351+09:00"
+      }
+    },
+    {
+      "id": "na-20260718-hm0w8",
+      "pref": "nagano",
+      "date": "2026-07-18",
+      "weekday": "土",
+      "title": "【松本市】公務員合同説明会",
+      "place": "イオンモール松本 「風庭」エリア",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "場所：イオンモール松本 風庭２F イオンホール 時間：１１：００～１６：００ (１５：４０受付終了) 内容：「公務員ってなにしてるの？」その疑問を解決！ 自衛隊、防衛省職員、長野県警、北アルプス消防、木曽広域消防、松本市役所、安曇野市役所、大町市役所 合同により、公務員の仕事内容、生活、ワークライフバランス、待遇等わかりやすく説明させていただきます。",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-03T20:01:30.984+09:00"
       }
     },
     {
@@ -4259,31 +4259,6 @@
         "geocodedAt": "2026-06-28T22:18:32.249+09:00"
       },
       "deadlineDate": "2026-07-27"
-    },
-    {
-      "id": "os-office-20260705-d4rah",
-      "pref": "osaka",
-      "date": "2026-07-05",
-      "weekday": "日",
-      "title": "海上自衛隊 阪神基地隊サマーフェスタ2026",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "艦艇公開",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/osaka/experience/event.html",
-      "notes": "掲載元: 枚方出張所・茨木地域事務所",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html",
-      "weatherLocation": {
-        "latitude": 34.686,
-        "longitude": 135.52,
-        "label": "大阪府",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:31.252+09:00"
-      }
     }
   ],
   "hyogo": [],
@@ -4501,6 +4476,7 @@
       "ageRequirement": "16歳から32歳の方",
       "deadline": "8月4日（月）",
       "source_type": "office_ocr",
+      "deadlineDate": "2026-08-04",
       "weatherLocation": {
         "latitude": 34.34,
         "longitude": 134.043,
@@ -4508,8 +4484,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:34.270+09:00"
-      },
-      "deadlineDate": "2026-08-04"
+      }
     }
   ],
   "kochi": [],
@@ -4852,56 +4827,6 @@
         "source": "gsi",
         "geocodedAt": "2026-07-02T08:50:46.282+09:00"
       }
-    },
-    {
-      "id": "ok-off-20260705-im9j2",
-      "pref": "okayama",
-      "date": "2026-07-05",
-      "weekday": "日",
-      "title": "職員採用合同説明会",
-      "place": "高梁市役所3階大会議室",
-      "address": "",
-      "time": "13:30～16:00",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/okayama/img/takahashi_godo.pdf",
-      "notes": "申込不要、服装自由",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "weatherLocation": {
-        "latitude": 34.791,
-        "longitude": 133.617,
-        "label": "岡山県高梁市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-02T15:00:03.872+09:00"
-      }
-    },
-    {
-      "id": "ok-off-20260705-ns1vb",
-      "pref": "okayama",
-      "date": "2026-07-05",
-      "weekday": "日",
-      "title": "公安系（自衛官・警察官・消防官・海上保安官）・公務員採用試験合同説明会",
-      "place": "防災危機管理センター",
-      "address": "",
-      "time": "13:00～16:30",
-      "category": "採用イベント",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/okayama/img/kurashiki_godo.pdf",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "weatherLocation": {
-        "latitude": 34.662,
-        "longitude": 133.935,
-        "label": "岡山県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-02T15:00:04.402+09:00"
-      }
     }
   ],
   "hiroshima": [
@@ -5233,5 +5158,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/06 02:37"
+  "updatedAt": "2026/07/06 08:15"
 }
