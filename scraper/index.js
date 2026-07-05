@@ -3285,7 +3285,7 @@ async function scrapeOfficeAssets(withFreshContext) {
     await sleep(BETWEEN_PAGES_MS);
 
     /**
-     * アセット群に対してOCRを実行し、成功イベント or 公式ページ参照スタブを生成する。
+     * アセット群に対してOCRを実行し、日付付きイベントを生成する。
      * @param {Array} assets - sortByPriority 済みアセット配列
      * @param {string} sourceUrl - スタブの url に使うページURL
      * @param {string} pref
@@ -3369,7 +3369,7 @@ async function scrapeOfficeAssets(withFreshContext) {
     await sleep(BETWEEN_PAGES_MS);
   }
 
-  console.log(`[OfficeOCR] 合計 ${allEvents.length} 件（OCR成功 + 公式ページ参照スタブ含む）`);
+  console.log(`[OfficeOCR] 合計 ${allEvents.length} 件`);
   return { events: allEvents, exploredHqPrefs };
 }
 
@@ -4601,11 +4601,9 @@ function archivePastEvents(candidates, today) {
   const byId = new Map(archive.events.map(e => [e.id, e]));
   let added = 0;
   for (const e of candidates) {
-    if (!e || !e.id || !e.date) continue;
-    // 品質防御: 旧ルール時代の不正タイトルや「公式確認」スタブ（date=スクレイプ当日の
-    // 疑似イベント）を過去ログに持ち込まない
-    if (e.source_type === 'office_notice') continue;
-    if (!e.title || isJunkOrStubTitle(e.title)) continue;
+    // 品質防御は shared/titleQuality の isArchivableEvent に一本化
+    // （不正タイトル・office_notice スタブ・検疫対象＝疑わしいタイトルを過去ログへ持ち込まない）
+    if (!isArchivableEvent(e)) continue;
     if (!byId.has(e.id)) added++;
     byId.set(e.id, pick(e)); // 再退避時は最新で上書き
   }

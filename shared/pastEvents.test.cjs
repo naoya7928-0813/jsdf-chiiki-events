@@ -165,3 +165,43 @@ test('archive: 期間フィルタはアーカイブにも効く', () => {
   const ids = buildA(acc({ user: 'n', pass: 'p', pref: '*' }), { to: '2026-03-01' }).events.map(e => e.id).sort();
   assert.deepEqual(ids, ['a1', 'a2']); // 2026-03-01 以前のみ
 });
+
+// ── 回帰: アーカイブ×検疫の同時動作（統合PR） ─────────────────────
+// 検疫（isSuspiciousTitle）で公開を止めたイベントや不正タイトルが、
+// アーカイブ経由で過去ログ・運営「過去イベント」に紛れ込まないこと。
+const TQ = require('./titleQuality.cjs');
+
+test('isArchivableEvent: 正常な過去イベントは退避可・検疫/不正/スタブは退避不可', () => {
+  // 正常（退避可）
+  assert.equal(TQ.isArchivableEvent({ id: 'x1', date: '2026-06-20', title: '自衛隊職場体験（岩手駐屯地）' }), true);
+  assert.equal(TQ.isArchivableEvent({ id: 'x2', date: '2026-06-21', title: '県民の日' }), true); // イベント語なし固有名
+  // 検疫対象（疑わしい）は退避不可 … 公開を止めたものを過去ログに残さない
+  assert.equal(TQ.isArchivableEvent({ id: 'q1', date: '2026-06-22', title: '乗艦受付時刻' }), false);
+  assert.equal(TQ.isArchivableEvent({ id: 'q2', date: '2026-06-23', title: '宮古港上空を航過' }), false);
+  // 確実な不正（junk）は退避不可
+  assert.equal(TQ.isArchivableEvent({ id: 'j1', date: '2026-06-24', title: '一般曹候補生' }), false);
+  // office_notice スタブは退避不可
+  assert.equal(TQ.isArchivableEvent({ id: 's1', date: '2026-06-25', title: '説明会', source_type: 'office_notice' }), false);
+  // id/date/title 欠落は退避不可
+  assert.equal(TQ.isArchivableEvent({ id: '', date: '2026-06-25', title: 'x' }), false);
+  assert.equal(TQ.isArchivableEvent({ id: 'a', date: '', title: 'x' }), false);
+});
+
+test('回帰: 検疫対象を isArchivableEvent で弾いた後のアーカイブは過去タブに正しく併合される', () => {
+  // アーカイブ候補（前回events.json相当）に検疫対象が混ざっているケース
+  const candidates = [
+    { id: 'ok1', pref: 'tokyo', date: '2026-05-10', title: '練馬駐屯地見学', place: 'X' },
+    { id: 'bad1', pref: 'tokyo', date: '2026-05-11', title: '乗艦受付時刻' },      // 検疫対象
+    { id: 'bad2', pref: 'tokyo', date: '2026-05-12', title: '岩手地本公式' },      // 検疫対象
+  ];
+  const archived = candidates.filter(TQ.isArchivableEvent);
+  assert.deepEqual(archived.map(e => e.id), ['ok1']); // 検疫対象は退避されない
+  // 退避されたアーカイブが過去タブ（buildPastEvents）に出る
+  const r = P.buildPastEvents({
+    manualEvents: [], scrapeData: { updatedAt: 'x' }, archiveEvents: archived, overrides: {},
+    account: acc({ user: 'n', pass: 'p', pref: '*' }),
+    query: P.validatePastQuery({}).value, today: TODAY, canManageScope: scope,
+  });
+  assert.deepEqual(r.events.map(e => e.id), ['ok1']);
+  assert.ok(!r.events.some(e => /受付時刻|公式$/.test(e.title))); // 検疫対象が紛れていない
+});
