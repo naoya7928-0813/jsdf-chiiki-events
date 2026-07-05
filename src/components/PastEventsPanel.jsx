@@ -28,8 +28,8 @@ export default function PastEventsPanel({ adminFetch, account, primary }) {
   const [status, setStatus] = useState('');
   const [prefFilter, setPrefFilter] = useState(''); // national のみ任意
   const [offset, setOffset] = useState(0);
-  const [data, setData] = useState({ events: [], total: 0, hasMore: false, note: '' });
-  const [state, setState] = useState('idle'); // idle|loading|ok|error
+  const [data, setData] = useState({ events: [], total: 0, hasMore: false, note: '', reason: '' });
+  const [state, setState] = useState('idle'); // idle|loading|ok|error|auth
 
   const input = { width: '100%', boxSizing: 'border-box', fontFamily: F.sans, fontSize: 13, color: 'var(--text)', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 10px', outline: 'none' };
   const label = { fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', marginBottom: 4 };
@@ -37,20 +37,24 @@ export default function PastEventsPanel({ adminFetch, account, primary }) {
   const query = useMemo(() => ({ q, from, to, status, pref: isNational ? prefFilter : '', limit: PAGE, offset }), [q, from, to, status, prefFilter, isNational, offset]);
 
   const load = useCallback(async (qy) => {
+    if (!adminFetch) return; // 認証(adminFetch)確定前は取得しない（空結果を確定させない）
     setState('loading');
     try {
       const params = new URLSearchParams();
       for (const [k, v] of Object.entries(qy)) if (v !== '' && v != null) params.set(k, String(v));
       const r = await adminFetch(`/api/admin/past-events?${params.toString()}`);
+      if (r.status === 401 || r.status === 403) { setState('auth'); return; }
       if (!r.ok) { setState('error'); return; }
       const j = await r.json();
-      setData({ events: j.events || [], total: j.total || 0, hasMore: !!j.hasMore, note: j.note || '' });
+      setData({ events: j.events || [], total: j.total || 0, hasMore: !!j.hasMore, note: j.note || '', reason: j.reason || '' });
       setState('ok');
     } catch { setState('error'); }
   }, [adminFetch]);
 
-  // 初回 + offset 変更で取得
-  useEffect(() => { load(query); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [offset]);
+  // 初回 + offset 変更 + 認証(adminFetch)確定時に取得。
+  // load は adminFetch を依存に持つため、account 確定で adminFetch が変わると再取得される
+  // （account 確定前に空結果を読んだまま固定される問題を防ぐ）。
+  useEffect(() => { load(query); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [offset, load]);
 
   const search = () => { if (offset !== 0) setOffset(0); else load(query); };
 
@@ -58,7 +62,7 @@ export default function PastEventsPanel({ adminFetch, account, primary }) {
     <div>
       <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 6 }}>過去イベント（閲覧専用）</div>
       <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 12 }}>
-        終了したイベントを確認できます（監査履歴・削除済みイベントとは別です）。現在保存されているデータのみ表示します。
+        終了したイベントを確認できます（監査履歴・削除済みイベントとは別です）。終了後はアーカイブに保存され、後からも確認できます。
       </div>
 
       {/* 絞り込み */}
@@ -90,10 +94,21 @@ export default function PastEventsPanel({ adminFetch, account, primary }) {
       <button onClick={search} style={{ width: '100%', padding: 11, borderRadius: 10, border: 'none', fontFamily: F.sans, fontSize: 14, fontWeight: 700, color: '#fff', background: primary, cursor: 'pointer', marginBottom: 14 }}>検索</button>
       {officeScoped && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>※ あなたの担当事務所のイベントのみ表示されます。</div>}
 
-      {/* 状態表示 */}
+      {/* 状態表示（該当なし／範囲になし／保存期間外/取得失敗／認証を区別） */}
       {state === 'loading' && <div style={{ fontSize: 12.5, color: 'var(--text-muted)', padding: '8px 0' }}>読み込み中…</div>}
-      {state === 'error' && <div style={{ fontSize: 12.5, color: '#ef4444', padding: '8px 0' }}>過去イベントを取得できませんでした。時間をおいて再度お試しください。</div>}
-      {state === 'ok' && data.events.length === 0 && <div style={{ fontSize: 12.5, color: 'var(--text-muted)', padding: '8px 0' }}>該当する過去イベントはありません。</div>}
+      {state === 'auth' && <div style={{ fontSize: 12.5, color: '#ef4444', padding: '8px 0' }}>認証の有効期限が切れた可能性があります。再度ログインしてください。</div>}
+      {state === 'error' && <div style={{ fontSize: 12.5, color: '#ef4444', padding: '8px 0' }}>過去イベントを取得できませんでした。通信状況を確認し、時間をおいて再度お試しください。</div>}
+      {state === 'ok' && data.events.length === 0 && (
+        <div style={{ fontSize: 12.5, color: 'var(--text-muted)', padding: '8px 0', lineHeight: 1.7 }}>
+          {data.reason === 'data_unavailable'
+            ? '現在、イベントデータを取得できませんでした。時間をおいて再度お試しください（データ取得の一時的な問題の可能性があります）。'
+            : data.reason === 'filtered_empty'
+              ? '検索条件に一致する過去イベントはありません。条件を変えて再検索してください。'
+              : officeScoped
+                ? '担当事務所に紐づく過去イベントはありません。中央で掲載されたイベントの担当割り当ては、地本管理者にご相談ください。'
+                : '権限範囲内に、保存されている過去イベントはまだありません。（この機能の運用開始より前に終了したイベントは含まれない場合があります）'}
+        </div>
+      )}
 
       {/* 一覧（閲覧専用） */}
       {state === 'ok' && data.events.length > 0 && (
