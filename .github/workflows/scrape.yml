@@ -159,6 +159,30 @@ jobs:
             echo "TITLE_WARNINGS=0" >> "$GITHUB_ENV"
           fi
 
+      # ── 検疫レポート（疑わしいタイトル＝公開保留の管理者通知） ─────────
+      # writeOutput が「新種のゴミの可能性が高い」タイトルを公開せず
+      # events-quarantine.json へ隔離する。ここでは件数を確認し、あれば通知する。
+      # 正規イベントなら shared/titleQuality.cjs の APPROVED_TITLES へ追加で公開される。
+      - name: 検疫レポート（公開保留イベントの通知）
+        run: |
+          QN=$(node -e "try{console.log(require('./public/data/events-quarantine.json').count||0)}catch{console.log(0)}")
+          echo "QUARANTINED=${QN}" >> "$GITHUB_ENV"
+          if [ "$QN" -gt 0 ]; then
+            LIST=$(node -e "const q=require('./public/data/events-quarantine.json');q.events.slice(0,10).forEach(e=>console.log(\`[\${e.pref}] \${e.date} \${e.title}\`))")
+            echo "::warning::疑わしいタイトル ${QN} 件を公開保留（検疫）にしました"
+            printf '%s\n' "$LIST"
+            curl -sS --fail-with-body --retry 3 --retry-all-errors --connect-timeout 10 --max-time 30 \
+              -H "Title: 🔒 イベント ${QN} 件を公開保留（検疫）" \
+              -H "Tags: lock" \
+              -H "Priority: high" \
+              -H "Content-Type: text/plain; charset=utf-8" \
+              -d "$(printf '%s\n%s' '疑わしいタイトルのため公開を保留しました。正規のイベントなら APPROVED_TITLES への追加で公開されます。' "$LIST")" \
+              "https://ntfy.sh/${{ secrets.NTFY_ADMIN_TOPIC }}" \
+              || echo "::warning::管理者通知（検疫）の送信に失敗しました（本来の処理には影響しません）"
+          else
+            echo "検疫対象なし"
+          fi
+
       # ── データ品質チェック（構造破損・ID重複・不正日付・座標範囲等。エラーでデプロイ停止）──
       - name: データ品質チェック（必須）
         run: |
@@ -180,7 +204,7 @@ jobs:
           #   書き換わる。これを add し忘れると未ステージの追跡変更として残り、後続の
           #   `git rebase` が "cannot rebase: You have unstaged changes" で失敗していた
           #   （2026-06-28 の天気/ジオコーディング機能導入以降、毎回 push 前に停止）。
-          git add public/data/events.json public/events.html public/events/ public/sitemap.xml scraper/geocode-cache.json
+          git add public/data/events.json public/data/events-quarantine.json public/events.html public/events/ public/sitemap.xml scraper/geocode-cache.json
 
           # 公開データ（events.json / events.html / sitemap.xml）が変わった時のみ
           # コミット＆デプロイ対象とする（geocode-cache 単独の変化ではデプロイしない）。
@@ -487,6 +511,7 @@ jobs:
             echo "| イベント総数 | ${TOTAL_EVENTS:-N/A} 件（前回 ${PREV_EVENTS:-N/A} 件） |"
             echo "| データ健全性 | ${HEALTH_ALERT:-異常なし} |"
             echo "| 品質警告数（イベント名） | ${TITLE_WARNINGS:-0} 件 |"
+            echo "| 検疫（公開保留） | ${QUARANTINED:-0} 件 |"
             echo "| 必須品質チェック | ${DATA_QUALITY_RESULT:-未実行/失敗} |"
             echo "| commit | ${COMMIT_RESULT:-未実行} |"
             echo "| push | ${PUSH_RESULT:-未実行} |"

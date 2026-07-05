@@ -35,7 +35,7 @@ const geocode             = require('./lib/geocode');
 // 募集案内所イベントのタイトル整形・非イベント判定（フロント/スクリプトと共通）
 const { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } = require('../shared/officeTitle.cjs');
 // イベント名の品質管理（検証済み修正・整形・junk判定・年ズレ判定・重複統合）。最終出力の防御に使う
-const { applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, cleanTimeText, cleanDeadlineText, isJunkOrStubTitle, isStaleDatedEvent, dedupEvents } = require('../shared/titleQuality.cjs');
+const { applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, cleanTimeText, cleanDeadlineText, isJunkOrStubTitle, isSuspiciousTitle, isStaleDatedEvent, dedupEvents } = require('../shared/titleQuality.cjs');
 
 const { chromium } = require('playwright-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
@@ -103,6 +103,9 @@ const { toHalfWidth, reiwaToAD, reiwaNum, resolveYearByWeekday, HEISEI_BASE, pad
 // ── 設定 ─────────────────────────────────────────────────────
 const OUTPUT_PATH = path.join(__dirname, '../public/data/events.json');
 const OFFICES_PATH = path.join(__dirname, '../public/data/offices.json');
+// 検疫: 「疑わしい」タイトルのイベントを公開せず隔離する先（git コミット・管理者レビュー用）。
+// 新種のゴミパターンがルール追加まで公開され続けた事故（2026-07-03 岩手）の再発防止。
+const QUARANTINE_PATH = path.join(__dirname, '../public/data/events-quarantine.json');
 
 const URLS = {
   // 北海道地本（札幌は複数サブページ）
@@ -4346,6 +4349,7 @@ async function writeOutput(data) {
   const today = jstNow.toISOString().slice(0, 10); // "YYYY-MM-DD"
   const cutoff = new Date(jstNow.getTime() - ENDED_KEEP_DAYS * 86400000).toISOString().slice(0, 10);
   let removedCount = 0;
+  const quarantined = []; // 「疑わしい」タイトルで公開を保留したイベント（管理者レビュー用）
   // ★ ここが全イベントカードの最終整形・検証ゲート。各フィールドの書式・記述ルールの
   //    正準は CLAUDE.md「イベントカード記述ルール（正準仕様）」。実装は shared/titleQuality.cjs
   //    （+ 募集案内所は shared/officeTitle.cjs、カテゴリ/タグ/曜日は parsers/utils.js）。
@@ -4373,6 +4377,9 @@ async function writeOutput(data) {
       if (isJunkOrStubTitle(ev.title)) return false;
       // 過去年のイベントが現在年の日付で再登録されたもの（年ズレ）を除外
       if (isStaleDatedEvent(ev)) return false;
+      // 検疫: 新種のゴミの可能性が高い「疑わしい」タイトルは公開せず隔離。
+      // 正規イベントと確認できたら titleQuality の APPROVED_TITLES へ追加すると公開される。
+      if (isSuspiciousTitle(ev.title)) { quarantined.push(ev); return false; }
       return true;
     });
     // 同一（日付×名称×場所）の重複を統合。場所違いの同名イベントは残る
@@ -4389,6 +4396,22 @@ async function writeOutput(data) {
     });
   }
   if (removedCount > 0) console.log(`[フィルタ] 過去イベント ${removedCount} 件を削除`);
+
+  // ── 検疫ファイルの書き出し（毎回、今回の疑わしい件で全置換） ──────────
+  // ルール追加・APPROVED_TITLES 登録で解消した項目は次回から自動的に消える。
+  // CI（scrape.yml）がこのファイルを読んで管理者へ ntfy 通知する。
+  try {
+    const qEvents = quarantined.map(e => ({
+      id: e.id, pref: e.pref, date: e.date, endDate: e.endDate || '',
+      title: e.title || '', place: e.place || '', url: e.url || '',
+      source_type: e.source_type || '', quarantinedAt: today,
+    }));
+    fs.writeFileSync(QUARANTINE_PATH, JSON.stringify({ updatedAt: today, count: qEvents.length, events: qEvents }, null, 2), 'utf8');
+    if (qEvents.length > 0) {
+      console.log(`[検疫] 疑わしいタイトル ${qEvents.length} 件を公開保留にしました:`);
+      qEvents.forEach(e => console.log(`  - [${e.pref}] ${e.date} ${e.title}`));
+    }
+  } catch (e) { console.warn('[検疫] 書き出しに失敗:', e.message); }
 
   // 全県横断でイベントIDの重複（ハッシュ衝突）を一意化（お気に入りの誤連動防止・CI品質ゲート対応）
   try {

@@ -197,6 +197,20 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - **新種の不正パターンを見つけたら `titleQuality.cjs` に追加し、`shared/titleQuality.test.cjs` にテストケースを足す**（`npm test` で検証）
 - 既存 `events.json` の汚染は再スクレイプを待たず、titleQuality を使ったスクリプトで直接クリーンアップ → `node scripts/generate-events-html.mjs` → commit/push で即デプロイできる（deploy.yml が public/ 変更で自動発火）
 
+### 検疫（quarantine）— 新種のゴミを公開前に止める仕組み（2026-07-03 導入）
+既知ルール（isJunkOrStubTitle）をすり抜ける**新種のゴミパターンがルール追加まで公開され続けた事故**
+（岩手: 艦艇公開ページの表の行「乗艦受付時刻」等が3日間公開）の再発防止。**安全側デフォルト＝疑わしきは公開しない**。
+
+- `isSuspiciousTitle`（titleQuality.cjs）: イベント語（説明会/見学/体験/まつり等）を含まず、かつ
+  非イベント兆候（ラベル語終わり・組織名のみ・装備スペック・述語断片・様式行）があるタイトルを「疑わしい」と判定
+- `writeOutput`: 疑わしいイベントは events.json に**載せず** `public/data/events-quarantine.json` へ隔離
+  （毎回全置換。ルール追加や承認で解消すると次回から自動的に消える）
+- `scrape.yml`「検疫レポート」ステップ: 検疫が発生したら ntfy で管理者へタイトル一覧を通知＋Summary に件数
+- **検疫されたのが正規イベントだった場合**: `titleQuality.cjs` の **`APPROVED_TITLES`** に部分一致パターンを
+  追加すると次回スクレイプから公開される（正式名へ修正する場合は `VERIFIED_OVERRIDES` を使う）
+- 誤検疫を最小化するため判定は保守的（イベント語があれば検疫しない）。検知漏れは従来どおり
+  isJunkOrStubTitle へのルール追加で対応し、テストを `titleQuality.test.cjs` に足す
+
 ## フロントエンド仕様
 
 - **地域マップ**: 8地域（北海道・東北・関東・中部・近畿・中国・四国・九州）
