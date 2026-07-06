@@ -6,6 +6,12 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-07-06',
+    version: '1.19.39',
+    type:    'feature',
+    content: 'イベントごとの共有用URLに対応しました。共有されたリンクを開くと直接そのイベントが表示されます。あわせてブラウザ・スマホの「戻る」操作とリロード時の画面復元にも対応しました。',
+  },
+  {
+    date:    '2026-07-06',
     version: '1.18.39',
     type:    'improvement',
     content: '読み込み速度を改善しました（軽微な修正）。',
