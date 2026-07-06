@@ -6,6 +6,12 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-07-06',
+    version: '1.20.41',
+    type:    'improvement',
+    content: '読み込みを高速化しました（画面ごとの分割読み込み・フォント配信の改善）。',
+  },
+  {
+    date:    '2026-07-06',
     version: '1.20.40',
     type:    'improvement',
     content: '表示の細部を調整しました（数字の桁揃え・横スクロール列の端表示・ダークモードの選択状態）。',

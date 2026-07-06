@@ -72,8 +72,8 @@ export function parseYM(d) {
 
 // ─── フォントスタック定数 ────────────────────────────────────
 export const F = {
-  sans:  '"Hiragino Sans","ヒラギノ角ゴシック","Yu Gothic UI","游ゴシック","Noto Sans JP",-apple-system,BlinkMacSystemFont,sans-serif',
-  serif: '"Hiragino Mincho ProN","ヒラギノ明朝 ProN","Yu Mincho","游明朝","Noto Serif JP",serif',
+  sans:  '"Hiragino Sans","ヒラギノ角ゴシック","Yu Gothic UI","游ゴシック","Noto Sans JP Variable","Noto Sans JP",-apple-system,BlinkMacSystemFont,sans-serif',
+  serif: '"Hiragino Mincho ProN","ヒラギノ明朝 ProN","Yu Mincho","游明朝","Noto Serif JP Variable","Noto Serif JP",serif',
   mono:  '"SF Mono","IBM Plex Mono",ui-monospace,"Menlo","Consolas",monospace',
 };
 

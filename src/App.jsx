@@ -5,14 +5,16 @@ import { PREFECTURE_INFO } from './data/regionMap';
 import { OperatorNavContext } from './components/Shared';
 import HomeScreen        from './components/HomeScreen';
 import ListScreen        from './components/ListScreen';
-import DetailScreen      from './components/DetailScreen';
-import SettingsScreen    from './components/SettingsScreen';
-import NotificationScreen from './components/NotificationScreen';
-import FavoritesScreen   from './components/FavoritesScreen';
-import LegalScreen        from './components/LegalScreen';
-import ReportScreen       from './components/ReportScreen';
 import RegionScreen       from './components/RegionScreen';
 import SplashScreen       from './components/SplashScreen';
+// 初期表示に不要な画面は遅延読込でバンドル分割（フィードバック§1-2③）。
+// トップを開いただけで詳細・設定・報告等のコードまで落とさない。
+const DetailScreen       = lazy(() => import('./components/DetailScreen'));
+const SettingsScreen     = lazy(() => import('./components/SettingsScreen'));
+const NotificationScreen = lazy(() => import('./components/NotificationScreen'));
+const FavoritesScreen    = lazy(() => import('./components/FavoritesScreen'));
+const LegalScreen        = lazy(() => import('./components/LegalScreen'));
+const ReportScreen       = lazy(() => import('./components/ReportScreen'));
 // 管理画面は運営者ページ(/admin.html)でのみ使う。遅延読込で公開バンドルから分離する。
 const AdminScreen = lazy(() => import('./components/AdminScreen'));
 
@@ -405,6 +407,8 @@ export default function App({ operator = false }) {
         <SplashScreen schemeKey={schemeKey} onDone={handleSplashDone} />
       )}
 
+      {/* 遅延読込画面のフォールバックは null（既存画面が残らないよう軽量に） */}
+      <Suspense fallback={null}>
       {screen === 'home' && (
         <HomeScreen
           events={events} loading={loading} error={error}
@@ -566,6 +570,7 @@ export default function App({ operator = false }) {
           />
         </Suspense>
       )}
+      </Suspense>
     </div>
     </OperatorNavContext.Provider>
   );

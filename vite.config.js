@@ -40,6 +40,16 @@ export default defineConfig({
     rollupOptions: {
       // 公開アプリ(index) と 運営者専用ページ(admin) の2エントリ
       input: { main: r('./index.html'), admin: r('./admin.html') },
+      output: {
+        // ライブラリを分離してキャッシュ効率を上げる（アプリコード変更で
+        // vendor チャンクが無効化されない。フィードバック§1-2③）
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return undefined;
+          if (/[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/.test(id)) return 'vendor-react';
+          if (id.includes('@fontsource')) return undefined; // フォントCSSは各エントリへ
+          return 'vendor';
+        },
+      },
     },
   },
   plugins: [
