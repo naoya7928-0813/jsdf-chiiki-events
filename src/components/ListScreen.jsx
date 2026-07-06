@@ -322,7 +322,7 @@ export default function ListScreen({
         </div>
 
         {/* ── 第1段: 地方タブ ── */}
-        <div ref={regionTabScrollRef} style={{
+        <div ref={regionTabScrollRef} className="jsdf-hscroll" style={{
           display: 'flex', overflowX: 'auto', gap: 4, padding: '0 16px 6px',
           scrollbarWidth: 'none', msOverflowStyle: 'none',
           WebkitOverflowScrolling: 'touch',
@@ -358,7 +358,7 @@ export default function ListScreen({
 
         {/* ── 第2段: 都道府県タブ（地方選択時のみ表示） ── */}
         {activeRegionId !== 'all' && prefTabs.length > 0 && (
-          <div ref={prefTabScrollRef} style={{
+          <div ref={prefTabScrollRef} className="jsdf-hscroll" style={{
             display: 'flex', overflowX: 'auto', gap: 3, padding: '4px 16px 8px',
             scrollbarWidth: 'none', msOverflowStyle: 'none',
             WebkitOverflowScrolling: 'touch',

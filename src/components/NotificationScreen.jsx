@@ -99,7 +99,7 @@ export default function NotificationScreen({
 
       {/* ── 地区フィルター ── */}
       <div style={{ background: primary, paddingBottom: 10, flexShrink: 0 }}>
-        <div style={{
+        <div className="jsdf-hscroll" style={{
           display: 'flex', overflowX: 'auto', gap: 6, padding: '0 16px',
           scrollbarWidth: 'none', msOverflowStyle: 'none',
           WebkitOverflowScrolling: 'touch',

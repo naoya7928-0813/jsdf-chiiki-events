@@ -246,11 +246,13 @@ export default function SettingsScreen({
                 return (
                   <button key={m.id} onClick={() => onDarkModeChange(m.id)} style={{
                     flex: 1, height: 40, borderRadius: 6, border: 'none', cursor: 'pointer',
-                    background: isA ? 'var(--card)' : 'transparent',
-                    color: isA ? primary : 'var(--text-muted)',
+                    // 選択中は primary 背景＋白文字。旧 var(--card)＋primary 文字は
+                    // ダークモードで背景に溶けて選択状態が読めなかった（フィードバック§4-2④）
+                    background: isA ? primary : 'transparent',
+                    color: isA ? '#fff' : 'var(--text-muted)',
                     fontFamily: F.sans, fontSize: 13,
                     fontWeight: isA ? 600 : 400,
-                    boxShadow: isA ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                    boxShadow: isA ? '0 1px 3px rgba(0,0,0,0.15)' : 'none',
                     transition: 'all 0.15s',
                   }}>
                     {m.label}
