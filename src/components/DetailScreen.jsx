@@ -3,6 +3,7 @@ import { ICO } from './Icons';
 import { Emblem, F, splitDate, SectionTitle, iconBtnStyle, StatusBadge } from './Shared';
 import { REGION_HQ, REGION_SOURCE } from '../config';
 import WeatherCard from './WeatherCard';
+import { googleCalendarUrl, downloadIcs } from '../utils/calendar';
 
 function officeSourceLabel(ev) {
   if (!ev?.source_type) return null;
@@ -493,6 +494,34 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
           <span>{targetUrl ? (ev.url ? 'イベント詳細・申込方法を見る' : '地本の公式ページを確認') : '公式ページなし'}</span>
           {targetUrl && ICO.extLink('#fff', 14)}
         </button>
+
+        {/* カレンダー登録（Google / iPhone・その他=.ics） */}
+        <div style={{ display: 'flex', gap: 8 }}>
+          <a
+            href={googleCalendarUrl(ev)} target="_blank" rel="noopener noreferrer"
+            aria-label="Googleカレンダーに追加"
+            style={{
+              flex: 1, height: 42, borderRadius: 8, border: '1px solid var(--border)',
+              background: 'var(--tag-bg)', color: 'var(--text)', textDecoration: 'none',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              fontSize: 12.5, fontWeight: 600, fontFamily: F.sans, cursor: 'pointer',
+            }}
+          >
+            📅 Googleカレンダー
+          </a>
+          <button
+            onClick={() => downloadIcs(ev)}
+            aria-label="カレンダーに追加（iPhone・その他）"
+            style={{
+              flex: 1, height: 42, borderRadius: 8, border: '1px solid var(--border)',
+              background: 'var(--tag-bg)', color: 'var(--text)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              fontSize: 12.5, fontWeight: 600, fontFamily: F.sans, cursor: 'pointer',
+            }}
+          >
+            📅 iPhone・その他
+          </button>
+        </div>
 
         {/* 共有エリア：「このイベントを共有」ボタン → 展開して手段を選択 */}
         {!shareOpen ? (
