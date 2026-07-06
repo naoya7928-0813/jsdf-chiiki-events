@@ -80,6 +80,8 @@ export const GLOBAL_CSS = `
     inset: 0;
     width: 100%;
     font-feature-settings: "palt" 1;
+    /* 日付・件数・時刻の桁幅を揃える（一覧の整列感。フィードバック§4-2②） */
+    font-variant-numeric: tabular-nums;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -87,6 +89,13 @@ export const GLOBAL_CSS = `
   }
 
   #root { height: 100%; height: 100dvh; overflow: hidden; }
+
+  /* 横スクロールのチップ列: 右端をフェードさせ「続きがある」ことを伝える
+     （フィードバック§4-2③。全チップ列共通） */
+  .jsdf-hscroll {
+    -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 28px), transparent 100%);
+    mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 28px), transparent 100%);
+  }
 
   ::-webkit-scrollbar { display: none; }
   * { scrollbar-width: none; }

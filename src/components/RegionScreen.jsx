@@ -67,7 +67,7 @@ export default function RegionScreen({
 
       {/* ─ 都道府県タブ（横スクロール） ─ */}
       <div style={{ background: primary, paddingBottom: 10, flexShrink: 0 }}>
-        <div style={{
+        <div className="jsdf-hscroll" style={{
           display: 'flex', overflowX: 'auto', padding: '0 16px', gap: 6,
           scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch',
         }}>

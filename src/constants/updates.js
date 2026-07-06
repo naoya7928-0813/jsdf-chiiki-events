@@ -6,6 +6,12 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-07-06',
+    version: '1.20.40',
+    type:    'improvement',
+    content: '表示の細部を調整しました（数字の桁揃え・横スクロール列の端表示・ダークモードの選択状態）。',
+  },
+  {
+    date:    '2026-07-06',
     version: '1.20.39',
     type:    'feature',
     content: 'イベント詳細に「カレンダーに追加」ボタンを追加しました（Googleカレンダー／iPhone・その他対応）。開催日・会場・公式リンク・申込締切がそのまま登録されます。',

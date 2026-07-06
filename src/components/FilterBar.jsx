@@ -233,7 +233,7 @@ export default function FilterBar({
         <div style={{ paddingBottom: 8 }}>
 
           {/* 期間チップ行 */}
-          <div style={{ ...scrollRow, padding: '2px 16px 0' }} onWheel={onWheel}>
+          <div className="jsdf-hscroll" style={{ ...scrollRow, padding: '2px 16px 0' }} onWheel={onWheel}>
             {PERIODS.map(({ id, label }) => {
               const isOn = activePeriod === id;
               const cnt  = periodCounts[id];
@@ -266,7 +266,7 @@ export default function FilterBar({
           </div>
 
           {/* カテゴリチップ行 */}
-          <div style={{ ...scrollRow, padding: '6px 16px 0' }} onWheel={onWheel}>
+          <div className="jsdf-hscroll" style={{ ...scrollRow, padding: '6px 16px 0' }} onWheel={onWheel}>
             {categories.map(cat => {
               const key  = cat === 'すべて' ? 'all' : cat;
               const isOn = activeCategory === key;
@@ -299,7 +299,7 @@ export default function FilterBar({
           </div>
 
           {/* タグ行（固定リスト・件数バッジ付き） */}
-          <div style={{ ...scrollRow, padding: '6px 16px 0' }} onWheel={onWheel}>
+          <div className="jsdf-hscroll" style={{ ...scrollRow, padding: '6px 16px 0' }} onWheel={onWheel}>
 
             {/* 申請済みチップ（先頭・緑系） */}
             {(() => {
