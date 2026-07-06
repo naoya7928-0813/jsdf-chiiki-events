@@ -240,6 +240,11 @@
       "source_type": "office_ocr",
       "endDate": "2026-07-27",
       "endWeekday": "月",
+      "deadlineDate": "2026-06-19",
+      "status": "closed",
+      "statusReason": "締切日経過",
+      "statusSource": "ocr",
+      "statusUpdatedAt": "2026-07-06",
       "weatherLocation": {
         "latitude": 41.769,
         "longitude": 140.729,
@@ -247,12 +252,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:09.386+09:00"
-      },
-      "deadlineDate": "2026-06-19",
-      "status": "closed",
-      "statusReason": "締切日経過",
-      "statusSource": "ocr",
-      "statusUpdatedAt": "2026-07-06"
+      }
     }
   ],
   "miyagi": [
@@ -266,6 +266,54 @@
       "address": "",
       "time": "",
       "category": "一般公開",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 38.269,
+        "longitude": 140.872,
+        "label": "宮城県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:09.635+09:00"
+      }
+    },
+    {
+      "id": "mi-20260721-ja823",
+      "pref": "miyagi",
+      "date": "2026-07-21",
+      "weekday": "火",
+      "title": "イオンモール新利府で「自衛隊お仕事フェスタ」",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 38.269,
+        "longitude": 140.872,
+        "label": "宮城県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:09.635+09:00"
+      }
+    },
+    {
+      "id": "mi-20260725-ic8il",
+      "pref": "miyagi",
+      "date": "2026-07-25",
+      "weekday": "土",
+      "title": "仙台駐屯地夏まつり・プロテックフェア",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
       "tag": "",
       "url": "",
       "notes": null,
@@ -984,38 +1032,6 @@
     }
   ],
   "tokyo": [
-    {
-      "id": "t-20260704-04iln",
-      "pref": "tokyo",
-      "date": "2026-07-04",
-      "weekday": "土",
-      "title": "自衛隊プチ体験フェア",
-      "place": "北地域事務所",
-      "time": "10:00～16:00",
-      "category": "体験",
-      "tag": "",
-      "ageRequirement": "どなたでも参加可能",
-      "deadline": null,
-      "url": "https://www.mod.go.jp/pco/tokyo/kita/index.html#0704",
-      "notes": "・部隊見学\n・体験喫食\n・隊員との懇談\n応募締切: 当日参加可能\n入場無料",
-      "source_type": "office_html"
-    },
-    {
-      "id": "t-20260704-bcyhd",
-      "pref": "tokyo",
-      "date": "2026-07-04",
-      "weekday": "土",
-      "title": "キャビンアテンダントとの懇談会",
-      "place": "豊島出張所",
-      "time": "14:00～16:00",
-      "category": "広報活動",
-      "tag": "要予約",
-      "ageRequirement": "政府専用機キャビンアテンダントを目指したい方",
-      "deadline": null,
-      "url": "https://www.mod.go.jp/pco/tokyo/toshima/index.html#0704",
-      "notes": "・キャビンアテンダントとの懇談\n・個別相談\n応募締切: 前日までにお申し込みください。",
-      "source_type": "office_html"
-    },
     {
       "id": "t-20260711-f8ged",
       "pref": "tokyo",
@@ -4487,7 +4503,32 @@
       }
     }
   ],
-  "kochi": [],
+  "kochi": [
+    {
+      "id": "ko-20260725-4psjk",
+      "pref": "kochi",
+      "date": "2026-07-25",
+      "weekday": "土",
+      "title": "サマーキャンペーン",
+      "place": "イオンモール高知",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kochi/event_info.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 33.56,
+        "longitude": 133.531,
+        "label": "高知県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-06T15:33:56.984+09:00"
+      }
+    }
+  ],
   "tokushima": [],
   "tottori": [],
   "shimane": [],
@@ -4882,6 +4923,31 @@
   "yamaguchi": [],
   "fukuoka": [
     {
+      "id": "fu-off-20260706-4tpav",
+      "pref": "fukuoka",
+      "date": "2026-07-06",
+      "weekday": "月",
+      "title": "期間業務隊員の募集案内",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/fukuoka/news/images/2024/8.7.6kigyouinbosyu.pdf",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 33.606,
+        "longitude": 130.418,
+        "label": "福岡県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.993+09:00"
+      }
+    },
+    {
       "id": "fu-off-20260808-bjxbc",
       "pref": "fukuoka",
       "date": "2026-08-08",
@@ -5158,5 +5224,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/06 08:15"
+  "updatedAt": "2026/07/06 15:33"
 }
