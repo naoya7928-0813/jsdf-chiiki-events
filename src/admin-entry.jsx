@@ -6,6 +6,11 @@
 // 公開アプリ(/)にはこれらの機能・コードは一切含まれない（App に operator を渡さないため）。
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+// フォントはセルフホスト（公開アプリと同一。Google Fonts への外部接続なし）
+import '@fontsource-variable/noto-sans-jp';
+import '@fontsource-variable/noto-serif-jp';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
 import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
 import { injectGlobalStyles } from './globalStyles';
