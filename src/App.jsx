@@ -50,6 +50,16 @@ function resolveIsDark(mode) {
   return window.matchMedia('(prefers-color-scheme: dark)').matches;
 }
 
+// ── URL同期（イベント個別URL・戻るボタン・リロード復元） ─────────
+// 画面状態を history/URL に反映する薄いルーティング。
+// /event/:id で個別イベントへ直接リンクでき、共有・SNS・リロードに対応する。
+// Vercel 側の SPA rewrite（vercel.json）が任意パスで index.html を返すため
+// サーバー設定は不要。運営者ページ(/admin.html)は URL 体系が別のため対象外。
+const ROUTE_SCREENS = {
+  home: '/', list: '/list', favorites: '/favorites',
+  settings: '/settings', notifications: '/notifications',
+};
+
 export default function App({ operator = false }) {
   // ── スプラッシュ ──────────────────────────────────────────
   // ページロード（再起動）のたびに毎回表示する
@@ -185,6 +195,73 @@ export default function App({ operator = false }) {
 
   // ── データ取得 ────────────────────────────────────────────
   const { events, loading, error, updatedAt, checkedAt, refresh } = useEvents(autoMode);
+
+  // ── URL同期（イベント個別URL /event/:id・戻るボタン・リロード復元） ──
+  const popNav = useRef(false);       // popstate/初期解決による遷移中は pushState しない
+  const pendingPath = useRef(
+    operator ? null : (window.location.pathname !== '/' ? window.location.pathname : null)
+  );
+
+  const findEventById = useCallback((id) => {
+    for (const v of Object.values(events)) {
+      if (!Array.isArray(v)) continue;
+      const hit = v.find(e => e && e.id === id);
+      if (hit) return hit;
+    }
+    return null;
+  }, [events]);
+
+  // パス → 画面状態（不明なパスは notfound）
+  const applyPath = useCallback((pathname) => {
+    const evm = pathname.match(/^\/event\/([^/]+)\/?$/);
+    if (evm) {
+      const ev = findEventById(decodeURIComponent(evm[1]));
+      if (ev) { setDetailEvent(ev); setDetailBack('home'); setScreen('detail'); }
+      else if (loading) pendingPath.current = pathname; // データ到着後に再解決
+      else setScreen('notfound');
+      return;
+    }
+    const rgm = pathname.match(/^\/region\/([a-z]+)\/?$/);
+    if (rgm) { setMapRegionId(rgm[1]); setScreen('region'); return; }
+    const entry = Object.entries(ROUTE_SCREENS).find(([, p]) => p === pathname);
+    if (entry) { if (entry[0] === 'list') setRegion('all'); setScreen(entry[0]); return; }
+    setScreen('notfound');
+  }, [findEventById, loading]);
+
+  // 初回ディープリンクの解決（イベントデータ到着後）
+  useEffect(() => {
+    if (operator || !pendingPath.current || loading) return;
+    const p = pendingPath.current;
+    pendingPath.current = null;
+    popNav.current = true; // URL は既に正しいので push しない
+    applyPath(p);
+  }, [loading, applyPath, operator]);
+
+  // 画面状態 → URL（pushState）。ディープリンク解決前は URL を壊さない
+  useEffect(() => {
+    if (operator || pendingPath.current) return;
+    if (popNav.current) { popNav.current = false; return; }
+    let path = null;
+    if (screen === 'detail' && detailEvent?.id) path = `/event/${encodeURIComponent(detailEvent.id)}`;
+    else if (screen === 'region' && mapRegionId) path = `/region/${mapRegionId}`;
+    else if (ROUTE_SCREENS[screen]) path = ROUTE_SCREENS[screen];
+    if (path && window.location.pathname !== path) window.history.pushState({}, '', path);
+  }, [screen, detailEvent, mapRegionId, operator]);
+
+  // ブラウザ/スマホの戻る・進む
+  useEffect(() => {
+    if (operator) return;
+    const onPop = () => { popNav.current = true; applyPath(window.location.pathname); };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, [applyPath, operator]);
+
+  // 画面タイトル（共有・履歴・タブ表示用）
+  useEffect(() => {
+    if (operator) return;
+    const base = '地本イベントナビ（非公式）';
+    document.title = (screen === 'detail' && detailEvent?.title) ? `${detailEvent.title} | ${base}` : base;
+  }, [screen, detailEvent, operator]);
 
   // ── お気に入り ────────────────────────────────────────────
   const [favorites, setFavorites] = useState(loadFavorites);
@@ -443,6 +520,21 @@ export default function App({ operator = false }) {
           theme={theme}
           onBack={() => setScreen('settings')}
         />
+      )}
+
+      {/* ── 404（不明なURL・掲載終了イベントの共有リンク） ── */}
+      {screen === 'notfound' && (
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 32, textAlign: 'center', background: 'var(--bg)' }}>
+          <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)', marginBottom: 8 }}>ページが見つかりません</div>
+          <div style={{ fontSize: 12.5, color: 'var(--text-muted)', lineHeight: 1.8, marginBottom: 20 }}>
+            お探しのページ・イベントが見つかりませんでした。<br />
+            掲載期間が終了したイベントの可能性があります。
+          </div>
+          <button onClick={() => setScreen('home')} style={{ padding: '12px 28px', borderRadius: 10, border: 'none', fontSize: 14, fontWeight: 700, color: '#fff', background: scheme.primary, cursor: 'pointer' }}>
+            ホームへ戻る
+          </button>
+        </div>
       )}
 
       {screen === 'favorites' && (

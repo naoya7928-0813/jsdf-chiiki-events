@@ -18,7 +18,11 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
 
   // ev が null のときは空文字で代替（実運用では null になることはない）
   const ev = event;
-  const shareUrl  = ev?.url || window.location.origin;
+  // 共有はこのイベントの個別URL（/event/:id）。受け取った相手はアプリ内で
+  // 直接このイベント詳細が開く（公式ページへのリンクはカード内に別途あり）
+  const shareUrl  = ev?.id
+    ? `${window.location.origin}/event/${encodeURIComponent(ev.id)}`
+    : (ev?.url || window.location.origin);
   const dateStr   = ev ? (ev.endDate ? `${ev.date}〜${ev.endDate}` : ev.date) : '';
 
   // ネイティブシェア（Web Share API）

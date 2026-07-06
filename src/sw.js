@@ -1,5 +1,5 @@
-import { precacheAndRoute, cleanupOutdatedCaches } from 'workbox-precaching';
-import { registerRoute } from 'workbox-routing';
+import { precacheAndRoute, cleanupOutdatedCaches, createHandlerBoundToURL } from 'workbox-precaching';
+import { registerRoute, NavigationRoute } from 'workbox-routing';
 import { NetworkFirst, CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
 import { ExpirationPlugin } from 'workbox-expiration';
 
@@ -13,6 +13,12 @@ self.addEventListener('activate', (event) => {
 // ── プリキャッシュ ─────────────────────────────────────────────
 cleanupOutdatedCaches();
 precacheAndRoute(self.__WB_MANIFEST);
+
+// ── SPAナビゲーション（/event/:id 等の個別URLをオフライン/PWAでも解決） ──
+// 拡張子付きパス（静的HTML/画像/JSON等）・API・運営者ページは対象外。
+registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html'), {
+  denylist: [/^\/api\//, /^\/admin/, /\.[a-z0-9]+$/i],
+}));
 
 // ── ランタイムキャッシュ ──────────────────────────────────────
 registerRoute(
