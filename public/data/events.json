@@ -4307,6 +4307,30 @@
   "wakayama": [],
   "ehime": [
     {
+      "id": "em-20260711-3o53y",
+      "pref": "ehime",
+      "date": "2026-07-11",
+      "weekday": "土",
+      "title": "河原学園 大学園祭",
+      "place": "アイテムえひめ大展示場",
+      "address": "",
+      "time": "10:30～16:00",
+      "category": "採用イベント",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/ehime/event.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 33.842,
+        "longitude": 132.766,
+        "label": "愛媛県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-07T15:01:13.555+09:00"
+      }
+    },
+    {
       "id": "em-20260801-z6tb5",
       "pref": "ehime",
       "date": "2026-08-01",
@@ -4750,10 +4774,10 @@
       }
     },
     {
-      "id": "ok-20260805-raws8",
+      "id": "ok-20260804-w5bdl",
       "pref": "okayama",
-      "date": "2026-08-05",
-      "weekday": "水",
+      "date": "2026-08-04",
+      "weekday": "火",
       "title": "艦艇一般公開",
       "place": "玉野市宇野港第一突堤",
       "address": "",
@@ -5170,7 +5194,32 @@
       }
     }
   ],
-  "oita": [],
+  "oita": [
+    {
+      "id": "oi-20260801-p1pzp",
+      "pref": "oita",
+      "date": "2026-08-01",
+      "weekday": "土",
+      "title": "防衛大学校・航空学生説明会",
+      "place": "大分西部公民館",
+      "address": "",
+      "time": "10:00～12:30",
+      "category": "説明会",
+      "tag": "学生向け",
+      "url": "https://www.mod.go.jp/pco/oita/03_event.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 33.239,
+        "longitude": 131.61,
+        "label": "大分県大分郡",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-07T15:01:14.151+09:00"
+      }
+    }
+  ],
   "miyazaki": [],
   "kagoshima": [
     {
@@ -5199,5 +5248,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/07 08:30"
+  "updatedAt": "2026/07/07 15:01"
 }
