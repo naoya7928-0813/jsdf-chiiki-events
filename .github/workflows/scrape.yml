@@ -487,6 +487,32 @@ jobs:
             echo "NOTIFY_RESULT=新着なし（スキップ）" >> "$GITHUB_ENV"
           fi
 
+      # ── Web Push 送信（アプリを閉じていても届く購読者向け） ────────────
+      # 送信タイミングは commit → push → Vercel デプロイ → CDN 伝播待機 → ntfy
+      # スロット待機の「後」（このステップ位置）。以前はスクレイプ中に送信しており、
+      # 通知タップ時にまだ旧データが CDN に載っている問題があった（Issue #16 解消）。
+      # ペイロードは scraper が push-payload.json に書き出し済み（新着0なら count:0）。
+      - name: Web Push を送信（デプロイ反映後）
+        if: steps.commit.outputs.changed == 'true'
+        run: |
+          if [ ! -f scraper/push-payload.json ]; then
+            echo "[WebPush] ペイロードなし。スキップ"; exit 0
+          fi
+          CNT=$(node -p "try{require('./scraper/push-payload.json').count||0}catch{0}")
+          if [ "$CNT" -le 0 ]; then
+            echo "[WebPush] 新着0件。スキップ"; exit 0
+          fi
+          echo "[WebPush] 新着 ${CNT} 件を購読者へ送信します（デプロイ反映後）"
+          BODY=$(node -e "const p=require('./scraper/push-payload.json');process.stdout.write(JSON.stringify({title:p.title,body:p.body,url:p.url||'/'}))")
+          curl -sS --retry 3 --retry-all-errors --connect-timeout 10 --max-time 30 \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -H "x-notify-secret: ${{ secrets.NOTIFY_SECRET }}" \
+            -d "$BODY" \
+            "${{ secrets.SITE_URL }}/api/notify" \
+            && echo "[WebPush] 送信完了" \
+            || echo "::warning::Web Push の送信に失敗しました（データ更新自体は成功しています）"
+
       # ── 失敗段階を特定して管理者に通知 ──────────────────────
       # 一律の「スクレイピング失敗」ではなく、実際に停止した段階を表示する。
       - name: 失敗を管理者に通知

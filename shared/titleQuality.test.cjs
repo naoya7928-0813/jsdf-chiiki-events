@@ -430,3 +430,38 @@ test('isSuspiciousTitle: イベント語を含む・固有名の正規イベン�
   ];
   for (const t of legit) assert.equal(isSuspiciousTitle(t), false, `公開すべき: ${t}`);
 });
+
+// ── splitPlaceAddress（会場名と住所の分離。フィードバック§1-2⑥） ──
+const { splitPlaceAddress } = require('./titleQuality.cjs');
+
+test('splitPlaceAddress: 会場＋住所を分離（都道府県/市区町村＋番地・括弧内）', () => {
+  const cases = [
+    ['陸上自衛隊幌別駐屯地 登別市緑町３丁目１番地', '陸上自衛隊幌別駐屯地', '登別市緑町３丁目１番地'],
+    ['陸上自衛隊岩手駐屯地（岩手県滝沢市後268-433）', '陸上自衛隊岩手駐屯地', '岩手県滝沢市後268-433'],
+    ['郡山労働福祉会館 郡山市虎丸町7番7号', '郡山労働福祉会館', '郡山市虎丸町7番7号'],
+    ['自衛隊 神町駐屯地 山形県東根市神町南3-1-1', '自衛隊 神町駐屯地', '山形県東根市神町南3-1-1'],
+    ['福島第二合同庁舎 １階会議室 (福島市花園町５番１７号)', '福島第二合同庁舎 １階会議室', '福島市花園町５番１７号'],
+  ];
+  for (const [inp, ep, ea] of cases) {
+    const r = splitPlaceAddress(inp, '');
+    assert.equal(r.place, ep, `place: ${inp}`);
+    assert.equal(r.address, ea, `address: ${inp}`);
+  }
+});
+
+test('splitPlaceAddress: 会場名のみは分離しない（誤分離防止）', () => {
+  for (const t of ['平塚地域事務所', '留萌港', 'イオンモール松本 「風庭」エリア', '村山市民会館',
+                   '熊本地方合同庁舎A棟', '高松サンポート合同庁舎アイホール', '京都募集案内所', '善通寺市民会館']) {
+    const r = splitPlaceAddress(t, '');
+    assert.equal(r.place, t, `維持: ${t}`);
+    assert.equal(r.address, '', `address空: ${t}`);
+  }
+});
+
+test('splitPlaceAddress: 既存 address は上書きしない・空入力は安全', () => {
+  const r = splitPlaceAddress('郡山労働福祉会館 郡山市虎丸町7番7号', '正しい住所');
+  assert.equal(r.place, '郡山労働福祉会館');
+  assert.equal(r.address, '正しい住所'); // 既存優先
+  assert.deepEqual(splitPlaceAddress('', ''), { place: '', address: '' });
+  assert.deepEqual(splitPlaceAddress(null, null), { place: '', address: '' });
+});

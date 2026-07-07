@@ -5,6 +5,12 @@
  */
 export const UPDATE_NOTES = [
   {
+    date:    '2026-07-07',
+    version: '1.20.42',
+    type:    'improvement',
+    content: '会場名の表示を整理し、住所を分けて扱うようにしました（地図・天気の精度向上）。新着通知はサイト反映後に届くよう改善しました。',
+  },
+  {
     date:    '2026-07-06',
     version: '1.20.41',
     type:    'improvement',

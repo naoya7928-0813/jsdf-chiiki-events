@@ -21,7 +21,7 @@ const isOffice = ev => typeof ev?.source_type === 'string' && ev.source_type.sta
 // 整形・非イベント判定は共通モジュールに一本化（writeOutput と同一経路）
 import { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } from '../shared/officeTitle.cjs';
 import {
-  applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, cleanTimeText, cleanDeadlineText,
+  applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, splitPlaceAddress, cleanTimeText, cleanDeadlineText,
   isJunkOrStubTitle, isStaleDatedEvent, dedupEvents,
 } from '../shared/titleQuality.cjs';
 
@@ -54,9 +54,11 @@ for (const k of Object.keys(data)) {
       out.title = cleaned;
       changed++;
     }
-    // 場所欄の整形（全経路共通 + office 系）
-    const cp = isOffice(ev) ? cleanOfficePlace(cleanPlaceText(ev.place)) : cleanPlaceText(ev.place);
+    // 場所欄の整形（全経路共通 + office 系）＋ 住所分離
+    const cpBase = isOffice(ev) ? cleanOfficePlace(cleanPlaceText(ev.place)) : cleanPlaceText(ev.place);
+    const { place: cp, address: ca } = splitPlaceAddress(cpBase, ev.address);
     if ((cp || '') !== (ev.place || '')) { out.place = cp; placeChanged++; }
+    if ((ca || '') !== (ev.address || '')) { out.address = ca; fieldChanged++; }
     // 時間・締切の書式整形（"null"・時分表記・英語表記など）
     const ct = cleanTimeText(ev.time);
     if ((ct || '') !== (ev.time || '')) { out.time = ct; fieldChanged++; }

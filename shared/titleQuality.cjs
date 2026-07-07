@@ -396,6 +396,37 @@ function cleanPlaceText(raw) {
   return p;
 }
 
+// 都道府県名（address 分離の目印）
+const PREF_NAMES_RE = new RegExp(
+  '(北海道|青森県|岩手県|宮城県|秋田県|山形県|福島県|茨城県|栃木県|群馬県|埼玉県|千葉県|東京都|神奈川県|新潟県|富山県|石川県|福井県|山梨県|長野県|岐阜県|静岡県|愛知県|三重県|滋賀県|京都府|大阪府|兵庫県|奈良県|和歌山県|鳥取県|島根県|岡山県|広島県|山口県|徳島県|香川県|愛媛県|高知県|福岡県|佐賀県|長崎県|熊本県|大分県|宮崎県|鹿児島県|沖縄県)'
+);
+// 市区町村＋番地（都道府県名を伴わない住所の目印）
+const CITY_ADDR_RE = /[一-鿿ぁ-んァ-ヶ]{1,6}[市区町村](?:[一-鿿ぁ-んァ-ヶ]{0,8})?[0-9０-９]{1,4}\s*(?:丁目|番地|番|号|[-−－])/;
+
+/**
+ * place に会場名と住所が連結している場合、住所を address 側へ分離する（純粋）。
+ * 例: 「郡山労働福祉会館 郡山市虎丸町7番7号」→ place「郡山労働福祉会館」/ address「郡山市虎丸町7番7号」
+ * - 目印は「都道府県名」または「市区町村＋番地」。会場か住所のどちらかが空になる分割はしない。
+ * - address が既にあれば上書きしない。表示の質と天気ジオコーディングの精度を両立させる。
+ * @returns {{place:string, address:string}}
+ */
+function splitPlaceAddress(rawPlace, existingAddress) {
+  let place = String(rawPlace || '').replace(/\s+/g, ' ').trim();
+  const address = String(existingAddress || '').trim();
+  if (!place) return { place, address };
+  const commit = (idx) => {
+    const p = place.slice(0, idx).replace(/[\s（(、,・]+$/, '').trim();
+    const a = place.slice(idx).replace(/^[\s（(]+/, '').replace(/[）)\s]+$/, '').trim();
+    if (!p || !a) return null; // 会場か住所が空になる分割はしない
+    return { place: p, address: address || a };
+  };
+  let m = place.match(PREF_NAMES_RE);       // 1) 都道府県名から（先頭でない場合）
+  if (m && m.index > 0) { const r = commit(m.index); if (r) return r; }
+  m = place.match(CITY_ADDR_RE);            // 2) 市区町村＋番地
+  if (m && m.index > 0) { const r = commit(m.index); if (r) return r; }
+  return { place, address };
+}
+
 /**
  * 「時間」欄を正準形 `HH:MM～HH:MM`（波ダッシュ ～ 統一）へ整形する。
  * - 「N時M分」「N時」「N時半」「午前/午後」「HHMM（4桁）」「から」「-/〜/~」を変換
@@ -449,6 +480,7 @@ module.exports = {
   applyVerifiedOverrides,
   cleanEventTitle,
   cleanPlaceText,
+  splitPlaceAddress,
   cleanTimeText,
   cleanDeadlineText,
   isEmptyFieldText,
