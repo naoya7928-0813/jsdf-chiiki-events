@@ -40,12 +40,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 43.062,
-        "longitude": 141.354,
-        "label": "北海道札幌市",
-        "accuracy": "venue",
+        "latitude": 42.399,
+        "longitude": 141.089,
+        "label": "北海道登別市",
+        "accuracy": "address",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:06.919+09:00"
+        "geocodedAt": "2026-07-08T08:23:26.630+09:00"
       }
     },
     {
@@ -64,12 +64,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 43.062,
-        "longitude": 141.354,
-        "label": "北海道札幌市",
-        "accuracy": "venue",
+        "latitude": 42.858,
+        "longitude": 141.583,
+        "label": "北海道恵庭市",
+        "accuracy": "address",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:07.194+09:00"
+        "geocodedAt": "2026-07-08T08:23:27.270+09:00"
       }
     },
     {
@@ -112,12 +112,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 43.062,
-        "longitude": 141.354,
-        "label": "北海道札幌市",
-        "accuracy": "venue",
+        "latitude": 43.215,
+        "longitude": 141.8,
+        "label": "北海道岩見沢市",
+        "accuracy": "address",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:07.736+09:00"
+        "geocodedAt": "2026-07-08T08:23:27.634+09:00"
       }
     },
     {
@@ -268,7 +268,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-07-07",
+      "statusUpdatedAt": "2026-07-08",
       "weatherLocation": {
         "latitude": 41.769,
         "longitude": 140.729,
@@ -374,14 +374,14 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-07",
+      "statusUpdatedAt": "2026-07-08",
       "weatherLocation": {
-        "latitude": 39.02,
-        "longitude": 141.633,
-        "label": "岩手県陸前高田市",
-        "accuracy": "venue",
+        "latitude": 39.839,
+        "longitude": 141.094,
+        "label": "岩手県滝沢市",
+        "accuracy": "address",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:10.445+09:00"
+        "geocodedAt": "2026-07-08T08:23:28.207+09:00"
       }
     },
     {
@@ -400,12 +400,12 @@
       "ageRequirement": "| 募集対象者等 | |",
       "deadline": null,
       "weatherLocation": {
-        "latitude": 39.02,
-        "longitude": 141.633,
-        "label": "岩手県陸前高田市",
-        "accuracy": "venue",
+        "latitude": 38.262,
+        "longitude": 140.916,
+        "label": "宮城県仙台市",
+        "accuracy": "address",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:11.255+09:00"
+        "geocodedAt": "2026-07-08T08:23:28.571+09:00"
       }
     },
     {
@@ -424,40 +424,16 @@
       "ageRequirement": "| 岩手県内の33歳未満の自衛隊に興味のある方 |",
       "deadline": null,
       "weatherLocation": {
-        "latitude": 39.704,
-        "longitude": 141.153,
-        "label": "基地（青森県八戸市",
-        "accuracy": "venue",
+        "latitude": 40.538,
+        "longitude": 141.481,
+        "label": "青森県八戸市",
+        "accuracy": "address",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:11.519+09:00"
+        "geocodedAt": "2026-07-08T08:23:28.927+09:00"
       }
     }
   ],
   "yamagata": [
-    {
-      "id": "ya-20260707-0nhb7",
-      "pref": "yamagata",
-      "date": "2026-07-07",
-      "weekday": "火",
-      "title": "ｶﾞｲﾀﾞﾝｽ「村山業界研究会」",
-      "place": "村山市民会館",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 38.483,
-        "longitude": 140.38,
-        "label": "山形県村山市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:14.537+09:00"
-      }
-    },
     {
       "id": "ya-20260709-vut98",
       "pref": "yamagata",
@@ -620,12 +596,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 37.75,
-        "longitude": 140.468,
-        "label": "いわき市",
-        "accuracy": "venue",
+        "latitude": 36.945,
+        "longitude": 140.916,
+        "label": "福島県いわき市",
+        "accuracy": "address",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:15.637+09:00"
+        "geocodedAt": "2026-07-08T08:23:29.287+09:00"
       }
     },
     {
@@ -644,12 +620,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 37.4,
-        "longitude": 140.36,
+        "latitude": 37.398,
+        "longitude": 140.373,
         "label": "福島県郡山市",
-        "accuracy": "venue",
+        "accuracy": "address",
         "source": "gsi",
-        "geocodedAt": "2026-07-02T08:50:34.786+09:00"
+        "geocodedAt": "2026-07-08T08:23:29.666+09:00"
       }
     },
     {
@@ -692,12 +668,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 37.761,
-        "longitude": 140.475,
+        "latitude": 37.762,
+        "longitude": 140.473,
         "label": "福島県福島市",
-        "accuracy": "venue",
+        "accuracy": "address",
         "source": "gsi",
-        "geocodedAt": "2026-07-02T08:50:35.134+09:00"
+        "geocodedAt": "2026-07-08T08:23:30.134+09:00"
       }
     },
     {
@@ -716,12 +692,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 37.75,
-        "longitude": 140.468,
-        "label": "神町",
-        "accuracy": "venue",
+        "latitude": 38.404,
+        "longitude": 140.386,
+        "label": "山形県東根市",
+        "accuracy": "address",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:16.166+09:00"
+        "geocodedAt": "2026-07-08T08:23:30.666+09:00"
       }
     },
     {
@@ -740,12 +716,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 37.75,
-        "longitude": 140.468,
+        "latitude": 35.693,
+        "longitude": 139.73,
         "label": "東京都新宿区",
-        "accuracy": "venue",
+        "accuracy": "address",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:16.414+09:00"
+        "geocodedAt": "2026-07-08T08:23:31.199+09:00"
       }
     }
   ],
@@ -801,29 +777,6 @@
     }
   ],
   "kanagawa": [
-    {
-      "id": "k-20260707-szuo9",
-      "pref": "kanagawa",
-      "date": "2026-07-07",
-      "weekday": "火",
-      "title": "個別説明会",
-      "place": "川崎出張所",
-      "address": "",
-      "time": "09:00～16:30",
-      "category": "説明会",
-      "tag": "個別",
-      "url": "https://www.mod.go.jp/pco/kanagawa/mado/kawasaki/kawasaki.html",
-      "notes": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 35.531,
-        "longitude": 139.703,
-        "label": "神奈川県川崎市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:17.181+09:00"
-      }
-    },
     {
       "id": "k-20260711-16zr4",
       "pref": "kanagawa",
@@ -1025,6 +978,7 @@
       "url": "https://www.mod.go.jp/pco/tokyo/event2/0711_boudai.html",
       "notes": "トークショー及び個別相談会\n要予約",
       "source_type": "office_html",
+      "address": "",
       "deadlineDate": "2026-07-10",
       "weatherLocation": {
         "latitude": 35.69,
@@ -1050,6 +1004,7 @@
       "url": "https://www.mod.go.jp/pco/tokyo/tachikawa/index.html#0723",
       "notes": "・海上自衛隊東京音楽隊による演奏\n・ＶＲ体験\n・迷彩服試着体験\n応募締切: 当日参加可能",
       "source_type": "office_html",
+      "address": "",
       "weatherLocation": {
         "latitude": 35.714,
         "longitude": 139.408,
@@ -1074,6 +1029,7 @@
       "url": "https://www.mod.go.jp/pco/tokyo/tachikawa/index.html#0726",
       "notes": "・海上自衛隊東京音楽隊による演奏\n・缶バッジ作り\n・試着体験\n応募締切: 当日参加可能\n先着80名",
       "source_type": "office_html",
+      "address": "",
       "weatherLocation": {
         "latitude": 35.714,
         "longitude": 139.408,
@@ -1098,10 +1054,11 @@
       "url": "https://www.mod.go.jp/pco/tokyo/adachi/index.html#0730",
       "notes": "・装備品展示\n・体験試乗\n・駐屯地見学\n・体験喫食\n応募締切: 応募終了しました。\n応募者多数の場合は抽選",
       "source_type": "office_html",
+      "address": "",
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-07",
+      "statusUpdatedAt": "2026-07-08",
       "weatherLocation": {
         "latitude": 35.775,
         "longitude": 139.805,
@@ -1126,11 +1083,12 @@
       "url": "https://www.mod.go.jp/pco/tokyo/shinkoiwa/index.html#0731",
       "notes": "・基地見学\n・航空機見学\n・体験喫食\n応募締切: 応募終了しました。\n応募多数の場合、抽選。お食事代514円。",
       "source_type": "office_html",
+      "address": "",
       "deadlineDate": "2026-06-22",
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-07",
+      "statusUpdatedAt": "2026-07-08",
       "weatherLocation": {
         "latitude": 35.694,
         "longitude": 139.704,
@@ -1155,6 +1113,7 @@
       "url": "https://www.mod.go.jp/pco/tokyo/toshima/index.html#0803",
       "notes": "・T-4見学\n・管制塔見学\n・医学実験隊見学\n・体験喫食\n内容は変更することがあります",
       "source_type": "office_html",
+      "address": "",
       "deadlineDate": "2026-07-24",
       "weatherLocation": {
         "latitude": 35.726,
@@ -1180,6 +1139,7 @@
       "url": "https://www.mod.go.jp/pco/tokyo/event2/0804_simofusa.html",
       "notes": "・フライトシミュレーター体験\n・施設見学\n・体験喫食",
       "source_type": "office_html",
+      "address": "",
       "deadlineDate": "2026-07-09",
       "weatherLocation": {
         "latitude": 35.69,
@@ -1205,6 +1165,7 @@
       "url": "https://www.mod.go.jp/pco/tokyo/koutou/event.html#0804",
       "notes": "・航空機見学\n・施設見学\n・体験喫食\n応募多数の場合は抽選。落選者に連絡はしない。",
       "source_type": "office_html",
+      "address": "",
       "deadlineDate": "2026-07-08",
       "weatherLocation": {
         "latitude": 35.673,
@@ -1230,6 +1191,7 @@
       "url": "https://www.mod.go.jp/pco/tokyo/koutou/event.html#0825",
       "notes": "・戦車、MCV見学\n・施設見学\n・体験喫食\n応募多数は抽選。当選者のみに連絡。落選連絡なし。",
       "source_type": "office_html",
+      "address": "",
       "deadlineDate": "2026-07-27",
       "weatherLocation": {
         "latitude": 35.673,
@@ -1633,14 +1595,14 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-07-07",
+      "statusUpdatedAt": "2026-07-08",
       "weatherLocation": {
         "latitude": 36.566,
         "longitude": 139.884,
         "label": "栃木県",
         "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:21.449+09:00"
+        "geocodedAt": "2026-07-03T20:01:30.261+09:00"
       }
     }
   ],
@@ -1950,30 +1912,6 @@
   "yamanashi": [],
   "nagano": [
     {
-      "id": "na-20260718-hm0w8",
-      "pref": "nagano",
-      "date": "2026-07-18",
-      "weekday": "土",
-      "title": "【松本市】公務員合同説明会",
-      "place": "イオンモール松本 「風庭」エリア",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "場所：イオンモール松本 風庭２F イオンホール 時間：１１：００～１６：００ (１５：４０受付終了) 内容：「公務員ってなにしてるの？」その疑問を解決！ 自衛隊、防衛省職員、長野県警、北アルプス消防、木曽広域消防、松本市役所、安曇野市役所、大町市役所 合同により、公務員の仕事内容、生活、ワークライフバランス、待遇等わかりやすく説明させていただきます。",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-03T20:01:30.984+09:00"
-      }
-    },
-    {
       "id": "na-20260718-uimr5",
       "pref": "nagano",
       "date": "2026-07-18",
@@ -1995,6 +1933,30 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-03T20:01:31.351+09:00"
+      }
+    },
+    {
+      "id": "na-20260718-hm0w8",
+      "pref": "nagano",
+      "date": "2026-07-18",
+      "weekday": "土",
+      "title": "【松本市】公務員合同説明会",
+      "place": "イオンモール松本 「風庭」エリア",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "場所：イオンモール松本 風庭２F イオンホール 時間：１１：００～１６：００ (１５：４０受付終了) 内容：「公務員ってなにしてるの？」その疑問を解決！ 自衛隊、防衛省職員、長野県警、北アルプス消防、木曽広域消防、松本市役所、安曇野市役所、大町市役所 合同により、公務員の仕事内容、生活、ワークライフバランス、待遇等わかりやすく説明させていただきます。",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-03T20:01:30.984+09:00"
       }
     },
     {
@@ -3898,6 +3860,30 @@
       }
     },
     {
+      "id": "ky-set-20260714-qxcmh",
+      "pref": "kyoto",
+      "date": "2026-07-14",
+      "weekday": "火",
+      "title": "自衛官 就職・進学説明会",
+      "place": "京都テルサハローワーク西館3Ｆ",
+      "address": "",
+      "time": "10:00～15:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
+      "notes": "担当: 京都募集案内所",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.012,
+        "longitude": 135.768,
+        "label": "京都府京都市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-08T08:23:31.561+09:00"
+      }
+    },
+    {
       "id": "ky-set-20260715-7c03c",
       "pref": "kyoto",
       "date": "2026-07-15",
@@ -4024,7 +4010,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-07-07"
+      "statusUpdatedAt": "2026-07-08"
     },
     {
       "id": "os-office-20260718-scxu6",
@@ -5122,6 +5108,30 @@
       }
     },
     {
+      "id": "km-20260726-kt8ju",
+      "pref": "kumamoto",
+      "date": "2026-07-26",
+      "weekday": "日",
+      "title": "公安系公務員合同説明会",
+      "place": "山鹿市消防本部",
+      "address": "",
+      "time": "10:00～12:30",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kumamoto/event/index.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 33.018,
+        "longitude": 130.691,
+        "label": "熊本県山鹿市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-08T08:23:32.070+09:00"
+      }
+    },
+    {
       "id": "km-20260808-apzd8",
       "pref": "kumamoto",
       "date": "2026-08-08",
@@ -5248,5 +5258,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/07 15:01"
+  "updatedAt": "2026/07/08 08:23"
 }
