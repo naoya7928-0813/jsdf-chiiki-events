@@ -370,8 +370,8 @@ function IntroView({ onConfirm, onCancel, primary }) {
         <div style={{
           width: 60, height: 60, borderRadius: '50%',
           background: `${primary}18`, margin: '0 auto 14px',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30,
-        }}>📍</div>
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>{ICO.pin(primary, 28)}</div>
         <div style={{ fontFamily: F.serif, fontSize: 17, fontWeight: 700, color: 'var(--text)', lineHeight: 1.4 }}>
           現在地を使って施設を探す
         </div>
@@ -384,8 +384,8 @@ function IntroView({ onConfirm, onCancel, primary }) {
         background: 'var(--card)', borderRadius: 14, border: '1px solid var(--border)',
         padding: '14px 16px', marginBottom: 20,
       }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', marginBottom: 12 }}>
-          🛡️ プライバシーについて
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: 'var(--text)', marginBottom: 12 }}>
+          {ICO.shield('var(--text)', 14)} プライバシーについて
         </div>
         {[
           '位置情報は端末内でのみ処理されます',
@@ -434,8 +434,10 @@ function RadarScreen({ phase, nearby }) {
       <RadarCircle blips={isDramatic ? nearby : []} />
 
       <div key={phase} style={{ marginTop: 22, textAlign: 'center', animation: 'status-in 0.4s ease-out' }}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: GREEN, letterSpacing: 0.4, lineHeight: 1.4 }}>
-          {isDramatic ? `⚡ ${nearby.length} 件の施設を検出` : '📡 スキャン中...'}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontSize: 15, fontWeight: 700, color: GREEN, letterSpacing: 0.4, lineHeight: 1.4 }}>
+          {isDramatic
+            ? <>{ICO.locator(GREEN, 15)}<span>{nearby.length} 件の施設を検出</span></>
+            : <>{ICO.radar(GREEN, 15)}<span>スキャン中...</span></>}
         </div>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 5, lineHeight: 1.6 }}>
           {isDramatic ? '距離を計算しています...' : '現在地と施設データを取得しています'}
@@ -672,9 +674,12 @@ function OfficeCard({ office, rank, primary }) {
         <div style={{
           marginTop: 4, fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.5,
           padding: '3px 6px', borderRadius: 4, background: 'var(--bg)',
-          display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+          display: 'flex', alignItems: 'flex-start', gap: 4,
         }}>
-          📍 担当: {office.area}
+          <span style={{ display: 'flex', marginTop: 1, flexShrink: 0 }}>{ICO.pin('var(--text-muted)', 10)}</span>
+          <span style={{
+            display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+          }}>担当: {office.area}</span>
         </div>
       )}
 
@@ -717,7 +722,7 @@ function btnStyle(bg, border, color) {
 function DeniedView({ onRetry, primary }) {
   return (
     <div style={{ textAlign: 'center', padding: '44px 16px 52px', animation: 'intro-in 0.35s ease-out' }}>
-      <div style={{ fontSize: 42, marginBottom: 14 }}>🔒</div>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>{ICO.lock('var(--text-muted)', 40)}</div>
       <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', marginBottom: 8 }}>
         位置情報の使用が拒否されました
       </div>
@@ -734,7 +739,7 @@ function DeniedView({ onRetry, primary }) {
 function ErrorView({ msg, onRetry, primary }) {
   return (
     <div style={{ textAlign: 'center', padding: '44px 16px 52px', animation: 'intro-in 0.35s ease-out' }}>
-      <div style={{ fontSize: 42, marginBottom: 14 }}>⚠️</div>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>{ICO.warn(undefined, 40)}</div>
       <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)', marginBottom: 8 }}>
         エラーが発生しました
       </div>

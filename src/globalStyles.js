@@ -18,6 +18,12 @@ export const GLOBAL_CSS = `
     --map-hover:       #c4c8d0;
     --notice-bg:       rgba(133,107,0,0.07);
     --notice-border:   rgba(133,107,0,0.15);
+    /* 角丸の2段階ルール（フィードバック§4-2⑤）:
+       外側の容れ物（カード・モーダル・バナー）は大きめ、
+       内側の要素（バッジ・チップ・タグ）は小さめ＝角ばった規格ラベル調に統一する。 */
+    --radius-container: 12px;
+    --radius-element:   4px;
+    --radius-tag:       2px;   /* カテゴリバッジ等の角ばったタグ形 */
   }
 
   /* ─── ダークモード ─── */

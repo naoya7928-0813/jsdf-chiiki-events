@@ -476,13 +476,19 @@ export default function ListScreen({
               display: 'flex', gap: 10, flexWrap: 'wrap',
             }}>
               {searchQuery && (
-                <span>🔍 {Object.values(filteredGrouped).flat().length} 件ヒット</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  {ICO.search('rgba(255,255,255,0.65)', 12)} {Object.values(filteredGrouped).flat().length} 件ヒット
+                </span>
               )}
               {activePeriod !== 'all' && (
-                <span>📅 期間フィルター適用中</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  {ICO.cal('rgba(255,255,255,0.65)', 12)} 期間フィルター適用中
+                </span>
               )}
               {(activeCategory !== 'all' || activeTag !== 'all') && (
-                <span>🏷 カテゴリ絞り込み中</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  {ICO.tag('rgba(255,255,255,0.65)', 12)} カテゴリ絞り込み中
+                </span>
               )}
             </div>
           </div>
@@ -585,7 +591,7 @@ export default function ListScreen({
                     <div key={`${ev.id}#${evIdx}`} onClick={() => onOpenDetail(ev)} role="button" tabIndex={0}
                       onKeyDown={e => e.key === 'Enter' && onOpenDetail(ev)}
                       style={{
-                        background: 'var(--card)', margin: '0 16px 10px', borderRadius: 12, minHeight: 72,
+                        background: 'var(--card)', margin: '0 16px 10px', borderRadius: 'var(--radius-container)', minHeight: 72,
                         cursor: 'pointer',
                         boxShadow: '0 1px 2px rgba(11,37,69,0.04),0 2px 8px rgba(11,37,69,0.05)',
                         border: `1px solid ${(showDl && dlDays <= 3) ? '#f9731644' : showEvent ? `${primary}33` : 'var(--border)'}`,
@@ -628,7 +634,8 @@ export default function ListScreen({
                             {ev.ended && (
                               <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3, background: '#6b7280', color: '#fff', letterSpacing: 0.5, flexShrink: 0 }}>終了済み</span>
                             )}
-                            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 3, background: 'var(--tag-bg)', color: primary, letterSpacing: 0.5 }}>
+                            {/* カテゴリは角ばったタグ型（装備品の規格ラベル調・フィードバック§4-2⑤） */}
+                            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 'var(--radius-tag)', background: 'var(--tag-bg)', color: primary, letterSpacing: 0.5 }}>
                               {ev.category}
                             </span>
                             {ev.tag && <span style={{ fontSize: 11, color: 'var(--text-sub)' }}>{ev.tag}</span>}

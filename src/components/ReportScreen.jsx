@@ -103,7 +103,12 @@ export default function ReportScreen({ theme, updatedAt, onBack, target }) {
             marginTop: 24, textAlign: 'center', padding: '28px 18px',
             background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12,
           }}>
-            <div style={{ fontSize: 40, marginBottom: 10 }}>✅</div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }} aria-hidden="true">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9.2" stroke="#16a34a" strokeWidth="1.6" />
+                <path d="M7.5 12.3l3 3 6-6.2" stroke="#16a34a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
             <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', marginBottom: 8 }}>送信しました</div>
             <div style={{ fontSize: 12.5, color: 'var(--text-muted)', lineHeight: 1.7 }}>
               ご報告ありがとうございます。<br />内容を確認し、改善に役立てます。
