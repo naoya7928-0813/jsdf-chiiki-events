@@ -155,7 +155,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
             )}
             <div style={{
               display: 'inline-block', fontSize: 10, fontFamily: F.mono,
-              padding: '3px 8px', borderRadius: 3,
+              padding: '3px 8px', borderRadius: 'var(--radius-tag)',
               background: 'rgba(255,255,255,0.15)', letterSpacing: 1.5,
             }}>{ev.category}{ev.tag ? ` · ${ev.tag}` : ''}</div>
             {sourceLabel && (
@@ -507,7 +507,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
               fontSize: 12.5, fontWeight: 600, fontFamily: F.sans, cursor: 'pointer',
             }}
           >
-            📅 Googleカレンダー
+            {ICO.cal('var(--text)', 15)} Googleカレンダー
           </a>
           <button
             onClick={() => downloadIcs(ev)}
@@ -519,7 +519,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
               fontSize: 12.5, fontWeight: 600, fontFamily: F.sans, cursor: 'pointer',
             }}
           >
-            📅 iPhone・その他
+            {ICO.cal('var(--text)', 15)} iPhone・その他
           </button>
         </div>
 

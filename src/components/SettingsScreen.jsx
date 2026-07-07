@@ -147,10 +147,12 @@ export default function SettingsScreen({
           )}
           {push.error && (
             <div style={{
+              display: 'flex', alignItems: 'flex-start', gap: 6,
               padding: '8px 14px 12px', borderTop: '1px solid var(--sep)',
               fontSize: 12, color: '#e05252', lineHeight: 1.5,
             }}>
-              ⚠️ {push.error}
+              <span style={{ display: 'flex', marginTop: 1, flexShrink: 0 }}>{ICO.warn('#e05252', 13)}</span>
+              <span>{push.error}</span>
             </div>
           )}
         </Card>

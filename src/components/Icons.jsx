@@ -35,4 +35,8 @@ export const ICO = {
   shield:  (c = '#6b7280', s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M12 3l7 2.5v5.5c0 4.5-3 8.2-7 9.5-4-1.3-7-5-7-9.5V5.5L12 3z" stroke={c} strokeWidth="1.6" strokeLinejoin="round"/></svg>,
   // 📡 レーダー／スキャン（同心の探索波）
   radar:   (c = '#6b7280', s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="2" fill={c}/><path d="M12 12l6-6" stroke={c} strokeWidth="1.6" strokeLinecap="round"/><path d="M8.5 15.5a5 5 0 010-7" stroke={c} strokeWidth="1.6" strokeLinecap="round"/><path d="M6 18a9 9 0 010-12" stroke={c} strokeWidth="1.6" strokeLinecap="round"/></svg>,
+  // 🔒 施錠（権限拒否など）
+  lock:    (c = '#6b7280', s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><rect x="5" y="10.5" width="14" height="10" rx="2" stroke={c} strokeWidth="1.6"/><path d="M8 10.5V8a4 4 0 018 0v2.5" stroke={c} strokeWidth="1.6" strokeLinecap="round"/><circle cx="12" cy="15.5" r="1.4" fill={c}/></svg>,
+  // 🏷 タグ（カテゴリ・絞り込み）
+  tag:     (c = '#6b7280', s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M3 12.5V4a1 1 0 011-1h8.5L21 11.5a1.5 1.5 0 010 2.1l-6.4 6.4a1.5 1.5 0 01-2.1 0L3 12.5z" stroke={c} strokeWidth="1.6" strokeLinejoin="round"/><circle cx="7.5" cy="7.5" r="1.3" fill={c}/></svg>,
 };

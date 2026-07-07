@@ -35,7 +35,12 @@ export default class ErrorBoundary extends Component {
         padding: 24, textAlign: 'center',
         fontFamily: '"Hiragino Sans","Yu Gothic UI","Noto Sans JP",sans-serif',
       }}>
-        <div style={{ fontSize: 40 }} aria-hidden="true">⚠️</div>
+        {/* 端末非依存の線画（絵文字を避ける）。ErrorBoundary は自己完結させ他コンポーネント非依存にする */}
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 3.5l9 15.5H3L12 3.5z" stroke="#a88500" strokeWidth="1.6" strokeLinejoin="round" />
+          <path d="M12 10v4" stroke="#a88500" strokeWidth="1.6" strokeLinecap="round" />
+          <circle cx="12" cy="16.6" r="0.6" fill="#a88500" />
+        </svg>
         <div style={{ fontSize: 16, fontWeight: 700 }}>表示中に問題が発生しました</div>
         <div style={{ fontSize: 13, opacity: 0.75, lineHeight: 1.7 }}>
           ご不便をおかけしています。<br />

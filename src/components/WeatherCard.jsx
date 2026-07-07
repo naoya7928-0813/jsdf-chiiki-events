@@ -2,23 +2,83 @@ import { useState, useEffect } from 'react';
 import { F, SectionTitle } from './Shared';
 import W from '../../shared/weather.cjs';
 
-// WMO weather code → 日本語名称 + 絵文字アイコン（Open-Meteo の weather_code に対応）
+// WMO weather code → 日本語名称 + アイコン種別（Open-Meteo の weather_code に対応）。
+// 端末で見た目が変わる絵文字を廃し、線画アイコン（WeatherGlyph）へ統一（フィードバック§4-2⑦）。
 const WMO = {
-  0:  ['快晴', '☀️'],
-  1:  ['晴れ', '🌤️'], 2: ['薄曇り', '⛅'], 3: ['曇り', '☁️'],
-  45: ['霧', '🌫️'], 48: ['霧（着氷）', '🌫️'],
-  51: ['霧雨（弱）', '🌦️'], 53: ['霧雨', '🌦️'], 55: ['霧雨（強）', '🌦️'],
-  56: ['着氷性の霧雨', '🌧️'], 57: ['着氷性の霧雨', '🌧️'],
-  61: ['弱い雨', '🌦️'], 63: ['雨', '🌧️'], 65: ['強い雨', '🌧️'],
-  66: ['着氷性の雨', '🌧️'], 67: ['着氷性の雨', '🌧️'],
-  71: ['弱い雪', '🌨️'], 73: ['雪', '🌨️'], 75: ['強い雪', '❄️'],
-  77: ['霧雪', '🌨️'],
-  80: ['にわか雨（弱）', '🌦️'], 81: ['にわか雨', '🌧️'], 82: ['激しいにわか雨', '⛈️'],
-  85: ['にわか雪', '🌨️'], 86: ['強いにわか雪', '❄️'],
-  95: ['雷雨', '⛈️'], 96: ['雷雨（ひょう）', '⛈️'], 99: ['激しい雷雨（ひょう）', '⛈️'],
+  0:  ['快晴', 'clear'],
+  1:  ['晴れ', 'partly'], 2: ['薄曇り', 'partly'], 3: ['曇り', 'cloudy'],
+  45: ['霧', 'fog'], 48: ['霧（着氷）', 'fog'],
+  51: ['霧雨（弱）', 'rain'], 53: ['霧雨', 'rain'], 55: ['霧雨（強）', 'rain'],
+  56: ['着氷性の霧雨', 'rain'], 57: ['着氷性の霧雨', 'rain'],
+  61: ['弱い雨', 'rain'], 63: ['雨', 'rain'], 65: ['強い雨', 'rain'],
+  66: ['着氷性の雨', 'rain'], 67: ['着氷性の雨', 'rain'],
+  71: ['弱い雪', 'snow'], 73: ['雪', 'snow'], 75: ['強い雪', 'snow'],
+  77: ['霧雪', 'snow'],
+  80: ['にわか雨（弱）', 'rain'], 81: ['にわか雨', 'rain'], 82: ['激しいにわか雨', 'thunder'],
+  85: ['にわか雪', 'snow'], 86: ['強いにわか雪', 'snow'],
+  95: ['雷雨', 'thunder'], 96: ['雷雨（ひょう）', 'thunder'], 99: ['激しい雷雨（ひょう）', 'thunder'],
 };
 function describeCode(code) {
-  return WMO[code] || ['天気', '🌡️'];
+  return WMO[code] || ['天気', 'cloudy'];
+}
+
+// 天気カテゴリ → 線画アイコン。ストロークは細めでナビ・ヘッダーの線画と統一。
+const CLOUD_PATH = 'M7 17.5h9.2a3.3 3.3 0 00.3-6.6 4.8 4.8 0 00-9.2-1.1A3.4 3.4 0 007 17.5z';
+function WeatherGlyph({ cat, size = 40 }) {
+  const sw = 1.6;
+  const sun = '#f59e0b', cloud = '#94a3b8', rain = '#3b82f6', snow = '#7ca8d6', bolt = '#f59e0b';
+  const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', 'aria-hidden': true };
+  if (cat === 'clear') {
+    return (
+      <svg {...common}>
+        <circle cx="12" cy="12" r="5" stroke={sun} strokeWidth={sw} />
+        <path d="M12 1.5v2.5M12 20v2.5M1.5 12H4M20 12h2.5M4.2 4.2l1.8 1.8M18 18l1.8 1.8M19.8 4.2L18 6M6 18l-1.8 1.8"
+          stroke={sun} strokeWidth={sw} strokeLinecap="round" />
+      </svg>
+    );
+  }
+  if (cat === 'partly') {
+    return (
+      <svg {...common}>
+        <circle cx="8.5" cy="8" r="3.2" stroke={sun} strokeWidth={sw} />
+        <path d="M8.5 2.2v1.6M2.7 8h1.6M4.4 4l1.1 1.1M12.6 4l-1.1 1.1" stroke={sun} strokeWidth={sw} strokeLinecap="round" />
+        <path d={CLOUD_PATH} stroke={cloud} strokeWidth={sw} strokeLinejoin="round" fill="var(--card)" />
+      </svg>
+    );
+  }
+  if (cat === 'cloudy') {
+    return <svg {...common}><path d={CLOUD_PATH} stroke={cloud} strokeWidth={sw} strokeLinejoin="round" /></svg>;
+  }
+  if (cat === 'fog') {
+    return (
+      <svg {...common}>
+        <path d="M4 9h14M6 13h14M4 17h12" stroke={cloud} strokeWidth={sw} strokeLinecap="round" />
+      </svg>
+    );
+  }
+  if (cat === 'rain') {
+    return (
+      <svg {...common}>
+        <path d={CLOUD_PATH} stroke={cloud} strokeWidth={sw} strokeLinejoin="round" />
+        <path d="M9 19.5l-1 2.5M13 19.5l-1 2.5M16.5 19.5l-1 2.5" stroke={rain} strokeWidth={sw} strokeLinecap="round" />
+      </svg>
+    );
+  }
+  if (cat === 'snow') {
+    return (
+      <svg {...common}>
+        <path d={CLOUD_PATH} stroke={cloud} strokeWidth={sw} strokeLinejoin="round" />
+        <g fill={snow}><circle cx="9" cy="20.6" r="1" /><circle cx="12.8" cy="21.2" r="1" /><circle cx="16.3" cy="20.6" r="1" /></g>
+      </svg>
+    );
+  }
+  // thunder
+  return (
+    <svg {...common}>
+      <path d={CLOUD_PATH} stroke={cloud} strokeWidth={sw} strokeLinejoin="round" />
+      <path d="M13 18.5l-3.2 3.8h2.4L11 24.5l3.4-4.2h-2.4l1-1.8z" fill={bolt} />
+    </svg>
+  );
 }
 
 /** JST 今日 "YYYY-MM-DD" */
@@ -168,7 +228,7 @@ export default function WeatherCard({ event, theme }) {
 
   const d = state.data || {};
   const stale = !!d.stale;
-  const [name, icon] = describeCode(d.weatherCode);
+  const [name, iconCat] = describeCode(d.weatherCode);
   const u = d.units || {};
   const tMax = typeof d.temperatureMax === 'number' ? `${Math.round(d.temperatureMax)}${u.temperature || '°C'}` : '—';
   const tMin = typeof d.temperatureMin === 'number' ? `${Math.round(d.temperatureMin)}${u.temperature || '°C'}` : '—';
@@ -190,7 +250,7 @@ export default function WeatherCard({ event, theme }) {
       </div>
       {/* 天気アイコン + 名称 + 最高/最低気温 */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 6 }}>
-        <div style={{ fontSize: 40, lineHeight: 1 }} aria-hidden="true">{icon}</div>
+        <div style={{ display: 'flex', lineHeight: 1 }}><WeatherGlyph cat={iconCat} size={40} /></div>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)', fontFamily: F.sans }}>{name}</div>
           <div style={{ marginTop: 4, display: 'flex', alignItems: 'baseline', gap: 8 }}>

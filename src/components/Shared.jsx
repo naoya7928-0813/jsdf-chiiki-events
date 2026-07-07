@@ -204,13 +204,15 @@ export function ErrorBanner({ message }) {
   if (!message) return null;
   return (
     <div style={{
+      display: 'flex', alignItems: 'flex-start', gap: 6,
       margin: '8px 16px 0',
       padding: '8px 12px',
       background: '#fff3f3', border: '1px solid #fca5a5',
       borderRadius: 8, fontSize: 12, color: '#b91c1c',
       fontFamily: F.sans,
     }}>
-      ⚠ データ取得に失敗しました。サンプルデータを表示しています。
+      <span style={{ display: 'flex', marginTop: 1, flexShrink: 0 }}>{ICO.warn('#b91c1c', 13)}</span>
+      <span>データ取得に失敗しました。サンプルデータを表示しています。</span>
     </div>
   );
 }

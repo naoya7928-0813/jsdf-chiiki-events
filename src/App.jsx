@@ -3,6 +3,7 @@ import { useEvents } from './hooks/useEvents';
 import { COLOR_SCHEMES, DEFAULT_SCHEME } from './config';
 import { PREFECTURE_INFO } from './data/regionMap';
 import { OperatorNavContext } from './components/Shared';
+import { ICO }           from './components/Icons';
 import HomeScreen        from './components/HomeScreen';
 import ListScreen        from './components/ListScreen';
 import RegionScreen       from './components/RegionScreen';
@@ -537,7 +538,7 @@ export default function App({ operator = false }) {
       {/* ── 404（不明なURL・掲載終了イベントの共有リンク） ── */}
       {screen === 'notfound' && (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 32, textAlign: 'center', background: 'var(--bg)' }}>
-          <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>{ICO.search('var(--icon-muted, #9ca3af)', 40)}</div>
           <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)', marginBottom: 8 }}>ページが見つかりません</div>
           <div style={{ fontSize: 12.5, color: 'var(--text-muted)', lineHeight: 1.8, marginBottom: 20 }}>
             お探しのページ・イベントが見つかりませんでした。<br />
