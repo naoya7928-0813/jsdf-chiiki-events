@@ -108,6 +108,10 @@ const OFFICES_PATH = path.join(__dirname, '../public/data/offices.json');
 // 検疫: 「疑わしい」タイトルのイベントを公開せず隔離する先（git コミット・管理者レビュー用）。
 // 新種のゴミパターンがルール追加まで公開され続けた事故（2026-07-03 岩手）の再発防止。
 const QUARANTINE_PATH = path.join(__dirname, '../public/data/events-quarantine.json');
+// Web Push ペイロード（git管理外）。スクレイパーは書き出しのみ行い、送信は
+// scrape.yml の「CDN 伝播待機」後のステップが行う（Issue #16: デプロイ前に通知が
+// 届くと、タップ時にまだ旧データが表示される問題の解消）。
+const PUSH_PAYLOAD_PATH = path.join(__dirname, 'push-payload.json');
 // 過去イベントの恒久ログ（events.json は終了7日で削除するため、退避先として git 管理でコミット）。
 // 運営サイトの「過去イベント」から終了後もずっと閲覧できるようにする。
 const ARCHIVE_PATH = path.join(__dirname, '../public/data/events-archive.json');
@@ -4368,10 +4372,14 @@ async function writeOutput(data) {
     // チラシ照合済みの修正を適用 → 先頭・末尾のゴミと場所欄を整形してから検査
     data[key] = data[key].map(ev => {
       const fixed = applyVerifiedOverrides(ev);
+      // place に住所が連結していれば address 側へ分離（会場名の表示を綺麗にし、
+      // かつ address を埋めて天気ジオコーディングの精度を上げる）
+      const { place, address } = splitPlaceAddress(cleanPlaceText(fixed.place), fixed.address);
       return {
         ...fixed,
         title:    cleanEventTitle(fixed.title),
-        place:    cleanPlaceText(fixed.place),
+        place,
+        address:  address || fixed.address || '',
         time:     cleanTimeText(fixed.time),
         deadline: cleanDeadlineText(fixed.deadline) || null,
       };
@@ -4632,13 +4640,6 @@ function archivePastEvents(candidates, today) {
  * いずれかが未設定の場合は何もしない（ローカル開発時など）。
  */
 async function notifyNewEvents(prevData, newData) {
-  const siteUrl     = process.env.SITE_URL;
-  const notifSecret = process.env.NOTIFY_SECRET;
-  if (!siteUrl || !notifSecret) {
-    console.log('[Push] SITE_URL / NOTIFY_SECRET 未設定のため通知をスキップします');
-    return;
-  }
-
   // 前回の全イベント ID セットを構築
   const prevIds = new Set();
   for (const key of Object.keys(prevData)) {
@@ -4657,57 +4658,27 @@ async function notifyNewEvents(prevData, newData) {
     }
   }
 
+  // ここでは送信せず、ペイロードをファイルへ書き出すだけにする。
+  // 実送信は scrape.yml が commit → push → Vercel デプロイ → CDN 伝播待機の
+  // 「後」に行う（デプロイ前に通知が届くと、タップ時に旧データが表示される
+  // 問題の解消。Issue #16）。毎回全置換のため前回の残骸が誤送信されることはない。
   if (newEvents.length === 0) {
-    console.log('[Push] 新規イベントなし。通知をスキップします');
+    fs.writeFileSync(PUSH_PAYLOAD_PATH, JSON.stringify({ count: 0 }), 'utf8');
+    console.log('[Push] 新規イベントなし。ペイロードは空で書き出し');
     return;
   }
-
-  console.log(`[Push] 新規イベント ${newEvents.length} 件を検出。通知を送信します`);
-
-  // 代表イベントで通知テキストを作成（最大3件）
-  const sample  = newEvents.slice(0, 3);
-  const title   = `自衛隊イベント情報 +${newEvents.length}件`;
-  const body    = sample.map(e => `・${e.title} (${e.date})`).join('\n')
-                + (newEvents.length > 3 ? `\n他 ${newEvents.length - 3} 件…` : '');
-  const url     = '/';
-
-  const payload = JSON.stringify({ title, body, url });
-  const apiUrl  = new URL('/api/notify', siteUrl);
-
-  const https = require('https');
-  const http  = require('http');
-  const lib   = apiUrl.protocol === 'https:' ? https : http;
-
-  await new Promise((resolve) => {
-    const req = lib.request(
-      {
-        hostname: apiUrl.hostname,
-        port:     apiUrl.port || (apiUrl.protocol === 'https:' ? 443 : 80),
-        path:     apiUrl.pathname,
-        method:   'POST',
-        headers: {
-          'Content-Type':     'application/json',
-          'Content-Length':   Buffer.byteLength(payload),
-          'x-notify-secret':  notifSecret,
-        },
-      },
-      res => {
-        let body = '';
-        res.on('data', c => { body += c; });
-        res.on('end', () => {
-          console.log(`[Push] API 応答 ${res.statusCode}: ${body}`);
-          resolve();
-        });
-      }
-    );
-    req.on('error', err => {
-      console.warn('[Push] API 呼び出しに失敗しました:', err.message);
-      resolve();
-    });
-    req.write(payload);
-    req.end();
-  });
+  const sample = newEvents.slice(0, 3);
+  const payload = {
+    count: newEvents.length,
+    title: `自衛隊イベント情報 +${newEvents.length}件`,
+    body:  sample.map(e => `・${e.title} (${e.date})`).join('\n')
+         + (newEvents.length > 3 ? `\n他 ${newEvents.length - 3} 件…` : ''),
+    url:   '/',
+  };
+  fs.writeFileSync(PUSH_PAYLOAD_PATH, JSON.stringify(payload, null, 2), 'utf8');
+  console.log(`[Push] 新規イベント ${newEvents.length} 件のペイロードを書き出し（送信はデプロイ後に workflow が実施）`);
 }
+
 
 // ── エントリーポイント ────────────────────────────────────────
 main().catch(err => {
