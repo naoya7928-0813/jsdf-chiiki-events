@@ -90,6 +90,72 @@ export const PREFECTURE_TO_REGION = Object.fromEntries(
   Object.entries(PREFECTURE_INFO).map(([id, v]) => [id, v.region])
 );
 
+/**
+ * 地本キーの隣接（地理的に隣り合う地本）マップ。
+ * 0件の地本を選んだとき「隣の◯◯で開催予定」と近隣を案内するために使う（フィードバック§2-2-4）。
+ * 北海道は4地本に分割されているため道内＋函館〜青森（津軽海峡）で接続する。
+ */
+export const NEIGHBORS = {
+  // 北海道（道内の地本間 + 函館〜青森）
+  sapporo:   ['asahikawa', 'obihiro', 'hakodate'],
+  asahikawa: ['sapporo', 'obihiro'],
+  obihiro:   ['sapporo', 'asahikawa', 'hakodate'],
+  hakodate:  ['sapporo', 'obihiro', 'aomori'],
+  // 東北
+  aomori:    ['akita', 'iwate', 'hakodate'],
+  iwate:     ['aomori', 'akita', 'miyagi'],
+  miyagi:    ['iwate', 'akita', 'yamagata', 'fukushima'],
+  akita:     ['aomori', 'iwate', 'yamagata'],
+  yamagata:  ['akita', 'miyagi', 'fukushima', 'niigata'],
+  fukushima: ['miyagi', 'yamagata', 'niigata', 'gunma', 'tochigi', 'ibaraki'],
+  // 関東
+  ibaraki:   ['fukushima', 'tochigi', 'saitama', 'chiba'],
+  tochigi:   ['fukushima', 'ibaraki', 'gunma', 'saitama'],
+  gunma:     ['fukushima', 'tochigi', 'saitama', 'niigata', 'nagano'],
+  saitama:   ['gunma', 'tochigi', 'ibaraki', 'chiba', 'tokyo', 'yamanashi', 'nagano'],
+  chiba:     ['ibaraki', 'saitama', 'tokyo'],
+  tokyo:     ['saitama', 'chiba', 'kanagawa', 'yamanashi'],
+  kanagawa:  ['tokyo', 'yamanashi', 'shizuoka'],
+  // 中部
+  niigata:   ['yamagata', 'fukushima', 'gunma', 'nagano', 'toyama'],
+  toyama:    ['niigata', 'nagano', 'gifu', 'ishikawa'],
+  ishikawa:  ['toyama', 'gifu', 'fukui'],
+  fukui:     ['ishikawa', 'gifu', 'shiga', 'kyoto'],
+  yamanashi: ['saitama', 'tokyo', 'kanagawa', 'shizuoka', 'nagano'],
+  nagano:    ['niigata', 'gunma', 'saitama', 'yamanashi', 'shizuoka', 'aichi', 'gifu', 'toyama'],
+  gifu:      ['toyama', 'ishikawa', 'fukui', 'nagano', 'aichi', 'mie', 'shiga'],
+  shizuoka:  ['kanagawa', 'yamanashi', 'nagano', 'aichi'],
+  aichi:     ['nagano', 'gifu', 'shizuoka', 'mie'],
+  // 近畿
+  mie:       ['gifu', 'aichi', 'shiga', 'kyoto', 'nara', 'wakayama'],
+  shiga:     ['fukui', 'gifu', 'mie', 'kyoto'],
+  kyoto:     ['fukui', 'shiga', 'mie', 'nara', 'osaka', 'hyogo'],
+  osaka:     ['kyoto', 'nara', 'wakayama', 'hyogo'],
+  hyogo:     ['kyoto', 'osaka', 'tottori', 'okayama'],
+  nara:      ['kyoto', 'mie', 'osaka', 'wakayama'],
+  wakayama:  ['mie', 'osaka', 'nara'],
+  // 中国
+  tottori:   ['hyogo', 'okayama', 'shimane'],
+  shimane:   ['tottori', 'hiroshima', 'yamaguchi'],
+  okayama:   ['hyogo', 'tottori', 'hiroshima', 'kagawa'],
+  hiroshima: ['okayama', 'shimane', 'yamaguchi', 'ehime'],
+  yamaguchi: ['shimane', 'hiroshima', 'fukuoka'],
+  // 四国
+  tokushima: ['kagawa', 'ehime', 'kochi'],
+  kagawa:    ['tokushima', 'ehime', 'okayama'],
+  ehime:     ['kagawa', 'tokushima', 'kochi', 'hiroshima', 'oita'],
+  kochi:     ['tokushima', 'ehime'],
+  // 九州・沖縄
+  fukuoka:   ['yamaguchi', 'saga', 'oita', 'kumamoto'],
+  saga:      ['fukuoka', 'nagasaki'],
+  nagasaki:  ['saga', 'kumamoto'],
+  kumamoto:  ['fukuoka', 'saga', 'nagasaki', 'oita', 'miyazaki', 'kagoshima'],
+  oita:      ['fukuoka', 'kumamoto', 'miyazaki', 'ehime'],
+  miyazaki:  ['kumamoto', 'oita', 'kagoshima'],
+  kagoshima: ['kumamoto', 'miyazaki', 'okinawa'],
+  okinawa:   ['kagoshima'],
+};
+
 /** 8地域の定義 */
 export const REGIONS = [
   {

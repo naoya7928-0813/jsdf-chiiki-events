@@ -28,4 +28,11 @@ export const ICO = {
   locator: (c = '#fff', s = 18) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" fill={c}/><circle cx="12" cy="12" r="7" stroke={c} strokeWidth="1.6"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2" stroke={c} strokeWidth="1.6" strokeLinecap="round"/></svg>,
   // 電話アイコン
   phone:   (c = '#fff', s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z" stroke={c} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  // ── 絵文字置換用の線画アイコン（端末非依存で世界観を統一・フィードバック§4-2①） ──
+  // ⚠ 注意（三角＋感嘆符）
+  warn:    (c = '#a88500', s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M12 3.5l9 15.5H3L12 3.5z" stroke={c} strokeWidth="1.6" strokeLinejoin="round"/><path d="M12 10v4" stroke={c} strokeWidth="1.6" strokeLinecap="round"/><circle cx="12" cy="16.6" r="0.5" fill={c} stroke={c} strokeWidth="0.8"/></svg>,
+  // 🛡 シールド（プライバシー等）
+  shield:  (c = '#6b7280', s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M12 3l7 2.5v5.5c0 4.5-3 8.2-7 9.5-4-1.3-7-5-7-9.5V5.5L12 3z" stroke={c} strokeWidth="1.6" strokeLinejoin="round"/></svg>,
+  // 📡 レーダー／スキャン（同心の探索波）
+  radar:   (c = '#6b7280', s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="2" fill={c}/><path d="M12 12l6-6" stroke={c} strokeWidth="1.6" strokeLinecap="round"/><path d="M8.5 15.5a5 5 0 010-7" stroke={c} strokeWidth="1.6" strokeLinecap="round"/><path d="M6 18a9 9 0 010-12" stroke={c} strokeWidth="1.6" strokeLinecap="round"/></svg>,
 };

@@ -1,9 +1,9 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { ICO } from './Icons';
 import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle, StatusBadge } from './Shared';
-import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, matchesTag, APPLIED_TAG_ID, ENDED_TAG_ID } from './FilterBar';
+import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, weekendRange, matchesTag, APPLIED_TAG_ID, ENDED_TAG_ID } from './FilterBar';
 import { daysUntil, deadlineDaysUntil, daysLabel, daysColor } from '../utils/date';
-import { REGIONS, SUPPORTED_PREFECTURES, PREFECTURE_INFO } from '../data/regionMap';
+import { REGIONS, SUPPORTED_PREFECTURES, PREFECTURE_INFO, NEIGHBORS } from '../data/regionMap';
 
 // ── 地方タブ（第1段）─────────────────────────────────────────
 const REGION_TABS = [
@@ -148,8 +148,11 @@ export default function ListScreen({
   };
 
   // ── フィルターバー 折り畳み状態 ──────────────────────────
+  // 既定は収納。上部にコントロールが積み上がりイベントカードへの到達が遅れるのを避け、
+  // 収納時は適用中のフィルタだけをチップで表示する（フィードバック§4-2⑥）。
+  // 以前に自分で開いた利用者は展開状態を保持する。
   const [filterOpen, setFilterOpen] = useState(() => {
-    try { return localStorage.getItem('jsdf-filter-open') !== 'false'; } catch { return true; }
+    try { return localStorage.getItem('jsdf-filter-open') === 'true'; } catch { return false; }
   });
   const handleToggleFilter = () => {
     setFilterOpen(prev => {
@@ -158,6 +161,19 @@ export default function ListScreen({
       return next;
     });
   };
+
+  // ── 免責バナー 折り畳み ──────────────────────────────────
+  // 初回のみ全文表示し、以降は1行に畳む（詳細画面に免責文言があるため役割は保たれる）。
+  // 既読フラグは localStorage に置く（フィードバック§4-2⑥）。
+  const [noticeRead] = useState(() => {
+    try { return localStorage.getItem('jsdf-notice-read') === '1'; } catch { return false; }
+  });
+  const [noticeExpanded, setNoticeExpanded] = useState(false);
+  useEffect(() => {
+    // 今回の表示をもって既読とし、次回以降は畳む（当回は全文のまま見せる）
+    if (!noticeRead) { try { localStorage.setItem('jsdf-notice-read', '1'); } catch {} }
+  }, [noticeRead]);
+  const noticeFolded = noticeRead && !noticeExpanded;
 
   // ── カテゴリ・タグ・期間 フィルター ─────────────────────
   const [activeCategory, setActiveCategory] = useState('all');
@@ -188,6 +204,7 @@ export default function ListScreen({
 
     const wStr = addDays(tStr, 6);
     const mStr = `${Y}-${pad(Mo)}-${pad(lastDay(Y, Mo))}`;
+    const { sat: satStr, sun: sunStr } = weekendRange(tStr);
 
     // 来月（年またぎ対応）
     const nmY = Mo === 12 ? Y + 1 : Y;
@@ -213,6 +230,7 @@ export default function ListScreen({
         const ee = ev.endDate ?? ev.date;
         let periodOk = true;
         if (activePeriod === 'today')     periodOk = ev.date <= tStr && ee >= tStr;
+        if (activePeriod === 'weekend')   periodOk = ev.date <= sunStr && ee >= satStr && ee >= tStr;
         if (activePeriod === 'thisWeek')  periodOk = ev.date <= wStr && ee >= tStr;
         if (activePeriod === 'thisMonth') periodOk = ev.date <= mStr && ee >= tStr;
         // 来月：開始日が来月の範囲に入るイベントのみ（今月開始来月終了のイベントは除外）
@@ -486,18 +504,39 @@ export default function ListScreen({
         onToggleCollapsed={handleToggleFilter}
       />
 
-      {/* 非公式サービス注意バナー */}
-      <div style={{
-        display: 'flex', alignItems: 'flex-start', gap: 6,
-        padding: '7px 14px', background: 'var(--notice-bg, rgba(120,100,0,0.07))',
-        borderBottom: '1px solid var(--notice-border, rgba(120,100,0,0.13))',
-        flexShrink: 0,
-      }}>
-        <span style={{ fontSize: 12, lineHeight: 1, marginTop: 1, flexShrink: 0 }}>⚠️</span>
-        <span style={{ fontSize: 10.5, color: 'var(--text-muted)', lineHeight: 1.55 }}>
-          当サービスは非公式の情報まとめです。参加・申込・中止・変更などの最新情報は、各地方協力本部の公式ページで必ずご確認ください。
-        </span>
-      </div>
+      {/* 非公式サービス注意バナー（初回のみ全文・以降は1行に畳む／タップで展開） */}
+      {noticeFolded ? (
+        <button
+          onClick={() => setNoticeExpanded(true)}
+          aria-label="免責事項を表示"
+          style={{
+            display: 'flex', alignItems: 'center', gap: 6, width: '100%',
+            padding: '5px 14px', background: 'var(--notice-bg, rgba(120,100,0,0.07))',
+            borderBottom: '1px solid var(--notice-border, rgba(120,100,0,0.13))',
+            border: 'none', cursor: 'pointer', textAlign: 'left', flexShrink: 0,
+          }}
+        >
+          <span style={{ display: 'flex', flexShrink: 0 }}>{ICO.warn(undefined, 12)}</span>
+          <span style={{
+            fontSize: 10.5, color: 'var(--text-muted)', lineHeight: 1.4,
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1, minWidth: 0,
+          }}>
+            非公式の情報まとめです。最新情報は公式ページでご確認ください
+          </span>
+        </button>
+      ) : (
+        <div style={{
+          display: 'flex', alignItems: 'flex-start', gap: 6,
+          padding: '7px 14px', background: 'var(--notice-bg, rgba(120,100,0,0.07))',
+          borderBottom: '1px solid var(--notice-border, rgba(120,100,0,0.13))',
+          flexShrink: 0,
+        }}>
+          <span style={{ display: 'flex', marginTop: 1, flexShrink: 0 }}>{ICO.warn(undefined, 12)}</span>
+          <span style={{ fontSize: 10.5, color: 'var(--text-muted)', lineHeight: 1.55 }}>
+            当サービスは非公式の情報まとめです。参加・申込・中止・変更などの最新情報は、各地方協力本部の公式ページで必ずご確認ください。
+          </span>
+        </div>
+      )}
 
       <div ref={listScrollRef} style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 60px)' }}>
         <ErrorBanner message={error} />
@@ -505,7 +544,13 @@ export default function ListScreen({
         {/* 初回ローディング中はスピナー（既にデータがある場合は出さない） */}
         {loading && list.length === 0 ? <Spinner primary={primary} /> : (
           Object.keys(filteredGrouped).length === 0 ? (
-            <EmptyState searchQuery={searchQuery} primary={primary} />
+            <EmptyState
+              searchQuery={searchQuery}
+              primary={primary}
+              prefId={activePrefId}
+              events={events}
+              onSelectPref={handlePrefClick}
+            />
           ) : (
             Object.entries(filteredGrouped).map(([month, evs]) => (
               <div key={month}>
@@ -527,9 +572,12 @@ export default function ListScreen({
                   const eventDays  = daysUntil(ev.endDate || ev.date);
                   const dlDays     = deadlineDaysUntil(ev.deadline);
                   const sourceLabel = officeSourceLabel(ev);
-                  // 開催まで7日以内、または締切まで3日以内のときバッジ表示
+                  // 開催まで7日以内、または締切まで7日以内のときバッジ表示。
+                  // 締切は一覧を眺めるだけで優先度が分かるよう表示窓を広げ、
+                  // 残り日数に応じて色（近いほど赤→橙）を変える（フィードバック§2-2-7）。
                   const showEvent  = !isOngoing && eventDays >= 0 && eventDays <= 7;
-                  const showDl     = dlDays != null && dlDays >= 0 && dlDays <= 3;
+                  const showDl     = dlDays != null && dlDays >= 0 && dlDays <= 7;
+                  const dlColor    = dlDays != null ? daysColor(dlDays, '#f97316', '#f97316') : '#f97316';
                   // key には id だけでなく月内インデックスも含める。
                   // 同一日・同名イベントや稀なハッシュ衝突で id が重複しても、
                   // React の key 衝突（リスト縮小時に旧DOMが残る不具合）を防ぐ。
@@ -540,7 +588,7 @@ export default function ListScreen({
                         background: 'var(--card)', margin: '0 16px 10px', borderRadius: 12, minHeight: 72,
                         cursor: 'pointer',
                         boxShadow: '0 1px 2px rgba(11,37,69,0.04),0 2px 8px rgba(11,37,69,0.05)',
-                        border: `1px solid ${showDl ? '#f9731644' : showEvent ? `${primary}33` : 'var(--border)'}`,
+                        border: `1px solid ${(showDl && dlDays <= 3) ? '#f9731644' : showEvent ? `${primary}33` : 'var(--border)'}`,
                       }}>
                       <div style={{ display: 'flex', padding: '14px 16px', gap: 14 }}>
                         {/* 日付バッジ */}
@@ -616,7 +664,7 @@ export default function ListScreen({
                             {showDl && (
                               <span style={{
                                 fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3,
-                                background: '#f9731622', color: '#f97316',
+                                background: `${dlColor}22`, color: dlColor,
                                 fontFamily: F.mono, letterSpacing: 0.5,
                               }}>
                                 締切 {daysLabel(dlDays, 'deadline')}
@@ -702,7 +750,7 @@ export default function ListScreen({
 }
 
 // ─── 空状態（検索ヒットなし or イベントなし） ──────────────
-function EmptyState({ searchQuery, primary }) {
+function EmptyState({ searchQuery, primary, prefId, events, onSelectPref }) {
   if (searchQuery) {
     return (
       <div style={{ padding: '40px 24px', textAlign: 'center' }}>
@@ -716,9 +764,51 @@ function EmptyState({ searchQuery, primary }) {
       </div>
     );
   }
+
+  // 特定の地本を選んでいて、その地本にイベントが1件も無いときは近隣を案内する
+  // （フィルタで0件になった場合＝地本自体には掲載あり、は対象外）。
+  const isSpecificPref = prefId && prefId !== 'all' && SUPPORTED_PREFECTURES.has(prefId);
+  const prefEmpty = isSpecificPref && (events?.[prefId]?.length ?? 0) === 0;
+  const nearby = prefEmpty
+    ? (NEIGHBORS[prefId] || [])
+        .map(id => ({ id, count: events?.[id]?.length ?? 0, label: PREFECTURE_INFO[id]?.label ?? id }))
+        .filter(n => n.count > 0)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 4)
+    : [];
+
+  const prefLabel = isSpecificPref ? (PREFECTURE_INFO[prefId]?.label ?? prefId) : '';
+
   return (
-    <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)', fontSize: 14, fontFamily: F.sans }}>
-      現在公開中のイベントはありません
+    <div style={{ padding: '40px 24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: 14, fontFamily: F.sans }}>
+      <div>
+        {prefEmpty ? `${prefLabel}地本は現在、公開中のイベントがありません` : '現在公開中のイベントはありません'}
+      </div>
+      {nearby.length > 0 && (
+        <div style={{ marginTop: 20 }}>
+          <div style={{ fontSize: 12.5, color: 'var(--text-sub)', marginBottom: 10 }}>
+            近隣の地本で開催予定があります
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
+            {nearby.map(n => (
+              <button
+                key={n.id}
+                onClick={() => onSelectPref?.(n.id)}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  border: `1px solid ${primary}33`, background: 'var(--card)',
+                  color: 'var(--text)', borderRadius: 999, padding: '7px 14px',
+                  fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: F.sans,
+                }}
+              >
+                <Emblem ch={PREFECTURE_INFO[n.id]?.emblem ?? n.label.charAt(0)} size={15} primary={primary} />
+                <span>{n.label}</span>
+                <span style={{ fontSize: 11, fontFamily: F.mono, color: primary, fontWeight: 700 }}>{n.count}件</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

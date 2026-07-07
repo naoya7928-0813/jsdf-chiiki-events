@@ -11,10 +11,25 @@ export const STANDARD_CATEGORIES = [
 export const PERIODS = [
   { id: 'all',       label: '全期間' },
   { id: 'today',     label: '今日'   },
+  { id: 'weekend',   label: '今週末' },
   { id: 'thisWeek',  label: '今週'   },
   { id: 'thisMonth', label: '今月'   },
   { id: 'nextMonth', label: '来月'   },
 ];
+
+// 今週末（直近の土曜・日曜）の日付範囲を { sat, sun } で返す。
+// 日曜日は当日を週末扱い（過ぎた土曜には戻さない）。ListScreen と件数計算で共有。
+export function weekendRange(tStr) {
+  const addDays = (s, n) => {
+    const d = new Date(s + 'T00:00:00Z');
+    d.setUTCDate(d.getUTCDate() + n);
+    return d.toISOString().slice(0, 10);
+  };
+  const dow = new Date(tStr + 'T00:00:00Z').getUTCDay(); // 0=日 .. 6=土
+  if (dow === 0) return { sat: tStr, sun: tStr };          // 日曜: 当日のみ
+  const toSat = 6 - dow;
+  return { sat: addDays(tStr, toSat), sun: addDays(tStr, toSat + 1) };
+}
 
 // ── タグ定義（固定リスト + 照合キーワード） ────────────────────
 // 各タグは title・notes・tag フィールドをまとめてキーワード検索する。
@@ -64,10 +79,13 @@ export function calcPeriodCounts(events) {
   const nmEStr = `${nmY}-${pad(nmM)}-${pad(lastDay(nmY, nmM))}`;
 
   const inRange = (e, s, f) => { const ee = e.endDate ?? e.date; return e.date <= f && ee >= s; };
+  const { sat: satStr, sun: sunStr } = weekendRange(tStr);
 
   return {
     all:       events.length,
     today:     events.filter(e => inRange(e, tStr,  tStr)).length,
+    // 今週末：直近の土日に開催がかかるイベント（かつ終了前）
+    weekend:   events.filter(e => inRange(e, satStr, sunStr) && (e.endDate ?? e.date) >= tStr).length,
     thisWeek:  events.filter(e => inRange(e, tStr,  wStr)).length,
     thisMonth: events.filter(e => inRange(e, tStr,  mStr)).length,
     // 来月：開始日ベースで判定
