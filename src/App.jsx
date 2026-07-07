@@ -64,9 +64,17 @@ const ROUTE_SCREENS = {
 
 export default function App({ operator = false }) {
   // ── スプラッシュ ──────────────────────────────────────────
-  // ページロード（再起動）のたびに毎回表示する
-  const [showSplash, setShowSplash] = useState(true);
-  const handleSplashDone = useCallback(() => setShowSplash(false), []);
+  // 世界観の演出だが毎回2〜3秒は毎日使う利用者の負担になるため、
+  // セッション内の初回のみ表示する（同一セッションのリロード・画面遷移では再生しない。
+  // 運営者ページでは表示しない）。（フィードバック§2-2-1）
+  const [showSplash, setShowSplash] = useState(() => {
+    if (operator) return false;
+    try { return sessionStorage.getItem('jsdf-splash-shown') !== '1'; } catch { return true; }
+  });
+  const handleSplashDone = useCallback(() => {
+    try { sessionStorage.setItem('jsdf-splash-shown', '1'); } catch {}
+    setShowSplash(false);
+  }, []);
 
   // ── ナビゲーション ────────────────────────────────────────
   const [screen,      setScreen]      = useState('home');
