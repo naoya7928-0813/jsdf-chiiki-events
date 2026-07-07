@@ -304,6 +304,38 @@ function renderRows(events) {
   }).join('\n      ');
 }
 
+// カテゴリ横断ページ（種目LP）の定義。events.html からも内部リンクするため
+// ここ（events.html 生成より前）で宣言する。
+const CATEGORY_TOPICS = [
+  { cat: '体験',       slug: 'taiken',       h1: '自衛隊の体験イベント（体験搭乗・体験航海など）',
+    kw: '体験搭乗,体験航海,自衛隊 体験,ヘリ 体験搭乗,自衛隊 体験イベント',
+    lead: 'ヘリコプターや輸送機の体験搭乗、艦艇の体験航海など、自衛隊の装備を実際に体験できるイベントを全国から集約しています。体験系は人気が高く、事前申込・抽選となることが多いため、気になるイベントは早めに公式の募集要項をご確認ください。' },
+  { cat: '艦艇公開',   slug: 'kantei-kokai', h1: '自衛隊の艦艇公開・一般公開（護衛艦・巡視船など）',
+    kw: '艦艇公開,護衛艦 一般公開,自衛艦 公開,艦艇 見学,体験航海',
+    lead: '護衛艦などの艦艇を見学できる艦艇公開イベントを全国から集約しています。停泊地での一般公開や、乗艦しての体験航海が行われることがあります。開催日・受付時間・事前申込の要否は各公式情報をご確認ください。' },
+  { cat: '一般公開',   slug: 'ippan-kokai',  h1: '駐屯地・基地の一般公開',
+    kw: '駐屯地 一般公開,基地 一般公開,自衛隊 一般公開,航空祭',
+    lead: '駐屯地・基地の一般公開イベントを全国から集約しています。装備品展示・訓練展示・音楽演奏・子ども向け体験など、どなたでも楽しめる催しが一般的です。' },
+  { cat: '記念行事',   slug: 'kinen-gyoji',  h1: '自衛隊の記念行事（創立記念・観閲式など）',
+    kw: '自衛隊 記念行事,創立記念,観閲式,駐屯地祭',
+    lead: '駐屯地・基地の創立記念行事や式典など、自衛隊の記念行事を全国から集約しています。観閲式や訓練展示が行われることもあります。' },
+  { cat: '演奏会',     slug: 'ensokai',      h1: '自衛隊音楽隊の演奏会・コンサート',
+    kw: '自衛隊 音楽隊,自衛隊 演奏会,陸上自衛隊 音楽隊 コンサート',
+    lead: '陸・海・空自衛隊の音楽隊による演奏会・コンサート情報を全国から集約しています。入場無料・事前申込制のものが多くあります。' },
+  { cat: '説明会',     slug: 'setsumeikai',  h1: '自衛隊の説明会・個別相談会',
+    kw: '自衛隊 説明会,自衛官 募集 説明会,自衛隊 相談会',
+    lead: '入隊・採用を検討している方向けの自衛隊説明会・個別相談会を全国から集約しています。多くは事前予約・事前申込制です。' },
+  { cat: '採用イベント', slug: 'saiyo',       h1: '自衛官募集の採用イベント',
+    kw: '自衛官 募集,自衛隊 採用イベント,自衛官候補生,一般曹候補生',
+    lead: '自衛官募集に関する採用イベントを全国から集約しています。採用区分・年齢・学歴の要件は年度により異なるため、最新の募集要項を公式でご確認ください。' },
+  { cat: '広報活動',   slug: 'koho',         h1: '自衛隊の広報活動・イベント',
+    kw: '自衛隊 広報,自衛隊 イベント,地方協力本部 広報',
+    lead: '地方協力本部・募集案内所による広報活動やイベントを全国から集約しています。' },
+  { cat: '地域参加',   slug: 'chiiki',       h1: '自衛隊が参加する地域イベント・お祭り',
+    kw: '自衛隊 お祭り,自衛隊 地域イベント,自衛隊 参加 イベント',
+    lead: '地域のお祭りや催しに自衛隊が参加するイベントを全国から集約しています。' },
+];
+
 // ── 全イベント一覧 events.html を生成 ───────────────────────────
 
 const sections = Object.entries(byPref).map(([label, events]) => {
@@ -372,6 +404,12 @@ ${allJsonLd}
   </p>
 
 ${sections}
+
+  <section style="margin-top:3em">
+    <h2>種目から自衛隊イベントを探す</h2>
+    <p class="meta">体験搭乗・艦艇公開・一般公開・記念行事・説明会など、種目ごとに全国横断で探せます。</p>
+    <p>${CATEGORY_TOPICS.map(t => `<a href="/topics/${t.slug}.html">${esc(t.cat)}</a>`).join('　／　')}</p>
+  </section>
 
   <section style="margin-top:3em">
     <h2>都道府県別の自衛隊地本イベントページ</h2>
@@ -500,6 +538,127 @@ for (const f of readdirSync(EVENTS_DIR)) {
   }
 }
 
+// ── カテゴリ横断ページ topics/<slug>.html を生成 ────────────────────
+// 「体験搭乗 いつ」「艦艇公開 予定」等の“種目”クエリ向けエバーグリーンLP。
+// 全国のイベントをカテゴリ横断で集約し、都道府県別ページ（縦）に対する
+// 横断（横）の導線を作る（フィードバック§2-2-6 / §1-2）。URLは常設で安定させる。
+const TOPICS_DIR = join(__dirname, '../public/topics');
+mkdirSync(TOPICS_DIR, { recursive: true });
+
+// カテゴリ間の相互リンク（内部リンク網でクロール性を高める）
+function topicNav(currentSlug) {
+  const links = CATEGORY_TOPICS
+    .filter(t => t.slug !== currentSlug)
+    .map(t => `<a href="/topics/${t.slug}.html">${esc(t.cat)}</a>`)
+    .join('　／　');
+  return `<nav class="topics-nav">種目から探す：${links}</nav>`;
+}
+
+const topicValidFiles = new Set(CATEGORY_TOPICS.map(t => `${t.slug}.html`));
+for (const t of CATEGORY_TOPICS) {
+  const evs = allEvents.filter(e => e.category === t.cat);
+  // 都道府県別にまとめる（表示名の順序は allEvents=日付順を保つ）
+  const grouped = {};
+  for (const ev of evs) (grouped[ev.prefLabel] ||= []).push(ev);
+  const sectionsHtml = Object.entries(grouped).map(([label, list]) => {
+    const prefKey = list[0]?.prefKey ?? '';
+    const prefLink = prefKey ? ` <a href="/events/${prefKey}.html">（${esc(label)}のみ）</a>` : '';
+    return `  <section>
+    <h2>${esc(label)}（${list.length}件）${prefLink}</h2>
+    <ul>
+      ${renderRows(list)}
+    </ul>
+  </section>`;
+  }).join('\n\n');
+
+  const schemas = [
+    { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+      { '@type': 'ListItem', position: 1, name: '自衛隊地本イベント', item: `${SITE_URL}/events.html` },
+      { '@type': 'ListItem', position: 2, name: t.h1, item: `${SITE_URL}/topics/${t.slug}.html` },
+    ] },
+    ...evs.map(ev => toEventSchema(ev, ev.prefLabel)),
+  ];
+  const topicJsonLd = jsonLdSafe(schemas);
+  const desc = `全国の自衛隊「${t.cat}」イベントを横断でまとめた非公式ページ。${t.lead.slice(0, 60)}（${esc(updatedAt)}更新・${evs.length}件）`;
+
+  const body = evs.length > 0
+    ? sectionsHtml
+    : `  <p class="meta">現在、公開中の「${esc(t.cat)}」イベントはありません。時期により開催状況が変わるため、都道府県別ページやアプリ版で最新情報をご確認ください。</p>`;
+
+  const html = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${esc(t.h1)}【全国・非公式まとめ】</title>
+  <meta name="description" content="${esc(desc)}" />
+  <meta name="keywords" content="${esc(t.kw)}" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="${SITE_URL}/topics/${t.slug}.html" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+  <meta property="og:title" content="${esc(t.h1)}【非公式まとめ】" />
+  <meta property="og:description" content="${esc(t.lead.slice(0, 100))}" />
+  <meta property="og:url" content="${SITE_URL}/topics/${t.slug}.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="${SITE_URL}/icons/icon-512.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="${esc(t.h1)}" />
+  <meta name="twitter:description" content="${esc(t.lead.slice(0, 100))}" />
+  <meta name="twitter:image" content="${SITE_URL}/icons/icon-512.png" />
+  <script type="application/ld+json">
+${topicJsonLd}
+  </script>
+  <style>
+    body { font-family: sans-serif; max-width: 900px; margin: 0 auto; padding: 16px; line-height: 1.7; }
+    h1 { font-size: 1.4em; }
+    h2 { font-size: 1.1em; margin-top: 2em; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
+    nav { margin-bottom: 1.2em; font-size: 0.9em; }
+    .topics-nav { margin: 1.4em 0; font-size: 0.88em; color: #444; }
+    ul { padding-left: 1.2em; }
+    li { margin: 6px 0; font-size: 0.95em; }
+    time { color: #555; }
+    .meta { color: #666; font-size: 0.85em; }
+    a { color: #0b2545; }
+  </style>
+</head>
+<body>
+  <nav><a href="/events.html">← 全国の自衛隊イベント一覧</a>　／　<a href="/">アプリ版（PWA）</a></nav>
+  <h1>${esc(t.h1)}</h1>
+  <p>${esc(t.lead)}全国の自衛隊地方協力本部が公開する情報を横断で自動集約しています（現在 ${evs.length} 件・${esc(updatedAt)} 更新）。</p>
+  <p class="meta" style="border:1px solid #ccc;border-radius:4px;padding:8px 12px;background:#fffbe6">
+    当サイトは有志による非公式サイトです。防衛省・自衛隊および各地方協力本部とは直接関係ありません。
+    参加・申込・中止・変更などの最新情報は、必ず各地方協力本部の公式ページでご確認ください。
+  </p>
+
+${body}
+
+  ${topicNav(t.slug)}
+
+  <section style="margin-top:2.5em">
+    <h2>地域から探す</h2>
+    <p class="meta">お住まいの都道府県のイベントはこちらから。</p>
+${nationalIndex()}
+  </section>
+
+  <footer>
+    <p class="meta" style="margin-top:3em">
+      本ページは自衛隊地方協力本部の公式サイトから取得した情報を自動集約したものです。最新・正確な情報は各地本公式サイトでご確認ください。
+    </p>
+  </footer>
+</body>
+</html>
+`;
+  writeFileSync(join(TOPICS_DIR, `${t.slug}.html`), minifyHtml(html), 'utf8');
+  console.log(`[generate-events-html] topics/${t.slug}.html を生成（${evs.length} 件）`);
+}
+// 孤立トピックの掃除
+for (const f of readdirSync(TOPICS_DIR)) {
+  if (f.endsWith('.html') && !topicValidFiles.has(f)) {
+    unlinkSync(join(TOPICS_DIR, f));
+    console.log(`[generate-events-html] 孤立ファイル削除: topics/${f}`);
+  }
+}
+
 // ── 参加ガイド guide.html を生成（長尾の情報収集クエリ向けエバーグリーン） ──
 // 「自衛隊 説明会 流れ / 持ち物 / 服装 / 申込 / 体験搭乗 申し込み / 一般公開 楽しみ方 / 年齢」等。
 // FAQ は可視本文と FAQPage 構造化データを同一データから生成し本文一致を担保する（2026年要件）。
@@ -609,6 +768,17 @@ const prefUrls = Object.keys(PREF_LABELS).map(k => {
   </url>`;
 }).join('\n');
 
+// カテゴリ横断ページ（種目LP）をサイトマップに追加
+const topicUrls = CATEGORY_TOPICS.map(t => {
+  const has = allEvents.some(e => e.category === t.cat);
+  return `  <url>
+    <loc>${SITE_URL}/topics/${t.slug}.html</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>${has ? 'weekly' : 'monthly'}</changefreq>
+    <priority>${has ? '0.7' : '0.4'}</priority>
+  </url>`;
+}).join('\n');
+
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -629,6 +799,7 @@ const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
+${topicUrls}
 ${prefUrls}
 </urlset>
 `;

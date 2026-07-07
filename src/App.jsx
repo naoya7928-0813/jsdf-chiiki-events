@@ -77,6 +77,21 @@ export default function App({ operator = false }) {
     setShowSplash(false);
   }, []);
 
+  // ── デスクトップ2ペイン判定（フィードバック§2-2-8） ──────────────
+  // 広い画面では一覧の余白が大きいため、一覧（左）＋詳細（右）の2ペインにする。
+  // 運営者ページは対象外。
+  const [isWide, setIsWide] = useState(() => {
+    try { return !operator && window.matchMedia('(min-width: 1000px)').matches; } catch { return false; }
+  });
+  useEffect(() => {
+    if (operator) return;
+    const mq = window.matchMedia('(min-width: 1000px)');
+    const apply = () => setIsWide(mq.matches);
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  }, [operator]);
+
   // ── ナビゲーション ────────────────────────────────────────
   const [screen,      setScreen]      = useState('home');
   const [detailEvent, setDetailEvent] = useState(null);
@@ -104,8 +119,10 @@ export default function App({ operator = false }) {
   const openDetail = useCallback((ev, backTo = 'region') => {
     setDetailEvent(ev);
     setDetailBack(backTo);
-    setScreen('detail');
-  }, []);
+    // 広い画面で一覧から開いた場合は、画面遷移せず右ペインに詳細を表示する
+    if (isWide && backTo === 'list') setScreen('list');
+    else setScreen('detail');
+  }, [isWide]);
 
   // イベント詳細から「情報の誤りを報告」: 対象イベントを引き継いで報告画面へ
   const openReportForEvent = useCallback((ev, regionKey) => {
@@ -253,11 +270,12 @@ export default function App({ operator = false }) {
     if (operator || pendingPath.current) return;
     if (popNav.current) { popNav.current = false; return; }
     let path = null;
-    if (screen === 'detail' && detailEvent?.id) path = `/event/${encodeURIComponent(detailEvent.id)}`;
+    // detail 画面、または広い画面の2ペインで右に詳細を表示中は /event/:id を反映
+    if ((screen === 'detail' || (isWide && screen === 'list')) && detailEvent?.id) path = `/event/${encodeURIComponent(detailEvent.id)}`;
     else if (screen === 'region' && mapRegionId) path = `/region/${mapRegionId}`;
     else if (ROUTE_SCREENS[screen]) path = ROUTE_SCREENS[screen];
     if (path && window.location.pathname !== path) window.history.pushState({}, '', path);
-  }, [screen, detailEvent, mapRegionId, operator]);
+  }, [screen, detailEvent, mapRegionId, operator, isWide]);
 
   // ブラウザ/スマホの戻る・進む
   useEffect(() => {
@@ -271,8 +289,9 @@ export default function App({ operator = false }) {
   useEffect(() => {
     if (operator) return;
     const base = '地本イベントナビ（非公式）';
-    document.title = (screen === 'detail' && detailEvent?.title) ? `${detailEvent.title} | ${base}` : base;
-  }, [screen, detailEvent, operator]);
+    const showingDetail = screen === 'detail' || (isWide && screen === 'list' && detailEvent);
+    document.title = (showingDetail && detailEvent?.title) ? `${detailEvent.title} | ${base}` : base;
+  }, [screen, detailEvent, operator, isWide]);
 
   // ── お気に入り ────────────────────────────────────────────
   const [favorites, setFavorites] = useState(loadFavorites);
@@ -381,8 +400,10 @@ export default function App({ operator = false }) {
     try { localStorage.removeItem('jsdf-notif-history'); } catch {}
   }, []);
 
+  // 広い画面かつ一覧表示中は 2 ペイン（一覧＋詳細）。それ以外は従来の 430px フレーム。
+  const showTwoPane = isWide && screen === 'list';
   const containerStyle = {
-    maxWidth: 430, margin: '0 auto',
+    maxWidth: showTwoPane ? 1040 : 430, margin: '0 auto',
     height: '100dvh',
     display: 'flex', flexDirection: 'column',
     position: 'relative', overflow: 'hidden',
@@ -454,19 +475,73 @@ export default function App({ operator = false }) {
       )}
 
       {screen === 'list' && (
-        <ListScreen
-          events={events} loading={loading} error={error}
-          updatedAt={updatedAt} checkedAt={checkedAt} onRefresh={refresh}
-          theme={theme}
-          region={region} onRegionChange={handleRegionChange}
-          favorites={favorites}
-          applied={applied}
-          onToggleApplied={handleToggleApplied}
-          onOpenHome={() => setScreen('home')}
-          onOpenDetail={(ev) => openDetail(ev, 'list')}
-          onOpenSettings={() => setScreen('settings')}
-          onOpenFavorites={() => setScreen('favorites')}
-        />
+        showTwoPane ? (
+          // ── デスクトップ2ペイン：左=一覧 / 右=詳細（フィードバック§2-2-8） ──
+          <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
+            <div style={{
+              width: 430, flexShrink: 0, height: '100%',
+              display: 'flex', flexDirection: 'column',
+              borderRight: '1px solid var(--border)', position: 'relative',
+            }}>
+              <ListScreen
+                events={events} loading={loading} error={error}
+                updatedAt={updatedAt} checkedAt={checkedAt} onRefresh={refresh}
+                theme={theme}
+                region={region} onRegionChange={handleRegionChange}
+                favorites={favorites}
+                applied={applied}
+                onToggleApplied={handleToggleApplied}
+                onOpenHome={() => setScreen('home')}
+                onOpenDetail={(ev) => openDetail(ev, 'list')}
+                onOpenSettings={() => setScreen('settings')}
+                onOpenFavorites={() => setScreen('favorites')}
+                selectedId={detailEvent?.id}
+              />
+            </div>
+            <div style={{ flex: 1, minWidth: 0, height: '100%', position: 'relative', background: 'var(--bg)' }}>
+              {detailEvent ? (
+                <DetailScreen
+                  key={detailEvent.id}
+                  event={detailEvent}
+                  theme={theme}
+                  favorites={favorites}
+                  applied={applied}
+                  onToggleFavorite={handleToggleFavorite}
+                  onToggleApplied={handleToggleApplied}
+                  autoApply={autoApply}
+                  onMarkApplied={handleMarkApplied}
+                  adminAuthed={adminAuthed}
+                  onEditEvent={editEventAsAdmin}
+                  onBack={() => setDetailEvent(null)}
+                  onReport={openReportForEvent}
+                />
+              ) : (
+                <div style={{
+                  height: '100%', display: 'flex', flexDirection: 'column',
+                  alignItems: 'center', justifyContent: 'center', gap: 12,
+                  color: 'var(--text-muted)', padding: 32, textAlign: 'center',
+                }}>
+                  {ICO.cal('var(--icon-muted, #9ca3af)', 44)}
+                  <div style={{ fontSize: 14 }}>左の一覧からイベントを選ぶと<br />ここに詳細が表示されます</div>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <ListScreen
+            events={events} loading={loading} error={error}
+            updatedAt={updatedAt} checkedAt={checkedAt} onRefresh={refresh}
+            theme={theme}
+            region={region} onRegionChange={handleRegionChange}
+            favorites={favorites}
+            applied={applied}
+            onToggleApplied={handleToggleApplied}
+            onOpenHome={() => setScreen('home')}
+            onOpenDetail={(ev) => openDetail(ev, 'list')}
+            onOpenSettings={() => setScreen('settings')}
+            onOpenFavorites={() => setScreen('favorites')}
+          />
+        )
       )}
 
       {screen === 'detail' && (

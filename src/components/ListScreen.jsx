@@ -40,6 +40,7 @@ export default function ListScreen({
   favorites, applied, onToggleApplied,
   onOpenHome, onOpenDetail, onOpenSettings, onOpenFavorites,
   theme,
+  selectedId,   // デスクトップ2ペイン時に右ペインで開いているイベントID（一覧で強調表示）
 }) {
   // region prop から2段タブの状態を導出
   const { regionId: activeRegionId, prefId: activePrefId } = deriveRegionAndPref(region);
@@ -593,8 +594,10 @@ export default function ListScreen({
                       style={{
                         background: 'var(--card)', margin: '0 16px 10px', borderRadius: 'var(--radius-container)', minHeight: 72,
                         cursor: 'pointer',
-                        boxShadow: '0 1px 2px rgba(11,37,69,0.04),0 2px 8px rgba(11,37,69,0.05)',
-                        border: `1px solid ${(showDl && dlDays <= 3) ? '#f9731644' : showEvent ? `${primary}33` : 'var(--border)'}`,
+                        boxShadow: selectedId === ev.id
+                          ? `0 0 0 2px ${primary}`
+                          : '0 1px 2px rgba(11,37,69,0.04),0 2px 8px rgba(11,37,69,0.05)',
+                        border: `1px solid ${selectedId === ev.id ? primary : (showDl && dlDays <= 3) ? '#f9731644' : showEvent ? `${primary}33` : 'var(--border)'}`,
                       }}>
                       <div style={{ display: 'flex', padding: '14px 16px', gap: 14 }}>
                         {/* 日付バッジ */}
