@@ -268,7 +268,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-07-08",
+      "statusUpdatedAt": "2026-07-09",
       "weatherLocation": {
         "latitude": 41.769,
         "longitude": 140.729,
@@ -374,7 +374,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-08",
+      "statusUpdatedAt": "2026-07-09",
       "weatherLocation": {
         "latitude": 39.839,
         "longitude": 141.094,
@@ -1058,7 +1058,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-08",
+      "statusUpdatedAt": "2026-07-09",
       "weatherLocation": {
         "latitude": 35.775,
         "longitude": 139.805,
@@ -1137,6 +1137,10 @@
       "source_type": "office_html",
       "address": "",
       "deadlineDate": "2026-07-08",
+      "status": "closed",
+      "statusReason": "締切日経過",
+      "statusSource": "html",
+      "statusUpdatedAt": "2026-07-09",
       "weatherLocation": {
         "latitude": 35.673,
         "longitude": 139.817,
@@ -1616,7 +1620,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-07-08",
+      "statusUpdatedAt": "2026-07-09",
       "weatherLocation": {
         "latitude": 36.566,
         "longitude": 139.884,
@@ -1655,6 +1659,78 @@
   ],
   "chiba": [],
   "niigata": [
+    {
+      "id": "ni-20260725-tqaz5",
+      "pref": "niigata",
+      "date": "2026-07-25",
+      "weekday": "土",
+      "title": "さんわ祭り",
+      "place": "三和スポーツ公園",
+      "address": "",
+      "time": "15:30～18:00",
+      "category": "地域参加",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 37.636,
+        "longitude": 138.962,
+        "label": "新潟県三条市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-09T08:17:48.514+09:00"
+      }
+    },
+    {
+      "id": "ni-20260726-b1uuq",
+      "pref": "niigata",
+      "date": "2026-07-26",
+      "weekday": "日",
+      "title": "川口まつり",
+      "place": "川口支所おまつり広場",
+      "address": "",
+      "time": "10:00～17:00",
+      "category": "地域参加",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 37.902,
+        "longitude": 139.023,
+        "label": "新潟県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-09T08:17:49.200+09:00"
+      }
+    },
+    {
+      "id": "ni-20260801-xdck1",
+      "pref": "niigata",
+      "date": "2026-08-01",
+      "weekday": "土",
+      "title": "高田駐屯地サマーフレンドシップキャンペーン２０２６ｉｎパティオ",
+      "place": "上越ウィングマーケットセンター パティオ",
+      "address": "",
+      "time": "10:00～16:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 37.148,
+        "longitude": 138.236,
+        "label": "新潟県上越市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-09T08:17:49.629+09:00"
+      }
+    },
     {
       "id": "ni-off-20260718-cbdrt",
       "pref": "niigata",
@@ -2177,31 +2253,6 @@
     }
   ],
   "aichi": [
-    {
-      "id": "ai-20260708-bee4z",
-      "pref": "aichi",
-      "date": "2026-07-08",
-      "weekday": "水",
-      "title": "自衛官等募集用ポスターデザインコンテスト応募締切",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "イベント",
-      "ageRequirement": null,
-      "deadline": null,
-      "endDate": null,
-      "weatherLocation": {
-        "latitude": 35.18,
-        "longitude": 136.907,
-        "label": "愛知県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
-      }
-    },
     {
       "id": "ai-20260710-tqwmu",
       "pref": "aichi",
@@ -4079,7 +4130,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-07-08"
+      "statusUpdatedAt": "2026-07-09"
     },
     {
       "id": "os-office-20260718-scxu6",
@@ -4359,7 +4410,34 @@
       }
     }
   ],
-  "wakayama": [],
+  "wakayama": [
+    {
+      "id": "wa-off-20260820-nh9c1",
+      "pref": "wakayama",
+      "date": "2026-08-20",
+      "weekday": "木",
+      "title": "女性のための駐屯地見学 伊丹駐屯地・千僧駐屯地へGO!!",
+      "place": "伊丹駐屯地・千僧駐屯地",
+      "address": "",
+      "time": "09:30～15:00",
+      "category": "体験",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/wakayama/2020/wp-content/uploads/2026/07/671e8927bd06cc65c767525471de420e-1-443x640.jpg",
+      "notes": "定員になり次第締切",
+      "ageRequirement": "15歳〜32歳までの女性",
+      "deadline": "7月28日（火）",
+      "source_type": "office_ocr",
+      "deadlineDate": "2026-07-28",
+      "weatherLocation": {
+        "latitude": 34.226,
+        "longitude": 135.167,
+        "label": "和歌山県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-07-09T08:17:49.967+09:00"
+      }
+    }
+  ],
   "ehime": [
     {
       "id": "em-20260711-3o53y",
@@ -5146,7 +5224,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-08",
+      "statusUpdatedAt": "2026-07-09",
       "weatherLocation": {
         "latitude": 32.803,
         "longitude": 130.708,
@@ -5331,5 +5409,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/08 19:41"
+  "updatedAt": "2026/07/09 08:17"
 }
