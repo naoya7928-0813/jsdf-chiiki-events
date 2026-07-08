@@ -1069,36 +1069,6 @@
       }
     },
     {
-      "id": "t-20260731-gzr9l",
-      "pref": "tokyo",
-      "date": "2026-07-31",
-      "weekday": "金",
-      "title": "入間基地見学",
-      "place": "新小岩募集案内所",
-      "time": "16:00～",
-      "category": "体験",
-      "tag": "",
-      "ageRequirement": "17歳～32歳",
-      "deadline": "6月22日（月）",
-      "url": "https://www.mod.go.jp/pco/tokyo/shinkoiwa/index.html#0731",
-      "notes": "・基地見学\n・航空機見学\n・体験喫食\n応募締切: 応募終了しました。\n応募多数の場合、抽選。お食事代514円。",
-      "source_type": "office_html",
-      "address": "",
-      "deadlineDate": "2026-06-22",
-      "status": "closed",
-      "statusReason": "受付終了告知",
-      "statusSource": "html",
-      "statusUpdatedAt": "2026-07-08",
-      "weatherLocation": {
-        "latitude": 35.694,
-        "longitude": 139.704,
-        "label": "東京都新宿区",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-29T16:31:20.866+09:00"
-      }
-    },
-    {
       "id": "t-20260803-66pdi",
       "pref": "tokyo",
       "date": "2026-08-03",
@@ -1174,6 +1144,57 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-02T08:50:36.640+09:00"
+      }
+    },
+    {
+      "id": "t-20260805-b6pgo",
+      "pref": "tokyo",
+      "date": "2026-08-05",
+      "weekday": "水",
+      "title": "イオンモール日の出 サマーフェア",
+      "place": "福生募集案内所",
+      "time": "10:00～15:00",
+      "category": "体験",
+      "tag": "",
+      "ageRequirement": "16歳～32歳",
+      "deadline": null,
+      "url": "https://www.mod.go.jp/pco/tokyo/fussa/index.html#0805",
+      "notes": "・射的ゲーム\n・握力チャレンジ\n・制服試着体験\n・自衛隊偵察用ゴムボート展示\n応募締切: 当日参加可能\n16歳～32歳限定特典有",
+      "source_type": "office_html",
+      "address": "",
+      "weatherLocation": {
+        "latitude": 35.738,
+        "longitude": 139.327,
+        "label": "東京都福生市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-08T14:27:38.825+09:00"
+      }
+    },
+    {
+      "id": "t-20260809-iew9z",
+      "pref": "tokyo",
+      "date": "2026-08-09",
+      "weekday": "日",
+      "title": "LUXURY FLIGHT2026",
+      "place": "大田出張所",
+      "time": "午前10:30～11:30、午後13:30～14:30",
+      "category": "記念行事",
+      "tag": "",
+      "ageRequirement": "どなたでも参加可能",
+      "deadline": "8月3日（月）",
+      "url": "https://www.mod.go.jp/pco/tokyo/oota/event.html#0809",
+      "notes": "・パイロットによるトークショー\n・記念写真撮影会\n事前予約制",
+      "source_type": "office_html",
+      "address": "",
+      "deadlineDate": "2026-08-03",
+      "weatherLocation": {
+        "latitude": 35.561,
+        "longitude": 139.716,
+        "label": "東京都大田区",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-08T14:27:39.404+09:00"
       }
     },
     {
@@ -1581,7 +1602,7 @@
       "date": "2026-07-18",
       "weekday": "土",
       "title": "西那須野ふれあいまつり",
-      "place": "JR西那須野駅西口駅前、駅前通り、要町通り、桜通り、水源通り、市営西大和駐車場、",
+      "place": "JR西那須野駅西口駅前、駅前通り、要町通り、桜通り、水源通り、市営西大和駐車場、歩行者天国",
       "address": "",
       "time": "15:00～21:00",
       "category": "地域参加",
@@ -1602,7 +1623,7 @@
         "label": "栃木県",
         "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-07-03T20:01:30.261+09:00"
+        "geocodedAt": "2026-06-28T22:18:21.449+09:00"
       }
     }
   ],
@@ -1936,6 +1957,30 @@
       }
     },
     {
+      "id": "na-20260718-zu6xe",
+      "pref": "nagano",
+      "date": "2026-07-18",
+      "weekday": "土",
+      "title": "長野駅前広報",
+      "place": "長野駅",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "14時～20時の間に長野駅東自由通路にて行います！",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.649,
+        "longitude": 138.195,
+        "label": "長野県長野市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-08T14:27:39.776+09:00"
+      }
+    },
+    {
       "id": "na-20260718-hm0w8",
       "pref": "nagano",
       "date": "2026-07-18",
@@ -1981,6 +2026,30 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:26.996+09:00"
+      }
+    },
+    {
+      "id": "na-20260726-1aawe",
+      "pref": "nagano",
+      "date": "2026-07-26",
+      "weekday": "日",
+      "title": "【長野市】公務員合同説明会",
+      "place": "シャトレーゼ シャトレーゼホテル長野店",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "【開催時間】 開場・受付 09:45 説明会 10:00～13:30 【参加団体】 防衛省（一般職） 防衛省自衛隊 法務省長野刑務所 長野県庁（総合土木職） 長野県警察 千曲市 須坂市 野沢温泉村 長野市消防局 須坂市消防本部 【事前予約】 2026.7.26公務員合同説明会 - Google フォーム",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-08T14:27:40.144+09:00"
       }
     },
     {
@@ -3908,12 +3977,12 @@
       }
     },
     {
-      "id": "ky-set-20260721-h0ypv",
+      "id": "ky-set-20260721-inji8",
       "pref": "kyoto",
       "date": "2026-07-21",
       "weekday": "火",
       "title": "自衛官 就職・進学説明会",
-      "place": "京都募集案内所",
+      "place": "ハローワーク伏見",
       "address": "",
       "time": "11:00～15:00",
       "category": "説明会",
@@ -3923,12 +3992,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.012,
-        "longitude": 135.768,
-        "label": "京都府京都市",
+        "latitude": 35.021,
+        "longitude": 135.756,
+        "label": "京都府",
         "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:30.519+09:00"
+        "geocodedAt": "2026-07-08T14:27:40.505+09:00"
       }
     },
     {
@@ -5258,5 +5327,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/08 08:23"
+  "updatedAt": "2026/07/08 14:27"
 }
