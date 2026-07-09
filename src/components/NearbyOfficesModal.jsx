@@ -23,7 +23,6 @@ const GREEN       = '#00e060';
 const RADAR_PX    = 244;
 const RADAR_R     = RADAR_PX / 2;
 const DRAMATIC_MS = 2800;
-const STAGGER_MS  = 160;
 const SWEEP_MS    = 2500;  // CSS animation と同期
 const INTRO_KEY   = 'jsdf-nearby-intro-seen';
 
@@ -42,17 +41,17 @@ const MODAL_CSS = `
   45%  { transform: translate(-50%,-50%) scale(2.8); opacity: 1; }
   100% { transform: translate(-50%,-50%) scale(1);   opacity: 1; }
 }
-/* スイープアーム通過時フラッシュ（グリーン） */
+/* スイープアーム通過時フラッシュ（グリーンのみ・白い光は使わない） */
 @keyframes blip-pass {
   0%   { box-shadow: 0 0 18px 8px #00e060ff, 0 0 36px 16px #00e06088; opacity: 1; }
   10%  { box-shadow: 0 0 10px 4px #00e060cc; opacity: 0.95; }
-  100% { box-shadow: 0 0 2px  1px #00e06033; opacity: 0.48; }
+  100% { box-shadow: 0 0 2px  1px #00e06033; opacity: 0.55; }
 }
-/* スイープアーム通過時フラッシュ（白・最近傍） */
-@keyframes blip-pass-top {
-  0%   { box-shadow: 0 0 18px 8px #ffffffee, 0 0 36px 16px #ffffff77; opacity: 1; }
-  10%  { box-shadow: 0 0 10px 4px #ffffffcc; opacity: 0.95; }
-  100% { box-shadow: 0 0 2px  1px #ffffff55; opacity: 0.7; }
+/* 最近傍を少し強めに光らせる（同じくグリーン） */
+@keyframes blip-pass-strong {
+  0%   { box-shadow: 0 0 22px 10px #00e060ff, 0 0 44px 20px #00e060aa; opacity: 1; }
+  10%  { box-shadow: 0 0 12px 5px #00e060dd; opacity: 0.97; }
+  100% { box-shadow: 0 0 3px  1px #00e06044; opacity: 0.7; }
 }
 /* JPN ラベル出現 */
 @keyframes blip-label-appear {
@@ -60,7 +59,7 @@ const MODAL_CSS = `
   to   { opacity: 0.9; transform: translate(-50%, 0) scale(1); }
 }
 @keyframes center-pulse {
-  0%,100% { box-shadow: 0 0 0  0px #ffffff50, 0 0 8px  #00e06070; }
+  0%,100% { box-shadow: 0 0 0  0px #00e06060, 0 0 8px  #00e06070; }
   50%      { box-shadow: 0 0 0  7px transparent, 0 0 14px #00e060cc; }
 }
 @keyframes status-in {
@@ -95,6 +94,38 @@ function normDist(km) {
 
 function lsGet(k)   { try { return localStorage.getItem(k);   } catch { return null; } }
 function lsSet(k,v) { try { localStorage.setItem(k, v);        } catch {} }
+
+// 端末の向き（コンパス方位）を一度だけ取得する。取得できなければ null。
+// iOS(13+) は要許可（ユーザー操作起点で呼ぶこと）。方位＝端末上端が指す向き（0=北, 時計回り）。
+function captureHeading() {
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined' || typeof window.DeviceOrientationEvent === 'undefined') return resolve(null);
+    let done = false;
+    const finish = (v) => {
+      if (done) return; done = true;
+      window.removeEventListener('deviceorientationabsolute', handler);
+      window.removeEventListener('deviceorientation', handler);
+      resolve(v);
+    };
+    const handler = (e) => {
+      let h = null;
+      if (typeof e.webkitCompassHeading === 'number') h = e.webkitCompassHeading;       // iOS: 磁北からの時計回り
+      else if (e.alpha != null && (e.absolute || e.absolute === undefined)) h = (360 - e.alpha) % 360; // その他: alpha から換算
+      if (h != null) finish(((h % 360) + 360) % 360);
+    };
+    const attach = () => {
+      window.addEventListener('deviceorientationabsolute', handler, true);
+      window.addEventListener('deviceorientation', handler, true);
+      setTimeout(() => finish(null), 1200); // 取得できなければ諦める
+    };
+    const D = window.DeviceOrientationEvent;
+    if (typeof D.requestPermission === 'function') {
+      D.requestPermission().then(s => (s === 'granted' ? attach() : resolve(null))).catch(() => resolve(null));
+    } else {
+      attach();
+    }
+  });
+}
 
 // ─── Web Audio ソナーエンジン ─────────────────────────────────
 class SonarAudio {
@@ -155,6 +186,8 @@ export default function NearbyOfficesModal({ isOpen, onClose, theme }) {
   const [nearby,   setNearby]   = useState([]);
   const [userPos,  setUserPos]  = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
+  // レーダーの方角オフセット（0=北が上。端末の向き設定時はコンパス方位を入れる）
+  const [headingOffset, setHeadingOffset] = useState(0);
 
   const abortRef    = useRef(false);
   const timerRef    = useRef(null);    // dramatic → found のタイマー
@@ -189,10 +222,15 @@ export default function NearbyOfficesModal({ isOpen, onClose, theme }) {
     setNearby([]);
     setUserPos(null);
     setErrorMsg('');
+    setHeadingOffset(0);
 
     // サウンド開始
     if (!audioRef.current) audioRef.current = new SonarAudio();
     startSweep();
+
+    // レーダーの方角設定。「端末の向き」なら方位センサーを（この操作起点で）取得開始する。
+    const orientation = lsGet('jsdf-radar-orientation') === 'heading' ? 'heading' : 'north';
+    const headingPromise = orientation === 'heading' ? captureHeading() : Promise.resolve(null);
 
     const officesPromise = fetchOfficesData().catch(() => null);
 
@@ -226,6 +264,11 @@ export default function NearbyOfficesModal({ isOpen, onClose, theme }) {
           }))
           .sort((a, b) => a.dist - b.dist)
           .slice(0, 15);
+
+        // 端末の向き（取得できた場合のみ）をレーダーの回転オフセットに反映
+        const hRaw = await headingPromise;
+        if (abortRef.current) return;
+        setHeadingOffset(orientation === 'heading' && hRaw != null ? hRaw : 0);
 
         setUserPos({ lat, lng });
         setNearby(sorted);
@@ -350,7 +393,7 @@ export default function NearbyOfficesModal({ isOpen, onClose, theme }) {
         {/* コンテンツ */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '0 16px 48px' }}>
           {phase === 'intro'  && <IntroView onConfirm={handleIntroConfirm} onCancel={onClose} primary={primary} />}
-          {showRadar          && <RadarScreen phase={phase} nearby={nearby} />}
+          {showRadar          && <RadarScreen phase={phase} nearby={nearby} headingOffset={headingOffset} />}
           {phase === 'found'  && <OfficeList offices={nearby} primary={primary} />}
           {phase === 'denied' && <DeniedView onRetry={startLocating} primary={primary} />}
           {phase === 'error'  && <ErrorView  msg={errorMsg} onRetry={startLocating} primary={primary} />}
@@ -424,14 +467,14 @@ function IntroView({ onConfirm, onCancel, primary }) {
 // ─────────────────────────────────────────────────────────────────
 // RadarScreen
 // ─────────────────────────────────────────────────────────────────
-function RadarScreen({ phase, nearby }) {
+function RadarScreen({ phase, nearby, headingOffset }) {
   const isDramatic = phase === 'dramatic';
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center',
       padding: '18px 0 28px',
     }}>
-      <RadarCircle blips={isDramatic ? nearby : []} />
+      <RadarCircle blips={isDramatic ? nearby : []} headingOffset={headingOffset || 0} />
 
       <div key={phase} style={{ marginTop: 22, textAlign: 'center', animation: 'status-in 0.4s ease-out' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontSize: 15, fontWeight: 700, color: GREEN, letterSpacing: 0.4, lineHeight: 1.4 }}>
@@ -450,7 +493,7 @@ function RadarScreen({ phase, nearby }) {
 // ─────────────────────────────────────────────────────────────────
 // RadarCircle — グリーンレーダー
 // ─────────────────────────────────────────────────────────────────
-function RadarCircle({ blips }) {
+function RadarCircle({ blips, headingOffset = 0 }) {
   return (
     <div style={{
       width: RADAR_PX, height: RADAR_PX,
@@ -507,39 +550,41 @@ function RadarCircle({ blips }) {
         zIndex: 3,
       }} />
 
-      {/* 施設ブリップ（結果件数分）＋ JPN ラベル */}
+      {/* 施設ブリップ（結果件数分）＋ JPN ラベル。
+          ・現在地からの実際の方位（＋端末の向きオフセット）に配置する
+          ・スイープアームがその方位に到達した瞬間に出現し、以後は通過ごとに光る（白い光は使わない） */}
       {blips.flatMap((o, i) => {
         if (o.lat == null || o.lng == null) return [];
         const toRad  = d => d * Math.PI / 180;
+        // 表示方位＝地理方位 − 端末の向き（北が上のときは headingOffset=0）
+        const disp   = (((o.bearing - headingOffset) % 360) + 360) % 360;
         const nr     = normDist(o.dist) * RADAR_R;
-        const bx     = nr * Math.sin(toRad(o.bearing));
-        const by     = -nr * Math.cos(toRad(o.bearing));
+        const bx     = nr * Math.sin(toRad(disp));
+        const by     = -nr * Math.cos(toRad(disp));
         const cx     = RADAR_R + bx;
         const cy     = RADAR_R + by;
-        const isTop  = i === 0;
-        const dotD   = isTop ? 9 : 7;
+        const isNearest = i === 0;
+        const dotD   = isNearest ? 9 : 7;
         const dotR   = dotD / 2;
 
-        // アームが方位角に到達するタイミングを計算
-        const appearsAt = i * STAGGER_MS;
-        const basePass  = (o.bearing / 360) * SWEEP_MS;
-        // ブリップが出現した後の最初のアーム通過を待つ
-        const passDelay = basePass >= appearsAt ? basePass : basePass + SWEEP_MS;
-        const passKf    = isTop ? 'blip-pass-top' : 'blip-pass';
+        // スイープアームがこの方位に達する時刻（0deg=上=北から時計回り）。
+        // この時刻に出現させ、以後 SWEEP_MS ごとの通過で光らせる。
+        const passTime = (disp / 360) * SWEEP_MS;
+        const passKf   = isNearest ? 'blip-pass-strong' : 'blip-pass';
 
         return [
-          // ブリップ本体
+          // ブリップ本体（グリーンのみ）
           <div key={`d${o.id}`} style={{
             position: 'absolute',
             left: cx, top: cy,
             width: dotD, height: dotD,
             borderRadius: '50%',
-            background: isTop ? '#ffffff' : GREEN,
+            background: GREEN,
             transform: 'translate(-50%, -50%) scale(0)',
             opacity: 0,
             animation: [
-              `blip-appear 0.45s ease-out ${appearsAt}ms forwards`,
-              `${passKf} ${SWEEP_MS}ms linear ${passDelay}ms infinite`,
+              `blip-appear 0.4s ease-out ${passTime}ms forwards`,
+              `${passKf} ${SWEEP_MS}ms linear ${passTime}ms infinite`,
             ].join(', '),
             zIndex: 10,
           }} />,
@@ -551,9 +596,9 @@ function RadarCircle({ blips }) {
             top: cy + dotR + 2,
             transform: 'translate(-50%, 0) scale(0.7)',
             opacity: 0,
-            animation: `blip-label-appear 0.3s ease-out ${appearsAt + 250}ms forwards`,
+            animation: `blip-label-appear 0.3s ease-out ${passTime + 200}ms forwards`,
             fontSize: 6,
-            color: isTop ? 'rgba(255,255,255,0.92)' : `${GREEN}dd`,
+            color: `${GREEN}dd`,
             fontFamily: 'monospace',
             fontWeight: 900,
             letterSpacing: 1.5,
@@ -561,17 +606,15 @@ function RadarCircle({ blips }) {
             zIndex: 10,
             pointerEvents: 'none',
             lineHeight: 1,
-            textShadow: isTop
-              ? '0 0 5px rgba(255,255,255,0.7)'
-              : `0 0 5px ${GREEN}99`,
+            textShadow: `0 0 5px ${GREEN}99`,
           }}>JPN</div>,
         ];
       })}
 
-      {/* 中心点（現在地） */}
+      {/* 中心点（現在地）＝グリーン（白い光は使わない） */}
       <div style={{
         position: 'absolute', left: '50%', top: '50%',
-        width: 7, height: 7, borderRadius: '50%', background: '#ffffff',
+        width: 7, height: 7, borderRadius: '50%', background: GREEN,
         transform: 'translate(-50%, -50%)',
         animation: 'center-pulse 2.2s ease-in-out infinite',
         zIndex: 20,

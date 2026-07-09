@@ -2,6 +2,7 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { ICO } from './Icons';
 import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle, StatusBadge } from './Shared';
 import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, weekendRange, matchesTag, APPLIED_TAG_ID, ENDED_TAG_ID } from './FilterBar';
+import CalendarView from './CalendarView';
 import { daysUntil, deadlineDaysUntil, daysLabel, daysColor } from '../utils/date';
 import { REGIONS, SUPPORTED_PREFECTURES, PREFECTURE_INFO, NEIGHBORS } from '../data/regionMap';
 
@@ -162,6 +163,12 @@ export default function ListScreen({
       return next;
     });
   };
+
+  // ── 表示形式（カード / カレンダー）── 設定画面で選択・保持する（localStorage）。
+  // マウント時に読み込む（設定変更後に一覧へ戻ると再マウントされ反映される）。
+  const [viewMode] = useState(() => {
+    try { return localStorage.getItem('jsdf-view-mode') === 'calendar' ? 'calendar' : 'card'; } catch { return 'card'; }
+  });
 
   // ── 免責バナー 折り畳み ──────────────────────────────────
   // 初回のみ全文表示し、以降は1行に畳む（詳細画面に免責文言があるため役割は保たれる）。
@@ -550,6 +557,17 @@ export default function ListScreen({
 
         {/* 初回ローディング中はスピナー（既にデータがある場合は出さない） */}
         {loading && list.length === 0 ? <Spinner primary={primary} /> : (
+          viewMode === 'calendar' ? (
+            <CalendarView
+              events={filteredList}
+              onOpenDetail={onOpenDetail}
+              primary={primary}
+              accent={accent}
+              favorites={favorites}
+              applied={applied}
+              activePrefId={activePrefId}
+            />
+          ) :
           Object.keys(filteredGrouped).length === 0 ? (
             <EmptyState
               searchQuery={searchQuery}
