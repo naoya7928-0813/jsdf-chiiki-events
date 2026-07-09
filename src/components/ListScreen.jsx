@@ -2,6 +2,7 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { ICO } from './Icons';
 import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle, StatusBadge } from './Shared';
 import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, weekendRange, matchesTag, APPLIED_TAG_ID, ENDED_TAG_ID } from './FilterBar';
+import CalendarView from './CalendarView';
 import { daysUntil, deadlineDaysUntil, daysLabel, daysColor } from '../utils/date';
 import { REGIONS, SUPPORTED_PREFECTURES, PREFECTURE_INFO, NEIGHBORS } from '../data/regionMap';
 
@@ -161,6 +162,15 @@ export default function ListScreen({
       try { localStorage.setItem('jsdf-filter-open', String(next)); } catch {}
       return next;
     });
+  };
+
+  // ── 表示形式（カード / カレンダー）── 利用者ごとに選択・保持する
+  const [viewMode, setViewMode] = useState(() => {
+    try { return localStorage.getItem('jsdf-view-mode') === 'calendar' ? 'calendar' : 'card'; } catch { return 'card'; }
+  });
+  const changeViewMode = (mode) => {
+    setViewMode(mode);
+    try { localStorage.setItem('jsdf-view-mode', mode); } catch {}
   };
 
   // ── 免責バナー 折り畳み ──────────────────────────────────
@@ -545,11 +555,52 @@ export default function ListScreen({
         </div>
       )}
 
+      {/* ── 表示形式の切り替え（カード / カレンダー）── */}
+      <div style={{
+        display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8,
+        padding: '8px 16px 4px', flexShrink: 0,
+      }}>
+        <div style={{ display: 'inline-flex', background: 'var(--tag-bg)', borderRadius: 8, padding: 2 }}>
+          {[
+            { id: 'card', label: 'カード', icon: ICO.cardsView },
+            { id: 'calendar', label: 'カレンダー', icon: ICO.cal },
+          ].map(v => {
+            const on = viewMode === v.id;
+            return (
+              <button key={v.id} onClick={() => changeViewMode(v.id)}
+                aria-label={`${v.label}表示`} aria-pressed={on}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  border: 'none', cursor: 'pointer', borderRadius: 6, padding: '5px 11px',
+                  fontFamily: F.sans, fontSize: 12, fontWeight: on ? 700 : 500,
+                  background: on ? 'var(--card)' : 'transparent',
+                  color: on ? primary : 'var(--text-muted)',
+                  boxShadow: on ? '0 1px 2px rgba(0,0,0,0.08)' : 'none',
+                }}>
+                {v.icon(on ? primary : 'var(--icon-muted)', 14)}
+                <span>{v.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       <div ref={listScrollRef} style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 60px)' }}>
         <ErrorBanner message={error} />
 
         {/* 初回ローディング中はスピナー（既にデータがある場合は出さない） */}
         {loading && list.length === 0 ? <Spinner primary={primary} /> : (
+          viewMode === 'calendar' ? (
+            <CalendarView
+              events={filteredList}
+              onOpenDetail={onOpenDetail}
+              primary={primary}
+              accent={accent}
+              favorites={favorites}
+              applied={applied}
+              activePrefId={activePrefId}
+            />
+          ) :
           Object.keys(filteredGrouped).length === 0 ? (
             <EmptyState
               searchQuery={searchQuery}
