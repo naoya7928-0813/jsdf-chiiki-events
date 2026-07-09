@@ -231,6 +231,14 @@
     "source": "gsi",
     "geocodedAt": "2026-07-02T20:06:06.394+09:00"
   },
+  "fukuoka||柳川地域事務所": {
+    "latitude": 33.163,
+    "longitude": 130.406,
+    "label": "福岡県柳川市",
+    "accuracy": "venue",
+    "source": "gsi",
+    "geocodedAt": "2026-07-10T08:35:10.076+09:00"
+  },
   "fukuoka||航空自衛隊 芦屋基地、陸上自衛隊 崎辺分屯地、海上自衛隊 佐世保地区・大村航空基地": {
     "latitude": 33.606,
     "longitude": 130.418,
@@ -1335,6 +1343,14 @@
     "source": "gsi",
     "geocodedAt": "2026-06-28T22:18:37.226+09:00"
   },
+  "saga||防衛省陸上自衛隊佐賀駐屯地": {
+    "latitude": 33.249,
+    "longitude": 130.299,
+    "label": "佐賀県",
+    "accuracy": "venue",
+    "source": "gsi",
+    "geocodedAt": "2026-07-10T08:35:10.468+09:00"
+  },
   "saitama||": {
     "latitude": 35.857,
     "longitude": 139.649,
@@ -1902,6 +1918,14 @@
     "accuracy": "venue",
     "source": "gsi",
     "geocodedAt": "2026-07-09T15:17:23.302+09:00"
+  },
+  "yamaguchi|防府市佐波二丁目11番25号|防府市消防本部": {
+    "latitude": 34.057,
+    "longitude": 131.563,
+    "label": "山口県防府市",
+    "accuracy": "address",
+    "source": "gsi",
+    "geocodedAt": "2026-07-10T08:35:08.688+09:00"
   },
   "yamanashi||": {
     "latitude": 35.664,

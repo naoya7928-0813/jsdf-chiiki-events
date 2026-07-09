@@ -316,7 +316,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-07-09",
+      "statusUpdatedAt": "2026-07-10",
       "weatherLocation": {
         "latitude": 41.769,
         "longitude": 140.729,
@@ -422,7 +422,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-09",
+      "statusUpdatedAt": "2026-07-10",
       "weatherLocation": {
         "latitude": 39.839,
         "longitude": 141.094,
@@ -482,30 +482,6 @@
     }
   ],
   "yamagata": [
-    {
-      "id": "ya-20260709-vut98",
-      "pref": "yamagata",
-      "date": "2026-07-09",
-      "weekday": "木",
-      "title": "ｶﾞｲﾀﾞﾝｽ「米沢業界研究会」",
-      "place": "米沢市 グランドホクヨウ米沢",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 37.922,
-        "longitude": 140.116,
-        "label": "山形県米沢市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:14.786+09:00"
-      }
-    },
     {
       "id": "ya-20260711-owoql",
       "pref": "yamagata",
@@ -1106,7 +1082,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-09",
+      "statusUpdatedAt": "2026-07-10",
       "weatherLocation": {
         "latitude": 35.775,
         "longitude": 139.805,
@@ -1159,6 +1135,10 @@
       "source_type": "office_html",
       "address": "",
       "deadlineDate": "2026-07-09",
+      "status": "closed",
+      "statusReason": "締切日経過",
+      "statusSource": "html",
+      "statusUpdatedAt": "2026-07-10",
       "weatherLocation": {
         "latitude": 35.69,
         "longitude": 139.692,
@@ -1188,7 +1168,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-09",
+      "statusUpdatedAt": "2026-07-10",
       "weatherLocation": {
         "latitude": 35.673,
         "longitude": 139.817,
@@ -1294,7 +1274,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-09",
+      "statusUpdatedAt": "2026-07-10",
       "weatherLocation": {
         "latitude": 35.646,
         "longitude": 139.653,
@@ -2024,7 +2004,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-07-09",
+      "statusUpdatedAt": "2026-07-10",
       "weatherLocation": {
         "latitude": 36.566,
         "longitude": 139.884,
@@ -2413,27 +2393,27 @@
   "yamanashi": [],
   "nagano": [
     {
-      "id": "na-20260718-hm0w8",
+      "id": "na-20260718-uimr5",
       "pref": "nagano",
       "date": "2026-07-18",
       "weekday": "土",
-      "title": "【松本市】公務員合同説明会",
-      "place": "イオンモール松本 「風庭」エリア",
+      "title": "【伊那市】自衛隊採用説明会",
+      "place": "中部森林管理局 南信森林管理署",
       "address": "",
       "time": "",
       "category": "説明会",
       "tag": "",
       "url": "",
-      "notes": "場所：イオンモール松本 風庭２F イオンホール 時間：１１：００～１６：００ (１５：４０受付終了) 内容：「公務員ってなにしてるの？」その疑問を解決！ 自衛隊、防衛省職員、長野県警、北アルプス消防、木曽広域消防、松本市役所、安曇野市役所、大町市役所 合同により、公務員の仕事内容、生活、ワークライフバランス、待遇等わかりやすく説明させていただきます。",
+      "notes": "自衛隊採用説明会 １０：００～１２：００ 説明内容 ・自衛隊の概要 ・自衛隊の職種、職域 ・福利厚生など 気軽にお立ち寄りください",
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
+        "latitude": 35.635,
+        "longitude": 137.946,
         "label": "長野県",
         "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-07-03T20:01:30.984+09:00"
+        "geocodedAt": "2026-07-03T20:01:31.351+09:00"
       }
     },
     {
@@ -2461,27 +2441,27 @@
       }
     },
     {
-      "id": "na-20260718-uimr5",
+      "id": "na-20260718-hm0w8",
       "pref": "nagano",
       "date": "2026-07-18",
       "weekday": "土",
-      "title": "【伊那市】自衛隊採用説明会",
-      "place": "中部森林管理局 南信森林管理署",
+      "title": "【松本市】公務員合同説明会",
+      "place": "イオンモール松本 「風庭」エリア",
       "address": "",
       "time": "",
       "category": "説明会",
       "tag": "",
       "url": "",
-      "notes": "自衛隊採用説明会 １０：００～１２：００ 説明内容 ・自衛隊の概要 ・自衛隊の職種、職域 ・福利厚生など 気軽にお立ち寄りください",
+      "notes": "場所：イオンモール松本 風庭２F イオンホール 時間：１１：００～１６：００ (１５：４０受付終了) 内容：「公務員ってなにしてるの？」その疑問を解決！ 自衛隊、防衛省職員、長野県警、北アルプス消防、木曽広域消防、松本市役所、安曇野市役所、大町市役所 合同により、公務員の仕事内容、生活、ワークライフバランス、待遇等わかりやすく説明させていただきます。",
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.635,
-        "longitude": 137.946,
+        "latitude": 36.651,
+        "longitude": 138.181,
         "label": "長野県",
         "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-07-03T20:01:31.351+09:00"
+        "geocodedAt": "2026-07-03T20:01:30.984+09:00"
       }
     },
     {
@@ -4534,7 +4514,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-07-09"
+      "statusUpdatedAt": "2026-07-10"
     },
     {
       "id": "os-office-20260718-scxu6",
@@ -5433,30 +5413,6 @@
   ],
   "hiroshima": [
     {
-      "id": "hi-20260709-ftnnc",
-      "pref": "hiroshima",
-      "date": "2026-07-09",
-      "weekday": "木",
-      "title": "第４１回防衛問題セミナー開催（防衛省中国四国防衛局主催）",
-      "place": "",
-      "address": "",
-      "time": "18:00～19:45",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/hiroshima/events/3603/",
-      "notes": "定員530名、事前申込",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 34.397,
-        "longitude": 132.46,
-        "label": "広島県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      }
-    },
-    {
       "id": "hi-20260717-cbah2",
       "pref": "hiroshima",
       "date": "2026-07-17",
@@ -5673,9 +5629,59 @@
         "source": "gsi",
         "geocodedAt": "2026-07-09T15:17:24.419+09:00"
       }
+    },
+    {
+      "id": "ya-off-20260718-4yssp",
+      "pref": "yamaguchi",
+      "date": "2026-07-18",
+      "weekday": "土",
+      "title": "警察・消防・自衛隊",
+      "place": "防府市消防本部",
+      "address": "防府市佐波二丁目11番25号",
+      "time": "09:00～12:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/yamaguchi/setumeikai_yama080718.pdf",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 34.057,
+        "longitude": 131.563,
+        "label": "山口県防府市",
+        "accuracy": "address",
+        "source": "gsi",
+        "geocodedAt": "2026-07-10T08:35:08.688+09:00"
+      }
     }
   ],
   "fukuoka": [
+    {
+      "id": "fu-off-20260712-440rp",
+      "pref": "fukuoka",
+      "date": "2026-07-12",
+      "weekday": "日",
+      "title": "陸・海・空 自衛隊 就職・転職説明会",
+      "place": "柳川地域事務所",
+      "address": "",
+      "time": "10:00～16:00",
+      "category": "採用イベント",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/fukuoka/recruit/recruiting-fair/images/2024/8.7.9yanagawa.pdf",
+      "notes": "事前予約制",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 33.163,
+        "longitude": 130.406,
+        "label": "福岡県柳川市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-10T08:35:10.076+09:00"
+      }
+    },
     {
       "id": "fu-off-20260808-bjxbc",
       "pref": "fukuoka",
@@ -5725,6 +5731,31 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:37.226+09:00"
+      }
+    },
+    {
+      "id": "sa-off-20260720-hw17x",
+      "pref": "saga",
+      "date": "2026-07-20",
+      "weekday": "月・祝",
+      "title": "防衛省職員（任期付自衛官）募集要項",
+      "place": "防衛省陸上自衛隊佐賀駐屯地",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/saga/img_index/bn/yukoutai_bosyuuyoukou.pdf",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 33.249,
+        "longitude": 130.299,
+        "label": "佐賀県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-10T08:35:10.468+09:00"
       }
     }
   ],
@@ -5821,7 +5852,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-09",
+      "statusUpdatedAt": "2026-07-10",
       "weatherLocation": {
         "latitude": 32.803,
         "longitude": 130.708,
@@ -6006,5 +6037,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/09 20:22"
+  "updatedAt": "2026/07/10 08:35"
 }
