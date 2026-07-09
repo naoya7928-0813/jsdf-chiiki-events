@@ -26,6 +26,16 @@ export default function SettingsScreen({
   const [sourceOpen,  setSourceOpen]  = useState(false);
   const [updatesOpen, setUpdatesOpen] = useState(false);
 
+  // ── 表示設定（localStorage 直読み・直書き。一覧/近隣モーダルが参照） ──
+  const [viewMode, setViewMode] = useState(() => {
+    try { return localStorage.getItem('jsdf-view-mode') === 'calendar' ? 'calendar' : 'card'; } catch { return 'card'; }
+  });
+  const [radarOri, setRadarOri] = useState(() => {
+    try { return localStorage.getItem('jsdf-radar-orientation') === 'heading' ? 'heading' : 'north'; } catch { return 'north'; }
+  });
+  const changeViewMode = (v) => { setViewMode(v); try { localStorage.setItem('jsdf-view-mode', v); } catch {} };
+  const changeRadarOri = (v) => { setRadarOri(v); try { localStorage.setItem('jsdf-radar-orientation', v); } catch {} };
+
   // ── 掲載元: 各地本の事務所一覧（offices.json を遅延ロード） ──────
   const [offices,   setOffices]   = useState(null);   // null=未取得 / []=取得失敗
   const [openHqs,   setOpenHqs]   = useState(() => new Set()); // 展開中の地本キー
@@ -262,6 +272,35 @@ export default function SettingsScreen({
                 );
               })}
             </div>
+          </div>
+        </Card>
+
+        {/* ─ 表示設定（一覧の表示形式・レーダーの方角） ─ */}
+        <GroupTitle>表示設定</GroupTitle>
+        <Card>
+          <div style={{ padding: '14px' }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 3 }}>イベント一覧の表示形式</div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>
+              カード表示とカレンダー表示を選べます
+            </div>
+            <Segment
+              value={viewMode}
+              onChange={changeViewMode}
+              primary={primary}
+              options={[{ id: 'card', label: 'カード' }, { id: 'calendar', label: 'カレンダー' }]}
+            />
+          </div>
+          <div style={{ padding: '14px', borderTop: '1px solid var(--sep)' }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 3 }}>近くの施設レーダーの方角</div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>
+              「北が上」＝地図と同じ向き。「端末の向き」＝スマホを向けた方向が上（方位センサーの許可が必要）
+            </div>
+            <Segment
+              value={radarOri}
+              onChange={changeRadarOri}
+              primary={primary}
+              options={[{ id: 'north', label: '北が上' }, { id: 'heading', label: '端末の向き' }]}
+            />
           </div>
         </Card>
 
@@ -520,6 +559,27 @@ function GroupTitle({ children }) {
       padding: '14px 24px 6px', letterSpacing: 2,
       fontFamily: F.sans, fontWeight: 500,
     }}>{children}</div>
+  );
+}
+
+// 2択以上のセグメントコントロール（ダークモード設定と同じ見た目）
+function Segment({ value, onChange, options, primary }) {
+  return (
+    <div style={{ display: 'flex', background: 'var(--badge-bg)', borderRadius: 8, padding: 3, gap: 2 }}>
+      {options.map(o => {
+        const isA = value === o.id;
+        return (
+          <button key={o.id} onClick={() => onChange(o.id)} style={{
+            flex: 1, height: 40, borderRadius: 6, border: 'none', cursor: 'pointer',
+            background: isA ? primary : 'transparent',
+            color: isA ? '#fff' : 'var(--text-muted)',
+            fontFamily: F.sans, fontSize: 13, fontWeight: isA ? 600 : 400,
+            boxShadow: isA ? '0 1px 3px rgba(0,0,0,0.15)' : 'none',
+            transition: 'all 0.15s',
+          }}>{o.label}</button>
+        );
+      })}
+    </div>
   );
 }
 

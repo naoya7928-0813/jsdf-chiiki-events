@@ -164,14 +164,11 @@ export default function ListScreen({
     });
   };
 
-  // ── 表示形式（カード / カレンダー）── 利用者ごとに選択・保持する
-  const [viewMode, setViewMode] = useState(() => {
+  // ── 表示形式（カード / カレンダー）── 設定画面で選択・保持する（localStorage）。
+  // マウント時に読み込む（設定変更後に一覧へ戻ると再マウントされ反映される）。
+  const [viewMode] = useState(() => {
     try { return localStorage.getItem('jsdf-view-mode') === 'calendar' ? 'calendar' : 'card'; } catch { return 'card'; }
   });
-  const changeViewMode = (mode) => {
-    setViewMode(mode);
-    try { localStorage.setItem('jsdf-view-mode', mode); } catch {}
-  };
 
   // ── 免責バナー 折り畳み ──────────────────────────────────
   // 初回のみ全文表示し、以降は1行に畳む（詳細画面に免責文言があるため役割は保たれる）。
@@ -554,36 +551,6 @@ export default function ListScreen({
           </span>
         </div>
       )}
-
-      {/* ── 表示形式の切り替え（カード / カレンダー）── */}
-      <div style={{
-        display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8,
-        padding: '8px 16px 4px', flexShrink: 0,
-      }}>
-        <div style={{ display: 'inline-flex', background: 'var(--tag-bg)', borderRadius: 8, padding: 2 }}>
-          {[
-            { id: 'card', label: 'カード', icon: ICO.cardsView },
-            { id: 'calendar', label: 'カレンダー', icon: ICO.cal },
-          ].map(v => {
-            const on = viewMode === v.id;
-            return (
-              <button key={v.id} onClick={() => changeViewMode(v.id)}
-                aria-label={`${v.label}表示`} aria-pressed={on}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 5,
-                  border: 'none', cursor: 'pointer', borderRadius: 6, padding: '5px 11px',
-                  fontFamily: F.sans, fontSize: 12, fontWeight: on ? 700 : 500,
-                  background: on ? 'var(--card)' : 'transparent',
-                  color: on ? primary : 'var(--text-muted)',
-                  boxShadow: on ? '0 1px 2px rgba(0,0,0,0.08)' : 'none',
-                }}>
-                {v.icon(on ? primary : 'var(--icon-muted)', 14)}
-                <span>{v.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
 
       <div ref={listScrollRef} style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 60px)' }}>
         <ErrorBanner message={error} />
