@@ -364,7 +364,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-07-10",
+      "statusUpdatedAt": "2026-07-11",
       "weatherLocation": {
         "latitude": 41.769,
         "longitude": 140.729,
@@ -470,7 +470,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-10",
+      "statusUpdatedAt": "2026-07-11",
       "weatherLocation": {
         "latitude": 39.839,
         "longitude": 141.094,
@@ -1100,6 +1100,10 @@
       "source_type": "office_html",
       "address": "",
       "deadlineDate": "2026-07-10",
+      "status": "closed",
+      "statusReason": "締切日経過",
+      "statusSource": "html",
+      "statusUpdatedAt": "2026-07-11",
       "weatherLocation": {
         "latitude": 35.69,
         "longitude": 139.692,
@@ -1178,7 +1182,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-10",
+      "statusUpdatedAt": "2026-07-11",
       "weatherLocation": {
         "latitude": 35.775,
         "longitude": 139.805,
@@ -1233,7 +1237,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-10",
+      "statusUpdatedAt": "2026-07-11",
       "weatherLocation": {
         "latitude": 35.69,
         "longitude": 139.692,
@@ -1263,7 +1267,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-10",
+      "statusUpdatedAt": "2026-07-11",
       "weatherLocation": {
         "latitude": 35.673,
         "longitude": 139.817,
@@ -1576,30 +1580,6 @@
   ],
   "gunma": [
     {
-      "id": "gu-20260710-q10fo",
-      "pref": "gunma",
-      "date": "2026-07-10",
-      "weekday": "金",
-      "title": "群馬パーツショー",
-      "place": "Gメッセ群馬",
-      "address": "高崎市岩押町12-24",
-      "time": "10:00～18:00",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "＜広報展示ブース設置します！＞ メガクルーザーと高機動車とのコラボ予定です。 制服試着コーナーもあります！ 記念撮影ができますよ♪",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.319,
-        "longitude": 139.022,
-        "label": "群馬県高崎市",
-        "accuracy": "address",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:19.977+09:00"
-      }
-    },
-    {
       "id": "gu-20260718-lewu0",
       "pref": "gunma",
       "date": "2026-07-18",
@@ -1768,7 +1748,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-07-10",
+      "statusUpdatedAt": "2026-07-11",
       "weatherLocation": {
         "latitude": 36.566,
         "longitude": 139.884,
@@ -2157,30 +2137,6 @@
   "yamanashi": [],
   "nagano": [
     {
-      "id": "na-20260718-hm0w8",
-      "pref": "nagano",
-      "date": "2026-07-18",
-      "weekday": "土",
-      "title": "【松本市】公務員合同説明会",
-      "place": "イオンモール松本 「風庭」エリア",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "場所：イオンモール松本 風庭２F イオンホール 時間：１１：００～１６：００ (１５：４０受付終了) 内容：「公務員ってなにしてるの？」その疑問を解決！ 自衛隊、防衛省職員、長野県警、北アルプス消防、木曽広域消防、松本市役所、安曇野市役所、大町市役所 合同により、公務員の仕事内容、生活、ワークライフバランス、待遇等わかりやすく説明させていただきます。",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-03T20:01:30.984+09:00"
-      }
-    },
-    {
       "id": "na-20260718-uimr5",
       "pref": "nagano",
       "date": "2026-07-18",
@@ -2226,6 +2182,30 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-08T14:27:39.776+09:00"
+      }
+    },
+    {
+      "id": "na-20260718-hm0w8",
+      "pref": "nagano",
+      "date": "2026-07-18",
+      "weekday": "土",
+      "title": "【松本市】公務員合同説明会",
+      "place": "イオンモール松本 「風庭」エリア",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "場所：イオンモール松本 風庭２F イオンホール 時間：１１：００～１６：００ (１５：４０受付終了) 内容：「公務員ってなにしてるの？」その疑問を解決！ 自衛隊、防衛省職員、長野県警、北アルプス消防、木曽広域消防、松本市役所、安曇野市役所、大町市役所 合同により、公務員の仕事内容、生活、ワークライフバランス、待遇等わかりやすく説明させていただきます。",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-03T20:01:30.984+09:00"
       }
     },
     {
@@ -2401,31 +2381,6 @@
     }
   ],
   "aichi": [
-    {
-      "id": "ai-20260710-tqwmu",
-      "pref": "aichi",
-      "date": "2026-07-10",
-      "weekday": "金",
-      "title": "金山所｜自衛隊制度説明会",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "自衛隊制度",
-      "ageRequirement": null,
-      "deadline": null,
-      "endDate": null,
-      "weatherLocation": {
-        "latitude": 35.18,
-        "longitude": 136.907,
-        "label": "愛知県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
-      }
-    },
     {
       "id": "ai-20260711-exscz",
       "pref": "aichi",
@@ -4278,7 +4233,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-07-10"
+      "statusUpdatedAt": "2026-07-11"
     },
     {
       "id": "os-office-20260718-scxu6",
@@ -4657,30 +4612,6 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-06T21:34:48.290+09:00"
-      }
-    },
-    {
-      "id": "em-20260710-3q8y6",
-      "pref": "ehime",
-      "date": "2026-07-10",
-      "weekday": "金",
-      "title": "陸上自衛隊第14旅団 第14音楽隊【自衛隊ふれあいコンサート in あいなん】",
-      "place": "愛南町御荘文化センター ホール",
-      "address": "",
-      "time": "",
-      "category": "演奏会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/ehime/event.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 33.002,
-        "longitude": 132.521,
-        "label": "愛媛県愛南町",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-02T15:00:03.434+09:00"
       }
     },
     {
@@ -5597,7 +5528,33 @@
       }
     }
   ],
-  "kumamoto": [],
+  "kumamoto": [
+    {
+      "id": "ku-off-20260824-skdxx",
+      "pref": "kumamoto",
+      "date": "2026-08-24",
+      "weekday": "月",
+      "title": "現場の仕事体夏。",
+      "place": "大学生·专門学校生（高校",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kumamoto/event/event/20260824_28_intern/img/20260824_28_intern.pdf",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 32.878,
+        "longitude": 130.869,
+        "label": "熊本県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-11T08:18:05.614+09:00"
+      }
+    }
+  ],
   "oita": [
     {
       "id": "oi-20260801-p1pzp",
@@ -5652,5 +5609,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/10 20:20"
+  "updatedAt": "2026/07/11 08:18"
 }
