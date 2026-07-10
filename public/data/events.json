@@ -245,7 +245,55 @@
       }
     },
     {
-      "id": "ob-20260724-rt65s",
+      "id": "ob-20260712-znf27",
+      "pref": "obihiro",
+      "date": "2026-07-12",
+      "weekday": "日",
+      "title": "釧路駐屯地創立記念行事",
+      "place": "釧路駐屯地",
+      "address": "",
+      "time": "",
+      "category": "記念行事",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 42.924,
+        "longitude": 143.196,
+        "label": "北海道帯広市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-10T20:20:31.806+09:00"
+      }
+    },
+    {
+      "id": "ob-20260718-enj6n",
+      "pref": "obihiro",
+      "date": "2026-07-18",
+      "weekday": "土",
+      "title": "美幌駐屯地創立記念行事",
+      "place": "美幌駐屯地",
+      "address": "",
+      "time": "",
+      "category": "記念行事",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 42.784,
+        "longitude": 143.095,
+        "label": "北海道帯広市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-10T20:20:32.500+09:00"
+      }
+    },
+    {
+      "id": "ob-20260724-3q42v",
       "pref": "obihiro",
       "date": "2026-07-24",
       "weekday": "金",
@@ -430,6 +478,30 @@
         "accuracy": "address",
         "source": "gsi",
         "geocodedAt": "2026-07-08T08:23:28.207+09:00"
+      }
+    },
+    {
+      "id": "iw-20260801-793n9",
+      "pref": "iwate",
+      "date": "2026-08-01",
+      "weekday": "土",
+      "title": "こうむいん",
+      "place": "二戸ニコアショッピングセンター",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/iwate/assets/img/event/until20260801/20260801ninohe.pdf",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 40.271,
+        "longitude": 141.305,
+        "label": "岩手県二戸郡",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:10.722+09:00"
       }
     },
     {
@@ -1153,14 +1225,13 @@
       "category": "体験",
       "tag": "",
       "ageRequirement": "日本国籍を持つ18歳～32歳の方",
-      "deadline": "7月9日（木）",
+      "deadline": null,
       "url": "https://www.mod.go.jp/pco/tokyo/event2/0804_simofusa.html",
-      "notes": "・フライトシミュレーター体験\n・施設見学\n・体験喫食",
+      "notes": "・フライトシミュレーター体験\n・施設見学\n・体験喫食\n応募締切: 応募終了しました。",
       "source_type": "office_html",
       "address": "",
-      "deadlineDate": "2026-07-09",
       "status": "closed",
-      "statusReason": "締切日経過",
+      "statusReason": "受付終了告知",
       "statusSource": "html",
       "statusUpdatedAt": "2026-07-10",
       "weatherLocation": {
@@ -2086,30 +2157,6 @@
   "yamanashi": [],
   "nagano": [
     {
-      "id": "na-20260718-uimr5",
-      "pref": "nagano",
-      "date": "2026-07-18",
-      "weekday": "土",
-      "title": "【伊那市】自衛隊採用説明会",
-      "place": "中部森林管理局 南信森林管理署",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "自衛隊採用説明会 １０：００～１２：００ 説明内容 ・自衛隊の概要 ・自衛隊の職種、職域 ・福利厚生など 気軽にお立ち寄りください",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 35.635,
-        "longitude": 137.946,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-03T20:01:31.351+09:00"
-      }
-    },
-    {
       "id": "na-20260718-hm0w8",
       "pref": "nagano",
       "date": "2026-07-18",
@@ -2131,6 +2178,30 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-03T20:01:30.984+09:00"
+      }
+    },
+    {
+      "id": "na-20260718-uimr5",
+      "pref": "nagano",
+      "date": "2026-07-18",
+      "weekday": "土",
+      "title": "【伊那市】自衛隊採用説明会",
+      "place": "中部森林管理局 南信森林管理署",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "自衛隊採用説明会 １０：００～１２：００ 説明内容 ・自衛隊の概要 ・自衛隊の職種、職域 ・福利厚生など 気軽にお立ち寄りください",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.635,
+        "longitude": 137.946,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-03T20:01:31.351+09:00"
       }
     },
     {
@@ -5581,5 +5652,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/10 15:03"
+  "updatedAt": "2026/07/10 20:20"
 }
