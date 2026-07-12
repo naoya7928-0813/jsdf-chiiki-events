@@ -1710,33 +1710,7 @@
       }
     }
   ],
-  "toyama": [
-    {
-      "id": "to-off-20260711-jchb1",
-      "pref": "toyama",
-      "date": "2026-07-11",
-      "weekday": "土",
-      "title": "日頃より自衛隊富山地方協力本部睦友会の活動に対する格別のご理解とご協力",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/toyama/images/bokuyuukai7.pdf",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "weatherLocation": {
-        "latitude": 36.695,
-        "longitude": 137.211,
-        "label": "富山県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-07-02T08:50:40.109+09:00"
-      }
-    }
-  ],
+  "toyama": [],
   "ishikawa": [
     {
       "id": "ik-20260712-x6cr5",
@@ -1962,30 +1936,6 @@
   "yamanashi": [],
   "nagano": [
     {
-      "id": "na-20260718-uimr5",
-      "pref": "nagano",
-      "date": "2026-07-18",
-      "weekday": "土",
-      "title": "【伊那市】自衛隊採用説明会",
-      "place": "中部森林管理局 南信森林管理署",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "自衛隊採用説明会 １０：００～１２：００ 説明内容 ・自衛隊の概要 ・自衛隊の職種、職域 ・福利厚生など 気軽にお立ち寄りください",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 35.635,
-        "longitude": 137.946,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-03T20:01:31.351+09:00"
-      }
-    },
-    {
       "id": "na-20260718-zu6xe",
       "pref": "nagano",
       "date": "2026-07-18",
@@ -2031,6 +1981,30 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-03T20:01:30.984+09:00"
+      }
+    },
+    {
+      "id": "na-20260718-uimr5",
+      "pref": "nagano",
+      "date": "2026-07-18",
+      "weekday": "土",
+      "title": "【伊那市】自衛隊採用説明会",
+      "place": "中部森林管理局 南信森林管理署",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "自衛隊採用説明会 １０：００～１２：００ 説明内容 ・自衛隊の概要 ・自衛隊の職種、職域 ・福利厚生など 気軽にお立ち寄りください",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.635,
+        "longitude": 137.946,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-03T20:01:31.351+09:00"
       }
     },
     {
@@ -5214,5 +5188,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/12 07:59"
+  "updatedAt": "2026/07/12 14:34"
 }
