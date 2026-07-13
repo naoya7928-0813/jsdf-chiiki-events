@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { ICO } from './Icons';
 import { Emblem, F, splitDate, SectionTitle, iconBtnStyle, StatusBadge } from './Shared';
 import { REGION_HQ, REGION_SOURCE } from '../config';
@@ -16,6 +16,36 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
   // ── フック（Rules of Hooks: 早期 return の前に宣言する） ─────────
   const [copied,    setCopied]    = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [mapOpen,   setMapOpen]   = useState(false);   // 地図は折り畳み（既定は閉じる）
+
+  // ── 掲載元へ遷移 →「戻ってきたら」申請済みにする（設定でON/OFF） ──
+  // 開いた瞬間ではなく復帰時に付ける。誤タップで即座に申請済みにならず、
+  // 「掲載元を見て戻ってきた＝申込動線に入った」ときだけ記録される。
+  // 実際にアプリを離れたこと（hidden / blur）を確認してから復帰を待つため、
+  // リンクが開かなかった場合（ポップアップブロック等）は何も起きない。
+  const pendingApply = useRef(null);   // { id, left } | null
+  useEffect(() => {
+    const onLeave = () => {
+      if (pendingApply.current) pendingApply.current.left = true;
+    };
+    const onReturn = () => {
+      const p = pendingApply.current;
+      if (!p || !p.left || document.visibilityState !== 'visible') return;
+      pendingApply.current = null;
+      onMarkApplied?.(p.id);
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') onLeave(); else onReturn();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('blur',  onLeave);
+    window.addEventListener('focus', onReturn);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('blur',  onLeave);
+      window.removeEventListener('focus', onReturn);
+    };
+  }, [onMarkApplied]);
 
   // ev が null のときは空文字で代替（実運用では null になることはない）
   const ev = event;
@@ -89,11 +119,14 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
 
   // 個別URL → なければ地本公式サイト にフォールバック
   const targetUrl = ev.url || source?.url || '';
-  // 公式サイトを開いたら（設定がONのとき）自動で申請済みにする
-  const markAppliedIfAuto = () => { if (autoApply) onMarkApplied?.(ev.id); };
+  // 掲載元を開く。設定がONなら「戻ってきたとき」に申請済みにする（上の useEffect）
+  const armAutoApply = () => {
+    if (autoApply && !isApplied) pendingApply.current = { id: ev.id, left: false };
+  };
   const openUrl = () => {
-    markAppliedIfAuto();
-    if (targetUrl) window.open(targetUrl, '_blank', 'noopener,noreferrer');
+    if (!targetUrl) return;
+    armAutoApply();
+    window.open(targetUrl, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -246,44 +279,70 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
             {ev.address && (
               <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>{ev.address}</div>
             )}
-            {/* インライン地図 — place が取れていれば表示 */}
+            {/* インライン地図（折り畳み）— place が取れていれば表示。
+                開いたときに初めて iframe を読み込む */}
             {hasLocation ? (
               <>
-                <div style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid var(--border)', height: 200, position: 'relative', background: 'var(--card)' }}>
-                  {/* 読み込み中フォールバック */}
-                  <div style={{
-                    position: 'absolute', inset: 0,
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                    gap: 6, pointerEvents: 'none',
-                  }}>
-                    {ICO.pin('var(--text-muted)', 26)}
-                    <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: F.sans }}>地図を読み込んでいます…</span>
-                  </div>
-                  <iframe
-                    src={mapSrc}
-                    width="100%"
-                    height="200"
-                    style={{ border: 0, display: 'block', position: 'relative', zIndex: 1 }}
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title={`${ev.place}の地図`}
-                  />
-                </div>
-                {/* Google Maps で開くリンク */}
-                <a
-                  href={`https://maps.google.com/maps?q=${mapQuery}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => setMapOpen(v => !v)}
+                  aria-expanded={mapOpen}
                   style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                    marginTop: 8, padding: '10px 12px', borderRadius: 8,
-                    border: `1px solid ${primary}33`, color: primary,
-                    fontSize: 13, textDecoration: 'none', fontFamily: F.sans,
-                    background: `${primary}06`,
+                    width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    gap: 10, minHeight: 42, padding: '10px 12px',
+                    borderRadius: 8, border: '1px solid var(--border)',
+                    background: 'var(--bg)', cursor: 'pointer',
+                    fontFamily: F.sans, textAlign: 'left',
                   }}
                 >
-                  {ICO.extLink(primary, 13)} Google Maps で開く
-                </a>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+                    {ICO.pin('var(--text-muted)', 14)}
+                    {mapOpen ? '地図を隠す' : '地図を表示'}
+                  </span>
+                  <span style={{ display: 'flex', transition: 'transform 0.2s', transform: mapOpen ? 'rotate(90deg)' : 'rotate(0deg)' }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                      <path d="M9 18l6-6-6-6" stroke="var(--icon-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
+                </button>
+                {mapOpen && (
+                  <>
+                    <div style={{ marginTop: 8, borderRadius: 8, overflow: 'hidden', border: '1px solid var(--border)', height: 200, position: 'relative', background: 'var(--card)' }}>
+                      {/* 読み込み中フォールバック */}
+                      <div style={{
+                        position: 'absolute', inset: 0,
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                        gap: 6, pointerEvents: 'none',
+                      }}>
+                        {ICO.pin('var(--text-muted)', 26)}
+                        <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: F.sans }}>地図を読み込んでいます…</span>
+                      </div>
+                      <iframe
+                        src={mapSrc}
+                        width="100%"
+                        height="200"
+                        style={{ border: 0, display: 'block', position: 'relative', zIndex: 1 }}
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title={`${ev.place}の地図`}
+                      />
+                    </div>
+                    {/* Google Maps で開くリンク */}
+                    <a
+                      href={`https://maps.google.com/maps?q=${mapQuery}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                        marginTop: 8, padding: '10px 12px', borderRadius: 8,
+                        border: `1px solid ${primary}33`, color: primary,
+                        fontSize: 13, textDecoration: 'none', fontFamily: F.sans,
+                        background: `${primary}06`,
+                      }}
+                    >
+                      {ICO.extLink(primary, 13)} Google Maps で開く
+                    </a>
+                  </>
+                )}
               </>
             ) : (
               /* place も空：プレースホルダーを表示 */
@@ -307,7 +366,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
                     href={targetUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={markAppliedIfAuto}
+                    onClick={armAutoApply}
                     style={{
                       display: 'inline-flex', alignItems: 'center', gap: 5,
                       padding: '8px 16px', borderRadius: 8,
@@ -436,7 +495,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
               href={source.url}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={markAppliedIfAuto}
+              onClick={armAutoApply}
               aria-label={`${source.name}の公式ページで確認（外部サイトへ移動）`}
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,

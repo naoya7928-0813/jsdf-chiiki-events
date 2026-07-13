@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { F, SectionTitle } from './Shared';
 import W from '../../shared/weather.cjs';
 
@@ -96,13 +96,39 @@ function fmtFetched(iso) {
 // 天気予報は全表示で必ず出す共通注記
 const BASE_NOTE = '天気予報は参考情報です。開催・中止・内容変更については、必ず主催者の公式情報をご確認ください。';
 
-// カードの外枠
-function CardShell({ children, heading }) {
+// カードの外枠（折り畳み。見出しをタップして開く）
+function CardShell({ children, heading, open, onToggle }) {
   return (
     <div style={{ padding: '6px 16px 14px' }}>
       <SectionTitle>{heading}</SectionTitle>
-      <div style={{ background: 'var(--card)', borderRadius: 12, border: '1px solid var(--border)', padding: 14 }}>
-        {children}
+      <div style={{
+        background: 'var(--card)', borderRadius: 12,
+        border: '1px solid var(--border)', overflow: 'hidden',
+      }}>
+        <button
+          onClick={onToggle}
+          aria-expanded={open}
+          style={{
+            width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            gap: 10, minHeight: 46, padding: '12px 14px',
+            background: 'none', border: 'none', cursor: 'pointer',
+            fontFamily: F.sans, textAlign: 'left',
+          }}
+        >
+          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+            {open ? '天気予報を隠す' : '天気予報を表示'}
+          </span>
+          <span style={{ display: 'flex', transition: 'transform 0.2s', transform: open ? 'rotate(90deg)' : 'rotate(0deg)' }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+              <path d="M9 18l6-6-6-6" stroke="var(--icon-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </span>
+        </button>
+        {open && (
+          <div style={{ padding: 14, borderTop: '1px solid var(--sep)' }}>
+            {children}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -148,9 +174,9 @@ function StatLine({ label, value }) {
   );
 }
 
-function Message({ heading, text, primary, extraNotes }) {
+function Message({ heading, text, primary, extraNotes, open, onToggle }) {
   return (
-    <CardShell heading={heading}>
+    <CardShell heading={heading} open={open} onToggle={onToggle}>
       <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.7, fontFamily: F.sans }}>{text}</div>
       <Footnotes primary={primary} extraNotes={extraNotes} />
     </CardShell>
@@ -171,12 +197,20 @@ export default function WeatherCard({ event, theme }) {
   const today = jstToday();
   const decision = W.decideWeatherDisplay(ev || {}, today);
 
-  const shouldFetch = decision.status === 'forecast';
+  // 折り畳み（既定は閉じる）。開いたときに初めて予報を取得する。
+  const [open, setOpen] = useState(false);
+  const toggle = () => setOpen(v => !v);
+  const fold = { open, onToggle: toggle };
+
+  const shouldFetch = decision.status === 'forecast' && open;
   const loc = ev?.weatherLocation;
   const [state, setState] = useState({ status: 'idle', data: null });
+  const loadedKey = useRef(null);   // 開閉のたびに取得し直さない
 
   useEffect(() => {
     if (!shouldFetch) return;
+    const key = `${loc.latitude},${loc.longitude},${ev.date}`;
+    if (loadedKey.current === key) return;
     let cancelled = false;
     setState({ status: 'loading', data: null });
     const qs = new URLSearchParams({
@@ -186,7 +220,7 @@ export default function WeatherCard({ event, theme }) {
     });
     fetch(`/api/weather?${qs.toString()}`)
       .then(r => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
-      .then(data => { if (!cancelled) setState({ status: 'ok', data }); })
+      .then(data => { if (!cancelled) { loadedKey.current = key; setState({ status: 'ok', data }); } })
       .catch(() => { if (!cancelled) setState({ status: 'error', data: null }); });
     return () => { cancelled = true; };
   }, [shouldFetch, loc?.latitude, loc?.longitude, ev?.date]);
@@ -196,19 +230,19 @@ export default function WeatherCard({ event, theme }) {
 
   // 座標なし
   if (decision.status === 'no-coords') {
-    return <Message heading="開催日の天気" primary={primary}
+    return <Message heading="開催日の天気" primary={primary} {...fold}
       text="天気表示に必要な位置情報を取得できませんでした。" />;
   }
 
   // 都道府県代表座標のみ → API を呼ばず非表示
   if (decision.status === 'prefecture-blocked') {
-    return <Message heading="開催日の天気" primary={primary}
+    return <Message heading="開催日の天気" primary={primary} {...fold}
       text="開催場所の詳細な位置を特定できないため、天気予報を表示できません。" />;
   }
 
   // 17日以上先（予報発表前）
   if (decision.status === 'too-far') {
-    return <Message heading="開催日の天気（予報発表前）" primary={primary}
+    return <Message heading="開催日の天気（予報発表前）" primary={primary} {...fold}
       text={`天気予報は開催日の${W.FORECAST_MAX_DAYS}日前から表示されます。`} />;
   }
 
@@ -217,13 +251,13 @@ export default function WeatherCard({ event, theme }) {
 
   if (state.status === 'loading' || state.status === 'idle') {
     return (
-      <CardShell heading={heading}>
+      <CardShell heading={heading} {...fold}>
         <div style={{ fontSize: 13, color: 'var(--text-muted)', fontFamily: F.sans }}>天気情報を取得しています…</div>
       </CardShell>
     );
   }
   if (state.status === 'error') {
-    return <Message heading={heading} primary={primary} text="天気情報を取得できませんでした。" />;
+    return <Message heading={heading} primary={primary} text="天気情報を取得できませんでした。" {...fold} />;
   }
 
   const d = state.data || {};
@@ -241,7 +275,7 @@ export default function WeatherCard({ event, theme }) {
   if (stale) extraNotes.push('現在、最新の予報を取得できないため、前回取得した情報を表示しています。');
 
   return (
-    <CardShell heading={heading}>
+    <CardShell heading={heading} {...fold}>
       <div>
         {decision.isMunicipality
           ? <Badge primary={primary}>開催地域の参考予報</Badge>

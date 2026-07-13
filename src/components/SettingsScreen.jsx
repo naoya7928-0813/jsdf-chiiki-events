@@ -9,6 +9,7 @@ import { UPDATE_NOTES, TYPE_LABEL } from '../constants/updates';
 // package.json の version を vite.config.js の define で埋め込んだ定数
 /* global __APP_VERSION__ */
 
+
 export default function SettingsScreen({
   theme,
   onColorChange, onDarkModeChange,
@@ -23,8 +24,17 @@ export default function SettingsScreen({
   // ── Web Push ─────────────────────────────────────────────────
   const push = usePushNotification();
 
-  const [sourceOpen,  setSourceOpen]  = useState(false);
-  const [updatesOpen, setUpdatesOpen] = useState(false);
+  // ── 折込（アコーディオン） ────────────────────────────────────
+  // 設定項目を縦に並べると全体像が掴めないため、既定では見出しだけを表示し、
+  // 開いた節の中身だけを見せる。複数の節を同時に開いてよい。
+  const [openSections, setOpenSections] = useState(() => new Set());
+  const isOpen = id => openSections.has(id);
+  const toggleSection = id => setOpenSections(prev => {
+    const next = new Set(prev);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
+  const sourceOpen = isOpen('source');
 
   // ── 表示設定（localStorage 直読み・直書き。一覧/近隣モーダルが参照） ──
   const [viewMode, setViewMode] = useState(() => {
@@ -179,9 +189,13 @@ export default function SettingsScreen({
           }
         </div>
 
-        {/* ─ 1.5 オートモード（自動更新設定） ─ */}
-        <GroupTitle>アプリケーション設定</GroupTitle>
-        <Card>
+        {/* ─ 1.5 オートモード・自動申請済み（折込） ─ */}
+        <Section
+          title="アプリケーション設定"
+          summary={`ON ${[autoMode, autoApply].filter(Boolean).length}/2`}
+          open={isOpen('app')}
+          onToggle={() => toggleSection('app')}
+        >
           <ToggleRow
             label="オートモード (自動更新)"
             sub="5分ごとの自動更新と、バックグラウンド復帰時の自動再取得を行います"
@@ -190,14 +204,14 @@ export default function SettingsScreen({
             primary={primary}
           />
           <ToggleRow
-            label="公式サイトを開いたら申込済みにする"
-            sub="イベント詳細から公式ページを開いたとき、自動で「申請済み」に切り替えます"
+            label="掲載元を見て戻ったら申請済みにする"
+            sub="イベント詳細から掲載元（公式ページ）を開き、アプリに戻ってきたときに自動で「申請済み」にします。OFFにすると手動で切り替えるまで変わりません"
             on={autoApply}
             onChange={() => onAutoApplyChange?.(!autoApply)}
             primary={primary}
             last
           />
-        </Card>
+        </Section>
 
         {/* ─ 2. テーマカラー ─ */}
         <GroupTitle>テーマカラー</GroupTitle>
@@ -275,9 +289,13 @@ export default function SettingsScreen({
           </div>
         </Card>
 
-        {/* ─ 表示設定（一覧の表示形式・レーダーの方角） ─ */}
-        <GroupTitle>表示設定</GroupTitle>
-        <Card>
+        {/* ─ 表示設定（一覧の表示形式・レーダーの方角）（折込） ─ */}
+        <Section
+          title="表示設定"
+          summary={viewMode === 'calendar' ? 'カレンダー' : 'カード'}
+          open={isOpen('view')}
+          onToggle={() => toggleSection('view')}
+        >
           <div style={{ padding: '14px' }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 3 }}>イベント一覧の表示形式</div>
             <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>
@@ -302,7 +320,7 @@ export default function SettingsScreen({
               options={[{ id: 'north', label: '北が上' }, { id: 'heading', label: '端末の向き' }]}
             />
           </div>
-        </Card>
+        </Section>
 
         {/* ─ お問い合わせ ─ */}
         <GroupTitle>お問い合わせ</GroupTitle>
@@ -318,33 +336,13 @@ export default function SettingsScreen({
         </Card>
 
         {/* ─ 6. 掲載元（参照元公式サイト） ─ */}
-        <div style={{
-          margin: '20px 16px 0',
-          background: 'var(--card)',
-          border: '1px solid var(--border)',
-          borderRadius: 12,
-          overflow: 'hidden',
-        }}>
-          <button
-            onClick={() => setSourceOpen(v => !v)}
-            style={{
-              width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '14px 16px', background: 'none', border: 'none', cursor: 'pointer',
-              fontFamily: F.sans,
-            }}
-          >
-            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, color: 'var(--text-muted)' }}>
-              掲載元（参照元公式サイト）
-            </span>
-            <span style={{
-              display: 'flex', transition: 'transform 0.2s',
-              transform: sourceOpen ? 'rotate(90deg)' : 'rotate(0deg)',
-            }}>
-              {ICO.chev('var(--text-muted)', 12)}
-            </span>
-          </button>
+        <Section
+          title="掲載元（参照元公式サイト）"
+          open={sourceOpen}
+          onToggle={() => toggleSection('source')}
+        >
           {sourceOpen && (
-            <div style={{ padding: '0 16px 14px', borderTop: '1px solid var(--border)' }}>
+            <div style={{ padding: '0 16px 14px' }}>
               {/* 各地本ブロック（タップで配下の事務所・募集案内所を展開） */}
               {Object.entries(REGION_SOURCE).map(([key, src]) => {
                 const hqName   = REGION_HQ[key]?.name || src.name;
@@ -462,34 +460,15 @@ export default function SettingsScreen({
               </div>
             </div>
           )}
-        </div>
+        </Section>
 
-        {/* ─ 7. 更新ノート（折り畳み式） ─ */}
-        <div style={{
-          margin: '20px 16px 0',
-          background: 'var(--card)',
-          border: '1px solid var(--border)',
-          borderRadius: 12,
-          overflow: 'hidden',
-        }}>
-          <button
-            onClick={() => setUpdatesOpen(v => !v)}
-            style={{
-              width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '14px 16px', background: 'none', border: 'none', cursor: 'pointer',
-              fontFamily: F.sans,
-            }}
-          >
-            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, color: 'var(--text-muted)' }}>
-              更新ノート
-            </span>
-            <span style={{ display: 'flex', transition: 'transform 0.2s', transform: updatesOpen ? 'rotate(90deg)' : 'rotate(0deg)' }}>
-              {ICO.chev('var(--text-muted)', 12)}
-            </span>
-          </button>
-          {updatesOpen && (
+        {/* ─ 7. 更新ノート（従来どおりの折り畳み） ─ */}
+        <Section
+          title="更新ノート"
+          open={isOpen('updates')}
+          onToggle={() => toggleSection('updates')}
+        >
             <div style={{
-              borderTop: '1px solid var(--border)',
               maxHeight: 300,
               overflowY: 'auto',
               WebkitOverflowScrolling: 'touch',
@@ -527,8 +506,7 @@ export default function SettingsScreen({
                 );
               })}
             </div>
-          )}
-        </div>
+        </Section>
 
         {/* ─ 8. バージョン ─ */}
         <div style={{ textAlign: 'center', padding: '16px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 20px)', fontSize: 11, color: 'var(--text-muted)', fontFamily: F.mono }}>
@@ -562,6 +540,53 @@ function GroupTitle({ children }) {
   );
 }
 
+/**
+ * 折込セクション（見出し＋現在値のみを常時表示し、中身は開いたときだけ表示）。
+ * 見出し右の summary で、開かなくても現在の設定が分かるようにしている。
+ */
+function Section({ title, summary, open, onToggle, gap = 20, children }) {
+  return (
+    <div style={{
+      margin: `${gap}px 16px 0`,
+      background: 'var(--card)',
+      border: '1px solid var(--border)',
+      borderRadius: 12,
+      overflow: 'hidden',
+    }}>
+      <button
+        onClick={onToggle}
+        aria-expanded={open}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          gap: 10, minHeight: 48, padding: '13px 16px',
+          background: 'none', border: 'none', cursor: 'pointer',
+          fontFamily: F.sans, textAlign: 'left',
+        }}
+      >
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, color: 'var(--text-muted)' }}>
+          {title}
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          {summary && (
+            <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: F.mono }}>
+              {summary}
+            </span>
+          )}
+          <span style={{
+            display: 'flex', transition: 'transform 0.2s',
+            transform: open ? 'rotate(90deg)' : 'rotate(0deg)',
+          }}>
+            {ICO.chev('var(--text-muted)', 12)}
+          </span>
+        </span>
+      </button>
+      {open && (
+        <div style={{ borderTop: '1px solid var(--border)' }}>{children}</div>
+      )}
+    </div>
+  );
+}
+
 // 2択以上のセグメントコントロール（ダークモード設定と同じ見た目）
 function Segment({ value, onChange, options, primary }) {
   return (
@@ -580,15 +605,6 @@ function Segment({ value, onChange, options, primary }) {
         );
       })}
     </div>
-  );
-}
-
-function Card({ children }) {
-  return (
-    <div style={{
-      background: 'var(--card)', margin: '0 16px',
-      borderRadius: 12, border: '1px solid var(--border)', overflow: 'hidden',
-    }}>{children}</div>
   );
 }
 
@@ -624,6 +640,15 @@ function ToggleRow({ label, sub, on, onChange, primary, last, loading }) {
         }} />
       </button>
     </div>
+  );
+}
+
+function Card({ children }) {
+  return (
+    <div style={{
+      background: 'var(--card)', margin: '0 16px',
+      borderRadius: 12, border: '1px solid var(--border)', overflow: 'hidden',
+    }}>{children}</div>
   );
 }
 
