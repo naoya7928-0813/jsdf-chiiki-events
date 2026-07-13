@@ -9,9 +9,10 @@ import { F } from './Shared';
 const POLL_MS = 20000; // 自動更新間隔（この間隔で状態が更新される）
 
 const STATE_META = {
-  online:  { label: '在席中',    color: '#16a34a', filled: true  },
-  away:    { label: '離席中',    color: '#f59e0b', filled: true  },
-  offline: { label: 'オフライン', color: '#9ca3af', filled: false },
+  online:  { label: '在席中',      color: '#16a34a', filled: true  },
+  away:    { label: '離席中',      color: '#f59e0b', filled: true  },
+  // アカウント自体は存在し、いまログインしていない状態＝ログアウト中
+  offline: { label: 'ログアウト中', color: '#9ca3af', filled: false },
 };
 const ROLE_LABEL = {
   pco_admin:      '所長・担当官',
@@ -22,16 +23,17 @@ const ROLE_LABEL = {
   system_admin:   'システム管理',
 };
 
-// 経過秒 → 相対表記
+// 経過秒 → 相対表記（最終アクティビティからの経過）
 function fmtAgo(state, agoSec) {
-  if (agoSec == null) return 'まだログインなし';
+  if (agoSec == null) return '';   // 一度もログインしていない既存アカウント → 補足なし
   if (state === 'online') return agoSec < 60 ? 'たった今まで操作' : `${Math.floor(agoSec / 60)}分前まで操作`;
-  if (agoSec < 60) return '数十秒前';
   const min = Math.floor(agoSec / 60);
-  if (min < 60) return `${min}分前`;
+  const prefix = state === 'offline' ? '最終ログイン ' : '';
+  if (agoSec < 60) return `${prefix}数十秒前`;
+  if (min < 60) return `${prefix}${min}分前`;
   const h = Math.floor(min / 60);
-  if (h < 24) return `${h}時間前`;
-  return `${Math.floor(h / 24)}日前`;
+  if (h < 24) return `${prefix}${h}時間前`;
+  return `${prefix}${Math.floor(h / 24)}日前`;
 }
 function fmtClock(iso) {
   try { return new Date(iso).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Tokyo' }); }
@@ -110,7 +112,7 @@ export default function PresencePanel({ adminFetch, primary }) {
       <div style={{ display: 'flex', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
         {chip('#16a34a', counts.online, '在席中')}
         {chip('#f59e0b', counts.away, '離席中')}
-        {chip('#9ca3af', counts.offline, 'オフライン')}
+        {chip('#9ca3af', counts.offline, 'ログアウト中')}
       </div>
 
       {status === 'forbidden' && (
@@ -163,7 +165,7 @@ export default function PresencePanel({ adminFetch, primary }) {
           <div style={{ marginTop: 10, padding: '10px 12px', ...card, fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.8 }}>
             <div><b style={{ color: '#16a34a' }}>在席中</b>＝直近{Math.round((data.onlineWindowSec || 180) / 60)}分以内に操作／
               <b style={{ color: '#f59e0b' }}>離席中</b>＝ログイン中だが操作なし／
-              <b style={{ color: '#9ca3af' }}>オフライン</b>＝ログアウト済み・失効</div>
+              <b style={{ color: '#9ca3af' }}>ログアウト中</b>＝アカウントは有効・現在ログインしていない</div>
             <div style={{ marginTop: 4 }}>
               約{POLL_MS / 1000}秒ごとに自動更新
               {updatedAt ? `（最終更新 ${fmtClock(updatedAt.toISOString())}）` : ''}。
