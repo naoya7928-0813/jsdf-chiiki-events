@@ -364,7 +364,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-07-13",
+      "statusUpdatedAt": "2026-07-14",
       "weatherLocation": {
         "latitude": 41.769,
         "longitude": 140.729,
@@ -446,7 +446,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-13",
+      "statusUpdatedAt": "2026-07-14",
       "weatherLocation": {
         "latitude": 39.839,
         "longitude": 141.094,
@@ -1010,7 +1010,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-13",
+      "statusUpdatedAt": "2026-07-14",
       "weatherLocation": {
         "latitude": 35.775,
         "longitude": 139.805,
@@ -1091,7 +1091,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-13",
+      "statusUpdatedAt": "2026-07-14",
       "weatherLocation": {
         "latitude": 35.69,
         "longitude": 139.692,
@@ -1121,7 +1121,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-13",
+      "statusUpdatedAt": "2026-07-14",
       "weatherLocation": {
         "latitude": 35.673,
         "longitude": 139.817,
@@ -1254,7 +1254,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-13"
+      "statusUpdatedAt": "2026-07-14"
     },
     {
       "id": "to-off-20260910-i07ot",
@@ -1351,7 +1351,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-13",
+      "statusUpdatedAt": "2026-07-14",
       "weatherLocation": {
         "latitude": 35.857,
         "longitude": 139.649,
@@ -1846,7 +1846,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-07-13",
+      "statusUpdatedAt": "2026-07-14",
       "weatherLocation": {
         "latitude": 36.566,
         "longitude": 139.884,
@@ -2377,30 +2377,6 @@
       }
     },
     {
-      "id": "na-20260718-uimr5",
-      "pref": "nagano",
-      "date": "2026-07-18",
-      "weekday": "土",
-      "title": "【伊那市】自衛隊採用説明会",
-      "place": "中部森林管理局 南信森林管理署",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "自衛隊採用説明会 １０：００～１２：００ 説明内容 ・自衛隊の概要 ・自衛隊の職種、職域 ・福利厚生など 気軽にお立ち寄りください",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 35.635,
-        "longitude": 137.946,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-03T20:01:31.351+09:00"
-      }
-    },
-    {
       "id": "na-20260718-hm0w8",
       "pref": "nagano",
       "date": "2026-07-18",
@@ -2422,6 +2398,30 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-03T20:01:30.984+09:00"
+      }
+    },
+    {
+      "id": "na-20260718-uimr5",
+      "pref": "nagano",
+      "date": "2026-07-18",
+      "weekday": "土",
+      "title": "【伊那市】自衛隊採用説明会",
+      "place": "中部森林管理局 南信森林管理署",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "自衛隊採用説明会 １０：００～１２：００ 説明内容 ・自衛隊の概要 ・自衛隊の職種、職域 ・福利厚生など 気軽にお立ち寄りください",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.635,
+        "longitude": 137.946,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-03T20:01:31.351+09:00"
       }
     },
     {
@@ -4175,30 +4175,6 @@
   "shiga": [],
   "kyoto": [
     {
-      "id": "ky-set-20260713-la5uv",
-      "pref": "kyoto",
-      "date": "2026-07-13",
-      "weekday": "月",
-      "title": "自衛官 就職・進学説明会",
-      "place": "ハローワーク西陣 烏丸御池庁舎",
-      "address": "",
-      "time": "09:00～12:00",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
-      "notes": "担当: 河原町募集案内所",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 35.021,
-        "longitude": 135.756,
-        "label": "京都府",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-03T14:54:08.279+09:00"
-      }
-    },
-    {
       "id": "ky-set-20260714-qxcmh",
       "pref": "kyoto",
       "date": "2026-07-14",
@@ -4321,30 +4297,6 @@
     }
   ],
   "osaka": [
-    {
-      "id": "os-set-20260713-iwrrz",
-      "pref": "osaka",
-      "date": "2026-07-13",
-      "weekday": "月",
-      "title": "区役所説明会",
-      "place": "東淀川区役所（東淀川区豊新）",
-      "address": "",
-      "time": "11:00～15:00",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/osaka/recruit/session/menu.html",
-      "notes": "自衛隊希望者への募集説明会",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 34.679,
-        "longitude": 135.601,
-        "label": "大阪府東大阪市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-13T07:58:33.340+09:00"
-      }
-    },
     {
       "id": "os-set-20260714-uiyx4",
       "pref": "osaka",
@@ -4640,30 +4592,6 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-02T08:50:42.670+09:00"
-      }
-    },
-    {
-      "id": "em-20260713-94l8m",
-      "pref": "ehime",
-      "date": "2026-07-13",
-      "weekday": "月",
-      "title": "公安職5機関合同職業説明会",
-      "place": "松山市青少年センター 3F 大ホール",
-      "address": "",
-      "time": "13:00～16:00",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/ehime/event.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 33.885,
-        "longitude": 132.856,
-        "label": "愛媛県松山市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:33.538+09:00"
       }
     }
   ],
@@ -5540,5 +5468,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/13 20:22"
+  "updatedAt": "2026/07/14 08:09"
 }
