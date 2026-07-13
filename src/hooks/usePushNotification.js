@@ -78,8 +78,8 @@ export function usePushNotification() {
         return;
       }
 
-      // VAPID 公開鍵を取得
-      const keyRes = await fetch('/api/vapid-public-key');
+      // VAPID 公開鍵を取得（/api/subscribe の GET に統合）
+      const keyRes = await fetch('/api/subscribe');
       if (!keyRes.ok) throw new Error(`VAPID key fetch failed: ${keyRes.status}`);
       const { publicKey } = await keyRes.json();
 

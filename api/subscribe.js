@@ -1,3 +1,4 @@
+// GET /api/subscribe    – VAPID 公開鍵を返す（{ publicKey }）
 // POST /api/subscribe  – { subscription: PushSubscription }  → 購読登録
 // DELETE /api/subscribe – { endpoint: string }               → 購読解除
 //
@@ -16,9 +17,17 @@ const KEY = 'push:subscriptions';   // Redis Hash  field=endpoint, value=JSON
 
 export default async function handler(req, res) {
   if (!checkOrigin(req, res)) return;
-  res.setHeader('Access-Control-Allow-Methods', 'POST, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(204).end();
+
+  // ── VAPID 公開鍵の取得（購読前にフロントが取得する。旧 /api/vapid-public-key を統合） ──
+  if (req.method === 'GET') {
+    const key = process.env.VAPID_PUBLIC_KEY;
+    if (!key) return res.status(500).json({ error: 'VAPID_PUBLIC_KEY not configured' });
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    return res.status(200).json({ publicKey: key });
+  }
 
   if (!await rateLimit(req, res, 'subscribe', 20, 600)) return; // 20回/10分/IP
 
