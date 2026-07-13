@@ -149,7 +149,7 @@ export function requireAdmin(req, res) {
 //   平文 or "scrypt$..." ハッシュ（session.cjs で検証）。
 // 後方互換: ADMIN_SECRET（パスワードのみ）は **LEGACY_ADMIN_SECRET=true の時のみ**
 //   user 'admin' / national_admin として受理（既定は無効）。正式運用では ADMIN_SECRET を削除する。
-function loadAccounts() {
+export function loadAccounts() {
   const out = [];
   try {
     const b64 = process.env.ADMIN_ACCOUNTS_B64;
@@ -202,6 +202,25 @@ const SESSION_ABS_TTL = Number(process.env.ADMIN_SESSION_TTL || 8 * 3600); // �
 const SESSION_IDLE    = Number(process.env.ADMIN_SESSION_IDLE || 60 * 60); // 無操作失効(秒)
 const SESSION_SECURE  = process.env.SESSION_INSECURE !== 'true';           // ローカルHTTP検証用に解除可
 
+// 在席状況（プレゼンス）用の最終アクティビティ時刻。userId → 最終アクセス(ms) のハッシュ。
+// ログイン時・認証付きリクエストのたびに更新し、ログアウトで消す（在席状況APIが参照）。
+const LASTSEEN_KEY = 'admin:lastseen';
+export const SESSION_IDLE_SEC = SESSION_IDLE;
+/** 在席用の最終アクティビティを記録（ベストエフォート）。 */
+async function touchLastSeen(userId, nowMs) {
+  if (!userId) return;
+  try { await redis.hset(LASTSEEN_KEY, { [userId]: nowMs }); } catch { /* noop */ }
+}
+/** userId → 最終アクティビティ(ms) のマップを取得。 */
+export async function readLastSeenMap() {
+  try {
+    const h = await redis.hgetall(LASTSEEN_KEY);
+    const out = {};
+    for (const [k, v] of Object.entries(h || {})) { const n = Number(v); if (Number.isFinite(n)) out[k] = n; }
+    return out;
+  } catch { return {}; }
+}
+
 /** ログイン成功時にセッションを発行し Set-Cookie を付与。失敗時 false。 */
 export async function startSession(res, account) {
   const token = sessionUtil.newToken();
@@ -210,14 +229,22 @@ export async function startSession(res, account) {
   const data = { userId: account.userId, user: account.user, createdAt: now, lastSeen: now, sv: account.sessionVersion };
   try { await redis.set(SESSION_PREFIX + token, JSON.stringify(data), { ex: SESSION_ABS_TTL }); }
   catch { return false; }
+  await touchLastSeen(account.userId, now);   // 在席状況に反映
   res.setHeader('Set-Cookie', sessionUtil.serializeSessionCookie(token, { maxAge: SESSION_ABS_TTL, secure: SESSION_SECURE }));
   return true;
 }
 
-/** ログアウト: セッション失効 + Cookie 削除。 */
+/** ログアウト: セッション失効 + Cookie 削除。在席状況も即オフラインにする。 */
 export async function endSession(req, res) {
   const token = sessionUtil.getSessionToken(req);
-  if (token) { try { await redis.del(SESSION_PREFIX + token); } catch { /* noop */ } }
+  if (token) {
+    try {
+      const raw = await redis.get(SESSION_PREFIX + token);
+      const data = raw ? (typeof raw === 'string' ? JSON.parse(raw) : raw) : null;
+      if (data && data.userId) { try { await redis.hdel(LASTSEEN_KEY, data.userId); } catch { /* noop */ } }
+      await redis.del(SESSION_PREFIX + token);
+    } catch { /* noop */ }
+  }
   res.setHeader('Set-Cookie', sessionUtil.clearSessionCookie({ secure: SESSION_SECURE }));
 }
 
@@ -237,6 +264,7 @@ async function resolveSession(req) {
   }
   data.lastSeen = now;
   try { await redis.set(SESSION_PREFIX + token, JSON.stringify(data), { ex: SESSION_ABS_TTL }); } catch { /* noop */ }
+  await touchLastSeen(acc.userId, now);   // 在席状況に反映（操作のたびに緑を維持）
   return acc;
 }
 
