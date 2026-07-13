@@ -189,29 +189,18 @@ export default function SettingsScreen({
           }
         </div>
 
-        {/* ─ 1.5 オートモード・自動申請済み（折込） ─ */}
-        <Section
-          title="アプリケーション設定"
-          summary={`ON ${[autoMode, autoApply].filter(Boolean).length}/2`}
-          open={isOpen('app')}
-          onToggle={() => toggleSection('app')}
-        >
+        {/* ─ 1.5 オートモード（自動更新設定） ─ */}
+        <GroupTitle>アプリケーション設定</GroupTitle>
+        <Card>
           <ToggleRow
             label="オートモード (自動更新)"
             sub="5分ごとの自動更新と、バックグラウンド復帰時の自動再取得を行います"
             on={autoMode}
             onChange={() => onAutoModeChange(!autoMode)}
             primary={primary}
-          />
-          <ToggleRow
-            label="掲載元を見て戻ったら申請済みにする"
-            sub="イベント詳細から掲載元（公式ページ）を開き、アプリに戻ってきたときに自動で「申請済み」にします。OFFにすると手動で切り替えるまで変わりません"
-            on={autoApply}
-            onChange={() => onAutoApplyChange?.(!autoApply)}
-            primary={primary}
             last
           />
-        </Section>
+        </Card>
 
         {/* ─ 2. テーマカラー ─ */}
         <GroupTitle>テーマカラー</GroupTitle>
@@ -289,10 +278,9 @@ export default function SettingsScreen({
           </div>
         </Card>
 
-        {/* ─ 表示設定（一覧の表示形式・レーダーの方角）（折込） ─ */}
+        {/* ─ 表示設定（一覧の表示形式・レーダーの方角・申請済みの自動切替）（折込） ─ */}
         <Section
           title="表示設定"
-          summary={viewMode === 'calendar' ? 'カレンダー' : 'カード'}
           open={isOpen('view')}
           onToggle={() => toggleSection('view')}
         >
@@ -318,6 +306,16 @@ export default function SettingsScreen({
               onChange={changeRadarOri}
               primary={primary}
               options={[{ id: 'north', label: '北が上' }, { id: 'heading', label: '端末の向き' }]}
+            />
+          </div>
+          <div style={{ borderTop: '1px solid var(--sep)' }}>
+            <ToggleRow
+              label="掲載元を見て戻ったら申請済みにする"
+              sub="イベント詳細から掲載元（公式ページ）を開き、アプリに戻ってきたときに自動で「申請済み」にします。OFFにすると手動で切り替えるまで変わりません"
+              on={autoApply}
+              onChange={() => onAutoApplyChange?.(!autoApply)}
+              primary={primary}
+              last
             />
           </div>
         </Section>
