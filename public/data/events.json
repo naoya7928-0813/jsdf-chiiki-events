@@ -49,7 +49,7 @@
       }
     },
     {
-      "id": "sp-ot-20260725-6",
+      "id": "sp-ot-20260725-7",
       "pref": "sapporo",
       "date": "2026-07-25",
       "weekday": "土",
@@ -73,7 +73,7 @@
       }
     },
     {
-      "id": "sp-ot-20260725-7",
+      "id": "sp-ot-20260725-8",
       "pref": "sapporo",
       "date": "2026-07-25",
       "weekday": "土",
@@ -121,7 +121,31 @@
       }
     },
     {
-      "id": "sp-ot-20260801-8",
+      "id": "sp-nv-20260726-5",
+      "pref": "sapporo",
+      "date": "2026-07-26",
+      "weekday": "日",
+      "title": "護衛艦「いせ」一般公開",
+      "place": "苫小牧港西港区南ふ頭",
+      "address": "",
+      "time": "09:00～15:00",
+      "category": "一般公開",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/sapporo/event_naval.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 43.062,
+        "longitude": 141.354,
+        "label": "北海道札幌市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-14T14:06:44.836+09:00"
+      }
+    },
+    {
+      "id": "sp-ot-20260801-9",
       "pref": "sapporo",
       "date": "2026-08-01",
       "weekday": "土",
@@ -145,7 +169,7 @@
       }
     },
     {
-      "id": "sp-nv-20260808-5",
+      "id": "sp-nv-20260808-6",
       "pref": "sapporo",
       "date": "2026-08-08",
       "weekday": "土",
@@ -169,7 +193,7 @@
       }
     },
     {
-      "id": "sp-ot-20260824-9",
+      "id": "sp-ot-20260824-10",
       "pref": "sapporo",
       "date": "2026-08-24",
       "weekday": "月",
@@ -751,6 +775,102 @@
   ],
   "akita": [
     {
+      "id": "ak-20260718-ilt8g",
+      "pref": "akita",
+      "date": "2026-07-18",
+      "weekday": "土",
+      "title": "［出展/説明会］3機関合同説明会(能代市)",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.719,
+        "longitude": 140.102,
+        "label": "秋田県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
+      }
+    },
+    {
+      "id": "ak-20260720-yx1qd",
+      "pref": "akita",
+      "date": "2026-07-20",
+      "weekday": "月・祝",
+      "title": "［説明会］自衛隊説明会(横手市)",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.719,
+        "longitude": 140.102,
+        "label": "秋田県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
+      }
+    },
+    {
+      "id": "ak-20260725-030ks",
+      "pref": "akita",
+      "date": "2026-07-25",
+      "weekday": "土",
+      "title": "［説明会］自衛隊説明会(湯沢市)",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.719,
+        "longitude": 140.102,
+        "label": "秋田県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
+      }
+    },
+    {
+      "id": "ak-20260725-8nwpt",
+      "pref": "akita",
+      "date": "2026-07-25",
+      "weekday": "土",
+      "title": "［イベント］｢みたねサンドクラフト2026(三種町)｣に自衛隊ブース出展します",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.719,
+        "longitude": 140.102,
+        "label": "秋田県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
+      }
+    },
+    {
       "id": "ak-20260725-vzu4a",
       "pref": "akita",
       "date": "2026-07-25",
@@ -763,6 +883,54 @@
       "tag": "",
       "url": "",
       "notes": "詳細は秋田地本SNSにてご覧ください",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.719,
+        "longitude": 140.102,
+        "label": "秋田県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
+      }
+    },
+    {
+      "id": "ak-20260727-ww93i",
+      "pref": "akita",
+      "date": "2026-07-27",
+      "weekday": "月",
+      "title": "［説明会］自衛隊説明会(鹿角市)",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.719,
+        "longitude": 140.102,
+        "label": "秋田県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
+      }
+    },
+    {
+      "id": "ak-20260802-a1o9r",
+      "pref": "akita",
+      "date": "2026-08-02",
+      "weekday": "日",
+      "title": "［出展/説明会］3機関合同採用説明会(由利本荘市)",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
@@ -1233,28 +1401,6 @@
         "source": "gsi",
         "geocodedAt": "2026-06-29T16:31:20.069+09:00"
       }
-    },
-    {
-      "id": "t-20260711-f8ged",
-      "pref": "tokyo",
-      "date": "2026-07-11",
-      "weekday": "土",
-      "title": "現役防大生・防大卒若手幹部自衛官とのトークショー",
-      "place": "募集課",
-      "time": "13:00～15:00",
-      "category": "説明会",
-      "tag": "個別",
-      "ageRequirement": "大学進学を検討している学生及び保護者様",
-      "deadline": "7月10日（金）",
-      "url": "https://www.mod.go.jp/pco/tokyo/event2/0711_boudai.html",
-      "notes": "トークショー及び個別相談会\n要予約",
-      "source_type": "office_html",
-      "address": "",
-      "deadlineDate": "2026-07-10",
-      "status": "closed",
-      "statusReason": "締切日経過",
-      "statusSource": "html",
-      "statusUpdatedAt": "2026-07-14"
     },
     {
       "id": "to-off-20260910-i07ot",
@@ -2353,30 +2499,6 @@
   "yamanashi": [],
   "nagano": [
     {
-      "id": "na-20260718-zu6xe",
-      "pref": "nagano",
-      "date": "2026-07-18",
-      "weekday": "土",
-      "title": "長野駅前広報",
-      "place": "長野駅",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "14時～20時の間に長野駅東自由通路にて行います！",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.649,
-        "longitude": 138.195,
-        "label": "長野県長野市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-08T14:27:39.776+09:00"
-      }
-    },
-    {
       "id": "na-20260718-hm0w8",
       "pref": "nagano",
       "date": "2026-07-18",
@@ -2422,6 +2544,30 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-03T20:01:31.351+09:00"
+      }
+    },
+    {
+      "id": "na-20260718-zu6xe",
+      "pref": "nagano",
+      "date": "2026-07-18",
+      "weekday": "土",
+      "title": "長野駅前広報",
+      "place": "長野駅",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "14時～20時の間に長野駅東自由通路にて行います！",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.649,
+        "longitude": 138.195,
+        "label": "長野県長野市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-08T14:27:39.776+09:00"
       }
     },
     {
@@ -2480,11 +2626,11 @@
       "title": "【諏訪地域】公務員合同職業説明会",
       "place": "諏訪市駅前交流テラスすわっチャオ",
       "address": "",
-      "time": "02:00",
+      "time": "",
       "category": "説明会",
       "tag": "",
       "url": "",
-      "notes": null,
+      "notes": "【開催時間】 開場・受付 11:00～16:00 【参加団体】 防衛省自衛隊 長野県警察 諏訪広域消防 諏訪市役所 【事前予約】 https://forms.gle/Zf82qFA65z9EcHU49",
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
@@ -2542,6 +2688,30 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:27.986+09:00"
+      }
+    },
+    {
+      "id": "na-20260817-w54dq",
+      "pref": "nagano",
+      "date": "2026-08-17",
+      "weekday": "月",
+      "title": "【諏訪地域】自衛隊を「就職先」として考える個別相談会",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "採用イベント",
+      "tag": "個別",
+      "url": "",
+      "notes": "自衛隊を「就職先」として考える完全予約制の 個別相談会です 【場所】 自衛隊長野地方協力本部茅野地域事務所 長野県茅野市塚原１－３－２０ 【時間】 １０：００～１５：００ 【事前予約】 https://forms.gle/NJJdNZoeuQpZYAaS9",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:26.996+09:00"
       }
     }
   ],
@@ -5468,5 +5638,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/14 08:09"
+  "updatedAt": "2026/07/14 14:06"
 }
