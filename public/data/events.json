@@ -823,30 +823,6 @@
       }
     },
     {
-      "id": "ak-20260725-030ks",
-      "pref": "akita",
-      "date": "2026-07-25",
-      "weekday": "土",
-      "title": "［説明会］自衛隊説明会(湯沢市)",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 39.719,
-        "longitude": 140.102,
-        "label": "秋田県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
-      }
-    },
-    {
       "id": "ak-20260725-8nwpt",
       "pref": "akita",
       "date": "2026-07-25",
@@ -883,6 +859,30 @@
       "tag": "",
       "url": "",
       "notes": "詳細は秋田地本SNSにてご覧ください",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.719,
+        "longitude": 140.102,
+        "label": "秋田県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
+      }
+    },
+    {
+      "id": "ak-20260725-030ks",
+      "pref": "akita",
+      "date": "2026-07-25",
+      "weekday": "土",
+      "title": "［説明会］自衛隊説明会(湯沢市)",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
@@ -2499,6 +2499,30 @@
   "yamanashi": [],
   "nagano": [
     {
+      "id": "na-20260718-zu6xe",
+      "pref": "nagano",
+      "date": "2026-07-18",
+      "weekday": "土",
+      "title": "長野駅前広報",
+      "place": "長野駅",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "14時～20時の間に長野駅東自由通路にて行います！",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.649,
+        "longitude": 138.195,
+        "label": "長野県長野市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-08T14:27:39.776+09:00"
+      }
+    },
+    {
       "id": "na-20260718-hm0w8",
       "pref": "nagano",
       "date": "2026-07-18",
@@ -2544,30 +2568,6 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-03T20:01:31.351+09:00"
-      }
-    },
-    {
-      "id": "na-20260718-zu6xe",
-      "pref": "nagano",
-      "date": "2026-07-18",
-      "weekday": "土",
-      "title": "長野駅前広報",
-      "place": "長野駅",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "14時～20時の間に長野駅東自由通路にて行います！",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.649,
-        "longitude": 138.195,
-        "label": "長野県長野市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-08T14:27:39.776+09:00"
       }
     },
     {
@@ -4591,7 +4591,31 @@
   "hyogo": [],
   "nara": [
     {
-      "id": "na-20260804-1",
+      "id": "na-20260729-1",
+      "pref": "nara",
+      "date": "2026-07-29",
+      "weekday": "水",
+      "title": "第４術科学校 給養課程見学",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "体験",
+      "tag": "学生向け",
+      "url": "https://www.mod.go.jp/pco/nara/post-16488/",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 34.685,
+        "longitude": 135.833,
+        "label": "奈良県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:32.748+09:00"
+      }
+    },
+    {
+      "id": "na-20260804-2",
       "pref": "nara",
       "date": "2026-08-04",
       "weekday": "火",
@@ -4615,7 +4639,7 @@
       }
     },
     {
-      "id": "na-20260819-2",
+      "id": "na-20260819-3",
       "pref": "nara",
       "date": "2026-08-19",
       "weekday": "水",
@@ -4639,27 +4663,27 @@
       }
     },
     {
-      "id": "na-20260731-fsqaz",
+      "id": "na-20260724-5",
       "pref": "nara",
-      "date": "2026-07-31",
+      "date": "2026-07-24",
       "weekday": "金",
-      "title": "サマーイベント",
-      "place": "大阪港",
+      "title": "公務員合同職業説明会 in 大和西大寺",
+      "place": "",
       "address": "",
-      "time": "11:00～15:00",
-      "category": "広報活動",
+      "time": "",
+      "category": "説明会",
       "tag": "",
-      "url": "https://www.mod.go.jp/pco/nara/post-16353/",
-      "notes": "参加費無料・送迎つき",
+      "url": "https://www.mod.go.jp/pco/nara/post-16137/",
+      "notes": null,
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 34.391,
-        "longitude": 135.79,
+        "latitude": 34.685,
+        "longitude": 135.833,
         "label": "奈良県",
-        "accuracy": "venue",
+        "accuracy": "prefecture",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:32.982+09:00"
+        "geocodedAt": "2026-06-28T22:18:32.748+09:00"
       }
     }
   ],
@@ -4717,6 +4741,30 @@
   ],
   "ehime": [
     {
+      "id": "em-20260806-6s019",
+      "pref": "ehime",
+      "date": "2026-08-06",
+      "weekday": "木",
+      "title": "松山駐屯地 納涼祭",
+      "place": "陸上自衛隊松山駐屯地",
+      "address": "",
+      "time": "17:30～21:30",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/ehime/event.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 33.842,
+        "longitude": 132.766,
+        "label": "愛媛県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-14T19:08:36.311+09:00"
+      }
+    },
+    {
       "id": "em-20260801-z6tb5",
       "pref": "ehime",
       "date": "2026-08-01",
@@ -4762,6 +4810,30 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-02T08:50:42.670+09:00"
+      }
+    },
+    {
+      "id": "em-20260831-dpbeu",
+      "pref": "ehime",
+      "date": "2026-08-31",
+      "weekday": "月",
+      "title": "自衛隊のサテライトブース【Smile station 2026】",
+      "place": "松山市 銀天街商店街",
+      "address": "",
+      "time": "14:00～19:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/ehime/event.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 33.839,
+        "longitude": 132.766,
+        "label": "愛媛県松山市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-14T19:08:37.151+09:00"
       }
     }
   ],
@@ -5635,8 +5707,32 @@
         "source": "gsi",
         "geocodedAt": "2026-07-03T14:54:09.750+09:00"
       }
+    },
+    {
+      "id": "ks-20260802-btqb3",
+      "pref": "kagoshima",
+      "date": "2026-08-02",
+      "weekday": "日",
+      "title": "国分駐屯地夏祭り2026",
+      "place": "国分駐屯地",
+      "address": "",
+      "time": "17:00～20:45",
+      "category": "地域参加",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kagoshima/event/index.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 31.56,
+        "longitude": 130.558,
+        "label": "鹿児島県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-14T19:08:37.512+09:00"
+      }
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/14 14:06"
+  "updatedAt": "2026/07/14 19:08"
 }
