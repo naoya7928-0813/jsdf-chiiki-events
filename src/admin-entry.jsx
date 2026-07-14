@@ -14,10 +14,17 @@ import '@fontsource/ibm-plex-mono/500.css';
 import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
 import { injectGlobalStyles } from './globalStyles';
+import { recoverFromChunkError } from './utils/lazyChunk';
 
 // 公開アプリと同じグローバルCSS（CSS変数・リセット）。配色/ダークモードは
 // App 内で localStorage(jsdf-scheme / jsdf-dark) から復元するため、見た目は完全に揃う。
 injectGlobalStyles();
+
+// 公開側 main.jsx と同じ復旧処理。運営サイトも lazy チャンク（AdminScreen 等）を
+// 使うため、古い app shell が消えた旧チャンクを要求した場合はここで取り直す。
+window.addEventListener('vite:preloadError', (e) => {
+  if (recoverFromChunkError()) e.preventDefault();
+});
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
