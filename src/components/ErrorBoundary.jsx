@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { purgeAppShell } from '../utils/lazyChunk';
 
 /**
  * アプリ全体のエラーバウンダリ。
@@ -21,8 +22,9 @@ export default class ErrorBoundary extends Component {
   }
 
   handleReload = () => {
-    // データ起因の描画エラーに備え、リロードで最新データから再構築する
-    window.location.reload();
+    // データ起因の描画エラー、および古い app shell（消えたチャンクを要求し続ける
+    // インストール済み PWA）の両方から復帰させるため、precache を捨てて再読込する
+    purgeAppShell().finally(() => window.location.reload());
   };
 
   render() {

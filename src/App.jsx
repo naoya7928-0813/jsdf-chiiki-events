@@ -1,5 +1,7 @@
-import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
+import { useState, useCallback, useEffect, useRef, Suspense } from 'react';
 import { useEvents } from './hooks/useEvents';
+// 遅延読込は lazyWithRecovery 経由（旧チャンクが消えた時に自動復旧する。utils/lazyChunk.js）
+import { lazyWithRecovery } from './utils/lazyChunk';
 import { COLOR_SCHEMES, DEFAULT_SCHEME } from './config';
 import { PREFECTURE_INFO } from './data/regionMap';
 import { OperatorNavContext } from './components/Shared';
@@ -10,14 +12,14 @@ import RegionScreen       from './components/RegionScreen';
 import SplashScreen       from './components/SplashScreen';
 // 初期表示に不要な画面は遅延読込でバンドル分割（フィードバック§1-2③）。
 // トップを開いただけで詳細・設定・報告等のコードまで落とさない。
-const DetailScreen       = lazy(() => import('./components/DetailScreen'));
-const SettingsScreen     = lazy(() => import('./components/SettingsScreen'));
-const NotificationScreen = lazy(() => import('./components/NotificationScreen'));
-const FavoritesScreen    = lazy(() => import('./components/FavoritesScreen'));
-const LegalScreen        = lazy(() => import('./components/LegalScreen'));
-const ReportScreen       = lazy(() => import('./components/ReportScreen'));
+const DetailScreen       = lazyWithRecovery(() => import('./components/DetailScreen'));
+const SettingsScreen     = lazyWithRecovery(() => import('./components/SettingsScreen'));
+const NotificationScreen = lazyWithRecovery(() => import('./components/NotificationScreen'));
+const FavoritesScreen    = lazyWithRecovery(() => import('./components/FavoritesScreen'));
+const LegalScreen        = lazyWithRecovery(() => import('./components/LegalScreen'));
+const ReportScreen       = lazyWithRecovery(() => import('./components/ReportScreen'));
 // 管理画面は運営者ページ(/admin.html)でのみ使う。遅延読込で公開バンドルから分離する。
-const AdminScreen = lazy(() => import('./components/AdminScreen'));
+const AdminScreen = lazyWithRecovery(() => import('./components/AdminScreen'));
 
 // ─── localStorage 復元ヘルパー ────────────────────────────────
 function loadScheme()       { try { return localStorage.getItem('jsdf-scheme') || DEFAULT_SCHEME; } catch { return DEFAULT_SCHEME; } }

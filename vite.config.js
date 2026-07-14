@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -12,6 +13,53 @@ const r = (p) => fileURLToPath(new URL(p, import.meta.url));
 // 公開用 /manifest.webmanifest（start_url:"/"）を注入するため、その後に
 // admin.html のみ /admin.webmanifest（start_url:"/admin.html"）へ差し替える。
 // これでホーム画面追加時、運営アプリは運営サイトを起動し、公開と別アプリになる。
+// shared/*.cjs は scraper・API・CI と共有するため CommonJS のまま置いている。
+// 本番ビルドは rollup の commonjs 変換で名前付き export に解決されるが、dev サーバーは
+// 素の .cjs をそのまま ESM として配信するため `module.exports` が見えず、
+// 名前付き import が全滅してアプリが起動しない。dev のみ ESM ラッパーへ変換する。
+function sharedCjsDevInterop() {
+  const require_ = createRequire(import.meta.url);
+  return {
+    name: 'shared-cjs-dev-interop',
+    apply: 'serve',
+    enforce: 'pre',
+    transform(code, id) {
+      const path = id.split('?')[0].replace(/\\/g, '/');
+      if (!/\/shared\/[^/]+\.cjs$/.test(path)) return null;
+
+      // shared 同士の相互参照（require('./weather.cjs') 等）は静的 import に置き換える
+      const imports = [];
+      let n = 0;
+      const body = code.replace(/require\((['"])(\.[^'"]+)\1\)/g, (_, q, spec) => {
+        const local = `__cjs${n++}`;
+        imports.push(`import ${local} from '${spec}';`);
+        return local;
+      });
+
+      // 名前付き export は実物を Node で読み込んで取得する（正規表現で推測しない）
+      let names = [];
+      try {
+        names = Object.keys(require_(path)).filter(k => /^[A-Za-z_$][\w$]*$/.test(k));
+      } catch { /* 読めない場合は default だけ生やす */ }
+
+      // CJS 側と同名の関数宣言が既にあるため、別名で受けてから export する
+      const alias = k => `__ex_${k}`;
+      return {
+        code: [
+          ...imports,
+          'const module = { exports: {} };',
+          'const exports = module.exports;',
+          body,
+          ...names.map(k => `const ${alias(k)} = module.exports.${k};`),
+          names.length ? `export { ${names.map(k => `${alias(k)} as ${k}`).join(', ')} };` : '',
+          'export default module.exports;',
+        ].join('\n'),
+        map: null,
+      };
+    },
+  };
+}
+
 function adminManifestSwap() {
   return {
     name: 'admin-manifest-swap',
@@ -54,6 +102,7 @@ export default defineConfig({
   },
   plugins: [
     react(),
+    sharedCjsDevInterop(),
     adminManifestSwap(),
     VitePWA({
       strategies: 'injectManifest',

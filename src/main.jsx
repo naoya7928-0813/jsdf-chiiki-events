@@ -10,6 +10,7 @@ import { injectSpeedInsights } from '@vercel/speed-insights';
 import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
 import { injectGlobalStyles } from './globalStyles';
+import { recoverFromChunkError } from './utils/lazyChunk';
 
 // ─── グローバルスタイル（公開/運営で共通） ──────────────────────
 injectGlobalStyles();
@@ -20,6 +21,12 @@ injectAnalytics();
 injectSpeedInsights();
 
 // vite-plugin-pwa が registerType:'autoUpdate' で SW を自動登録するため手動登録は不要
+
+// 古い app shell が残ったクライアント（主にインストール済み PWA）はデプロイ後に
+// 消えた旧チャンクを要求して失敗する。preload 段階で気付いた場合もここで復旧する。
+window.addEventListener('vite:preloadError', (e) => {
+  if (recoverFromChunkError()) e.preventDefault();
+});
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

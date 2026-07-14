@@ -5,6 +5,12 @@
  */
 export const UPDATE_NOTES = [
   {
+    date:    '2026-07-14',
+    version: '1.25.48',
+    type:    'fix',
+    content: 'お気に入りなど一部の画面で「表示中に問題が発生しました」と表示されることがある不具合を修正しました。',
+  },
+  {
     date:    '2026-07-13',
     version: '1.25.47',
     type:    'improvement',
