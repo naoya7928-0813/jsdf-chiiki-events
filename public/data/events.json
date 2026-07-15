@@ -197,6 +197,30 @@
       }
     },
     {
+      "id": "ob-20260731-yke62",
+      "pref": "obihiro",
+      "date": "2026-07-31",
+      "weekday": "金",
+      "title": "公務員合同説明会入場無料！！どなたでも参加できます！！",
+      "place": "帯広とかちプラザ１Ｆアトリウム 帯広市西４条南１３丁目１",
+      "address": "",
+      "time": "13:30～16:30",
+      "category": "説明会",
+      "tag": "入場無料",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 42.924,
+        "longitude": 143.196,
+        "label": "北海道帯広市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-15T19:15:59.848+09:00"
+      }
+    },
+    {
       "id": "ob-20260822-tt9u7",
       "pref": "obihiro",
       "date": "2026-08-22",
@@ -679,30 +703,6 @@
       }
     },
     {
-      "id": "ak-20260725-030ks",
-      "pref": "akita",
-      "date": "2026-07-25",
-      "weekday": "土",
-      "title": "［説明会］自衛隊説明会(湯沢市)",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 39.719,
-        "longitude": 140.102,
-        "label": "秋田県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
-      }
-    },
-    {
       "id": "ak-20260725-8nwpt",
       "pref": "akita",
       "date": "2026-07-25",
@@ -715,6 +715,30 @@
       "tag": "",
       "url": "",
       "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.719,
+        "longitude": 140.102,
+        "label": "秋田県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
+      }
+    },
+    {
+      "id": "ak-20260725-030ks",
+      "pref": "akita",
+      "date": "2026-07-25",
+      "weekday": "土",
+      "title": "［説明会］自衛隊説明会(湯沢市)",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
@@ -1566,8 +1590,8 @@
       "time": "",
       "category": "体験",
       "tag": "",
-      "url": "https://www.mod.go.jp/pco/saitama/event/img/8.8.20hyakuri.jpg",
-      "notes": "応募多数の場合は、抽選となり当選された方のみに詳細なご案内をお送りいたします。",
+      "url": null,
+      "notes": "応募多数の場合は、抽選となり当選された方のみに詳細なご案内をお送りいたします。\n応募多数の場合は、抽選となり当選された方のみに詳細なご案内をお送りいたします。",
       "ageRequirement": "17歳以上32歳以下",
       "deadline": "7月15日（水）",
       "deadlineDate": "2026-07-15",
@@ -4823,15 +4847,15 @@
       }
     },
     {
-      "id": "ok-20260805-zsuhq",
+      "id": "ok-20260805-wc4hw",
       "pref": "okayama",
       "date": "2026-08-05",
       "weekday": "水",
-      "title": "三軒屋納涼祭",
+      "title": "駐屯地（三軒屋）夏祭り",
       "place": "三軒屋駐屯地",
       "address": "",
       "time": "",
-      "category": "広報活動",
+      "category": "地域参加",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html",
       "notes": null,
@@ -4847,58 +4871,10 @@
       }
     },
     {
-      "id": "ok-20260808-bxmoy",
+      "id": "ok-20260808-uad6g",
       "pref": "okayama",
       "date": "2026-08-08",
       "weekday": "土",
-      "title": "土曜夜市（笠岡）",
-      "place": "笠岡市番町ふれあい夏祭り",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 34.507,
-        "longitude": 133.507,
-        "label": "岡山県笠岡市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-02T08:50:45.919+09:00"
-      }
-    },
-    {
-      "id": "ok-20260808-bbftk",
-      "pref": "okayama",
-      "date": "2026-08-08",
-      "weekday": "土",
-      "title": "自衛隊フェスタinイコットニコット",
-      "place": "イコットニコット",
-      "address": "",
-      "time": "",
-      "category": "地域参加",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 34.662,
-        "longitude": 133.935,
-        "label": "岡山県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-02T08:50:46.282+09:00"
-      }
-    },
-    {
-      "id": "ok-20260809-ttypl",
-      "pref": "okayama",
-      "date": "2026-08-09",
-      "weekday": "日",
       "title": "番町ふれあい夏祭り",
       "place": "笠岡運動公園",
       "address": "",
@@ -4919,12 +4895,12 @@
       }
     },
     {
-      "id": "ok-20260830-vme8n",
+      "id": "ok-20260830-v9kno",
       "pref": "okayama",
       "date": "2026-08-30",
       "weekday": "日",
-      "title": "ハートフルコンサートinそうじゃ",
-      "place": "イコットニコット",
+      "title": "陸上自衛隊第13音楽隊ハートフルコンサートinそうじゃ",
+      "place": "総社市民会館",
       "address": "",
       "time": "",
       "category": "演奏会",
@@ -4934,12 +4910,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 34.662,
-        "longitude": 133.935,
-        "label": "岡山県",
+        "latitude": 34.673,
+        "longitude": 133.747,
+        "label": "岡山県総社市",
         "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-07-02T08:50:46.282+09:00"
+        "geocodedAt": "2026-07-15T19:16:00.665+09:00"
       }
     }
   ],
@@ -5469,5 +5445,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/15 14:10"
+  "updatedAt": "2026/07/15 19:15"
 }
