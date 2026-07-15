@@ -679,18 +679,18 @@
       }
     },
     {
-      "id": "ak-20260725-vzu4a",
+      "id": "ak-20260725-030ks",
       "pref": "akita",
       "date": "2026-07-25",
       "weekday": "土",
-      "title": "［艦艇広報］多用途支援艦すおう一般公開(秋田港)",
+      "title": "［説明会］自衛隊説明会(湯沢市)",
       "place": "",
       "address": "",
       "time": "",
-      "category": "一般公開",
+      "category": "説明会",
       "tag": "",
       "url": "",
-      "notes": "詳細は秋田地本SNSにてご覧ください",
+      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
@@ -727,18 +727,18 @@
       }
     },
     {
-      "id": "ak-20260725-030ks",
+      "id": "ak-20260725-vzu4a",
       "pref": "akita",
       "date": "2026-07-25",
       "weekday": "土",
-      "title": "［説明会］自衛隊説明会(湯沢市)",
+      "title": "［艦艇広報］多用途支援艦すおう一般公開(秋田港)",
       "place": "",
       "address": "",
       "time": "",
-      "category": "説明会",
+      "category": "一般公開",
       "tag": "",
       "url": "",
-      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
+      "notes": "詳細は秋田地本SNSにてご覧ください",
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
@@ -2355,6 +2355,30 @@
   "yamanashi": [],
   "nagano": [
     {
+      "id": "na-20260718-hm0w8",
+      "pref": "nagano",
+      "date": "2026-07-18",
+      "weekday": "土",
+      "title": "【松本市】公務員合同説明会",
+      "place": "イオンモール松本 「風庭」エリア",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "場所：イオンモール松本 風庭２F イオンホール 時間：１１：００～１６：００ (１５：４０受付終了) 内容：「公務員ってなにしてるの？」その疑問を解決！ 自衛隊、防衛省職員、長野県警、北アルプス消防、木曽広域消防、松本市役所、安曇野市役所、大町市役所 合同により、公務員の仕事内容、生活、ワークライフバランス、待遇等わかりやすく説明させていただきます。",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-03T20:01:30.984+09:00"
+      }
+    },
+    {
       "id": "na-20260718-uimr5",
       "pref": "nagano",
       "date": "2026-07-18",
@@ -2400,30 +2424,6 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-08T14:27:39.776+09:00"
-      }
-    },
-    {
-      "id": "na-20260718-hm0w8",
-      "pref": "nagano",
-      "date": "2026-07-18",
-      "weekday": "土",
-      "title": "【松本市】公務員合同説明会",
-      "place": "イオンモール松本 「風庭」エリア",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "場所：イオンモール松本 風庭２F イオンホール 時間：１１：００～１６：００ (１５：４０受付終了) 内容：「公務員ってなにしてるの？」その疑問を解決！ 自衛隊、防衛省職員、長野県警、北アルプス消防、木曽広域消防、松本市役所、安曇野市役所、大町市役所 合同により、公務員の仕事内容、生活、ワークライフバランス、待遇等わかりやすく説明させていただきます。",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-03T20:01:30.984+09:00"
       }
     },
     {
@@ -4703,6 +4703,30 @@
       }
     },
     {
+      "id": "ok-20260726-taw9c",
+      "pref": "okayama",
+      "date": "2026-07-26",
+      "weekday": "日",
+      "title": "沙美ビーチフェスティバル",
+      "place": "倉敷市玉島黒崎浜 沙美海岸",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 34.514,
+        "longitude": 133.635,
+        "label": "岡山県倉敷市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-15T14:10:08.495+09:00"
+      }
+    },
+    {
       "id": "ok-20260801-mzhsh",
       "pref": "okayama",
       "date": "2026-08-01",
@@ -4775,6 +4799,30 @@
       }
     },
     {
+      "id": "ok-20260804-yb8dq",
+      "pref": "okayama",
+      "date": "2026-08-04",
+      "weekday": "火",
+      "title": "護衛艦【ゆうべつ】一般公開",
+      "place": "玉野市宇野港第一突堤",
+      "address": "",
+      "time": "",
+      "category": "一般公開",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 34.49,
+        "longitude": 133.947,
+        "label": "岡山県玉野市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-03T14:54:09.018+09:00"
+      }
+    },
+    {
       "id": "ok-20260805-zsuhq",
       "pref": "okayama",
       "date": "2026-08-05",
@@ -4796,30 +4844,6 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-02T08:50:45.555+09:00"
-      }
-    },
-    {
-      "id": "ok-20260804-w5bdl",
-      "pref": "okayama",
-      "date": "2026-08-04",
-      "weekday": "火",
-      "title": "艦艇一般公開",
-      "place": "玉野市宇野港第一突堤",
-      "address": "",
-      "time": "",
-      "category": "一般公開",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 34.49,
-        "longitude": 133.947,
-        "label": "岡山県玉野市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-03T14:54:09.018+09:00"
       }
     },
     {
@@ -4934,6 +4958,30 @@
       "url": "https://www.mod.go.jp/pco/hiroshima/events/3740/",
       "notes": "予約不要",
       "ageRequirement": "18歳～33歳未満の方",
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 34.397,
+        "longitude": 132.46,
+        "label": "広島県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.248+09:00"
+      }
+    },
+    {
+      "id": "hi-20260720-cwonc",
+      "pref": "hiroshima",
+      "date": "2026-07-20",
+      "weekday": "月・祝",
+      "title": "第２回 自衛隊 サテライトブース ｉｎ アルパーク",
+      "place": "",
+      "address": "",
+      "time": "11:00",
+      "category": "地域参加",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/hiroshima/events/3746/",
+      "notes": null,
+      "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
         "latitude": 34.397,
@@ -5421,5 +5469,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/15 08:15"
+  "updatedAt": "2026/07/15 14:10"
 }
