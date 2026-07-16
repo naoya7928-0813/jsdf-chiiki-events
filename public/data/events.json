@@ -5,7 +5,7 @@
       "pref": "sapporo",
       "date": "2026-07-18",
       "weekday": "土",
-      "title": "南恵庭駐屯地創設７４周年第３施設団創隊６５周年記念行事",
+      "title": "南恵庭駐屯地創設７４周年記念第３施設団創隊６５周年記念行事",
       "place": "陸上自衛隊南恵庭駐屯地",
       "address": "恵庭市恵南６３番地",
       "time": "09:00～14:30",
@@ -49,6 +49,54 @@
       }
     },
     {
+      "id": "sp-st-20260722-5",
+      "pref": "sapporo",
+      "date": "2026-07-22",
+      "weekday": "水",
+      "title": "東千歳駐屯地夏祭り",
+      "place": "東千歳駐屯地",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/sapporo/event_station.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 43.076,
+        "longitude": 141.364,
+        "label": "北海道札幌市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-16T19:21:58.900+09:00"
+      }
+    },
+    {
+      "id": "sp-st-20260725-6",
+      "pref": "sapporo",
+      "date": "2026-07-25",
+      "weekday": "土",
+      "title": "北部隊夏まつり",
+      "place": "北千歳駐屯地",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/sapporo/event_station.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 43.091,
+        "longitude": 141.341,
+        "label": "北海道札幌市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-16T19:22:00.011+09:00"
+      }
+    },
+    {
       "id": "sp-st-20260726-2",
       "pref": "sapporo",
       "date": "2026-07-26",
@@ -70,6 +118,54 @@
         "accuracy": "address",
         "source": "gsi",
         "geocodedAt": "2026-07-08T08:23:27.634+09:00"
+      }
+    },
+    {
+      "id": "sp-st-20260728-7",
+      "pref": "sapporo",
+      "date": "2026-07-28",
+      "weekday": "火",
+      "title": "滝川駐屯地盆踊り大会",
+      "place": "滝川駐屯地",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/sapporo/event_station.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 43.062,
+        "longitude": 141.354,
+        "label": "北海道札幌市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-16T19:22:00.446+09:00"
+      }
+    },
+    {
+      "id": "sp-st-20260728-8",
+      "pref": "sapporo",
+      "date": "2026-07-28",
+      "weekday": "火",
+      "title": "美唄駐屯地夏祭り",
+      "place": "美唄駐屯地",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/sapporo/event_station.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 43.062,
+        "longitude": 141.354,
+        "label": "北海道札幌市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-16T19:22:00.777+09:00"
       }
     },
     {
@@ -727,18 +823,18 @@
       }
     },
     {
-      "id": "ak-20260725-030ks",
+      "id": "ak-20260725-8nwpt",
       "pref": "akita",
       "date": "2026-07-25",
       "weekday": "土",
-      "title": "［説明会］自衛隊説明会(湯沢市)",
+      "title": "［イベント］｢みたねサンドクラフト2026(三種町)｣に自衛隊ブース出展します",
       "place": "",
       "address": "",
       "time": "",
-      "category": "説明会",
+      "category": "広報活動",
       "tag": "",
       "url": "",
-      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
+      "notes": null,
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
@@ -775,18 +871,18 @@
       }
     },
     {
-      "id": "ak-20260725-8nwpt",
+      "id": "ak-20260725-030ks",
       "pref": "akita",
       "date": "2026-07-25",
       "weekday": "土",
-      "title": "［イベント］｢みたねサンドクラフト2026(三種町)｣に自衛隊ブース出展します",
+      "title": "［説明会］自衛隊説明会(湯沢市)",
       "place": "",
       "address": "",
       "time": "",
-      "category": "広報活動",
+      "category": "説明会",
       "tag": "",
       "url": "",
-      "notes": null,
+      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
@@ -2457,6 +2553,30 @@
   "yamanashi": [],
   "nagano": [
     {
+      "id": "na-20260718-hm0w8",
+      "pref": "nagano",
+      "date": "2026-07-18",
+      "weekday": "土",
+      "title": "【松本市】公務員合同説明会",
+      "place": "イオンモール松本 「風庭」エリア",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "場所：イオンモール松本 風庭２F イオンホール 時間：１１：００～１６：００ (１５：４０受付終了) 内容：「公務員ってなにしてるの？」その疑問を解決！ 自衛隊、防衛省職員、長野県警、北アルプス消防、木曽広域消防、松本市役所、安曇野市役所、大町市役所 合同により、公務員の仕事内容、生活、ワークライフバランス、待遇等わかりやすく説明させていただきます。",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-03T20:01:30.984+09:00"
+      }
+    },
+    {
       "id": "na-20260718-uimr5",
       "pref": "nagano",
       "date": "2026-07-18",
@@ -2502,30 +2622,6 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-08T14:27:39.776+09:00"
-      }
-    },
-    {
-      "id": "na-20260718-hm0w8",
-      "pref": "nagano",
-      "date": "2026-07-18",
-      "weekday": "土",
-      "title": "【松本市】公務員合同説明会",
-      "place": "イオンモール松本 「風庭」エリア",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "場所：イオンモール松本 風庭２F イオンホール 時間：１１：００～１６：００ (１５：４０受付終了) 内容：「公務員ってなにしてるの？」その疑問を解決！ 自衛隊、防衛省職員、長野県警、北アルプス消防、木曽広域消防、松本市役所、安曇野市役所、大町市役所 合同により、公務員の仕事内容、生活、ワークライフバランス、待遇等わかりやすく説明させていただきます。",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-03T20:01:30.984+09:00"
       }
     },
     {
@@ -2721,6 +2817,31 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:28.503+09:00"
+      }
+    },
+    {
+      "id": "sh-off-20260716-b2anz",
+      "pref": "shizuoka",
+      "date": "2026-07-16",
+      "weekday": "木",
+      "title": "令和８年度第２回一般幹部候補生及び幹部候補曹採用第１次試験合格者",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "採用イベント",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/sizuoka/bosyu/pdf/42.pdf",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 34.977,
+        "longitude": 138.383,
+        "label": "静岡県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-07-16T19:22:01.105+09:00"
       }
     }
   ],
@@ -4401,6 +4522,31 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:33.260+09:00"
       }
+    },
+    {
+      "id": "na-off-20260716-l2sg5",
+      "pref": "nara",
+      "date": "2026-07-16",
+      "weekday": "木",
+      "title": "一般大卒女子",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/gsdf/mae/contents/6-1-bosyu/pdf/kannkou_ippann_1ji.pdf",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 34.685,
+        "longitude": 135.833,
+        "label": "奈良県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:32.748+09:00"
+      }
     }
   ],
   "wakayama": [
@@ -5426,5 +5572,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/16 14:18"
+  "updatedAt": "2026/07/16 19:21"
 }
