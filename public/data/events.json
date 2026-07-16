@@ -455,6 +455,30 @@
         "source": "gsi",
         "geocodedAt": "2026-07-08T08:23:28.927+09:00"
       }
+    },
+    {
+      "id": "iw-20260822-rymlw",
+      "pref": "iwate",
+      "date": "2026-08-22",
+      "weekday": "土",
+      "title": "夏の陸上自衛隊見学ツアー",
+      "place": "宮城県七ヶ宿町ダム",
+      "address": "",
+      "time": "10:30～13:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/iwate/assets/img/event/until20260822/zyusisetu.pdf",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.64,
+        "longitude": 141.946,
+        "label": "岩手県宮古市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-16T14:18:56.709+09:00"
+      }
     }
   ],
   "yamagata": [
@@ -727,30 +751,6 @@
       }
     },
     {
-      "id": "ak-20260725-8nwpt",
-      "pref": "akita",
-      "date": "2026-07-25",
-      "weekday": "土",
-      "title": "［イベント］｢みたねサンドクラフト2026(三種町)｣に自衛隊ブース出展します",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 39.719,
-        "longitude": 140.102,
-        "label": "秋田県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
-      }
-    },
-    {
       "id": "ak-20260725-vzu4a",
       "pref": "akita",
       "date": "2026-07-25",
@@ -763,6 +763,30 @@
       "tag": "",
       "url": "",
       "notes": "詳細は秋田地本SNSにてご覧ください",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.719,
+        "longitude": 140.102,
+        "label": "秋田県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
+      }
+    },
+    {
+      "id": "ak-20260725-8nwpt",
+      "pref": "akita",
+      "date": "2026-07-25",
+      "weekday": "土",
+      "title": "［イベント］｢みたねサンドクラフト2026(三種町)｣に自衛隊ブース出展します",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
@@ -804,6 +828,54 @@
       "date": "2026-08-02",
       "weekday": "日",
       "title": "［出展/説明会］3機関合同採用説明会(由利本荘市)",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.719,
+        "longitude": 140.102,
+        "label": "秋田県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
+      }
+    },
+    {
+      "id": "ak-20260806-yz4hk",
+      "pref": "akita",
+      "date": "2026-08-06",
+      "weekday": "木",
+      "title": "［出展/説明会］3機関合同採用説明会(大館市)",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.719,
+        "longitude": 140.102,
+        "label": "秋田県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
+      }
+    },
+    {
+      "id": "ak-20260807-9zajm",
+      "pref": "akita",
+      "date": "2026-08-07",
+      "weekday": "金",
+      "title": "［説明会］自衛隊説明会(北秋田市)",
       "place": "",
       "address": "",
       "time": "",
@@ -1257,10 +1329,61 @@
       }
     },
     {
-      "id": "t-20260903-j1qk8",
+      "id": "t-20260828-bcxll",
       "pref": "tokyo",
-      "date": "2026-09-03",
-      "weekday": "木",
+      "date": "2026-08-28",
+      "weekday": "金",
+      "title": "入間見学",
+      "place": "西東京地域事務所",
+      "time": "8/28(金）10:00～15:00",
+      "category": "体験",
+      "tag": "",
+      "ageRequirement": "16歳～32歳",
+      "deadline": "7/30(木）12:00",
+      "url": "https://www.mod.go.jp/pco/tokyo/nishitokyo/index.html#0828",
+      "notes": "・航空機見学\n・管制塔見学\n・修武台記念館見学\n・体験喫食\n無料、受付7:45～8:05、応募多数の場合は抽選",
+      "source_type": "office_html",
+      "address": "",
+      "weatherLocation": {
+        "latitude": 35.726,
+        "longitude": 139.538,
+        "label": "東京都西東京市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-02T08:50:37.016+09:00"
+      }
+    },
+    {
+      "id": "t-20260902-tkkhz",
+      "pref": "tokyo",
+      "date": "2026-09-02",
+      "weekday": "水",
+      "title": "潜水艦艦内見学",
+      "place": "豊島出張所",
+      "time": "9/2（水）10:00～",
+      "category": "艦艇公開",
+      "tag": "",
+      "ageRequirement": "志募 資格 27歳から32歳",
+      "deadline": "8月31日（月）",
+      "url": "https://www.mod.go.jp/pco/tokyo/toshima/index.html#0902",
+      "notes": "・MCV射撃訓練見学\n・WAPC体験搭乗\n・資料館見学\n・体験喫食\n※内容は変更することがあります　※応募者多数の場合、抽選となります",
+      "source_type": "office_html",
+      "address": "",
+      "deadlineDate": "2026-08-31",
+      "weatherLocation": {
+        "latitude": 35.726,
+        "longitude": 139.717,
+        "label": "東京都豊島区",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-29T16:31:20.069+09:00"
+      }
+    },
+    {
+      "id": "t-20260907-ta858",
+      "pref": "tokyo",
+      "date": "2026-09-07",
+      "weekday": "月",
       "title": "MCV体験型見学",
       "place": "豊島出張所",
       "time": "10:00～15:00",
@@ -2329,57 +2452,32 @@
         "source": "gsi",
         "geocodedAt": "2026-07-02T08:50:41.211+09:00"
       }
-    },
-    {
-      "id": "fu-off-20260727-duezo",
-      "pref": "fukui",
-      "date": "2026-07-27",
-      "weekday": "月",
-      "title": "小浜漁港（福井鼎小浜市）",
-      "place": "",
-      "address": "",
-      "time": "13:00～14:30",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/fukui/contents/15-oubo/images/20260727fleet_tour-aishima.pdf",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "weatherLocation": {
-        "latitude": 36.065,
-        "longitude": 136.222,
-        "label": "福井県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-07-03T08:23:08.975+09:00"
-      }
     }
   ],
   "yamanashi": [],
   "nagano": [
     {
-      "id": "na-20260718-hm0w8",
+      "id": "na-20260718-uimr5",
       "pref": "nagano",
       "date": "2026-07-18",
       "weekday": "土",
-      "title": "【松本市】公務員合同説明会",
-      "place": "イオンモール松本 「風庭」エリア",
+      "title": "【伊那市】自衛隊採用説明会",
+      "place": "中部森林管理局 南信森林管理署",
       "address": "",
       "time": "",
       "category": "説明会",
       "tag": "",
       "url": "",
-      "notes": "場所：イオンモール松本 風庭２F イオンホール 時間：１１：００～１６：００ (１５：４０受付終了) 内容：「公務員ってなにしてるの？」その疑問を解決！ 自衛隊、防衛省職員、長野県警、北アルプス消防、木曽広域消防、松本市役所、安曇野市役所、大町市役所 合同により、公務員の仕事内容、生活、ワークライフバランス、待遇等わかりやすく説明させていただきます。",
+      "notes": "自衛隊採用説明会 １０：００～１２：００ 説明内容 ・自衛隊の概要 ・自衛隊の職種、職域 ・福利厚生など 気軽にお立ち寄りください",
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
+        "latitude": 35.635,
+        "longitude": 137.946,
         "label": "長野県",
         "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-07-03T20:01:30.984+09:00"
+        "geocodedAt": "2026-07-03T20:01:31.351+09:00"
       }
     },
     {
@@ -2407,27 +2505,27 @@
       }
     },
     {
-      "id": "na-20260718-uimr5",
+      "id": "na-20260718-hm0w8",
       "pref": "nagano",
       "date": "2026-07-18",
       "weekday": "土",
-      "title": "【伊那市】自衛隊採用説明会",
-      "place": "中部森林管理局 南信森林管理署",
+      "title": "【松本市】公務員合同説明会",
+      "place": "イオンモール松本 「風庭」エリア",
       "address": "",
       "time": "",
       "category": "説明会",
       "tag": "",
       "url": "",
-      "notes": "自衛隊採用説明会 １０：００～１２：００ 説明内容 ・自衛隊の概要 ・自衛隊の職種、職域 ・福利厚生など 気軽にお立ち寄りください",
+      "notes": "場所：イオンモール松本 風庭２F イオンホール 時間：１１：００～１６：００ (１５：４０受付終了) 内容：「公務員ってなにしてるの？」その疑問を解決！ 自衛隊、防衛省職員、長野県警、北アルプス消防、木曽広域消防、松本市役所、安曇野市役所、大町市役所 合同により、公務員の仕事内容、生活、ワークライフバランス、待遇等わかりやすく説明させていただきます。",
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.635,
-        "longitude": 137.946,
+        "latitude": 36.651,
+        "longitude": 138.181,
         "label": "長野県",
         "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-07-03T20:01:31.351+09:00"
+        "geocodedAt": "2026-07-03T20:01:30.984+09:00"
       }
     },
     {
@@ -5328,5 +5426,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/16 08:15"
+  "updatedAt": "2026/07/16 14:18"
 }
