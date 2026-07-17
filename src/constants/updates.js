@@ -6,6 +6,12 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-07-17',
+    version: '1.25.50',
+    type:    'fix',
+    content: 'イベント名・開催時間の表記統一と、一部イベントの名称・会場情報の修正。',
+  },
+  {
+    date:    '2026-07-17',
     version: '1.25.49',
     type:    'improvement',
     content: 'イベント情報の充実（会場情報・チラシ画像の拡充）と表記の軽微な修正。',

@@ -8,7 +8,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
   applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, cleanTimeText, cleanDeadlineText,
-  isJunkOrStubTitle, isStaleDatedEvent, dedupEvents,
+  isJunkOrStubTitle, isSuspiciousTitle, isStaleDatedEvent, dedupEvents,
 } = require('./titleQuality.cjs');
 
 test('applyVerifiedOverrides: チラシ照合済みの修正がURLで適用される', () => {
@@ -42,6 +42,74 @@ test('applyVerifiedOverrides: チラシ照合済みの修正がURLで適用さ�
   // 同名でも日付・地本が違えば適用しない
   const e = applyVerifiedOverrides({ pref: 'ibaraki', date: '2026-07-27', title: 'つくば市公安系公務員 合同説明会', place: 'X', url: '' });
   assert.equal(e.place, 'X');
+});
+
+test('applyVerifiedOverrides: 2026-07-17 監査分（帯広やはぎ/秋田すおう/熊本インターン）', () => {
+  // 帯広: url無し → pref+date+titleIncludes で種別・終了日を補完
+  const yah = applyVerifiedOverrides({ pref: 'obihiro', date: '2026-07-24', title: '護衛艦「やはぎ」', url: '' });
+  assert.equal(yah.title, '護衛艦「やはぎ」一般公開');
+  assert.equal(yah.endDate, '2026-07-26');
+  assert.equal(yah.category, '艦艇公開');
+  // 秋田すおう: OCR断片 → チラシ正式名＋終了日
+  const suou = applyVerifiedOverrides({
+    pref: 'akita', date: '2026-07-25', title: 'すおう in秋田港',
+    url: 'https://www.mod.go.jp/pco/akita/file/result/20260725_26.pdf',
+  });
+  assert.equal(suou.title, '多用途支援艦すおう一般公開(秋田港)');
+  assert.equal(suou.endDate, '2026-07-26');
+  // 熊本: OCR誤読「現場の仕事体夏。」→ チラシ正式名（。付き長文junkルールに抵触しない形）
+  const km = applyVerifiedOverrides({
+    pref: 'kumamoto', date: '2026-08-24', title: '現場の仕事体夏。',
+    url: 'https://www.mod.go.jp/pco/kumamoto/event/event/20260824_28_intern/img/20260824_28_intern.pdf',
+  });
+  assert.equal(km.endDate, '2026-08-28');
+  assert.equal(isJunkOrStubTitle(cleanEventTitle(km.title)), false);
+});
+
+test('dedupEvents: 秋田すおう（iCal と チラシOCR）が名称包含で統合される', () => {
+  const merged = dedupEvents([
+    { id: 'a1', pref: 'akita', date: '2026-07-25', title: '［艦艇広報］多用途支援艦すおう一般公開(秋田港)', place: '' },
+    // オーバーライド適用後の OCR 側（place・notes を持つ＝情報量スコアで勝つ）
+    { id: 'a2', pref: 'akita', date: '2026-07-25', title: '多用途支援艦すおう一般公開(秋田港)',
+      place: '中島埠頭2号岸壁', endDate: '2026-07-26', url: 'https://example.com/20260725_26.pdf',
+      notes: '7/25 09:00～12:00・13:00～16:00／7/26 09:00～12:00（乗艦締切は各回30分前）' },
+  ]);
+  assert.equal(merged.length, 1);
+  assert.equal(merged[0].place, '中島埠頭2号岸壁'); // 情報量の多い方が残る
+});
+
+test('cleanEventTitle: 全角英数を半角へ統一（表記ゆれ解消）', () => {
+  assert.equal(cleanEventTitle('第５６回 ひがしね祭'), '第56回 ひがしね祭');
+  assert.equal(cleanEventTitle('公安系公務員 合同説明会 ｉｎ 呉'), '公安系公務員 合同説明会 in 呉');
+  assert.equal(cleanEventTitle('高田駐屯地サマーフレンドシップキャンペーン２０２６ｉｎパティオ'),
+    '高田駐屯地サマーフレンドシップキャンペーン2026inパティオ');
+  assert.equal(cleanEventTitle('２Daysインターンシップ'), '2Daysインターンシップ');
+  // 記号・カナは触らない
+  assert.equal(cleanEventTitle('夏だ！自衛官と一緒に楽しもう！'), '夏だ！自衛官と一緒に楽しもう！');
+});
+
+test('cleanEventTitle: 末尾の宣伝フレーズ連結を除去（帯広の表セル連結）', () => {
+  assert.equal(cleanEventTitle('公務員合同説明会入場無料！！どなたでも参加できます！！'), '公務員合同説明会');
+  assert.equal(cleanEventTitle('防災フェスタ 入場無料'), '防災フェスタ');
+  // 名称の一部としての「無料」は誤爆しない（末尾連結のみ対象）
+  assert.equal(cleanEventTitle('無料相談会'), '無料相談会');
+});
+
+test('isJunkOrStubTitle: 採用文書（募集要項/募集案内）・OCR簡体字を除外', () => {
+  assert.equal(isJunkOrStubTitle('防衛省職員（任期付自衛官）募集要項'), true);
+  assert.equal(isJunkOrStubTitle('任期付自衛官の募集要项'), true);   // 簡体字「项」
+  assert.equal(isJunkOrStubTitle('防衛省職員（非常勤隊員）募集案内'), true);
+  // イベント名は除外しない
+  assert.equal(isJunkOrStubTitle('自衛官募集説明会'), false);
+  assert.equal(isJunkOrStubTitle('自衛官採用説明会'), false);
+});
+
+test('isSuspiciousTitle: 会場名で終わるタイトルを検疫（イベント語があれば素通し）', () => {
+  assert.equal(isSuspiciousTitle('イーストピアみやこ 2階 多目的ホール'), true);
+  assert.equal(isSuspiciousTitle('中島埠頭'), true);
+  // イベント語を含めば検疫しない
+  assert.equal(isSuspiciousTitle('市民ホールまつり'), false);
+  assert.equal(isSuspiciousTitle('文化センター 見学会'), false);
 });
 
 test('cleanEventTitle: 表の内訳（【参加団体】/【場所】）の連結を切り落とす', () => {
@@ -124,14 +192,16 @@ test('cleanEventTitle: 更新バッジ接頭辞・会場連結・末尾断片を
   assert.equal(cleanEventTitle('採用説明会の'), '採用説明会');
   // 年号サフィックスや！！直後に空白の無い本文は切らない（誤爆防止）
   assert.equal(cleanEventTitle('自衛隊体験フェスタ!! 2026'), '自衛隊体験フェスタ!! 2026');
+  // 末尾の宣伝フレーズ連結は 2026-07-17 から除去仕様（帯広の表セル連結）
   assert.equal(cleanEventTitle('公務員合同説明会入場無料！！どなたでも参加できます！！'),
-    '公務員合同説明会入場無料！！どなたでも参加できます！！');
+    '公務員合同説明会');
 });
 
 test('cleanEventTitle: 複数イベントの連結は先頭イベントのみ残す（2026-06-16 広島で検出）', () => {
+  // 全角英数は 2026-07-17 から半角へ統一（第１回→第1回）
   assert.equal(
     cleanEventTitle('第１回公安系公務員合同説明会in広島の 公安系公務員合同説明会inふくやまの 公安職公務員ガイダンスのご案内'),
-    '第１回公安系公務員合同説明会in広島');
+    '第1回公安系公務員合同説明会in広島');
   // 単独イベント（イベント語1回）は連結扱いしない（※末尾「のご案内」は2026-07-02から除去仕様）
   assert.equal(cleanEventTitle('公務員合同説明会のご案内'), '公務員合同説明会');
 });
@@ -281,7 +351,7 @@ test('cleanEventTitle: 先頭連番＋文書件名「募集の件」を除去（
 test('cleanEventTitle: 末尾「のお知らせ」「のご案内」を除去（旭川・広島）', () => {
   assert.equal(cleanEventTitle('艦艇広報 護衛艦「きりさめ」「あさぎり」一般公開のお知らせ'),
     '艦艇広報 護衛艦「きりさめ」「あさぎり」一般公開');
-  assert.equal(cleanEventTitle('第１回公安系公務員合同説明会ｉｎ広島のお知らせ'), '第１回公安系公務員合同説明会ｉｎ広島');
+  assert.equal(cleanEventTitle('第１回公安系公務員合同説明会ｉｎ広島のお知らせ'), '第1回公安系公務員合同説明会in広島');
   assert.equal(cleanEventTitle('公安職公務員ガイダンスのご案内'), '公安職公務員ガイダンス');
 });
 
@@ -393,6 +463,18 @@ test('cleanTimeText: 時分/午前午後/4桁/区切りを HH:MM～HH:MM に正�
   // 午前/午後＋コロン形式・2部制（東京 2026-07 で実際に出た表記）
   assert.equal(cleanTimeText('午前10:30～11:30、午後13:30～14:30'), '10:30～11:30／13:30～14:30');
   assert.equal(cleanTimeText('10:00～12:00、14:00～16:00'), '10:00～12:00／14:00～16:00');
+  // 先頭の開催日プレフィックス（date と重複）・括弧の全半角混在
+  assert.equal(cleanTimeText('8/28(金）10:00～15:00'), '10:00～15:00');
+  assert.equal(cleanTimeText('7/26（日）13:00～16:30'), '13:00～16:30');
+  // 開始時刻のみ（末尾の～は落とす）
+  assert.equal(cleanTimeText('9/2（水）10:00～'), '10:00');
+  assert.equal(cleanTimeText('13:30～'), '13:30');
+  // ①②枠・第N部ラベルは「／」区切りへ（番号の重複ミスにも頑健）
+  assert.equal(cleanTimeText('①10:00～11:30 ②13:10～14:40 ②15:00～16:30'), '10:00～11:30／13:10～14:40／15:00～16:30');
+  assert.equal(cleanTimeText('①13:00②15:00③17:00④19:00'), '13:00／15:00／17:00／19:00');
+  assert.equal(cleanTimeText('第1部10:00～12:00 第2部13:00～15:00'), '10:00～12:00／13:00～15:00');
+  assert.equal(cleanTimeText('第一部 09:30～12:00、第二部 13:30～16:00'), '09:30～12:00／13:30～16:00');
+  assert.equal(cleanTimeText('第一部 10:00～12:00 第二部 14:00～16:00 第三部 17:00～19:00'), '10:00～12:00／14:00～16:00／17:00～19:00');
   // 受付/開場/※注記は除去
   assert.equal(cleanTimeText('18:00～19:45(開場17:00)'), '18:00～19:45');
   assert.equal(cleanTimeText('10:00～18:00 ※金曜日のみ12:00～'), '10:00～18:00');
@@ -426,7 +508,7 @@ test('cleanPlaceText: ジオコーダ住所サフィックス除去・活動羅�
 });
 
 // ── 検疫（isSuspiciousTitle）: 新種ゴミの公開保留（2026-07-03 岩手事故の再発防止） ──
-const { isSuspiciousTitle } = require('./titleQuality.cjs');
+// isSuspiciousTitle はファイル先頭でまとめて require 済み
 
 test('isSuspiciousTitle: 表の行・ラベル・組織名・スペック・述語断片を検疫する', () => {
   const suspicious = [
