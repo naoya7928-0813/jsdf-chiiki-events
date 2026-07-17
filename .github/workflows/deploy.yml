@@ -55,13 +55,30 @@ jobs:
         # （リポジトリ・バンドルに出さない）。未設定なら api/report.js が旧トピックに退避。
         # トークンは別名 env で受け取り改行を除去してから --token に渡す
         # （VERCEL_TOKEN シークレットに改行が混入しており CLI が拒否するため）
+        # デプロイは同一コミットの再実行で冪等なため、一時的な通信断はリトライで吸収する
         run: |
           CLEAN_TOKEN=$(printf '%s' "$VTOKEN" | tr -d '\r\n')
           ARGS=""
           if [ -n "$NTFY_BUG_TOPIC" ]; then ARGS="$ARGS -e NTFY_BUG_TOPIC=$NTFY_BUG_TOPIC"; fi
           if [ -n "$ADMIN_SECRET" ];   then ARGS="$ARGS -e ADMIN_SECRET=$ADMIN_SECRET"; fi
           if [ -n "$ADMIN_ACCOUNTS_B64" ]; then ARGS="$ARGS -e ADMIN_ACCOUNTS_B64=$ADMIN_ACCOUNTS_B64"; fi
-          npx vercel --prod --token "$CLEAN_TOKEN" $ARGS
+          ATTEMPTS=3
+          OK=0
+          for i in $(seq 1 "$ATTEMPTS"); do
+            if npx vercel --prod --token "$CLEAN_TOKEN" $ARGS; then
+              OK=1
+              break
+            fi
+            if [ "$i" -lt "$ATTEMPTS" ]; then
+              WAIT=$((i * 60))
+              echo "::warning::Vercel デプロイに失敗（試行 ${i}/${ATTEMPTS}）。通信の一時障害の可能性。${WAIT}秒後に再試行します。"
+              sleep "$WAIT"
+            fi
+          done
+          if [ "$OK" != "1" ]; then
+            echo "::error::Vercel デプロイに失敗しました（${ATTEMPTS} 回試行）"
+            exit 1
+          fi
         env:
           VTOKEN:            ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
