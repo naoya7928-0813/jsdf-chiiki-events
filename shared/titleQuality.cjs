@@ -51,6 +51,10 @@ function cleanEventTitle(raw) {
       && /(?:説明会|ガイダンス|相談会|フェア|見学会)(?:in[^\sの]+)?の\s/.test(t)) {
     t = t.replace(/((?:説明会|ガイダンス|相談会|フェア|見学会)(?:in[^\sの]+)?)の\s.*$/, '$1');
   }
+  // 表の「内容等」列の内訳がタイトルに連結したもの（茨城 setsumeikai 等）
+  // 「○○合同説明会【参加団体】・警察・消防・…」→ 一覧以降を切り落とす
+  t = t.replace(/\s*【参加団体】.*$/, '');
+  t = t.replace(/\s*【場所】.*$/, '');
   t = t.replace(/\s*参加費\s*無料[!！]*$/, '');    // 末尾の宣伝文句
   // 末尾のCTA誘導「ご応募はコチラ」「お申し込みはこちら」
   t = t.replace(/\s*(?:ご|お)?(?:応募|申し?込み?)は?(?:こちら|コチラ)[!！]*$/, '');
@@ -351,6 +355,12 @@ const VERIFIED_OVERRIDES = [
   // 徳島: OCRが場所行を文字化けタイトル化（チラシ: 官公庁合同公務員職業説明会 7/4 四国大学交流プラザ）
   { urlIncludes: 'setumei/setumei02.pdf',
     set: { title: '官公庁合同 公務員職業説明会', place: '四国大学交流プラザ（徳島市）', time: '13:00～16:40', category: '説明会' } },
+  // 茨城: setsumeikai.html の表が 7/28 つくば市説明会の会場を前行と同じ「土浦市役所」と
+  // 記載しているが、土浦地域事務所ページ（jimusho/tsuchiura.html）では
+  // 「イオンモールつくば 3Fイオンホール」と明記（2026-07-17 両ページ照合。開催市とも整合）。
+  // このイベントは url が無いため pref+date+titleIncludes でマッチさせる
+  { pref: 'ibaraki', date: '2026-07-28', titleIncludes: 'つくば市公安系公務員',
+    set: { place: 'イオンモールつくば 3Fイオンホール' } },
 ];
 
 /** イベントに検証済み修正を適用する（writeOutput から毎回呼ばれる） */
@@ -359,7 +369,11 @@ function applyVerifiedOverrides(ev) {
   const u = String(ev.url || '') + ' ' + String(ev.imageUrl || '');
   let out = ev;
   for (const o of VERIFIED_OVERRIDES) {
-    if (!u.includes(o.urlIncludes)) continue;
+    // urlIncludes / titleIncludes のどちらかは必須（誤って全件へ適用しないためのガード）
+    if (!o.urlIncludes && !o.titleIncludes) continue;
+    if (o.urlIncludes && !u.includes(o.urlIncludes)) continue;
+    if (o.titleIncludes && !String(ev.title || '').includes(o.titleIncludes)) continue;
+    if (o.pref && ev.pref !== o.pref) continue;
     if (o.date && ev.date !== o.date) continue;
     out = { ...out, ...o.set };
   }
@@ -446,6 +460,9 @@ function cleanTimeText(raw) {
   // 午前/午後（午後N時→(N%12)+12時）
   t = t.replace(/午前\s*(\d{1,2})\s*時/g, (m, h) => `${h}時`);
   t = t.replace(/午後\s*(\d{1,2})\s*時/g, (m, h) => `${(Number(h) % 12) + 12}時`);
+  // 午前/午後＋コロン形式（例: 午前10:30 → 10:30、午後1:30 → 13:30）
+  t = t.replace(/午前\s*(\d{1,2})(:\d{2})/g, (m, h, mm) => `${h}${mm}`);
+  t = t.replace(/午後\s*(\d{1,2})(:\d{2})/g, (m, h, mm) => `${(Number(h) % 12) + 12}${mm}`);
   // 「N時M分」「N時半」「N時」→ HH:MM
   t = t.replace(/(\d{1,2})\s*時\s*(\d{1,2})\s*分/g, (m, h, mm) => `${h}:${mm.padStart(2, '0')}`);
   t = t.replace(/(\d{1,2})\s*時半/g, (m, h) => `${h}:30`);
@@ -457,6 +474,9 @@ function cleanTimeText(raw) {
   t = t.replace(/(?<![\d:])(\d{2})(\d{2})(?![\d:])/g, (m, h, mm) => (Number(h) <= 23 && Number(mm) <= 59) ? `${h}:${mm}` : m);
   // H:MM → 0H:MM（時を2桁化）
   t = t.replace(/(?<![\d:])(\d):(\d{2})/g, '0$1:$2');
+  // 複数部制の区切り（「、」「,」で時刻が続く）は「／」に統一
+  // 例: 「10:30～11:30、13:30～14:30」→「10:30～11:30／13:30～14:30」
+  t = t.replace(/(\d{2}:\d{2})\s*[、,]\s*(?=\d{1,2}:\d{2})/g, '$1／');
   t = t.replace(/\s+/g, ' ').replace(/\s*～\s*/g, '～').trim();
   t = t.replace(/^[、,～\s]+|[、,\s]+$/g, '').trim();
   return t;

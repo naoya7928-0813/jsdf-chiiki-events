@@ -48,15 +48,32 @@ function parseAichi($) {
           .text().replace(/\s+/g, ' ').trim();
         if (!title) return;
 
-        // 詳細ページ URL（相対パスを絶対パスへ）
+        // 詳細ページ URL（相対パスを絶対パスへ）。2026-07 時点の構造では
+        // href は廃止され、data-img のチラシをモーダル表示する形になっている
         const href = $link.attr('href') || '';
-        const url  = href
+        let url = href
           ? (href.startsWith('http') ? href : AICHI_BASE + href.replace(/^\.?\//, ''))
           : '';
 
+        // チラシ（data-img）: 画像なら imageUrl として OCR/カード表示に使う。
+        // PDF は ocrImage 非対応のため url として扱う（場所はチラシ内にのみ記載）
+        const dataImg = $link.attr('data-img') || '';
+        let imageUrl = '';
+        if (dataImg) {
+          const abs = dataImg.startsWith('http') ? dataImg : AICHI_BASE + dataImg.replace(/^\.?\//, '');
+          if (/\.pdf(\?.*)?$/i.test(abs)) { if (!url) url = abs; }
+          else imageUrl = abs;
+        }
+
+        // 「お申込」ボタン（Google フォーム等）は公式の申込先として url に採用
+        if (!url) {
+          const applyHref = $(itemEl).find('a.apply-btn').attr('href') || '';
+          if (applyHref.startsWith('http')) url = applyHref;
+        }
+
         const typeLabel = $(itemEl).find('.event-label').text().replace(/\s+/g, ' ').trim();
 
-        // カレンダーページに場所情報はないため空文字（詳細ページ取得は fetchAichiDetail で実施）
+        // カレンダーページに場所情報はない（imageUrl のチラシ OCR で補完される）
         events.push({
           id:             `ai-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
           pref:           'aichi',
@@ -69,6 +86,7 @@ function parseAichi($) {
           category:       guessCategory(toHalfWidth(title)) || '説明会',
           tag:            guessTag(title),
           url,
+          imageUrl,
           notes:          typeLabel || null,
           ageRequirement: null,
           deadline:       null,

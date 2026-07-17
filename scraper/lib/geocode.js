@@ -117,10 +117,21 @@ async function resolveLocation(ev, lookupFn, now = Date.now()) {
   if (!ev || typeof ev !== 'object') return null;
   const pj = PREF_JP[ev.pref];
   const attempts = [];
-  if (ev.address) attempts.push(['address', ev.address]);
+  // 市区町村までしか書かれていない address（例:「能代市」。タイトル抽出由来など）は
+  // accuracy を municipality と正しくラベルする（address だと天気カードが
+  // 「開催地の参考予報」注記なしの通常表示になり精度を過大表示してしまう）
+  const addr = String(ev.address || '').trim();
+  const muniOnly = addr
+    && /^(?:北海道|(?:京都|大阪)府|東京都|[一-鿿ぁ-んァ-ヶー]{2,3}県)?[一-鿿ぁ-んァ-ヶー]{1,8}[市区町村]$/.test(addr);
+  if (addr && !muniOnly) attempts.push(['address', addr]);
   const venue = pickVenue(ev.place);
   // 会場名は同名衝突を避けるため都道府県名を前置してから検索
   if (venue) attempts.push(['venue', pj ? `${pj} ${venue}` : venue]);
+  if (addr && muniOnly) {
+    // 同名市町村の衝突を避けるため都道府県名を前置（例: 府中市は東京/広島にある）
+    const prefName = pj ? (pj.match(/^(北海道|京都府|大阪府|東京都|.{2,3}県)/) || [])[1] || '' : '';
+    attempts.push(['municipality', /道|府|都|県/.test(addr) ? addr : `${prefName}${addr}`]);
+  }
   const muni = extractPrefMuni(ev.address || ev.place);
   if (muni) attempts.push(['municipality', muni]);
   if (pj) attempts.push(['prefecture', pj]);
@@ -206,7 +217,10 @@ function logQuality(counts, active, today) {
   try { prev = collectAccuracyCounts(JSON.parse(fs.readFileSync(path.join(__dirname, '../../public/data/events.json'), 'utf8')), today); }
   catch { /* 初回など */ }
 
-  const warn = (msg) => console.warn(`::warning title=weather-geocode::${msg}`);
+  // モック実行（CIスモークテスト）ではデータが実データと無関係のため、
+  // 前回比の急変警告が毎回誤発報になる → GitHub Actions 警告は抑止する
+  const isMock = process.argv.includes('--mock');
+  const warn = (msg) => { if (!isMock) console.warn(`::warning title=weather-geocode::${msg}`); };
   if ((counts.missing || 0) > 0) warn(`座標を取得できないイベントが ${counts.missing} 件あります`);
   if (rate < 0.9) warn(`ジオコーディング成功率が低下しています（${(rate * 100).toFixed(1)}%）`);
   if (prev) {

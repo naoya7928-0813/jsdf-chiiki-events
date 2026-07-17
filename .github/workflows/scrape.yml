@@ -55,17 +55,17 @@ jobs:
     steps:
       # ── リポジトリをチェックアウト ──────────────────────────
       - name: リポジトリをチェックアウト
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # ── Node.js のセットアップ ───────────────────────────────
       - name: Node.js 22 をセットアップ
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22'
 
       # ── Python OCR（RapidOCR）のセットアップ ───────────────────
       - name: Python 3.11 をセットアップ
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
           cache: 'pip'
@@ -82,7 +82,7 @@ jobs:
 
       # ── OCRキャッシュを復元（git管理外・大容量対応） ────────────
       - name: OCRキャッシュを復元
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: scraper/ocr-cache.json
           key: ocr-cache-${{ runner.os }}-${{ github.run_id }}
@@ -92,7 +92,7 @@ jobs:
       # ── Playwright Chromium バイナリをキャッシュ ─────────────
       - name: Playwright Chromium キャッシュを復元
         id: pw-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/ms-playwright
           key: playwright-chromium-${{ runner.os }}-${{ hashFiles('scraper/package-lock.json') }}
@@ -107,6 +107,21 @@ jobs:
       - name: Playwright Chromium をインストール
         working-directory: scraper
         run: npx playwright install chromium --with-deps
+
+      # ── スクレイパーのスモークテスト ──────────────────────────
+      # 2026-07-07 に import 漏れ（ReferenceError）が本番実行で初めて露見し
+      # 定期スクレイプが全失敗した再発防止。--mock は HTTP アクセスなしで
+      # writeOutput（整形・検疫・出力）まで実行するため、構文エラーに加えて
+      # 実行時の未定義参照も本スクレイプ前に検出できる。
+      - name: スクレイパーのスモークテスト（構文＋モック実行）
+        run: |
+          echo "STAGE=smoke" >> "$GITHUB_ENV"
+          node --check scraper/index.js
+          node scraper/index.js --mock
+          # モック出力が実データ（前回データ維持・PREV_EVENTS の基準）を
+          # 汚さないよう、書き出されたファイルを復元する
+          git checkout -- public/ scraper/geocode-cache.json
+          rm -f scraper/push-payload.json
 
       # ── スクレイピング実行 ────────────────────────────────────
       - name: イベントデータをスクレイピング
@@ -534,6 +549,7 @@ jobs:
         if: failure()
         run: |
           case "${STAGE:-unknown}" in
+            smoke)         LABEL="スクレイパー スモークテスト失敗（コード不備の可能性）" ;;
             scrape)        LABEL="データ取得失敗" ;;
             health_check)  LABEL="データ健全性チェック失敗" ;;
             title_check)   LABEL="イベント名チェック失敗" ;;

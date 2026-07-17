@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, padTwo, titleHash } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, padTwo, titleHash, extractLocationFromTitle } = require('./utils');
 
 /**
  * iCal テキストを行単位で解析して VEVENT ブロックを抽出する。
@@ -107,7 +107,13 @@ function parseICalEvents(icsText, prefId) {
     const title = toHalfWidth(ve.summary || '').replace(/\s+/g, ' ').trim();
     if (!title) continue;
 
-    const place = toHalfWidth(ve.location || '').replace(/\s+/g, ' ').trim();
+    let place = toHalfWidth(ve.location || '').replace(/\s+/g, ' ').trim();
+    // LOCATION 未記入のカレンダー運用向け: タイトル内の場所ヒントで補完
+    let address = '';
+    if (!place) {
+      const hint = extractLocationFromTitle(title);
+      if (hint) { place = hint.place; address = hint.address; }
+    }
     const rawDesc = ve.description
       ? ve.description
           .replace(/<br\s*\/?>/gi, ' ')
@@ -125,7 +131,7 @@ function parseICalEvents(icsText, prefId) {
       weekday,
       title,
       place,
-      address:        '',
+      address,
       time,
       category:       guessCategory(title),
       tag:            guessTag(title),

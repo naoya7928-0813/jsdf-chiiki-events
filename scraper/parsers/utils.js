@@ -188,4 +188,27 @@ function titleHash(date, title) {
   return (h >>> 0).toString(36).padStart(5, '0').slice(-5);
 }
 
-module.exports = { reiwaToAD, reiwaNum, resolveYearByWeekday, HEISEI_BASE, padTwo, toHalfWidth, jstYear, isPast, guessCategory, guessTag, guessTags, calcWeekday, titleHash };
+// タイトル内の場所ヒント抽出に使う会場語（会場名として place に採用できる語）
+const TITLE_VENUE_KW = /会場|駐屯地|基地|分屯|港|駅|公園|ホール|センター|会館|プラザ|体育館|アリーナ|庁舎|大学|高校|学校|モール|広場|グラウンド|市役所|役場|城|ドーム|スタジアム|球場|美術館|博物館|図書館|神社|寺/;
+
+/**
+ * タイトル末尾の「(場所)」/ 先頭の「【場所】」から開催場所のヒントを抽出する。
+ * Google カレンダー（iCal）運用の地本は LOCATION 未記入でタイトルに場所を
+ * 書く運用が多い（秋田「自衛隊説明会(横手市)」・長野「【駒ケ根市】KOMA夏」等）。
+ * - 会場語を含む → place（例:「秋田港」）
+ * - 市区町村のみ → address（例:「能代市」。会場ではないため place にはしない。
+ *   ジオコーディングで municipality 相当の座標が取れる）
+ * - どちらでもない（「オンライン」「要予約」等）→ null
+ * @returns {{place:string, address:string}|null}
+ */
+function extractLocationFromTitle(title) {
+  const t = String(title || '').trim();
+  const m = t.match(/[（(]([^（()）]{2,15})[）)]\s*$/) || t.match(/^【([^【】]{2,15})】/);
+  if (!m) return null;
+  const loc = m[1].trim();
+  if (TITLE_VENUE_KW.test(loc)) return { place: loc, address: '' };
+  if (/^[一-鿿ぁ-んァ-ヶー]{1,8}[市町村]$/.test(loc)) return { place: '', address: loc };
+  return null;
+}
+
+module.exports = { reiwaToAD, reiwaNum, resolveYearByWeekday, HEISEI_BASE, padTwo, toHalfWidth, jstYear, isPast, guessCategory, guessTag, guessTags, calcWeekday, titleHash, extractLocationFromTitle };

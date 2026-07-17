@@ -89,7 +89,7 @@ const { parseTokushima } = require('./parsers/tokushima');
 const { parseTottori }   = require('./parsers/tottori');
 const { parseShimane }   = require('./parsers/shimane');
 const { parseOkayama }   = require('./parsers/okayama');
-const { parseHiroshima } = require('./parsers/hiroshima');
+const { parseHiroshima, parseHiroshimaDetail } = require('./parsers/hiroshima');
 const { parseYamaguchi } = require('./parsers/yamaguchi');
 // 九州・沖縄地本
 const { parseFukuoka }   = require('./parsers/fukuoka');
@@ -550,10 +550,74 @@ async function tryRapidOcr(buf, label = 'RapidOCR') {
     }
     return null;
   } catch (err) {
-    console.warn(`[${label}] RapidOCR エラー: ${err.message}`);
+    // rapidocr_cli.py は例外時に {"ok":false,"error":...} を stdout に出して exit 1 する。
+    // execFile の err.message は「Command failed」だけで原因が分からないため詳細を拾う
+    let detail = err.message;
+    const out = `${err.stdout || ''}`.trim();
+    const errOut = `${err.stderr || ''}`.trim();
+    if (out) {
+      try { detail = JSON.parse(out).error || detail; } catch { detail = out.slice(0, 200); }
+    } else if (errOut) {
+      detail = errOut.slice(0, 200);
+    }
+    console.warn(`[${label}] RapidOCR エラー: ${detail}`);
     return null;
   } finally {
     fsp.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
+  }
+}
+
+// ── OCR前の画像正規化（巨大画像のリサイズ・再エンコード） ─────────
+// Groq は 33,177,600px 超の画像を 400、巨大ファイルを 413 で拒否し、
+// 巨大画像はローカル OCR（Tesseract/RapidOCR）のタイムアウト・メモリ失敗も招く。
+// API へ流す前にローカルで縮小し、無駄なフォールバックとクォータ消費を防ぐ。
+// sharp が使えない環境では素通し（従来動作）。
+const OCR_MAX_PIXELS = Number.parseInt(process.env.OCR_MAX_PIXELS || '20000000', 10);  // 2,000万px
+const OCR_MAX_BYTES  = Number.parseInt(process.env.OCR_MAX_BYTES  || '3000000', 10);   // 3MB（base64で約4MB）
+
+let sharpModule; // 遅延ロード。未インストールなら null
+function getSharp() {
+  if (sharpModule === undefined) {
+    try { sharpModule = require('sharp'); } catch { sharpModule = null; }
+  }
+  return sharpModule;
+}
+
+/**
+ * OCR に送る画像バッファを正規化する。
+ * - 画素数・バイト数が上限を超える場合は縮小して JPEG に再エンコード
+ * - CMYK など OCR API が拒否しやすい色空間も sRGB JPEG に変換
+ * - デコード不能（画像を装った HTML エラーページ等）は ok:false を返し、
+ *   呼び出し側は API 送信をスキップする（400 での失敗が確定しているため）
+ * @returns {{buf: Buffer, mime: string, ok: boolean}}
+ */
+async function prepareImageForOcr(buf, mime, label = 'OCR') {
+  const sharp = getSharp();
+  if (!sharp) return { buf, mime, ok: true };
+  try {
+    const meta = await sharp(buf, { limitInputPixels: false }).metadata();
+    const pixels = (meta.width || 0) * (meta.height || 0);
+    if (!pixels) return { buf, mime, ok: true };
+    const needsRework = pixels > OCR_MAX_PIXELS
+      || buf.length > OCR_MAX_BYTES
+      || /cmyk/i.test(meta.space || '');
+    if (!needsRework) return { buf, mime, ok: true };
+
+    const scale = Math.min(1, Math.sqrt(OCR_MAX_PIXELS / pixels));
+    const width = Math.max(1, Math.floor((meta.width || 1) * scale));
+    let out = await sharp(buf, { limitInputPixels: false })
+      .rotate() // EXIF の回転を反映（回転情報は JPEG 再エンコードで失われるため）
+      .resize({ width, withoutEnlargement: true })
+      .jpeg({ quality: 82 })
+      .toBuffer();
+    if (out.length > OCR_MAX_BYTES) {
+      out = await sharp(out).jpeg({ quality: 60 }).toBuffer();
+    }
+    console.log(`[${label}] 巨大画像を縮小: ${meta.width}x${meta.height}/${buf.length}B → 幅${width}px/${out.length}B`);
+    return { buf: out, mime: 'image/jpeg', ok: true };
+  } catch (err) {
+    console.warn(`[${label}] 画像デコード失敗（API送信をスキップ）: ${err.message}`);
+    return { buf, mime, ok: false };
   }
 }
 
@@ -729,7 +793,11 @@ async function pdfToImages(pdfBuf, maxPages = 2) {
       .filter(f => /\.(jpg|jpeg)$/i.test(f))
       .sort()
       .slice(0, maxPages);
-    return Promise.all(files.map(f => fsp.readFile(path.join(tmpDir, f))));
+    const bufs = await Promise.all(files.map(f => fsp.readFile(path.join(tmpDir, f))));
+    // 大判ポスターPDF は 150dpi でも 3,000万px 超になり OCR API に拒否されるため縮小する
+    const prepped = [];
+    for (const b of bufs) prepped.push((await prepareImageForOcr(b, 'image/jpeg', 'PDF2IMG')).buf);
+    return prepped;
   } catch (err) {
     console.warn('[PDF2IMG]', err.message);
     return [];
@@ -885,6 +953,7 @@ const OCR_PROMPT = `この自衛隊イベントのポスター画像から情報
 以下のJSONのみを返してください（説明文不要）。該当情報がない項目はnullにしてください。
 {
   "title": "ポスター${OCR_TITLE_RULE}",
+  "place": "開催場所・会場名（施設名のみ、住所不要）",
   "time": "開催時間（例: 10:00～16:00）",
   "ageRequirement": "参加資格・対象者を簡潔に（例: 中学生以上33歳未満、日本国籍を有する方）",
   "deadline": "${OCR_DEADLINE_RULE}",
@@ -909,11 +978,12 @@ async function ocrImage(imageUrl) {
     return assetCache.getByHash(dl.hash).result;
   }
 
-  const base64 = dl.buf.toString('base64');
+  const prep = await prepareImageForOcr(dl.buf, dl.mime, 'OCR');
+  const base64 = prep.buf.toString('base64');
   let result = null;
 
   // 1. ローカル Tesseract
-  const tessText = await tryTesseractOcr(dl.buf);
+  const tessText = await tryTesseractOcr(prep.buf);
   if (tessText) {
     result = parseTextToEvent(tessText, 'full');
     if (result) console.log(`[OCR] Tesseract 成功: ${imageUrl.split('/').pop()}`);
@@ -921,7 +991,7 @@ async function ocrImage(imageUrl) {
 
   // 2. RapidOCR
   if (!result) {
-    const rapidText = await tryRapidOcr(dl.buf, 'OCR');
+    const rapidText = await tryRapidOcr(prep.buf, 'OCR');
     if (rapidText) {
       result = parseTextToEvent(rapidText, 'full');
       if (result) console.log(`[OCR] RapidOCR 構造化成功: ${imageUrl.split('/').pop()}`);
@@ -929,18 +999,18 @@ async function ocrImage(imageUrl) {
   }
 
   // 3. Groq Vision
-  if (!result && process.env.GROQ_API_KEY) {
-    result = await callGroqOcr(base64, dl.mime, OCR_PROMPT, 'OCR');
+  if (!result && prep.ok && process.env.GROQ_API_KEY) {
+    result = await callGroqOcr(base64, prep.mime, OCR_PROMPT, 'OCR');
   }
   // 4. OCR.space
-  if (!result && process.env.OCR_SPACE_API_KEY) {
-    const ocrSpaceText = await callOcrSpaceText(base64, dl.mime, 'OCR');
+  if (!result && prep.ok && process.env.OCR_SPACE_API_KEY) {
+    const ocrSpaceText = await callOcrSpaceText(base64, prep.mime, 'OCR');
     if (ocrSpaceText) result = parseTextToEvent(ocrSpaceText, 'full');
   }
   // 5. Gemini Flash
-  if (!result && process.env.GEMINI_API_KEY) {
+  if (!result && prep.ok && process.env.GEMINI_API_KEY) {
     result = await callGeminiOcr([
-      { inline_data: { mime_type: dl.mime, data: base64 } },
+      { inline_data: { mime_type: prep.mime, data: base64 } },
       { text: OCR_PROMPT },
     ], 'OCR');
   }
@@ -1200,37 +1270,39 @@ async function ocrFlyerFull(url) {
       ], 'チラシOCR-PDF(Gemini)');
     }
   } else {
+    const prep = await prepareImageForOcr(dl.buf, dl.mime, 'チラシOCR');
+    const imgBase64 = prep.buf.toString('base64');
     // 2a. ローカル Tesseract
-    const tessText = await tryTesseractOcr(dl.buf);
+    const tessText = await tryTesseractOcr(prep.buf);
     if (tessText) {
       result = parseTextToEvent(tessText, 'full');
       if (result) console.log(`[チラシOCR] Tesseract 成功: ${url.split('/').pop()}`);
     }
     // 2b. RapidOCR
     if (!result) {
-      const rapidText = await tryRapidOcr(dl.buf, 'チラシOCR');
+      const rapidText = await tryRapidOcr(prep.buf, 'チラシOCR');
       if (rapidText) {
         result = parseTextToEvent(rapidText, 'full');
         if (result) console.log(`[チラシOCR] RapidOCR 成功: ${url.split('/').pop()}`);
       }
     }
     // 2c. Groq Vision
-    if (!result && process.env.GROQ_API_KEY) {
-      result = await callGroqOcr(base64, dl.mime, FLYER_OCR_PROMPT, 'チラシOCR(Groq)');
+    if (!result && prep.ok && process.env.GROQ_API_KEY) {
+      result = await callGroqOcr(imgBase64, prep.mime, FLYER_OCR_PROMPT, 'チラシOCR(Groq)');
     }
     // 2d. OCR.space
-    if (!result && process.env.OCR_SPACE_API_KEY) {
-      const ocrSpaceText = await callOcrSpaceText(base64, dl.mime, 'チラシOCR(OCR.space)');
+    if (!result && prep.ok && process.env.OCR_SPACE_API_KEY) {
+      const ocrSpaceText = await callOcrSpaceText(imgBase64, prep.mime, 'チラシOCR(OCR.space)');
       if (ocrSpaceText) result = parseTextToEvent(ocrSpaceText, 'full');
     }
     // 2e. Mistral OCR（画像）
-    if (!result) {
-      result = await callMistralOcr(base64, dl.mime, 'チラシOCR(Mistral)');
+    if (!result && prep.ok) {
+      result = await callMistralOcr(imgBase64, prep.mime, 'チラシOCR(Mistral)');
     }
     // 2f. Gemini Flash
-    if (!result && process.env.GEMINI_API_KEY) {
+    if (!result && prep.ok && process.env.GEMINI_API_KEY) {
       result = await callGeminiOcr([
-        { inline_data: { mime_type: dl.mime, data: base64 } },
+        { inline_data: { mime_type: prep.mime, data: imgBase64 } },
         { text: FLYER_OCR_PROMPT },
       ], 'チラシOCR(Gemini)');
     }
@@ -1350,11 +1422,12 @@ async function ocrImageFull(imageUrl) {
     return assetCache.getByHash(dl.hash).result;
   }
 
-  const base64 = dl.buf.toString('base64');
+  const prep = await prepareImageForOcr(dl.buf, dl.mime, 'OCR-FULL');
+  const base64 = prep.buf.toString('base64');
   let result = null;
 
   // 1. ローカル Tesseract
-  const tessText = await tryTesseractOcr(dl.buf);
+  const tessText = await tryTesseractOcr(prep.buf);
   if (tessText) {
     result = parseTextToEvent(tessText, 'full');
     if (result) console.log(`[OCR-FULL] Tesseract 成功: ${imageUrl.split('/').pop()}`);
@@ -1362,7 +1435,7 @@ async function ocrImageFull(imageUrl) {
 
   // 2. RapidOCR
   if (!result) {
-    const rapidText = await tryRapidOcr(dl.buf, 'OCR-FULL');
+    const rapidText = await tryRapidOcr(prep.buf, 'OCR-FULL');
     if (rapidText) {
       result = parseTextToEvent(rapidText, 'full');
       if (result) console.log(`[OCR-FULL] RapidOCR 成功: ${imageUrl.split('/').pop()}`);
@@ -1370,18 +1443,18 @@ async function ocrImageFull(imageUrl) {
   }
 
   // 3. Groq Vision
-  if (!result && process.env.GROQ_API_KEY) {
-    result = await callGroqOcr(base64, dl.mime, OCR_PROMPT_FULL, 'OCR-FULL');
+  if (!result && prep.ok && process.env.GROQ_API_KEY) {
+    result = await callGroqOcr(base64, prep.mime, OCR_PROMPT_FULL, 'OCR-FULL');
   }
   // 4. OCR.space
-  if (!result && process.env.OCR_SPACE_API_KEY) {
-    const ocrSpaceText = await callOcrSpaceText(base64, dl.mime, 'OCR-FULL(OCR.space)');
+  if (!result && prep.ok && process.env.OCR_SPACE_API_KEY) {
+    const ocrSpaceText = await callOcrSpaceText(base64, prep.mime, 'OCR-FULL(OCR.space)');
     if (ocrSpaceText) result = parseTextToEvent(ocrSpaceText, 'full');
   }
   // 5. Gemini Flash
-  if (!result && process.env.GEMINI_API_KEY) {
+  if (!result && prep.ok && process.env.GEMINI_API_KEY) {
     result = await callGeminiOcr([
-      { inline_data: { mime_type: dl.mime, data: base64 } },
+      { inline_data: { mime_type: prep.mime, data: base64 } },
       { text: OCR_PROMPT_FULL },
     ], 'OCR-FULL');
   }
@@ -1404,6 +1477,9 @@ function mergeOcr(ev, ocr) {
     ...ev,
     // HTMLパース済みタイトルを優先し、OCRタイトルは未取得時のみ補完
     title:          ev.title || (ocr.title && fixOcrTitle(safeStr(ocr.title))) || '',
+    // HTMLパース済みの place を優先し、空の場合のみ OCR で補完
+    // （writeOutput の cleanPlaceText / splitPlaceAddress が最終整形する）
+    place:          ev.place || safeStr(ocr.place) || '',
     time:           safeStr(ocr.time)           || ev.time  || '',
     ageRequirement: safeStr(ocr.ageRequirement) || ev.ageRequirement || null,
     deadline:       safeStr(ocr.deadline)       || ev.deadline       || null,
@@ -1901,6 +1977,38 @@ async function fetchAichi(ctx) {
   return events;
 }
 const fetchShizuoka  = (ctx) => fetchHtmlPref(ctx, '静岡', URLS.shizuoka,  parseShizuoka);
+
+/**
+ * 広島: カレンダー（calendarEvents JSON）から一覧を取得し、
+ * place が空のイベントは WP 詳細ページ（events/NNNN/）本文の
+ * 「場所▶…」「場所：…」行から place / time を補完する。
+ */
+async function fetchHiroshima(ctx) {
+  const events = await fetchHtmlPref(ctx, '広島', URLS.hiroshima, parseHiroshima);
+
+  let enriched = 0;
+  for (const ev of events) {
+    if (!ev.url || ev.place || !/\/events\/\d+/.test(ev.url)) continue;
+    try {
+      const page = await ctx.newPage();
+      try {
+        await page.goto(ev.url, { waitUntil: 'domcontentloaded', timeout: 20_000 });
+        await page.waitForTimeout(1500);
+        const html = await page.content();
+        const $ = cheerio.load(html, { decodeEntities: false });
+        const detail = parseHiroshimaDetail($);
+        if (detail.place) { ev.place = detail.place; enriched++; }
+        if (detail.time && !ev.time) ev.time = detail.time;
+      } finally {
+        await page.close();
+      }
+    } catch {
+      // 詳細取得失敗は無視（place は空文字のまま）
+    }
+  }
+  if (enriched > 0) console.log(`[広島] 詳細ページから place 補完: ${enriched}件`);
+  return events;
+}
 
 /**
  * 札幌地本: 4 つのサブページを順番に取得し、イベントを統合して返す。
@@ -3928,7 +4036,7 @@ async function main() {
     await sleep(BETWEEN_PAGES_MS);
 
     try {
-      hiroshimaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '広島', URLS.hiroshima, parseHiroshima));
+      hiroshimaEvents = await withFreshContext(ctx => fetchHiroshima(ctx));
     } catch (err) {
       console.error(`[広島] 取得失敗: ${err.message}`);
       hiroshimaError = true;

@@ -5,6 +5,12 @@
  */
 export const UPDATE_NOTES = [
   {
+    date:    '2026-07-17',
+    version: '1.25.49',
+    type:    'improvement',
+    content: 'イベント情報の充実（会場情報・チラシ画像の拡充）と表記の軽微な修正。',
+  },
+  {
     date:    '2026-07-14',
     version: '1.25.48',
     type:    'fix',

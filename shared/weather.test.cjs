@@ -215,6 +215,23 @@ test('resolveLocation: accuracy を address>venue>municipality>prefecture で判
   const venue = await geocode.resolveLocation({ pref: 'tokyo', place: '日本武道館' }, async () => ({ lat: 35.69, lon: 139.74, title: '東京都千代田区日本武道館' }), now);
   assert.equal(venue.accuracy, 'venue');
 });
+test('resolveLocation: 市区町村のみの address は municipality と分類する', async () => {
+  const now = Date.parse('2026-07-17T03:00:00Z');
+  // タイトル抽出由来の「能代市」だけの address → 精度は municipality（address ではない）
+  const seen = [];
+  const lookup = async (q) => { seen.push(q); return { lat: 40.21, lon: 140.03, title: '秋田県能代市' }; };
+  const loc = await geocode.resolveLocation({ pref: 'akita', address: '能代市', place: '' }, lookup, now);
+  assert.equal(loc.accuracy, 'municipality');
+  assert.equal(seen[0], '秋田県能代市'); // 同名市町村の衝突回避に都道府県名を前置
+  // 番地まである住所は従来どおり address
+  const full = await geocode.resolveLocation({ pref: 'akita', address: '秋田県能代市字腹鞁ノ沢1-1', place: '' }, async () => ({ lat: 40.2, lon: 140.0, title: '秋田県能代市' }), now);
+  assert.equal(full.accuracy, 'address');
+  // 市区町村 address より会場名（venue）の方が精密なので venue を先に試す
+  const order = [];
+  const loc2 = await geocode.resolveLocation({ pref: 'akita', address: '能代市', place: '能代市文化会館' },
+    async (q) => { order.push(q); return q.includes('文化会館') ? { lat: 40.2, lon: 140.0, title: '能代市文化会館' } : null; }, now);
+  assert.equal(loc2.accuracy, 'venue');
+});
 test('resolveLocation: 個別がダメでも都道府県でフォールバック', async () => {
   // address/venue/municipality は null、prefecture(都道府県名) だけ返す lookup
   const lookup = async (q) => (q === '東京都' ? { lat: 35.7, lon: 139.7, title: '東京都' } : null);

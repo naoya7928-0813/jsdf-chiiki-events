@@ -32,6 +32,26 @@ test('applyVerifiedOverrides: チラシ照合済みの修正がURLで適用さ�
   // 無関係なURLは変更しない
   const c = applyVerifiedOverrides({ date: '2026-07-01', title: 'そのまま', url: 'https://example.com/x.pdf' });
   assert.equal(c.title, 'そのまま');
+  // URL が無いイベント: pref+date+titleIncludes で適用（茨城 7/28 つくば市の会場誤記）
+  const d = applyVerifiedOverrides({
+    pref: 'ibaraki', date: '2026-07-28',
+    title: 'つくば市公安系公務員 合同説明会 【参加団体】・警察・消防・海上保安庁・刑務所・少年院・入国警備官・自衛隊',
+    place: '土浦市役所2F201会議室', url: '',
+  });
+  assert.equal(d.place, 'イオンモールつくば 3Fイオンホール');
+  // 同名でも日付・地本が違えば適用しない
+  const e = applyVerifiedOverrides({ pref: 'ibaraki', date: '2026-07-27', title: 'つくば市公安系公務員 合同説明会', place: 'X', url: '' });
+  assert.equal(e.place, 'X');
+});
+
+test('cleanEventTitle: 表の内訳（【参加団体】/【場所】）の連結を切り落とす', () => {
+  assert.equal(
+    cleanEventTitle('つくば市公安系公務員 合同説明会 【参加団体】・警察・消防・海上保安庁・刑務所・少年院・入国警備官・自衛隊'),
+    'つくば市公安系公務員 合同説明会');
+  assert.equal(cleanEventTitle('石岡市公安系公務員 合同説明会 【参加団体】・警察・消防・自衛隊'), '石岡市公安系公務員 合同説明会');
+  assert.equal(cleanEventTitle('採用説明会【場所】土浦地域事務所'), '採用説明会');
+  // 【参加団体】を含まない通常タイトルは不変
+  assert.equal(cleanEventTitle('公務員合同説明会'), '公務員合同説明会');
 });
 
 test('isJunkOrStubTitle: 部隊名のみ・助詞終わりの断片を除外する', () => {
@@ -370,6 +390,9 @@ test('cleanTimeText: 時分/午前午後/4桁/区切りを HH:MM～HH:MM に正�
   assert.equal(cleanTimeText('10:00-15:00'), '10:00～15:00');
   assert.equal(cleanTimeText('08:30~17:00'), '08:30～17:00');
   assert.equal(cleanTimeText('13時半～16時'), '13:30～16:00');
+  // 午前/午後＋コロン形式・2部制（東京 2026-07 で実際に出た表記）
+  assert.equal(cleanTimeText('午前10:30～11:30、午後13:30～14:30'), '10:30～11:30／13:30～14:30');
+  assert.equal(cleanTimeText('10:00～12:00、14:00～16:00'), '10:00～12:00／14:00～16:00');
   // 受付/開場/※注記は除去
   assert.equal(cleanTimeText('18:00～19:45(開場17:00)'), '18:00～19:45');
   assert.equal(cleanTimeText('10:00～18:00 ※金曜日のみ12:00～'), '10:00～18:00');
