@@ -134,8 +134,13 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         setUInput(''); setPInput('');
         if (mode === 'login' && onLoggedIn) { onLoggedIn(); return; } // 通常サイトへ
         applyScope(acc.organization); loadList();
-      } else if (r.status === 429) setAuthErr('試行回数が多すぎます。しばらく待ってください。');
-      else setAuthErr('ユーザー名またはパスワードが違います。');
+      } else {
+        // サーバーのメッセージ（ロック・残り回数）をそのまま表示。無ければ既定文言。
+        let msg = '';
+        try { msg = (await r.json())?.message || ''; } catch { /* noop */ }
+        if (r.status === 429) setAuthErr(msg || 'ログインに続けて失敗したため、しばらくロックされています。時間をおいてお試しください。');
+        else setAuthErr(msg || 'ユーザー名またはパスワードが違います。');
+      }
     } catch { setAuthErr('通信に失敗しました。'); }
     finally { setBusy(false); }
   }

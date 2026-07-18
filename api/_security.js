@@ -11,11 +11,16 @@ const redis = new Redis({
   token: process.env.KV_REST_API_TOKEN,
 });
 
-/** 自サイトとして許可するオリジン */
+/** 自サイトとして許可するオリジン。
+ *  独自ドメイン等へ移行する際は、コードを変えずに環境変数 SITE_ORIGINS（カンマ区切りの
+ *  完全なオリジン。例: "https://jsdf-events.jp,https://www.jsdf-events.jp"）で追加できる。
+ *  移行期は旧 vercel.app オリジンも残しておくと切替中の書き込みが 403 にならない。 */
 const ALLOWED_ORIGINS = new Set([
   'https://jsdf-chiiki-events.vercel.app',
   'http://localhost:5173',  // vite dev
   'http://localhost:4173',  // vite preview
+  ...String(process.env.SITE_ORIGINS || '')
+    .split(',').map(s => s.trim()).filter(s => /^https?:\/\//.test(s)),
 ]);
 
 /**
