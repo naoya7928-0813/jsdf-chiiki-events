@@ -825,27 +825,27 @@
       }
     },
     {
-      "id": "ak-20260725-vzu4a",
+      "id": "ak-20260725-030ks",
       "pref": "akita",
       "date": "2026-07-25",
       "weekday": "土",
-      "title": "［艦艇広報］多用途支援艦すおう一般公開(秋田港)",
-      "place": "秋田港",
-      "address": "",
+      "title": "［説明会］自衛隊説明会(湯沢市)",
+      "place": "",
+      "address": "湯沢市",
       "time": "",
-      "category": "一般公開",
+      "category": "説明会",
       "tag": "",
       "url": "",
-      "notes": "詳細は秋田地本SNSにてご覧ください",
+      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 39.72,
-        "longitude": 140.104,
-        "label": "秋田県秋田市",
-        "accuracy": "venue",
+        "latitude": 39.164,
+        "longitude": 140.496,
+        "label": "秋田県湯沢市",
+        "accuracy": "municipality",
         "source": "gsi",
-        "geocodedAt": "2026-07-18T08:05:13.829+09:00"
+        "geocodedAt": "2026-07-18T08:05:14.158+09:00"
       }
     },
     {
@@ -873,27 +873,27 @@
       }
     },
     {
-      "id": "ak-20260725-030ks",
+      "id": "ak-20260725-vzu4a",
       "pref": "akita",
       "date": "2026-07-25",
       "weekday": "土",
-      "title": "［説明会］自衛隊説明会(湯沢市)",
-      "place": "",
-      "address": "湯沢市",
+      "title": "［艦艇広報］多用途支援艦すおう一般公開(秋田港)",
+      "place": "秋田港",
+      "address": "",
       "time": "",
-      "category": "説明会",
+      "category": "一般公開",
       "tag": "",
       "url": "",
-      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
+      "notes": "詳細は秋田地本SNSにてご覧ください",
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 39.164,
-        "longitude": 140.496,
-        "label": "秋田県湯沢市",
-        "accuracy": "municipality",
+        "latitude": 39.72,
+        "longitude": 140.104,
+        "label": "秋田県秋田市",
+        "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-07-18T08:05:14.158+09:00"
+        "geocodedAt": "2026-07-18T08:05:13.829+09:00"
       }
     },
     {
@@ -2581,6 +2581,30 @@
   "yamanashi": [],
   "nagano": [
     {
+      "id": "na-20260718-uimr5",
+      "pref": "nagano",
+      "date": "2026-07-18",
+      "weekday": "土",
+      "title": "【伊那市】自衛隊採用説明会",
+      "place": "中部森林管理局 南信森林管理署",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "自衛隊採用説明会 １０：００～１２：００ 説明内容 ・自衛隊の概要 ・自衛隊の職種、職域 ・福利厚生など 気軽にお立ち寄りください",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.635,
+        "longitude": 137.946,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-03T20:01:31.351+09:00"
+      }
+    },
+    {
       "id": "na-20260718-hm0w8",
       "pref": "nagano",
       "date": "2026-07-18",
@@ -2626,30 +2650,6 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-08T14:27:39.776+09:00"
-      }
-    },
-    {
-      "id": "na-20260718-uimr5",
-      "pref": "nagano",
-      "date": "2026-07-18",
-      "weekday": "土",
-      "title": "【伊那市】自衛隊採用説明会",
-      "place": "中部森林管理局 南信森林管理署",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "自衛隊採用説明会 １０：００～１２：００ 説明内容 ・自衛隊の概要 ・自衛隊の職種、職域 ・福利厚生など 気軽にお立ち寄りください",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 35.635,
-        "longitude": 137.946,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-03T20:01:31.351+09:00"
       }
     },
     {
@@ -2749,30 +2749,6 @@
       }
     },
     {
-      "id": "na-20260817-w54dq",
-      "pref": "nagano",
-      "date": "2026-08-17",
-      "weekday": "月",
-      "title": "【諏訪地域】自衛隊を「就職先」として考える個別相談会",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "採用イベント",
-      "tag": "個別",
-      "url": "",
-      "notes": "自衛隊を「就職先」として考える完全予約制の 個別相談会です 【場所】 自衛隊長野地方協力本部茅野地域事務所 長野県茅野市塚原１－３－２０ 【時間】 １０：００～１５：００ 【事前予約】 https://forms.gle/NJJdNZoeuQpZYAaS9",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:26.996+09:00"
-      }
-    },
-    {
       "id": "na-20260817-lb6zo",
       "pref": "nagano",
       "date": "2026-08-17",
@@ -2794,6 +2770,30 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:27.986+09:00"
+      }
+    },
+    {
+      "id": "na-20260817-w54dq",
+      "pref": "nagano",
+      "date": "2026-08-17",
+      "weekday": "月",
+      "title": "【諏訪地域】自衛隊を「就職先」として考える個別相談会",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "採用イベント",
+      "tag": "個別",
+      "url": "",
+      "notes": "自衛隊を「就職先」として考える完全予約制の 個別相談会です 【場所】 自衛隊長野地方協力本部茅野地域事務所 長野県茅野市塚原１－３－２０ 【時間】 １０：００～１５：００ 【事前予約】 https://forms.gle/NJJdNZoeuQpZYAaS9",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:26.996+09:00"
       }
     }
   ],
@@ -5987,5 +5987,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/18 14:13"
+  "updatedAt": "2026/07/18 19:01"
 }
