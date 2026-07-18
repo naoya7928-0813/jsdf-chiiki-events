@@ -66,11 +66,11 @@ export default function ReportsPanel({ adminFetch, primary }) {
 
   async function reveal(id) {
     try {
-      const r = await adminFetch(`/api/report?reveal=1&limit=200`);
+      // 実値は対象1件のみ取得（一覧には連絡先の実値を載せない）
+      const r = await adminFetch(`/api/report?reveal=1&id=${encodeURIComponent(id)}`);
       if (r.ok) {
         const j = await r.json();
-        const found = (j.reports || []).find(x => x.id === id);
-        setRevealed(m => ({ ...m, [id]: (found && found.contact) || '（未記入）' }));
+        setRevealed(m => ({ ...m, [id]: j.contact || '（未記入）' }));
       }
     } catch { /* noop */ }
   }

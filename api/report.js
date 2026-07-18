@@ -15,7 +15,7 @@
 //   DELETE … 報告の削除＝個人情報の消去（要ログイン＋report:read＋同一オリジン）
 import {
   checkOrigin, noStore, requireSameOrigin, rateLimit,
-  requireAuth, hasPermission, writeAudit, redis, cleanText,
+  requireAuth, hasPermission, writeAudit, redis,
 } from './_security.js';
 import { randomUUID } from 'node:crypto';
 
@@ -153,19 +153,23 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET') {
     if (!await rateLimit(req, res, 'admin-report', 60, 600)) return;
-    const reveal = String(req.query?.reveal || '') === '1'; // 連絡先の実値表示（既定は伏字）
+    // 連絡先の実値表示は「1件ずつ」に限定する（一覧では常に伏字）。
+    // reveal=1 のときは id 必須で、その1件の連絡先のみを返す＝画面に不要な個人情報を渡さない。
+    const revealId = String(req.query?.reveal || '') === '1' ? String(req.query?.id || '') : '';
     try {
+      if (revealId) {
+        const raw = await redis.get(ITEM_KEY(revealId));
+        if (!raw) return res.status(404).json({ error: 'not found' });
+        const item = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        await writeAudit(account, { action: 'report.reveal', result: 'success', targetId: revealId });
+        return res.status(200).json({ id: revealId, contact: item.contact || '' });
+      }
       const limit = Math.min(500, Math.max(1, Number.parseInt(req.query?.limit, 10) || 200));
       const items = await readReports(limit);
-      const reports = items.map((r) => ({
-        ...r,
-        contact: reveal ? r.contact : undefined,
-        contactMasked: maskContact(r.contact),
-        hasContact: !!r.contact,
-      }));
-      if (reveal) {
-        await writeAudit(account, { action: 'report.reveal', result: 'success', note: `count=${reports.length}` });
-      }
+      const reports = items.map((r) => {
+        const { contact, ...rest } = r; // 一覧では実値を返さない（伏字のみ）
+        return { ...rest, contactMasked: maskContact(contact), hasContact: !!contact };
+      });
       const unread = reports.filter(r => !r.read).length;
       return res.status(200).json({ reports, unread, ttlDays: TTL_DAYS });
     } catch (err) { console.error('[report] GET', err); return res.status(500).json({ error: 'failed to read reports' }); }
