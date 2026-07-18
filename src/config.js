@@ -2,9 +2,9 @@
 // イベントのプッシュ通知は Web Push (VAPID) を使用（src/hooks/usePushNotification.js）。
 // 旧 ntfy.sh トピック方式（NTFY_TOPIC / NtfyGuideModal）は廃止済み。
 
-// バグ・不具合報告は /api/report（サーバー関数）経由で ntfy へ送信する。
-// トピック名はサーバー環境変数 NTFY_BUG_TOPIC でのみ扱い、
-// フロントエンド（バンドル）には出さない。受信側（管理者）は ntfy で購読する。
+// バグ・不具合報告は /api/report（サーバー関数）経由でサーバー側 Redis に保存する。
+// 外部サービス（ntfy 等）へは送信しない。運営者は管理画面「報告」タブで閲覧・対応する
+// （2026-07-17 ntfy から運営コンソールへ完全移行。個人情報を公開経路に出さないため）。
 
 // ─── データソース ─────────────────────────────────────────────
 // GitHub Actions が定期スクレイピングし public/data/events.json に書き出す。

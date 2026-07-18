@@ -298,7 +298,10 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
           })}
         </div>
       )}
-      <div data-admin-scroll style={{ flex: 1, overflowY: 'auto', padding: '16px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 28px)' }}>
+      {/* overflowX:hidden = 横方向のドラッグ/遊びを抑止（overflowY:auto のみだと
+          CSS仕様で overflow-x が auto になり、はみ出し時に横スクロールが生じる）。
+          フォーム内の要素は各自 width:100%/minWidth:0 で縮むため内容は欠けない。 */}
+      <div data-admin-scroll style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '16px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 28px)' }}>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10 }}>ログイン中: <strong style={{ color: 'var(--text)' }}>{account.label}</strong>（担当: {prefLabel}）</div>
 
         {/* 権限はサーバー側のロールで決定（操作者ID＝displayId・氏名は表示しない） */}
@@ -341,8 +344,9 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         <input value={form.title} onChange={e => set('title', e.target.value)} placeholder="例: 〇〇駐屯地 創立記念行事" style={input} />
 
         <div style={{ display: 'flex', gap: 10 }}>
-          <div style={{ flex: 1 }}><div style={label}>イベント種別</div><select value={form.category} onChange={e => set('category', e.target.value)} style={input}>{CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
-          <div style={{ flex: 1 }}><div style={label}>申込要否</div><select value={form.tag} onChange={e => set('tag', e.target.value)} style={input}>{APPLY_OPTS.map(o => <option key={o} value={o}>{o || '—'}</option>)}</select></div>
+          {/* minWidth:0 で選択肢の長い select が縮む（無いと横はみ出しの原因になる） */}
+          <div style={{ flex: 1, minWidth: 0 }}><div style={label}>イベント種別</div><select value={form.category} onChange={e => set('category', e.target.value)} style={input}>{CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
+          <div style={{ flex: 1, minWidth: 0 }}><div style={label}>申込要否</div><select value={form.tag} onChange={e => set('tag', e.target.value)} style={input}>{APPLY_OPTS.map(o => <option key={o} value={o}>{o || '—'}</option>)}</select></div>
         </div>
 
         <div style={label}>時間</div>
