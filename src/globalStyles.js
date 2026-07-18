@@ -107,6 +107,14 @@ export const GLOBAL_CSS = `
   * { scrollbar-width: none; }
   button { -webkit-appearance: none; appearance: none; }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* iOS Safari は font-size が 16px 未満の入力欄をタップすると自動でズームインし、
+     そのズームがログイン後の画面まで残って「拡大表示」に見える不具合になる。
+     タッチ端末では入力系フォントを 16px 以上に固定して自動ズームを無効化する
+     （インライン style の fontSize:14 も !important で上書きする。デスクトップは対象外）。 */
+  @media (pointer: coarse) {
+    input, select, textarea { font-size: 16px !important; }
+  }
 `;
 
 /** グローバルCSSを <head> に注入する */

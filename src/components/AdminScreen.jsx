@@ -65,6 +65,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const [list, setList] = useState([]);
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [reportUnread, setReportUnread] = useState(0);
   const [filter, setFilter] = useState(initialFilter); // all（追加修正＝公開系）| draft（下書き確認）
   const [editingId, setEditingId] = useState(null);
   const [editingDeadline, setEditingDeadline] = useState(null);
@@ -210,6 +211,12 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   async function setStatus(id, status) { setBusy(true); try { const r = await adminFetch('/api/admin/events', { method: 'PATCH', body: JSON.stringify({ id, patch: { status } }) }); if (r.ok) loadList(); } finally { setBusy(false); } }
   async function remove(id) { if (!window.confirm('このイベントを削除しますか？')) return; setBusy(true); try { const r = await adminFetch('/api/admin/events', { method: 'DELETE', body: JSON.stringify({ id }) }); if (r.ok) loadList(); } finally { setBusy(false); } }
   async function loadHistory() { try { const r = await adminFetch('/api/admin/history'); if (r.ok) { const j = await r.json(); setHistory(j.history || []); } } catch { /* noop */ } }
+  // 利用者からの報告の未読件数（「報告」タブのバッジ＝運営サイト内の通知）。report:read 保持者のみ。
+  const loadReportUnread = useCallback(async () => {
+    try { const r = await adminFetch('/api/report?limit=200'); if (r.ok) { const j = await r.json(); setReportUnread(j.unread || 0); } } catch { /* noop */ }
+  }, [adminFetch]);
+  // ログイン後・タブ切替時に未読数を取得（新着報告の「運営サイト内通知」）。
+  useEffect(() => { if (perms.has('report:read')) loadReportUnread(); }, [perms, filter, loadReportUnread]);
   function toggleHistory() { const n = !showHistory; setShowHistory(n); if (n) loadHistory(); }
   // 監査履歴は追記専用（削除不可）。削除UI・関数は廃止。
 
@@ -266,7 +273,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const isPresenceView = filter === 'presence';
   const isReportsView = filter === 'reports';
   // タブ定義（在席状況・報告は権限を持つロールのみ）
-  const TABS = [['all', '現在・今後'], ['draft', '下書き'], ['past', '過去イベント']];
+  const TABS = [['all', '公開中'], ['draft', '下書き'], ['past', '終了済み']];
   if (canSeeReports) TABS.push(['reports', '報告']);
   if (canSeePresence) TABS.push(['presence', '在席状況']);
   // 下書き確認ページでは登録フォームを出さない（編集時のみ表示）。追加修正ページは常時表示。
@@ -286,7 +293,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
                 flex: 1, padding: '9px 0', borderRadius: 9, fontFamily: F.sans, fontSize: 13, fontWeight: 700,
                 cursor: 'pointer', border: `1px solid ${on ? primary : 'var(--border)'}`,
                 background: on ? primary : 'var(--card)', color: on ? '#fff' : 'var(--text-sub)',
-              }}>{jp}{v === 'draft' && list.filter(e => e.status === 'draft').length > 0 ? `（${list.filter(e => e.status === 'draft').length}）` : ''}</button>
+              }}>{jp}{v === 'draft' && list.filter(e => e.status === 'draft').length > 0 ? `（${list.filter(e => e.status === 'draft').length}）` : ''}{v === 'reports' && reportUnread > 0 ? `（${reportUnread}）` : ''}</button>
             );
           })}
         </div>
@@ -416,7 +423,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         {isPresenceView && <PresencePanel adminFetch={adminFetch} primary={primary} />}
 
         {/* 利用者からの報告（report:read を持つロールのみ・別画面） */}
-        {isReportsView && <ReportsPanel adminFetch={adminFetch} primary={primary} />}
+        {isReportsView && <ReportsPanel adminFetch={adminFetch} primary={primary} account={account} onUnreadChange={loadReportUnread} />}
 
         {/* 一覧 + 出力 + 履歴（現在・今後／下書き） */}
         {!isPastView && !isPresenceView && !isReportsView && (<>

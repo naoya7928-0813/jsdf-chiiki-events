@@ -122,23 +122,8 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Failed to save report' });
     }
 
-    // 任意: 運営へ「新着あり」だけを通知（個人情報・本文は載せない）。
-    const topic = process.env.NTFY_BUG_TOPIC;
-    if (topic) {
-      try {
-        await fetch('https://ntfy.sh', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            topic,
-            title: '新しい報告が届きました',
-            // 種別のみ。本文・連絡先・端末情報は運営コンソールでのみ閲覧する。
-            message: `種別: ${item.category}\n運営サイトの「報告」タブでご確認ください。`,
-            tags: ['beetle'], priority: 3,
-          }),
-        });
-      } catch (err) { console.error('[report] ntfy ping error', err); /* 通知失敗は報告保存に影響させない */ }
-    }
+    // 通知は運営サイト（管理画面「報告」タブの未読バッジ）のみ。
+    // 外部サービス（ntfy 等）へは一切送らない＝個人情報を含みうる報告を公開経路に出さない。
     return res.status(200).json({ ok: true });
   }
 
@@ -185,7 +170,17 @@ export default async function handler(req, res) {
       if (!raw) return res.status(404).json({ error: 'not found' });
       const item = typeof raw === 'string' ? JSON.parse(raw) : raw;
       if (typeof read === 'boolean') item.read = read;
-      if (typeof status === 'string' && ['open', 'resolved'].includes(status)) item.status = status;
+      if (typeof status === 'string' && ['open', 'resolved'].includes(status)) {
+        item.status = status;
+        if (status === 'resolved') {
+          // 「対応済みにする」を押した運営者を記録（仮名 displayId ＋ 表示名 label）
+          item.resolvedBy = account.displayId || account.label || '';
+          item.resolvedByLabel = account.label || account.displayId || '';
+          item.resolvedAt = new Date().toISOString();
+        } else {
+          delete item.resolvedBy; delete item.resolvedByLabel; delete item.resolvedAt;
+        }
+      }
       // 残り TTL を維持したまま更新（個人情報の保存期間を延ばさない）
       let ttl = await redis.ttl(ITEM_KEY(id));
       if (!Number.isFinite(ttl) || ttl <= 0) ttl = TTL_SEC;

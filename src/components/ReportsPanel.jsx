@@ -19,7 +19,7 @@ function fmtWhen(iso) {
   } catch { return ''; }
 }
 
-export default function ReportsPanel({ adminFetch, primary }) {
+export default function ReportsPanel({ adminFetch, primary, account, onUnreadChange }) {
   const [reports, setReports] = useState([]);
   const [unread, setUnread] = useState(0);
   const [ttlDays, setTtlDays] = useState(60);
@@ -53,6 +53,7 @@ export default function ReportsPanel({ adminFetch, primary }) {
       if (r.ok) {
         setReports(rs => rs.map(x => x.id === id ? { ...x, read } : x));
         setUnread(u => Math.max(0, u + (read ? -1 : 1)));
+        onUnreadChange?.(); // 上位のタブバッジも更新
       }
     } catch { /* noop */ }
   }
@@ -60,7 +61,15 @@ export default function ReportsPanel({ adminFetch, primary }) {
   async function setResolved(id, status) {
     try {
       const r = await adminFetch('/api/report', { method: 'PATCH', body: JSON.stringify({ id, status }) });
-      if (r.ok) setReports(rs => rs.map(x => x.id === id ? { ...x, status } : x));
+      if (r.ok) {
+        // 対応者名はサーバーが認証済みアカウントから記録する。画面には即時反映する。
+        const who = account?.label || account?.displayId || '';
+        setReports(rs => rs.map(x => x.id === id ? {
+          ...x, status,
+          resolvedByLabel: status === 'resolved' ? who : undefined,
+          resolvedBy: status === 'resolved' ? who : undefined,
+        } : x));
+      }
     } catch { /* noop */ }
   }
 
@@ -78,10 +87,12 @@ export default function ReportsPanel({ adminFetch, primary }) {
   async function remove(id) {
     if (!window.confirm('この報告を削除します。連絡先などの個人情報も消去され、元に戻せません。よろしいですか？')) return;
     try {
+      const removed = reports.find(x => x.id === id);
       const r = await adminFetch('/api/report', { method: 'DELETE', body: JSON.stringify({ id }) });
       if (r.ok) {
         setReports(rs => rs.filter(x => x.id !== id));
         setRevealed(m => { const n = { ...m }; delete n[id]; return n; });
+        if (removed && !removed.read) { setUnread(u => Math.max(0, u - 1)); onUnreadChange?.(); }
       }
     } catch { /* noop */ }
   }
@@ -131,7 +142,11 @@ export default function ReportsPanel({ adminFetch, primary }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
               <span style={chip(`${catColor}18`, catColor)}>{r.category}</span>
               {!r.read && <span style={chip('#ef444418', '#ef4444')}>未読</span>}
-              {r.status === 'resolved' && <span style={chip('#16a34a18', '#16a34a')}>対応済み</span>}
+              {r.status === 'resolved' && (
+                <span style={chip('#16a34a18', '#16a34a')}>
+                  対応済み{(r.resolvedByLabel || r.resolvedBy) ? `（${r.resolvedByLabel || r.resolvedBy}）` : ''}
+                </span>
+              )}
               <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 'auto', fontFamily: F.mono }}>
                 {fmtWhen(r.at)}
               </span>
