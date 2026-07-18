@@ -5,6 +5,7 @@ import { fetchOfficesData } from '../hooks/useOffices';
 import { facilitiesForPref, AGE_OPTIONS } from '../data/jsdfFacilities';
 import PastEventsPanel from './PastEventsPanel';
 import PresencePanel from './PresencePanel';
+import ReportsPanel from './ReportsPanel';
 
 /**
  * 運営者管理画面。
@@ -76,6 +77,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const canCreate = perms.has('event:create');
   const canAddDelete = perms.has('event:delete');
   const canSeePresence = perms.has('account:read'); // 在席状況（所長・担当官のみ）
+  const canSeeReports = perms.has('report:read'); // 利用者からの報告（所長・担当官のみ）
   const org = account?.organization ?? account?.pref ?? '*';
 
   useEffect(() => { fetchOfficesData().then(d => setOffices(Array.isArray(d) ? d : (d?.offices || []))).catch(() => {}); }, []);
@@ -262,14 +264,16 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const shown = filter === 'draft' ? list.filter(e => e.status === 'draft') : list.filter(e => e.status !== 'draft');
   const isPastView = filter === 'past';
   const isPresenceView = filter === 'presence';
-  // タブ定義（在席状況は account:read を持つロールのみ）
+  const isReportsView = filter === 'reports';
+  // タブ定義（在席状況・報告は権限を持つロールのみ）
   const TABS = [['all', '現在・今後'], ['draft', '下書き'], ['past', '過去イベント']];
+  if (canSeeReports) TABS.push(['reports', '報告']);
   if (canSeePresence) TABS.push(['presence', '在席状況']);
   // 下書き確認ページでは登録フォームを出さない（編集時のみ表示）。追加修正ページは常時表示。
   const showForm = (filter === 'all') || !!editingId; // 'draft'・'past' ではフォームを出さない（編集時を除く）
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)', fontFamily: F.sans }}>
-      <ScreenHeader primary={primary} title={editingId ? '編集' : (filter === 'draft' ? '下書き確認' : filter === 'past' ? '過去イベント' : filter === 'presence' ? '在席状況' : 'イベント追加・修正')} subtitle="ADMIN"
+      <ScreenHeader primary={primary} title={editingId ? '編集' : (filter === 'draft' ? '下書き確認' : filter === 'past' ? '過去イベント' : filter === 'presence' ? '在席状況' : filter === 'reports' ? '利用者からの報告' : 'イベント追加・修正')} subtitle="ADMIN"
         onBack={(editingId && !fromDetail) ? cancelEdit : onBack}
         trailing={<button onClick={logout} style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', borderRadius: 8, fontSize: 12, padding: '6px 10px', cursor: 'pointer' }}>ログアウト</button>} />
       {/* タブ（追加・修正／下書き／過去／在席状況）。1ページで全機能にアクセス */}
@@ -411,8 +415,11 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         {/* 在席状況（誰がログイン中か。account:read を持つロールのみ・別画面） */}
         {isPresenceView && <PresencePanel adminFetch={adminFetch} primary={primary} />}
 
+        {/* 利用者からの報告（report:read を持つロールのみ・別画面） */}
+        {isReportsView && <ReportsPanel adminFetch={adminFetch} primary={primary} />}
+
         {/* 一覧 + 出力 + 履歴（現在・今後／下書き） */}
-        {!isPastView && !isPresenceView && (<>
+        {!isPastView && !isPresenceView && !isReportsView && (<>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', flex: 1 }}>{filter === 'draft' ? '下書き一覧' : '公開中のイベント'}（{shown.length}）</div>
           <button onClick={exportCSV} disabled={!list.length} style={miniOut(primary)}>CSV</button>

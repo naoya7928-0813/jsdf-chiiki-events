@@ -43,36 +43,31 @@ export default function ReportScreen({ theme, updatedAt, onBack, target }) {
   async function handleSubmit() {
     if (!canSend) return;
     setStatus('sending');
-    // 詳細から開いた場合は対象イベント情報を添付（イベントID・地本名・名称・日付）
-    const targetBlock = target
-      ? `―― 対象イベント（自動添付）――\n` +
-        `地本: ${target.prefLabel || target.pref || '不明'}\n` +
-        `イベント名: ${target.title || '不明'}\n` +
-        `開催日: ${target.date || '不明'}\n` +
-        `イベントID: ${target.id || '不明'}\n\n`
-      : '';
-    const message =
-      `【種別】${category}\n` +
-      `【内容】\n${content.trim()}\n\n` +
-      `【連絡先】${contact.trim() || '未記入'}\n\n` +
-      targetBlock +
-      `―― 状況（自動添付）――\n` +
-      `ページURL: ${ctx.url}\n` +
-      `バージョン: ${ctx.version}\n` +
-      `端末/ブラウザ: ${ctx.ua}\n` +
-      `画面サイズ: ${ctx.size}\n` +
-      `データ更新: ${ctx.updatedAt}\n` +
-      `送信日時: ${ctx.sentAt}`;
+    // 報告本文（利用者の記入分のみ）。連絡先・状況はサーバーで別フィールドに保存する。
+    const message = content.trim();
+    // 状況情報（個人を特定しない端末・環境情報）。詳細から開いた場合は対象イベントも添付。
+    const context = {
+      url: ctx.url, version: ctx.version, ua: ctx.ua, size: ctx.size,
+      updatedAt: ctx.updatedAt, sentAt: ctx.sentAt,
+    };
+    if (target) {
+      context.pref = target.prefLabel || target.pref || '';
+      context.eventId = target.id || '';
+      context.eventTitle = target.title || '';
+      context.eventDate = target.date || '';
+    }
     try {
-      // 送信先トピックはサーバー側（/api/report）でのみ扱う。
-      // フロントにはトピック名を持たせない。
+      // 送信先は運営コンソール（サーバーの /api/report → Redis 保存）。
+      // 連絡先などの個人情報は公開型サービスには送らない。
       const res = await fetch('/api/report', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: `🐞 ${category}の報告`,
+          title: `${category}の報告`,
+          category,
           message,
-          priority: ['バグ', '表示崩れ', 'イベント情報の誤り'].includes(category) ? 4 : 3,
+          contact: contact.trim(),
+          context,
         }),
       });
       if (res.status === 429) { setStatus('rate'); return; } // 送信が多すぎる
@@ -196,7 +191,7 @@ export default function ReportScreen({ theme, updatedAt, onBack, target }) {
               style={{ ...inputBase, marginBottom: 6 }}
             />
             <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 16 }}>
-              ※ 個人で運営しているため、いただいた内容すべてには対応できず、<strong>返信できない場合があります</strong>。あらかじめご了承ください。
+              ※ ご記入いただいた連絡先は<strong>運営者のみが閲覧できる保護された画面</strong>で扱い、返信の目的にのみ使用します（一定期間後に自動削除されます）。個人で運営しているため、いただいた内容すべてには対応できず、<strong>返信できない場合があります</strong>。あらかじめご了承ください。
             </div>
 
             {/* 自動添付の案内 */}

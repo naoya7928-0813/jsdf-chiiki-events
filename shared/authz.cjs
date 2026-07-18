@@ -13,14 +13,14 @@ const ROLE_PERMISSIONS = {
   office_editor:   ['event:create', 'event:update'],
   // 自分の事務所の追加・編集・削除・公開・上書き
   office_manager:  ['event:create', 'event:update', 'event:delete', 'event:publish', 'event:override'],
-  // 自分の地本全体を管理（＋監査閲覧）
-  pco_admin:       ['event:create', 'event:update', 'event:delete', 'event:publish', 'event:override', 'audit:read', 'account:read'],
+  // 自分の地本全体を管理（＋監査閲覧・利用者からの報告閲覧）
+  pco_admin:       ['event:create', 'event:update', 'event:delete', 'event:publish', 'event:override', 'audit:read', 'account:read', 'report:read'],
   // 全国を管理
-  national_admin:  ['event:create', 'event:update', 'event:delete', 'event:publish', 'event:override', 'audit:read', 'account:read', 'account:manage', 'national:manage'],
+  national_admin:  ['event:create', 'event:update', 'event:delete', 'event:publish', 'event:override', 'audit:read', 'account:read', 'account:manage', 'national:manage', 'report:read'],
   // 監査履歴の閲覧のみ
   auditor:         ['audit:read'],
-  // システム設定の管理（原則イベント承認はしない）
-  system_admin:    ['system:manage', 'audit:read'],
+  // システム設定の管理（原則イベント承認はしない・報告は閲覧可）
+  system_admin:    ['system:manage', 'audit:read', 'report:read'],
 };
 
 const ALL_ROLES = Object.keys(ROLE_PERMISSIONS);
