@@ -8,19 +8,23 @@
 'use strict';
 
 // ロール → 付与する権限（permissions を明示指定しないアカウントはロールから導出）
+// 報告(report)の権限は2段階:
+//   report:read   … 一覧の閲覧＋既読化＋対応済み切替（連絡先は伏字のまま）。一般広報官(平)も可。
+//   report:manage … 連絡先の実値表示＋削除。トップ所長・運営(pco_admin/national/system)のみ。
+// ※「未読に戻す」機能は廃止（既読は一方向。開いた時点で自動既読）。
 const ROLE_PERMISSIONS = {
-  // 自分の事務所の下書き作成・編集のみ（公開・削除は不可）
-  office_editor:   ['event:create', 'event:update'],
-  // 自分の事務所の追加・編集・削除・公開・上書き
-  office_manager:  ['event:create', 'event:update', 'event:delete', 'event:publish', 'event:override'],
-  // 自分の地本全体を管理（＋監査閲覧・利用者からの報告閲覧）
-  pco_admin:       ['event:create', 'event:update', 'event:delete', 'event:publish', 'event:override', 'audit:read', 'account:read', 'report:read'],
+  // 自分の事務所の下書き作成・編集のみ（公開・削除は不可）。報告は閲覧＋対応済み化まで。
+  office_editor:   ['event:create', 'event:update', 'report:read'],
+  // 自分の事務所の追加・編集・削除・公開・上書き。報告は閲覧＋対応済み化まで。
+  office_manager:  ['event:create', 'event:update', 'event:delete', 'event:publish', 'event:override', 'report:read'],
+  // 自分の地本全体を管理（＋監査閲覧・報告の閲覧/削除/連絡先表示）
+  pco_admin:       ['event:create', 'event:update', 'event:delete', 'event:publish', 'event:override', 'audit:read', 'account:read', 'report:read', 'report:manage'],
   // 全国を管理
-  national_admin:  ['event:create', 'event:update', 'event:delete', 'event:publish', 'event:override', 'audit:read', 'account:read', 'account:manage', 'national:manage', 'report:read'],
+  national_admin:  ['event:create', 'event:update', 'event:delete', 'event:publish', 'event:override', 'audit:read', 'account:read', 'account:manage', 'national:manage', 'report:read', 'report:manage'],
   // 監査履歴の閲覧のみ
   auditor:         ['audit:read'],
-  // システム設定の管理（原則イベント承認はしない・報告は閲覧可）
-  system_admin:    ['system:manage', 'audit:read', 'report:read'],
+  // システム設定の管理（原則イベント承認はしない・報告は閲覧/削除/連絡先表示可）
+  system_admin:    ['system:manage', 'audit:read', 'report:read', 'report:manage'],
 };
 
 const ALL_ROLES = Object.keys(ROLE_PERMISSIONS);

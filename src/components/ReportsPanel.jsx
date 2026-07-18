@@ -19,7 +19,7 @@ function fmtWhen(iso) {
   } catch { return ''; }
 }
 
-export default function ReportsPanel({ adminFetch, primary, account, onUnreadChange }) {
+export default function ReportsPanel({ adminFetch, primary, account, onUnreadChange, canManage = false }) {
   const [reports, setReports] = useState([]);
   const [unread, setUnread] = useState(0);
   const [ttlDays, setTtlDays] = useState(60);
@@ -47,15 +47,23 @@ export default function ReportsPanel({ adminFetch, primary, account, onUnreadCha
 
   useEffect(() => { load(); }, [load]);
 
-  async function markRead(id, read) {
+  // 既読化は一方向（未読へは戻せない）。報告を開いた時点で自動的に既読にする。
+  async function markReadOnce(id) {
     try {
-      const r = await adminFetch('/api/report', { method: 'PATCH', body: JSON.stringify({ id, read }) });
+      const r = await adminFetch('/api/report', { method: 'PATCH', body: JSON.stringify({ id, read: true }) });
       if (r.ok) {
-        setReports(rs => rs.map(x => x.id === id ? { ...x, read } : x));
-        setUnread(u => Math.max(0, u + (read ? -1 : 1)));
+        setReports(rs => rs.map(x => x.id === id ? { ...x, read: true } : x));
+        setUnread(u => Math.max(0, u - 1));
         onUnreadChange?.(); // 上位のタブバッジも更新
       }
     } catch { /* noop */ }
+  }
+
+  // 報告カードを開く（開いた時点で未読なら自動既読）
+  function toggleExpand(r) {
+    const open = expanded === r.id;
+    setExpanded(open ? null : r.id);
+    if (!open && !r.read) markReadOnce(r.id);
   }
 
   async function setResolved(id, status) {
@@ -153,7 +161,7 @@ export default function ReportsPanel({ adminFetch, primary, account, onUnreadCha
             </div>
 
             <div
-              onClick={() => setExpanded(open ? null : r.id)}
+              onClick={() => toggleExpand(r)}
               style={{
                 fontSize: 13, color: 'var(--text)', lineHeight: 1.6, marginTop: 8, cursor: 'pointer',
                 whiteSpace: 'pre-wrap', wordBreak: 'break-word',
@@ -174,7 +182,8 @@ export default function ReportsPanel({ adminFetch, primary, account, onUnreadCha
                     ) : (
                       <>
                         <span style={{ fontFamily: F.mono, color: 'var(--text-sub)' }}>{r.contactMasked}</span>
-                        <button onClick={() => reveal(r.id)} style={{ ...miniBtn(false), marginLeft: 8, padding: '2px 9px' }}>表示</button>
+                        {/* 連絡先の実値表示はトップ所長・運営（report:manage）のみ */}
+                        {canManage && <button onClick={() => reveal(r.id)} style={{ ...miniBtn(false), marginLeft: 8, padding: '2px 9px' }}>表示</button>}
                       </>
                     )
                   ) : (
@@ -205,15 +214,16 @@ export default function ReportsPanel({ adminFetch, primary, account, onUnreadCha
                 </div>
 
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  <button onClick={() => markRead(r.id, !r.read)} style={miniBtn(false)}>
-                    {r.read ? '未読に戻す' : '既読にする'}
-                  </button>
+                  {/* 対応済み切替は全ロール可。未読へ戻す機能は廃止（開いた時点で自動既読）。 */}
                   <button onClick={() => setResolved(r.id, r.status === 'resolved' ? 'open' : 'resolved')} style={miniBtn(r.status === 'resolved')}>
                     {r.status === 'resolved' ? '未対応に戻す' : '対応済みにする'}
                   </button>
-                  <button onClick={() => remove(r.id)} style={{ ...miniBtn(false), color: '#ef4444', borderColor: '#ef444455', marginLeft: 'auto' }}>
-                    削除
-                  </button>
+                  {/* 削除はトップ所長・運営（report:manage）のみ表示 */}
+                  {canManage && (
+                    <button onClick={() => remove(r.id)} style={{ ...miniBtn(false), color: '#ef4444', borderColor: '#ef444455', marginLeft: 'auto' }}>
+                      削除
+                    </button>
+                  )}
                 </div>
               </div>
             )}

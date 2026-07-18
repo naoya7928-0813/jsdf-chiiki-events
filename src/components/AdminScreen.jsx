@@ -427,7 +427,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         {isPresenceView && <PresencePanel adminFetch={adminFetch} primary={primary} />}
 
         {/* 利用者からの報告（report:read を持つロールのみ・別画面） */}
-        {isReportsView && <ReportsPanel adminFetch={adminFetch} primary={primary} account={account} onUnreadChange={loadReportUnread} />}
+        {isReportsView && <ReportsPanel adminFetch={adminFetch} primary={primary} account={account} onUnreadChange={loadReportUnread} canManage={perms.has('report:manage')} />}
 
         {/* 一覧 + 出力 + 履歴（現在・今後／下書き） */}
         {!isPastView && !isPresenceView && !isReportsView && (<>

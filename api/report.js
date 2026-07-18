@@ -137,11 +137,15 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET') {
     if (!await rateLimit(req, res, 'admin-report', 60, 600)) return;
-    // 連絡先の実値表示は「1件ずつ」に限定する（一覧では常に伏字）。
-    // reveal=1 のときは id 必須で、その1件の連絡先のみを返す＝画面に不要な個人情報を渡さない。
+    // 連絡先の実値表示は「1件ずつ」に限定し、さらに report:manage（トップ所長・運営）のみ許可。
+    // 一般広報官(平)には常に伏字のまま見せる（個人情報の閲覧範囲を絞る）。
     const revealId = String(req.query?.reveal || '') === '1' ? String(req.query?.id || '') : '';
     try {
       if (revealId) {
+        if (!hasPermission(account, 'report:manage')) {
+          await writeAudit(account, { action: 'report.reveal', result: 'denied', targetId: revealId, note: '権限不足' });
+          return res.status(403).json({ error: '連絡先を表示する権限がありません' });
+        }
         const raw = await redis.get(ITEM_KEY(revealId));
         if (!raw) return res.status(404).json({ error: 'not found' });
         const item = typeof raw === 'string' ? JSON.parse(raw) : raw;
@@ -168,7 +172,8 @@ export default async function handler(req, res) {
       const raw = await redis.get(ITEM_KEY(id));
       if (!raw) return res.status(404).json({ error: 'not found' });
       const item = typeof raw === 'string' ? JSON.parse(raw) : raw;
-      if (typeof read === 'boolean') item.read = read;
+      // 既読は一方向（未読へは戻せない）。read:true のみ受理し、false は無視する。
+      if (read === true) item.read = true;
       if (typeof status === 'string' && ['open', 'resolved'].includes(status)) {
         item.status = status;
         if (status === 'resolved') {
@@ -189,9 +194,13 @@ export default async function handler(req, res) {
     } catch (err) { console.error('[report] PATCH', err); return res.status(500).json({ error: 'failed to update' }); }
   }
 
-  // 削除＝個人情報の即時消去
+  // 削除＝個人情報の即時消去。report:manage（トップ所長・運営）のみ。
   if (req.method === 'DELETE') {
     if (!await requireSameOrigin(req, res)) return;
+    if (!hasPermission(account, 'report:manage')) {
+      await writeAudit(account, { action: 'report.delete', result: 'denied', note: '権限不足' });
+      return res.status(403).json({ error: '報告を削除する権限がありません' });
+    }
     const id = req.body?.id || req.query?.id;
     if (!id) return res.status(400).json({ error: 'id is required' });
     try {

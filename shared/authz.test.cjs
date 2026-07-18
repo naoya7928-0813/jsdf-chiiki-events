@@ -38,17 +38,26 @@ test('hasPermission: ロール別の権限', () => {
   assert.equal(A.hasPermission(auditor, 'audit:read'), true);
   assert.equal(A.hasPermission(auditor, 'event:create'), false);
 });
-test('hasPermission: report:read は所長・全国管理・システム管理のみ', () => {
+test('hasPermission: report:read は広報官含む運営ロール、report:manage は所長・運営のみ', () => {
   const pco = acc({ user: 'p', pass: 'p', pref: 'tokyo', role: 'pco_admin' });
   const national = acc({ user: 'n', pass: 'p', pref: '*', role: 'national_admin' });
   const sys = acc({ user: 's', pass: 'p', pref: 'tokyo', role: 'system_admin' });
   const editor = acc({ user: 'e', pass: 'p', pref: 'tokyo', role: 'office_editor' });
+  const manager = acc({ user: 'm', pass: 'p', pref: 'tokyo', role: 'office_manager' });
   const auditor = acc({ user: 'a', pass: 'p', pref: 'tokyo', role: 'auditor' });
+  // 閲覧＋対応済み化（report:read）: 広報官(平)も可
+  assert.equal(A.hasPermission(editor, 'report:read'), true);
+  assert.equal(A.hasPermission(manager, 'report:read'), true);
   assert.equal(A.hasPermission(pco, 'report:read'), true);
   assert.equal(A.hasPermission(national, 'report:read'), true);
   assert.equal(A.hasPermission(sys, 'report:read'), true);
-  assert.equal(A.hasPermission(editor, 'report:read'), false);   // 広報官は不可
-  assert.equal(A.hasPermission(auditor, 'report:read'), false);  // 監査のみは不可
+  assert.equal(A.hasPermission(auditor, 'report:read'), false);   // 監査のみは不可
+  // 削除＋連絡先表示（report:manage）: トップ所長・運営のみ（平は不可）
+  assert.equal(A.hasPermission(editor, 'report:manage'), false);  // 広報官(平)は削除・連絡先表示不可
+  assert.equal(A.hasPermission(manager, 'report:manage'), false);
+  assert.equal(A.hasPermission(pco, 'report:manage'), true);
+  assert.equal(A.hasPermission(national, 'report:manage'), true);
+  assert.equal(A.hasPermission(sys, 'report:manage'), true);
 });
 test('hasPermission: 無効アカウントは常に false', () => {
   const d = acc({ user: 'x', pass: 'p', pref: 'tokyo', role: 'office_manager', enabled: false });
