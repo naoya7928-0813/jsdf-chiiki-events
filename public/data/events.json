@@ -681,30 +681,6 @@
       }
     },
     {
-      "id": "ak-20260725-vzu4a",
-      "pref": "akita",
-      "date": "2026-07-25",
-      "weekday": "土",
-      "title": "［艦艇広報］多用途支援艦すおう一般公開(秋田港)",
-      "place": "秋田港",
-      "address": "",
-      "time": "",
-      "category": "一般公開",
-      "tag": "",
-      "url": "",
-      "notes": "詳細は秋田地本SNSにてご覧ください",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 39.72,
-        "longitude": 140.104,
-        "label": "秋田県秋田市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-18T08:05:13.829+09:00"
-      }
-    },
-    {
       "id": "ak-20260725-030ks",
       "pref": "akita",
       "date": "2026-07-25",
@@ -750,6 +726,30 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:16.656+09:00"
+      }
+    },
+    {
+      "id": "ak-20260725-vzu4a",
+      "pref": "akita",
+      "date": "2026-07-25",
+      "weekday": "土",
+      "title": "［艦艇広報］多用途支援艦すおう一般公開(秋田港)",
+      "place": "秋田港",
+      "address": "",
+      "time": "",
+      "category": "一般公開",
+      "tag": "",
+      "url": "",
+      "notes": "詳細は秋田地本SNSにてご覧ください",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.72,
+        "longitude": 140.104,
+        "label": "秋田県秋田市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-18T08:05:13.829+09:00"
       }
     },
     {
@@ -1808,36 +1808,6 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:20.952+09:00"
       }
-    },
-    {
-      "id": "gu-off-20260718-fu234",
-      "pref": "gunma",
-      "date": "2026-07-18",
-      "weekday": "土",
-      "title": "プラス トーク Plus talk ~女性自衛官とカジュアルに話そう",
-      "place": "前橋プラザ元気21",
-      "address": "",
-      "time": "14:00～16:00",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/gunma/sozai_setumei/20260718-1.pdf",
-      "notes": null,
-      "ageRequirement": "16歳〜32歳までの女性、保護者等",
-      "deadline": "7月17日（金）",
-      "source_type": "office_ocr",
-      "deadlineDate": "2026-07-17",
-      "status": "closed",
-      "statusReason": "締切日経過",
-      "statusSource": "ocr",
-      "statusUpdatedAt": "2026-07-19",
-      "weatherLocation": {
-        "latitude": 36.389,
-        "longitude": 139.063,
-        "label": "群馬県前橋市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:21.202+09:00"
-      }
     }
   ],
   "tochigi": [
@@ -2184,31 +2154,6 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-09T08:17:49.629+09:00"
-      }
-    },
-    {
-      "id": "ni-off-20260718-cbdrt",
-      "pref": "niigata",
-      "date": "2026-07-18",
-      "weekday": "土",
-      "title": "公務員合同説明会",
-      "place": "柏崎市役所1F 多目的室",
-      "address": "",
-      "time": "10:00～12:00",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/niigata/images/honbu/8.7.18kashiwazakisetumei.jpg",
-      "notes": "当日参加もOK！お気軽にご参加ください！",
-      "ageRequirement": "高校生以上33歳未満（保護者同伴OK！）",
-      "deadline": null,
-      "source_type": "office_ocr",
-      "weatherLocation": {
-        "latitude": 37.365,
-        "longitude": 138.558,
-        "label": "新潟県柏崎市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:23.964+09:00"
       }
     }
   ],
@@ -5332,5 +5277,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/19 08:04"
+  "updatedAt": "2026/07/19 14:34"
 }
