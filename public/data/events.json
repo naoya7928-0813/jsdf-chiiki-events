@@ -681,27 +681,27 @@
       }
     },
     {
-      "id": "ak-20260725-030ks",
+      "id": "ak-20260725-8nwpt",
       "pref": "akita",
       "date": "2026-07-25",
       "weekday": "土",
-      "title": "［説明会］自衛隊説明会(湯沢市)",
+      "title": "［イベント］｢みたねサンドクラフト2026(三種町)｣に自衛隊ブース出展します",
       "place": "",
-      "address": "湯沢市",
+      "address": "",
       "time": "",
-      "category": "説明会",
+      "category": "広報活動",
       "tag": "",
       "url": "",
-      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
+      "notes": null,
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 39.164,
-        "longitude": 140.496,
-        "label": "秋田県湯沢市",
-        "accuracy": "municipality",
+        "latitude": 39.719,
+        "longitude": 140.102,
+        "label": "秋田県",
+        "accuracy": "prefecture",
         "source": "gsi",
-        "geocodedAt": "2026-07-18T08:05:14.158+09:00"
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
       }
     },
     {
@@ -729,27 +729,27 @@
       }
     },
     {
-      "id": "ak-20260725-8nwpt",
+      "id": "ak-20260725-030ks",
       "pref": "akita",
       "date": "2026-07-25",
       "weekday": "土",
-      "title": "［イベント］｢みたねサンドクラフト2026(三種町)｣に自衛隊ブース出展します",
+      "title": "［説明会］自衛隊説明会(湯沢市)",
       "place": "",
-      "address": "",
+      "address": "湯沢市",
       "time": "",
-      "category": "広報活動",
+      "category": "説明会",
       "tag": "",
       "url": "",
-      "notes": null,
+      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 39.719,
-        "longitude": 140.102,
-        "label": "秋田県",
-        "accuracy": "prefecture",
+        "latitude": 39.164,
+        "longitude": 140.496,
+        "label": "秋田県湯沢市",
+        "accuracy": "municipality",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
+        "geocodedAt": "2026-07-18T08:05:14.158+09:00"
       }
     },
     {
@@ -2334,30 +2334,6 @@
       }
     },
     {
-      "id": "na-20260817-lb6zo",
-      "pref": "nagano",
-      "date": "2026-08-17",
-      "weekday": "月",
-      "title": "【伊那市】就活ラボ",
-      "place": "細部、調整中",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:27.986+09:00"
-      }
-    },
-    {
       "id": "na-20260817-w54dq",
       "pref": "nagano",
       "date": "2026-08-17",
@@ -2379,6 +2355,30 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:26.996+09:00"
+      }
+    },
+    {
+      "id": "na-20260817-lb6zo",
+      "pref": "nagano",
+      "date": "2026-08-17",
+      "weekday": "月",
+      "title": "【伊那市】就活ラボ",
+      "place": "細部、調整中",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:27.986+09:00"
       }
     }
   ],
@@ -5204,5 +5204,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/20 08:16"
+  "updatedAt": "2026/07/20 14:50"
 }
