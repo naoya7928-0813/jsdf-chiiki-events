@@ -270,7 +270,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-07-20",
+      "statusUpdatedAt": "2026-07-21",
       "weatherLocation": {
         "latitude": 41.769,
         "longitude": 140.729,
@@ -352,7 +352,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-20",
+      "statusUpdatedAt": "2026-07-21",
       "weatherLocation": {
         "latitude": 39.839,
         "longitude": 141.094,
@@ -657,13 +657,13 @@
   ],
   "akita": [
     {
-      "id": "ak-20260720-yx1qd",
+      "id": "ak-20260725-030ks",
       "pref": "akita",
-      "date": "2026-07-20",
-      "weekday": "月・祝",
-      "title": "［説明会］自衛隊説明会(横手市)",
+      "date": "2026-07-25",
+      "weekday": "土",
+      "title": "［説明会］自衛隊説明会(湯沢市)",
       "place": "",
-      "address": "横手市",
+      "address": "湯沢市",
       "time": "",
       "category": "説明会",
       "tag": "",
@@ -672,12 +672,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 39.314,
-        "longitude": 140.567,
-        "label": "秋田県横手市",
+        "latitude": 39.164,
+        "longitude": 140.496,
+        "label": "秋田県湯沢市",
         "accuracy": "municipality",
         "source": "gsi",
-        "geocodedAt": "2026-07-18T08:05:13.372+09:00"
+        "geocodedAt": "2026-07-18T08:05:14.158+09:00"
       }
     },
     {
@@ -702,30 +702,6 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-18T08:05:13.829+09:00"
-      }
-    },
-    {
-      "id": "ak-20260725-030ks",
-      "pref": "akita",
-      "date": "2026-07-25",
-      "weekday": "土",
-      "title": "［説明会］自衛隊説明会(湯沢市)",
-      "place": "",
-      "address": "湯沢市",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 39.164,
-        "longitude": 140.496,
-        "label": "秋田県湯沢市",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-07-18T08:05:14.158+09:00"
       }
     },
     {
@@ -1086,7 +1062,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-20",
+      "statusUpdatedAt": "2026-07-21",
       "weatherLocation": {
         "latitude": 35.775,
         "longitude": 139.805,
@@ -1167,7 +1143,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-20",
+      "statusUpdatedAt": "2026-07-21",
       "weatherLocation": {
         "latitude": 35.69,
         "longitude": 139.692,
@@ -1197,7 +1173,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-20",
+      "statusUpdatedAt": "2026-07-21",
       "weatherLocation": {
         "latitude": 35.673,
         "longitude": 139.817,
@@ -1407,7 +1383,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-20",
+      "statusUpdatedAt": "2026-07-21",
       "weatherLocation": {
         "latitude": 35.926,
         "longitude": 139.815,
@@ -1636,7 +1612,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-20"
+      "statusUpdatedAt": "2026-07-21"
     },
     {
       "id": "s-20260823-4luf8",
@@ -3940,6 +3916,30 @@
   "hyogo": [],
   "nara": [
     {
+      "id": "na-20260829-40a92",
+      "pref": "nara",
+      "date": "2026-08-29",
+      "weekday": "土",
+      "title": "陸自ヘリ 体験搭乗",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "体験",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/nara/post-16474/",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 34.685,
+        "longitude": 135.833,
+        "label": "奈良県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:32.748+09:00"
+      }
+    },
+    {
       "id": "na-20260825-op2gf",
       "pref": "nara",
       "date": "2026-08-25",
@@ -4438,30 +4438,6 @@
     }
   ],
   "hiroshima": [
-    {
-      "id": "hi-20260720-nc41f",
-      "pref": "hiroshima",
-      "date": "2026-07-20",
-      "weekday": "月・祝",
-      "title": "サテライトブース in アルパーク",
-      "place": "",
-      "address": "",
-      "time": "11:00",
-      "category": "地域参加",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/hiroshima/events/3746/",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 34.397,
-        "longitude": 132.46,
-        "label": "広島県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      }
-    },
     {
       "id": "hi-20260725-p969z",
       "pref": "hiroshima",
@@ -5180,5 +5156,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/20 20:16"
+  "updatedAt": "2026/07/21 08:21"
 }
