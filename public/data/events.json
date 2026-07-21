@@ -657,30 +657,6 @@
   ],
   "akita": [
     {
-      "id": "ak-20260725-vzu4a",
-      "pref": "akita",
-      "date": "2026-07-25",
-      "weekday": "土",
-      "title": "［艦艇広報］多用途支援艦すおう一般公開(秋田港)",
-      "place": "秋田港",
-      "address": "",
-      "time": "",
-      "category": "一般公開",
-      "tag": "",
-      "url": "",
-      "notes": "詳細は秋田地本SNSにてご覧ください",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 39.72,
-        "longitude": 140.104,
-        "label": "秋田県秋田市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-18T08:05:13.829+09:00"
-      }
-    },
-    {
       "id": "ak-20260725-8nwpt",
       "pref": "akita",
       "date": "2026-07-25",
@@ -702,6 +678,30 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:16.656+09:00"
+      }
+    },
+    {
+      "id": "ak-20260725-vzu4a",
+      "pref": "akita",
+      "date": "2026-07-25",
+      "weekday": "土",
+      "title": "［艦艇広報］多用途支援艦すおう一般公開(秋田港)",
+      "place": "秋田港",
+      "address": "",
+      "time": "",
+      "category": "一般公開",
+      "tag": "",
+      "url": "",
+      "notes": "詳細は秋田地本SNSにてご覧ください",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.72,
+        "longitude": 140.104,
+        "label": "秋田県秋田市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-18T08:05:13.829+09:00"
       }
     },
     {
@@ -2466,7 +2466,7 @@
       "date": "2026-07-25",
       "weekday": "土",
       "title": "名古屋所｜高等工科学校制度説明会",
-      "place": "",
+      "place": "中学3年生～高校",
       "address": "",
       "time": "",
       "category": "説明会",
@@ -2480,9 +2480,9 @@
         "latitude": 35.18,
         "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture",
+        "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
+        "geocodedAt": "2026-07-21T19:53:59.836+09:00"
       }
     },
     {
@@ -2541,7 +2541,7 @@
       "date": "2026-07-26",
       "weekday": "日",
       "title": "名古屋所｜高等工科学校制度説明会",
-      "place": "",
+      "place": "中学3年生～高校",
       "address": "",
       "time": "",
       "category": "説明会",
@@ -2555,9 +2555,9 @@
         "latitude": 35.18,
         "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture",
+        "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
+        "geocodedAt": "2026-07-21T19:53:59.836+09:00"
       }
     },
     {
@@ -2716,7 +2716,7 @@
       "date": "2026-07-30",
       "weekday": "木",
       "title": "安城所｜自衛隊・警察合同職場見学会",
-      "place": "",
+      "place": "自衛隊安城募集案内所 ＊JR三河安城駅から徒歩4分",
       "address": "",
       "time": "",
       "category": "体験",
@@ -2730,9 +2730,9 @@
         "latitude": 35.18,
         "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture",
+        "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
+        "geocodedAt": "2026-07-21T19:54:00.571+09:00"
       }
     },
     {
@@ -3066,9 +3066,9 @@
       "date": "2026-08-08",
       "weekday": "土",
       "title": "名古屋所｜公務員合同説明会in中川",
-      "place": "",
+      "place": "中川区役所講堂",
       "address": "",
-      "time": "",
+      "time": "10:00～13:30",
       "category": "説明会",
       "tag": "",
       "url": "https://forms.gle/iY6FAkRbPxW27vZf7",
@@ -3079,10 +3079,10 @@
       "weatherLocation": {
         "latitude": 35.18,
         "longitude": 136.907,
-        "label": "愛知県",
-        "accuracy": "prefecture",
+        "label": "愛知県中川区",
+        "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
+        "geocodedAt": "2026-07-21T19:54:00.920+09:00"
       }
     },
     {
@@ -4245,30 +4245,6 @@
       }
     },
     {
-      "id": "ok-20260726-taw9c",
-      "pref": "okayama",
-      "date": "2026-07-26",
-      "weekday": "日",
-      "title": "沙美ビーチフェスティバル",
-      "place": "倉敷市玉島黒崎浜 沙美海岸",
-      "address": "",
-      "time": "",
-      "category": "地域参加",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 34.514,
-        "longitude": 133.635,
-        "label": "岡山県倉敷市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-15T14:10:08.495+09:00"
-      }
-    },
-    {
       "id": "ok-20260801-mzhsh",
       "pref": "okayama",
       "date": "2026-08-01",
@@ -5156,5 +5132,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/21 14:32"
+  "updatedAt": "2026/07/21 19:53"
 }
