@@ -2110,6 +2110,30 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:25.248+09:00"
       }
+    },
+    {
+      "id": "ik-20260829-la5l3",
+      "pref": "ishikawa",
+      "date": "2026-08-29",
+      "weekday": "土",
+      "title": "陸上自衛隊 高等工科学校 学校見学会",
+      "place": "陸上自衛隊 高等工科学校",
+      "address": "",
+      "time": "",
+      "category": "体験",
+      "tag": "学生向け",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.595,
+        "longitude": 136.626,
+        "label": "石川県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-22T14:31:52.687+09:00"
+      }
     }
   ],
   "fukui": [
@@ -2286,30 +2310,6 @@
       }
     },
     {
-      "id": "na-20260817-w54dq",
-      "pref": "nagano",
-      "date": "2026-08-17",
-      "weekday": "月",
-      "title": "【諏訪地域】自衛隊を「就職先」として考える個別相談会",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "採用イベント",
-      "tag": "個別",
-      "url": "",
-      "notes": "自衛隊を「就職先」として考える完全予約制の 個別相談会です 【場所】 自衛隊長野地方協力本部茅野地域事務所 長野県茅野市塚原１－３－２０ 【時間】 １０：００～１５：００ 【事前予約】 https://forms.gle/NJJdNZoeuQpZYAaS9",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:26.996+09:00"
-      }
-    },
-    {
       "id": "na-20260817-lb6zo",
       "pref": "nagano",
       "date": "2026-08-17",
@@ -2331,6 +2331,30 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:27.986+09:00"
+      }
+    },
+    {
+      "id": "na-20260817-w54dq",
+      "pref": "nagano",
+      "date": "2026-08-17",
+      "weekday": "月",
+      "title": "【諏訪地域】自衛隊を「就職先」として考える個別相談会",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "採用イベント",
+      "tag": "個別",
+      "url": "",
+      "notes": "自衛隊を「就職先」として考える完全予約制の 個別相談会です 【場所】 自衛隊長野地方協力本部茅野地域事務所 長野県茅野市塚原１－３－２０ 【時間】 １０：００～１５：００ 【事前予約】 https://forms.gle/NJJdNZoeuQpZYAaS9",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:26.996+09:00"
       }
     }
   ],
@@ -3868,6 +3892,30 @@
   "hyogo": [],
   "nara": [
     {
+      "id": "na-20260829-40a92",
+      "pref": "nara",
+      "date": "2026-08-29",
+      "weekday": "土",
+      "title": "陸自ヘリ 体験搭乗",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "体験",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/nara/post-16474/",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 34.685,
+        "longitude": 135.833,
+        "label": "奈良県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:32.748+09:00"
+      }
+    },
+    {
       "id": "na-20260825-op2gf",
       "pref": "nara",
       "date": "2026-08-25",
@@ -4015,6 +4063,30 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-02T08:50:42.670+09:00"
+      }
+    },
+    {
+      "id": "em-20260723-umjm9",
+      "pref": "ehime",
+      "date": "2026-07-23",
+      "weekday": "木",
+      "title": "【イオンスタイル松山に自衛隊がやって来る！】",
+      "place": "イオンスタイル松山 南側駐車場",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/ehime/event.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 33.842,
+        "longitude": 132.766,
+        "label": "愛媛県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-22T14:31:53.557+09:00"
       }
     },
     {
@@ -5057,5 +5129,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/22 08:18"
+  "updatedAt": "2026/07/22 14:31"
 }
