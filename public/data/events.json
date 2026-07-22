@@ -1,31 +1,7 @@
 {
   "sapporo": [
     {
-      "id": "sp-st-20260722-3",
-      "pref": "sapporo",
-      "date": "2026-07-22",
-      "weekday": "水",
-      "title": "東千歳駐屯地夏祭り",
-      "place": "東千歳駐屯地",
-      "address": "",
-      "time": "",
-      "category": "地域参加",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/sapporo/event_station.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 43.076,
-        "longitude": 141.364,
-        "label": "北海道札幌市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-16T19:21:58.900+09:00"
-      }
-    },
-    {
-      "id": "sp-st-20260725-4",
+      "id": "sp-st-20260725-3",
       "pref": "sapporo",
       "date": "2026-07-25",
       "weekday": "土",
@@ -73,7 +49,7 @@
       }
     },
     {
-      "id": "sp-st-20260728-5",
+      "id": "sp-st-20260728-4",
       "pref": "sapporo",
       "date": "2026-07-28",
       "weekday": "火",
@@ -97,7 +73,7 @@
       }
     },
     {
-      "id": "sp-st-20260728-6",
+      "id": "sp-st-20260728-5",
       "pref": "sapporo",
       "date": "2026-07-28",
       "weekday": "火",
@@ -270,7 +246,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-07-22",
+      "statusUpdatedAt": "2026-07-23",
       "weatherLocation": {
         "latitude": 41.769,
         "longitude": 140.729,
@@ -328,7 +304,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-22",
+      "statusUpdatedAt": "2026-07-23",
       "weatherLocation": {
         "latitude": 39.839,
         "longitude": 141.094,
@@ -1038,7 +1014,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-22",
+      "statusUpdatedAt": "2026-07-23",
       "weatherLocation": {
         "latitude": 35.775,
         "longitude": 139.805,
@@ -1119,7 +1095,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-22",
+      "statusUpdatedAt": "2026-07-23",
       "weatherLocation": {
         "latitude": 35.69,
         "longitude": 139.692,
@@ -1149,7 +1125,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-22",
+      "statusUpdatedAt": "2026-07-23",
       "weatherLocation": {
         "latitude": 35.673,
         "longitude": 139.817,
@@ -1359,7 +1335,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-22",
+      "statusUpdatedAt": "2026-07-23",
       "weatherLocation": {
         "latitude": 35.926,
         "longitude": 139.815,
@@ -1588,7 +1564,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-22"
+      "statusUpdatedAt": "2026-07-23"
     },
     {
       "id": "s-20260823-4luf8",
@@ -2310,30 +2286,6 @@
       }
     },
     {
-      "id": "na-20260817-lb6zo",
-      "pref": "nagano",
-      "date": "2026-08-17",
-      "weekday": "月",
-      "title": "【伊那市】就活ラボ",
-      "place": "細部、調整中",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:27.986+09:00"
-      }
-    },
-    {
       "id": "na-20260817-w54dq",
       "pref": "nagano",
       "date": "2026-08-17",
@@ -2355,6 +2307,30 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:26.996+09:00"
+      }
+    },
+    {
+      "id": "na-20260817-lb6zo",
+      "pref": "nagano",
+      "date": "2026-08-17",
+      "weekday": "月",
+      "title": "【伊那市】就活ラボ",
+      "place": "細部、調整中",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:27.986+09:00"
       }
     }
   ],
@@ -2410,31 +2386,6 @@
     }
   ],
   "aichi": [
-    {
-      "id": "ai-20260722-yrhfv",
-      "pref": "aichi",
-      "date": "2026-07-22",
-      "weekday": "水",
-      "title": "金山所｜ハローワーク名古屋南説明会",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "自衛隊制度",
-      "ageRequirement": null,
-      "deadline": null,
-      "endDate": null,
-      "weatherLocation": {
-        "latitude": 35.18,
-        "longitude": 136.907,
-        "label": "愛知県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
-      }
-    },
     {
       "id": "ai-20260725-n27nt",
       "pref": "aichi",
@@ -4173,30 +4124,6 @@
   "shimane": [],
   "okayama": [
     {
-      "id": "ok-20260722-u8rw2",
-      "pref": "okayama",
-      "date": "2026-07-22",
-      "weekday": "水",
-      "title": "日本原納涼祭",
-      "place": "日本原駐屯地",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 34.662,
-        "longitude": 133.935,
-        "label": "岡山県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-02T08:50:44.084+09:00"
-      }
-    },
-    {
       "id": "ok-20260725-llj4p",
       "pref": "okayama",
       "date": "2026-07-25",
@@ -5153,5 +5080,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/22 19:49"
+  "updatedAt": "2026/07/23 08:23"
 }
