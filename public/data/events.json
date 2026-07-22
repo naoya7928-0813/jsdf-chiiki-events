@@ -633,30 +633,6 @@
   ],
   "akita": [
     {
-      "id": "ak-20260725-030ks",
-      "pref": "akita",
-      "date": "2026-07-25",
-      "weekday": "土",
-      "title": "［説明会］自衛隊説明会(湯沢市)",
-      "place": "",
-      "address": "湯沢市",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 39.164,
-        "longitude": 140.496,
-        "label": "秋田県湯沢市",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-07-18T08:05:14.158+09:00"
-      }
-    },
-    {
       "id": "ak-20260725-8nwpt",
       "pref": "akita",
       "date": "2026-07-25",
@@ -702,6 +678,30 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-18T08:05:13.829+09:00"
+      }
+    },
+    {
+      "id": "ak-20260725-030ks",
+      "pref": "akita",
+      "date": "2026-07-25",
+      "weekday": "土",
+      "title": "［説明会］自衛隊説明会(湯沢市)",
+      "place": "",
+      "address": "湯沢市",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.164,
+        "longitude": 140.496,
+        "label": "秋田県湯沢市",
+        "accuracy": "municipality",
+        "source": "gsi",
+        "geocodedAt": "2026-07-18T08:05:14.158+09:00"
       }
     },
     {
@@ -4845,6 +4845,30 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
       }
+    },
+    {
+      "id": "hi-20260920-4ltt7",
+      "pref": "hiroshima",
+      "date": "2026-09-20",
+      "weekday": "日",
+      "title": "因島水軍まつり",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/hiroshima/events/3893/",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 34.397,
+        "longitude": 132.46,
+        "label": "広島県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.248+09:00"
+      }
     }
   ],
   "yamaguchi": [
@@ -5129,5 +5153,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/22 14:31"
+  "updatedAt": "2026/07/22 19:49"
 }
