@@ -318,7 +318,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-07-23",
+      "statusUpdatedAt": "2026-07-24",
       "weatherLocation": {
         "latitude": 41.769,
         "longitude": 140.729,
@@ -376,7 +376,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-23",
+      "statusUpdatedAt": "2026-07-24",
       "weatherLocation": {
         "latitude": 39.839,
         "longitude": 141.094,
@@ -681,30 +681,6 @@
   ],
   "akita": [
     {
-      "id": "ak-20260725-030ks",
-      "pref": "akita",
-      "date": "2026-07-25",
-      "weekday": "土",
-      "title": "［説明会］自衛隊説明会(湯沢市)",
-      "place": "",
-      "address": "湯沢市",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 39.164,
-        "longitude": 140.496,
-        "label": "秋田県湯沢市",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-07-18T08:05:14.158+09:00"
-      }
-    },
-    {
       "id": "ak-20260725-8nwpt",
       "pref": "akita",
       "date": "2026-07-25",
@@ -750,6 +726,30 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-18T08:05:13.829+09:00"
+      }
+    },
+    {
+      "id": "ak-20260725-030ks",
+      "pref": "akita",
+      "date": "2026-07-25",
+      "weekday": "土",
+      "title": "［説明会］自衛隊説明会(湯沢市)",
+      "place": "",
+      "address": "湯沢市",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.164,
+        "longitude": 140.496,
+        "label": "秋田県湯沢市",
+        "accuracy": "municipality",
+        "source": "gsi",
+        "geocodedAt": "2026-07-18T08:05:14.158+09:00"
       }
     },
     {
@@ -1032,15 +1032,7 @@
       "url": "https://www.mod.go.jp/pco/tokyo/tachikawa/index.html#0723",
       "notes": "・海上自衛隊東京音楽隊による演奏\n・ＶＲ体験\n・迷彩服試着体験\n応募締切: 当日参加可能",
       "source_type": "office_html",
-      "address": "",
-      "weatherLocation": {
-        "latitude": 35.714,
-        "longitude": 139.408,
-        "label": "東京都立川市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-02T08:50:36.267+09:00"
-      }
+      "address": ""
     },
     {
       "id": "t-20260726-juoab",
@@ -1086,7 +1078,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-23",
+      "statusUpdatedAt": "2026-07-24",
       "weatherLocation": {
         "latitude": 35.775,
         "longitude": 139.805,
@@ -1167,7 +1159,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-23",
+      "statusUpdatedAt": "2026-07-24",
       "weatherLocation": {
         "latitude": 35.69,
         "longitude": 139.692,
@@ -1197,7 +1189,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-23",
+      "statusUpdatedAt": "2026-07-24",
       "weatherLocation": {
         "latitude": 35.673,
         "longitude": 139.817,
@@ -1459,7 +1451,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-23",
+      "statusUpdatedAt": "2026-07-24",
       "weatherLocation": {
         "latitude": 35.926,
         "longitude": 139.815,
@@ -1688,7 +1680,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-23"
+      "statusUpdatedAt": "2026-07-24"
     },
     {
       "id": "s-20260823-4luf8",
@@ -4189,30 +4181,6 @@
       }
     },
     {
-      "id": "em-20260723-umjm9",
-      "pref": "ehime",
-      "date": "2026-07-23",
-      "weekday": "木",
-      "title": "【イオンスタイル松山に自衛隊がやって来る！】",
-      "place": "イオンスタイル松山 南側駐車場",
-      "address": "",
-      "time": "",
-      "category": "地域参加",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/ehime/event.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 33.842,
-        "longitude": 132.766,
-        "label": "愛媛県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-22T14:31:53.557+09:00"
-      }
-    },
-    {
       "id": "em-20260831-dpbeu",
       "pref": "ehime",
       "date": "2026-08-31",
@@ -5298,5 +5266,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/23 19:48"
+  "updatedAt": "2026/07/24 08:22"
 }
