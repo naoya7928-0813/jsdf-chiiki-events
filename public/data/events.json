@@ -681,30 +681,6 @@
   ],
   "akita": [
     {
-      "id": "ak-20260725-8nwpt",
-      "pref": "akita",
-      "date": "2026-07-25",
-      "weekday": "土",
-      "title": "［イベント］｢みたねサンドクラフト2026(三種町)｣に自衛隊ブース出展します",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 39.719,
-        "longitude": 140.102,
-        "label": "秋田県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
-      }
-    },
-    {
       "id": "ak-20260725-030ks",
       "pref": "akita",
       "date": "2026-07-25",
@@ -726,6 +702,30 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-07-18T08:05:14.158+09:00"
+      }
+    },
+    {
+      "id": "ak-20260725-8nwpt",
+      "pref": "akita",
+      "date": "2026-07-25",
+      "weekday": "土",
+      "title": "［イベント］｢みたねサンドクラフト2026(三種町)｣に自衛隊ブース出展します",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.719,
+        "longitude": 140.102,
+        "label": "秋田県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
       }
     },
     {
@@ -2458,30 +2458,6 @@
       }
     },
     {
-      "id": "na-20260817-lb6zo",
-      "pref": "nagano",
-      "date": "2026-08-17",
-      "weekday": "月",
-      "title": "【伊那市】就活ラボ",
-      "place": "細部、調整中",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:27.986+09:00"
-      }
-    },
-    {
       "id": "na-20260817-w54dq",
       "pref": "nagano",
       "date": "2026-08-17",
@@ -2503,6 +2479,30 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:26.996+09:00"
+      }
+    },
+    {
+      "id": "na-20260817-lb6zo",
+      "pref": "nagano",
+      "date": "2026-08-17",
+      "weekday": "月",
+      "title": "【伊那市】就活ラボ",
+      "place": "細部、調整中",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:27.986+09:00"
       }
     }
   ],
@@ -5069,35 +5069,57 @@
       }
     }
   ],
-  "fukuoka": [
-    {
-      "id": "fu-off-20260808-bjxbc",
-      "pref": "fukuoka",
-      "date": "2026-08-08",
-      "weekday": "土",
-      "title": "地域説明会",
-      "place": "久留米地域事務所",
-      "address": "",
-      "time": "10:00～12:00／14:00～16:00／17:00～19:00",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/fukuoka/recruit/recruiting-fair/images/2024/8.7.1kurume.pdf",
-      "notes": "事前予約制",
-      "ageRequirement": "航空学生・一般曹候補生・2等陸・海・空士",
-      "deadline": null,
-      "source_type": "office_ocr",
-      "weatherLocation": {
-        "latitude": 33.319,
-        "longitude": 130.508,
-        "label": "福岡県久留米市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-02T20:06:06.394+09:00"
-      }
-    }
-  ],
+  "fukuoka": [],
   "saga": [],
   "nagasaki": [
+    {
+      "id": "ng-20260808-chib2",
+      "pref": "nagasaki",
+      "date": "2026-08-08",
+      "weekday": "土",
+      "title": "航空学生説明会",
+      "place": "佐世保市合同庁舎 （3階 第2会議室）",
+      "address": "",
+      "time": "13:00～16:00",
+      "category": "説明会",
+      "tag": "学生向け",
+      "url": "https://www.mod.go.jp/pco/nagasaki/event/index.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 33.18,
+        "longitude": 129.715,
+        "label": "長崎県佐世保市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-23T19:48:44.760+09:00"
+      }
+    },
+    {
+      "id": "ng-20260810-856tj",
+      "pref": "nagasaki",
+      "date": "2026-08-10",
+      "weekday": "月",
+      "title": "防衛大学校説明会",
+      "place": "防衛省長崎合同庁舎（4階会議室）",
+      "address": "",
+      "time": "13:30～16:00",
+      "category": "説明会",
+      "tag": "学生向け",
+      "url": "https://www.mod.go.jp/pco/nagasaki/event/index.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 32.75,
+        "longitude": 129.867,
+        "label": "長崎県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-23T19:48:45.463+09:00"
+      }
+    },
     {
       "id": "ng-20260829-dvol9",
       "pref": "nagasaki",
@@ -5276,5 +5298,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/23 14:35"
+  "updatedAt": "2026/07/23 19:48"
 }
