@@ -221,32 +221,6 @@
   ],
   "obihiro": [
     {
-      "id": "ob-20260724-3q42v",
-      "pref": "obihiro",
-      "date": "2026-07-24",
-      "weekday": "金",
-      "title": "護衛艦「やはぎ」一般公開",
-      "place": "釧路港 耐震旅客船ターミナル",
-      "address": "",
-      "time": "13:30～15:30",
-      "category": "艦艇公開",
-      "tag": "",
-      "url": "",
-      "notes": "7/24・7/25は13:30～15:30、7/26は09:00～15:30",
-      "ageRequirement": null,
-      "deadline": null,
-      "endDate": "2026-07-26",
-      "endWeekday": "日",
-      "weatherLocation": {
-        "latitude": 42.924,
-        "longitude": 143.196,
-        "label": "北海道帯広市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-06T21:34:46.377+09:00"
-      }
-    },
-    {
       "id": "ob-20260731-yke62",
       "pref": "obihiro",
       "date": "2026-07-31",
@@ -318,7 +292,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-07-24",
+      "statusUpdatedAt": "2026-07-25",
       "weatherLocation": {
         "latitude": 41.769,
         "longitude": 140.729,
@@ -376,7 +350,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-24",
+      "statusUpdatedAt": "2026-07-25",
       "weatherLocation": {
         "latitude": 39.839,
         "longitude": 141.094,
@@ -681,30 +655,6 @@
   ],
   "akita": [
     {
-      "id": "ak-20260725-8nwpt",
-      "pref": "akita",
-      "date": "2026-07-25",
-      "weekday": "土",
-      "title": "［イベント］｢みたねサンドクラフト2026(三種町)｣に自衛隊ブース出展します",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 39.719,
-        "longitude": 140.102,
-        "label": "秋田県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
-      }
-    },
-    {
       "id": "ak-20260725-030ks",
       "pref": "akita",
       "date": "2026-07-25",
@@ -750,6 +700,30 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-18T08:05:13.829+09:00"
+      }
+    },
+    {
+      "id": "ak-20260725-8nwpt",
+      "pref": "akita",
+      "date": "2026-07-25",
+      "weekday": "土",
+      "title": "［イベント］｢みたねサンドクラフト2026(三種町)｣に自衛隊ブース出展します",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.719,
+        "longitude": 140.102,
+        "label": "秋田県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
       }
     },
     {
@@ -1337,7 +1311,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-24",
+      "statusUpdatedAt": "2026-07-25",
       "weatherLocation": {
         "latitude": 35.775,
         "longitude": 139.805,
@@ -1390,6 +1364,10 @@
       "source_type": "office_html",
       "address": "",
       "deadlineDate": "2026-07-24",
+      "status": "closed",
+      "statusReason": "締切日経過",
+      "statusSource": "html",
+      "statusUpdatedAt": "2026-07-25",
       "weatherLocation": {
         "latitude": 35.726,
         "longitude": 139.717,
@@ -1418,7 +1396,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-24",
+      "statusUpdatedAt": "2026-07-25",
       "weatherLocation": {
         "latitude": 35.69,
         "longitude": 139.692,
@@ -1448,7 +1426,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-24",
+      "statusUpdatedAt": "2026-07-25",
       "weatherLocation": {
         "latitude": 35.673,
         "longitude": 139.817,
@@ -1742,23 +1720,6 @@
       }
     },
     {
-      "id": "t-20260723-2a459",
-      "pref": "tokyo",
-      "date": "2026-07-23",
-      "weekday": "木",
-      "title": "自衛隊体験イベント",
-      "place": "立川出張所",
-      "time": "10:00～17:00",
-      "category": "体験",
-      "tag": "",
-      "ageRequirement": "どなたでも参加可能",
-      "deadline": null,
-      "url": "https://www.mod.go.jp/pco/tokyo/tachikawa/index.html#0723",
-      "notes": "・海上自衛隊東京音楽隊による演奏\n・ＶＲ体験\n・迷彩服試着体験\n応募締切: 当日参加可能",
-      "source_type": "office_html",
-      "address": ""
-    },
-    {
       "id": "to-off-20260727-wq7tn",
       "pref": "tokyo",
       "date": "2026-07-27",
@@ -1804,7 +1765,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-24",
+      "statusUpdatedAt": "2026-07-25",
       "weatherLocation": {
         "latitude": 35.926,
         "longitude": 139.815,
@@ -2033,7 +1994,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-24"
+      "statusUpdatedAt": "2026-07-25"
     },
     {
       "id": "s-20260823-4luf8",
@@ -2803,30 +2764,6 @@
       }
     },
     {
-      "id": "na-20260817-w54dq",
-      "pref": "nagano",
-      "date": "2026-08-17",
-      "weekday": "月",
-      "title": "【諏訪地域】自衛隊を「就職先」として考える個別相談会",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "採用イベント",
-      "tag": "個別",
-      "url": "",
-      "notes": "自衛隊を「就職先」として考える完全予約制の 個別相談会です 【場所】 自衛隊長野地方協力本部茅野地域事務所 長野県茅野市塚原１－３－２０ 【時間】 １０：００～１５：００ 【事前予約】 https://forms.gle/NJJdNZoeuQpZYAaS9",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:26.996+09:00"
-      }
-    },
-    {
       "id": "na-20260817-lb6zo",
       "pref": "nagano",
       "date": "2026-08-17",
@@ -2848,6 +2785,30 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:27.986+09:00"
+      }
+    },
+    {
+      "id": "na-20260817-w54dq",
+      "pref": "nagano",
+      "date": "2026-08-17",
+      "weekday": "月",
+      "title": "【諏訪地域】自衛隊を「就職先」として考える個別相談会",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "採用イベント",
+      "tag": "個別",
+      "url": "",
+      "notes": "自衛隊を「就職先」として考える完全予約制の 個別相談会です 【場所】 自衛隊長野地方協力本部茅野地域事務所 長野県茅野市塚原１－３－２０ 【時間】 １０：００～１５：００ 【事前予約】 https://forms.gle/NJJdNZoeuQpZYAaS9",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:26.996+09:00"
       }
     }
   ],
@@ -5861,5 +5822,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/24 19:45"
+  "updatedAt": "2026/07/25 08:24"
 }
