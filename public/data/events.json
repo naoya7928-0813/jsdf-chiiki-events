@@ -990,23 +990,6 @@
   ],
   "tokyo": [
     {
-      "id": "t-20260726-juoab",
-      "pref": "tokyo",
-      "date": "2026-07-26",
-      "weekday": "日",
-      "title": "サマーコンサート",
-      "place": "立川出張所",
-      "time": "10:00～14:00",
-      "category": "体験",
-      "tag": "",
-      "ageRequirement": "どなたでも参加可能",
-      "deadline": null,
-      "url": "https://www.mod.go.jp/pco/tokyo/tachikawa/index.html#0726",
-      "notes": "・海上自衛隊東京音楽隊による演奏\n・缶バッジ作り\n・試着体験\n応募締切: 当日参加可能\n先着80名",
-      "source_type": "office_html",
-      "address": ""
-    },
-    {
       "id": "t-20260730-lkz6s",
       "pref": "tokyo",
       "date": "2026-07-30",
@@ -1432,6 +1415,23 @@
         "source": "gsi",
         "geocodedAt": "2026-06-29T16:31:20.069+09:00"
       }
+    },
+    {
+      "id": "t-20260726-juoab",
+      "pref": "tokyo",
+      "date": "2026-07-26",
+      "weekday": "日",
+      "title": "サマーコンサート",
+      "place": "立川出張所",
+      "time": "10:00～14:00",
+      "category": "体験",
+      "tag": "",
+      "ageRequirement": "どなたでも参加可能",
+      "deadline": null,
+      "url": "https://www.mod.go.jp/pco/tokyo/tachikawa/index.html#0726",
+      "notes": "・海上自衛隊東京音楽隊による演奏\n・缶バッジ作り\n・試着体験\n応募締切: 当日参加可能\n先着80名",
+      "source_type": "office_html",
+      "address": ""
     },
     {
       "id": "to-off-20260727-wq7tn",
@@ -2162,30 +2162,6 @@
       }
     },
     {
-      "id": "na-20260817-lb6zo",
-      "pref": "nagano",
-      "date": "2026-08-17",
-      "weekday": "月",
-      "title": "【伊那市】就活ラボ",
-      "place": "細部、調整中",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:27.986+09:00"
-      }
-    },
-    {
       "id": "na-20260817-w54dq",
       "pref": "nagano",
       "date": "2026-08-17",
@@ -2207,6 +2183,30 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:26.996+09:00"
+      }
+    },
+    {
+      "id": "na-20260817-lb6zo",
+      "pref": "nagano",
+      "date": "2026-08-17",
+      "weekday": "月",
+      "title": "【伊那市】就活ラボ",
+      "place": "細部、調整中",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:27.986+09:00"
       }
     }
   ],
@@ -4681,5 +4681,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/27 14:52"
+  "updatedAt": "2026/07/27 20:44"
 }
