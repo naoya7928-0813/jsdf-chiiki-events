@@ -592,6 +592,30 @@
       }
     },
     {
+      "id": "ak-20260802-bz1gc",
+      "pref": "akita",
+      "date": "2026-08-02",
+      "weekday": "日",
+      "title": "［イベント］イオンモール秋田にて自衛隊ブース出展します",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.719,
+        "longitude": 140.102,
+        "label": "秋田県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
+      }
+    },
+    {
       "id": "ak-20260802-a1o9r",
       "pref": "akita",
       "date": "2026-08-02",
@@ -645,30 +669,6 @@
       "date": "2026-08-02",
       "weekday": "日",
       "title": "［イベント］｢夏祭り大曲2026(大仙市)｣に自衛隊ブース出展します",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "地域参加",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 39.719,
-        "longitude": 140.102,
-        "label": "秋田県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
-      }
-    },
-    {
-      "id": "ak-20260802-bz1gc",
-      "pref": "akita",
-      "date": "2026-08-02",
-      "weekday": "日",
-      "title": "［イベント］イオンモール秋田にて自衛隊ブース出展します",
       "place": "",
       "address": "",
       "time": "",
@@ -760,15 +760,15 @@
       }
     },
     {
-      "id": "ak-20260822-maoxl",
+      "id": "ak-20260822-zxoso",
       "pref": "akita",
       "date": "2026-08-22",
       "weekday": "土",
-      "title": "［イベント］｢第2回石脇夏祭り(由利本荘市)｣に自衛隊ブース出展します",
+      "title": "［イベント］｢はたらく車だいしゅうごう!(大仙市)｣に自衛隊ブース出展します",
       "place": "",
       "address": "",
       "time": "",
-      "category": "地域参加",
+      "category": "広報活動",
       "tag": "",
       "url": "",
       "notes": null,
@@ -784,15 +784,15 @@
       }
     },
     {
-      "id": "ak-20260822-zxoso",
+      "id": "ak-20260822-maoxl",
       "pref": "akita",
       "date": "2026-08-22",
       "weekday": "土",
-      "title": "［イベント］｢はたらく車だいしゅうごう!(大仙市)｣に自衛隊ブース出展します",
+      "title": "［イベント］｢第2回石脇夏祭り(由利本荘市)｣に自衛隊ブース出展します",
       "place": "",
       "address": "",
       "time": "",
-      "category": "広報活動",
+      "category": "地域参加",
       "tag": "",
       "url": "",
       "notes": null,
@@ -1154,7 +1154,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-31",
+      "statusUpdatedAt": "2026-08-01",
       "weatherLocation": {
         "latitude": 35.726,
         "longitude": 139.717,
@@ -1183,7 +1183,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-31",
+      "statusUpdatedAt": "2026-08-01",
       "weatherLocation": {
         "latitude": 35.69,
         "longitude": 139.692,
@@ -1213,7 +1213,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-31",
+      "statusUpdatedAt": "2026-08-01",
       "weatherLocation": {
         "latitude": 35.673,
         "longitude": 139.817,
@@ -1346,7 +1346,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-31",
+      "statusUpdatedAt": "2026-08-01",
       "weatherLocation": {
         "latitude": 35.673,
         "longitude": 139.817,
@@ -1614,57 +1614,6 @@
         "source": "gsi",
         "geocodedAt": "2026-07-02T08:50:36.640+09:00"
       }
-    },
-    {
-      "id": "t-20260730-lkz6s",
-      "pref": "tokyo",
-      "date": "2026-07-30",
-      "weekday": "木",
-      "title": "練馬駐屯地見学",
-      "place": "足立地域事務所",
-      "time": "",
-      "category": "体験",
-      "tag": "",
-      "ageRequirement": "17歳～32歳",
-      "deadline": null,
-      "url": "https://www.mod.go.jp/pco/tokyo/adachi/index.html#0730",
-      "notes": "・装備品展示\n・体験試乗\n・駐屯地見学\n・体験喫食\n応募締切: 応募終了しました。",
-      "source_type": "office_html",
-      "address": "",
-      "status": "closed",
-      "statusReason": "受付終了告知",
-      "statusSource": "html",
-      "statusUpdatedAt": "2026-07-31"
-    },
-    {
-      "id": "t-20260731-ryvqo",
-      "pref": "tokyo",
-      "date": "2026-07-31",
-      "weekday": "金",
-      "title": "スマホじゃわからない自衛隊のリアル",
-      "place": "大田出張所",
-      "time": "14:00～16:00",
-      "category": "広報活動",
-      "tag": "",
-      "ageRequirement": "どなたでも参加可能",
-      "deadline": "7月30日（木）",
-      "url": "https://www.mod.go.jp/pco/tokyo/oota/event.html#0731",
-      "notes": "・現役自衛官によるトークショー\n参加無料・事前予約制",
-      "source_type": "office_html",
-      "address": "",
-      "deadlineDate": "2026-07-30",
-      "status": "closed",
-      "statusReason": "締切日経過",
-      "statusSource": "html",
-      "statusUpdatedAt": "2026-07-31",
-      "weatherLocation": {
-        "latitude": 35.561,
-        "longitude": 139.716,
-        "label": "東京都大田区",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-08T14:27:39.404+09:00"
-      }
     }
   ],
   "saitama": [
@@ -1791,7 +1740,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-31"
+      "statusUpdatedAt": "2026-08-01"
     },
     {
       "id": "s-20260823-4luf8",
@@ -1892,7 +1841,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-07-31"
+      "statusUpdatedAt": "2026-08-01"
     }
   ],
   "gunma": [
@@ -2423,30 +2372,6 @@
       }
     },
     {
-      "id": "na-20261003-kkjxa",
-      "pref": "nagano",
-      "date": "2026-10-03",
-      "weekday": "土",
-      "title": "【安曇野市】トラックの日イベント",
-      "place": "",
-      "address": "安曇野市",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.304,
-        "longitude": 137.906,
-        "label": "長野県安曇野市",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:37.394+09:00"
-      }
-    },
-    {
       "id": "na-20261003-37wm4",
       "pref": "nagano",
       "date": "2026-10-03",
@@ -2468,6 +2393,30 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-07-29T14:30:37.753+09:00"
+      }
+    },
+    {
+      "id": "na-20261003-kkjxa",
+      "pref": "nagano",
+      "date": "2026-10-03",
+      "weekday": "土",
+      "title": "【安曇野市】トラックの日イベント",
+      "place": "",
+      "address": "安曇野市",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.304,
+        "longitude": 137.906,
+        "label": "長野県安曇野市",
+        "accuracy": "municipality",
+        "source": "gsi",
+        "geocodedAt": "2026-07-29T14:30:37.394+09:00"
       }
     },
     {
@@ -2519,30 +2468,6 @@
       }
     },
     {
-      "id": "na-20261025-rv0ey",
-      "pref": "nagano",
-      "date": "2026-10-25",
-      "weekday": "日",
-      "title": "【大町市】県統合防災訓練",
-      "place": "",
-      "address": "大町市",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.503,
-        "longitude": 137.851,
-        "label": "長野県大町",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:38.512+09:00"
-      }
-    },
-    {
       "id": "na-20261025-hz7ka",
       "pref": "nagano",
       "date": "2026-10-25",
@@ -2564,6 +2489,30 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-29T14:30:38.884+09:00"
+      }
+    },
+    {
+      "id": "na-20261025-rv0ey",
+      "pref": "nagano",
+      "date": "2026-10-25",
+      "weekday": "日",
+      "title": "【大町市】県統合防災訓練",
+      "place": "",
+      "address": "大町市",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.503,
+        "longitude": 137.851,
+        "label": "長野県大町",
+        "accuracy": "municipality",
+        "source": "gsi",
+        "geocodedAt": "2026-07-29T14:30:38.512+09:00"
       }
     }
   ],
@@ -4208,7 +4157,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-07-31",
+      "statusUpdatedAt": "2026-08-01",
       "weatherLocation": {
         "latitude": 34.226,
         "longitude": 135.167,
@@ -5474,5 +5423,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/31 19:55"
+  "updatedAt": "2026/08/01 08:23"
 }
