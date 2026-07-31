@@ -101,30 +101,6 @@
   ],
   "obihiro": [
     {
-      "id": "ob-20260731-yke62",
-      "pref": "obihiro",
-      "date": "2026-07-31",
-      "weekday": "金",
-      "title": "公務員合同説明会",
-      "place": "帯広とかちプラザ１Ｆアトリウム 帯広市西４条南１３丁目１",
-      "address": "",
-      "time": "13:30～16:30",
-      "category": "説明会",
-      "tag": "入場無料",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 42.924,
-        "longitude": 143.196,
-        "label": "北海道帯広市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-15T19:15:59.848+09:00"
-      }
-    },
-    {
       "id": "ob-20260822-tt9u7",
       "pref": "obihiro",
       "date": "2026-08-22",
@@ -640,30 +616,6 @@
       }
     },
     {
-      "id": "ak-20260802-lzjzi",
-      "pref": "akita",
-      "date": "2026-08-02",
-      "weekday": "日",
-      "title": "［イベント］｢夏祭り大曲2026(大仙市)｣に自衛隊ブース出展します",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "地域参加",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 39.719,
-        "longitude": 140.102,
-        "label": "秋田県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
-      }
-    },
-    {
       "id": "ak-20260802-a1o9r",
       "pref": "akita",
       "date": "2026-08-02",
@@ -685,6 +637,30 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-07-18T08:05:14.825+09:00"
+      }
+    },
+    {
+      "id": "ak-20260802-lzjzi",
+      "pref": "akita",
+      "date": "2026-08-02",
+      "weekday": "日",
+      "title": "［イベント］｢夏祭り大曲2026(大仙市)｣に自衛隊ブース出展します",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.719,
+        "longitude": 140.102,
+        "label": "秋田県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
       }
     },
     {
@@ -4613,6 +4589,30 @@
       }
     },
     {
+      "id": "ok-20260817-7ybhu",
+      "pref": "okayama",
+      "date": "2026-08-17",
+      "weekday": "月",
+      "title": "自衛隊×イコットニコット",
+      "place": "イコットニコット",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 34.662,
+        "longitude": 133.935,
+        "label": "岡山県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-02T08:50:46.282+09:00"
+      }
+    },
+    {
       "id": "ok-20260830-v9kno",
       "pref": "okayama",
       "date": "2026-08-30",
@@ -4634,6 +4634,78 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-15T19:16:00.665+09:00"
+      }
+    },
+    {
+      "id": "ok-20260919-86xl9",
+      "pref": "okayama",
+      "date": "2026-09-19",
+      "weekday": "土",
+      "title": "備中たかはし納涼花火",
+      "place": "高梁市ききょう緑地公園",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 34.791,
+        "longitude": 133.617,
+        "label": "岡山県高梁市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-31T14:42:36.395+09:00"
+      }
+    },
+    {
+      "id": "ok-20260926-cxs3r",
+      "pref": "okayama",
+      "date": "2026-09-26",
+      "weekday": "土",
+      "title": "日本原駐屯記念行事（町内パレード）",
+      "place": "奈義町内",
+      "address": "",
+      "time": "",
+      "category": "記念行事",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.123,
+        "longitude": 134.178,
+        "label": "岡山県奈義町",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-31T14:42:37.279+09:00"
+      }
+    },
+    {
+      "id": "ok-20260927-tqrg0",
+      "pref": "okayama",
+      "date": "2026-09-27",
+      "weekday": "日",
+      "title": "日本原駐屯記念行事",
+      "place": "日本原駐屯地",
+      "address": "",
+      "time": "",
+      "category": "記念行事",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 34.662,
+        "longitude": 133.935,
+        "label": "岡山県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-02T08:50:44.084+09:00"
       }
     }
   ],
@@ -5303,5 +5375,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/07/31 08:26"
+  "updatedAt": "2026/07/31 14:42"
 }
