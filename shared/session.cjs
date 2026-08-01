@@ -149,8 +149,25 @@ function sessionStillValid(data, account, now, { absTtl, idleTtl }) {
   return true;
 }
 
+/**
+ * ログインロックの継続時間（秒）を、そのアカウントの累積ロック回数（level）から算出する（純粋）。
+ * 指数バックオフ: baseSec * factor^(level-1) を maxSec で頭打ち。
+ *   level=1 → baseSec（既定5分）, 2 → 10分, 3 → 20分, 4 → 40分, 5 → 60分(cap) …
+ * ＝ ロックを繰り返すほど待ち時間が伸びる（総当り耐性を段階的に強化）。
+ * @param {number} level 1以上の整数（そのアカウントが何回目のロックか）
+ * @param {object} opts  { baseSec=300, factor=2, maxSec=3600 }
+ */
+function lockDurationForLevel(level, { baseSec = 300, factor = 2, maxSec = 3600 } = {}) {
+  const lv = Math.max(1, Math.floor(Number(level) || 1));
+  const b = Math.max(1, Number(baseSec) || 300);
+  const f = Math.max(1, Number(factor) || 2);
+  const cap = Math.max(b, Number(maxSec) || b);
+  const raw = b * Math.pow(f, lv - 1);
+  return Math.min(cap, Math.round(raw));
+}
+
 module.exports = {
   hashPassword, verifyPassword, timingSafeEqualStr, newToken, newRequestId,
   COOKIE_NAME, serializeSessionCookie, clearSessionCookie, parseCookies, getSessionToken,
-  STATE_CHANGING, csrfDecision, sessionStillValid,
+  STATE_CHANGING, csrfDecision, sessionStillValid, lockDurationForLevel,
 };

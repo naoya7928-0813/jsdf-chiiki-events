@@ -4,18 +4,25 @@
 // パスワードは平文/scrypt 両対応（移行期）。後方互換: x-admin-secret も受理。
 import { checkOrigin, noStore, requireSameOrigin, rateLimit, verifyCredentials, startSession, writeAudit, redis } from '../_security.js';
 import authz from '../../shared/authz.cjs';
+import S from '../../shared/session.cjs';
 
-// ── アカウント単位のログインロック（安全保障要件） ────────────────
-// 連続 ADMIN_LOGIN_MAX_FAILS 回失敗したアカウント名を ADMIN_LOGIN_LOCK_SEC 秒ロックする。
-// 失敗のたびにロック期限を延長（スライディング）＝総当たり中は開かない。成功で解除。
-// ※ アカウント名単位のため、第三者が特定アカウント名で連続失敗させると当該アカウントを
-//   一時的にロックできる（ロックアウトDoS）。運用者数が限られ名簿管理されている前提で許容し、
-//   ロック時間は短め（既定5分）。IPレート制限(10回/10分)と多層で運用する。
-const LOCK_MAX_FAILS = Math.max(1, Number(process.env.ADMIN_LOGIN_MAX_FAILS || 3));   // 既定3回
-const LOCK_SECONDS   = Math.max(30, Number(process.env.ADMIN_LOGIN_LOCK_SEC || 300)); // 既定5分
-const LOCK_MIN       = Math.max(1, Math.ceil(LOCK_SECONDS / 60));
-const failKey = (u) => `login:fail:${String(u || '').toLowerCase().slice(0, 64)}`;
-const lockedMsg = `ログインに続けて失敗したため、約${LOCK_MIN}分間ロックされています。時間をおいて再度お試しください。`;
+// ── アカウント単位のログインロック（安全保障要件・指数バックオフでエスカレート） ──
+// 連続 ADMIN_LOGIN_MAX_FAILS 回失敗するとアカウント名をロックする。ロックは繰り返すほど
+// 継続時間が伸びる（level ごとに session.cjs の lockDurationForLevel で算出）:
+//   1回目=ADMIN_LOGIN_LOCK_SEC（既定5分）→ 2回目=10分 → 3回目=20分 → … ADMIN_LOGIN_LOCK_MAX_SEC(既定60分)で頭打ち。
+// エスカレーション記憶(level)は ADMIN_LOGIN_LEVEL_TTL（既定24h）無操作で自然リセット。ログイン成功で全解除。
+// ※ アカウント名単位のため特定名を連続失敗させる一時ロックDoSは残るが、運用者数が限られ名簿管理
+//   されている前提で許容。IPレート制限(10回/10分)と多層で運用する。
+const LOCK_MAX_FAILS  = Math.max(1, Number(process.env.ADMIN_LOGIN_MAX_FAILS || 3));     // 既定3回
+const LOCK_BASE_SEC   = Math.max(30, Number(process.env.ADMIN_LOGIN_LOCK_SEC || 300));   // 既定5分（level1）
+const LOCK_MAX_SEC    = Math.max(LOCK_BASE_SEC, Number(process.env.ADMIN_LOGIN_LOCK_MAX_SEC || 3600)); // 頭打ち（既定60分）
+const LOCK_FACTOR     = Math.max(1, Number(process.env.ADMIN_LOGIN_LOCK_FACTOR || 2));   // 逓増率（既定2倍）
+const LEVEL_TTL_SEC   = Math.max(60, Number(process.env.ADMIN_LOGIN_LEVEL_TTL || 86400)); // level記憶の寿命（既定24h）
+const ATTEMPT_WIN_SEC = LOCK_BASE_SEC;                                                    // 失敗回数の集計窓
+const failKey  = (u) => `login:fail:${String(u || '').toLowerCase().slice(0, 64)}`;
+const lockKey  = (u) => `login:lock:${String(u || '').toLowerCase().slice(0, 64)}`;
+const levelKey = (u) => `login:locklevel:${String(u || '').toLowerCase().slice(0, 64)}`;
+const lockedMsg = (sec) => `ログインに続けて失敗したため、約${Math.max(1, Math.ceil(sec / 60))}分間ロックされています。時間をおいて再度お試しください。`;
 
 export default async function handler(req, res) {
   noStore(res); // 管理APIはキャッシュ禁止（成功/エラー問わず）
@@ -32,32 +39,41 @@ export default async function handler(req, res) {
   const pass = req.headers['x-admin-pass'] || req.body?.pass || req.headers['x-admin-secret'] || req.body?.secret;
   const uname = String(user || '');
   const fkey = failKey(uname);
+  const lkey = lockKey(uname);
+  const lvlkey = levelKey(uname);
 
-  // ① ロック確認（認証前に判定＝ロック中は資格情報を一切検証しない）
-  let fails = 0;
-  try { fails = Number(await redis.get(fkey)) || 0; } catch { /* Redis障害時はロックを課さない（可用性優先） */ }
-  if (fails >= LOCK_MAX_FAILS) {
-    await writeAudit(null, { action: 'auth.login', result: 'locked', note: `user=${uname.slice(0, 40)}` });
-    res.setHeader('Retry-After', String(LOCK_SECONDS));
-    return res.status(429).json({ error: 'locked', message: lockedMsg });
+  // ① ロック確認（認証前に判定＝ロック中は資格情報を一切検証しない）。残TTLをそのまま返す。
+  let lockTtl = 0;
+  try { lockTtl = Number(await redis.ttl(lkey)) || 0; } catch { /* Redis障害時はロックを課さない（可用性優先） */ }
+  if (lockTtl > 0) {
+    await writeAudit(null, { action: 'auth.login', result: 'locked', note: `user=${uname.slice(0, 40)} ttl=${lockTtl}` });
+    res.setHeader('Retry-After', String(lockTtl));
+    return res.status(429).json({ error: 'locked', message: lockedMsg(lockTtl) });
   }
 
   const account = verifyCredentials(uname, pass);
   if (!account) {
-    // ② 失敗回数を加算し、ロック期限を延長（アカウント名単位）
-    let n = fails + 1;
-    try { n = await redis.incr(fkey); await redis.expire(fkey, LOCK_SECONDS); } catch { /* noop */ }
+    // ② 失敗回数を加算（ATTEMPT_WIN_SEC の窓でスライド集計）
+    let n = 1;
+    try { n = await redis.incr(fkey); await redis.expire(fkey, ATTEMPT_WIN_SEC); } catch { /* noop */ }
     await writeAudit(null, { action: 'auth.login', result: 'failure', note: `user=${uname.slice(0, 40)} fails=${n}` });
     if (n >= LOCK_MAX_FAILS) {
-      res.setHeader('Retry-After', String(LOCK_SECONDS));
-      return res.status(429).json({ error: 'locked', message: lockedMsg });
+      // ③ 規定回数到達 → ロック発動。level を +1 して継続時間を逓増（5→10→20→…→cap）。
+      let level = 1;
+      try { level = await redis.incr(lvlkey); await redis.expire(lvlkey, LEVEL_TTL_SEC); } catch { /* noop */ }
+      const lockSec = S.lockDurationForLevel(level, { baseSec: LOCK_BASE_SEC, factor: LOCK_FACTOR, maxSec: LOCK_MAX_SEC });
+      // ロックキーを duration の TTL でセットし、失敗カウンタは解除（解錠後は再び LOCK_MAX_FAILS 回から）
+      try { await redis.set(lkey, '1', { ex: lockSec }); await redis.del(fkey); } catch { /* noop */ }
+      await writeAudit(null, { action: 'auth.login', result: 'locked', note: `user=${uname.slice(0, 40)} level=${level} lock=${lockSec}s` });
+      res.setHeader('Retry-After', String(lockSec));
+      return res.status(429).json({ error: 'locked', message: lockedMsg(lockSec) });
     }
     const remaining = LOCK_MAX_FAILS - n;
     return res.status(401).json({ error: 'Unauthorized', message: `ユーザー名またはパスワードが違います。あと${remaining}回間違えるとロックされます。` });
   }
 
-  // ③ 成功: 失敗カウンタを解除
-  try { await redis.del(fkey); } catch { /* noop */ }
+  // ④ 成功: 失敗カウンタ・ロック・エスカレーション記憶をすべて解除
+  try { await redis.del(fkey); await redis.del(lkey); await redis.del(lvlkey); } catch { /* noop */ }
 
   const ok = await startSession(res, account);
   if (!ok) return res.status(503).json({ error: 'session unavailable' });

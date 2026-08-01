@@ -103,3 +103,15 @@ test('sessionStillValid: 絶対期限・無操作失効', () => {
   assert.equal(S.sessionStillValid(sess({ createdAt: now - 9 * 3600 * 1000 }), account(), now, TTL), false); // 絶対期限超過
   assert.equal(S.sessionStillValid(sess({ lastSeen: now - 2 * 3600 * 1000 }), account(), now, TTL), false);  // 無操作超過
 });
+
+test('lockDurationForLevel: 指数バックオフでエスカレート＋cap', () => {
+  const o = { baseSec: 300, factor: 2, maxSec: 3600 };
+  assert.equal(S.lockDurationForLevel(1, o), 300);   // 5分
+  assert.equal(S.lockDurationForLevel(2, o), 600);   // 10分
+  assert.equal(S.lockDurationForLevel(3, o), 1200);  // 20分
+  assert.equal(S.lockDurationForLevel(4, o), 2400);  // 40分
+  assert.equal(S.lockDurationForLevel(5, o), 3600);  // 80分→60分でcap
+  assert.equal(S.lockDurationForLevel(6, o), 3600);  // cap維持
+  assert.equal(S.lockDurationForLevel(0, o), 300);   // 0以下は level1 扱い
+  assert.equal(S.lockDurationForLevel(1, {}), 300);  // 既定値
+});
