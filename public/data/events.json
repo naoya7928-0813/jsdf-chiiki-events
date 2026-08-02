@@ -520,11 +520,11 @@
   ],
   "akita": [
     {
-      "id": "ak-20260802-bz1gc",
+      "id": "ak-20260802-lzjzi",
       "pref": "akita",
       "date": "2026-08-02",
       "weekday": "日",
-      "title": "［イベント］イオンモール秋田にて自衛隊ブース出展します",
+      "title": "［イベント］｢夏祭り大曲2026(大仙市)｣に自衛隊ブース出展します",
       "place": "",
       "address": "",
       "time": "",
@@ -544,35 +544,11 @@
       }
     },
     {
-      "id": "ak-20260802-a1o9r",
+      "id": "ak-20260802-bz1gc",
       "pref": "akita",
       "date": "2026-08-02",
       "weekday": "日",
-      "title": "［出展/説明会］3機関合同採用説明会(由利本荘市)",
-      "place": "",
-      "address": "由利本荘市",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "",
-      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 39.386,
-        "longitude": 140.049,
-        "label": "秋田県由利本荘市",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-07-18T08:05:14.825+09:00"
-      }
-    },
-    {
-      "id": "ak-20260802-lzjzi",
-      "pref": "akita",
-      "date": "2026-08-02",
-      "weekday": "日",
-      "title": "［イベント］｢夏祭り大曲2026(大仙市)｣に自衛隊ブース出展します",
+      "title": "［イベント］イオンモール秋田にて自衛隊ブース出展します",
       "place": "",
       "address": "",
       "time": "",
@@ -613,6 +589,30 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:16.656+09:00"
+      }
+    },
+    {
+      "id": "ak-20260802-a1o9r",
+      "pref": "akita",
+      "date": "2026-08-02",
+      "weekday": "日",
+      "title": "［出展/説明会］3機関合同採用説明会(由利本荘市)",
+      "place": "",
+      "address": "由利本荘市",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "現役自衛官がていねいにお話します 詳細は秋田地本SNSにて",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 39.386,
+        "longitude": 140.049,
+        "label": "秋田県由利本荘市",
+        "accuracy": "municipality",
+        "source": "gsi",
+        "geocodedAt": "2026-07-18T08:05:14.825+09:00"
       }
     },
     {
@@ -688,15 +688,15 @@
       }
     },
     {
-      "id": "ak-20260822-maoxl",
+      "id": "ak-20260822-zxoso",
       "pref": "akita",
       "date": "2026-08-22",
       "weekday": "土",
-      "title": "［イベント］｢第2回石脇夏祭り(由利本荘市)｣に自衛隊ブース出展します",
+      "title": "［イベント］｢はたらく車だいしゅうごう!(大仙市)｣に自衛隊ブース出展します",
       "place": "",
       "address": "",
       "time": "",
-      "category": "地域参加",
+      "category": "広報活動",
       "tag": "",
       "url": "",
       "notes": null,
@@ -712,15 +712,15 @@
       }
     },
     {
-      "id": "ak-20260822-zxoso",
+      "id": "ak-20260822-maoxl",
       "pref": "akita",
       "date": "2026-08-22",
       "weekday": "土",
-      "title": "［イベント］｢はたらく車だいしゅうごう!(大仙市)｣に自衛隊ブース出展します",
+      "title": "［イベント］｢第2回石脇夏祭り(由利本荘市)｣に自衛隊ブース出展します",
       "place": "",
       "address": "",
       "time": "",
-      "category": "広報活動",
+      "category": "地域参加",
       "tag": "",
       "url": "",
       "notes": null,
@@ -2252,30 +2252,6 @@
       }
     },
     {
-      "id": "na-20261025-hz7ka",
-      "pref": "nagano",
-      "date": "2026-10-25",
-      "weekday": "日",
-      "title": "【安曇野市】エルサ安曇野イベント",
-      "place": "エルサ あづみ野",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:38.884+09:00"
-      }
-    },
-    {
       "id": "na-20261025-rv0ey",
       "pref": "nagano",
       "date": "2026-10-25",
@@ -2297,6 +2273,30 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-07-29T14:30:38.512+09:00"
+      }
+    },
+    {
+      "id": "na-20261025-hz7ka",
+      "pref": "nagano",
+      "date": "2026-10-25",
+      "weekday": "日",
+      "title": "【安曇野市】エルサ安曇野イベント",
+      "place": "エルサ あづみ野",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-29T14:30:38.884+09:00"
       }
     }
   ],
@@ -4865,5 +4865,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/08/02 14:37"
+  "updatedAt": "2026/08/02 19:22"
 }
