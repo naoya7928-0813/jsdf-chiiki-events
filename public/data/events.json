@@ -568,15 +568,15 @@
       }
     },
     {
-      "id": "ak-20260822-maoxl",
+      "id": "ak-20260822-zxoso",
       "pref": "akita",
       "date": "2026-08-22",
       "weekday": "土",
-      "title": "［イベント］｢第2回石脇夏祭り(由利本荘市)｣に自衛隊ブース出展します",
+      "title": "［イベント］｢はたらく車だいしゅうごう!(大仙市)｣に自衛隊ブース出展します",
       "place": "",
       "address": "",
       "time": "",
-      "category": "地域参加",
+      "category": "広報活動",
       "tag": "",
       "url": "",
       "notes": null,
@@ -592,15 +592,15 @@
       }
     },
     {
-      "id": "ak-20260822-zxoso",
+      "id": "ak-20260822-maoxl",
       "pref": "akita",
       "date": "2026-08-22",
       "weekday": "土",
-      "title": "［イベント］｢はたらく車だいしゅうごう!(大仙市)｣に自衛隊ブース出展します",
+      "title": "［イベント］｢第2回石脇夏祭り(由利本荘市)｣に自衛隊ブース出展します",
       "place": "",
       "address": "",
       "time": "",
-      "category": "広報活動",
+      "category": "地域参加",
       "tag": "",
       "url": "",
       "notes": null,
@@ -2019,27 +2019,27 @@
       }
     },
     {
-      "id": "na-20261003-kkjxa",
+      "id": "na-20260829-qn6dj",
       "pref": "nagano",
-      "date": "2026-10-03",
+      "date": "2026-08-29",
       "weekday": "土",
-      "title": "【安曇野市】トラックの日イベント",
-      "place": "",
-      "address": "安曇野市",
+      "title": "【安曇野市】常念フェスティバル",
+      "place": "堀金中央公園",
+      "address": "",
       "time": "",
-      "category": "広報活動",
+      "category": "地域参加",
       "tag": "",
       "url": "",
-      "notes": "調整中",
+      "notes": "準備中",
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 36.304,
-        "longitude": 137.906,
-        "label": "長野県安曇野市",
-        "accuracy": "municipality",
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:37.394+09:00"
+        "geocodedAt": "2026-08-03T14:45:31.723+09:00"
       }
     },
     {
@@ -2064,6 +2064,30 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-07-29T14:30:37.753+09:00"
+      }
+    },
+    {
+      "id": "na-20261003-kkjxa",
+      "pref": "nagano",
+      "date": "2026-10-03",
+      "weekday": "土",
+      "title": "【安曇野市】トラックの日イベント",
+      "place": "",
+      "address": "安曇野市",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.304,
+        "longitude": 137.906,
+        "label": "長野県安曇野市",
+        "accuracy": "municipality",
+        "source": "gsi",
+        "geocodedAt": "2026-07-29T14:30:37.394+09:00"
       }
     },
     {
@@ -2115,30 +2139,6 @@
       }
     },
     {
-      "id": "na-20261025-rv0ey",
-      "pref": "nagano",
-      "date": "2026-10-25",
-      "weekday": "日",
-      "title": "【大町市】県統合防災訓練",
-      "place": "",
-      "address": "大町市",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.503,
-        "longitude": 137.851,
-        "label": "長野県大町",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:38.512+09:00"
-      }
-    },
-    {
       "id": "na-20261025-hz7ka",
       "pref": "nagano",
       "date": "2026-10-25",
@@ -2160,6 +2160,30 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-29T14:30:38.884+09:00"
+      }
+    },
+    {
+      "id": "na-20261025-rv0ey",
+      "pref": "nagano",
+      "date": "2026-10-25",
+      "weekday": "日",
+      "title": "【大町市】県統合防災訓練",
+      "place": "",
+      "address": "大町市",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.503,
+        "longitude": 137.851,
+        "label": "長野県大町",
+        "accuracy": "municipality",
+        "source": "gsi",
+        "geocodedAt": "2026-07-29T14:30:38.512+09:00"
       }
     }
   ],
@@ -2622,7 +2646,7 @@
       "date": "2026-08-26",
       "weekday": "水",
       "title": "安城所｜自衛隊・海上保安庁・警察2DAY合同職場見学会",
-      "place": "",
+      "place": "自衛隊安城募集案内所 ＊JR三河安城駅から徒歩4分",
       "address": "",
       "time": "",
       "category": "体験",
@@ -2636,9 +2660,9 @@
         "latitude": 35.18,
         "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture",
+        "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
+        "geocodedAt": "2026-07-21T19:54:00.571+09:00"
       }
     },
     {
@@ -2647,7 +2671,7 @@
       "date": "2026-08-27",
       "weekday": "木",
       "title": "安城所｜自衛隊・海上保安庁・警察2DAY合同職場見学会",
-      "place": "",
+      "place": "自衛隊安城募集案内所 ＊JR三河安城駅から徒歩4分",
       "address": "",
       "time": "",
       "category": "体験",
@@ -2661,9 +2685,9 @@
         "latitude": 35.18,
         "longitude": 136.907,
         "label": "愛知県",
-        "accuracy": "prefecture",
+        "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:28.766+09:00"
+        "geocodedAt": "2026-07-21T19:54:00.571+09:00"
       }
     },
     {
@@ -4580,5 +4604,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/08/03 08:16"
+  "updatedAt": "2026/08/03 14:45"
 }
