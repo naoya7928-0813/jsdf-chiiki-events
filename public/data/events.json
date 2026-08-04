@@ -2017,30 +2017,6 @@
       }
     },
     {
-      "id": "na-20261003-kkjxa",
-      "pref": "nagano",
-      "date": "2026-10-03",
-      "weekday": "土",
-      "title": "【安曇野市】トラックの日イベント",
-      "place": "",
-      "address": "安曇野市",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.304,
-        "longitude": 137.906,
-        "label": "長野県安曇野市",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:37.394+09:00"
-      }
-    },
-    {
       "id": "na-20261003-37wm4",
       "pref": "nagano",
       "date": "2026-10-03",
@@ -2062,6 +2038,30 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-07-29T14:30:37.753+09:00"
+      }
+    },
+    {
+      "id": "na-20261003-kkjxa",
+      "pref": "nagano",
+      "date": "2026-10-03",
+      "weekday": "土",
+      "title": "【安曇野市】トラックの日イベント",
+      "place": "",
+      "address": "安曇野市",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.304,
+        "longitude": 137.906,
+        "label": "長野県安曇野市",
+        "accuracy": "municipality",
+        "source": "gsi",
+        "geocodedAt": "2026-07-29T14:30:37.394+09:00"
       }
     },
     {
@@ -3507,45 +3507,62 @@
       }
     }
   ],
-  "wakayama": [
-    {
-      "id": "wa-off-20260820-nh9c1",
-      "pref": "wakayama",
-      "date": "2026-08-20",
-      "weekday": "木",
-      "title": "女性のための駐屯地見学 伊丹駐屯地・千僧駐屯地へGO!!",
-      "place": "伊丹駐屯地・千僧駐屯地",
-      "address": "",
-      "time": "09:30～15:00",
-      "category": "体験",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/wakayama/2020/wp-content/uploads/2026/07/671e8927bd06cc65c767525471de420e-1-443x640.jpg",
-      "notes": "定員になり次第締切",
-      "ageRequirement": "15歳〜32歳までの女性",
-      "deadline": "7月28日（火）",
-      "source_type": "office_ocr",
-      "deadlineDate": "2026-07-28",
-      "status": "closed",
-      "statusReason": "締切日経過",
-      "statusSource": "ocr",
-      "statusUpdatedAt": "2026-08-04",
-      "weatherLocation": {
-        "latitude": 34.226,
-        "longitude": 135.167,
-        "label": "和歌山県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-07-09T08:17:49.967+09:00"
-      }
-    }
-  ],
+  "wakayama": [],
   "ehime": [
     {
-      "id": "em-20260821-dpdes",
+      "id": "em-20260827-u4syu",
+      "pref": "ehime",
+      "date": "2026-08-27",
+      "weekday": "木",
+      "title": "陸上自衛隊高等工科学校オンライン説明会",
+      "place": "オンライン説明会なのでご自宅でもどちらでもOK！",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "オンライン",
+      "url": "https://www.mod.go.jp/pco/ehime/event.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 33.842,
+        "longitude": 132.766,
+        "label": "愛媛県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-04T14:27:16.607+09:00"
+      }
+    },
+    {
+      "id": "em-20260829-cer3r",
+      "pref": "ehime",
+      "date": "2026-08-29",
+      "weekday": "土",
+      "title": "陸上自衛隊高等工科学校 8月学校見学会",
+      "place": "陸上自衛隊高等工科学校",
+      "address": "",
+      "time": "",
+      "category": "体験",
+      "tag": "学生向け",
+      "url": "https://www.mod.go.jp/pco/ehime/event.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 33.842,
+        "longitude": 132.766,
+        "label": "愛媛県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-04T14:27:17.248+09:00"
+      }
+    },
+    {
+      "id": "em-20260821-fdeyz",
       "pref": "ehime",
       "date": "2026-08-21",
       "weekday": "金",
-      "title": "ミライはっけんおしごとたいけんデーく",
+      "title": "ミライはっけんおしごとたいけんデー",
       "place": "松山市北条児童センター",
       "address": "",
       "time": "13:00～15:00",
@@ -4601,5 +4618,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/08/04 08:21"
+  "updatedAt": "2026/08/04 14:27"
 }
