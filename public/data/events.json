@@ -568,15 +568,15 @@
       }
     },
     {
-      "id": "ak-20260822-zxoso",
+      "id": "ak-20260822-maoxl",
       "pref": "akita",
       "date": "2026-08-22",
       "weekday": "土",
-      "title": "［イベント］｢はたらく車だいしゅうごう!(大仙市)｣に自衛隊ブース出展します",
+      "title": "［イベント］｢第2回石脇夏祭り(由利本荘市)｣に自衛隊ブース出展します",
       "place": "",
       "address": "",
       "time": "",
-      "category": "広報活動",
+      "category": "地域参加",
       "tag": "",
       "url": "",
       "notes": null,
@@ -592,15 +592,15 @@
       }
     },
     {
-      "id": "ak-20260822-maoxl",
+      "id": "ak-20260822-zxoso",
       "pref": "akita",
       "date": "2026-08-22",
       "weekday": "土",
-      "title": "［イベント］｢第2回石脇夏祭り(由利本荘市)｣に自衛隊ブース出展します",
+      "title": "［イベント］｢はたらく車だいしゅうごう!(大仙市)｣に自衛隊ブース出展します",
       "place": "",
       "address": "",
       "time": "",
-      "category": "地域参加",
+      "category": "広報活動",
       "tag": "",
       "url": "",
       "notes": null,
@@ -858,13 +858,13 @@
       "weekday": "水",
       "title": "イオンモール日の出 サマーフェア",
       "place": "福生募集案内所",
-      "time": "10:00～15:00",
+      "time": "",
       "category": "体験",
       "tag": "",
-      "ageRequirement": "16歳～32歳",
+      "ageRequirement": "どなたでも参加可能",
       "deadline": null,
       "url": "https://www.mod.go.jp/pco/tokyo/fussa/index.html#0805",
-      "notes": "・射的ゲーム\n・握力チャレンジ\n・制服試着体験\n・自衛隊偵察用ゴムボート展示\n応募締切: 当日参加可能\n16歳～32歳限定特典有",
+      "notes": "・射的ゲーム\n・握力チャレンジ\n・制服試着体験\n・自衛隊偵察用ゴムボート展示\n応募締切: 当日参加可能",
       "source_type": "office_html",
       "address": "",
       "weatherLocation": {
@@ -1791,30 +1791,6 @@
   "yamanashi": [],
   "nagano": [
     {
-      "id": "na-20260817-lb6zo",
-      "pref": "nagano",
-      "date": "2026-08-17",
-      "weekday": "月",
-      "title": "【伊那市】就活ラボ",
-      "place": "細部、調整中",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:27.986+09:00"
-      }
-    },
-    {
       "id": "na-20260817-w54dq",
       "pref": "nagano",
       "date": "2026-08-17",
@@ -1836,6 +1812,30 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:26.996+09:00"
+      }
+    },
+    {
+      "id": "na-20260817-lb6zo",
+      "pref": "nagano",
+      "date": "2026-08-17",
+      "weekday": "月",
+      "title": "【伊那市】就活ラボ",
+      "place": "細部、調整中",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:27.986+09:00"
       }
     },
     {
@@ -1983,30 +1983,6 @@
       }
     },
     {
-      "id": "na-20261025-hz7ka",
-      "pref": "nagano",
-      "date": "2026-10-25",
-      "weekday": "日",
-      "title": "【安曇野市】エルサ安曇野イベント",
-      "place": "エルサ あづみ野",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:38.884+09:00"
-      }
-    },
-    {
       "id": "na-20261025-rv0ey",
       "pref": "nagano",
       "date": "2026-10-25",
@@ -2029,35 +2005,34 @@
         "source": "gsi",
         "geocodedAt": "2026-07-29T14:30:38.512+09:00"
       }
-    }
-  ],
-  "gifu": [],
-  "shizuoka": [
+    },
     {
-      "id": "sz-20260820-rqjrh",
-      "pref": "shizuoka",
-      "date": "2026-08-20",
-      "weekday": "木",
-      "title": "女性限定自衛隊職場見学バスツアー",
-      "place": "富士駐屯地",
+      "id": "na-20261025-hz7ka",
+      "pref": "nagano",
+      "date": "2026-10-25",
+      "weekday": "日",
+      "title": "【安曇野市】エルサ安曇野イベント",
+      "place": "エルサ あづみ野",
       "address": "",
       "time": "",
-      "category": "体験",
-      "tag": "要予約",
+      "category": "広報活動",
+      "tag": "",
       "url": "",
-      "notes": "静岡駅 8:40出発\n沼津駅 9:10出発\n当受入部隊の任務等都合により計画変更又は中止となる場合がございます。\n申し込み確認後、担当事務所より詳細のご案内を差し上げます。\n応募締切は令和8年7月20日(月・祝)24:00まで（申込者多数の場合、抽選の場合があります。ご了承下さい）",
-      "ageRequirement": "参加対象静岡県内にお住まいの 中学生以上～32歳までの女性 お子様のお母さま",
+      "notes": "調整中",
+      "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.161,
-        "longitude": 138.676,
-        "label": "静岡県富士郡",
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
         "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:28.503+09:00"
+        "geocodedAt": "2026-07-29T14:30:38.884+09:00"
       }
     }
   ],
+  "gifu": [],
+  "shizuoka": [],
   "aichi": [
     {
       "id": "ai-20260805-a1oo7",
@@ -4416,5 +4391,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/08/05 14:25"
+  "updatedAt": "2026/08/05 19:56"
 }
