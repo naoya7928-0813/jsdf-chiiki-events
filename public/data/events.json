@@ -1270,7 +1270,7 @@
       "time": "10:30",
       "category": "体験",
       "tag": "",
-      "url": "https://www.mod.go.jp/pco/saitama/event/img/8.8.27asaka.JPG",
+      "url": null,
       "notes": "担当: 朝霞地域事務所",
       "ageRequirement": null,
       "deadline": null,
@@ -1765,30 +1765,6 @@
       }
     },
     {
-      "id": "na-20261003-37wm4",
-      "pref": "nagano",
-      "date": "2026-10-03",
-      "weekday": "土",
-      "title": "【松本市】まちのおしごと体験",
-      "place": "",
-      "address": "松本市",
-      "time": "",
-      "category": "体験",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.238,
-        "longitude": 137.972,
-        "label": "長野県松本市",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:37.753+09:00"
-      }
-    },
-    {
       "id": "na-20261003-kkjxa",
       "pref": "nagano",
       "date": "2026-10-03",
@@ -1810,6 +1786,30 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-07-29T14:30:37.394+09:00"
+      }
+    },
+    {
+      "id": "na-20261003-37wm4",
+      "pref": "nagano",
+      "date": "2026-10-03",
+      "weekday": "土",
+      "title": "【松本市】まちのおしごと体験",
+      "place": "",
+      "address": "松本市",
+      "time": "",
+      "category": "体験",
+      "tag": "",
+      "url": "",
+      "notes": "調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.238,
+        "longitude": 137.972,
+        "label": "長野県松本市",
+        "accuracy": "municipality",
+        "source": "gsi",
+        "geocodedAt": "2026-07-29T14:30:37.753+09:00"
       }
     },
     {
@@ -1861,30 +1861,6 @@
       }
     },
     {
-      "id": "na-20261025-hz7ka",
-      "pref": "nagano",
-      "date": "2026-10-25",
-      "weekday": "日",
-      "title": "【安曇野市】エルサ安曇野イベント",
-      "place": "エルサ あづみ野",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:38.884+09:00"
-      }
-    },
-    {
       "id": "na-20261025-rv0ey",
       "pref": "nagano",
       "date": "2026-10-25",
@@ -1907,10 +1883,60 @@
         "source": "gsi",
         "geocodedAt": "2026-07-29T14:30:38.512+09:00"
       }
+    },
+    {
+      "id": "na-20261025-hz7ka",
+      "pref": "nagano",
+      "date": "2026-10-25",
+      "weekday": "日",
+      "title": "【安曇野市】エルサ安曇野イベント",
+      "place": "エルサ あづみ野",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-29T14:30:38.884+09:00"
+      }
     }
   ],
   "gifu": [],
-  "shizuoka": [],
+  "shizuoka": [
+    {
+      "id": "sh-off-20260806-lsglc",
+      "pref": "shizuoka",
+      "date": "2026-08-06",
+      "weekday": "木",
+      "title": "海上要員）採用試験合格者",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "採用イベント",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/sizuoka/bosyu/pdf/50.pdf",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "weatherLocation": {
+        "latitude": 34.977,
+        "longitude": 138.383,
+        "label": "静岡県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-07-16T19:22:01.105+09:00"
+      }
+    }
+  ],
   "aichi": [
     {
       "id": "ai-20260807-hgcwv",
@@ -2767,12 +2793,12 @@
   "shiga": [],
   "kyoto": [
     {
-      "id": "ky-set-20260807-0pzwo",
+      "id": "ky-set-20260807-jcal7",
       "pref": "kyoto",
       "date": "2026-08-07",
       "weekday": "金",
       "title": "自衛官 就職・進学説明会",
-      "place": "京都募集案内所",
+      "place": "京都募集案内所(事務所)",
       "address": "",
       "time": "09:00～17:00",
       "category": "説明会",
@@ -2787,175 +2813,103 @@
         "label": "京都府京都市",
         "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:30.519+09:00"
+        "geocodedAt": "2026-08-06T14:27:12.706+09:00"
       }
     },
     {
-      "id": "ky-set-20260808-1uobr",
+      "id": "ky-set-20260807-ilvbc",
+      "pref": "kyoto",
+      "date": "2026-08-07",
+      "weekday": "金",
+      "title": "自衛官 就職・進学説明会",
+      "place": "福知山地域事務所",
+      "address": "",
+      "time": "09:00～17:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
+      "notes": "担当: 福知山地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 35.297,
+        "longitude": 135.126,
+        "label": "京都府福知山市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-06T14:27:13.709+09:00"
+      }
+    },
+    {
+      "id": "ky-set-20260808-shwyq",
       "pref": "kyoto",
       "date": "2026-08-08",
       "weekday": "土",
       "title": "自衛官 就職・進学説明会",
-      "place": "京都募集案内所",
+      "place": "宇治地域事務所 ※事前予約が必要です。まずは事務所へお問い合わせください。",
       "address": "",
-      "time": "09:00～17:00",
+      "time": "",
       "category": "説明会",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
-      "notes": "担当: 京都募集案内所",
+      "notes": "担当: 宇治地域事務所",
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.012,
-        "longitude": 135.768,
-        "label": "京都府京都市",
+        "latitude": 34.884,
+        "longitude": 135.8,
+        "label": "京都府宇治市",
         "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:30.519+09:00"
+        "geocodedAt": "2026-08-06T14:27:14.063+09:00"
       }
     },
     {
-      "id": "ky-set-20260809-zodom",
+      "id": "ky-set-20260808-g3g6a",
       "pref": "kyoto",
-      "date": "2026-08-09",
-      "weekday": "日",
+      "date": "2026-08-08",
+      "weekday": "土",
       "title": "自衛官 就職・進学説明会",
-      "place": "京都募集案内所",
+      "place": "亀岡募集案内所 ※事前予約が必要です。まずは事務所へお問い合わせください。",
       "address": "",
-      "time": "09:00～17:00",
+      "time": "",
       "category": "説明会",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
-      "notes": "担当: 京都募集案内所",
+      "notes": "担当: 亀岡募集案内所",
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.012,
-        "longitude": 135.768,
-        "label": "京都府京都市",
+        "latitude": 35.013,
+        "longitude": 135.574,
+        "label": "京都府亀岡市",
         "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:30.519+09:00"
+        "geocodedAt": "2026-08-06T14:27:14.563+09:00"
       }
     },
     {
-      "id": "ky-set-20260810-4byni",
-      "pref": "kyoto",
-      "date": "2026-08-10",
-      "weekday": "月",
-      "title": "自衛官 就職・進学説明会",
-      "place": "京都募集案内所",
-      "address": "",
-      "time": "09:00～17:00",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
-      "notes": "担当: 京都募集案内所",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 35.012,
-        "longitude": 135.768,
-        "label": "京都府京都市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:30.519+09:00"
-      }
-    },
-    {
-      "id": "ky-set-20260811-0bkb3",
-      "pref": "kyoto",
-      "date": "2026-08-11",
-      "weekday": "火・祝",
-      "title": "自衛官 就職・進学説明会",
-      "place": "京都募集案内所",
-      "address": "",
-      "time": "09:00～17:00",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
-      "notes": "担当: 京都募集案内所",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 35.012,
-        "longitude": 135.768,
-        "label": "京都府京都市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:30.519+09:00"
-      }
-    },
-    {
-      "id": "ky-set-20260815-zfytn",
+      "id": "ky-set-20260815-7h93f",
       "pref": "kyoto",
       "date": "2026-08-15",
       "weekday": "土",
       "title": "自衛官 就職・進学説明会",
-      "place": "京都募集案内所",
+      "place": "河原町募集案内所",
       "address": "",
-      "time": "09:00～17:00",
+      "time": "10:00～16:00",
       "category": "説明会",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
-      "notes": "担当: 京都募集案内所",
+      "notes": "担当: 河原町募集案内所",
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.012,
-        "longitude": 135.768,
-        "label": "京都府京都市",
+        "latitude": 35.021,
+        "longitude": 135.756,
+        "label": "京都府河原町",
         "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:30.519+09:00"
-      }
-    },
-    {
-      "id": "ky-set-20260816-2r46g",
-      "pref": "kyoto",
-      "date": "2026-08-16",
-      "weekday": "日",
-      "title": "自衛官 就職・進学説明会",
-      "place": "京都募集案内所",
-      "address": "",
-      "time": "09:00～17:00",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
-      "notes": "担当: 京都募集案内所",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 35.012,
-        "longitude": 135.768,
-        "label": "京都府京都市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:30.519+09:00"
-      }
-    },
-    {
-      "id": "ky-set-20260817-19lqh",
-      "pref": "kyoto",
-      "date": "2026-08-17",
-      "weekday": "月",
-      "title": "自衛官 就職・進学説明会",
-      "place": "京都募集案内所",
-      "address": "",
-      "time": "09:00～17:00",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
-      "notes": "担当: 京都募集案内所",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 35.012,
-        "longitude": 135.768,
-        "label": "京都府京都市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:30.519+09:00"
+        "geocodedAt": "2026-07-03T14:54:07.525+09:00"
       }
     },
     {
@@ -2983,14 +2937,14 @@
       }
     },
     {
-      "id": "ky-set-20260821-3rzgs",
+      "id": "ky-set-20260824-mps6d",
       "pref": "kyoto",
-      "date": "2026-08-21",
-      "weekday": "金",
+      "date": "2026-08-24",
+      "weekday": "月",
       "title": "自衛官 就職・進学説明会",
-      "place": "京都募集案内所",
+      "place": "京都テルサハローワーク西館3Ｆ",
       "address": "",
-      "time": "09:00～17:00",
+      "time": "10:00～15:00",
       "category": "説明会",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
@@ -3003,18 +2957,18 @@
         "label": "京都府京都市",
         "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:30.519+09:00"
+        "geocodedAt": "2026-07-08T08:23:31.561+09:00"
       }
     },
     {
-      "id": "ky-set-20260822-7p4z3",
+      "id": "ky-set-20260824-kpz3e",
       "pref": "kyoto",
-      "date": "2026-08-22",
-      "weekday": "土",
+      "date": "2026-08-24",
+      "weekday": "月",
       "title": "自衛官 就職・進学説明会",
-      "place": "京都募集案内所",
+      "place": "ハローワーク伏見",
       "address": "",
-      "time": "09:00～17:00",
+      "time": "11:00～15:00",
       "category": "説明会",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
@@ -3022,84 +2976,12 @@
       "ageRequirement": null,
       "deadline": null,
       "weatherLocation": {
-        "latitude": 35.012,
-        "longitude": 135.768,
-        "label": "京都府京都市",
+        "latitude": 35.021,
+        "longitude": 135.756,
+        "label": "京都府",
         "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:30.519+09:00"
-      }
-    },
-    {
-      "id": "ky-set-20260828-bk3ol",
-      "pref": "kyoto",
-      "date": "2026-08-28",
-      "weekday": "金",
-      "title": "自衛官 就職・進学説明会",
-      "place": "京都募集案内所",
-      "address": "",
-      "time": "09:00～17:00",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
-      "notes": "担当: 京都募集案内所",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 35.012,
-        "longitude": 135.768,
-        "label": "京都府京都市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:30.519+09:00"
-      }
-    },
-    {
-      "id": "ky-set-20260901-5lcgf",
-      "pref": "kyoto",
-      "date": "2026-09-01",
-      "weekday": "火",
-      "title": "自衛官 就職・進学説明会",
-      "place": "京都募集案内所",
-      "address": "",
-      "time": "09:00～17:00",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
-      "notes": "担当: 京都募集案内所",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 35.012,
-        "longitude": 135.768,
-        "label": "京都府京都市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:30.519+09:00"
-      }
-    },
-    {
-      "id": "ky-set-20260904-n8p62",
-      "pref": "kyoto",
-      "date": "2026-09-04",
-      "weekday": "金",
-      "title": "自衛官 就職・進学説明会",
-      "place": "京都募集案内所",
-      "address": "",
-      "time": "09:00～17:00",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
-      "notes": "担当: 京都募集案内所",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 35.012,
-        "longitude": 135.768,
-        "label": "京都府京都市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:30.519+09:00"
+        "geocodedAt": "2026-07-08T14:27:40.505+09:00"
       }
     }
   ],
@@ -3158,6 +3040,30 @@
   ],
   "wakayama": [],
   "ehime": [
+    {
+      "id": "em-20260904-vvamc",
+      "pref": "ehime",
+      "date": "2026-09-04",
+      "weekday": "金",
+      "title": "第44回ふれ愛コンサートin愛媛",
+      "place": "松山市民会館「大ホール」",
+      "address": "",
+      "time": "",
+      "category": "演奏会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/ehime/event.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 33.839,
+        "longitude": 132.766,
+        "label": "愛媛県松山市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-06T14:27:14.912+09:00"
+      }
+    },
     {
       "id": "em-20260827-u4syu",
       "pref": "ehime",
@@ -3447,32 +3353,6 @@
         "source": "gsi",
         "geocodedAt": "2026-07-24T14:33:37.838+09:00"
       }
-    },
-    {
-      "id": "ka-off-20260808-qse6r",
-      "pref": "kagawa",
-      "date": "2026-08-08",
-      "weekday": "土",
-      "title": "4種説明会",
-      "place": "合同庁舎1階ロア",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/kagawa/img/yondai.png",
-      "notes": "申込フォームまたは当日窓口で申込",
-      "ageRequirement": "16歳から32歳の方",
-      "deadline": "8月4日（月）",
-      "source_type": "office_ocr",
-      "deadlineDate": "2026-08-04",
-      "weatherLocation": {
-        "latitude": 34.34,
-        "longitude": 134.043,
-        "label": "香川県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:34.270+09:00"
-      }
     }
   ],
   "kochi": [
@@ -3724,17 +3604,17 @@
       }
     },
     {
-      "id": "hi-20260822-yx7yu",
+      "id": "hi-20260822-1l65s",
       "pref": "hiroshima",
       "date": "2026-08-22",
       "weekday": "土",
-      "title": "庄原よいとこ祭",
+      "title": "イオンタウン楽々園 職業体験",
       "place": "",
       "address": "",
-      "time": "10:00",
-      "category": "広報活動",
+      "time": "11:00",
+      "category": "採用イベント",
       "tag": "",
-      "url": "https://www.mod.go.jp/pco/hiroshima/events/3845/",
+      "url": "https://www.mod.go.jp/pco/hiroshima/events/3853/",
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
@@ -3748,17 +3628,17 @@
       }
     },
     {
-      "id": "hi-20260822-1l65s",
+      "id": "hi-20260822-yx7yu",
       "pref": "hiroshima",
       "date": "2026-08-22",
       "weekday": "土",
-      "title": "イオンタウン楽々園 職業体験",
+      "title": "庄原よいとこ祭",
       "place": "",
       "address": "",
-      "time": "11:00",
-      "category": "採用イベント",
+      "time": "13:00",
+      "category": "広報活動",
       "tag": "",
-      "url": "https://www.mod.go.jp/pco/hiroshima/events/3853/",
+      "url": "https://www.mod.go.jp/pco/hiroshima/events/3845/",
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
@@ -3855,6 +3735,30 @@
       "category": "広報活動",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/hiroshima/events/3871/",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "weatherLocation": {
+        "latitude": 34.397,
+        "longitude": 132.46,
+        "label": "広島県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.248+09:00"
+      }
+    },
+    {
+      "id": "hi-20260912-w74nk",
+      "pref": "hiroshima",
+      "date": "2026-09-12",
+      "weekday": "土",
+      "title": "自衛隊ふれあいコンサート",
+      "place": "",
+      "address": "",
+      "time": "14:00",
+      "category": "演奏会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/hiroshima/events/3928/",
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
@@ -4171,5 +4075,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/08/06 08:22"
+  "updatedAt": "2026/08/06 14:27"
 }
