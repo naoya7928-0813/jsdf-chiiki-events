@@ -4542,12 +4542,19 @@ async function writeOutput(data) {
   // published（通常）は状態フィールドを付けない＝後方互換＆データ量を抑える。
   // 前回 events.json の status を読み、cancelled/closed の粘着性を維持（文言消失で復活させない）。
   const prevStatusById = new Map();
+  // 初回掲載日（firstSeen）。構造化データ（JSON-LD）の offers.validFrom に使うため、
+  // 一度付いた日付は前回 events.json から引き継いで変化させない。
+  const prevFirstSeenById = new Map();
   try {
     if (fs.existsSync(OUTPUT_PATH)) {
       const prev = JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8'));
       for (const k of Object.keys(prev)) {
         if (!Array.isArray(prev[k])) continue;
-        for (const e of prev[k]) if (e && e.id && e.status) prevStatusById.set(e.id, e.status);
+        for (const e of prev[k]) {
+          if (!e || !e.id) continue;
+          if (e.status) prevStatusById.set(e.id, e.status);
+          if (/^\d{4}-\d{2}-\d{2}$/.test(String(e.firstSeen ?? ''))) prevFirstSeenById.set(e.id, e.firstSeen);
+        }
       }
     }
   } catch (e) { console.warn('[status] 前回 events.json の読み込みに失敗:', e.message); }
@@ -4563,6 +4570,9 @@ async function writeOutput(data) {
   for (const key of Object.keys(data)) {
     if (!Array.isArray(data[key])) continue;
     for (const ev of data[key]) {
+      // 初回掲載日: 既知なら維持、初出なら今日。以後この値は変わらない。
+      ev.firstSeen = prevFirstSeenById.get(ev.id)
+        || (/^\d{4}-\d{2}-\d{2}$/.test(String(ev.firstSeen ?? '')) ? ev.firstSeen : today);
       const text = [ev.title, ev.notes, ev.place].filter(Boolean).join('\n');
       const derived = eventStatus.deriveStatus({
         text, deadline: ev.deadline || '', eventDate: ev.date || '', endDate: ev.endDate || '', today,

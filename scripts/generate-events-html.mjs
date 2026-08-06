@@ -84,11 +84,14 @@ for (const ev of allEvents) {
 // 県ごとに固有の実データ（地本・案内所の所在地一覧）を掲載する。
 const OFFICES_JSON = join(__dirname, '../public/data/offices.json');
 const officesByPref = {};
+// 地本本部（type: 'hq'）は JSON-LD の organizer.url / 住所にも使う
+const hqByPref = {};
 try {
   const od = JSON.parse(readFileSync(OFFICES_JSON, 'utf8'));
   for (const o of od.offices || []) {
     if (!o.pref || !o.name) continue;
     (officesByPref[o.pref] ||= []).push(o);
+    if (o.type === 'hq' && !hqByPref[o.pref]) hqByPref[o.pref] = o;
   }
 } catch { /* offices.json が無くてもページ生成は続行 */ }
 
@@ -233,17 +236,49 @@ function faqSchema(prefLabel) {
   };
 }
 
+// 北海道は4地本（札幌・旭川・帯広・函館）に分かれるため、住所の都道府県名は北海道に統一する
+const HOKKAIDO_PREF_KEYS = new Set(['sapporo', 'asahikawa', 'obihiro', 'hakodate']);
+
+/**
+ * `time`（"09:00～14:30"）を開始・終了時刻に分解する。
+ * 開始と終了が **両方** 揃い、かつ終了が開始より後のときだけ返す。
+ * 片方だけを startDate に足すと endDate（日付のみ＝その日の 0 時）が
+ * startDate より前と解釈され得るため、揃わない場合は日付のみで出力する。
+ */
+function parseTimeRange(time) {
+  const m = String(time ?? '').trim()
+    .match(/^(\d{1,2}):(\d{2})\s*[～~〜\-–—]\s*(\d{1,2}):(\d{2})$/);
+  if (!m) return null;
+  const [sh, sm, eh, em] = [m[1], m[2], m[3], m[4]].map(Number);
+  if (sh > 23 || eh > 23 || sm > 59 || em > 59) return null;
+  if (eh * 60 + em <= sh * 60 + sm) return null; // 日をまたぐ/逆転は不採用
+  const pad = (n) => String(n).padStart(2, '0');
+  return { start: `${pad(sh)}:${pad(sm)}`, end: `${pad(eh)}:${pad(em)}` };
+}
+
 /** Schema.org Event オブジェクトを生成 */
 function toEventSchema(ev, prefLabel) {
+  const prefKey = ev.prefKey ?? '';
+  const hq = hqByPref[prefKey];
+  // organizer.url は地本公式サイト（offices.json）を優先。無ければ当サイトの地本別ページ。
+  const organizerUrl = (hq && typeof hq.url === 'string' && /^https?:\/\//.test(hq.url))
+    ? hq.url
+    : (prefKey ? `${SITE_URL}/events/${prefKey}.html` : SITE_URL);
+
   const obj = {
     '@context': 'https://schema.org',
     '@type': 'Event',
     name: ev.title,
-    startDate: ev.date,
     eventStatus: 'https://schema.org/EventScheduled',
     eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
     organizer: {
       '@type': 'Organization',
+      name: `${prefLabel}地方協力本部`,
+      url: organizerUrl,
+    },
+    // 実施主体（演奏会は演奏団体として扱う）。個別の部隊名までは判別できないため地本名を用いる。
+    performer: {
+      '@type': ev.category === '演奏会' ? 'PerformingGroup' : 'Organization',
       name: `${prefLabel}地方協力本部`,
     },
     url: ev.url || SITE_URL,
@@ -262,7 +297,28 @@ function toEventSchema(ev, prefLabel) {
       url: ev.url || SITE_URL
     }
   };
-  if (ev.endDate) obj.endDate = ev.endDate;
+
+  // ── 開催日時（startDate / endDate は常に出力する） ─────────────────
+  // 単日開催でも endDate（＝同日）を明示する。Google の推奨項目であり、
+  // 未指定だと検索結果で開催期間が正しく扱われないことがある。
+  const endDay = (ev.endDate && ev.endDate >= ev.date) ? ev.endDate : ev.date;
+  const range = parseTimeRange(ev.time);
+  if (range) {
+    obj.startDate = `${ev.date}T${range.start}:00+09:00`;
+    obj.endDate   = `${endDay}T${range.end}:00+09:00`;
+  } else {
+    obj.startDate = ev.date;
+    obj.endDate   = endDay;
+  }
+
+  // offers.validFrom = 参加受付（＝情報公開）が有効になった日。
+  // スクレイパーが記録した初回掲載日 firstSeen を使い、無い場合は
+  // 「本日と開催日の早い方」を用いる（開催日より後にならないようにする）。
+  const isDate = (s) => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
+  const validFromDay = isDate(ev.firstSeen)
+    ? ev.firstSeen
+    : (today < ev.date ? today : ev.date);
+  obj.offers.validFrom = `${validFromDay}T00:00:00+09:00`;
 
   // location is a required property for Google Event rich results.
   const locationObj = {
@@ -271,7 +327,8 @@ function toEventSchema(ev, prefLabel) {
     address: {
       '@type': 'PostalAddress',
       addressCountry: 'JP',
-      addressRegion: prefLabel
+      // 地本名（札幌・旭川・帯広・函館）は都道府県名ではないため北海道に読み替える
+      addressRegion: HOKKAIDO_PREF_KEYS.has(prefKey) ? '北海道' : prefLabel
     }
   };
   if (ev.address) {
