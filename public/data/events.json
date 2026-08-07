@@ -1714,7 +1714,83 @@
       }
     }
   ],
-  "fukui": [],
+  "fukui": [
+    {
+      "id": "fu-20260829-xw0ga",
+      "pref": "fukui",
+      "date": "2026-08-29",
+      "weekday": "土",
+      "title": "若狭高校祭り",
+      "place": "若狭高等学校",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "",
+      "notes": "自衛隊車両展示・広報ブース等",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-07",
+      "weatherLocation": {
+        "latitude": 35.549,
+        "longitude": 135.908,
+        "label": "福井県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-07T18:23:44.110+09:00"
+      }
+    },
+    {
+      "id": "fu-20260911-olacv",
+      "pref": "fukui",
+      "date": "2026-09-11",
+      "weekday": "金",
+      "title": "越前モノづくりフェスタ2026",
+      "place": "サンドーム福井",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "",
+      "notes": "自衛隊車両展示・広報ブース等",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-07",
+      "weatherLocation": {
+        "latitude": 36.065,
+        "longitude": 136.222,
+        "label": "福井県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-07T18:23:44.682+09:00"
+      }
+    },
+    {
+      "id": "fu-20260926-fmk85",
+      "pref": "fukui",
+      "date": "2026-09-26",
+      "weekday": "土",
+      "title": "防災航空隊30周年記念イベント「防災ヘリを見に行こう！」",
+      "place": "福井空港",
+      "address": "",
+      "time": "",
+      "category": "記念行事",
+      "tag": "",
+      "url": "",
+      "notes": "自衛隊車両展示・広報ブース等",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-07",
+      "weatherLocation": {
+        "latitude": 36.064,
+        "longitude": 136.22,
+        "label": "福井県福井市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-07T18:23:45.146+09:00"
+      }
+    }
+  ],
   "yamanashi": [],
   "nagano": [
     {
@@ -1818,31 +1894,6 @@
       }
     },
     {
-      "id": "na-20261003-kkjxa",
-      "pref": "nagano",
-      "date": "2026-10-03",
-      "weekday": "土",
-      "title": "【安曇野市】トラックの日イベント",
-      "place": "",
-      "address": "安曇野市",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 36.304,
-        "longitude": 137.906,
-        "label": "長野県安曇野市",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:37.394+09:00"
-      }
-    },
-    {
       "id": "na-20261003-37wm4",
       "pref": "nagano",
       "date": "2026-10-03",
@@ -1868,13 +1919,13 @@
       }
     },
     {
-      "id": "na-20261010-jcj0l",
+      "id": "na-20261003-kkjxa",
       "pref": "nagano",
-      "date": "2026-10-10",
+      "date": "2026-10-03",
       "weekday": "土",
-      "title": "【松本市】松本矯正展",
-      "place": "松本少年刑務所",
-      "address": "",
+      "title": "【安曇野市】トラックの日イベント",
+      "place": "",
+      "address": "安曇野市",
       "time": "",
       "category": "広報活動",
       "tag": "",
@@ -1884,12 +1935,12 @@
       "deadline": null,
       "firstSeen": "2026-08-06",
       "weatherLocation": {
-        "latitude": 36.238,
-        "longitude": 137.972,
-        "label": "長野県松本市",
-        "accuracy": "venue",
+        "latitude": 36.304,
+        "longitude": 137.906,
+        "label": "長野県安曇野市",
+        "accuracy": "municipality",
         "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:38.136+09:00"
+        "geocodedAt": "2026-07-29T14:30:37.394+09:00"
       }
     },
     {
@@ -1915,6 +1966,31 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-07-18T08:05:17.140+09:00"
+      }
+    },
+    {
+      "id": "na-20261010-jcj0l",
+      "pref": "nagano",
+      "date": "2026-10-10",
+      "weekday": "土",
+      "title": "【松本市】松本矯正展",
+      "place": "松本少年刑務所",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-06",
+      "weatherLocation": {
+        "latitude": 36.238,
+        "longitude": 137.972,
+        "label": "長野県松本市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-29T14:30:38.136+09:00"
       }
     },
     {
@@ -1993,31 +2069,6 @@
       }
     },
     {
-      "id": "na-20261025-hz7ka",
-      "pref": "nagano",
-      "date": "2026-10-25",
-      "weekday": "日",
-      "title": "【安曇野市】エルサ安曇野イベント",
-      "place": "エルサ あづみ野",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:38.884+09:00"
-      }
-    },
-    {
       "id": "na-20261025-5plfp",
       "pref": "nagano",
       "date": "2026-10-25",
@@ -2040,6 +2091,31 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-06T19:57:02.477+09:00"
+      }
+    },
+    {
+      "id": "na-20261025-hz7ka",
+      "pref": "nagano",
+      "date": "2026-10-25",
+      "weekday": "日",
+      "title": "【安曇野市】エルサ安曇野イベント",
+      "place": "エルサ あづみ野",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-06",
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-29T14:30:38.884+09:00"
       }
     }
   ],
@@ -4244,5 +4320,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/08/07 13:55"
+  "updatedAt": "2026/08/07 18:23"
 }
