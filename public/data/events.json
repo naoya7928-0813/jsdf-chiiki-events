@@ -340,15 +340,15 @@
       }
     },
     {
-      "id": "ak-20260822-maoxl",
+      "id": "ak-20260822-zxoso",
       "pref": "akita",
       "date": "2026-08-22",
       "weekday": "土",
-      "title": "［イベント］｢第2回石脇夏祭り(由利本荘市)｣に自衛隊ブース出展します",
+      "title": "［イベント］｢はたらく車だいしゅうごう!(大仙市)｣に自衛隊ブース出展します",
       "place": "",
       "address": "",
       "time": "",
-      "category": "地域参加",
+      "category": "広報活動",
       "tag": "",
       "url": "",
       "notes": null,
@@ -365,15 +365,15 @@
       }
     },
     {
-      "id": "ak-20260822-zxoso",
+      "id": "ak-20260822-maoxl",
       "pref": "akita",
       "date": "2026-08-22",
       "weekday": "土",
-      "title": "［イベント］｢はたらく車だいしゅうごう!(大仙市)｣に自衛隊ブース出展します",
+      "title": "［イベント］｢第2回石脇夏祭り(由利本荘市)｣に自衛隊ブース出展します",
       "place": "",
       "address": "",
       "time": "",
-      "category": "広報活動",
+      "category": "地域参加",
       "tag": "",
       "url": "",
       "notes": null,
@@ -1483,31 +1483,6 @@
   "yamanashi": [],
   "nagano": [
     {
-      "id": "na-20260817-lb6zo",
-      "pref": "nagano",
-      "date": "2026-08-17",
-      "weekday": "月",
-      "title": "【伊那市】就活ラボ",
-      "place": "JA上伊那 本所",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "かみいな就活ラボ スイッチON 長野県上伊那開催の就活応援イベント ・参加費無料 ・昼食付 ・私服参加推奨 対象者 専門学校、短大、大学、大学院生(2028、29、30卒） ※これから就活を始める方、就活中の方 企業・団体の人事担当者や若手社員と気軽に交流！ 自衛隊も参加します。 申込期限 令和８年８月１１日",
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-06T19:57:00.345+09:00"
-      }
-    },
-    {
       "id": "na-20260817-w54dq",
       "pref": "nagano",
       "date": "2026-08-17",
@@ -1530,6 +1505,31 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:26.996+09:00"
+      }
+    },
+    {
+      "id": "na-20260817-lb6zo",
+      "pref": "nagano",
+      "date": "2026-08-17",
+      "weekday": "月",
+      "title": "【伊那市】就活ラボ",
+      "place": "JA上伊那 本所",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "かみいな就活ラボ スイッチON 長野県上伊那開催の就活応援イベント ・参加費無料 ・昼食付 ・私服参加推奨 対象者 専門学校、短大、大学、大学院生(2028、29、30卒） ※これから就活を始める方、就活中の方 企業・団体の人事担当者や若手社員と気軽に交流！ 自衛隊も参加します。 申込期限 令和８年８月１１日",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-06",
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-06T19:57:00.345+09:00"
       }
     },
     {
@@ -1583,31 +1583,6 @@
       }
     },
     {
-      "id": "na-20261003-kkjxa",
-      "pref": "nagano",
-      "date": "2026-10-03",
-      "weekday": "土",
-      "title": "【安曇野市】トラックの日イベント",
-      "place": "",
-      "address": "安曇野市",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 36.304,
-        "longitude": 137.906,
-        "label": "長野県安曇野市",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:37.394+09:00"
-      }
-    },
-    {
       "id": "na-20261003-37wm4",
       "pref": "nagano",
       "date": "2026-10-03",
@@ -1630,6 +1605,31 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-07-29T14:30:37.753+09:00"
+      }
+    },
+    {
+      "id": "na-20261003-kkjxa",
+      "pref": "nagano",
+      "date": "2026-10-03",
+      "weekday": "土",
+      "title": "【安曇野市】トラックの日イベント",
+      "place": "",
+      "address": "安曇野市",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-06",
+      "weatherLocation": {
+        "latitude": 36.304,
+        "longitude": 137.906,
+        "label": "長野県安曇野市",
+        "accuracy": "municipality",
+        "source": "gsi",
+        "geocodedAt": "2026-07-29T14:30:37.394+09:00"
       }
     },
     {
@@ -1733,6 +1733,31 @@
       }
     },
     {
+      "id": "na-20261025-rv0ey",
+      "pref": "nagano",
+      "date": "2026-10-25",
+      "weekday": "日",
+      "title": "【大町市】県統合防災訓練",
+      "place": "",
+      "address": "大町市",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-06",
+      "weatherLocation": {
+        "latitude": 36.503,
+        "longitude": 137.851,
+        "label": "長野県大町",
+        "accuracy": "municipality",
+        "source": "gsi",
+        "geocodedAt": "2026-07-29T14:30:38.512+09:00"
+      }
+    },
+    {
       "id": "na-20261025-5plfp",
       "pref": "nagano",
       "date": "2026-10-25",
@@ -1780,31 +1805,6 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-29T14:30:38.884+09:00"
-      }
-    },
-    {
-      "id": "na-20261025-rv0ey",
-      "pref": "nagano",
-      "date": "2026-10-25",
-      "weekday": "日",
-      "title": "【大町市】県統合防災訓練",
-      "place": "",
-      "address": "大町市",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 36.503,
-        "longitude": 137.851,
-        "label": "長野県大町",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:38.512+09:00"
       }
     }
   ],
@@ -3655,5 +3655,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/08/10 07:45"
+  "updatedAt": "2026/08/10 13:10"
 }
