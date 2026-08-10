@@ -607,7 +607,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-08-10"
+      "statusUpdatedAt": "2026-08-11"
     },
     {
       "id": "t-20260820-3vz9o",
@@ -656,7 +656,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-08-10",
+      "statusUpdatedAt": "2026-08-11",
       "weatherLocation": {
         "latitude": 35.775,
         "longitude": 139.805,
@@ -687,7 +687,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-08-10",
+      "statusUpdatedAt": "2026-08-11",
       "weatherLocation": {
         "latitude": 35.673,
         "longitude": 139.817,
@@ -717,7 +717,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-08-10",
+      "statusUpdatedAt": "2026-08-11",
       "weatherLocation": {
         "latitude": 35.714,
         "longitude": 139.408,
@@ -747,7 +747,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-08-10",
+      "statusUpdatedAt": "2026-08-11",
       "weatherLocation": {
         "latitude": 35.714,
         "longitude": 139.408,
@@ -777,7 +777,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-08-10",
+      "statusUpdatedAt": "2026-08-11",
       "weatherLocation": {
         "latitude": 35.775,
         "longitude": 139.805,
@@ -1056,7 +1056,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-08-10",
+      "statusUpdatedAt": "2026-08-11",
       "firstSeen": "2026-08-06"
     },
     {
@@ -1161,7 +1161,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-08-10",
+      "statusUpdatedAt": "2026-08-11",
       "firstSeen": "2026-08-06"
     }
   ],
@@ -1583,31 +1583,6 @@
       }
     },
     {
-      "id": "na-20261003-37wm4",
-      "pref": "nagano",
-      "date": "2026-10-03",
-      "weekday": "土",
-      "title": "【松本市】まちのおしごと体験",
-      "place": "",
-      "address": "松本市",
-      "time": "",
-      "category": "体験",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 36.238,
-        "longitude": 137.972,
-        "label": "長野県松本市",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:37.753+09:00"
-      }
-    },
-    {
       "id": "na-20261003-kkjxa",
       "pref": "nagano",
       "date": "2026-10-03",
@@ -1630,6 +1605,31 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-07-29T14:30:37.394+09:00"
+      }
+    },
+    {
+      "id": "na-20261003-37wm4",
+      "pref": "nagano",
+      "date": "2026-10-03",
+      "weekday": "土",
+      "title": "【松本市】まちのおしごと体験",
+      "place": "",
+      "address": "松本市",
+      "time": "",
+      "category": "体験",
+      "tag": "",
+      "url": "",
+      "notes": "調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-06",
+      "weatherLocation": {
+        "latitude": 36.238,
+        "longitude": 137.972,
+        "label": "長野県松本市",
+        "accuracy": "municipality",
+        "source": "gsi",
+        "geocodedAt": "2026-07-29T14:30:37.753+09:00"
       }
     },
     {
@@ -1733,6 +1733,31 @@
       }
     },
     {
+      "id": "na-20261025-5plfp",
+      "pref": "nagano",
+      "date": "2026-10-25",
+      "weekday": "日",
+      "title": "【伊那市】防災イベント（仮称）",
+      "place": "かんてんぱぱ くぬぎの杜",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "細部、調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-06",
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-06T19:57:02.477+09:00"
+      }
+    },
+    {
       "id": "na-20261025-hz7ka",
       "pref": "nagano",
       "date": "2026-10-25",
@@ -1780,31 +1805,6 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-07-29T14:30:38.512+09:00"
-      }
-    },
-    {
-      "id": "na-20261025-5plfp",
-      "pref": "nagano",
-      "date": "2026-10-25",
-      "weekday": "日",
-      "title": "【伊那市】防災イベント（仮称）",
-      "place": "かんてんぱぱ くぬぎの杜",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "細部、調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-06T19:57:02.477+09:00"
       }
     }
   ],
@@ -3522,31 +3522,6 @@
   "saga": [],
   "nagasaki": [
     {
-      "id": "ng-20260810-qtvdq",
-      "pref": "nagasaki",
-      "date": "2026-08-10",
-      "weekday": "月",
-      "title": "防衛大学校学生説明会",
-      "place": "防衛省長崎合同庁舎（4階会議室）",
-      "address": "",
-      "time": "13:30～16:00",
-      "category": "説明会",
-      "tag": "学生向け",
-      "url": "https://www.mod.go.jp/pco/nagasaki/event/index.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 32.75,
-        "longitude": 129.867,
-        "label": "長崎県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-23T19:48:45.463+09:00"
-      }
-    },
-    {
       "id": "ng-20260829-dvol9",
       "pref": "nagasaki",
       "date": "2026-08-29",
@@ -3655,5 +3630,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/08/10 18:45"
+  "updatedAt": "2026/08/11 07:54"
 }
