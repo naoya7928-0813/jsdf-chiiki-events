@@ -1324,7 +1324,83 @@
   ],
   "ibaraki": [],
   "chiba": [],
-  "niigata": [],
+  "niigata": [
+    {
+      "id": "ni-20260813-zmom3",
+      "pref": "niigata",
+      "date": "2026-08-13",
+      "weekday": "木",
+      "title": "イオン県央店イベント",
+      "place": "イオン県央店",
+      "address": "",
+      "time": "10:00～15:00",
+      "category": "地域参加",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-11",
+      "weatherLocation": {
+        "latitude": 37.902,
+        "longitude": 139.023,
+        "label": "新潟県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-11T13:06:57.065+09:00"
+      }
+    },
+    {
+      "id": "ni-20260814-iyowz",
+      "pref": "niigata",
+      "date": "2026-08-14",
+      "weekday": "金",
+      "title": "越後加茂川夏祭り",
+      "place": "加茂市加茂川周辺",
+      "address": "",
+      "time": "14:00～22:30",
+      "category": "地域参加",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-11",
+      "weatherLocation": {
+        "latitude": 37.67,
+        "longitude": 139.035,
+        "label": "新潟県加茂市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-11T13:06:57.843+09:00"
+      }
+    },
+    {
+      "id": "ni-20260814-koqhy",
+      "pref": "niigata",
+      "date": "2026-08-14",
+      "weekday": "金",
+      "title": "中之島中条夏祭り",
+      "place": "中之島コミュニティーセンター",
+      "address": "",
+      "time": "16:00～18:30",
+      "category": "地域参加",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-11",
+      "weatherLocation": {
+        "latitude": 37.902,
+        "longitude": 139.023,
+        "label": "新潟県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-08-11T13:06:58.198+09:00"
+      }
+    }
+  ],
   "toyama": [],
   "ishikawa": [
     {
@@ -1483,31 +1559,6 @@
   "yamanashi": [],
   "nagano": [
     {
-      "id": "na-20260817-w54dq",
-      "pref": "nagano",
-      "date": "2026-08-17",
-      "weekday": "月",
-      "title": "【諏訪地域】自衛隊を「就職先」として考える個別相談会",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "採用イベント",
-      "tag": "個別",
-      "url": "",
-      "notes": "自衛隊を「就職先」として考える完全予約制の 個別相談会です 【場所】 自衛隊長野地方協力本部茅野地域事務所 長野県茅野市塚原１－３－２０ 【時間】 1時間単位で時間を指定できます 詳細は予約フォームをご確認ください 【予約フォーム】 https://forms.gle/NJJdNZoeuQpZYAaS9",
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:26.996+09:00"
-      }
-    },
-    {
       "id": "na-20260817-lb6zo",
       "pref": "nagano",
       "date": "2026-08-17",
@@ -1530,6 +1581,31 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-06T19:57:00.345+09:00"
+      }
+    },
+    {
+      "id": "na-20260817-w54dq",
+      "pref": "nagano",
+      "date": "2026-08-17",
+      "weekday": "月",
+      "title": "【諏訪地域】自衛隊を「就職先」として考える個別相談会",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "採用イベント",
+      "tag": "個別",
+      "url": "",
+      "notes": "自衛隊を「就職先」として考える完全予約制の 個別相談会です 【場所】 自衛隊長野地方協力本部茅野地域事務所 長野県茅野市塚原１－３－２０ 【時間】 1時間単位で時間を指定できます 詳細は予約フォームをご確認ください 【予約フォーム】 https://forms.gle/NJJdNZoeuQpZYAaS9",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-06",
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:26.996+09:00"
       }
     },
     {
@@ -1583,31 +1659,6 @@
       }
     },
     {
-      "id": "na-20261003-kkjxa",
-      "pref": "nagano",
-      "date": "2026-10-03",
-      "weekday": "土",
-      "title": "【安曇野市】トラックの日イベント",
-      "place": "",
-      "address": "安曇野市",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 36.304,
-        "longitude": 137.906,
-        "label": "長野県安曇野市",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:37.394+09:00"
-      }
-    },
-    {
       "id": "na-20261003-37wm4",
       "pref": "nagano",
       "date": "2026-10-03",
@@ -1630,6 +1681,31 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-07-29T14:30:37.753+09:00"
+      }
+    },
+    {
+      "id": "na-20261003-kkjxa",
+      "pref": "nagano",
+      "date": "2026-10-03",
+      "weekday": "土",
+      "title": "【安曇野市】トラックの日イベント",
+      "place": "",
+      "address": "安曇野市",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-06",
+      "weatherLocation": {
+        "latitude": 36.304,
+        "longitude": 137.906,
+        "label": "長野県安曇野市",
+        "accuracy": "municipality",
+        "source": "gsi",
+        "geocodedAt": "2026-07-29T14:30:37.394+09:00"
       }
     },
     {
@@ -1758,31 +1834,6 @@
       }
     },
     {
-      "id": "na-20261025-hz7ka",
-      "pref": "nagano",
-      "date": "2026-10-25",
-      "weekday": "日",
-      "title": "【安曇野市】エルサ安曇野イベント",
-      "place": "エルサ あづみ野",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:38.884+09:00"
-      }
-    },
-    {
       "id": "na-20261025-rv0ey",
       "pref": "nagano",
       "date": "2026-10-25",
@@ -1805,6 +1856,31 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-07-29T14:30:38.512+09:00"
+      }
+    },
+    {
+      "id": "na-20261025-hz7ka",
+      "pref": "nagano",
+      "date": "2026-10-25",
+      "weekday": "日",
+      "title": "【安曇野市】エルサ安曇野イベント",
+      "place": "エルサ あづみ野",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-06",
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-29T14:30:38.884+09:00"
       }
     }
   ],
@@ -3630,5 +3706,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/08/11 07:54"
+  "updatedAt": "2026/08/11 13:06"
 }
