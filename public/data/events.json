@@ -240,15 +240,15 @@
       }
     },
     {
-      "id": "ak-20260822-zxoso",
+      "id": "ak-20260822-maoxl",
       "pref": "akita",
       "date": "2026-08-22",
       "weekday": "土",
-      "title": "［イベント］｢はたらく車だいしゅうごう!(大仙市)｣に自衛隊ブース出展します",
+      "title": "［イベント］｢第2回石脇夏祭り(由利本荘市)｣に自衛隊ブース出展します",
       "place": "",
       "address": "",
       "time": "",
-      "category": "広報活動",
+      "category": "地域参加",
       "tag": "",
       "url": "",
       "notes": null,
@@ -265,15 +265,15 @@
       }
     },
     {
-      "id": "ak-20260822-maoxl",
+      "id": "ak-20260822-zxoso",
       "pref": "akita",
       "date": "2026-08-22",
       "weekday": "土",
-      "title": "［イベント］｢第2回石脇夏祭り(由利本荘市)｣に自衛隊ブース出展します",
+      "title": "［イベント］｢はたらく車だいしゅうごう!(大仙市)｣に自衛隊ブース出展します",
       "place": "",
       "address": "",
       "time": "",
-      "category": "地域参加",
+      "category": "広報活動",
       "tag": "",
       "url": "",
       "notes": null,
@@ -1438,31 +1438,6 @@
   "yamanashi": [],
   "nagano": [
     {
-      "id": "na-20260817-w54dq",
-      "pref": "nagano",
-      "date": "2026-08-17",
-      "weekday": "月",
-      "title": "【諏訪地域】自衛隊を「就職先」として考える個別相談会",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "採用イベント",
-      "tag": "個別",
-      "url": "",
-      "notes": "自衛隊を「就職先」として考える完全予約制の 個別相談会です 【場所】 自衛隊長野地方協力本部茅野地域事務所 長野県茅野市塚原１－３－２０ 【時間】 1時間単位で時間を指定できます 詳細は予約フォームをご確認ください 【予約フォーム】 https://forms.gle/NJJdNZoeuQpZYAaS9",
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:26.996+09:00"
-      }
-    },
-    {
       "id": "na-20260817-lb6zo",
       "pref": "nagano",
       "date": "2026-08-17",
@@ -1485,6 +1460,31 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-06T19:57:00.345+09:00"
+      }
+    },
+    {
+      "id": "na-20260817-w54dq",
+      "pref": "nagano",
+      "date": "2026-08-17",
+      "weekday": "月",
+      "title": "【諏訪地域】自衛隊を「就職先」として考える個別相談会",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "採用イベント",
+      "tag": "個別",
+      "url": "",
+      "notes": "自衛隊を「就職先」として考える完全予約制の 個別相談会です 【場所】 自衛隊長野地方協力本部茅野地域事務所 長野県茅野市塚原１－３－２０ 【時間】 1時間単位で時間を指定できます 詳細は予約フォームをご確認ください 【予約フォーム】 https://forms.gle/NJJdNZoeuQpZYAaS9",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-06",
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:26.996+09:00"
       }
     },
     {
@@ -1713,31 +1713,6 @@
       }
     },
     {
-      "id": "na-20261025-5plfp",
-      "pref": "nagano",
-      "date": "2026-10-25",
-      "weekday": "日",
-      "title": "【伊那市】防災イベント（仮称）",
-      "place": "かんてんぱぱ くぬぎの杜",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "細部、調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-06T19:57:02.477+09:00"
-      }
-    },
-    {
       "id": "na-20261025-rv0ey",
       "pref": "nagano",
       "date": "2026-10-25",
@@ -1760,6 +1735,31 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-07-29T14:30:38.512+09:00"
+      }
+    },
+    {
+      "id": "na-20261025-5plfp",
+      "pref": "nagano",
+      "date": "2026-10-25",
+      "weekday": "日",
+      "title": "【伊那市】防災イベント（仮称）",
+      "place": "かんてんぱぱ くぬぎの杜",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "細部、調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-06",
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-06T19:57:02.477+09:00"
       }
     }
   ],
@@ -3560,5 +3560,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/08/14 07:59"
+  "updatedAt": "2026/08/14 13:21"
 }
