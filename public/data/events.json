@@ -111,31 +111,6 @@
   ],
   "yamagata": [
     {
-      "id": "ya-20260815-tj3cz",
-      "pref": "yamagata",
-      "date": "2026-08-15",
-      "weekday": "土",
-      "title": "維新祭",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 38.24,
-        "longitude": 140.364,
-        "label": "山形県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:15.368+09:00"
-      }
-    },
-    {
       "id": "ya-20260822-6k2wy",
       "pref": "yamagata",
       "date": "2026-08-22",
@@ -215,11 +190,11 @@
   ],
   "akita": [
     {
-      "id": "ak-20260815-b45pg",
+      "id": "ak-20260822-maoxl",
       "pref": "akita",
-      "date": "2026-08-15",
+      "date": "2026-08-22",
       "weekday": "土",
-      "title": "［イベント］｢第4回きみ恋夏祭り(能代市)｣に自衛隊ブース出展します",
+      "title": "［イベント］｢第2回石脇夏祭り(由利本荘市)｣に自衛隊ブース出展します",
       "place": "",
       "address": "",
       "time": "",
@@ -249,31 +224,6 @@
       "address": "",
       "time": "",
       "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 39.719,
-        "longitude": 140.102,
-        "label": "秋田県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
-      }
-    },
-    {
-      "id": "ak-20260822-maoxl",
-      "pref": "akita",
-      "date": "2026-08-22",
-      "weekday": "土",
-      "title": "［イベント］｢第2回石脇夏祭り(由利本荘市)｣に自衛隊ブース出展します",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "地域参加",
       "tag": "",
       "url": "",
       "notes": null,
@@ -341,30 +291,6 @@
     }
   ],
   "kanagawa": [
-    {
-      "id": "k-20260815-rkujz",
-      "pref": "kanagawa",
-      "date": "2026-08-15",
-      "weekday": "土",
-      "title": "航空学生制度説明会",
-      "place": "横浜中央募集案内所",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "学生向け",
-      "url": "https://www.mod.go.jp/pco/kanagawa/mado/chuou/chuou.html",
-      "notes": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 35.45,
-        "longitude": 139.634,
-        "label": "神奈川県横浜市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-24T19:45:02.951+09:00"
-      }
-    },
     {
       "id": "k-20260821-0nxtv",
       "pref": "kanagawa",
@@ -507,7 +433,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-08-15"
+      "statusUpdatedAt": "2026-08-16"
     },
     {
       "id": "t-20260820-3vz9o",
@@ -530,7 +456,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-08-15",
+      "statusUpdatedAt": "2026-08-16",
       "weatherLocation": {
         "latitude": 35.694,
         "longitude": 139.704,
@@ -560,7 +486,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-08-15",
+      "statusUpdatedAt": "2026-08-16",
       "weatherLocation": {
         "latitude": 35.775,
         "longitude": 139.805,
@@ -591,7 +517,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-08-15",
+      "statusUpdatedAt": "2026-08-16",
       "weatherLocation": {
         "latitude": 35.673,
         "longitude": 139.817,
@@ -621,7 +547,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-08-15",
+      "statusUpdatedAt": "2026-08-16",
       "weatherLocation": {
         "latitude": 35.714,
         "longitude": 139.408,
@@ -651,7 +577,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-08-15",
+      "statusUpdatedAt": "2026-08-16",
       "weatherLocation": {
         "latitude": 35.714,
         "longitude": 139.408,
@@ -681,7 +607,7 @@
       "status": "closed",
       "statusReason": "受付終了告知",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-08-15",
+      "statusUpdatedAt": "2026-08-16",
       "weatherLocation": {
         "latitude": 35.775,
         "longitude": 139.805,
@@ -960,7 +886,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-08-15",
+      "statusUpdatedAt": "2026-08-16",
       "firstSeen": "2026-08-06"
     },
     {
@@ -1065,7 +991,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-08-15",
+      "statusUpdatedAt": "2026-08-16",
       "firstSeen": "2026-08-06"
     }
   ],
@@ -1462,31 +1388,6 @@
       }
     },
     {
-      "id": "na-20261003-kkjxa",
-      "pref": "nagano",
-      "date": "2026-10-03",
-      "weekday": "土",
-      "title": "【安曇野市】トラックの日イベント",
-      "place": "",
-      "address": "安曇野市",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 36.304,
-        "longitude": 137.906,
-        "label": "長野県安曇野市",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:37.394+09:00"
-      }
-    },
-    {
       "id": "na-20261003-37wm4",
       "pref": "nagano",
       "date": "2026-10-03",
@@ -1509,6 +1410,31 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-07-29T14:30:37.753+09:00"
+      }
+    },
+    {
+      "id": "na-20261003-kkjxa",
+      "pref": "nagano",
+      "date": "2026-10-03",
+      "weekday": "土",
+      "title": "【安曇野市】トラックの日イベント",
+      "place": "",
+      "address": "安曇野市",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-06",
+      "weatherLocation": {
+        "latitude": 36.304,
+        "longitude": 137.906,
+        "label": "長野県安曇野市",
+        "accuracy": "municipality",
+        "source": "gsi",
+        "geocodedAt": "2026-07-29T14:30:37.394+09:00"
       }
     },
     {
@@ -2474,31 +2400,6 @@
   "mie": [],
   "shiga": [],
   "kyoto": [
-    {
-      "id": "ky-set-20260815-7h93f",
-      "pref": "kyoto",
-      "date": "2026-08-15",
-      "weekday": "土",
-      "title": "自衛官 就職・進学説明会",
-      "place": "河原町募集案内所",
-      "address": "",
-      "time": "10:00～16:00",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
-      "notes": "担当: 河原町募集案内所",
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 35.021,
-        "longitude": 135.756,
-        "label": "京都府河原町",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-03T14:54:07.525+09:00"
-      }
-    },
     {
       "id": "ky-set-20260817-hn6yl",
       "pref": "kyoto",
@@ -3484,5 +3385,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/08/15 17:40"
+  "updatedAt": "2026/08/16 07:32"
 }
