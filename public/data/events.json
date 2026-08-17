@@ -2494,6 +2494,31 @@
   "wakayama": [],
   "ehime": [
     {
+      "id": "em-20260905-37zg5",
+      "pref": "ehime",
+      "date": "2026-09-05",
+      "weekday": "土",
+      "title": "マイナビ転職フェア",
+      "place": "愛媛県県民文化会館",
+      "address": "",
+      "time": "11:00～17:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/ehime/event.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-17",
+      "weatherLocation": {
+        "latitude": 32.962,
+        "longitude": 132.583,
+        "label": "愛媛県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-17T17:56:19.549+09:00"
+      }
+    },
+    {
       "id": "em-20260904-vvamc",
       "pref": "ehime",
       "date": "2026-09-04",
@@ -3294,5 +3319,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/08/17 12:25"
+  "updatedAt": "2026/08/17 17:56"
 }
