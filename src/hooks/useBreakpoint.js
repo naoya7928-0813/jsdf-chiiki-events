@@ -45,3 +45,30 @@ export function useBreakpoint() {
 export function useIsDesktop() {
   return useBreakpoint() === 'desktop';
 }
+
+/**
+ * 要素自身の幅を購読する（コンテナクエリ相当）。
+ *
+ * 詳細画面は「一覧の右ペイン（約700px）」と「ホームから直接開いた全幅（約1200px）」の
+ * 両方で使われる。ウィンドウ幅で判定すると前者でも横並びに切り替わって潰れるため、
+ * 置かれた場所の実寸で判断する。
+ *
+ * @param {{current: HTMLElement|null}} ref
+ * @returns {number} 要素の幅(px)。未計測は 0
+ */
+export function useElementWidth(ref) {
+  const [width, setWidth] = useState(0);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(entries => {
+      for (const e of entries) setWidth(e.contentRect.width);
+    });
+    ro.observe(el);
+    setWidth(el.getBoundingClientRect().width);
+    return () => ro.disconnect();
+  }, [ref]);
+
+  return width;
+}
