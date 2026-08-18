@@ -424,15 +424,14 @@
       "category": "体験",
       "tag": "",
       "ageRequirement": "高校生〜32歳",
-      "deadline": "8月13日（木）",
+      "deadline": null,
       "url": "https://www.mod.go.jp/pco/tokyo/shinkoiwa/index.html#0820",
-      "notes": "水上降下訓練見学",
+      "notes": "水上降下訓練見学\n応募締切: 応募終了しました。",
       "source_type": "office_html",
       "address": "",
       "firstSeen": "2026-08-06",
-      "deadlineDate": "2026-08-13",
       "status": "closed",
-      "statusReason": "締切日経過",
+      "statusReason": "受付終了告知",
       "statusSource": "html",
       "statusUpdatedAt": "2026-08-18",
       "weatherLocation": {
@@ -1292,6 +1291,31 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-22T14:31:52.687+09:00"
+      }
+    },
+    {
+      "id": "ik-20260927-sxq5z",
+      "pref": "ishikawa",
+      "date": "2026-09-27",
+      "weekday": "日",
+      "title": "小松基地航空祭石川地方協力本部バスツアーnew!",
+      "place": "航空自衛隊 小松基地",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-18",
+      "weatherLocation": {
+        "latitude": 36.595,
+        "longitude": 136.626,
+        "label": "石川県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-18T17:50:23.825+09:00"
       }
     }
   ],
@@ -2520,6 +2544,56 @@
   "wakayama": [],
   "ehime": [
     {
+      "id": "em-20260915-07lpi",
+      "pref": "ehime",
+      "date": "2026-09-15",
+      "weekday": "火",
+      "title": "陸上自衛隊高等工科学校オンライン説明会",
+      "place": "オンライン説明会なのでご自宅でもどちらでもOK！",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "オンライン",
+      "url": "https://www.mod.go.jp/pco/ehime/event.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-18",
+      "weatherLocation": {
+        "latitude": 33.842,
+        "longitude": 132.766,
+        "label": "愛媛県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-04T14:27:16.607+09:00"
+      }
+    },
+    {
+      "id": "em-20261003-2nkvi",
+      "pref": "ehime",
+      "date": "2026-10-03",
+      "weekday": "土",
+      "title": "陸上自衛隊高等工科学校 説明会",
+      "place": "陸上自衛隊高等工科学校",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "学生向け",
+      "url": "https://www.mod.go.jp/pco/ehime/event.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-18",
+      "weatherLocation": {
+        "latitude": 33.842,
+        "longitude": 132.766,
+        "label": "愛媛県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-04T14:27:17.248+09:00"
+      }
+    },
+    {
       "id": "em-20260905-37zg5",
       "pref": "ehime",
       "date": "2026-09-05",
@@ -2567,56 +2641,6 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-06T14:27:14.912+09:00"
-      }
-    },
-    {
-      "id": "em-20260827-u4syu",
-      "pref": "ehime",
-      "date": "2026-08-27",
-      "weekday": "木",
-      "title": "陸上自衛隊高等工科学校オンライン説明会",
-      "place": "オンライン説明会なのでご自宅でもどちらでもOK！",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "オンライン",
-      "url": "https://www.mod.go.jp/pco/ehime/event.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 33.842,
-        "longitude": 132.766,
-        "label": "愛媛県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-04T14:27:16.607+09:00"
-      }
-    },
-    {
-      "id": "em-20260829-cer3r",
-      "pref": "ehime",
-      "date": "2026-08-29",
-      "weekday": "土",
-      "title": "陸上自衛隊高等工科学校 8月学校見学会",
-      "place": "陸上自衛隊高等工科学校",
-      "address": "",
-      "time": "",
-      "category": "体験",
-      "tag": "学生向け",
-      "url": "https://www.mod.go.jp/pco/ehime/event.html",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 33.842,
-        "longitude": 132.766,
-        "label": "愛媛県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-04T14:27:17.248+09:00"
       }
     },
     {
@@ -3295,5 +3319,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/08/18 07:37"
+  "updatedAt": "2026/08/18 17:50"
 }
