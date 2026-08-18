@@ -99,7 +99,9 @@ export default function SettingsScreen({
         </div>
       </div>
 
+      {/* 設定は読みやすさ優先。デスクトップでも横に伸ばさず中央 720px に収める */}
       <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '16px 0 8px' }}>
+      <div style={{ maxWidth: 720, margin: '0 auto', width: '100%' }}>
 
         {/* ─ 1. ブラウザ通知（Web Push） ─ */}
         <GroupTitle>ブラウザ通知</GroupTitle>
@@ -510,6 +512,7 @@ export default function SettingsScreen({
         <div style={{ textAlign: 'center', padding: '16px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 20px)', fontSize: 11, color: 'var(--text-muted)', fontFamily: F.mono }}>
           自衛隊地本イベント情報 {__APP_VERSION__}
         </div>
+      </div>
       </div>
 
       <BottomTabBar

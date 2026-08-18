@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { ICO } from './Icons';
 import { BottomTabBar, F, Spinner, ErrorBanner } from './Shared';
 import JapanMap from './JapanMap';
+import { useIsDesktop } from '../hooks/useBreakpoint';
 import NearbyOfficesModal from './NearbyOfficesModal';
 import { REGION_BY_ID, SUPPORTED_PREFECTURES, countEventsByRegion, getSupportedPrefsByRegion } from '../data/regionMap';
 
@@ -14,6 +15,7 @@ export default function HomeScreen({
   initialRegionId,
 }) {
   const { primary } = theme;
+  const isDesktop = useIsDesktop();
 
   // 近くの施設モーダル
   const [nearbyOpen, setNearbyOpen] = useState(false);
@@ -115,8 +117,14 @@ export default function HomeScreen({
         </div>
       </div>
 
-      {/* ─ コンテンツ ─ */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      {/* ─ コンテンツ ─
+           デスクトップは 地図（左） + 地域パネル（右）の2カラム。
+           モバイル／タブレットは従来どおり 地図の下にカードを敷く1カラム。 */}
+      <div style={{
+        flex: 1, display: 'flex',
+        flexDirection: isDesktop ? 'row' : 'column',
+        overflow: 'hidden',
+      }}>
         <ErrorBanner message={error} />
 
         {loading ? (
@@ -140,14 +148,18 @@ export default function HomeScreen({
             </div>
 
 
-            {/* ─ 下部カード（高さ固定でマップリサイズを防ぐ） ─ */}
+            {/* ─ 地域パネル ─
+                 モバイル: 地図下の帯（高さ固定でマップリサイズを防ぐ）
+                 デスクトップ: 右側の縦パネル。横に伸びきった帯にしない */}
             <div style={{
               flexShrink: 0,
-              margin: '0 16px 8px',
+              ...(isDesktop
+                ? { width: 360, margin: '12px 16px 16px 0', alignSelf: 'stretch', overflowY: 'auto' }
+                : { margin: '0 16px 8px' }),
               borderRadius: 14,
               border: `1px solid ${selectedRegion ? `${primary}33` : 'var(--border)'}`,
               background: selectedRegion ? `${primary}08` : 'var(--card)',
-              overflow: 'hidden',
+              overflow: isDesktop ? 'auto' : 'hidden',
             }}>
               {selectedRegion ? (
                 <div style={{ padding: '12px 16px', minHeight: 104, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
@@ -207,8 +219,10 @@ export default function HomeScreen({
                       <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
                         地域を選択してください
                       </div>
+                      {/* 地図の位置は幅で変わる（下=モバイル / 左=デスクトップ）ので
+                          案内の矢印と操作語もそれに合わせる */}
                       <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3, display: 'flex', alignItems: 'center', gap: 3 }}>
-                        ↑ 上の地図をタップ
+                        {isDesktop ? '← 左の地図をクリック' : '↑ 上の地図をタップ'}
                       </div>
                     </div>
                     {/* 全体サマリー */}

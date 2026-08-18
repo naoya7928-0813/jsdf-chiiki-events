@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { ICO } from './Icons';
 import { BottomTabBar, F, splitDate } from './Shared';
 import { SUPPORTED_PREFECTURES, PREFECTURE_INFO } from '../data/regionMap';
+import { useIsDesktop } from '../hooks/useBreakpoint';
 import { deadlineDaysUntil, daysUntil, daysLabel, daysColor } from '../utils/date';
 
 // ─── お気に入り一覧画面 ───────────────────────────────────────
@@ -13,6 +14,7 @@ export default function FavoritesScreen({
   onOpenHome, onOpenList, onOpenRegion, onOpenSettings,
 }) {
   const { primary, accent } = theme;
+  const isDesktop = useIsDesktop();
 
   // favorites は Set<string>（イベントID）
   const favEvents = useMemo(() => {
@@ -61,7 +63,15 @@ export default function FavoritesScreen({
         {favEvents.length === 0 ? (
           <EmptyState primary={primary} accent={accent} />
         ) : (
-          <div style={{ padding: '12px 0 8px' }}>
+          // デスクトップは1列だとカードが横に伸びきるのでグリッドに畳む。
+          // minmax(340px, 1fr) で幅に応じて2〜3列に自動で変わる。
+          <div style={isDesktop ? {
+            padding: '16px 20px 8px',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+            gap: 12,
+            alignContent: 'start',
+          } : { padding: '12px 0 8px' }}>
             {favEvents.map(ev => (
               <FavCard
                 key={ev.id}
@@ -70,6 +80,7 @@ export default function FavoritesScreen({
                 accent={accent}
                 applied={applied}
                 onTap={onOpenDetail}
+                inGrid={isDesktop}
               />
             ))}
           </div>
@@ -90,7 +101,7 @@ export default function FavoritesScreen({
 }
 
 // ─── お気に入りカード（ListScreen と同形式） ─────────────────
-function FavCard({ ev, primary, accent, applied, onTap }) {
+function FavCard({ ev, primary, accent, applied, onTap, inGrid = false }) {
   const { m, d }  = splitDate(ev.date);
   const endSplit  = ev.endDate ? splitDate(ev.endDate) : null;
   const isWeekend = /[土日祝]/.test(ev.weekday);
@@ -108,7 +119,8 @@ function FavCard({ ev, primary, accent, applied, onTap }) {
       role="button" tabIndex={0}
       onKeyDown={e => e.key === 'Enter' && onTap(ev)}
       style={{
-        background: 'var(--card)', margin: '0 16px 10px', borderRadius: 12,
+        // グリッド時は gap が間隔を持つので、カード自身のマージンは外す
+        background: 'var(--card)', margin: inGrid ? 0 : '0 16px 10px', borderRadius: 12,
         border: `1px solid ${accent}33`, cursor: 'pointer',
         boxShadow: '0 1px 2px rgba(11,37,69,0.04),0 2px 8px rgba(11,37,69,0.05)',
       }}
