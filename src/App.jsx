@@ -524,9 +524,14 @@ export default function App({ operator = false }) {
           // ── デスクトップ2ペイン：左=一覧 / 右=詳細（フィードバック§2-2-8） ──
           <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
             <div style={{
-              // サイドナビ導入で横幅に余裕ができたぶん一覧側を広げ、
-              // 地方チップ（全国/北海道/…）が途中で切れないようにする
-              width: isDesktopLayout ? 500 : 430, flexShrink: 0, height: '100%',
+              // 一覧側の幅。固定 500px にすると 1024px 幅で
+              // 「サイドナビ232 + 一覧500」で詳細に 292px しか残らず潰れる。
+              // 画面が広いほど広げ、狭いときは詳細に譲る。
+              //   1024px → 一覧380 / 詳細412
+              //   1440px → 一覧411 / 詳細797
+              //   1600px → 一覧465 / 詳細903
+              width: isDesktopLayout ? 'clamp(380px, 34%, 500px)' : 430,
+              flexShrink: 0, height: '100%',
               display: 'flex', flexDirection: 'column',
               borderRight: '1px solid var(--border)', position: 'relative',
             }}>
