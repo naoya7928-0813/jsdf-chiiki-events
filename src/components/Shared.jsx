@@ -1,5 +1,6 @@
 import { createContext, useContext } from 'react';
 import { ICO } from './Icons';
+import { useIsDesktop } from '../hooks/useBreakpoint';
 
 // 運営者ナビ用コンテキスト。operator=true のときだけ下部タブに「管理」を出す。
 // 公開アプリ(/)では provider を置かないため、管理タブも管理コードも一切現れない。
@@ -135,6 +136,11 @@ export function ScreenHeader({ primary, title, subtitle, onBack, trailing }) {
 // ─── 下部タブバー（CSS変数対応） ──────────────────────────────
 export function BottomTabBar({ active, onChange, primary }) {
   const op = useContext(OperatorNavContext);
+  // デスクトップでは App が左サイドナビ（SideNav）を出すので、下部タブは畳む。
+  // タブバーは各画面が個別に描画しているため、App 側で一括に消せない。
+  // ここで自己判断させることで、画面側の変更を不要にしている。
+  const isDesktop = useIsDesktop();
+  if (isDesktop) return null;
   const tabs = [
     { id: 'home',      label: 'ホーム',     icon: (c, s)     => ICO.home(c, s) },
     { id: 'list',      label: 'イベント',   icon: (c, s)     => ICO.cal(c, s)  },

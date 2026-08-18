@@ -5,6 +5,8 @@ import { lazyWithRecovery } from './utils/lazyChunk';
 import { COLOR_SCHEMES, DEFAULT_SCHEME } from './config';
 import { PREFECTURE_INFO } from './data/regionMap';
 import { OperatorNavContext } from './components/Shared';
+import { useBreakpoint } from './hooks/useBreakpoint';
+import SideNav from './components/SideNav';
 import { ICO }           from './components/Icons';
 import HomeScreen        from './components/HomeScreen';
 import ListScreen        from './components/ListScreen';
@@ -93,6 +95,11 @@ export default function App({ operator = false }) {
     mq.addEventListener('change', apply);
     return () => mq.removeEventListener('change', apply);
   }, [operator]);
+
+  // 画面幅の区分。デスクトップ(1024px～)では左サイドナビ + 各画面の横幅活用に切り替える。
+  // 運営者ページは従来の縦長レイアウトのままにする。
+  const breakpoint      = useBreakpoint();
+  const isDesktopLayout = !operator && breakpoint === 'desktop';
 
   // ── ナビゲーション ────────────────────────────────────────
   const [screen,      setScreen]      = useState('home');
@@ -404,13 +411,36 @@ export default function App({ operator = false }) {
 
   // 広い画面かつ一覧表示中は 2 ペイン（一覧＋詳細）。それ以外は従来の 430px フレーム。
   const showTwoPane = isWide && screen === 'list';
-  const containerStyle = {
-    maxWidth: showTwoPane ? 1040 : 430, margin: '0 auto',
-    height: '100dvh',
+
+  // ── 画面幅ごとの外枠 ───────────────────────────────────────
+  //  mobile  : 従来どおり 430px 枠
+  //  tablet  : 1カラムのまま 560px まで広げる（余白が間延びしすぎない範囲）
+  //  desktop : 左サイドナビ + 本文。1600px を上限に画面幅を使い切る
+  const containerStyle = isDesktopLayout
+    ? {
+        width: '100%', maxWidth: 1600, margin: '0 auto',
+        height: '100dvh',
+        display: 'flex', flexDirection: 'row',
+        position: 'relative', overflow: 'hidden',
+        background: 'var(--bg)',
+        boxShadow: '0 0 40px rgba(0,0,0,0.12)',
+      }
+    : {
+        maxWidth: showTwoPane ? 1040 : (breakpoint === 'tablet' ? 560 : 430), margin: '0 auto',
+        height: '100dvh',
+        display: 'flex', flexDirection: 'column',
+        position: 'relative', overflow: 'hidden',
+        background: 'var(--bg)',
+        boxShadow: '0 0 40px rgba(0,0,0,0.12)',
+      };
+
+  // 画面本体。デスクトップではサイドナビの右側、それ以外は外枠いっぱい。
+  // height ではなく flex:1 で伸ばすことで、縦(モバイル)・横(デスクトップ)
+  // どちらの外枠でも同じ指定が使える。
+  const mainStyle = {
+    flex: 1, minWidth: 0, minHeight: 0,
     display: 'flex', flexDirection: 'column',
     position: 'relative', overflow: 'hidden',
-    background: 'var(--bg)',
-    boxShadow: '0 0 40px rgba(0,0,0,0.12)',
   };
 
   // ── 運営者サイトはログイン必須。未ログインならログイン画面のみ表示 ──
@@ -439,6 +469,18 @@ export default function App({ operator = false }) {
         <SplashScreen schemeKey={schemeKey} onDone={handleSplashDone} />
       )}
 
+      {/* ── デスクトップの左サイドナビ（下部タブバーの代替） ── */}
+      {isDesktopLayout && (
+        <SideNav
+          active={screen}
+          onChange={setScreen}
+          primary={theme.primary}
+          unreadCount={unreadCount}
+          onOpenNotifications={() => setScreen('notifications')}
+        />
+      )}
+
+      <div style={mainStyle}>
       {/* 遅延読込画面のフォールバックは null（既存画面が残らないよう軽量に） */}
       <Suspense fallback={null}>
       {screen === 'home' && (
@@ -481,7 +523,9 @@ export default function App({ operator = false }) {
           // ── デスクトップ2ペイン：左=一覧 / 右=詳細（フィードバック§2-2-8） ──
           <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
             <div style={{
-              width: 430, flexShrink: 0, height: '100%',
+              // サイドナビ導入で横幅に余裕ができたぶん一覧側を広げ、
+              // 地方チップ（全国/北海道/…）が途中で切れないようにする
+              width: isDesktopLayout ? 500 : 430, flexShrink: 0, height: '100%',
               display: 'flex', flexDirection: 'column',
               borderRight: '1px solid var(--border)', position: 'relative',
             }}>
@@ -657,6 +701,7 @@ export default function App({ operator = false }) {
         </Suspense>
       )}
       </Suspense>
+      </div>
     </div>
     </OperatorNavContext.Provider>
   );
