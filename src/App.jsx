@@ -499,6 +499,7 @@ export default function App({ operator = false }) {
           onOpenRegion={openRegion}
           onOpenSettings={() => setScreen('settings')}
           onOpenFavorites={() => setScreen('favorites')}
+          onOpenDetail={(ev) => openDetail(ev, 'home')}
         />
       )}
 

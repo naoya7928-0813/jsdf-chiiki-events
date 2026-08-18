@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { ICO } from './Icons';
-import { BottomTabBar, F, Spinner, ErrorBanner } from './Shared';
+import { BottomTabBar, F, Spinner, ErrorBanner, splitDate } from './Shared';
 import JapanMap from './JapanMap';
 import { useIsDesktop } from '../hooks/useBreakpoint';
 import NearbyOfficesModal from './NearbyOfficesModal';
@@ -11,7 +11,7 @@ import { REGION_BY_ID, SUPPORTED_PREFECTURES, countEventsByRegion, getSupportedP
 export default function HomeScreen({
   events, loading, error, theme,
   favorites, unreadCount,
-  onOpenNotifications, onOpenRegion, onOpenList, onOpenSettings, onOpenFavorites,
+  onOpenNotifications, onOpenRegion, onOpenList, onOpenSettings, onOpenFavorites, onOpenDetail,
   initialRegionId,
 }) {
   const { primary } = theme;
@@ -202,6 +202,19 @@ export default function HomeScreen({
                       '現在イベントなし'
                     )}
                   </button>
+
+                  {/* デスクトップの縦パネルは下が大きく余るので、
+                      「地本を選ぶ」と「直近のイベント」で埋める。
+                      モバイルの帯レイアウトでは高さが足りないため出さない。 */}
+                  {isDesktop && hasEvents && (
+                    <RegionPanelDetail
+                      prefs={supportedPrefs}
+                      events={events}
+                      primary={primary}
+                      onOpenList={onOpenList}
+                      onOpenDetail={onOpenDetail}
+                    />
+                  )}
                 </div>
               ) : (
                 /* 地域未選択時のガイド */
@@ -275,3 +288,127 @@ export default function HomeScreen({
   );
 }
 
+
+// ─── 地域パネルの詳細（デスクトップのみ） ─────────────────────
+// 地図右のパネルは縦に長く、地域名と «イベントを見る» だけでは大きく余る。
+// 「どの地本か選ぶ」導線と「今すぐ見たい直近のイベント」を置いて埋める。
+function RegionPanelDetail({ prefs, events, primary, onOpenList, onOpenDetail }) {
+  // 開催予定のみを日付順に。上位5件をパネルに出す。
+  const upcoming = useMemo(() => {
+    const rows = [];
+    for (const p of prefs) {
+      for (const ev of (events[p.id] ?? [])) {
+        if (!ev.ended && ev.date) rows.push({ ...ev, _prefLabel: p.label });
+      }
+    }
+    return rows.sort((a, b) => a.date.localeCompare(b.date)).slice(0, 5);
+  }, [prefs, events]);
+
+  return (
+    <div style={{ marginTop: 16 }}>
+      {/* ─ 地本を選ぶ ─
+           イベント0件の地本も一覧に出す。見出しの「N 地本対応」と行数が
+           食い違うと「対応しているのに出てこない」と誤解されるため。
+           0件の行は淡色・非活性にして、押せる行と区別する。 */}
+      {prefs.length > 0 && (
+        <>
+          <SectionLabel>地本を選ぶ</SectionLabel>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 1, marginBottom: 18 }}>
+            {prefs.map(p => {
+              const empty = p.count === 0;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => !empty && onOpenList(p.id)}
+                  disabled={empty}
+                  title={empty ? '現在このエリアの掲載イベントはありません' : undefined}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    width: '100%', padding: '9px 10px',
+                    border: 'none', background: 'transparent',
+                    cursor: empty ? 'default' : 'pointer',
+                    borderRadius: 'var(--radius-element)',
+                    fontFamily: F.sans, textAlign: 'left',
+                  }}
+                  onMouseEnter={e => { if (!empty) e.currentTarget.style.background = 'var(--sep)'; }}
+                  onMouseLeave={e => { if (!empty) e.currentTarget.style.background = 'transparent'; }}
+                >
+                  <span style={{
+                    fontSize: 13.5, fontWeight: 500,
+                    color: empty ? 'var(--text-muted)' : 'var(--text)',
+                  }}>{p.label}地本</span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {empty ? (
+                      <span style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>イベントなし</span>
+                    ) : (
+                      <>
+                        <span style={{ fontSize: 13, color: primary, fontWeight: 700, fontFamily: F.mono }}>{p.count}</span>
+                        {ICO.chev('var(--icon-muted)', 14)}
+                      </>
+                    )}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {/* ─ 直近のイベント ─ */}
+      {upcoming.length > 0 && (
+        <>
+          <SectionLabel>直近のイベント</SectionLabel>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {upcoming.map(ev => {
+              const { m, d } = splitDate(ev.date);
+              return (
+                <button
+                  key={ev.id}
+                  onClick={() => onOpenDetail?.(ev)}
+                  style={{
+                    display: 'flex', alignItems: 'flex-start', gap: 10,
+                    width: '100%', padding: '9px 10px',
+                    border: '1px solid var(--border)', background: 'var(--card)',
+                    cursor: 'pointer', borderRadius: 'var(--radius-container)',
+                    fontFamily: F.sans, textAlign: 'left',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = `${primary}55`; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; }}
+                >
+                  {/* 日付 */}
+                  <span style={{
+                    flexShrink: 0, minWidth: 34, textAlign: 'center',
+                    display: 'flex', flexDirection: 'column', lineHeight: 1.1,
+                  }}>
+                    <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: F.mono }}>{m}月</span>
+                    <span style={{ fontFamily: F.serif, fontSize: 17, fontWeight: 600, color: primary }}>{d}</span>
+                  </span>
+                  {/* 本文 */}
+                  <span style={{ minWidth: 0, flex: 1 }}>
+                    <span style={{
+                      display: 'block', fontSize: 13, color: 'var(--text)', fontWeight: 600,
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    }}>{ev.title}</span>
+                    <span style={{ display: 'block', fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                      {ev._prefLabel}地本{ev.place ? ` ・ ${ev.place}` : ''}
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function SectionLabel({ children }) {
+  return (
+    <div style={{
+      fontSize: 11, fontWeight: 700, letterSpacing: 1,
+      color: 'var(--text-muted)', margin: '0 0 6px 2px',
+      fontFamily: F.sans,
+    }}>{children}</div>
+  );
+}

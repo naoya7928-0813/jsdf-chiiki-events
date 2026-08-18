@@ -3,6 +3,7 @@ import { ICO } from './Icons';
 import { Emblem, F, splitDate, SectionTitle, iconBtnStyle, StatusBadge } from './Shared';
 import { REGION_HQ, REGION_SOURCE } from '../config';
 import WeatherCard from './WeatherCard';
+import { useElementWidth } from '../hooks/useBreakpoint';
 import { googleCalendarUrl, downloadIcs } from '../utils/calendar';
 
 function officeSourceLabel(ev) {
@@ -16,7 +17,13 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
   // ── フック（Rules of Hooks: 早期 return の前に宣言する） ─────────
   const [copied,    setCopied]    = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
-  const [mapOpen,   setMapOpen]   = useState(false);   // 地図は折り畳み（既定は閉じる）
+  const [mapOpen,   setMapOpen]   = useState(true);    // 地図は既定で開く（会場位置は毎回見たい情報のため）
+
+  // 本文の実寸で「天気」と「開催場所+地図」を横並びにするか決める。
+  // 一覧の右ペイン（約700px）では縦積み、ホームから開いた全幅（約1200px）では横並び。
+  const bodyRef     = useRef(null);
+  const bodyWidth   = useElementWidth(bodyRef);
+  const sideBySide  = bodyWidth >= 900;
 
   // ── 掲載元へ遷移 →「戻ってきたら」申請済みにする（設定でON/OFF） ──
   // 開いた瞬間ではなく復帰時に付ける。誤タップで即座に申請済みにならず、
@@ -264,10 +271,24 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
         </div>
       </div>
 
-      {/* スクロール本文 */}
-      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '16px 0' }}>
-        {/* 開催日の天気（「開催日時」と「開催場所」の間に表示。詳細画面でのみ遅延取得） */}
-        <WeatherCard event={ev} theme={theme} />
+      {/* スクロール本文
+           ホームから直接開くとデスクトップでは幅いっぱい（約1200px）になり、
+           「降水確率 …… 30%」のように行が間延びして読みにくい。
+           一覧の2ペイン（約700px）と体感を揃えるため上限を設ける。 */}
+      <div ref={bodyRef} style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '16px 0' }}>
+        <div style={{ maxWidth: sideBySide ? 1200 : 860, margin: '0 auto', width: '100%' }}>
+
+        {/* 横長のときは 天気 と 開催場所+地図 を横並びにする。
+            縦に積むと地図まで必ずスクロールが要るため、広い画面では並べて
+            両方を一度に見せる。狭いペインでは従来どおり縦積み。 */}
+        <div style={sideBySide
+          ? { display: 'flex', alignItems: 'flex-start', gap: 4 }
+          : undefined}>
+          <div style={sideBySide ? { flex: '1 1 0', minWidth: 0 } : undefined}>
+            {/* 開催日の天気（詳細画面でのみ遅延取得） */}
+            <WeatherCard event={ev} theme={theme} />
+          </div>
+          <div style={sideBySide ? { flex: '1 1 0', minWidth: 0 } : undefined}>
 
         {/* 開催場所 + 地図 */}
         <div style={{ padding: '6px 16px 14px' }}>
@@ -382,6 +403,10 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
             )}
           </div>
         </div>
+
+          </div>
+        </div>
+        {/* ここまでが 天気 / 開催場所 の横並びブロック */}
 
         {/* 参加資格・締切 */}
         {(ev.ageRequirement || ev.deadline) && (
@@ -531,6 +556,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
               </button>
             )}
           </div>
+        </div>
         </div>
       </div>
 

@@ -197,8 +197,11 @@ export default function WeatherCard({ event, theme }) {
   const today = jstToday();
   const decision = W.decideWeatherDisplay(ev || {}, today);
 
-  // 折り畳み（既定は閉じる）。開いたときに初めて予報を取得する。
-  const [open, setOpen] = useState(false);
+  // 既定で開く。イベント詳細を開いたら天気は必ず見えている状態にする。
+  // （折り畳み自体は残すので、邪魔なときは閉じられる）
+  // 予報は開いている間だけ取得する。/api/weather は CDN と
+  // サーバ側でキャッシュしているため、既定オープンでも実リクエストは増えにくい。
+  const [open, setOpen] = useState(true);
   const toggle = () => setOpen(v => !v);
   const fold = { open, onToggle: toggle };
 
