@@ -20,10 +20,14 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
   const [mapOpen,   setMapOpen]   = useState(true);    // 地図は既定で開く（会場位置は毎回見たい情報のため）
 
   // 本文の実寸で「天気」と「開催場所+地図」を横並びにするか決める。
-  // 一覧の右ペイン（約700px）では縦積み、ホームから開いた全幅（約1200px）では横並び。
+  //
+  // 閾値 660px の根拠: 2カラムに割ると 1 列あたり約 320px 必要（天気カードの
+  // 「28°C 20°C」行と、地図の最小実用サイズ）。gap を足して 660px。
+  // 一覧の右ペインは「シェル上限1600 − サイドナビ232 − 一覧500 = 最大868px」で、
+  // 900px にすると通常の導線（一覧→詳細）では一生横並びにならなかった。
   const bodyRef     = useRef(null);
   const bodyWidth   = useElementWidth(bodyRef);
-  const sideBySide  = bodyWidth >= 900;
+  const sideBySide  = bodyWidth >= 660;
 
   // ── 掲載元へ遷移 →「戻ってきたら」申請済みにする（設定でON/OFF） ──
   // 開いた瞬間ではなく復帰時に付ける。誤タップで即座に申請済みにならず、
