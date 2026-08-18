@@ -25,3 +25,6 @@ scraper/ocr-cache.json
 
 .env*
 scraper/push-payload.json
+
+# OCR稼働統計（実行ごとの成果物。ワークフローが実行中に読む）
+scraper/ocr-stats.json

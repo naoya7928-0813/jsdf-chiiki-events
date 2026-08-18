@@ -35,24 +35,44 @@ jsdf-chiiki-events（自衛隊地本イベント情報・非公式）の日常�
 3. **データ消失時の復元**: `git show <正常コミット>:public/data/events.json > public/data/events.json` → `node scripts/generate-events-html.mjs` → commit/push。
 4. データ品質チェック（`node scripts/check-data-quality.mjs`）がデプロイをブロックした場合はログのエラーを修正。
 
-## 4. OCR誤認識の修正
+## 4. OCR が止まったとき（モデル廃止・APIキー失効）
+
+「⚠️ OCR稼働アラート」が届いた、または Actions のサマリで「OCR 稼働」が
+`成功0件` になっている場合。総イベント数はキャッシュ済み OCR 結果に支えられて
+しばらく下がらないため、総数だけ見ていても気付けない。
+
+1. 実行ログの `[OCRモデル]` 行で、どのモデルが選ばれたかを確認する。
+2. `Groq エラー (404)` / `Gemini エラー (404)` が出ていればモデル廃止。
+   scraper は候補リストの次のモデルへ自動で切り替えるが、候補が全滅した場合は
+   リスト自体の更新が必要（`scraper/index.js` の
+   `GROQ_VISION_MODEL_CANDIDATES` / `GEMINI_MODEL_CANDIDATES`）。
+3. 緊急時はコードを触らず、GitHub Secrets に `GROQ_OCR_MODEL` /
+   `GEMINI_OCR_MODEL` を登録すれば即座に上書きできる。
+4. `401/403` ならモデルではなく APIキーの失効を疑う。
+
+過去の実例:
+
+- 2026-07-17 Groq `meta-llama/llama-4-scout-17b-16e-instruct` 廃止
+- 2026-08-11 Gemini `gemini-2.0-flash` 廃止
+
+## 5. OCR誤認識の修正
 - チラシ実物（url/imageUrl）と照合。確定修正は `shared/titleQuality.cjs` の `VERIFIED_OVERRIDES` に登録（events.json 直接修正は OCR キャッシュで再発）。
 
-## 5. 天気座標の修正
+## 6. 天気座標の修正
 - 管理画面でイベントの場所/住所を修正すると `weatherLocation` は無効化され、次回スクレイプ/処理で再取得。
 - 手動で座標を指定する場合は管理APIに `weatherLocation:{latitude,longitude,label}` を渡すと `accuracy:'manual'` で確定。
 
-## 6. 障害対応
+## 7. 障害対応
 - **Redis(Upstash)障害**: レート制限・通知購読・天気キャッシュ・管理操作が影響。閲覧（events.json）は静的配信のため継続。天気はCDN/旧キャッシュ(stale)でしのぐ。復旧後に管理操作を再開。
 - **Vercel障害**: 公式の Status を確認。デプロイは復旧後に `gh workflow run deploy.yml`。
 - **GitHub Actions障害**: スクレイプ/デプロイが停止。復旧後に手動再実行。データは前回分が表示され続ける。
 
-## 7. バックアップと復元
+## 8. バックアップと復元
 - **events.json**: Git 履歴が実質バックアップ（コミット毎）。復元は §3-3。
 - **管理データ（Redis: manual:events / manual:overrides / manual:history）**: 定期的に管理画面の CSV/JSON 出力で控える。重要データは Upstash 側のバックアップ機能も検討。
 - **監査履歴**: 追記専用。長期保全は外部転送を今後整備。
 
-## 8. インシデント発生時（初動）
+## 9. インシデント発生時（初動）
 1. 影響範囲を特定（公開表示 / 管理操作 / データ）。
 2. 必要なら一時的に該当機能を停止（例: アカウント `enabled:false`、環境変数で機能停止）。
 3. 監査履歴（`/api/admin/history`、auditor 権限）で操作を確認。
