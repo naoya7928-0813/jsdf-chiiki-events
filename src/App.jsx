@@ -5,7 +5,8 @@ import { lazyWithRecovery } from './utils/lazyChunk';
 import { COLOR_SCHEMES, DEFAULT_SCHEME } from './config';
 import { PREFECTURE_INFO } from './data/regionMap';
 import { OperatorNavContext } from './components/Shared';
-import { useBreakpoint } from './hooks/useBreakpoint';
+import { useBreakpoint, LayoutModeContext, isPhoneSized } from './hooks/useBreakpoint';
+import { applyOrientationPreference } from './utils/orientation';
 import SideNav from './components/SideNav';
 import { ICO }           from './components/Icons';
 import HomeScreen        from './components/HomeScreen';
@@ -30,6 +31,7 @@ function loadDarkMode()     { try { return localStorage.getItem('jsdf-dark')   |
 function loadLastMapRegion(){ try { return localStorage.getItem('jsdf-last-region') || null;       } catch { return null;           } }
 function loadLastPrefId()   { try { return localStorage.getItem('jsdf-last-pref')   || null;       } catch { return null;           } }
 function loadAutoMode()     { try { return localStorage.getItem('jsdf-auto-mode') !== 'false';    } catch { return true;           } }
+function loadLayoutMode()   { try { return localStorage.getItem('jsdf-layout-mode') || 'auto';    } catch { return 'auto';         } }
 
 // favorites: イベントIDの Set として管理
 function loadFavorites() {
@@ -98,7 +100,17 @@ export default function App({ operator = false }) {
 
   // 画面幅の区分。デスクトップ(1024px～)では左サイドナビ + 各画面の横幅活用に切り替える。
   // 運営者ページは従来の縦長レイアウトのままにする。
-  const breakpoint      = useBreakpoint();
+  // 表示の向き（自動 / 横向き / 縦向き）。スマホでの見え方を利用者が選べる。
+  const [layoutMode, setLayoutMode] = useState(loadLayoutMode);
+  const handleLayoutModeChange = useCallback((mode) => {
+    setLayoutMode(mode);
+    try { localStorage.setItem('jsdf-layout-mode', mode); } catch {}
+    // 端末の向きそのもののロックは、対応環境でのみ試みる（iOS は非対応）
+    applyOrientationPreference(mode);
+  }, []);
+  useEffect(() => { applyOrientationPreference(layoutMode); }, [layoutMode]);
+
+  const breakpoint      = useBreakpoint(layoutMode);
   const isDesktopLayout = !operator && breakpoint === 'desktop';
 
   // ── ナビゲーション ────────────────────────────────────────
@@ -461,6 +473,7 @@ export default function App({ operator = false }) {
   }
 
   return (
+    <LayoutModeContext.Provider value={layoutMode}>
     <OperatorNavContext.Provider value={{ operator, openAdmin: () => { setAdminEditEvent(null); setScreen('admin'); } }}>
     <div style={containerStyle}>
 
@@ -618,6 +631,9 @@ export default function App({ operator = false }) {
           theme={theme}
           onColorChange={handleColorChange}
           onDarkModeChange={handleDarkModeChange}
+          layoutMode={layoutMode}
+          onLayoutModeChange={handleLayoutModeChange}
+          showLayoutSetting={isPhoneSized()}
           autoMode={autoMode}
           onAutoModeChange={handleAutoModeChange}
           autoApply={autoApply}
@@ -710,5 +726,6 @@ export default function App({ operator = false }) {
       </div>
     </div>
     </OperatorNavContext.Provider>
+    </LayoutModeContext.Provider>
   );
 }

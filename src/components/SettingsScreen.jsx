@@ -13,6 +13,7 @@ import { UPDATE_NOTES, TYPE_LABEL } from '../constants/updates';
 export default function SettingsScreen({
   theme,
   onColorChange, onDarkModeChange,
+  layoutMode = 'auto', onLayoutModeChange, showLayoutSetting = false,
   autoMode, onAutoModeChange,
   autoApply, onAutoApplyChange,
   onOpenHome, onOpenRegion, onOpenList, onOpenFavorites,
@@ -280,6 +281,57 @@ export default function SettingsScreen({
           </div>
         </Card>
 
+        {/* ─ 4-2. 表示の向き（スマートフォンのみ） ─
+             横向きは「幅に余裕・高さが希少」なので、地図とパネルを横に並べる
+             デスクトップ相当のレイアウトに切り替える。端末の回転ロックが
+             効いていて自動で切り替わらない場合に、手動で選べるようにする。 */}
+        {showLayoutSetting && (
+          <>
+            <GroupTitle>表示の向き</GroupTitle>
+            <Card>
+              <div style={{ padding: '14px' }}>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>
+                  画面の使い方に合わせて選べます
+                </div>
+                <div style={{
+                  display: 'flex', background: 'var(--badge-bg)',
+                  borderRadius: 8, padding: 3, gap: 2,
+                }}>
+                  {[
+                    { id: 'auto',      label: '自動'   },
+                    { id: 'landscape', label: '横向き' },
+                    { id: 'portrait',  label: '縦向き' },
+                  ].map(m => {
+                    const isA = layoutMode === m.id;
+                    return (
+                      <button key={m.id} onClick={() => onLayoutModeChange?.(m.id)} style={{
+                        flex: 1, height: 40, borderRadius: 6, border: 'none', cursor: 'pointer',
+                        background: isA ? primary : 'transparent',
+                        color: isA ? '#fff' : 'var(--text-muted)',
+                        fontFamily: F.sans, fontSize: 13,
+                        fontWeight: isA ? 600 : 400,
+                        boxShadow: isA ? '0 1px 3px rgba(0,0,0,0.15)' : 'none',
+                        transition: 'all 0.15s',
+                      }}>
+                        {m.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 10, lineHeight: 1.6 }}>
+                  {layoutMode === 'auto'      && '端末の向きに合わせて自動で切り替えます。'}
+                  {layoutMode === 'landscape' && '横向き用の2カラム表示（地図と情報を左右に並べる）に固定します。端末を横にしても切り替わらない場合にお使いください。'}
+                  {layoutMode === 'portrait'  && '縦向き用の1カラム表示に固定します。端末を横にしても縦向きの見た目のままになります。'}
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8, lineHeight: 1.6 }}>
+                  ※ この設定はアプリの表示だけを変えます。iPhone では端末の画面の向きロックを
+                  アプリ側から解除できないため、本体を回しても画面が回らない場合は
+                  コントロールセンターの向きロックを解除してください。
+                </div>
+              </div>
+            </Card>
+          </>
+        )}
         {/* ─ 表示設定（一覧の表示形式・レーダーの方角・申請済みの自動切替）（折込） ─ */}
         <Section
           title="表示設定"

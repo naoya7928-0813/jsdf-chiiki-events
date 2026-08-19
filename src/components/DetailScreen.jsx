@@ -3,7 +3,7 @@ import { ICO } from './Icons';
 import { Emblem, F, splitDate, SectionTitle, iconBtnStyle, StatusBadge } from './Shared';
 import { REGION_HQ, REGION_SOURCE } from '../config';
 import WeatherCard from './WeatherCard';
-import { useElementWidth } from '../hooks/useBreakpoint';
+import { useElementWidth, isTouchPhone } from '../hooks/useBreakpoint';
 import { googleCalendarUrl, downloadIcs } from '../utils/calendar';
 
 function officeSourceLabel(ev) {
@@ -27,7 +27,10 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
   // 900px にすると通常の導線（一覧→詳細）では一生横並びにならなかった。
   const bodyRef     = useRef(null);
   const bodyWidth   = useElementWidth(bodyRef);
-  const sideBySide  = bodyWidth >= 660;
+  // スマホ横向きは幅こそ 852px 等になるが、物理的な画面は 6 インチ程度しかない。
+  // PC と同じく2カラムに割ると1列が実寸で小さすぎて読めないため、
+  // 端末がスマホなら幅が足りていても縦に積む（PC・タブレットのみ横並び）。
+  const sideBySide  = bodyWidth >= 660 && !isTouchPhone();
 
   // ── 掲載元へ遷移 →「戻ってきたら」申請済みにする（設定でON/OFF） ──
   // 開いた瞬間ではなく復帰時に付ける。誤タップで即座に申請済みにならず、
