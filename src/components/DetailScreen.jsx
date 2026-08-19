@@ -13,7 +13,7 @@ function officeSourceLabel(ev) {
   return null;
 }
 
-export default function DetailScreen({ event, onBack, theme, favorites, applied, onToggleFavorite, onToggleApplied, autoApply, onMarkApplied, onReport, adminAuthed, onEditEvent }) {
+export default function DetailScreen({ event, onBack, theme, favorites, applied, onToggleFavorite, onToggleApplied, autoApply, onMarkApplied, onReport, adminAuthed, onEditEvent, weatherMapMode = 'auto' }) {
   // ── フック（Rules of Hooks: 早期 return の前に宣言する） ─────────
   const [copied,    setCopied]    = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
@@ -30,7 +30,17 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
   // スマホ横向きは幅こそ 852px 等になるが、物理的な画面は 6 インチ程度しかない。
   // PC と同じく2カラムに割ると1列が実寸で小さすぎて読めないため、
   // 端末がスマホなら幅が足りていても縦に積む（PC・タブレットのみ横並び）。
-  const sideBySide  = bodyWidth >= 660 && !isTouchPhone();
+  // 設定で明示指定があればそれに従う。auto は端末で判断する
+  // （スマホ横向きは幅こそ足りるが物理画面が小さく、2カラムだと実寸が足りない）。
+  // どの設定でも、そもそも幅が 660px 未満なら横並びにはしない。
+  const wantSide    = weatherMapMode === 'side'  ? true
+                    : weatherMapMode === 'stack' ? false
+                    : !isTouchPhone();
+  // 必要な最小幅。自動判定は余裕をみて 660px。
+  // 利用者が「左右」を明示的に選んだ場合はその意思を尊重し 560px まで許容する
+  // （スマホ横向きの本文は約620pxで、660px だと選んでも一生効かないため）。
+  const minSideWidth = weatherMapMode === 'side' ? 560 : 660;
+  const sideBySide   = bodyWidth >= minSideWidth && wantSide;
 
   // ── 掲載元へ遷移 →「戻ってきたら」申請済みにする（設定でON/OFF） ──
   // 開いた瞬間ではなく復帰時に付ける。誤タップで即座に申請済みにならず、

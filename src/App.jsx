@@ -32,6 +32,7 @@ function loadLastMapRegion(){ try { return localStorage.getItem('jsdf-last-regio
 function loadLastPrefId()   { try { return localStorage.getItem('jsdf-last-pref')   || null;       } catch { return null;           } }
 function loadAutoMode()     { try { return localStorage.getItem('jsdf-auto-mode') !== 'false';    } catch { return true;           } }
 function loadLayoutMode()   { try { return localStorage.getItem('jsdf-layout-mode') || 'auto';    } catch { return 'auto';         } }
+function loadWeatherMapMode(){try { return localStorage.getItem('jsdf-wm-layout')   || 'auto';    } catch { return 'auto';         } }
 
 // favorites: イベントIDの Set として管理
 function loadFavorites() {
@@ -109,6 +110,14 @@ export default function App({ operator = false }) {
     applyOrientationPreference(mode);
   }, []);
   useEffect(() => { applyOrientationPreference(layoutMode); }, [layoutMode]);
+
+  // 詳細画面で「天気」と「開催場所+地図」を左右に並べるか上下に積むか。
+  // auto は端末で判断（PC/タブレット=左右、スマホ=上下）。
+  const [weatherMapMode, setWeatherMapMode] = useState(loadWeatherMapMode);
+  const handleWeatherMapModeChange = useCallback((mode) => {
+    setWeatherMapMode(mode);
+    try { localStorage.setItem('jsdf-wm-layout', mode); } catch {}
+  }, []);
 
   const breakpoint      = useBreakpoint(layoutMode);
   const isDesktopLayout = !operator && breakpoint === 'desktop';
@@ -568,6 +577,7 @@ export default function App({ operator = false }) {
                 <DetailScreen
                   key={detailEvent.id}
                   event={detailEvent}
+                  weatherMapMode={weatherMapMode}
                   theme={theme}
                   favorites={favorites}
                   applied={applied}
@@ -612,6 +622,7 @@ export default function App({ operator = false }) {
       {screen === 'detail' && (
         <DetailScreen
           event={detailEvent}
+          weatherMapMode={weatherMapMode}
           theme={theme}
           favorites={favorites}
           applied={applied}
@@ -634,6 +645,8 @@ export default function App({ operator = false }) {
           layoutMode={layoutMode}
           onLayoutModeChange={handleLayoutModeChange}
           showLayoutSetting={isPhoneSized()}
+          weatherMapMode={weatherMapMode}
+          onWeatherMapModeChange={handleWeatherMapModeChange}
           autoMode={autoMode}
           onAutoModeChange={handleAutoModeChange}
           autoApply={autoApply}
