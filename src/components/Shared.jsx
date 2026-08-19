@@ -139,8 +139,13 @@ export function BottomTabBar({ active, onChange, primary }) {
   // デスクトップでは App が左サイドナビ（SideNav）を出すので、下部タブは畳む。
   // タブバーは各画面が個別に描画しているため、App 側で一括に消せない。
   // ここで自己判断させることで、画面側の変更を不要にしている。
+  //
+  // ただし運営者ページ(/admin.html)は App が SideNav を出さない
+  // （isDesktopLayout = !operator && ...）。運営者まで畳むと、デスクトップ幅で
+  // ナビが1つも無くなり「管理」タブに到達できなくなる。
+  // 畳むのは「SideNav が実際に出ている場合」だけにする。
   const isDesktop = useIsDesktop();
-  if (isDesktop) return null;
+  if (isDesktop && !op?.operator) return null;
   const tabs = [
     { id: 'home',      label: 'ホーム',     icon: (c, s)     => ICO.home(c, s) },
     { id: 'list',      label: 'イベント',   icon: (c, s)     => ICO.cal(c, s)  },

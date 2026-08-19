@@ -1961,8 +1961,15 @@ async function fetchTokyo(context) {
     const page = await context.newPage();
     try {
       await page.goto('https://www.mod.go.jp/pco/tokyo/event2/index.html', { waitUntil: 'domcontentloaded', timeout: 30_000 });
+      // このコールバックはブラウザ側で実行される。Node 側の fetchWithTimeout は
+      // 参照できないため、ブラウザの fetch にタイムアウトを直接付ける
+      // （ここで Node 側の関数を呼ぶと毎回 ReferenceError → 空文字になり、
+      //   Playwright フォールバックが機能しない）。
       js = await page.evaluate(async (u) => {
-        try { const r = await fetchWithTimeout(u); return r.ok ? await r.text() : ''; } catch { return ''; }
+        try {
+          const r = await fetch(u, { signal: AbortSignal.timeout(45_000) });
+          return r.ok ? await r.text() : '';
+        } catch { return ''; }
       }, CALENDAR_URL);
     } finally {
       await page.close();
