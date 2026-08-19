@@ -48,6 +48,28 @@ function naturalBreakpoint() {
   return 'mobile';
 }
 
+/**
+ * 縦に余裕がない画面かどうか（横向きスマホなど）。
+ *
+ * 横向き 852x393 では、一覧のヘッダー(135px) + 絞り込み + 注意バナーで
+ * 約197px を占め、画面の半分がイベントを1件も表示しないまま埋まっていた。
+ * 高さが足りないときはヘッダー類を詰めて、本文の面積を優先する。
+ */
+export function useIsShortViewport() {
+  const [short, setShort] = useState(() => viewport().h <= 540);
+  useEffect(() => {
+    const apply = () => setShort(viewport().h <= 540);
+    apply();
+    window.addEventListener('resize', apply);
+    window.addEventListener('orientationchange', apply);
+    return () => {
+      window.removeEventListener('resize', apply);
+      window.removeEventListener('orientationchange', apply);
+    };
+  }, []);
+  return short;
+}
+
 /** 物理的にスマホサイズかどうか（設定 UI の出し分けに使う） */
 export function isPhoneSized() {
   const { w, h } = viewport();

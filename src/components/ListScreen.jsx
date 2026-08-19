@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { ICO } from './Icons';
+import { useIsShortViewport } from '../hooks/useBreakpoint';
 import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle, StatusBadge } from './Shared';
 import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, weekendRange, matchesTag, APPLIED_TAG_ID, ENDED_TAG_ID } from './FilterBar';
 import CalendarView from './CalendarView';
@@ -43,6 +44,8 @@ export default function ListScreen({
   theme,
   selectedId,   // デスクトップ2ペイン時に右ペインで開いているイベントID（一覧で強調表示）
 }) {
+  // 横向きスマホなど高さの足りない画面ではヘッダーを詰める
+  const shortVp = useIsShortViewport();
   // region prop から2段タブの状態を導出
   const { regionId: activeRegionId, prefId: activePrefId } = deriveRegionAndPref(region);
 
@@ -181,7 +184,8 @@ export default function ListScreen({
     // 今回の表示をもって既読とし、次回以降は畳む（当回は全文のまま見せる）
     if (!noticeRead) { try { localStorage.setItem('jsdf-notice-read', '1'); } catch {} }
   }, [noticeRead]);
-  const noticeFolded = noticeRead && !noticeExpanded;
+  // 高さが足りない画面では、未読でも1行に畳む（タップで全文を表示できる）。
+  const noticeFolded = (noticeRead || shortVp) && !noticeExpanded;
 
   // ── カテゴリ・タグ・期間 フィルター ─────────────────────
   const [activeCategory, setActiveCategory] = useState('all');
@@ -300,17 +304,22 @@ export default function ListScreen({
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)', fontFamily: F.sans }}>
       {/* ヘッダー */}
       <div style={{
-        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)',
-        paddingBottom: 14, background: primary, color: '#fff', flexShrink: 0,
+        paddingTop: shortVp ? 'calc(env(safe-area-inset-top, 0px) + 6px)'
+                            : 'calc(env(safe-area-inset-top, 0px) + 16px)',
+        paddingBottom: shortVp ? 6 : 14, background: primary, color: '#fff', flexShrink: 0,
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px 10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: shortVp ? '0 20px 6px' : '0 20px 10px' }}>
           <div>
-            <div style={{ fontSize: 10, letterSpacing: 2, color: 'rgba(255,255,255,0.65)', fontWeight: 500 }}>EVENTS</div>
-            <div style={{ fontFamily: F.serif, fontSize: 19, fontWeight: 600, letterSpacing: 1, marginTop: 2 }}>イベント一覧</div>
-            {/* ⑥ 更新時刻をヘッダーに表示 */}
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', marginTop: 3, fontFamily: F.mono }}>
-              確認 {checkedLabel}
-            </div>
+            {!shortVp && (
+              <div style={{ fontSize: 10, letterSpacing: 2, color: 'rgba(255,255,255,0.65)', fontWeight: 500 }}>EVENTS</div>
+            )}
+            <div style={{ fontFamily: F.serif, fontSize: shortVp ? 16 : 19, fontWeight: 600, letterSpacing: 1, marginTop: shortVp ? 0 : 2 }}>イベント一覧</div>
+            {/* ⑥ 更新時刻をヘッダーに表示（高さが足りないときは省く） */}
+            {!shortVp && (
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', marginTop: 3, fontFamily: F.mono }}>
+                確認 {checkedLabel}
+              </div>
+            )}
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             {/* ② 検索ボタン — アイコン＋ラベルで目立たせる */}
