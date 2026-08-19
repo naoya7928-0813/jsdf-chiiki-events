@@ -3,7 +3,7 @@ import { ICO } from './Icons';
 import { Emblem, F, splitDate, SectionTitle, iconBtnStyle, StatusBadge } from './Shared';
 import { REGION_HQ, REGION_SOURCE } from '../config';
 import WeatherCard from './WeatherCard';
-import { useElementWidth, isTouchPhone } from '../hooks/useBreakpoint';
+import { useElementWidth, isTouchPhone, useIsShortViewport } from '../hooks/useBreakpoint';
 import { googleCalendarUrl, downloadIcs } from '../utils/calendar';
 
 function officeSourceLabel(ev) {
@@ -25,6 +25,9 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
   // 「28°C 20°C」行と、地図の最小実用サイズ）。gap を足して 660px。
   // 一覧の右ペインは「シェル上限1600 − サイドナビ232 − 一覧500 = 最大868px」で、
   // 900px にすると通常の導線（一覧→詳細）では一生横並びにならなかった。
+  // 横向きスマホでは高さ393pxのうちヘッダーが240px（61%）を占め本文がほぼ見えない。
+  // 高さが足りない画面ではヒーローヘッダーを詰める。
+  const shortVp     = useIsShortViewport();
   const bodyRef     = useRef(null);
   const bodyWidth   = useElementWidth(bodyRef);
   // スマホ横向きは幅こそ 852px 等になるが、物理的な画面は 6 インチ程度しかない。
@@ -153,146 +156,281 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
     window.open(targetUrl, '_blank', 'noopener,noreferrer');
   };
 
-  return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)', fontFamily: F.sans }}>
-      {/* ヒーローヘッダー */}
-      <div style={{
-        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
-        background: primary, color: '#fff',
-        position: 'relative', overflow: 'hidden', flexShrink: 0,
-      }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'repeating-linear-gradient(45deg,rgba(255,255,255,0.04) 0 12px,transparent 12px 24px)' }} />
-        <div style={{ position: 'relative', padding: '6px 16px 20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-            <button onClick={onBack} aria-label="戻る" style={iconBtnStyle}>
-              {ICO.back('#fff', 16)}
-            </button>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {/* 運営者ログイン時: イベントの編集（右上）。手動／自動収集どちらも可 */}
-              {adminAuthed && onEditEvent && (
-                <button onClick={() => onEditEvent(ev)} aria-label="このイベントを編集" style={{ ...iconBtnStyle, background: '#fff' }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-                </button>
-              )}
-              {/* 申請済みトグル */}
-              <button
-                onClick={() => onToggleApplied?.(ev.id)}
-                aria-label={isApplied ? '申請済みを解除' : '申請済みにする'}
-                style={{
-                  ...iconBtnStyle,
-                  background: isApplied ? '#16a34a' : 'rgba(255,255,255,0.1)',
-                  border: isApplied ? 'none' : '1px solid rgba(255,255,255,0.18)',
-                }}
-              >
-                {ICO.applied(isApplied ? '#fff' : '#fff', 16, isApplied)}
+  // ヒーローヘッダー。横向き（低い画面）ではスクロール本文の中に入れるため、
+  // 置き場所を差し替えられるよう変数にしておく。
+  const heroHeader = (
+    <div style={{
+      paddingTop: shortVp ? 'calc(env(safe-area-inset-top, 0px) + 2px)'
+                          : 'calc(env(safe-area-inset-top, 0px) + 8px)',
+      background: primary, color: '#fff',
+      position: 'relative', overflow: 'hidden', flexShrink: 0,
+    }}>
+      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'repeating-linear-gradient(45deg,rgba(255,255,255,0.04) 0 12px,transparent 12px 24px)' }} />
+      <div style={{ position: 'relative', padding: shortVp ? '2px 16px 6px' : '6px 16px 20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: shortVp ? 6 : 14 }}>
+          <button onClick={onBack} aria-label="戻る" style={iconBtnStyle}>
+            {ICO.back('#fff', 16)}
+          </button>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {/* 運営者ログイン時: イベントの編集（右上）。手動／自動収集どちらも可 */}
+            {adminAuthed && onEditEvent && (
+              <button onClick={() => onEditEvent(ev)} aria-label="このイベントを編集" style={{ ...iconBtnStyle, background: '#fff' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
               </button>
-              <button onClick={() => onToggleFavorite(ev.id)} aria-label={starred ? 'お気に入り解除' : 'お気に入り登録'} style={{
-                ...iconBtnStyle,
-                background: starred ? '#fff' : 'rgba(255,255,255,0.1)',
-              }}>
-                {ICO.star(starred ? accent : '#fff', 16, starred ? accent : 'none')}
-              </button>
-              {typeof navigator.share === 'function' && (
-                <button
-                  onClick={handleNativeShare}
-                  aria-label="このイベントを共有"
-                  style={iconBtnStyle}
-                >
-                  {ICO.share('#fff', 16)}
-                </button>
-              )}
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            {/* 中止/受付終了を最優先で表示 */}
-            <StatusBadge status={ev.status} size="lg" />
-            {ev.ended && (
-              <div style={{ display: 'inline-block', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 3, background: '#fff', color: '#6b7280', letterSpacing: 1 }}>終了済み</div>
             )}
+            {/* 申請済みトグル */}
+            <button
+              onClick={() => onToggleApplied?.(ev.id)}
+              aria-label={isApplied ? '申請済みを解除' : '申請済みにする'}
+              style={{
+                ...iconBtnStyle,
+                background: isApplied ? '#16a34a' : 'rgba(255,255,255,0.1)',
+                border: isApplied ? 'none' : '1px solid rgba(255,255,255,0.18)',
+              }}
+            >
+              {ICO.applied(isApplied ? '#fff' : '#fff', 16, isApplied)}
+            </button>
+            <button onClick={() => onToggleFavorite(ev.id)} aria-label={starred ? 'お気に入り解除' : 'お気に入り登録'} style={{
+              ...iconBtnStyle,
+              background: starred ? '#fff' : 'rgba(255,255,255,0.1)',
+            }}>
+              {ICO.star(starred ? accent : '#fff', 16, starred ? accent : 'none')}
+            </button>
+            {typeof navigator.share === 'function' && (
+              <button
+                onClick={handleNativeShare}
+                aria-label="このイベントを共有"
+                style={iconBtnStyle}
+              >
+                {ICO.share('#fff', 16)}
+              </button>
+            )}
+          </div>
+        </div>
+    
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          {/* 中止/受付終了を最優先で表示 */}
+          <StatusBadge status={ev.status} size="lg" />
+          {ev.ended && (
+            <div style={{ display: 'inline-block', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 3, background: '#fff', color: '#6b7280', letterSpacing: 1 }}>終了済み</div>
+          )}
+          <div style={{
+            display: 'inline-block', fontSize: 10, fontFamily: F.mono,
+            padding: '3px 8px', borderRadius: 'var(--radius-tag)',
+            background: 'rgba(255,255,255,0.15)', letterSpacing: 1.5,
+          }}>{ev.category}{ev.tag ? ` · ${ev.tag}` : ''}</div>
+          {sourceLabel && (
             <div style={{
               display: 'inline-block', fontSize: 10, fontFamily: F.mono,
-              padding: '3px 8px', borderRadius: 'var(--radius-tag)',
-              background: 'rgba(255,255,255,0.15)', letterSpacing: 1.5,
-            }}>{ev.category}{ev.tag ? ` · ${ev.tag}` : ''}</div>
-            {sourceLabel && (
-              <div style={{
-                display: 'inline-block', fontSize: 10, fontFamily: F.mono,
-                padding: '3px 8px', borderRadius: 3,
-                background: 'rgba(255,255,255,0.18)', letterSpacing: 1.2,
-              }}>{sourceLabel}</div>
-            )}
-            {isApplied && (
-              <div style={{
-                display: 'inline-flex', alignItems: 'center', gap: 5,
-                fontSize: 11, fontWeight: 700, fontFamily: F.mono,
-                padding: '3px 10px', borderRadius: 3,
-                background: '#16a34a', color: '#fff', letterSpacing: 1,
-              }}>
-                {ICO.applied('#fff', 12, true)} 申請済み
+              padding: '3px 8px', borderRadius: 3,
+              background: 'rgba(255,255,255,0.18)', letterSpacing: 1.2,
+            }}>{sourceLabel}</div>
+          )}
+          {isApplied && (
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 5,
+              fontSize: 11, fontWeight: 700, fontFamily: F.mono,
+              padding: '3px 10px', borderRadius: 3,
+              background: '#16a34a', color: '#fff', letterSpacing: 1,
+            }}>
+              {ICO.applied('#fff', 12, true)} 申請済み
+            </div>
+          )}
+        </div>
+    
+        <div style={{ fontFamily: F.serif, fontSize: shortVp ? 17 : 21, fontWeight: 600, marginTop: shortVp ? 6 : 12, lineHeight: 1.3 }}>
+          {ev.title}
+        </div>
+    
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 10, marginTop: shortVp ? 5 : 14,
+          paddingTop: shortVp ? 5 : 14,
+          borderTop: shortVp ? 'none' : '1px solid rgba(255,255,255,0.15)',
+        }}>
+          <div style={{
+            minWidth: 56, textAlign: 'center', padding: '6px 10px',
+            background: 'rgba(255,255,255,0.12)', borderRadius: 8,
+          }}>
+            {m !== null ? (
+              <>
+                <div style={{ fontSize: 9, fontFamily: F.mono, opacity: 0.8 }}>
+                  {endSplit && endSplit.m !== m ? `${m}〜${endSplit.m}月` : `${m}月`}
+                </div>
+                <div style={{ fontFamily: F.serif, fontSize: endSplit ? 15 : 24, fontWeight: 600, lineHeight: 1 }}>
+                  {endSplit ? `${d}〜${endSplit.d}日` : d}
+                </div>
+                {ev.weekday && (
+                  <div style={{ fontSize: 9, marginTop: 2 }}>
+                    {isOngoing ? '開催中' : `(${ev.endWeekday ? `${ev.weekday}〜${ev.endWeekday}` : ev.weekday})`}
+                  </div>
+                )}
+              </>
+            ) : (
+              /* 日程未定（CF ブロックで日付取得不能） */
+              <div style={{ fontFamily: F.sans, fontSize: 12, fontWeight: 600, lineHeight: 1.6, opacity: 0.85 }}>
+                日程<br/>未定
               </div>
             )}
           </div>
-
-          <div style={{ fontFamily: F.serif, fontSize: 21, fontWeight: 600, marginTop: 12, lineHeight: 1.35 }}>
-            {ev.title}
-          </div>
-
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 10, marginTop: 14,
-            paddingTop: 14, borderTop: '1px solid rgba(255,255,255,0.15)',
-          }}>
-            <div style={{
-              minWidth: 56, textAlign: 'center', padding: '6px 10px',
-              background: 'rgba(255,255,255,0.12)', borderRadius: 8,
-            }}>
-              {m !== null ? (
-                <>
-                  <div style={{ fontSize: 9, fontFamily: F.mono, opacity: 0.8 }}>
-                    {endSplit && endSplit.m !== m ? `${m}〜${endSplit.m}月` : `${m}月`}
-                  </div>
-                  <div style={{ fontFamily: F.serif, fontSize: endSplit ? 15 : 24, fontWeight: 600, lineHeight: 1 }}>
-                    {endSplit ? `${d}〜${endSplit.d}日` : d}
-                  </div>
-                  {ev.weekday && (
-                    <div style={{ fontSize: 9, marginTop: 2 }}>
-                      {isOngoing ? '開催中' : `(${ev.endWeekday ? `${ev.weekday}〜${ev.endWeekday}` : ev.weekday})`}
-                    </div>
-                  )}
-                </>
-              ) : (
-                /* 日程未定（CF ブロックで日付取得不能） */
-                <div style={{ fontFamily: F.sans, fontSize: 12, fontWeight: 600, lineHeight: 1.6, opacity: 0.85 }}>
-                  日程<br/>未定
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 11, opacity: 0.65, fontFamily: F.mono, letterSpacing: 1 }}>TIME</div>
+            {ev.time ? (
+              <div style={{ fontSize: 15, fontFamily: F.mono, fontWeight: 500, marginTop: 2 }}>
+                {ev.time}
+              </div>
+            ) : (
+              <div style={{ marginTop: 2 }}>
+                <div style={{ fontSize: 14, fontFamily: F.mono, fontWeight: 500, color: 'rgba(255,255,255,0.6)' }}>
+                  時間未定
                 </div>
-              )}
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 11, opacity: 0.65, fontFamily: F.mono, letterSpacing: 1 }}>TIME</div>
-              {ev.time ? (
-                <div style={{ fontSize: 15, fontFamily: F.mono, fontWeight: 500, marginTop: 2 }}>
-                  {ev.time}
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', marginTop: 2, lineHeight: 1.5 }}>
+                  公式ページでご確認ください
                 </div>
-              ) : (
-                <div style={{ marginTop: 2 }}>
-                  <div style={{ fontSize: 14, fontFamily: F.mono, fontWeight: 500, color: 'rgba(255,255,255,0.6)' }}>
-                    時間未定
-                  </div>
-                  <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', marginTop: 2, lineHeight: 1.5 }}>
-                    公式ページでご確認ください
-                  </div>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
+    </div>
+  );
+
+  // カレンダー登録・共有。横向きでは固定CTAに置かず本文末尾へ移す。
+  const secondaryActions = (
+    <>
+      {/* カレンダー登録（Google / iPhone・その他=.ics） */}
+      <div style={{ display: 'flex', gap: 8 }}>
+        <a
+          href={googleCalendarUrl(ev)} target="_blank" rel="noopener noreferrer"
+          aria-label="Googleカレンダーに追加"
+          style={{
+            flex: 1, height: 42, borderRadius: 8, border: '1px solid var(--border)',
+            background: 'var(--tag-bg)', color: 'var(--text)', textDecoration: 'none',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            fontSize: 12.5, fontWeight: 600, fontFamily: F.sans, cursor: 'pointer',
+          }}
+        >
+          {ICO.cal('var(--text)', 15)} Googleカレンダー
+        </a>
+        <button
+          onClick={() => downloadIcs(ev)}
+          aria-label="カレンダーに追加（iPhone・その他）"
+          style={{
+            flex: 1, height: 42, borderRadius: 8, border: '1px solid var(--border)',
+            background: 'var(--tag-bg)', color: 'var(--text)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            fontSize: 12.5, fontWeight: 600, fontFamily: F.sans, cursor: 'pointer',
+          }}
+        >
+          {ICO.cal('var(--text)', 15)} iPhone・その他
+        </button>
+      </div>
+      
+      {/* 共有エリア：「このイベントを共有」ボタン → 展開して手段を選択 */}
+      {!shareOpen ? (
+        <button
+          onClick={() => setShareOpen(true)}
+          aria-label="このイベントを共有"
+          style={{
+            width: '100%', height: 42, borderRadius: 8,
+            border: `1px solid var(--border)`,
+            background: 'var(--tag-bg)', color: 'var(--text)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+            fontSize: 13, fontWeight: 600, fontFamily: F.sans, cursor: 'pointer',
+          }}
+        >
+          {ICO.share('var(--text-muted)', 14)} このイベントを共有
+        </button>
+      ) : (
+        <div>
+          {/* 共有方法の選択ラベル＋閉じるボタン */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            marginBottom: 7,
+          }}>
+            <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: F.sans }}>
+              共有方法を選択してください
+            </span>
+            <button
+              onClick={() => setShareOpen(false)}
+              aria-label="共有メニューを閉じる"
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                fontSize: 11, color: 'var(--text-muted)', fontFamily: F.sans, padding: '2px 4px',
+              }}
+            >
+              閉じる
+            </button>
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {/* X (旧Twitter) でシェア */}
+            <a
+              href={xShareUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="X (旧Twitter) でシェア"
+              style={{
+                flex: 1, height: 42, borderRadius: 8,
+                background: '#000', color: '#fff',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+                textDecoration: 'none', fontSize: 11, fontWeight: 700, fontFamily: F.sans,
+              }}
+            >
+              {ICO.twitterX('#fff', 13)}
+              <span>X でシェア</span>
+            </a>
+      
+            {/* LINE で送る */}
+            <a
+              href={lineShareUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LINE で送る"
+              style={{
+                flex: 1, height: 42, borderRadius: 8,
+                background: '#06C755', color: '#fff',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+                textDecoration: 'none', fontSize: 11, fontWeight: 700, fontFamily: F.sans,
+              }}
+            >
+              {ICO.lineApp('#fff', 14)}
+              <span>LINE で送る</span>
+            </a>
+      
+            {/* URLをコピー */}
+            <button
+              onClick={handleCopy}
+              aria-label="URLをコピー"
+              style={{
+                flex: 1, height: 42, borderRadius: 8, border: '1px solid var(--border)',
+                background: copied ? `${primary}18` : 'var(--tag-bg)',
+                color: copied ? primary : 'var(--text-muted)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+                fontSize: 11, fontWeight: 600, fontFamily: F.sans,
+                cursor: 'pointer', transition: 'background 0.2s, color 0.2s',
+              }}
+            >
+              {copied
+                ? <>{ICO.check(primary, 12)} コピー済</>
+                : <>{ICO.copy('var(--text-muted)', 13)} URLをコピー</>
+              }
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+
+  return (
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)', fontFamily: F.sans }}>
+      {/* ヒーローヘッダー（横向きは本文と一緒にスクロールさせる） */}
+      {!shortVp && heroHeader}
 
       {/* スクロール本文
            ホームから直接開くとデスクトップでは幅いっぱい（約1200px）になり、
            「降水確率 …… 30%」のように行が間延びして読みにくい。
            一覧の2ペイン（約700px）と体感を揃えるため上限を設ける。 */}
       <div ref={bodyRef} style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '16px 0' }}>
+        {shortVp && heroHeader}
         <div style={{ maxWidth: sideBySide ? 1200 : 860, margin: '0 auto', width: '100%' }}>
 
         {/* 横長のときは 天気 と 開催場所+地図 を横並びにする。
@@ -574,19 +712,25 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
             )}
           </div>
         </div>
+        {shortVp && (
+          <div style={{ padding: '4px 16px 12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {secondaryActions}
+          </div>
+        )}
         </div>
       </div>
 
       {/* 下部 CTA */}
       <div style={{
-        padding: '10px 16px',
-        paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 12px)',
+        padding: shortVp ? '6px 12px' : '10px 16px',
+        paddingBottom: shortVp ? 'calc(env(safe-area-inset-bottom,0px) + 6px)'
+                               : 'calc(env(safe-area-inset-bottom,0px) + 12px)',
         background: 'var(--card)', borderTop: '1px solid var(--border)',
-        display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0,
+        display: 'flex', flexDirection: 'column', gap: shortVp ? 5 : 8, flexShrink: 0,
       }}>
         {/* 公式ページボタン */}
         <button onClick={openUrl} disabled={!targetUrl} style={{
-          width: '100%', minHeight: 46, border: 'none',
+          width: '100%', minHeight: shortVp ? 36 : 46, border: 'none',
           background: targetUrl ? primary : 'var(--tag-bg)',
           color: targetUrl ? '#fff' : 'var(--text-muted)',
           borderRadius: 8, cursor: targetUrl ? 'pointer' : 'default',
@@ -597,126 +741,8 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
           {targetUrl && ICO.extLink('#fff', 14)}
         </button>
 
-        {/* カレンダー登録（Google / iPhone・その他=.ics） */}
-        <div style={{ display: 'flex', gap: 8 }}>
-          <a
-            href={googleCalendarUrl(ev)} target="_blank" rel="noopener noreferrer"
-            aria-label="Googleカレンダーに追加"
-            style={{
-              flex: 1, height: 42, borderRadius: 8, border: '1px solid var(--border)',
-              background: 'var(--tag-bg)', color: 'var(--text)', textDecoration: 'none',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-              fontSize: 12.5, fontWeight: 600, fontFamily: F.sans, cursor: 'pointer',
-            }}
-          >
-            {ICO.cal('var(--text)', 15)} Googleカレンダー
-          </a>
-          <button
-            onClick={() => downloadIcs(ev)}
-            aria-label="カレンダーに追加（iPhone・その他）"
-            style={{
-              flex: 1, height: 42, borderRadius: 8, border: '1px solid var(--border)',
-              background: 'var(--tag-bg)', color: 'var(--text)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-              fontSize: 12.5, fontWeight: 600, fontFamily: F.sans, cursor: 'pointer',
-            }}
-          >
-            {ICO.cal('var(--text)', 15)} iPhone・その他
-          </button>
-        </div>
-
-        {/* 共有エリア：「このイベントを共有」ボタン → 展開して手段を選択 */}
-        {!shareOpen ? (
-          <button
-            onClick={() => setShareOpen(true)}
-            aria-label="このイベントを共有"
-            style={{
-              width: '100%', height: 42, borderRadius: 8,
-              border: `1px solid var(--border)`,
-              background: 'var(--tag-bg)', color: 'var(--text)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
-              fontSize: 13, fontWeight: 600, fontFamily: F.sans, cursor: 'pointer',
-            }}
-          >
-            {ICO.share('var(--text-muted)', 14)} このイベントを共有
-          </button>
-        ) : (
-          <div>
-            {/* 共有方法の選択ラベル＋閉じるボタン */}
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              marginBottom: 7,
-            }}>
-              <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: F.sans }}>
-                共有方法を選択してください
-              </span>
-              <button
-                onClick={() => setShareOpen(false)}
-                aria-label="共有メニューを閉じる"
-                style={{
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  fontSize: 11, color: 'var(--text-muted)', fontFamily: F.sans, padding: '2px 4px',
-                }}
-              >
-                閉じる
-              </button>
-            </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {/* X (旧Twitter) でシェア */}
-              <a
-                href={xShareUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="X (旧Twitter) でシェア"
-                style={{
-                  flex: 1, height: 42, borderRadius: 8,
-                  background: '#000', color: '#fff',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                  textDecoration: 'none', fontSize: 11, fontWeight: 700, fontFamily: F.sans,
-                }}
-              >
-                {ICO.twitterX('#fff', 13)}
-                <span>X でシェア</span>
-              </a>
-
-              {/* LINE で送る */}
-              <a
-                href={lineShareUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LINE で送る"
-                style={{
-                  flex: 1, height: 42, borderRadius: 8,
-                  background: '#06C755', color: '#fff',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                  textDecoration: 'none', fontSize: 11, fontWeight: 700, fontFamily: F.sans,
-                }}
-              >
-                {ICO.lineApp('#fff', 14)}
-                <span>LINE で送る</span>
-              </a>
-
-              {/* URLをコピー */}
-              <button
-                onClick={handleCopy}
-                aria-label="URLをコピー"
-                style={{
-                  flex: 1, height: 42, borderRadius: 8, border: '1px solid var(--border)',
-                  background: copied ? `${primary}18` : 'var(--tag-bg)',
-                  color: copied ? primary : 'var(--text-muted)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                  fontSize: 11, fontWeight: 600, fontFamily: F.sans,
-                  cursor: 'pointer', transition: 'background 0.2s, color 0.2s',
-                }}
-              >
-                {copied
-                  ? <>{ICO.check(primary, 12)} コピー済</>
-                  : <>{ICO.copy('var(--text-muted)', 13)} URLをコピー</>
-                }
-              </button>
-            </div>
-          </div>
-        )}
+        {/* 横向きでは本文末尾へ移して固定領域を減らす */}
+        {!shortVp && secondaryActions}
       </div>
     </div>
   );
