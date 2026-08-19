@@ -14,6 +14,7 @@ export default function SettingsScreen({
   theme,
   onColorChange, onDarkModeChange,
   layoutMode = 'auto', onLayoutModeChange, showLayoutSetting = false,
+  weatherMapMode = 'auto', onWeatherMapModeChange,
   autoMode, onAutoModeChange,
   autoApply, onAutoApplyChange,
   onOpenHome, onOpenRegion, onOpenList, onOpenFavorites,
@@ -298,9 +299,9 @@ export default function SettingsScreen({
                   borderRadius: 8, padding: 3, gap: 2,
                 }}>
                   {[
-                    { id: 'auto',      label: '自動'   },
-                    { id: 'landscape', label: '横向き' },
-                    { id: 'portrait',  label: '縦向き' },
+                    { id: 'portrait',  label: '縦表示' },
+                    { id: 'landscape', label: '横表示' },
+                    { id: 'auto',      label: '自由回転' },
                   ].map(m => {
                     const isA = layoutMode === m.id;
                     return (
@@ -319,14 +320,58 @@ export default function SettingsScreen({
                   })}
                 </div>
                 <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 10, lineHeight: 1.6 }}>
+                  {layoutMode === 'portrait'  && '縦表示に固定します。端末を横にしても縦向きの見た目のままです。'}
+                  {layoutMode === 'landscape' && '横表示に固定します。地図を大きく表示し、メニューを画面左側に置きます。端末を横にしても切り替わらない場合にお使いください。'}
                   {layoutMode === 'auto'      && '端末の向きに合わせて自動で切り替えます。'}
-                  {layoutMode === 'landscape' && '横向き用の2カラム表示（地図と情報を左右に並べる）に固定します。端末を横にしても切り替わらない場合にお使いください。'}
-                  {layoutMode === 'portrait'  && '縦向き用の1カラム表示に固定します。端末を横にしても縦向きの見た目のままになります。'}
                 </div>
                 <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8, lineHeight: 1.6 }}>
                   ※ この設定はアプリの表示だけを変えます。iPhone では端末の画面の向きロックを
                   アプリ側から解除できないため、本体を回しても画面が回らない場合は
                   コントロールセンターの向きロックを解除してください。
+                </div>
+              </div>
+            </Card>
+            {/* ─ 横表示のときの天気と地図の並び ─
+                 スマホ横向きは幅こそ足りるが物理画面が小さいため、既定では
+                 上下に積む。左右に並べたい場合に切り替えられるようにする。 */}
+            <GroupTitle>天気と地図の並び</GroupTitle>
+            <Card>
+              <div style={{ padding: '14px' }}>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>
+                  イベント詳細で横表示のとき
+                </div>
+                <div style={{
+                  display: 'flex', background: 'var(--badge-bg)',
+                  borderRadius: 8, padding: 3, gap: 2,
+                }}>
+                  {[
+                    { id: 'auto',  label: '自動'   },
+                    { id: 'stack', label: '上下'   },
+                    { id: 'side',  label: '左右'   },
+                  ].map(m => {
+                    const isA = weatherMapMode === m.id;
+                    return (
+                      <button key={m.id} onClick={() => onWeatherMapModeChange?.(m.id)} style={{
+                        flex: 1, height: 40, borderRadius: 6, border: 'none', cursor: 'pointer',
+                        background: isA ? primary : 'transparent',
+                        color: isA ? '#fff' : 'var(--text-muted)',
+                        fontFamily: F.sans, fontSize: 13,
+                        fontWeight: isA ? 600 : 400,
+                        boxShadow: isA ? '0 1px 3px rgba(0,0,0,0.15)' : 'none',
+                        transition: 'all 0.15s',
+                      }}>
+                        {m.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 10, lineHeight: 1.6 }}>
+                  {weatherMapMode === 'auto'  && 'スマートフォンでは上下、パソコン・タブレットでは左右に並べます。'}
+                  {weatherMapMode === 'stack' && '天気の下に地図を表示します。1つずつ大きく見られます。'}
+                  {weatherMapMode === 'side'  && '天気と地図を左右に並べます。スクロールせずに両方見られますが、1つあたりは小さくなります。'}
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8, lineHeight: 1.6 }}>
+                  ※ 画面の幅が足りないときは、設定にかかわらず上下に並べます。
                 </div>
               </div>
             </Card>
