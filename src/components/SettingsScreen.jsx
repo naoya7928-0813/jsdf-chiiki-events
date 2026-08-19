@@ -282,101 +282,6 @@ export default function SettingsScreen({
           </div>
         </Card>
 
-        {/* ─ 4-2. 表示の向き（スマートフォンのみ） ─
-             横向きは「幅に余裕・高さが希少」なので、地図とパネルを横に並べる
-             デスクトップ相当のレイアウトに切り替える。端末の回転ロックが
-             効いていて自動で切り替わらない場合に、手動で選べるようにする。 */}
-        {showLayoutSetting && (
-          <>
-            <GroupTitle>表示の向き</GroupTitle>
-            <Card>
-              <div style={{ padding: '14px' }}>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>
-                  画面の使い方に合わせて選べます
-                </div>
-                <div style={{
-                  display: 'flex', background: 'var(--badge-bg)',
-                  borderRadius: 8, padding: 3, gap: 2,
-                }}>
-                  {[
-                    { id: 'portrait',  label: '縦表示' },
-                    { id: 'landscape', label: '横表示' },
-                    { id: 'auto',      label: '自由回転' },
-                  ].map(m => {
-                    const isA = layoutMode === m.id;
-                    return (
-                      <button key={m.id} onClick={() => onLayoutModeChange?.(m.id)} style={{
-                        flex: 1, height: 40, borderRadius: 6, border: 'none', cursor: 'pointer',
-                        background: isA ? primary : 'transparent',
-                        color: isA ? '#fff' : 'var(--text-muted)',
-                        fontFamily: F.sans, fontSize: 13,
-                        fontWeight: isA ? 600 : 400,
-                        boxShadow: isA ? '0 1px 3px rgba(0,0,0,0.15)' : 'none',
-                        transition: 'all 0.15s',
-                      }}>
-                        {m.label}
-                      </button>
-                    );
-                  })}
-                </div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 10, lineHeight: 1.6 }}>
-                  {layoutMode === 'portrait'  && '縦表示に固定します。端末を横にしても縦向きの見た目のままです。'}
-                  {layoutMode === 'landscape' && '横表示に固定します。地図を大きく表示し、メニューを画面左側に置きます。端末を横にしても切り替わらない場合にお使いください。'}
-                  {layoutMode === 'auto'      && '端末の向きに合わせて自動で切り替えます。'}
-                </div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8, lineHeight: 1.6 }}>
-                  ※ この設定はアプリの表示だけを変えます。iPhone では端末の画面の向きロックを
-                  アプリ側から解除できないため、本体を回しても画面が回らない場合は
-                  コントロールセンターの向きロックを解除してください。
-                </div>
-              </div>
-            </Card>
-            {/* ─ 横表示のときの天気と地図の並び ─
-                 スマホ横向きは幅こそ足りるが物理画面が小さいため、既定では
-                 上下に積む。左右に並べたい場合に切り替えられるようにする。 */}
-            <GroupTitle>天気と地図の並び</GroupTitle>
-            <Card>
-              <div style={{ padding: '14px' }}>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>
-                  イベント詳細で横表示のとき
-                </div>
-                <div style={{
-                  display: 'flex', background: 'var(--badge-bg)',
-                  borderRadius: 8, padding: 3, gap: 2,
-                }}>
-                  {[
-                    { id: 'auto',  label: '自動'   },
-                    { id: 'stack', label: '上下'   },
-                    { id: 'side',  label: '左右'   },
-                  ].map(m => {
-                    const isA = weatherMapMode === m.id;
-                    return (
-                      <button key={m.id} onClick={() => onWeatherMapModeChange?.(m.id)} style={{
-                        flex: 1, height: 40, borderRadius: 6, border: 'none', cursor: 'pointer',
-                        background: isA ? primary : 'transparent',
-                        color: isA ? '#fff' : 'var(--text-muted)',
-                        fontFamily: F.sans, fontSize: 13,
-                        fontWeight: isA ? 600 : 400,
-                        boxShadow: isA ? '0 1px 3px rgba(0,0,0,0.15)' : 'none',
-                        transition: 'all 0.15s',
-                      }}>
-                        {m.label}
-                      </button>
-                    );
-                  })}
-                </div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 10, lineHeight: 1.6 }}>
-                  {weatherMapMode === 'auto'  && 'スマートフォンでは上下、パソコン・タブレットでは左右に並べます。'}
-                  {weatherMapMode === 'stack' && '天気の下に地図を表示します。1つずつ大きく見られます。'}
-                  {weatherMapMode === 'side'  && '天気と地図を左右に並べます。スクロールせずに両方見られますが、1つあたりは小さくなります。'}
-                </div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8, lineHeight: 1.6 }}>
-                  ※ 画面の幅が足りないときは、設定にかかわらず上下に並べます。
-                </div>
-              </div>
-            </Card>
-          </>
-        )}
         {/* ─ 表示設定（一覧の表示形式・レーダーの方角・申請済みの自動切替）（折込） ─ */}
         <Section
           title="表示設定"
@@ -407,6 +312,56 @@ export default function SettingsScreen({
               options={[{ id: 'north', label: '北が上' }, { id: 'heading', label: '端末の向き' }]}
             />
           </div>
+          {/* 表示の向き・天気と地図の並び（スマートフォンのみ）
+              横向きは「幅に余裕・高さが希少」なので、地図と情報を横に並べる
+              デスクトップ相当のレイアウトに切り替える。端末の回転ロックが
+              効いていて自動で切り替わらない場合に、手動で選べるようにする。 */}
+          {showLayoutSetting && (
+            <>
+              <div style={{ padding: '14px', borderTop: '1px solid var(--sep)' }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 3 }}>表示の向き</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>
+                  画面の使い方に合わせて選べます
+                </div>
+                <Segment
+                  value={layoutMode}
+                  onChange={onLayoutModeChange}
+                  primary={primary}
+                  options={[{ id: 'portrait', label: '縦表示' }, { id: 'landscape', label: '横表示' }, { id: 'auto', label: '自由回転' }]}
+                />
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 10, lineHeight: 1.6 }}>
+                  {layoutMode === 'portrait'  && '縦表示に固定します。端末を横にしても縦向きの見た目のままです。'}
+                  {layoutMode === 'landscape' && '横表示に固定します。地図を大きく表示し、メニューを画面左側に置きます。端末を横にしても切り替わらない場合にお使いください。'}
+                  {layoutMode === 'auto'      && '端末の向きに合わせて自動で切り替えます。'}
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8, lineHeight: 1.6 }}>
+                  ※ この設定はアプリの表示だけを変えます。iPhone では端末の画面の向きロックを
+                  アプリ側から解除できないため、本体を回しても画面が回らない場合は
+                  コントロールセンターの向きロックを解除してください。
+                </div>
+              </div>
+              <div style={{ padding: '14px', borderTop: '1px solid var(--sep)' }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 3 }}>天気と地図の並び</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>
+                  イベント詳細で横表示のとき
+                </div>
+                <Segment
+                  value={weatherMapMode}
+                  onChange={onWeatherMapModeChange}
+                  primary={primary}
+                  options={[{ id: 'auto', label: '自動' }, { id: 'stack', label: '上下' }, { id: 'side', label: '左右' }]}
+                />
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 10, lineHeight: 1.6 }}>
+                  {weatherMapMode === 'auto'  && 'スマートフォンでは上下、パソコン・タブレットでは左右に並べます。'}
+                  {weatherMapMode === 'stack' && '天気の下に地図を表示します。1つずつ大きく見られます。'}
+                  {weatherMapMode === 'side'  && '天気と地図を左右に並べます。スクロールせずに両方見られますが、1つあたりは小さくなります。'}
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8, lineHeight: 1.6 }}>
+                  ※ 画面の幅が足りないときは、設定にかかわらず上下に並べます。
+                </div>
+              </div>
+            </>
+          )}
           <div style={{ borderTop: '1px solid var(--sep)' }}>
             <ToggleRow
               label="掲載元を見て戻ったら申請済みにする"
