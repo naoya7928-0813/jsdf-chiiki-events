@@ -165,15 +165,15 @@
   ],
   "akita": [
     {
-      "id": "ak-20260822-zxoso",
+      "id": "ak-20260822-maoxl",
       "pref": "akita",
       "date": "2026-08-22",
       "weekday": "土",
-      "title": "［イベント］｢はたらく車だいしゅうごう!(大仙市)｣に自衛隊ブース出展します",
+      "title": "［イベント］｢第2回石脇夏祭り(由利本荘市)｣に自衛隊ブース出展します",
       "place": "",
       "address": "",
       "time": "",
-      "category": "広報活動",
+      "category": "地域参加",
       "tag": "",
       "url": "",
       "notes": null,
@@ -190,15 +190,15 @@
       }
     },
     {
-      "id": "ak-20260822-maoxl",
+      "id": "ak-20260822-zxoso",
       "pref": "akita",
       "date": "2026-08-22",
       "weekday": "土",
-      "title": "［イベント］｢第2回石脇夏祭り(由利本荘市)｣に自衛隊ブース出展します",
+      "title": "［イベント］｢はたらく車だいしゅうごう!(大仙市)｣に自衛隊ブース出展します",
       "place": "",
       "address": "",
       "time": "",
-      "category": "地域参加",
+      "category": "広報活動",
       "tag": "",
       "url": "",
       "notes": null,
@@ -1588,32 +1588,6 @@
       }
     },
     {
-      "id": "ni-office-20270916-sk1es",
-      "pref": "niigata",
-      "date": "2027-09-16",
-      "weekday": "木",
-      "title": "転職をお考えの方へ自衛隊説明会",
-      "place": "上越地域事務所",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/niigata/HP/setumeikai.html",
-      "notes": "掲載元: 上越地域事務所",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html",
-      "firstSeen": "2026-08-22",
-      "weatherLocation": {
-        "latitude": 37.148,
-        "longitude": 138.236,
-        "label": "新潟県上越市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:23.699+09:00"
-      }
-    },
-    {
       "id": "ni-office-20260916-lmcrs",
       "pref": "niigata",
       "date": "2026-09-16",
@@ -1637,6 +1611,32 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-22T07:49:05.422+09:00"
+      }
+    },
+    {
+      "id": "ni-office-20270916-sk1es",
+      "pref": "niigata",
+      "date": "2027-09-16",
+      "weekday": "木",
+      "title": "転職をお考えの方へ自衛隊説明会",
+      "place": "上越地域事務所",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/niigata/HP/setumeikai.html",
+      "notes": "掲載元: 上越地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html",
+      "firstSeen": "2026-08-22",
+      "weatherLocation": {
+        "latitude": 37.148,
+        "longitude": 138.236,
+        "label": "新潟県上越市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:23.699+09:00"
       }
     },
     {
@@ -2104,28 +2104,28 @@
       }
     },
     {
-      "id": "na-20261025-rv0ey",
+      "id": "na-20261025-5plfp",
       "pref": "nagano",
       "date": "2026-10-25",
       "weekday": "日",
-      "title": "【大町市】県統合防災訓練",
-      "place": "",
-      "address": "大町市",
+      "title": "【伊那市】防災イベント（仮称）",
+      "place": "かんてんぱぱ くぬぎの杜",
+      "address": "",
       "time": "",
       "category": "広報活動",
       "tag": "",
       "url": "",
-      "notes": "調整中",
+      "notes": "細部、調整中",
       "ageRequirement": null,
       "deadline": null,
       "firstSeen": "2026-08-06",
       "weatherLocation": {
-        "latitude": 36.503,
-        "longitude": 137.851,
-        "label": "長野県大町",
-        "accuracy": "municipality",
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:38.512+09:00"
+        "geocodedAt": "2026-08-06T19:57:02.477+09:00"
       }
     },
     {
@@ -2154,28 +2154,28 @@
       }
     },
     {
-      "id": "na-20261025-5plfp",
+      "id": "na-20261025-rv0ey",
       "pref": "nagano",
       "date": "2026-10-25",
       "weekday": "日",
-      "title": "【伊那市】防災イベント（仮称）",
-      "place": "かんてんぱぱ くぬぎの杜",
-      "address": "",
+      "title": "【大町市】県統合防災訓練",
+      "place": "",
+      "address": "大町市",
       "time": "",
       "category": "広報活動",
       "tag": "",
       "url": "",
-      "notes": "細部、調整中",
+      "notes": "調整中",
       "ageRequirement": null,
       "deadline": null,
       "firstSeen": "2026-08-06",
       "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
+        "latitude": 36.503,
+        "longitude": 137.851,
+        "label": "長野県大町",
+        "accuracy": "municipality",
         "source": "gsi",
-        "geocodedAt": "2026-08-06T19:57:02.477+09:00"
+        "geocodedAt": "2026-07-29T14:30:38.512+09:00"
       }
     }
   ],
@@ -3884,58 +3884,6 @@
       }
     },
     {
-      "id": "ok-office-20260828-zblou",
-      "pref": "okayama",
-      "date": "2026-08-28",
-      "weekday": "金",
-      "title": "学校の概要説明 ▷ 約30分 ◁",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "学生向け",
-      "url": "https://www.mod.go.jp/pco/okayama/img/koutou_online_03.pdf",
-      "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-08-21",
-      "weatherLocation": {
-        "latitude": 34.662,
-        "longitude": 133.935,
-        "label": "岡山県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:36.000+09:00"
-      }
-    },
-    {
-      "id": "ok-office-20260915-r0dmb",
-      "pref": "okayama",
-      "date": "2026-09-15",
-      "weekday": "火",
-      "title": "対象者 高工校に興味のある方",
-      "place": "",
-      "address": "",
-      "time": "09:00～10:00",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/okayama/img/koutou_setumei.pdf",
-      "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-08-21",
-      "weatherLocation": {
-        "latitude": 34.662,
-        "longitude": 133.935,
-        "label": "岡山県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:36.000+09:00"
-      }
-    },
-    {
       "id": "ok-office-20260915-bm6sa",
       "pref": "okayama",
       "date": "2026-09-15",
@@ -4264,6 +4212,58 @@
       "deadline": null,
       "source_type": "office_html",
       "firstSeen": "2026-08-19",
+      "weatherLocation": {
+        "latitude": 34.662,
+        "longitude": 133.935,
+        "label": "岡山県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.000+09:00"
+      }
+    },
+    {
+      "id": "ok-office-20260915-r0dmb",
+      "pref": "okayama",
+      "date": "2026-09-15",
+      "weekday": "火",
+      "title": "対象者 高工校に興味のある方",
+      "place": "",
+      "address": "",
+      "time": "09:00～10:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/okayama/img/koutou_setumei.pdf",
+      "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-08-21",
+      "weatherLocation": {
+        "latitude": 34.662,
+        "longitude": 133.935,
+        "label": "岡山県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.000+09:00"
+      }
+    },
+    {
+      "id": "ok-office-20260828-zblou",
+      "pref": "okayama",
+      "date": "2026-08-28",
+      "weekday": "金",
+      "title": "学校の概要説明 ▷ 約30分 ◁",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "学生向け",
+      "url": "https://www.mod.go.jp/pco/okayama/img/koutou_online_03.pdf",
+      "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-08-21",
       "weatherLocation": {
         "latitude": 34.662,
         "longitude": 133.935,
@@ -4632,32 +4632,6 @@
   ],
   "fukuoka": [
     {
-      "id": "fu-off-20260822-kn9ye",
-      "pref": "fukuoka",
-      "date": "2026-08-22",
-      "weekday": "土",
-      "title": "航空学生説明会",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "学生向け",
-      "url": "https://www.mod.go.jp/pco/fukuoka/recruit/recruiting-fair/images/2024/8.8.6kougaku.pdf",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-08-19",
-      "weatherLocation": {
-        "latitude": 33.606,
-        "longitude": 130.418,
-        "label": "福岡県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:36.993+09:00"
-      }
-    },
-    {
       "id": "fu-office-20261003-8ijtr",
       "pref": "fukuoka",
       "date": "2026-10-03",
@@ -4681,6 +4655,32 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-20T12:34:06.525+09:00"
+      }
+    },
+    {
+      "id": "fu-off-20260822-kn9ye",
+      "pref": "fukuoka",
+      "date": "2026-08-22",
+      "weekday": "土",
+      "title": "航空学生説明会",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "学生向け",
+      "url": "https://www.mod.go.jp/pco/fukuoka/recruit/recruiting-fair/images/2024/8.8.6kougaku.pdf",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-08-19",
+      "weatherLocation": {
+        "latitude": 33.606,
+        "longitude": 130.418,
+        "label": "福岡県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.993+09:00"
       }
     }
   ],
@@ -4900,5 +4900,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/08/22 07:49"
+  "updatedAt": "2026/08/22 12:32"
 }
