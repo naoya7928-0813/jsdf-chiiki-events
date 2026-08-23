@@ -1226,58 +1226,6 @@
         "source": "gsi",
         "geocodedAt": "2026-08-21T12:40:43.103+09:00"
       }
-    },
-    {
-      "id": "to-off-20260822-qqskf",
-      "pref": "tochigi",
-      "date": "2026-08-22",
-      "weekday": "土",
-      "title": "真名子小PTA",
-      "place": "",
-      "address": "",
-      "time": "14:00～20:30",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/tochigi/doc/event/information/20260822_nishikata_kodomonatsu.pdf",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-08-21",
-      "weatherLocation": {
-        "latitude": 36.566,
-        "longitude": 139.884,
-        "label": "栃木県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-08-21T12:40:44.016+09:00"
-      }
-    },
-    {
-      "id": "to-off-20260822-3qyca",
-      "pref": "tochigi",
-      "date": "2026-08-22",
-      "weekday": "土",
-      "title": "こどもフェスティバル",
-      "place": "ところ:湯津上庁舎",
-      "address": "",
-      "time": "",
-      "category": "地域参加",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/tochigi/doc/event/information/20260822_ootawara_kodomofes.pdf",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 36.566,
-        "longitude": 139.884,
-        "label": "栃木県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-31T08:26:27.821+09:00"
-      }
     }
   ],
   "ibaraki": [],
@@ -1435,32 +1383,6 @@
       }
     },
     {
-      "id": "ni-office-20270916-sk1es",
-      "pref": "niigata",
-      "date": "2027-09-16",
-      "weekday": "木",
-      "title": "転職をお考えの方へ自衛隊説明会",
-      "place": "上越地域事務所",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/niigata/HP/setumeikai.html",
-      "notes": "掲載元: 上越地域事務所",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html",
-      "firstSeen": "2026-08-22",
-      "weatherLocation": {
-        "latitude": 37.148,
-        "longitude": 138.236,
-        "label": "新潟県上越市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:23.699+09:00"
-      }
-    },
-    {
       "id": "ni-office-20260916-lmcrs",
       "pref": "niigata",
       "date": "2026-09-16",
@@ -1484,6 +1406,32 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-22T07:49:05.422+09:00"
+      }
+    },
+    {
+      "id": "ni-office-20270916-sk1es",
+      "pref": "niigata",
+      "date": "2027-09-16",
+      "weekday": "木",
+      "title": "転職をお考えの方へ自衛隊説明会",
+      "place": "上越地域事務所",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/niigata/HP/setumeikai.html",
+      "notes": "掲載元: 上越地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html",
+      "firstSeen": "2026-08-22",
+      "weatherLocation": {
+        "latitude": 37.148,
+        "longitude": 138.236,
+        "label": "新潟県上越市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:23.699+09:00"
       }
     },
     {
@@ -1721,34 +1669,7 @@
       }
     }
   ],
-  "yamanashi": [
-    {
-      "id": "ya-office-20260822-6dh0q",
-      "pref": "yamanashi",
-      "date": "2026-08-22",
-      "weekday": "土",
-      "title": "広報活動 2りんかん祭りEast2026",
-      "place": "巨摩募集案内所",
-      "address": "",
-      "time": "",
-      "category": "地域参加",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/yamanashi/event.html",
-      "notes": "掲載元: 巨摩募集案内所",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html",
-      "firstSeen": "2026-08-19",
-      "weatherLocation": {
-        "latitude": 35.664,
-        "longitude": 138.568,
-        "label": "山梨県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-19T07:57:19.044+09:00"
-      }
-    }
-  ],
+  "yamanashi": [],
   "nagano": [
     {
       "id": "na-20260829-qn6dj",
@@ -1801,31 +1722,6 @@
       }
     },
     {
-      "id": "na-20261003-37wm4",
-      "pref": "nagano",
-      "date": "2026-10-03",
-      "weekday": "土",
-      "title": "【松本市】まちのおしごと体験",
-      "place": "",
-      "address": "松本市",
-      "time": "",
-      "category": "体験",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 36.238,
-        "longitude": 137.972,
-        "label": "長野県松本市",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:37.753+09:00"
-      }
-    },
-    {
       "id": "na-20261003-kkjxa",
       "pref": "nagano",
       "date": "2026-10-03",
@@ -1851,15 +1747,15 @@
       }
     },
     {
-      "id": "na-20261010-jcj0l",
+      "id": "na-20261003-37wm4",
       "pref": "nagano",
-      "date": "2026-10-10",
+      "date": "2026-10-03",
       "weekday": "土",
-      "title": "【松本市】松本矯正展",
-      "place": "松本少年刑務所",
-      "address": "",
+      "title": "【松本市】まちのおしごと体験",
+      "place": "",
+      "address": "松本市",
       "time": "",
-      "category": "広報活動",
+      "category": "体験",
       "tag": "",
       "url": "",
       "notes": "調整中",
@@ -1870,9 +1766,9 @@
         "latitude": 36.238,
         "longitude": 137.972,
         "label": "長野県松本市",
-        "accuracy": "venue",
+        "accuracy": "municipality",
         "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:38.136+09:00"
+        "geocodedAt": "2026-07-29T14:30:37.753+09:00"
       }
     },
     {
@@ -1898,6 +1794,31 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-07-18T08:05:17.140+09:00"
+      }
+    },
+    {
+      "id": "na-20261010-jcj0l",
+      "pref": "nagano",
+      "date": "2026-10-10",
+      "weekday": "土",
+      "title": "【松本市】松本矯正展",
+      "place": "松本少年刑務所",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-06",
+      "weatherLocation": {
+        "latitude": 36.238,
+        "longitude": 137.972,
+        "label": "長野県松本市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-29T14:30:38.136+09:00"
       }
     },
     {
@@ -1951,31 +1872,6 @@
       }
     },
     {
-      "id": "na-20261025-rv0ey",
-      "pref": "nagano",
-      "date": "2026-10-25",
-      "weekday": "日",
-      "title": "【大町市】県統合防災訓練",
-      "place": "",
-      "address": "大町市",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 36.503,
-        "longitude": 137.851,
-        "label": "長野県大町",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:38.512+09:00"
-      }
-    },
-    {
       "id": "na-20261025-5plfp",
       "pref": "nagano",
       "date": "2026-10-25",
@@ -2024,37 +1920,35 @@
         "source": "gsi",
         "geocodedAt": "2026-07-29T14:30:38.884+09:00"
       }
-    }
-  ],
-  "gifu": [],
-  "shizuoka": [
+    },
     {
-      "id": "sh-office-20260822-dn6zo",
-      "pref": "shizuoka",
-      "date": "2026-08-22",
-      "weekday": "土",
-      "title": "自衛隊航空学生説明会",
-      "place": "応募对象者:高校",
-      "address": "",
+      "id": "na-20261025-rv0ey",
+      "pref": "nagano",
+      "date": "2026-10-25",
+      "weekday": "日",
+      "title": "【大町市】県統合防災訓練",
+      "place": "",
+      "address": "大町市",
       "time": "",
-      "category": "説明会",
-      "tag": "学生向け",
-      "url": "https://www.mod.go.jp/pco/sizuoka/office/images/numazu/20260822.jpg",
-      "notes": "掲載元: 沼津地域事務所",
-      "ageRequirement": "18以上24未满",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "調整中",
+      "ageRequirement": null,
       "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-08-19",
+      "firstSeen": "2026-08-06",
       "weatherLocation": {
-        "latitude": 34.977,
-        "longitude": 138.383,
-        "label": "静岡県",
-        "accuracy": "venue",
+        "latitude": 36.503,
+        "longitude": 137.851,
+        "label": "長野県大町",
+        "accuracy": "municipality",
         "source": "gsi",
-        "geocodedAt": "2026-08-19T07:57:19.473+09:00"
+        "geocodedAt": "2026-07-29T14:30:38.512+09:00"
       }
     }
   ],
+  "gifu": [],
+  "shizuoka": [],
   "aichi": [
     {
       "id": "ai-20260823-hzzoj",
@@ -4407,5 +4301,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/08/23 07:45"
+  "updatedAt": "2026/08/23 12:39"
 }
