@@ -560,6 +560,32 @@
       }
     },
     {
+      "id": "to-off-20260918-yo4xy",
+      "pref": "tokyo",
+      "date": "2026-09-18",
+      "weekday": "金",
+      "title": "自衛隊職業説明会",
+      "place": "",
+      "address": "",
+      "time": "10:00～16:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tokyo/shinkoiwa/img/0918-30_setumeikai.png",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-08-24",
+      "weatherLocation": {
+        "latitude": 35.69,
+        "longitude": 139.692,
+        "label": "東京都",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-07-04T08:19:18.955+09:00"
+      }
+    },
+    {
       "id": "to-off-20260829-vjwlk",
       "pref": "tokyo",
       "date": "2026-08-29",
@@ -1207,32 +1233,6 @@
       }
     },
     {
-      "id": "ni-office-20270916-sk1es",
-      "pref": "niigata",
-      "date": "2027-09-16",
-      "weekday": "木",
-      "title": "転職をお考えの方へ自衛隊説明会",
-      "place": "上越地域事務所",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/niigata/HP/setumeikai.html",
-      "notes": "掲載元: 上越地域事務所",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html",
-      "firstSeen": "2026-08-22",
-      "weatherLocation": {
-        "latitude": 37.148,
-        "longitude": 138.236,
-        "label": "新潟県上越市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:23.699+09:00"
-      }
-    },
-    {
       "id": "ni-office-20260916-lmcrs",
       "pref": "niigata",
       "date": "2026-09-16",
@@ -1256,6 +1256,32 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-22T07:49:05.422+09:00"
+      }
+    },
+    {
+      "id": "ni-office-20270916-sk1es",
+      "pref": "niigata",
+      "date": "2027-09-16",
+      "weekday": "木",
+      "title": "転職をお考えの方へ自衛隊説明会",
+      "place": "上越地域事務所",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/niigata/HP/setumeikai.html",
+      "notes": "掲載元: 上越地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html",
+      "firstSeen": "2026-08-22",
+      "weatherLocation": {
+        "latitude": 37.148,
+        "longitude": 138.236,
+        "label": "新潟県上越市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:23.699+09:00"
       }
     },
     {
@@ -1546,31 +1572,6 @@
       }
     },
     {
-      "id": "na-20261003-37wm4",
-      "pref": "nagano",
-      "date": "2026-10-03",
-      "weekday": "土",
-      "title": "【松本市】まちのおしごと体験",
-      "place": "",
-      "address": "松本市",
-      "time": "",
-      "category": "体験",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 36.238,
-        "longitude": 137.972,
-        "label": "長野県松本市",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:37.753+09:00"
-      }
-    },
-    {
       "id": "na-20261003-kkjxa",
       "pref": "nagano",
       "date": "2026-10-03",
@@ -1596,28 +1597,28 @@
       }
     },
     {
-      "id": "na-20261010-4oeph",
+      "id": "na-20261003-37wm4",
       "pref": "nagano",
-      "date": "2026-10-10",
+      "date": "2026-10-03",
       "weekday": "土",
-      "title": "【駒ケ根市】駒ヶ根商工祭",
+      "title": "【松本市】まちのおしごと体験",
       "place": "",
-      "address": "駒ケ根市",
+      "address": "松本市",
       "time": "",
-      "category": "広報活動",
+      "category": "体験",
       "tag": "",
       "url": "",
-      "notes": null,
+      "notes": "調整中",
       "ageRequirement": null,
       "deadline": null,
       "firstSeen": "2026-08-06",
       "weatherLocation": {
-        "latitude": 35.729,
-        "longitude": 137.934,
-        "label": "長野県駒ヶ根市",
+        "latitude": 36.238,
+        "longitude": 137.972,
+        "label": "長野県松本市",
         "accuracy": "municipality",
         "source": "gsi",
-        "geocodedAt": "2026-07-18T08:05:17.140+09:00"
+        "geocodedAt": "2026-07-29T14:30:37.753+09:00"
       }
     },
     {
@@ -1643,6 +1644,31 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-29T14:30:38.136+09:00"
+      }
+    },
+    {
+      "id": "na-20261010-4oeph",
+      "pref": "nagano",
+      "date": "2026-10-10",
+      "weekday": "土",
+      "title": "【駒ケ根市】駒ヶ根商工祭",
+      "place": "",
+      "address": "駒ケ根市",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-06",
+      "weatherLocation": {
+        "latitude": 35.729,
+        "longitude": 137.934,
+        "label": "長野県駒ヶ根市",
+        "accuracy": "municipality",
+        "source": "gsi",
+        "geocodedAt": "2026-07-18T08:05:17.140+09:00"
       }
     },
     {
@@ -2375,34 +2401,7 @@
       }
     }
   ],
-  "shiga": [
-    {
-      "id": "sh-office-20260823-54ytn",
-      "pref": "shiga",
-      "date": "2026-08-23",
-      "weekday": "日",
-      "title": "近江八幡エリア】自衛隊説明会",
-      "place": "開催:自衛隧滋贺地方協力本部近江八幡地域事務所",
-      "address": "",
-      "time": "09:00～17:45",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/shiga/wp2023/wp-content/uploads/2026/07/b62d798a91071dfdd33594f6b490b3e4.jpg",
-      "notes": "掲載元: 大津地域事務所・彦根地域事務所・長浜地域事務所 ほか1拠点",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-08-19",
-      "weatherLocation": {
-        "latitude": 35.005,
-        "longitude": 135.869,
-        "label": "滋賀県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-19T07:57:22.057+09:00"
-      }
-    }
-  ],
+  "shiga": [],
   "kyoto": [
     {
       "id": "ky-set-20260824-mps6d",
@@ -3918,5 +3917,5 @@
     }
   ],
   "okinawa": [],
-  "updatedAt": "2026/08/24 07:44"
+  "updatedAt": "2026/08/24 12:41"
 }
