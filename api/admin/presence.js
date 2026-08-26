@@ -3,7 +3,7 @@
 //   スコープ: national は全アカウント、それ以外は自分の地本（organization）のみ。
 //   返却: { now, onlineWindowSec, awayWindowSec, counts, members:[{displayId,label,role,office,state,agoSec,self}] }
 //   ※ ログインID(user) や パスワード等の機微情報は返さない（displayId＝仮名で扱う）。
-import { checkOrigin, noStore, requireAuth, hasPermission, loadAccounts, readLastSeenMap, SESSION_IDLE_SEC } from '../_security.js';
+import { checkOrigin, noStore, requireAuth, hasPermission, loadAccounts, readLastSeenMap, SESSION_IDLE_SEC, rateLimit } from '../_security.js';
 import authz from '../../shared/authz.cjs';
 import presence from '../../shared/presence.cjs';
 
@@ -15,6 +15,10 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   if (req.method === 'OPTIONS') return res.status(204).end();
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+
+  // 認証前にレート制限をかける。ここだけ制限が無いと、資格情報を変えながら
+  // 叩き続けられる的になってしまう（他の管理APIには入っている）。
+  if (!await rateLimit(req, res, 'admin-presence', 120, 600)) return;
 
   const account = await requireAuth(req, res);
   if (!account) return;

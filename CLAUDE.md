@@ -401,6 +401,7 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - 本番URLを変更（独自ドメイン化等）したら `api/_security.js` の `ALLOWED_ORIGINS` を更新すること
 
 ### 管理者認証・認可（2026-06-28 強化。詳細は SECURITY.md / OPERATIONS.md）
+- **総当り対策**: ログインは IP レート制限（10回/10分）＋**アカウント単位の指数バックオフ施錠**（5回失敗で5分→10分→20分→…最大60分。施錠中は資格情報を検証しない）。この施錠を迂回させないため、ヘッダ認証は既定で無効（上記 `LEGACY_HEADER_AUTH`）。認証を伴う管理APIには残らずレート制限を入れること（2026-08-26 に `presence` の抜けを追加）。
 - **認証**: ログイン成功で**サーバー側セッション**を発行し HttpOnly/Secure/SameSite=Strict Cookie で保持（`shared/session.cjs`・`api/admin/login.js`・`logout.js`）。セッションは Redis 保存・絶対期限/無操作失効・アカウント無効化で失効。パスワードは **scrypt** 対応（平文は移行期のみ `LEGACY_PLAINTEXT_PASSWORDS=true`）。クライアントはパスワードを保存しない。
 - **sessionVersion**: アカウントの版番号をセッションへ刻み、毎リクエスト照合。値を上げると旧セッションは失効。**パスワード変更時は必ず +1**（`sessionStillValid`）。
 - **キャッシュ禁止**: 全 `/api/admin/*` は `noStore()` で `Cache-Control: no-store, private`（成功/エラー問わず）。
@@ -428,7 +429,8 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - 認証: `ADMIN_ACCOUNTS_B64`（base64 JSON配列: `{user,pass,organization|pref,office,role,displayId,enabled,sessionVersion}`）, `ADMIN_SECRET`（旧共通PW・既定無効。`LEGACY_ADMIN_SECRET=true` の時のみ有効。office ロールは `office` 必須＝未設定だと deny-by-default で操作不可）
 - セッション: `ADMIN_SESSION_TTL`(既定28800), `ADMIN_SESSION_IDLE`(既定3600), `SESSION_INSECURE`(ローカルHTTP検証のみ true)
 - CSRF: `INTERNAL_API_SECRET`（任意。非ブラウザ正当経路が Origin 無しで状態変更する場合のみ）
-- 移行フラグ: `LEGACY_PLAINTEXT_PASSWORDS`(既定true→正式運用前 false), `LEGACY_HEADER_AUTH`(既定true→正式運用前 false), `LEGACY_ADMIN_SECRET`(既定false。ADMIN_SECRET経路を使う移行時のみtrue), `ENABLE_DEV_STAFF`(既定false)
+- 移行フラグ: `LEGACY_PLAINTEXT_PASSWORDS`(既定true→正式運用前 false), **`LEGACY_HEADER_AUTH`(既定false。2026-08-26 に既定を反転)**, `LEGACY_ADMIN_SECRET`(既定false。ADMIN_SECRET経路を使う移行時のみtrue), `ENABLE_DEV_STAFF`(既定false)
+  - ヘッダ認証（`x-admin-user`/`x-admin-pass` を毎リクエストに付ける旧方式）を既定で許すと、**ログイン画面のロック（回数制限・指数バックオフ）を通らずに管理APIへ資格情報を投げ続けられ、総当りが実質無制限になる**。管理画面はセッション Cookie のみを使うため通常運用では不要。移行で必要な場合だけ `true` にする。
 - 監査: `AUDIT_MAX`(既定5000)
 - 既存: `KV_REST_API_URL`/`KV_REST_API_TOKEN`(Upstash), `NOTIFY_SECRET`, `NTFY_BUG_TOPIC`, `NTFY_ADMIN_TOPIC`, `VERCEL_*`, OCR各種, `SITE_URL`
 

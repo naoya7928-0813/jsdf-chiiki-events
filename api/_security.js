@@ -15,10 +15,17 @@ const redis = new Redis({
  *  独自ドメイン等へ移行する際は、コードを変えずに環境変数 SITE_ORIGINS（カンマ区切りの
  *  完全なオリジン。例: "https://jsdf-events.jp,https://www.jsdf-events.jp"）で追加できる。
  *  移行期は旧 vercel.app オリジンも残しておくと切替中の書き込みが 403 にならない。 */
-const ALLOWED_ORIGINS = new Set([
-  'https://jsdf-chiiki-events.vercel.app',
+// localhost は開発時だけ許可する。本番で許可し続けると、利用者の端末で動く
+// ローカルのページを起点にした書き込みが Origin 検証を素通りしてしまう
+// （SameSite=Strict Cookie と Sec-Fetch-Site でも止まるが、层を減らさない）。
+const IS_PRODUCTION = process.env.VERCEL_ENV === 'production';
+const DEV_ORIGINS = IS_PRODUCTION ? [] : [
   'http://localhost:5173',  // vite dev
   'http://localhost:4173',  // vite preview
+];
+const ALLOWED_ORIGINS = new Set([
+  'https://jsdf-chiiki-events.vercel.app',
+  ...DEV_ORIGINS,
   ...String(process.env.SITE_ORIGINS || '')
     .split(',').map(s => s.trim()).filter(s => /^https?:\/\//.test(s)),
 ]);
@@ -193,11 +200,17 @@ export function loadAccounts() {
 }
 
 // 移行フラグは呼び出し時に評価する（運用での切替・テストを容易にするため）。
-const allowPlaintext   = () => process.env.LEGACY_PLAINTEXT_PASSWORDS !== 'false'; // 既定: 許可
-const allowHeaderAuth  = () => process.env.LEGACY_HEADER_AUTH !== 'false';         // 既定: 許可
+const allowPlaintext   = () => process.env.LEGACY_PLAINTEXT_PASSWORDS !== 'false'; // 既定: 許可（移行期）
+// ヘッダ認証（x-admin-user/x-admin-pass を毎リクエストに付ける旧方式）は **既定で無効**。
+// これを既定で許すと、ログイン画面のロック（回数制限・指数バックオフ）を通らずに
+// 任意の管理APIへ資格情報を投げ続けられ、総当りが実質無制限になる。
+// 管理画面はセッション Cookie のみを使うため、通常運用でこの経路は不要。
+const allowHeaderAuth  = () => process.env.LEGACY_HEADER_AUTH === 'true';          // 既定: 拒否
 // ADMIN_SECRET（任意ユーザー名＋共通PWで national_admin になる旧経路）は既定で無効。
 // 移行時に LEGACY_ADMIN_SECRET=true を明示した場合のみ許可する。正式運用では ADMIN_SECRET 自体を削除する。
 const allowAdminSecret = () => process.env.LEGACY_ADMIN_SECRET === 'true';
+
+let plaintextWarned = false;
 
 /** user/pass を検証してアカウントを返す（平文/scrypt両対応・無効アカウントは拒否）。 */
 export function verifyCredentials(user, pass) {
@@ -205,6 +218,14 @@ export function verifyCredentials(user, pass) {
   for (const a of loadAccounts()) {
     if (a.user === String(user) && a.enabled !== false &&
         sessionUtil.verifyPassword(String(pass), a.pass, { allowPlaintext: allowPlaintext() })) {
+      // 平文のまま保存されたパスワードで認証が通った場合は警告する。
+      // 設定を読める人（デプロイ設定の閲覧者・漏洩時）にパスワードそのものが渡るため、
+      // scrypt ハッシュへ移行して LEGACY_PLAINTEXT_PASSWORDS=false にすべき状態。
+      if (!plaintextWarned && typeof a.pass === 'string' && !a.pass.startsWith('scrypt$')) {
+        plaintextWarned = true;
+        console.warn('[security] 平文パスワードのアカウントで認証されました。'
+          + ' scrypt ハッシュへ移行し LEGACY_PLAINTEXT_PASSWORDS=false を設定してください。');
+      }
       return a;
     }
   }

@@ -65,3 +65,29 @@ test('無効アカウント(enabled:false)は拒否', async () => {
   assert.equal(verifyCredentials('d', 'pw'), null);
   resetFlags();
 });
+
+
+// ── ヘッダ認証（移行用の旧経路）は既定で無効 ─────────────────────
+// 既定で許すと、ログイン画面のロック（回数制限・指数バックオフ）を通らずに
+// 任意の管理APIへ資格情報を投げ続けられ、総当りが実質無制限になる。
+test('ヘッダ認証: 既定では拒否される（総当り迂回路を塞ぐ）', async () => {
+  resetFlags();
+  delete process.env.LEGACY_HEADER_AUTH;
+  delete process.env.ADMIN_SECRET;
+  setAccounts([{ user: 'op', pass: S.hashPassword('pw'), pref: 'tokyo', displayId: 'OP-1' }]);
+  const { authenticate } = await sec();
+  const r = await authenticate({ headers: { 'x-admin-user': 'op', 'x-admin-pass': 'pw' } });
+  assert.equal(r, null, '既定でヘッダ認証を通してしまっている');
+});
+
+test('ヘッダ認証: LEGACY_HEADER_AUTH=true のときだけ通る', async () => {
+  resetFlags();
+  delete process.env.ADMIN_SECRET;
+  process.env.LEGACY_HEADER_AUTH = 'true';
+  setAccounts([{ user: 'op', pass: S.hashPassword('pw'), pref: 'tokyo', displayId: 'OP-1' }]);
+  const { authenticate } = await sec();
+  const r = await authenticate({ headers: { 'x-admin-user': 'op', 'x-admin-pass': 'pw' } });
+  assert.ok(r && r.account, '移行フラグを立てても通らない');
+  assert.equal(r.via, 'header');
+  delete process.env.LEGACY_HEADER_AUTH;
+});

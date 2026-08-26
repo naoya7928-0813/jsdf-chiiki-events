@@ -7,7 +7,10 @@ const S = require('./session.cjs');
 
 process.env.KV_REST_API_URL = process.env.KV_REST_API_URL || 'https://example.invalid';
 process.env.KV_REST_API_TOKEN = process.env.KV_REST_API_TOKEN || 'x';
-// ヘッダ認証（移行期・既定ON）で national_admin を用意（パスワードは scrypt）
+// このテストは past-events の挙動を見るのが目的なので、認証は簡便なヘッダ経路を使う。
+// ヘッダ認証は既定で無効（ログイン施錠を迂回されるため）なので、ここで明示的に有効化する。
+process.env.LEGACY_HEADER_AUTH = 'true';
+// national_admin を用意（パスワードは scrypt）
 process.env.ADMIN_ACCOUNTS_B64 = Buffer.from(JSON.stringify([
   { user: 'nat', pass: S.hashPassword('pw'), pref: '*', displayId: 'OP-N' },
 ])).toString('base64');

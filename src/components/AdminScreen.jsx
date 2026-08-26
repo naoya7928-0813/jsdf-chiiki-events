@@ -11,7 +11,7 @@ import ReportsPanel from './ReportsPanel';
  * 運営者管理画面。
  *  mode='login'  : ログインのみ。成功したら onLoggedIn() で通常サイトへ戻す（#admin 用）
  *  mode='manage' : 管理（イベント追加・修正／下書き確認）。設定の運営者メニューから開く
- * 認証情報は localStorage に保持し、各APIへ x-admin-user / x-admin-pass で送る。
+ * 認証はサーバー側セッション（HttpOnly Cookie）。パスワードは保存も送信もしない。
  */
 
 const CATEGORIES = ['説明会', '採用イベント', '一般公開', '艦艇公開', '体験', '演奏会', '記念行事', '広報活動', '地域参加'];
