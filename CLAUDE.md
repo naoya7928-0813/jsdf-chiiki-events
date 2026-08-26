@@ -300,6 +300,14 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - **地域マップ**: 8地域（北海道・東北・関東・中部・近畿・中国・四国・九州）
 - **都道府県 emblem**: `regionMap.js` の PREFECTURE_INFO と REGIONS 両方に同じ値が必要（全50件ユニーク）
 - **テーマ**: CSS 変数 `var(--bg)` / `var(--text)` / `var(--card)` / `var(--border)` でライト/ダーク切替
+- **起動時のテーマ確定（白フラッシュ対策）**: グローバルCSS は `main.jsx` が JS 実行時に注入するため、
+  それまで body はライト色のままで、ダーク利用者はコールドロードのたびに白い画面を経由していた。
+  `shared/bootTheme.cjs` の `<style>`＋`<script>` を `vite.config.js` の `bootThemeInject` が
+  `index.html` / `admin.html` の `<head>` 先頭へ注入し、**初回描画前に**テーマを確定させる
+  （CSS が OS 設定、script が `localStorage['jsdf-dark']` の明示指定を担当）。
+  ⚠️ **`index.html` に背景色を直接書かないこと**（ライト固定になり同じ事故が再発する）。
+  `BOOT_BG` は `globalStyles.js` の `--bg` と一致必須で、`shared/bootTheme.test.cjs` が実ファイルを
+  読んで検証している（ズレると起動直後と描画後で色が変わり、別の形でちらつく）。
 - **プッシュ通知**: ntfy.sh トピック `jsdf-chiiki-events-7928`
 
 ## オフライン対応（2026-08-26 導入）

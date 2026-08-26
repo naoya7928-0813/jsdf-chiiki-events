@@ -6,6 +6,12 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-08-27',
+    version: '1.30.9',
+    type:    'improvement',
+    content: 'ダークモードで起動したときに、一瞬白い画面が表示される問題を修正しました。',
+  },
+  {
+    date:    '2026-08-27',
     version: '1.30.8',
     type:    'feature',
     content: '絞り込みに「陸上・海上・航空」を追加しました。イベント名や会場から自動で見分けます。'
