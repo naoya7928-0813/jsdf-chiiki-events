@@ -32,6 +32,8 @@ function pickUpcoming(events, limit = MAX_SUGGESTIONS) {
     for (const ev of list) {
       if (!ev || !ev.date || ev.ended) continue;
       if ((ev.endDate || ev.date) < today) continue;
+      // 中止・受付終了のイベントは「次にどうぞ」の提案に向かない
+      if (ev.status === 'cancelled' || ev.status === 'closed') continue;
       flat.push(ev);
     }
   }

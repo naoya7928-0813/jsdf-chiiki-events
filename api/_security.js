@@ -104,11 +104,37 @@ export function isValidPushEndpoint(endpoint) {
 }
 
 /**
+ * レート制限に使う「信用できる」クライアントIPを取り出す。
+ *
+ * x-forwarded-for の *先頭* を使ってはいけない。プロキシは受け取ったアドレスを
+ * 末尾に足していくため、先頭は利用者が自由に詐称できる値になる。
+ * 先頭を使うと、このヘッダーを毎回変えるだけでレート制限を素通りできてしまう。
+ *
+ * 優先順:
+ *   1. x-real-ip            … Vercel が付与（利用者は上書きできない）
+ *   2. x-vercel-forwarded-for の末尾
+ *   3. x-forwarded-for の末尾  … 最後に足されたもの＝プラットフォームに最も近い
+ * キーが無制限に伸びないよう長さも制限する。
+ */
+export function clientIp(req) {
+  const h = req.headers || {};
+  const last = (v) => {
+    const parts = String(v || '').split(',').map(x => x.trim()).filter(Boolean);
+    return parts.length ? parts[parts.length - 1] : '';
+  };
+  const ip = String(h['x-real-ip'] || '').trim()
+    || last(h['x-vercel-forwarded-for'])
+    || last(h['x-forwarded-for'])
+    || 'unknown';
+  return ip.slice(0, 45); // IPv6 の最大長
+}
+
+/**
  * IPごとの簡易レートリミット。windowSec の間に limit 回まで。
  * 超過したら 429 を返して false。Redis障害時は許可（可用性優先）。
  */
 export async function rateLimit(req, res, bucket, limit, windowSec) {
-  const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
+  const ip = clientIp(req);
   const key = `rl:${bucket}:${ip}`;
   try {
     const count = await redis.incr(key);

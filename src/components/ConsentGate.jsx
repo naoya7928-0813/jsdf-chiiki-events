@@ -1,9 +1,11 @@
 import { useState, useCallback } from 'react';
 import { F } from './Shared';
+// 規約本文は規約画面と同じレンダラーで描く（見た目を揃え、**強調** も反映する）
+import { renderMarkdown } from './LegalScreen';
 import { TERMS_MD } from '../constants/terms';
 import { PRIVACY_MD } from '../constants/privacy';
 import {
-  LEGAL_VERSION, LEGAL_REVISED_AT, LEGAL_CHANGES,
+  LEGAL_VERSION, LEGAL_REVISED_AT, LEGAL_CHANGES, LEGAL_SUMMARY,
   saveAcceptedLegalVersion,
 } from '../constants/legal';
 
@@ -19,17 +21,6 @@ import {
  * 閉じられなかった場合はアプリ本体を描画しない終了画面を表示し続ける
  * （＝実質的に利用不可）。誤操作からの復帰用に「やはり同意する」だけ残す。
  */
-
-// 規約本文のプレビュー用。ヘッダー行を落として本文だけを流し込む
-function plainSections(md) {
-  return md
-    .split('\n')
-    .filter(l => !l.startsWith('# '))
-    .map(l => l.replace(/^##\s+/, '■ ').replace(/\*\*/g, '').replace(/^-\s+/, '・'))
-    .join('\n')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
-}
 
 export default function ConsentGate({ state, theme, onAccepted }) {
   const primary = theme?.primary || '#0b2545';
@@ -111,11 +102,10 @@ export default function ConsentGate({ state, theme, onAccepted }) {
           </div>
         </div>
         <div style={{
-          flex: 1, overflowY: 'auto', padding: '18px 20px 32px',
-          fontSize: 12.5, lineHeight: 1.9, whiteSpace: 'pre-wrap',
+          flex: 1, overflowY: 'auto', padding: '4px 20px 32px',
           color: 'var(--text)',
         }}>
-          {plainSections(isTerms ? TERMS_MD : PRIVACY_MD)}
+          {renderMarkdown(isTerms ? TERMS_MD : PRIVACY_MD, primary)}
         </div>
       </div>
     );
@@ -178,7 +168,10 @@ export default function ConsentGate({ state, theme, onAccepted }) {
         display: 'flex', flexDirection: 'column', alignItems: 'center',
         padding: '32px 20px 20px',
       }}>
-        <div style={{ width: '100%', maxWidth: 520 }}>
+        {/* 内容が短い初回表示では縦中央に寄せる。auto マージンを使うのは、
+            justify-content: center だと内容が溢れたときに上端が切れて
+            スクロールで戻れなくなるため。 */}
+        <div style={{ width: '100%', maxWidth: 520, margin: 'auto 0' }}>
           <div style={{
             fontSize: 10.5, letterSpacing: 2, color: 'var(--text-muted)',
             fontFamily: F.mono, marginBottom: 6,
@@ -194,22 +187,27 @@ export default function ConsentGate({ state, theme, onAccepted }) {
               : '本アプリをご利用いただく前に、利用規約とプライバシーポリシーへの同意をお願いします。'}
           </div>
 
-          {isRevised && LEGAL_CHANGES.length > 0 && (
-            <div style={{
-              border: '1px solid var(--border)', borderRadius: 12,
-              padding: '14px 16px', marginBottom: 18, background: 'var(--card)',
-            }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: primary, marginBottom: 8 }}>
-                主な変更点
-              </div>
-              {LEGAL_CHANGES.map((c, i) => (
-                <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 6, fontSize: 12, lineHeight: 1.8 }}>
-                  <span style={{ color: primary, flexShrink: 0 }}>•</span>
-                  <span>{c}</span>
+          {/* 初回は「何に同意するのか」の要点、改定時は「何が変わったか」を示す */}
+          {(() => {
+            const items = isRevised ? LEGAL_CHANGES : LEGAL_SUMMARY;
+            if (items.length === 0) return null;
+            return (
+              <div style={{
+                border: '1px solid var(--border)', borderRadius: 12,
+                padding: '14px 16px', marginBottom: 18, background: 'var(--card)',
+              }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: primary, marginBottom: 8 }}>
+                  {isRevised ? '主な変更点' : '要点'}
                 </div>
-              ))}
-            </div>
-          )}
+                {items.map((c, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 6, fontSize: 12, lineHeight: 1.8 }}>
+                    <span style={{ color: primary, flexShrink: 0 }}>•</span>
+                    <span>{c}</span>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
 
           <div style={{ display: 'flex', gap: 16, marginBottom: 22, flexWrap: 'wrap' }}>
             <button onClick={() => setDoc('terms')} style={linkStyle}>利用規約を読む</button>

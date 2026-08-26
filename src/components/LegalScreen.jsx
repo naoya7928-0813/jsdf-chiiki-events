@@ -17,7 +17,7 @@ function inline(text, key = 0) {
   );
 }
 
-function renderMarkdown(md, primary) {
+export function renderMarkdown(md, primary) {
   const lines = md.split('\n');
   const nodes = [];
   let key = 0;

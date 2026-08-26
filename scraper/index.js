@@ -44,7 +44,7 @@ const geocode             = require('./lib/geocode');
 // 募集案内所イベントのタイトル整形・非イベント判定（フロント/スクリプトと共通）
 const { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } = require('../shared/officeTitle.cjs');
 // イベント名の品質管理（検証済み修正・整形・junk判定・年ズレ判定・重複統合）。最終出力の防御に使う
-const { applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, splitPlaceAddress, cleanTimeText, cleanDeadlineText, isJunkOrStubTitle, isSuspiciousTitle, isStaleDatedEvent, dedupEvents, isArchivableEvent } = require('../shared/titleQuality.cjs');
+const { applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, splitPlaceAddress, cleanTimeText, cleanDeadlineText, isJunkOrStubTitle, isSuspiciousTitle, isStaleDatedEvent, dedupEvents, isArchivableEvent, safeUrl } = require('../shared/titleQuality.cjs');
 // 受付終了/中止の状態判定・締切日解決（誤判定防止つき。shared/eventStatus.cjs）
 const eventStatus = require('../shared/eventStatus.cjs');
 
@@ -4867,6 +4867,9 @@ async function writeOutput(data) {
         address:  address || fixed.address || '',
         time:     cleanTimeText(fixed.time),
         deadline: cleanDeadlineText(fixed.deadline) || null,
+        // http(s) 以外の URL は公開データに載せない（javascript: 等の混入防止）
+        url:      safeUrl(fixed.url),
+        imageUrl: safeUrl(fixed.imageUrl) || undefined,
       };
     });
   }

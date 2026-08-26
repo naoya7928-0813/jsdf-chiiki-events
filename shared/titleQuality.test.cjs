@@ -9,6 +9,7 @@ const assert = require('node:assert/strict');
 const {
   applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, cleanTimeText, cleanDeadlineText,
   isJunkOrStubTitle, isSuspiciousTitle, isStaleDatedEvent, dedupEvents,
+  safeUrl,
 } = require('./titleQuality.cjs');
 
 test('applyVerifiedOverrides: チラシ照合済みの修正がURLで適用される', () => {
@@ -569,4 +570,34 @@ test('splitPlaceAddress: 既存 address は上書きしない・空入力は安�
   assert.equal(r.address, '正しい住所'); // 既存優先
   assert.deepEqual(splitPlaceAddress('', ''), { place: '', address: '' });
   assert.deepEqual(splitPlaceAddress(null, null), { place: '', address: '' });
+});
+
+
+// ── URL スキームの検証（格納型XSS対策） ─────────────────────────
+test('safeUrl: http/https だけを通す', () => {
+  assert.strictEqual(safeUrl('https://www.mod.go.jp/pco/aomori/'), 'https://www.mod.go.jp/pco/aomori/');
+  assert.strictEqual(safeUrl('http://example.jp/a.pdf'), 'http://example.jp/a.pdf');
+});
+
+test('safeUrl: スクリプト実行につながるスキームを落とす', () => {
+  for (const bad of [
+    'javascript:alert(1)',
+    'JavaScript:alert(1)',
+    'java\nscript:alert(1)',
+    'java\tscript:alert(1)',
+    ' javascript:alert(1)',
+    'data:text/html;base64,PHNjcmlwdD4=',
+    'vbscript:msgbox(1)',
+    'file:///etc/passwd',
+  ]) {
+    assert.strictEqual(safeUrl(bad), '', `通してしまった: ${JSON.stringify(bad)}`);
+  }
+});
+
+test('safeUrl: 空・非文字列は空文字', () => {
+  assert.strictEqual(safeUrl(''), '');
+  assert.strictEqual(safeUrl(null), '');
+  assert.strictEqual(safeUrl(undefined), '');
+  assert.strictEqual(safeUrl(123), '');
+  assert.strictEqual(safeUrl({}), '');
 });

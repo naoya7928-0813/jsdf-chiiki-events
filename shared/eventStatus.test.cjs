@@ -186,3 +186,29 @@ test('mergeStatus: published → closed は素直に反映', () => {
 test('STATUS_VALUES は published/closed/cancelled/draft のみ', () => {
   assert.deepEqual([...S.STATUS_VALUES].sort(), ['cancelled', 'closed', 'draft', 'published']);
 });
+
+
+// ── 見出しバッジ形式の中止表記 ─────────────────────────────────
+// 地本サイトはタイトル先頭に「【中止】」を付けて告知することが多い。
+// 本文に「中止します」等が無いため、語句リストだけでは拾えず published のまま
+// 公開されていた（中止バッジも出ず、利用者が会場へ行ってしまう恐れがあった）。
+test('括弧付きの「中止」は確定中止として扱う', () => {
+  const at = (text) => S.deriveStatus({
+    text, deadline: '', eventDate: '2026-09-05', endDate: '', today: '2026-08-26',
+  }).status;
+  assert.strictEqual(at('【中止】護衛艦あきづき艦艇広報'), 'cancelled');
+  assert.strictEqual(at('［中止］納涼祭'), 'cancelled');
+  assert.strictEqual(at('(中止)体験航海'), 'cancelled');
+  assert.strictEqual(at('（中止）音楽まつり'), 'cancelled');
+  assert.strictEqual(at('【開催中止】音楽まつり'), 'cancelled');
+});
+
+test('条件付きの「中止」は確定中止にしない（誤判定防止は維持）', () => {
+  const at = (text) => S.deriveStatus({
+    text, deadline: '', eventDate: '2026-09-05', endDate: '', today: '2026-08-26',
+  }).status;
+  assert.notStrictEqual(at('藪塚まつり ※荒天中止'), 'cancelled');
+  assert.notStrictEqual(at('納涼祭（荒天の場合中止）'), 'cancelled');
+  assert.notStrictEqual(at('雨天の場合は中止となる場合があります'), 'cancelled');
+  assert.notStrictEqual(at('立川駐屯地見学'), 'cancelled');
+});
