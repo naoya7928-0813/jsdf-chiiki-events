@@ -89,6 +89,15 @@ jobs:
           restore-keys: |
             ocr-cache-${{ runner.os }}-
 
+      # ── LLMキャッシュを復元（段1〜3の呼び出し結果。クォータ節約） ──
+      - name: LLMキャッシュを復元
+        uses: actions/cache@v5
+        with:
+          path: scraper/llm-cache.json
+          key: llm-cache-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            llm-cache-${{ runner.os }}-
+
       # ── Playwright Chromium バイナリをキャッシュ ─────────────
       - name: Playwright Chromium キャッシュを復元
         id: pw-cache
@@ -211,6 +220,27 @@ jobs:
             echo "検疫対象なし"
           fi
 
+      # ── LLM再検査レポート（一次ソース照合で自動修正された内容の通知） ──
+      # 段2でタイトル・開催日が怪しいと判定されたイベントを、段3がチラシ実物を
+      # 読み直して修正している。何がどう書き換わったかを管理者が検証できるよう通知する。
+      - name: LLM再検査レポート（自動修正の通知）
+        run: |
+          CN=$(node -e "try{console.log(require('./public/data/events-llm-recheck.json').summary.corrected||0)}catch{console.log(0)}")
+          if [ "$CN" -gt 0 ]; then
+            LIST=$(node -e "const r=require('./public/data/events-llm-recheck.json');r.corrections.slice(0,10).forEach(c=>console.log(\`[\${c.pref}] \${c.changes.map(x=>\`\${x.field}: \${x.from??'なし'} → \${x.to??'なし'}\`).join(' / ')}\`))")
+            echo "::warning::一次ソース再検査により ${CN} 件を自動修正しました"
+            printf '%s\n' "$LIST"
+            curl -sS --fail-with-body --retry 3 --retry-all-errors --connect-timeout 10 --max-time 30 \
+              -H "Title: 🔍 一次ソース再検査で ${CN} 件を自動修正" \
+              -H "Tags: mag" \
+              -H "Content-Type: text/plain; charset=utf-8" \
+              -d "$(printf '%s\n%s' 'チラシ実物を読み直して修正しました。内容は events-llm-recheck.json で確認できます。' "$LIST")" \
+              "https://ntfy.sh/${{ secrets.NTFY_ADMIN_TOPIC }}" \
+              || echo "::warning::管理者通知（LLM再検査）の送信に失敗しました（本来の処理には影響しません）"
+          else
+            echo "自動修正なし"
+          fi
+
       # ── データ品質チェック（構造破損・ID重複・不正日付・座標範囲等。エラーでデプロイ停止）──
       - name: データ品質チェック（必須）
         run: |
@@ -232,11 +262,12 @@ jobs:
           #   書き換わる。これを add し忘れると未ステージの追跡変更として残り、後続の
           #   `git rebase` が "cannot rebase: You have unstaged changes" で失敗していた
           #   （2026-06-28 の天気/ジオコーディング機能導入以降、毎回 push 前に停止）。
-          git add public/data/events.json public/data/events-archive.json public/data/events-quarantine.json public/events.html public/events/ public/sitemap.xml scraper/geocode-cache.json
+          git add public/data/events.json public/data/events-quarantine.json public/data/events-llm-recheck.json data/events-archive.json public/events.html public/events/ public/sitemap.xml scraper/geocode-cache.json
 
           # 変更判定は「ステージ済み差分」で行う（個別ファイル列挙だと archive/quarantine 等の
-          # 追加ファイルの検知漏れが起きるため）。デプロイ要否は public/ 配下の変更有無で決める
-          # （geocode-cache 単独の変化はコミットのみ・デプロイなし）。
+          # 追加ファイルの検知漏れが起きるため）。デプロイ要否は public/ と data/ の変更で決める
+          # （data/events-archive.json は運営APIの関数バンドルへ同梱されるため、更新には
+          #   デプロイが必要。geocode-cache 単独の変化はコミットのみ・デプロイなし）。
           STAGED=$(git diff --cached --name-only)
 
           if [ -z "$STAGED" ]; then
@@ -247,11 +278,11 @@ jobs:
             exit 0
           fi
           echo "ステージ済みの変更:"; printf '%s\n' "$STAGED"
-          if printf '%s\n' "$STAGED" | grep -q '^public/'; then
+          if printf '%s\n' "$STAGED" | grep -qE '^(public/|data/)'; then
             DEPLOY_NEEDED=true
           else
             DEPLOY_NEEDED=false
-            echo "public/ 配下の変更なし（geocode-cache のみ）。コミットのみ行いデプロイはスキップします。"
+            echo "public/・data/ 配下の変更なし（geocode-cache のみ）。コミットのみ行いデプロイはスキップします。"
           fi
 
           if ! git commit -m "chore: update events data [skip ci]"; then

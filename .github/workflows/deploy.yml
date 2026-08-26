@@ -8,6 +8,8 @@ on:
     paths:
       - 'src/**'
       - 'public/**'
+      # 恒久アーカイブ（public/ の外・運営APIの関数バンドルへ同梱）。更新にはデプロイが必要
+      - 'data/**'
       - 'api/**'
       - 'scripts/**'
       - 'index.html'

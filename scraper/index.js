@@ -33,13 +33,18 @@ const { extractAssets }   = require('./lib/extractAssets');
 const { findEventLinks }  = require('./lib/exploreLinks');
 // OCRテキストからの日付抽出（表記ゆれ吸収。parseTextToEvent / parseOcrDate 共通）
 const { parseDateFromText, toJpDateString } = require('./lib/ocrDate');
+const llmClient = require('./lib/llmClient');
+const llmCache  = require('./lib/llmCache');
+const {
+  decideRecheck, mergeRecheck, isPublishable, titleIssues,
+} = require('../shared/llmExtract.cjs');
 // OCR モデルIDの実行時解決（プロバイダ側の廃止に自動追従）
 const { OcrModelResolver, isModelGoneError, discoverGroqModel, discoverGeminiModel } = require('./lib/ocrModel');
 const geocode             = require('./lib/geocode');
 // 募集案内所イベントのタイトル整形・非イベント判定（フロント/スクリプトと共通）
 const { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } = require('../shared/officeTitle.cjs');
 // イベント名の品質管理（検証済み修正・整形・junk判定・年ズレ判定・重複統合）。最終出力の防御に使う
-const { applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, splitPlaceAddress, cleanTimeText, cleanDeadlineText, isJunkOrStubTitle, isSuspiciousTitle, isStaleDatedEvent, dedupEvents, isArchivableEvent } = require('../shared/titleQuality.cjs');
+const { applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, splitPlaceAddress, cleanTimeText, cleanDeadlineText, isJunkOrStubTitle, isSuspiciousTitle, isStaleDatedEvent, dedupEvents, isArchivableEvent, safeUrl } = require('../shared/titleQuality.cjs');
 // 受付終了/中止の状態判定・締切日解決（誤判定防止つき。shared/eventStatus.cjs）
 const eventStatus = require('../shared/eventStatus.cjs');
 
@@ -112,16 +117,24 @@ const OFFICES_PATH = path.join(__dirname, '../public/data/offices.json');
 // 検疫: 「疑わしい」タイトルのイベントを公開せず隔離する先（git コミット・管理者レビュー用）。
 // 新種のゴミパターンがルール追加まで公開され続けた事故（2026-07-03 岩手）の再発防止。
 const QUARANTINE_PATH = path.join(__dirname, '../public/data/events-quarantine.json');
+// 段3（一次ソース再検査）の結果レポート。管理者が「何が自動で直ったか」を後から検証できるようにする
+const LLM_RECHECK_PATH = path.join(__dirname, '../public/data/events-llm-recheck.json');
 // Web Push ペイロード（git管理外）。スクレイパーは書き出しのみ行い、送信は
 // scrape.yml の「CDN 伝播待機」後のステップが行う（Issue #16: デプロイ前に通知が
 // 届くと、タップ時にまだ旧データが表示される問題の解消）。
 const PUSH_PAYLOAD_PATH = path.join(__dirname, 'push-payload.json');
 // 過去イベントの恒久ログ（events.json は終了7日で削除するため、退避先として git 管理でコミット）。
 // 運営サイトの「過去イベント」から終了後もずっと閲覧できるようにする。
-const ARCHIVE_PATH = path.join(__dirname, '../public/data/events-archive.json');
+// 恒久アーカイブは **public/ の外** に置く。public/data/ に置くと静的配信されて
+// 誰でも全履歴を取得できてしまい、「公開サイトは1週間・運営は蓄積」という
+// 保存方針が成り立たない。運営APIはファイルシステムから読む。
+const ARCHIVE_PATH = path.join(__dirname, '../data/events-archive.json');
 // 保持設定（環境変数で調整可）。既定: 開催日が約2年以内、かつ最大2万件。
-const ARCHIVE_RETENTION_DAYS = Number.parseInt(process.env.ARCHIVE_RETENTION_DAYS || '', 10) || 730;
-const ARCHIVE_MAX = Number.parseInt(process.env.ARCHIVE_MAX || '', 10) || 20000;
+// 運営のアーカイブは期限で切らずに蓄積する（収集したデータを残すのが目的）。
+// ARCHIVE_RETENTION_DAYS を明示的に設定した場合だけ、その日数より古いものを落とす。
+const ARCHIVE_RETENTION_DAYS = Number.parseInt(process.env.ARCHIVE_RETENTION_DAYS || '', 10) || 0; // 0 = 無期限
+// 件数上限はファイルの暴走を防ぐ安全弁。年 3000 件程度の増加を想定し十分な余裕を取る。
+const ARCHIVE_MAX = Number.parseInt(process.env.ARCHIVE_MAX || '', 10) || 200000;
 
 const URLS = {
   // 北海道地本（札幌は複数サブページ）
@@ -198,6 +211,7 @@ const BETWEEN_PAGES_MS = 10_000;
 // ── OCR キャッシュ（lib/assetCache に委譲） ───────────────────
 // ocr-cache.json は .gitignore 対象。GitHub Actions cache で永続化。
 assetCache.load();
+llmCache.load();
 
 // ── モックデータ（--mock 時に使用） ───────────────────────────
 const MOCK_DATA = {
@@ -758,10 +772,70 @@ function noteOcrSuccess(engine) {
  * 抽出テキストを構造化し、成功したらどのエンジンが効いたかを記録する。
  * parseTextToEvent を直接呼ぶと「どの段で取れたか」が統計に残らない。
  */
-function structureOcrText(text, mode, engine) {
-  const result = parseTextToEvent(text, mode);
-  if (result) noteOcrSuccess(engine);
-  return result;
+/** JST の今日 "YYYY-MM-DD" */
+function jstTodayStr() {
+  return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+}
+
+/**
+ * LLM の抽出結果（YYYY-MM-DD 形式）を、既存 OCR 経路が扱う形
+ * （date は「YYYY年M月D日（曜）」）へ揃える。
+ */
+function llmEventToOcrShape(llm) {
+  if (!llm) return null;
+  return {
+    title:          llm.title,
+    date:           llm.date    ? toJpDateString({ dateStr: llm.date })    : null,
+    endDate:        llm.endDate ? toJpDateString({ dateStr: llm.endDate }) : null,
+    place:          llm.place,
+    time:           llm.time,
+    ageRequirement: llm.ageRequirement,
+    deadline:       llm.deadline,
+    notes:          llm.notes,
+    url:            llm.url,
+  };
+}
+
+/**
+ * 段1: 抽出テキストを構造化する。
+ *
+ * ローカル OCR（Tesseract/RapidOCR）の生テキストは行が分断されるため、
+ * 正規表現（parseTextToEvent）だけではタイトル・場所を取りこぼしやすい。
+ * 先に LLM で規定スキーマへ整理し、駄目なら従来の正規表現に落とす。
+ *
+ * 方針: LLM は「足す」だけで「引かない」。
+ *   - LLM が使えない/失敗した → 従来どおり正規表現の結果を使う
+ *   - LLM がタイトルを取れなかった → 正規表現の結果を使う（今より悪くしない）
+ *   - LLM が日付を取れず正規表現が取れた → 日付だけ正規表現から補う
+ * 実際に情報を落とす判断は、段2（検査）・段3（一次ソース再検査）で行う。
+ */
+async function structureOcrText(text, mode, engine, opts = {}) {
+  const fallback = parseTextToEvent(text, mode);
+
+  if (llmClient.hasLlm()) {
+    let llm = null;
+    try {
+      llm = await llmClient.extractEventFromText(text, {
+        prefLabel: opts.prefLabel || '',
+        today:     jstTodayStr(),
+        label:     `LLM整形/${engine}`,
+      });
+    } catch (err) {
+      console.warn(`[LLM整形/${engine}] 失敗（正規表現にフォールバック）: ${err.message}`);
+    }
+    const shaped = llmEventToOcrShape(llm);
+    if (shaped && shaped.title) {
+      if (!shaped.date && fallback?.date) shaped.date = fallback.date;
+      if (mode !== 'full' || shaped.date) {
+        noteOcrSuccess(engine);
+        ocrStats.llmStructured = (ocrStats.llmStructured || 0) + 1;
+        return shaped;
+      }
+    }
+  }
+
+  if (fallback) noteOcrSuccess(engine);
+  return fallback;
 }
 
 const OCR_STATS_PATH = path.join(__dirname, 'ocr-stats.json');
@@ -1219,7 +1293,7 @@ async function ocrImage(imageUrl) {
   // 1. ローカル Tesseract
   const tessText = await tryTesseractOcr(prep.buf);
   if (tessText) {
-    result = structureOcrText(tessText, 'full', 'tesseract');
+    result = await structureOcrText(tessText, 'full', 'tesseract');
     if (result) console.log(`[OCR] Tesseract 成功: ${imageUrl.split('/').pop()}`);
   }
 
@@ -1227,7 +1301,7 @@ async function ocrImage(imageUrl) {
   if (!result) {
     const rapidText = await tryRapidOcr(prep.buf, 'OCR');
     if (rapidText) {
-      result = structureOcrText(rapidText, 'full', 'rapidocr');
+      result = await structureOcrText(rapidText, 'full', 'rapidocr');
       if (result) console.log(`[OCR] RapidOCR 構造化成功: ${imageUrl.split('/').pop()}`);
     }
   }
@@ -1239,7 +1313,7 @@ async function ocrImage(imageUrl) {
   // 4. OCR.space
   if (!result && prep.ok && process.env.OCR_SPACE_API_KEY) {
     const ocrSpaceText = await callOcrSpaceText(base64, prep.mime, 'OCR');
-    if (ocrSpaceText) result = structureOcrText(ocrSpaceText, 'full', 'ocrspace');
+    if (ocrSpaceText) result = await structureOcrText(ocrSpaceText, 'full', 'ocrspace');
   }
   // 5. Gemini Flash
   if (!result && prep.ok && process.env.GEMINI_API_KEY) {
@@ -1316,7 +1390,7 @@ async function ocrPdf(pdfUrl) {
   // 1. PDFテキスト直接抽出
   const pdfText = await extractPdfText(dl.buf);
   if (pdfText) {
-    result = structureOcrText(pdfText, 'pdf', 'pdftext');
+    result = await structureOcrText(pdfText, 'pdf', 'pdftext');
     if (result) console.log(`[PDF-OCR] テキスト抽出成功（API不要）: ${pdfUrl.split('/').pop()}`);
   }
 
@@ -1325,7 +1399,7 @@ async function ocrPdf(pdfUrl) {
     const imgs = await pdfToImages(dl.buf, 2);
     for (const imgBuf of imgs) {
       const tessText = await tryTesseractOcr(imgBuf);
-      if (tessText) { result = structureOcrText(tessText, 'full', 'tesseract'); }
+      if (tessText) { result = await structureOcrText(tessText, 'full', 'tesseract'); }
       if (result) { console.log(`[PDF-OCR] Tesseract 成功: ${pdfUrl.split('/').pop()}`); break; }
     }
   }
@@ -1335,7 +1409,7 @@ async function ocrPdf(pdfUrl) {
     const imgs = await pdfToImages(dl.buf, 2);
     for (const imgBuf of imgs) {
       const rapidText = await tryRapidOcr(imgBuf, 'PDF-OCR');
-      if (rapidText) result = structureOcrText(rapidText, 'pdf', 'rapidocr');
+      if (rapidText) result = await structureOcrText(rapidText, 'pdf', 'rapidocr');
       if (result) { console.log(`[PDF-OCR] RapidOCR 成功: ${pdfUrl.split('/').pop()}`); break; }
     }
   }
@@ -1353,7 +1427,7 @@ async function ocrPdf(pdfUrl) {
   // 5. OCR.space（PDFネイティブ）
   if (!result && process.env.OCR_SPACE_API_KEY) {
     const ocrSpaceText = await callOcrSpaceText(base64, 'application/pdf', 'PDF-OCR(OCR.space)');
-    if (ocrSpaceText) result = structureOcrText(ocrSpaceText, 'pdf', 'ocrspace');
+    if (ocrSpaceText) result = await structureOcrText(ocrSpaceText, 'pdf', 'ocrspace');
   }
 
   // 6. Mistral OCR（PDFネイティブ）
@@ -1464,7 +1538,7 @@ async function ocrFlyerFull(url) {
     // 1. PDFテキスト直接抽出
     const pdfText = await extractPdfText(dl.buf);
     if (pdfText) {
-      result = structureOcrText(pdfText, 'full', 'pdftext');
+      result = await structureOcrText(pdfText, 'full', 'pdftext');
       if (result) console.log(`[チラシOCR] PDFテキスト抽出成功（API不要）: ${url.split('/').pop()}`);
     }
     // 2. PDF→画像 → Tesseract
@@ -1472,7 +1546,7 @@ async function ocrFlyerFull(url) {
       const imgs = await pdfToImages(dl.buf, 2);
       for (const imgBuf of imgs) {
         const t = await tryTesseractOcr(imgBuf);
-        if (t) { result = structureOcrText(t, 'full', 'tesseract'); }
+        if (t) { result = await structureOcrText(t, 'full', 'tesseract'); }
         if (result) { console.log(`[チラシOCR] PDF+Tesseract 成功`); break; }
       }
     }
@@ -1481,7 +1555,7 @@ async function ocrFlyerFull(url) {
       const imgs = await pdfToImages(dl.buf, 2);
       for (const imgBuf of imgs) {
         const rapidText = await tryRapidOcr(imgBuf, 'チラシOCR-PDF');
-        if (rapidText) result = structureOcrText(rapidText, 'full', 'rapidocr');
+        if (rapidText) result = await structureOcrText(rapidText, 'full', 'rapidocr');
         if (result) { console.log(`[チラシOCR] PDF+RapidOCR 成功`); break; }
       }
     }
@@ -1496,7 +1570,7 @@ async function ocrFlyerFull(url) {
     // 5. OCR.space（PDFネイティブ）
     if (!result && process.env.OCR_SPACE_API_KEY) {
       const ocrSpaceText = await callOcrSpaceText(base64, 'application/pdf', 'チラシOCR-PDF(OCR.space)');
-      if (ocrSpaceText) result = structureOcrText(ocrSpaceText, 'full', 'ocrspace');
+      if (ocrSpaceText) result = await structureOcrText(ocrSpaceText, 'full', 'ocrspace');
     }
     // 6. Mistral OCR（PDFネイティブ）
     if (!result) result = await callMistralOcr(base64, 'application/pdf', 'チラシOCR-PDF(Mistral)');
@@ -1513,14 +1587,14 @@ async function ocrFlyerFull(url) {
     // 2a. ローカル Tesseract
     const tessText = await tryTesseractOcr(prep.buf);
     if (tessText) {
-      result = structureOcrText(tessText, 'full', 'tesseract');
+      result = await structureOcrText(tessText, 'full', 'tesseract');
       if (result) console.log(`[チラシOCR] Tesseract 成功: ${url.split('/').pop()}`);
     }
     // 2b. RapidOCR
     if (!result) {
       const rapidText = await tryRapidOcr(prep.buf, 'チラシOCR');
       if (rapidText) {
-        result = structureOcrText(rapidText, 'full', 'rapidocr');
+        result = await structureOcrText(rapidText, 'full', 'rapidocr');
         if (result) console.log(`[チラシOCR] RapidOCR 成功: ${url.split('/').pop()}`);
       }
     }
@@ -1531,7 +1605,7 @@ async function ocrFlyerFull(url) {
     // 2d. OCR.space
     if (!result && prep.ok && process.env.OCR_SPACE_API_KEY) {
       const ocrSpaceText = await callOcrSpaceText(imgBase64, prep.mime, 'チラシOCR(OCR.space)');
-      if (ocrSpaceText) result = structureOcrText(ocrSpaceText, 'full', 'ocrspace');
+      if (ocrSpaceText) result = await structureOcrText(ocrSpaceText, 'full', 'ocrspace');
     }
     // 2e. Mistral OCR（画像）
     if (!result && prep.ok) {
@@ -1646,7 +1720,7 @@ async function ocrImageFull(imageUrl) {
   // 1. ローカル Tesseract
   const tessText = await tryTesseractOcr(prep.buf);
   if (tessText) {
-    result = structureOcrText(tessText, 'full', 'tesseract');
+    result = await structureOcrText(tessText, 'full', 'tesseract');
     if (result) console.log(`[OCR-FULL] Tesseract 成功: ${imageUrl.split('/').pop()}`);
   }
 
@@ -1654,7 +1728,7 @@ async function ocrImageFull(imageUrl) {
   if (!result) {
     const rapidText = await tryRapidOcr(prep.buf, 'OCR-FULL');
     if (rapidText) {
-      result = structureOcrText(rapidText, 'full', 'rapidocr');
+      result = await structureOcrText(rapidText, 'full', 'rapidocr');
       if (result) console.log(`[OCR-FULL] RapidOCR 成功: ${imageUrl.split('/').pop()}`);
     }
   }
@@ -1666,7 +1740,7 @@ async function ocrImageFull(imageUrl) {
   // 4. OCR.space
   if (!result && prep.ok && process.env.OCR_SPACE_API_KEY) {
     const ocrSpaceText = await callOcrSpaceText(base64, prep.mime, 'OCR-FULL(OCR.space)');
-    if (ocrSpaceText) result = structureOcrText(ocrSpaceText, 'full', 'ocrspace');
+    if (ocrSpaceText) result = await structureOcrText(ocrSpaceText, 'full', 'ocrspace');
   }
   // 5. Gemini Flash
   if (!result && prep.ok && process.env.GEMINI_API_KEY) {
@@ -4627,6 +4701,9 @@ async function main() {
   writeOcrStats();
 
   await writeOutput(output);
+  // 段1〜3で使ったLLM結果を保存（次回は変化した分だけ呼ぶ）
+  llmCache.save();
+  llmClient.logStats();
   // 新規イベントを検出してプッシュ通知（非同期・失敗しても続行）
   await notifyNewEvents(prev, output).catch(err =>
     console.warn('[Push] notifyNewEvents エラー:', err.message)
@@ -4634,6 +4711,135 @@ async function main() {
 }
 
 /** public/data/events.json に書き出す */
+// ── 段2・段3: LLM を挟んだ検査と一次ソース再検査 ─────────────────
+//
+// 段2（検査・無料）: 各イベントを規定スキーマと突き合わせ、タイトル欄に
+//   タイトルでない値（住所・部隊名のみ・案内文・ラベル行など）が入っていないか、
+//   日付・時間・締切の書式が規定どおりかを調べる（shared/llmExtract.cjs の decideRecheck）。
+//   ここは規則判定だけで済ませ、LLM は呼ばない＝疑わしい件にだけ費用をかける。
+//
+// 段3（再検査・LLM）: 段2が「怪しい」と判定し、かつ一次ソース（チラシ画像・PDF）を
+//   持つイベントだけ、その資料を実際に読み直して抽出し直す。
+//   - 差異があれば再抽出を採用する（一次ソースを直接見た結果なので照合済み扱い）
+//   - 再検査しても必須項目（タイトル・日付）が埋まらなければ公開しない（検疫）
+//   結果は events-llm-recheck.json に残し、後から検証できるようにする。
+//
+// 1実行あたりの再検査件数には上限を設ける（クォータの暴走防止）。
+// 上限を超えた分は今回は手を触れず、従来どおりの判定のまま次回へ回す。
+const LLM_RECHECK_LIMIT = Number(process.env.LLM_RECHECK_LIMIT || 30);
+
+/**
+ * イベントの一次ソース（チラシ画像 / PDF）を取得し、LLM に読み直させる。
+ * 取得は downloadFile 経由（＝assetCache の条件付きGETに乗るので重複DLしない）。
+ * @returns {Promise<Object|null>} normalizeLlmEvent 済みの再抽出結果
+ */
+async function recheckFromPrimarySource(ev, prefLabel, today) {
+  const src = String(ev.imageUrl || ev.url || '');
+  if (!/^https?:/i.test(src)) return null;
+
+  const looksPdf = /\.pdf(\?|$)/i.test(src);
+  // HTML ページは画像として読ませられないため対象外（チラシ実物のみ）
+  if (!looksPdf && !isImageUrl(src)) return null;
+
+  let dl;
+  try { dl = await downloadFile(src); } catch { return null; }
+  if (!dl) return null;
+
+  // 304（中身が変わっていない）はハッシュだけでキャッシュを引ける
+  if (!dl.buf) {
+    return llmClient.extractEventFromImage('', dl.mime || 'image/jpeg', {
+      cacheKey: dl.hash, prefLabel, today, label: 'LLM再検査',
+    });
+  }
+
+  let base64, mime;
+  if (looksPdf || dl.mime === 'application/pdf') {
+    const pages = await pdfToImages(dl.buf, 1);
+    if (!pages || pages.length === 0) return null;
+    base64 = pages[0].toString('base64');
+    mime   = 'image/jpeg';
+  } else {
+    const prepared = await prepareImageForOcr(dl.buf, dl.mime, 'LLM再検査');
+    if (!prepared.ok) return null;
+    base64 = prepared.buf.toString('base64');
+    mime   = prepared.mime;
+  }
+
+  return llmClient.extractEventFromImage(base64, mime, {
+    cacheKey: dl.hash, prefLabel, today, label: 'LLM再検査',
+  });
+}
+
+/**
+ * 全イベントに段2の検査をかけ、必要なものだけ段3で再検査する。
+ * data は破壊的に更新する（修正の採用・検疫マークの付与）。
+ */
+async function llmReviewEvents(data, today, cutoff = '0000-00-00') {
+  const outcome = {
+    checked: 0, flagged: 0, attempted: 0, corrected: 0,
+    unverified: 0, noSource: 0, overBudget: 0, changes: [],
+  };
+  if (!llmClient.hasLlm()) {
+    console.log('[LLM検査] APIキーが無いためスキップ（従来の規則判定のみで動作します）');
+    return outcome;
+  }
+
+  let budget = LLM_RECHECK_LIMIT;
+
+  for (const key of Object.keys(data)) {
+    if (!Array.isArray(data[key])) continue;
+    const list = data[key];
+    for (let i = 0; i < list.length; i++) {
+      const ev = list[i];
+      if (!ev || !ev.title) continue;
+      // 終了から1週間を過ぎたものはこの後の公開判定で削除される。再検査の予算を使わない
+      if ((ev.endDate || ev.date || '') < cutoff) continue;
+      outcome.checked++;
+
+      const verdict = decideRecheck(ev);
+      if (verdict.action !== 'recheck') continue;
+      outcome.flagged++;
+
+      if (!verdict.hasSource) { outcome.noSource++; continue; }
+      if (budget <= 0)        { outcome.overBudget++; continue; }
+      budget--;
+      outcome.attempted++;
+
+      let reextracted = null;
+      try {
+        reextracted = await recheckFromPrimarySource(ev, key, today);
+      } catch (err) {
+        console.warn(`[LLM再検査] ${key} ${ev.id}: ${err.message}`);
+      }
+      // 一次ソースを読めなかった → 何も変えず、従来の規則判定に委ねる
+      if (!reextracted) continue;
+
+      const { merged, changes } = mergeRecheck(ev, reextracted);
+      if (changes.length === 0) continue;
+
+      if (isPublishable(merged)) {
+        list[i] = { ...merged, verifiedAt: new Date().toISOString() };
+        outcome.corrected++;
+        outcome.changes.push({
+          id: ev.id, pref: key, source: ev.imageUrl || ev.url || '',
+          reasons: verdict.reasons, changes,
+        });
+        console.log(`[LLM再検査] 修正 [${key}] ${changes.map(c => `${c.field}: ${c.from ?? 'null'} → ${c.to ?? 'null'}`).join(' / ')}`);
+      } else {
+        // 一次ソースに裏付けが無い＝公開してよい根拠が無い → 検疫へ
+        list[i] = { ...ev, __llmUnverified: verdict.reasons.join(' / ') || '一次ソースで確認できませんでした' };
+        outcome.unverified++;
+        console.log(`[LLM再検査] 裏付けなし [${key}] ${ev.title}`);
+      }
+    }
+  }
+
+  console.log(`[LLM検査] ${outcome.checked} 件を検査 / 要再検査 ${outcome.flagged} 件`
+    + ` → 再検査 ${outcome.attempted} 件（修正 ${outcome.corrected} / 裏付けなし ${outcome.unverified}）`
+    + ` / 一次ソース無し ${outcome.noSource} 件 / 上限超過 ${outcome.overBudget} 件`);
+  return outcome;
+}
+
 async function writeOutput(data) {
   // ディレクトリが無ければ作成
   const dir = path.dirname(OUTPUT_PATH);
@@ -4651,9 +4857,9 @@ async function writeOutput(data) {
   //    正準は CLAUDE.md「イベントカード記述ルール（正準仕様）」。実装は shared/titleQuality.cjs
   //    （+ 募集案内所は shared/officeTitle.cjs、カテゴリ/タグ/曜日は parsers/utils.js）。
   //    新経路を足すときも必ずこのゲート（titleQuality 適用後）を通すこと。
+  // ── 先に全県の整形を済ませる（段2の検査は整形後の値に対して行う） ──
   for (const key of Object.keys(data)) {
     if (!Array.isArray(data[key])) continue;
-    const before = data[key].length;
     // チラシ照合済みの修正を適用 → 先頭・末尾のゴミと場所欄を整形してから検査
     data[key] = data[key].map(ev => {
       const fixed = applyVerifiedOverrides(ev);
@@ -4667,8 +4873,23 @@ async function writeOutput(data) {
         address:  address || fixed.address || '',
         time:     cleanTimeText(fixed.time),
         deadline: cleanDeadlineText(fixed.deadline) || null,
+        // http(s) 以外の URL は公開データに載せない（javascript: 等の混入防止）
+        url:      safeUrl(fixed.url),
+        imageUrl: safeUrl(fixed.imageUrl) || undefined,
       };
     });
+  }
+
+  // ── 段2（検査）→ 段3（一次ソース再検査） ──────────────────────
+  // タイトル欄にタイトルでない値が入っている／開催日が取れていないイベントだけを
+  // チラシ実物で読み直す。差異は再抽出を採用し、裏付けが取れないものは公開しない。
+  // cutoff を渡して、この後どのみち削除される過去イベントに予算を使わないようにする。
+  const llmOutcome = await llmReviewEvents(data, today, cutoff);
+
+  // ── 公開判定（既存の規則 + 段3の結果） ─────────────────────────
+  for (const key of Object.keys(data)) {
+    if (!Array.isArray(data[key])) continue;
+    const before = data[key].length;
     data[key] = data[key].filter(ev => {
       if (!ev.date) return false;
       if ((ev.endDate || ev.date) < cutoff) return false; // 終了から1週間を過ぎたものだけ削除
@@ -4678,6 +4899,8 @@ async function writeOutput(data) {
       if (isJunkOrStubTitle(ev.title)) return false;
       // 過去年のイベントが現在年の日付で再登録されたもの（年ズレ）を除外
       if (isStaleDatedEvent(ev)) return false;
+      // 段3で一次ソースの裏付けが取れなかったものは公開しない
+      if (ev.__llmUnverified) { quarantined.push(ev); return false; }
       // 検疫: 新種のゴミの可能性が高い「疑わしい」タイトルは公開せず隔離。
       // 正規イベントと確認できたら titleQuality の APPROVED_TITLES へ追加すると公開される。
       if (isSuspiciousTitle(ev.title)) { quarantined.push(ev); return false; }
@@ -4706,6 +4929,8 @@ async function writeOutput(data) {
       id: e.id, pref: e.pref, date: e.date, endDate: e.endDate || '',
       title: e.title || '', place: e.place || '', url: e.url || '',
       source_type: e.source_type || '', quarantinedAt: today,
+      // 段3で裏付けが取れなかった場合はその理由（規則による検疫のときは空）
+      reason: e.__llmUnverified || '',
     }));
     fs.writeFileSync(QUARANTINE_PATH, JSON.stringify({ updatedAt: today, count: qEvents.length, events: qEvents }, null, 2), 'utf8');
     if (qEvents.length > 0) {
@@ -4713,6 +4938,26 @@ async function writeOutput(data) {
       qEvents.forEach(e => console.log(`  - [${e.pref}] ${e.date} ${e.title}`));
     }
   } catch (e) { console.warn('[検疫] 書き出しに失敗:', e.message); }
+
+  // ── 段3の結果レポート（毎回全置換） ───────────────────────────
+  // 「どのイベントを、どんな理由で、何から何へ自動修正したか」を残す。
+  // 自動採用の根拠は一次ソースそのものなので、後から人が検証できる形にしておく。
+  try {
+    fs.writeFileSync(LLM_RECHECK_PATH, JSON.stringify({
+      updatedAt: today,
+      limit: LLM_RECHECK_LIMIT,
+      summary: {
+        checked:    llmOutcome.checked,
+        flagged:    llmOutcome.flagged,
+        attempted:  llmOutcome.attempted,
+        corrected:  llmOutcome.corrected,
+        unverified: llmOutcome.unverified,
+        noSource:   llmOutcome.noSource,
+        overBudget: llmOutcome.overBudget,
+      },
+      corrections: llmOutcome.changes,
+    }, null, 2), 'utf8');
+  } catch (e) { console.warn('[LLM再検査] レポート書き出しに失敗:', e.message); }
 
   // ── 受付終了/中止の状態・締切日を付与（誤判定防止つき） ─────────────
   // タイトル・備考の文言と締切日から status(closed/cancelled)・deadlineDate を導出する。
@@ -4875,10 +5120,12 @@ async function writeOutput(data) {
 
 /**
  * 終了したイベント（候補=前回 events.json＋今回出力の過去イベント）を恒久アーカイブへ退避する。
- * - 保存先 public/data/events-archive.json（git コミット。運営「過去イベント」が閲覧）。
+ * - 保存先 data/events-archive.json（git コミット・**public/ の外**なので公開配信されない。
+ *   運営「過去イベント」だけが /api/admin/past-events 経由で閲覧する）。
  * - id で upsert（再退避は最新で上書き＝毎回実行しても冪等）。
  * - 品質防御: 不正タイトル・office_notice スタブは持ち込まない。
- * - 保持: 開催日が ARCHIVE_RETENTION_DAYS 以内、かつ最大 ARCHIVE_MAX 件（新しい順）。
+ * - 保持: 既定は無期限（蓄積）。ARCHIVE_RETENTION_DAYS を設定した場合のみ日数で打ち切る。
+ *   件数は ARCHIVE_MAX（暴走防止の安全弁）まで。
  * - 天気座標など表示に不要な大きいフィールドは載せない（サイズ抑制）。
  */
 function archivePastEvents(candidates, today) {
@@ -4911,11 +5158,14 @@ function archivePastEvents(candidates, today) {
     byId.set(e.id, pick(e)); // 再退避時は最新で上書き
   }
 
-  // 保持: 開催日(実効日)が RETENTION_DAYS 以内のみ。新しい順に上限件数。
-  const minDate = new Date(Date.now() + 9 * 3600 * 1000 - ARCHIVE_RETENTION_DAYS * 86400000)
-    .toISOString().slice(0, 10);
+  // 保持: 既定は無期限（蓄積）。ARCHIVE_RETENTION_DAYS を設定したときだけ古いものを落とす。
   const eff = (e) => e.endDate || e.date || '';
-  let events = [...byId.values()].filter(e => eff(e) >= minDate);
+  let events = [...byId.values()];
+  if (ARCHIVE_RETENTION_DAYS > 0) {
+    const minDate = new Date(Date.now() + 9 * 3600 * 1000 - ARCHIVE_RETENTION_DAYS * 86400000)
+      .toISOString().slice(0, 10);
+    events = events.filter(e => eff(e) >= minDate);
+  }
   events.sort((a, b) => (eff(a) < eff(b) ? 1 : eff(a) > eff(b) ? -1 : 0)); // 新しい順
   if (events.length > ARCHIVE_MAX) events = events.slice(0, ARCHIVE_MAX);
 

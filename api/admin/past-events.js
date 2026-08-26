@@ -11,6 +11,9 @@
 import { checkOrigin, noStore, rateLimit, requireAuth, canManageScope, redis } from '../_security.js';
 import W from '../../shared/weather.cjs';
 import past from '../../shared/pastEvents.cjs';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const MKEY = 'manual:events';
 const OKEY = 'manual:overrides';
@@ -37,20 +40,41 @@ async function loadScrape(req) {
 }
 
 // 過去イベントの恒久アーカイブ（events.json から7日で外れた後もここで閲覧できる）。
-// public/data/events-archive.json をフェッチ（events.json と同経路・短期キャッシュ）。
+//
+// データは data/events-archive.json（**public/ の外**）に置く。public/data/ に置くと
+// 静的配信されて誰でも全履歴を取得できてしまい、「公開サイトは1週間・運営は蓄積」という
+// 保存方針が成立しない。そのため HTTP ではなくファイルシステムから読む
+// （関数バンドルへの同梱は vercel.json の functions.includeFiles で指定）。
 let archiveCache = { at: 0, events: null };
-async function loadArchive(req) {
+
+/**
+ * 配置場所の候補（実行環境によって作業ディレクトリが異なるため複数見る）。
+ * EVENTS_ARCHIVE_PATH を設定すればそこを最優先で読む（別ボリュームへ置く場合・テスト用）。
+ */
+function archiveCandidates() {
+  const here = path.dirname(fileURLToPath(import.meta.url));   // api/admin
+  const explicit = String(process.env.EVENTS_ARCHIVE_PATH || '').trim();
+  return [
+    ...(explicit ? [explicit] : []),
+    path.join(process.cwd(), 'data/events-archive.json'),
+    path.join(here, '../../data/events-archive.json'),
+  ];
+}
+
+async function loadArchive() {
   const now = Date.now();
   if (archiveCache.events && now - archiveCache.at < 60000) return archiveCache.events;
-  const base = process.env.SITE_URL || (req.headers.host ? `https://${req.headers.host}` : 'https://jsdf-chiiki-events.vercel.app');
   let events = [];
-  try {
-    const r = await fetch(`${base}/data/events-archive.json`, { signal: AbortSignal.timeout(5000) });
-    if (r.ok) { const j = await r.json(); if (Array.isArray(j?.events)) events = j.events; }
-    else if (r.status !== 404) console.error(`[past-events] archive 取得が非200: ${r.status}`);
-  } catch (e) {
-    console.error(`[past-events] archive 取得失敗: ${e && e.name === 'TimeoutError' ? 'timeout(5s)' : (e && e.message) || 'error'}`);
+  for (const p of archiveCandidates()) {
+    try {
+      const raw = await readFile(p, 'utf8');
+      const j = JSON.parse(raw);
+      if (Array.isArray(j?.events)) { events = j.events; break; }
+    } catch (e) {
+      if (e && e.code !== 'ENOENT') console.error(`[past-events] archive 読み込み失敗(${p}): ${e.message}`);
+    }
   }
+  if (events.length === 0) console.warn('[past-events] アーカイブが読めませんでした（過去分は手動イベントと events.json のみ）');
   archiveCache = { at: now, events };
   return events;
 }
@@ -86,7 +110,7 @@ export default async function handler(req, res) {
   } catch { /* ignore */ }
   // events.json とアーカイブは独立した静的ファイルなので並列取得（携帯での応答短縮）
   const [{ data: scrapeData, ok: scrapeOk }, archiveEvents] =
-    await Promise.all([loadScrape(req), loadArchive(req)]);
+    await Promise.all([loadScrape(req), loadArchive()]);
 
   const result = past.buildPastEvents({
     manualEvents, scrapeData, archiveEvents, overrides,

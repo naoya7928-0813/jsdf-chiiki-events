@@ -3,7 +3,7 @@ import { API_URL, REFRESH_INTERVAL_MS } from '../config';
 // 募集案内所イベントの整形・非イベント判定は共通モジュールに一本化（scraper/スクリプトと共有）
 import { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } from '../../shared/officeTitle.cjs';
 // 時間・締切・場所の書式整形（旧データ／CDN・SWキャッシュ由来の "null" 等への防御）
-import { cleanTimeText, cleanDeadlineText, cleanPlaceText, splitPlaceAddress } from '../../shared/titleQuality.cjs';
+import { cleanTimeText, cleanDeadlineText, cleanPlaceText, splitPlaceAddress, safeUrl } from '../../shared/titleQuality.cjs';
 
 const EMPTY = { updatedAt: null };
 
@@ -48,7 +48,9 @@ function normalizeEvent(ev) {
     deadline: cleanDeadlineText(ev.deadline) || undefined,
     category: str(ev.category),
     tag:      str(ev.tag),
-    url:      str(ev.url),
+    // http(s) 以外（javascript: 等）は捨てる。リンク経由のスクリプト実行を防ぐ
+    url:      safeUrl(ev.url),
+    imageUrl: safeUrl(ev.imageUrl) || undefined,
     weekday:  str(ev.weekday),
     // endDate は形式不正・開始日より前なら無かったことにする（期間表示の崩れ防止）
     endDate:    (typeof ev.endDate === 'string' && DATE_RE.test(ev.endDate) && ev.endDate >= ev.date) ? ev.endDate : undefined,
@@ -109,6 +111,53 @@ function filterPastEvents(rawData, today) {
   return out;
 }
 
+// ── オフライン用のデータ保持 ───────────────────────────────────
+// Service Worker のランタイムキャッシュだけでは、有効期限切れ・キャッシュ破棄・
+// 初回起動直後などにイベントが1件も出ない「空のアプリ」になる。
+// 取得に成功したデータを端末内にも残し、通信できないときはそれを表示する。
+const CACHE_KEY     = 'jsdf-events-cache';
+const CACHE_VERSION = 1;
+
+/** 保存済みイベントデータを読み出す（壊れていれば null） */
+function loadCachedEvents() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || parsed.v !== CACHE_VERSION) return null;
+    if (!parsed.data || typeof parsed.data !== 'object') return null;
+    return {
+      data:    parsed.data,
+      savedAt: typeof parsed.savedAt === 'string' ? parsed.savedAt : null,
+    };
+  } catch { return null; }
+}
+
+/** 取得に成功したデータを端末内に保存する（容量超過等は無視して表示を優先） */
+function saveCachedEvents(data) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({
+      v: CACHE_VERSION, savedAt: new Date().toISOString(), data,
+    }));
+  } catch { /* 保存できなくても表示は続行する */ }
+}
+
+/** ISO 文字列を "YYYY/MM/DD HH:mm"（JST）にする。不正なら null */
+function fmtIso(iso) {
+  if (!iso) return null;
+  const t = new Date(iso);
+  if (Number.isNaN(t.getTime())) return null;
+  return t.toLocaleString('ja-JP', {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Tokyo',
+  }).replace(',', '');
+}
+
+/** ブラウザがオンラインと報告しているか（判定できない環境では true 扱い） */
+function navigatorOnline() {
+  try { return navigator.onLine !== false; } catch { return true; }
+}
+
 /** 現在時刻を "YYYY/MM/DD HH:mm" 形式で返す（JST 固定） */
 function fmtNow() {
   return new Date().toLocaleString('ja-JP', {
@@ -119,13 +168,21 @@ function fmtNow() {
 }
 
 export function useEvents(autoMode = true) {
-  const [rawData,   setRawData]   = useState(null);
+  // 前回取得したデータを初期値にする（オフライン起動でも中身のある画面から始まる）
+  const cachedInit = useRef(undefined);
+  if (cachedInit.current === undefined) cachedInit.current = loadCachedEvents();
+
+  const [rawData,   setRawData]   = useState(() => cachedInit.current?.data ?? null);
   const [loading,   setLoading]   = useState(true);
   const [error,     setError]     = useState(null);
   const [checkedAt, setCheckedAt] = useState(null);
+  // 表示中のデータが「取得できた最新」ではない状態（オフライン・取得失敗）
+  const [stale,      setStale]      = useState(() => Boolean(cachedInit.current));
+  const [online,     setOnline]     = useState(navigatorOnline);
+  const [syncedAtIso, setSyncedAtIso] = useState(() => cachedInit.current?.savedAt ?? null);
   /** JST 今日の日付。深夜0時に更新することでフィルターを再適用する */
   const [jstDate,   setJstDate]   = useState(jstToday);
-  const hasData = useRef(false);
+  const hasData = useRef(Boolean(cachedInit.current));
 
   const fetchEvents = useCallback(async () => {
     try {
@@ -139,6 +196,7 @@ export function useEvents(autoMode = true) {
           .catch(() => ({ events: [], overrides: {} })),
       ]);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const fromCache = res.headers.get('x-from-cache') === '1';
       const json = await res.json();
       if (typeof json !== 'object' || json === null) throw new Error('invalid response shape');
       const { events: manual, overrides } = manualResp;
@@ -160,9 +218,24 @@ export function useEvents(autoMode = true) {
       setRawData(merged);
       hasData.current = true;
       setError(null);
+      // Service Worker がキャッシュから返した応答は「取得成功」ではない。
+      // 印（X-From-Cache）が付いていれば、最新ではないものを表示していると扱う。
+      if (fromCache) {
+        setStale(true);
+        setOnline(navigatorOnline());
+      } else {
+        // 取得できたデータを端末内にも残す（次回オフライン起動時の表示に使う）
+        saveCachedEvents(merged);
+        setSyncedAtIso(new Date().toISOString());
+        setStale(false);
+        setOnline(true);
+      }
     } catch (err) {
       setError(err.message);
+      // 取得に失敗しても、持っているデータは消さずに「最新ではない」印だけ付ける
       if (!hasData.current) setRawData(EMPTY);
+      else setStale(true);
+      if (!navigatorOnline()) setOnline(false);
     } finally {
       setLoading(false);
       setCheckedAt(fmtNow());
@@ -181,6 +254,19 @@ export function useEvents(autoMode = true) {
       document.removeEventListener('visibilitychange', onVisible);
     };
   }, [fetchEvents, autoMode]);
+
+  // ── オンライン復帰の検知 ───────────────────────────────────
+  // 圏外から戻ったら自動で取り直す（利用者が手動で更新しなくても最新に戻る）。
+  useEffect(() => {
+    const goOnline  = () => { setOnline(true); fetchEvents(); };
+    const goOffline = () => { setOnline(false); if (hasData.current) setStale(true); };
+    window.addEventListener('online',  goOnline);
+    window.addEventListener('offline', goOffline);
+    return () => {
+      window.removeEventListener('online',  goOnline);
+      window.removeEventListener('offline', goOffline);
+    };
+  }, [fetchEvents]);
 
   // ── JST 深夜0時タイマー：日付が変わったら自動でフィルター更新 ─
   // 発火後は必ず翌日の0時を再スケジュールする（連鎖）。以前は初回の1回しか
@@ -222,5 +308,12 @@ export function useEvents(autoMode = true) {
     updatedAt: rawData?.updatedAt ?? null,
     checkedAt,
     isMock:    !hasData.current,
+    // ── オフライン表示用 ──
+    /** ブラウザが通信不能と報告している */
+    offline:      !online,
+    /** 表示中のデータが最新の取得結果ではない（オフライン・取得失敗・キャッシュ由来） */
+    stale,
+    /** 最後にデータを取得できた日時（"YYYY/MM/DD HH:mm" JST。無ければ null） */
+    lastSyncedAt: fmtIso(syncedAtIso),
   };
 }

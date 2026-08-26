@@ -48,6 +48,12 @@ function urlBase64ToUint8Array(base64String) {
 export function usePushNotification() {
   const { supported, reason } = detectEnv();
 
+  // 通知の登録・解除はサーバーへの保存を伴うため、オフラインでは行えない。
+  // 通知の許可ダイアログだけ出して失敗させると分かりにくいので、先に止める。
+  const offlineNow = () => {
+    try { return navigator.onLine === false; } catch { return false; }
+  };
+
   const [subscribed, setSubscribed] = useState(false);
   const [loading,    setLoading]    = useState(false);
   const [error,      setError]      = useState(null);
@@ -64,6 +70,10 @@ export function usePushNotification() {
   // ── 購読開始 ─────────────────────────────────────────────
   const subscribe = useCallback(async () => {
     if (!supported) return;
+    if (offlineNow()) {
+      setError('オフラインのため通知を設定できません。通信できる状態でお試しください。');
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -124,6 +134,10 @@ export function usePushNotification() {
   // ── 購読解除 ─────────────────────────────────────────────
   const unsubscribe = useCallback(async () => {
     if (!supported) return;
+    if (offlineNow()) {
+      setError('オフラインのため通知を解除できません。通信できる状態でお試しください。');
+      return;
+    }
     setLoading(true);
     setError(null);
     try {

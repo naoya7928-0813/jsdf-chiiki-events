@@ -20,24 +20,60 @@ registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html'), {
   denylist: [/^\/api\//, /^\/admin/, /\.[a-z0-9]+$/i],
 }));
 
+// ── キャッシュ由来の応答に印を付ける ──────────────────────────
+// NetworkFirst はネットワークに失敗するとキャッシュを返すが、ページ側からは
+// 通常の 200 応答と区別が付かない。そのままだと「オフラインなのに取得成功」と
+// 誤判定し、いつ時点の情報かを利用者に示せない。
+// キャッシュから返すときだけヘッダーを足して、ページ側が判別できるようにする。
+const markFromCache = {
+  async cachedResponseWillBeUsed({ cachedResponse }) {
+    if (!cachedResponse) return cachedResponse;
+    const headers = new Headers(cachedResponse.headers);
+    headers.set('X-From-Cache', '1');
+    return new Response(await cachedResponse.blob(), {
+      status:     cachedResponse.status,
+      statusText: cachedResponse.statusText,
+      headers,
+    });
+  },
+};
+
 // ── ランタイムキャッシュ ──────────────────────────────────────
+// イベント本体。NetworkFirst なので、オンラインなら常に最新を取りに行く。
+// maxAgeSeconds は「ネットワークが失敗したときに、どこまで古いキャッシュを
+// 出してよいか」の上限であって、鮮度の上限ではない。
+// ここが 5 分だった頃は、5 分を過ぎたキャッシュが破棄されるため
+// オフラインだとイベントが 1 件も表示されない「空のアプリ」になっていた。
+// オフラインでも中身を見せることを優先し、フォールバックの寿命を長く取る
+// （古さは画面側のオフライン表示で利用者に明示する）。
 registerRoute(
   ({ url }) => url.pathname === '/data/events.json',
   new NetworkFirst({
     cacheName: 'events-data',
-    plugins: [new ExpirationPlugin({ maxAgeSeconds: 300 })],
+    plugins: [new ExpirationPlugin({ maxEntries: 2, maxAgeSeconds: 60 * 60 * 24 * 30, purgeOnQuotaError: true }), markFromCache],
     networkTimeoutSeconds: 5,
   })
 );
 
 // 公開読み取り（手動イベント）のみキャッシュ対象にする。
 // 管理API（/api/admin/*）や報告・購読などはキャッシュせず常に最新をネットワークから取得。
+// 運営の手動イベント・上書き修正。events.json と同じ理由でフォールバックを長く保つ。
 registerRoute(
   ({ url }) => url.pathname === '/api/manual-events',
   new NetworkFirst({
     cacheName: 'api-cache',
-    plugins: [new ExpirationPlugin({ maxAgeSeconds: 120 })],
+    plugins: [new ExpirationPlugin({ maxEntries: 2, maxAgeSeconds: 60 * 60 * 24 * 7, purgeOnQuotaError: true }), markFromCache],
     networkTimeoutSeconds: 8,
+  })
+);
+
+// 募集案内所の拠点データ（「近くの募集案内所」）。ほとんど変化しないため
+// StaleWhileRevalidate で即表示しつつ裏で更新し、オフラインでも使えるようにする。
+registerRoute(
+  ({ url }) => url.pathname === '/data/offices.json',
+  new StaleWhileRevalidate({
+    cacheName: 'offices-data',
+    plugins: [new ExpirationPlugin({ maxEntries: 2, maxAgeSeconds: 60 * 60 * 24 * 30, purgeOnQuotaError: true })],
   })
 );
 

@@ -21,6 +21,9 @@ scraper/verify_*.js
 # OCRキャッシュ（大容量のためgit管理外・GitHub Actions Cacheで永続化）
 scraper/ocr-cache.json
 
+# LLMキャッシュ（同上。段1〜3の呼び出し結果を再利用してクォータを節約する）
+scraper/llm-cache.json
+
 .env*.local
 
 .env*

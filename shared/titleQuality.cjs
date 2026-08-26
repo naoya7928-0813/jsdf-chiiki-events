@@ -13,6 +13,27 @@
  * （追加時は CLAUDE.md の該当節とテスト titleQuality.test.cjs も更新する）。
  */
 
+/**
+ * 表示・遷移に使ってよい URL だけを通す（http/https 以外は捨てる）。
+ *
+ * イベントの url / imageUrl は外部サイトのスクレイプ・OCR・運営の手動入力と
+ * 複数経路で入ってくる。`javascript:` や `data:` が混ざると、リンクを押した
+ * 利用者の画面でスクリプトが動く（格納型XSS）。
+ * CSP（script-src 'self'）でも javascript: は止まるが、CSP を緩めた瞬間に
+ * 穴が開くので、データ側でも経路非依存に落としておく。
+ *
+ * @param {*} raw
+ * @returns {string} 安全な URL。そうでなければ空文字
+ */
+function safeUrl(raw) {
+  const s = typeof raw === 'string' ? raw.trim() : '';
+  if (!s) return '';
+  // 制御文字を挟んで "java\nscript:" のように偽装されるのを防ぐ
+  const flat = s.replace(/[\u0000-\u001F\u007F\s]/g, '');
+  if (!/^https?:\/\//i.test(flat)) return '';
+  return s;
+}
+
 /** 全角英数字を半角に変換する（年判定・重複判定の正規化用） */
 function toHalfAlnum(s) {
   return String(s || '').replace(/[０-９Ａ-Ｚａ-ｚ]/g,
@@ -548,6 +569,7 @@ function cleanDeadlineText(raw) {
 }
 
 module.exports = {
+  safeUrl,
   applyVerifiedOverrides,
   cleanEventTitle,
   cleanPlaceText,

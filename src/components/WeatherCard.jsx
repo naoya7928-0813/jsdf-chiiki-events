@@ -224,7 +224,12 @@ export default function WeatherCard({ event, theme }) {
     fetch(`/api/weather?${qs.toString()}`)
       .then(r => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then(data => { if (!cancelled) { loadedKey.current = key; setState({ status: 'ok', data }); } })
-      .catch(() => { if (!cancelled) setState({ status: 'error', data: null }); });
+      .catch(() => {
+        // オフラインなのか、天気APIの障害なのかで文言を変える（利用者の対処が違う）
+        let isOffline = false;
+        try { isOffline = navigator.onLine === false; } catch { /* 判定できない環境 */ }
+        if (!cancelled) setState({ status: 'error', data: null, offline: isOffline });
+      });
     return () => { cancelled = true; };
   }, [shouldFetch, loc?.latitude, loc?.longitude, ev?.date]);
 
@@ -260,7 +265,10 @@ export default function WeatherCard({ event, theme }) {
     );
   }
   if (state.status === 'error') {
-    return <Message heading={heading} primary={primary} text="天気情報を取得できませんでした。" {...fold} />;
+    return <Message heading={heading} primary={primary} {...fold}
+      text={state.offline
+        ? 'オフラインのため、天気予報を表示できません。通信できる状態で開き直してください。'
+        : '天気情報を取得できませんでした。'} />;
   }
 
   const d = state.data || {};

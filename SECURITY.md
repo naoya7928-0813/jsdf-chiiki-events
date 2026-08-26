@@ -43,7 +43,8 @@
 
 ## 既知の制約 / 正式導入前に必要な追加対策
 - 管理画面の URL は秘密ではない（URL の秘匿を安全性の根拠にしない）。
-- パスワードの scrypt 化は任意（移行期は平文許容）。**正式運用前に全アカウントをハッシュ化し `LEGACY_PLAINTEXT_PASSWORDS=false` / `LEGACY_HEADER_AUTH=false` にすること**。
+- パスワードの scrypt 化は任意（移行期は平文許容）。**正式運用前に全アカウントをハッシュ化し `LEGACY_PLAINTEXT_PASSWORDS=false` にすること**（平文で認証が通るとサーバーログに警告が出る）。
+- `LEGACY_HEADER_AUTH` は **2026-08-26 に既定を false（拒否）へ反転**した。ヘッダ認証を許すとログイン施錠を迂回して総当りできるため、移行で必要な場合のみ明示的に `true` にする。
 - 監査ログは Redis リスト（上限 `AUDIT_MAX`）。長期保全のため**外部ログ保管への転送**は今後の課題。
 - 重要操作の再認証（step-up）・アカウント管理UI・承認フローのUIは未実装（API/データ構造は準備）。
 - 依存監査（npm audit / Dependabot / CodeQL / Secret scanning / SBOM）・アクションSHA固定・PR必須・本番承認環境は段階導入を推奨。

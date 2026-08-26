@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ページが見つかりません | 地本イベントナビ（非公式）</title>
+<!-- 404 は検索結果に載せない（ソフト404の防止） -->
+<meta name="robots" content="noindex, follow" />
+<meta name="description" content="お探しのページは移動または削除された可能性があります。自衛隊地方協力本部のイベント情報はトップページからご覧いただけます。" />
+<!--
+  静的パス（/events/<県>.html, /data/*, /icons/* など vercel.json の rewrite 除外パス）で
+  ファイルが存在しないときに Vercel が返す 404 ページ。
+  SPA 内の 404（不明なURL・掲載終了イベント）は src/components/NotFoundScreen.jsx が担当する。
+  外部リソースに依存させない（オフラインや障害時にも表示できるようにする）。
+-->
+<style>
+  :root {
+    --bg: #f7f7f5;
+    --text: #1c1c1a;
+    --text-muted: #6b7280;
+    --card: #ffffff;
+    --border: #e2e2dd;
+    --primary: #3a4130;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a;
+      --text: #e8e8e4;
+      --text-muted: #9aa2b1;
+      --card: #1c1f25;
+      --border: #2c3038;
+      --primary: #8fa06f;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Sans", "ヒラギノ角ゴシック", "Yu Gothic UI", "游ゴシック",
+                 "Noto Sans JP", -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.8;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+  }
+  main { width: 100%; max-width: 480px; text-align: center; }
+  /* 文字と余白は画面幅に追従させる（狭い端末で詰まらず、広い画面で間延びしない） */
+  .code {
+    font-family: "SF Mono", "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    font-size: clamp(36px, 11vw, 52px);
+    letter-spacing: clamp(3px, 1.6vw, 8px);
+    line-height: 1;
+    color: var(--primary); opacity: 0.28; margin-bottom: 18px;
+  }
+  h1 { font-size: clamp(15px, 4.2vw, 19px); margin: 0 0 10px; }
+  p { font-size: clamp(12px, 3.4vw, 14px); color: var(--text-muted); margin: 0 0 26px; }
+  .actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 30px; }
+  a.btn {
+    display: inline-block; padding: 12px 24px; border-radius: 10px;
+    font-size: 13.5px; font-weight: 700; text-decoration: none;
+    background: var(--primary); color: #fff;
+    flex: 1 1 auto; min-width: 148px;   /* 折り返したら押しやすい幅にする */
+  }
+  a.btn.ghost {
+    background: transparent; color: var(--text);
+    border: 1px solid var(--border); font-weight: 600;
+  }
+  .note {
+    border: 1px solid var(--border); border-radius: 12px; background: var(--card);
+    padding: 14px 16px; font-size: clamp(11.5px, 3vw, 13px);
+    color: var(--text-muted); text-align: left;
+  }
+  /* 極端に狭い端末（320px 等）でも余白で潰れないようにする */
+  @media (max-width: 360px) {
+    body { padding: 24px 14px; }
+    a.btn { padding: 12px 16px; min-width: 130px; }
+  }
+  .note a { color: var(--primary); }
+</style>
+</head>
+<body>
+  <main>
+    <div class="code">404</div>
+    <h1>ページが見つかりません</h1>
+    <p>
+      お探しのページは、移動または削除された可能性があります。<br />
+      URLに誤りがないかご確認ください。
+    </p>
+    <div class="actions">
+      <a class="btn" href="/">トップページへ</a>
+      <a class="btn ghost" href="/events.html">イベント一覧を見る</a>
+    </div>
+    <div class="note">
+      都道府県別のイベント一覧は <a href="/events.html">イベント一覧</a> から辿れます。
+      イベントの共有リンクは、開催終了から約1週間で表示できなくなります。
+    </div>
+  </main>
+</body>
+</html>

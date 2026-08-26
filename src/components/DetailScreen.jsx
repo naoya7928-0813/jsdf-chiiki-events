@@ -5,6 +5,7 @@ import { REGION_HQ, REGION_SOURCE } from '../config';
 import WeatherCard from './WeatherCard';
 import { useElementWidth, isTouchPhone, useIsShortViewport } from '../hooks/useBreakpoint';
 import { googleCalendarUrl, downloadIcs } from '../utils/calendar';
+import { useOnline } from '../hooks/useOnline';
 
 function officeSourceLabel(ev) {
   if (!ev?.source_type) return null;
@@ -139,6 +140,9 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
   const primaryPlace = ev.place
     ? ev.place.replace(/×/g, '・').split(/[・\/]/)[0].trim()
     : '';
+  // オフラインでは Google マップの埋め込みが読み込めず、枠内にブラウザの
+  // エラーページが出てしまう。事前に代替表示へ切り替える。
+  const online      = useOnline();
   const mapQuery    = encodeURIComponent(
     [ev.address || primaryPlace].filter(Boolean).join(' ')
   );
@@ -483,24 +487,30 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
                 {mapOpen && (
                   <>
                     <div style={{ marginTop: 8, borderRadius: 8, overflow: 'hidden', border: '1px solid var(--border)', height: 200, position: 'relative', background: 'var(--card)' }}>
-                      {/* 読み込み中フォールバック */}
+                      {/* 読み込み中フォールバック（オフライン時はそのまま案内として残る） */}
                       <div style={{
                         position: 'absolute', inset: 0,
                         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                        gap: 6, pointerEvents: 'none',
+                        gap: 6, pointerEvents: 'none', padding: '0 16px', textAlign: 'center',
                       }}>
                         {ICO.pin('var(--text-muted)', 26)}
-                        <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: F.sans }}>地図を読み込んでいます…</span>
+                        <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: F.sans, lineHeight: 1.7 }}>
+                          {online
+                            ? '地図を読み込んでいます…'
+                            : 'オフラインのため地図を表示できません。会場名・住所は上に表示しています。'}
+                        </span>
                       </div>
-                      <iframe
-                        src={mapSrc}
-                        width="100%"
-                        height="200"
-                        style={{ border: 0, display: 'block', position: 'relative', zIndex: 1 }}
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                        title={`${ev.place}の地図`}
-                      />
+                      {online && (
+                        <iframe
+                          src={mapSrc}
+                          width="100%"
+                          height="200"
+                          style={{ border: 0, display: 'block', position: 'relative', zIndex: 1 }}
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                          title={`${ev.place}の地図`}
+                        />
+                      )}
                     </div>
                     {/* Google Maps で開くリンク */}
                     <a
