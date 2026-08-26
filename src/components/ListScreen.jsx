@@ -2,7 +2,7 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { ICO } from './Icons';
 import { useIsShortViewport } from '../hooks/useBreakpoint';
 import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle, StatusBadge } from './Shared';
-import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, weekendRange, matchesTag, APPLIED_TAG_ID, ENDED_TAG_ID } from './FilterBar';
+import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, weekendRange, matchesTag, matchesBranch, APPLIED_TAG_ID, ENDED_TAG_ID } from './FilterBar';
 import CalendarView from './CalendarView';
 import { daysUntil, deadlineDaysUntil, daysLabel, daysColor } from '../utils/date';
 import { REGIONS, SUPPORTED_PREFECTURES, PREFECTURE_INFO, NEIGHBORS } from '../data/regionMap';
@@ -187,17 +187,19 @@ export default function ListScreen({
   // 高さが足りない画面では、未読でも1行に畳む（タップで全文を表示できる）。
   const noticeFolded = (noticeRead || shortVp) && !noticeExpanded;
 
-  // ── カテゴリ・タグ・期間 フィルター ─────────────────────
+  // ── カテゴリ・タグ・期間・種別 フィルター ─────────────────
   const [activeCategory, setActiveCategory] = useState('all');
   const [activeTag,      setActiveTag]      = useState('all');
   const [activePeriod,   setActivePeriod]   = useState('all');
+  const [activeBranch,   setActiveBranch]   = useState('all');
 
-  // カテゴリ・タグ・期間を変更しても検索テキストはリセットしない（同時適用）
+  // カテゴリ・タグ・期間・種別を変更しても検索テキストはリセットしない（同時適用）
   const handleCategoryChange = (cat)    => setActiveCategory(cat);
   const handleTagChange      = (tag)    => setActiveTag(tag);
   const handlePeriodChange   = (period) => setActivePeriod(period);
+  const handleBranchChange   = (branch) => setActiveBranch(branch);
 
-  // ── フィルター適用済みリスト（期間×カテゴリ×タグ、開催日昇順） ──
+  // ── フィルター適用済みリスト（期間×カテゴリ×タグ×種別、開催日昇順） ──
   const filteredList = useMemo(() => {
     // JST の今日を YYYY-MM-DD 文字列で取得
     const tStr = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
@@ -215,6 +217,10 @@ export default function ListScreen({
     const pad = n => String(n).padStart(2, '0');
 
     const wStr = addDays(tStr, 6);
+    // 来週＝今週（今日〜6日後）の続きの7日間。暦の月〜日にすると今週との間に
+    // 隙間・重なりができるため、相対期間で揃える（FilterBar の件数計算と同じ）
+    const nwS  = addDays(tStr, 7);
+    const nwE  = addDays(tStr, 13);
     const mStr = `${Y}-${pad(Mo)}-${pad(lastDay(Y, Mo))}`;
     const { sat: satStr, sun: sunStr } = weekendRange(tStr);
 
@@ -231,6 +237,8 @@ export default function ListScreen({
           || (activeCategory === 'その他' ? !STANDARD_CATEGORIES.includes(ev.category) : ev.category === activeCategory);
         const tagOk = activeTag === 'all' || isEndedFilter
           || (activeTag === APPLIED_TAG_ID ? (applied?.has(ev.id) ?? false) : matchesTag(ev, activeTag));
+        // 陸・海・空。判定できないイベントは種別を選ぶと外れる（推測で見せない）
+        const branchOk = matchesBranch(ev, activeBranch);
 
         // 終了済みの表示制御:
         //  - 「終了済み」タグ選択時 → 終了済みのみ表示
@@ -244,11 +252,12 @@ export default function ListScreen({
         if (activePeriod === 'today')     periodOk = ev.date <= tStr && ee >= tStr;
         if (activePeriod === 'weekend')   periodOk = ev.date <= sunStr && ee >= satStr && ee >= tStr;
         if (activePeriod === 'thisWeek')  periodOk = ev.date <= wStr && ee >= tStr;
+        if (activePeriod === 'nextWeek')  periodOk = ev.date <= nwE && ee >= nwS;
         if (activePeriod === 'thisMonth') periodOk = ev.date <= mStr && ee >= tStr;
         // 来月：開始日が来月の範囲に入るイベントのみ（今月開始来月終了のイベントは除外）
         if (activePeriod === 'nextMonth') periodOk = ev.date >= nmS && ev.date <= nmE;
 
-        return catOk && tagOk && periodOk && endedOk;
+        return catOk && tagOk && branchOk && periodOk && endedOk;
       })
       .sort((a, b) => {
         // 日程未定（date=""）は常に末尾へ
@@ -257,7 +266,7 @@ export default function ListScreen({
         if (!b.date) return -1;
         return new Date(a.date) - new Date(b.date);
       });
-  }, [list, activeCategory, activeTag, activePeriod, favorites, applied]);
+  }, [list, activeCategory, activeTag, activePeriod, activeBranch, favorites, applied]);
 
   // ── イベントグループ化 ─────────────────────────────────────
   const grouped = useMemo(() => {
@@ -502,7 +511,7 @@ export default function ListScreen({
                   {ICO.cal('rgba(255,255,255,0.65)', 12)} 期間フィルター適用中
                 </span>
               )}
-              {(activeCategory !== 'all' || activeTag !== 'all') && (
+              {(activeCategory !== 'all' || activeTag !== 'all' || activeBranch !== 'all') && (
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                   {ICO.tag('rgba(255,255,255,0.65)', 12)} カテゴリ絞り込み中
                 </span>
@@ -519,9 +528,11 @@ export default function ListScreen({
         activeCategory={activeCategory}
         activeTag={activeTag}
         activePeriod={activePeriod}
+        activeBranch={activeBranch}
         onCategoryChange={handleCategoryChange}
         onTagChange={handleTagChange}
         onPeriodChange={handlePeriodChange}
+        onBranchChange={handleBranchChange}
         primary={primary}
         collapsed={!filterOpen}
         onToggleCollapsed={handleToggleFilter}

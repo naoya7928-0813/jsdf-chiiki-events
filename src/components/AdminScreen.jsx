@@ -3,6 +3,7 @@ import { ScreenHeader, F } from './Shared';
 import { PREFECTURE_INFO } from '../data/regionMap';
 import { fetchOfficesData } from '../hooks/useOffices';
 import { facilitiesForPref, AGE_OPTIONS } from '../data/jsdfFacilities';
+import { BRANCH_DEFS, normalizeBranches } from '../../shared/branch.cjs';
 import PastEventsPanel from './PastEventsPanel';
 import PresencePanel from './PresencePanel';
 import ReportsPanel from './ReportsPanel';
@@ -35,7 +36,15 @@ const WD = ['日', '月', '火', '水', '木', '金', '土'];
 const EMPTY = {
   pref: 'tokyo', multiDay: false, date: '', endDate: '', title: '', place: '', address: '',
   timeStart: '', timeEnd: '', category: '広報活動', tag: '', ageRequirement: '', deadline: '', url: '', notes: '',
+  // 自衛隊の種別（陸/海/空）。合同開催があるため複数選択できる。
+  // 未選択なら保存せず、表示側が文面から推定する（誤った断定より推定に任せる）
+  branch: [],
 };
+
+// 種別ID配列 → 表示用ラベル配列（未指定は空）
+function branchLabels(value) {
+  return normalizeBranches(value).map(id => BRANCH_DEFS.find(b => b.id === id)?.label || id);
+}
 
 // 開始/終了の時刻入力 → カード表記の time 文字列「HH:MM～HH:MM」
 function buildTime(f) {
@@ -157,7 +166,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
       title: ev.title || '', place: ev.place || '', address: ev.address || '',
       timeStart: tm ? tm[1] : '', timeEnd: tm ? tm[2] : '',
       category: ev.category || '広報活動', tag: ev.tag || '', ageRequirement: ev.ageRequirement || '',
-      deadline: '', url: ev.url || '', notes: ev.notes || '',
+      deadline: '', url: ev.url || '', notes: ev.notes || '', branch: normalizeBranches(ev.branch),
     });
     setEditingId(ev.id); setEditingDeadline(ev.deadline || null); setPreview(false); setMsg(null);
     try { document.querySelector('[data-admin-scroll]')?.scrollTo({ top: 0, behavior: 'smooth' }); } catch { /* noop */ }
@@ -187,6 +196,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         const patch = {
           title: form.title, place: form.place, address: form.address, time: buildTime(form),
           category: form.category, tag: form.tag, ageRequirement: form.ageRequirement,
+          branch: normalizeBranches(form.branch),
           url: form.url, notes: form.notes, date: form.date, endDate: form.multiDay ? form.endDate : '',
         };
         if (form.deadline) patch.deadline = toDeadlineStr(form.deadline);
@@ -228,13 +238,20 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   function download(name, text, mime) { const b = new Blob([text], { type: mime }); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(u), 1000); }
   function exportJSON() { download(`jsdf-events-${Date.now()}.json`, JSON.stringify(list, null, 2), 'application/json'); }
   function exportCSV() {
-    const cols = ['id', 'pref', 'date', 'endDate', 'title', 'place', 'address', 'time', 'category', 'tag', 'ageRequirement', 'deadline', 'url', 'notes', 'status'];
+    const cols = ['id', 'pref', 'date', 'endDate', 'title', 'place', 'address', 'time', 'category', 'branch', 'tag', 'ageRequirement', 'deadline', 'url', 'notes', 'status'];
     const esc = v => { let s = v == null ? '' : String(v); if (/[",\n]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"'; return s; };
-    const rows = [cols.join(',')].concat(list.map(e => cols.map(c => esc(e[c])).join(',')));
+    // branch は内部ID配列なので、CSV では日本語ラベル（例「陸上・海上」）に直す
+    const cell = (e, c) => (c === 'branch' ? branchLabels(e.branch).join('・') : e[c]);
+    const rows = [cols.join(',')].concat(list.map(e => cols.map(c => esc(cell(e, c))).join(',')));
     download(`jsdf-events-${Date.now()}.csv`, '﻿' + rows.join('\r\n'), 'text/csv;charset=utf-8');
   }
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  // 種別は合同開催があるため複数選択（もう一度押すと解除）
+  const toggleBranch = id => setForm(f => {
+    const cur = normalizeBranches(f.branch);
+    return { ...f, branch: cur.includes(id) ? cur.filter(b => b !== id) : [...cur, id] };
+  });
   const isScoped = account && org !== '*';
   const prefOffices = useMemo(() => offices.filter(o => o.pref === form.pref), [offices, form.pref]);
   const facilities = useMemo(() => facilitiesForPref(form.pref), [form.pref]);
@@ -352,6 +369,45 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
           {/* minWidth:0 で選択肢の長い select が縮む（無いと横はみ出しの原因になる） */}
           <div style={{ flex: 1, minWidth: 0 }}><div style={label}>イベント種別</div><select value={form.category} onChange={e => set('category', e.target.value)} style={input}>{CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
           <div style={{ flex: 1, minWidth: 0 }}><div style={label}>申込要否</div><select value={form.tag} onChange={e => set('tag', e.target.value)} style={input}>{APPLY_OPTS.map(o => <option key={o} value={o}>{o || '—'}</option>)}</select></div>
+        </div>
+
+        {/* 自衛隊の種別（陸/海/空）。合同開催は複数選択可。未選択なら文面から自動推定 */}
+        <div style={label}>自衛隊の種別（複数選択可）</div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
+          {BRANCH_DEFS.map(({ id, label: bl, short, color }) => {
+            const isOn = normalizeBranches(form.branch).includes(id);
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => toggleBranch(id)}
+                aria-pressed={isOn}
+                style={{
+                  cursor: 'pointer', fontFamily: F.sans, fontSize: 13,
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '8px 14px', borderRadius: 20,
+                  border: `1.5px solid ${isOn ? color : 'var(--border)'}`,
+                  background: isOn ? color : 'var(--card)',
+                  color: isOn ? '#fff' : 'var(--text-sub)',
+                  fontWeight: isOn ? 700 : 400,
+                }}
+              >
+                <span style={{
+                  fontSize: 11, fontWeight: 700, lineHeight: '16px',
+                  width: 16, height: 16, borderRadius: 4, textAlign: 'center',
+                  background: isOn ? 'rgba(255,255,255,0.25)' : `${color}1f`,
+                  color: isOn ? '#fff' : color,
+                }}>
+                  {short}
+                </span>
+                {bl}
+              </button>
+            );
+          })}
+        </div>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.6 }}>
+          未選択のままでも保存できます（イベント名・会場から自動で推定します）。
+          推定が付かない場合は絞り込みの「陸上／海上／航空」に出ません。
         </div>
 
         <div style={label}>時間</div>
@@ -496,6 +552,9 @@ function PreviewCard({ form, primary, prefLabel }) {
         <span style={{ fontSize: 10, fontWeight: 700, color: primary, background: `${primary}18`, borderRadius: 5, padding: '2px 7px' }}>{prefLabel}</span>
         {form.category && <span style={{ fontSize: 11, color: 'var(--text-sub)' }}>{form.category}</span>}
         {form.tag && <span style={{ fontSize: 11, color: 'var(--text-sub)' }}>· {form.tag}</span>}
+        {branchLabels(form.branch).length > 0 && (
+          <span style={{ fontSize: 11, color: 'var(--text-sub)' }}>· {branchLabels(form.branch).join('・')}</span>
+        )}
       </div>
       <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', lineHeight: 1.4 }}>{form.title || '（イベント名）'}</div>
       <div style={{ fontSize: 12.5, color: 'var(--text-muted)', marginTop: 6, lineHeight: 1.7 }}>

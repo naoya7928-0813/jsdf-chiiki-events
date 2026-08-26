@@ -7,6 +7,7 @@
 // 重要（IDOR対策）: 対象イベントの所属地本はクライアントの pref を信用せず、
 // サーバー側で実データ（Redis 手動イベント / events.json）から解決して権限判定する。
 import { checkOrigin, noStore, requireSameOrigin, rateLimit, requireAuth, hasPermission, canManageScope, redis, cleanText, writeAudit } from '../_security.js';
+import { normalizeBranches } from '../../shared/branch.cjs';
 
 const OKEY = 'manual:overrides';
 const MKEY = 'manual:events';
@@ -67,6 +68,11 @@ function buildPatch(input) {
     const ed = String(e.endDate || '').trim();
     if (ed && DATE_RE.test(ed)) { o.endDate = ed; o.endWeekday = weekdayOf(ed); }
     else { o.endDate = null; o.endWeekday = null; }
+  }
+  // 種別（陸/海/空）。空配列を送ると「指定なし」に戻し、文面からの推定に任せる
+  if (e.branch !== undefined) {
+    const b = normalizeBranches(e.branch);
+    o.branch = b.length ? b : null;
   }
   if (o.title !== undefined && !o.title) return { error: 'タイトルは必須です' };
   return { patch: o };
