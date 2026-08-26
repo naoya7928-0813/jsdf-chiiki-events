@@ -417,7 +417,16 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - データ源を統合: 手動イベント（Redis `manual:events`）＋スクレイプ（`events.json`）＋override 反映。**ID重複は手動を優先**。
 - 認可は `canManageScope`（deny-by-default）。office ロールは自office一致のみ（**スクレイプは office 欄が無いため pco_admin 以上のみ閲覧可**）。pco_admin=自地本/national=全国。**クライアントの pref/office では拡大不可**（サーバーの実データで判定）。
 - クエリ: `from/to/status/q/office/pref/limit(既定50・最大100)/offset`。不正日付/limit は 400・新しい順・`no-store`・GET のため状態変更CSRFは適用しない。
-- **保存方式の制約**: `events.json` は終了後約7日（`ENDED_KEEP_DAYS`）で削除されるため、それ以前のスクレイプ過去イベントは残らない。**完全な永久アーカイブではない**（応答 `note` で明示）。手動イベントは削除まで残る。
+- **保存方針（2026-08-26 確定）**: 収集したデータは**運営側に蓄積し、公開サイトは1週間だけ持つ**。
+  - 公開（`public/data/events.json`）… 終了後 **7日**（`ENDED_KEEP_DAYS`）で削除。フロントも同じ7日で切る。
+  - 運営（`data/events-archive.json`）… **期限を切らずに蓄積**する。`ARCHIVE_RETENTION_DAYS` を
+    明示的に設定したときだけ日数で打ち切る（既定 0 = 無期限）。件数上限 `ARCHIVE_MAX`（既定 200000）は暴走防止の安全弁。
+  - **アーカイブは `public/` の外に置く**。`public/data/` に置くと静的配信されて誰でも全履歴を
+    取得でき、この保存方針が成立しない。運営APIは HTTP ではなく**ファイルシステム**から読む
+    （`vercel.json` の `functions["api/admin/past-events.js"].includeFiles: "data/**"` で関数バンドルへ同梱。
+    `EVENTS_ARCHIVE_PATH` で配置を差し替え可能）。
+  - `data/**` を変更したらデプロイが必要（関数バンドルに載るため）。scrape.yml / deploy.yml のトリガーに追加済み。
+  - 手動イベント（Redis）は削除まで残る。
 - UI: 運営画面に「現在・今後／下書き／**過去イベント**」タブ（`src/components/PastEventsPanel.jsx`、閲覧専用）。監査履歴は別表示。
 - 将来のイベントID移行・恒久アーカイブ設計とは別課題（本機能は現存データの閲覧のみ）。
 

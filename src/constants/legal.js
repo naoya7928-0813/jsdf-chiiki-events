@@ -48,14 +48,30 @@ export const LEGAL_SUMMARY = [
   '表示速度と使い勝手の改善のため、利用状況を統計的に計測しています（個人の特定や他サイトをまたいだ追跡は行いません）。',
 ];
 
-/** 同意済みの版を読み出す（読めない環境では null） */
+/**
+ * 同意済みの版を読み出す。
+ * localStorage が使えない環境（プライベートモード・ストレージ拒否）でも
+ * 同じセッション中に何度も同意を求めないよう、sessionStorage も見る。
+ */
 export function loadAcceptedLegalVersion() {
-  try { return localStorage.getItem(LEGAL_STORAGE_KEY); } catch { return null; }
+  try {
+    const v = localStorage.getItem(LEGAL_STORAGE_KEY);
+    if (v) return v;
+  } catch { /* 読めない環境 */ }
+  try { return sessionStorage.getItem(LEGAL_STORAGE_KEY); } catch { return null; }
 }
 
-/** 同意を記録する */
+/**
+ * 同意を記録する。
+ * localStorage に書けない環境では sessionStorage に退避する。
+ * これが無いと、そうした環境で読み込みのたびに同意画面が出て
+ * 「改定時に1度だけ」という約束が守れない。
+ */
 export function saveAcceptedLegalVersion(version = LEGAL_VERSION) {
-  try { localStorage.setItem(LEGAL_STORAGE_KEY, version); } catch { /* 保存できなくても利用は妨げない */ }
+  let stored = false;
+  try { localStorage.setItem(LEGAL_STORAGE_KEY, version); stored = true; } catch { /* 次で退避 */ }
+  if (stored) return;
+  try { sessionStorage.setItem(LEGAL_STORAGE_KEY, version); } catch { /* 保存できなくても利用は妨げない */ }
 }
 
 /**

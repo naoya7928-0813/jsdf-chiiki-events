@@ -23,16 +23,22 @@ const SCRAPE = { tokyo: [
   { id: 'f1', pref: 'tokyo', date: today, title: '本日テスト' },
 ], updatedAt: today };
 
-// 恒久アーカイブ（events.json から7日超で外れた過去イベント）
+// 恒久アーカイブ（events.json から7日超で外れた過去イベント）。
+// 本番同様、public/ の外のファイルから読ませる（HTTP 配信しないため fetch では取れない）。
 const ARCHIVE = { updatedAt: today, events: [
   { id: 'arch1', pref: 'tokyo', office: '', date: '2026-01-10', title: 'アーカイブ過去テスト', place: 'Z', source_type: 'scrape', archivedAt: today },
 ] };
+const fs = require('node:fs');
+const os = require('node:os');
+const pathMod = require('node:path');
+const archiveFile = pathMod.join(fs.mkdtempSync(pathMod.join(os.tmpdir(), 'jsdf-arch-')), 'events-archive.json');
+fs.writeFileSync(archiveFile, JSON.stringify(ARCHIVE), 'utf8');
+process.env.EVENTS_ARCHIVE_PATH = archiveFile;
 
 // fetch スタブ: events.json はSCRAPE、archive はARCHIVE、Upstash は空(result:null)
 globalThis.fetch = async (url) => {
   const u = String(url);
   if (u.includes('/data/events.json')) return { ok: true, status: 200, json: async () => SCRAPE };
-  if (u.includes('/data/events-archive.json')) return { ok: true, status: 200, json: async () => ARCHIVE };
   return { ok: true, status: 200, json: async () => ({ result: null }), text: async () => '{"result":null}' };
 };
 

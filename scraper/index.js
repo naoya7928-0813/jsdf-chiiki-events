@@ -125,10 +125,16 @@ const LLM_RECHECK_PATH = path.join(__dirname, '../public/data/events-llm-recheck
 const PUSH_PAYLOAD_PATH = path.join(__dirname, 'push-payload.json');
 // 過去イベントの恒久ログ（events.json は終了7日で削除するため、退避先として git 管理でコミット）。
 // 運営サイトの「過去イベント」から終了後もずっと閲覧できるようにする。
-const ARCHIVE_PATH = path.join(__dirname, '../public/data/events-archive.json');
+// 恒久アーカイブは **public/ の外** に置く。public/data/ に置くと静的配信されて
+// 誰でも全履歴を取得できてしまい、「公開サイトは1週間・運営は蓄積」という
+// 保存方針が成り立たない。運営APIはファイルシステムから読む。
+const ARCHIVE_PATH = path.join(__dirname, '../data/events-archive.json');
 // 保持設定（環境変数で調整可）。既定: 開催日が約2年以内、かつ最大2万件。
-const ARCHIVE_RETENTION_DAYS = Number.parseInt(process.env.ARCHIVE_RETENTION_DAYS || '', 10) || 730;
-const ARCHIVE_MAX = Number.parseInt(process.env.ARCHIVE_MAX || '', 10) || 20000;
+// 運営のアーカイブは期限で切らずに蓄積する（収集したデータを残すのが目的）。
+// ARCHIVE_RETENTION_DAYS を明示的に設定した場合だけ、その日数より古いものを落とす。
+const ARCHIVE_RETENTION_DAYS = Number.parseInt(process.env.ARCHIVE_RETENTION_DAYS || '', 10) || 0; // 0 = 無期限
+// 件数上限はファイルの暴走を防ぐ安全弁。年 3000 件程度の増加を想定し十分な余裕を取る。
+const ARCHIVE_MAX = Number.parseInt(process.env.ARCHIVE_MAX || '', 10) || 200000;
 
 const URLS = {
   // 北海道地本（札幌は複数サブページ）
@@ -5114,10 +5120,12 @@ async function writeOutput(data) {
 
 /**
  * 終了したイベント（候補=前回 events.json＋今回出力の過去イベント）を恒久アーカイブへ退避する。
- * - 保存先 public/data/events-archive.json（git コミット。運営「過去イベント」が閲覧）。
+ * - 保存先 data/events-archive.json（git コミット・**public/ の外**なので公開配信されない。
+ *   運営「過去イベント」だけが /api/admin/past-events 経由で閲覧する）。
  * - id で upsert（再退避は最新で上書き＝毎回実行しても冪等）。
  * - 品質防御: 不正タイトル・office_notice スタブは持ち込まない。
- * - 保持: 開催日が ARCHIVE_RETENTION_DAYS 以内、かつ最大 ARCHIVE_MAX 件（新しい順）。
+ * - 保持: 既定は無期限（蓄積）。ARCHIVE_RETENTION_DAYS を設定した場合のみ日数で打ち切る。
+ *   件数は ARCHIVE_MAX（暴走防止の安全弁）まで。
  * - 天気座標など表示に不要な大きいフィールドは載せない（サイズ抑制）。
  */
 function archivePastEvents(candidates, today) {
@@ -5150,11 +5158,14 @@ function archivePastEvents(candidates, today) {
     byId.set(e.id, pick(e)); // 再退避時は最新で上書き
   }
 
-  // 保持: 開催日(実効日)が RETENTION_DAYS 以内のみ。新しい順に上限件数。
-  const minDate = new Date(Date.now() + 9 * 3600 * 1000 - ARCHIVE_RETENTION_DAYS * 86400000)
-    .toISOString().slice(0, 10);
+  // 保持: 既定は無期限（蓄積）。ARCHIVE_RETENTION_DAYS を設定したときだけ古いものを落とす。
   const eff = (e) => e.endDate || e.date || '';
-  let events = [...byId.values()].filter(e => eff(e) >= minDate);
+  let events = [...byId.values()];
+  if (ARCHIVE_RETENTION_DAYS > 0) {
+    const minDate = new Date(Date.now() + 9 * 3600 * 1000 - ARCHIVE_RETENTION_DAYS * 86400000)
+      .toISOString().slice(0, 10);
+    events = events.filter(e => eff(e) >= minDate);
+  }
   events.sort((a, b) => (eff(a) < eff(b) ? 1 : eff(a) > eff(b) ? -1 : 0)); // 新しい順
   if (events.length > ARCHIVE_MAX) events = events.slice(0, ARCHIVE_MAX);
 

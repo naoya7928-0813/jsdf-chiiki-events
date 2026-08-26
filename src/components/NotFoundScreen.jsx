@@ -75,27 +75,22 @@ export default function NotFoundScreen({
     <div style={{
       flex: 1, overflowY: 'auto', background: 'var(--bg)',
       display: 'flex', flexDirection: 'column', alignItems: 'center',
-      padding: '48px 20px 40px', fontFamily: F.sans,
+      padding: 'clamp(24px, 5vh, 48px) 20px 40px', fontFamily: F.sans,
     }}>
-      <div style={{ width: '100%', maxWidth: 460, textAlign: 'center' }}>
+      {/* 幅に応じた出し分け（文字サイズ・提案の段組み）は globalStyles の .nf-* が持つ */}
+      <div className="nf-wrap" style={{ textAlign: 'center' }}>
 
         {/* 404 の記号 */}
-        <div style={{
-          fontFamily: F.mono, fontSize: 46, fontWeight: 500,
-          letterSpacing: 6, color: `${primary}`, opacity: 0.28,
-          lineHeight: 1, marginBottom: 4,
-        }}>
-          404
-        </div>
+        <div className="nf-code" style={{ color: primary }}>404</div>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
           {ICO.search('var(--icon-muted, #9ca3af)', 32)}
         </div>
 
-        <h1 style={{ fontSize: 16.5, fontWeight: 700, color: 'var(--text)', margin: '0 0 10px' }}>
+        <h1 className="nf-title" style={{ fontWeight: 700, color: 'var(--text)', margin: '0 0 10px' }}>
           {isEvent ? 'このイベントは見つかりませんでした' : 'ページが見つかりません'}
         </h1>
 
-        <div style={{ fontSize: 12.5, color: 'var(--text-muted)', lineHeight: 1.9, marginBottom: 26 }}>
+        <div className="nf-lead" style={{ color: 'var(--text-muted)', lineHeight: 1.9, marginBottom: 26 }}>
           {isEvent ? (
             <>
               掲載期間が終了したか、内容が変更された可能性があります。<br />
@@ -109,7 +104,7 @@ export default function NotFoundScreen({
           )}
         </div>
 
-        <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 34 }}>
+        <div className="nf-actions" style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 34 }}>
           <button onClick={onOpenHome} style={btnPrimary}>ホームへ戻る</button>
           <button onClick={onOpenList} style={btnGhost}>イベント一覧を見る</button>
         </div>
@@ -123,10 +118,7 @@ export default function NotFoundScreen({
             }}>
               開催が近いイベント
             </div>
-            <div style={{
-              border: '1px solid var(--border)', borderRadius: 12,
-              overflow: 'hidden', background: 'var(--card)',
-            }}>
+            <div className="nf-list">
               {suggestions.map((ev, i) => {
                 const info = PREFECTURE_INFO[ev.pref];
                 return (
@@ -135,8 +127,8 @@ export default function NotFoundScreen({
                     onClick={() => onOpenDetail && onOpenDetail(ev)}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 11, width: '100%',
-                      padding: '12px 14px', background: 'transparent',
-                      border: 'none', borderTop: i === 0 ? 'none' : '1px solid var(--border)',
+                      padding: '12px 14px', background: 'var(--card)',
+                      border: '1px solid var(--border)', borderRadius: 12,
                       cursor: 'pointer', textAlign: 'left', fontFamily: F.sans,
                     }}
                   >

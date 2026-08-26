@@ -118,6 +118,45 @@ export const GLOBAL_CSS = `
   button { -webkit-appearance: none; appearance: none; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
+  /* ─── 404画面のレスポンシブ ───
+     インラインstyleでは幅に応じた出し分けができないため、ここをCSSで持つ。
+     JSのブレークポイント判定に頼らず、実際の表示幅にそのまま追従させる。 */
+  .nf-wrap {
+    width: 100%;
+    max-width: 460px;
+    /* 内容が短いときは縦中央へ。auto マージンを使うのは、justify-content:center だと
+       内容が溢れたときに上端が切れてスクロールで戻れなくなるため。 */
+    margin: auto 0;
+  }
+  .nf-code {
+    font-family: "SF Mono","IBM Plex Mono",ui-monospace,"Menlo","Consolas",monospace;
+    font-size: clamp(36px, 11vw, 52px);
+    letter-spacing: clamp(3px, 1.6vw, 8px);
+    line-height: 1;
+    font-weight: 500;
+    opacity: 0.28;
+    margin-bottom: 4px;
+  }
+  .nf-title  { font-size: clamp(15px, 4.2vw, 19px); }
+  .nf-lead   { font-size: clamp(12px, 3.4vw, 13.5px); }
+  /* 狭い画面ではボタンを横並びのまま縮め、折り返したときは全幅にして押しやすくする */
+  .nf-actions > button { flex: 1 1 auto; min-width: 148px; }
+  /* トラックは minmax(0,1fr) にすること。単なる 1fr は minmax(auto,1fr) と同義で、
+     最小幅が中身の min-content になる。タイトルは white-space:nowrap なので、
+     長い名前だとトラックごと親からはみ出し、省略記号（…）が効かずに切れてしまう。
+     ※ この CSS はテンプレートリテラル内なので、コメントにバッククォートを書かないこと
+       （文字列が途中で終わってビルドが壊れる）。 */
+  .nf-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  /* グリッドアイテム自身も既定が min-width:auto なので、これが無いと
+     カードが中身の min-content 幅まで広がって親からはみ出す。 */
+  .nf-list > button { min-width: 0; }
+
+  @media (min-width: 720px) {
+    /* 幅に余裕があれば提案を2列にして、下半分が空くのを防ぐ */
+    .nf-wrap { max-width: 720px; }
+    .nf-list { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  }
+
   /* iOS Safari は font-size が 16px 未満の入力欄をタップすると自動でズームインし、
      そのズームがログイン後の画面まで残って「拡大表示」に見える不具合になる。
      タッチ端末では入力系フォントを 16px 以上に固定して自動ズームを無効化する
