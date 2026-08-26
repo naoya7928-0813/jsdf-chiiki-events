@@ -24,13 +24,18 @@
          それまでの間に素のHTML（特に #root 外の SEO 用フッター）が画面に一瞬出るのを防ぐ。
          空の #root をビューポート高にしてアプリ描画前の余白を確保する。
          #seo-footer は内部リンク巡回のため DOM には残すが、利用者には見えないよう
-         視覚的に隠す（off-screen）。リンクは HTML 内に存在するためクローラーは辿れる。 -->
+         視覚的に隠す（off-screen）。リンクは HTML 内に存在するためクローラーは辿れる。
+
+         ※ 背景色はここに書かない。ライト色を固定で置くと、ダーク利用者が
+           コールドロードのたびに白い画面を経由する。テーマ確定は <head> 先頭へ
+           注入される shared/bootTheme.cjs（vite.config.js の bootThemeInject）が
+           初回描画前に行う。 -->
     <style>
       html, body { margin: 0; }
       /* ページ自体はスクロールさせない（アプリ内の領域だけスクロール）。
          モバイルの下部ラバーバンド／余計な動きを防ぐ（JS前から適用）。 */
       html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
-      body { background: #f5f6f8; position: fixed; inset: 0; width: 100%; }
+      body { position: fixed; inset: 0; width: 100%; }
       #root { min-height: 100vh; min-height: 100dvh; }
       /* SEO用フッターを画面から隠す（DOM・内部リンクは保持＝クロール可能） */
       #seo-footer {

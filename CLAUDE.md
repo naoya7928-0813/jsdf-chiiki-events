@@ -136,6 +136,7 @@ OCRの優先順は、無料ローカルOCR（Tesseract → RapidOCR）を先に�
 - `shared/titleQuality.cjs` … 全経路共通の整形/不正除外/年ズレ/重複（`cleanEventTitle`/`isJunkOrStubTitle`/`isStaleDatedEvent`/`dedupEvents`/`cleanPlaceText`/`applyVerifiedOverrides`）
 - `shared/officeTitle.cjs` … 募集案内所イベント専用の整形/除外（`cleanOfficeTitle`/`officeIsJunk`/`cleanOfficePlace`/`stripTrailingCta`）
 - `scraper/parsers/utils.js` … カテゴリ/タグ/曜日の判定（`guessCategory`/`guessTags`/`calcWeekday`）
+- `shared/branch.cjs` … 陸海空の種別判定（`BRANCH_DEFS`/`matchesBranch`/`branchesOf`/`normalizeBranches`）
 
 ### フィールド一覧（スキーマ）
 
@@ -151,6 +152,7 @@ OCRの優先順は、無料ローカルOCR（Tesseract → RapidOCR）を先に�
 | `time` | — | `HH:MM～HH:MM`（または `HH:MM`／`終日`） | 波ダッシュは `～` に統一。**不明なら空**（推測しない）。 |
 | `category` | ✓ | 固定9値（下記） | `guessCategory()` で判定。9値以外は使わない。 |
 | `tag` | — | 申込要否・属性（下記） | 主に1つ。 |
+| `branch` | — | `['ground'\|'maritime'\|'air']` | 陸海空の種別（下記）。**手動入力のみ保存**。スクレイプ品は持たず表示側で推定。 |
 | `ageRequirement` | — | 対象（下記） | 「対象」欄。 |
 | `deadline` | — | `M月D日（曜）` | 申込締切（例 `7月10日（金）`）。 |
 | `url` | — | URL | 公式ページ/チラシ。 |
@@ -169,6 +171,15 @@ OCRの優先順は、無料ローカルOCR（Tesseract → RapidOCR）を先に�
 - **複数イベント連結**: 「A説明会in広島の B説明会inふくやまの …」→ 先頭イベントのみ残す（イベント語2回以上＋「の␣」連結時）。
 - 案内所名のみのタイトルは「自衛隊説明会（○○）」に補完。
 
+**中国語（簡体字）の扱い**: OCR が日本語の漢字を簡体字として誤読することがある
+（実例: 「关山演习場」→ 正しくは「関山演習場」、「门司港」→「門司港」）。
+**単純に弾くと正規のイベントごと消える**ため、`toJapaneseKanji` でまず日本語（新字体）へ直し、
+それでも残る中国語だけを `hasForeignChinese` で不正とする。`cleanEventTitle` / `cleanPlaceText` /
+`normalizeLlmEvent`（LLM出力）のすべてが変換を通る。
+⚠️ 判定用の文字リストは**日本語で絶対に使わない字だけ**にすること。
+大きな簡体字リストを手で並べて「潜・横・里・谷・条」等を混入させ、正規イベント67件を
+誤除外する実装を一度作っている（2026-08-27）。迷ったら足さない。主役は変換表であって除外ではない。
+
 **除外（`isJunkOrStubTitle`＝中身なし/不正）**: 郵便番号・電話・住所混入、申込/リンク案内、様式・受験案内断片、ラベル行（「主催:」等）、OCR文字化け、部隊名のみ（種別なし）、助詞終わり、スタブ「○○地本イベント」、日本語がほぼ無い断片 等。
 
 **年ズレ（`isStaleDatedEvent`）**: タイトル/URL の西暦がイベント年より古い再登録を除外。
@@ -185,6 +196,22 @@ OCRの優先順は、無料ローカルOCR（Tesseract → RapidOCR）を先に�
 
 ### タグ（tag）
 申込要否・属性。スクレイプは `guessTags()` で `入場無料`/`要予約`/`オンライン`/`家族向け`/`学生向け`/`抽選`/`個別`/`OB・OG`。手動入力の申込要否は `要予約`/`予約不要`/`事前申込制`/`入場無料`/`要問合せ`。
+
+### 種別（branch）— 陸上 / 海上 / 航空
+判定は **`shared/branch.cjs` に集約**（フロントの絞り込み・運営テンプレ・管理API で共有）。
+
+- **値**: `ground`（陸上）/ `maritime`（海上）/ `air`（航空）の配列。合同開催があるため複数可。
+- **手動入力（運営）が最優先**: `branch` が入っていれば推定しない（人が入れた値を機械が上書きしない）。
+  運営画面の「自衛隊の種別（複数選択可）」で入力。未選択なら**フィールド自体を保存しない**。
+- **スクレイプ品は `branch` を持たない**。表示時に `title`/`place`/`notes`/`category` から推定する:
+  1. `strong`（`陸上自衛隊`・`駐屯地`・`護衛艦`・`航空自衛隊`・`航空祭` 等の明示語）に当たればそれ
+  2. どの種別の `strong` も無いときだけ `weak`（`岸壁`・`戦闘機` 等の施設・装備語）で補う
+     ※「基地」は海自（舞鶴基地）と空自（入間基地）の両方が使うので単独では決め手にしない
+- **判定できないイベントは種別なし**（実測で全179件中145件）。種別で絞ると出てこない。
+  **推測で振り分けない**方針（誤った断定より「出ない」を選ぶ）。運営が手動で `branch` を入れれば出る。
+- 新種の語を足すときは `shared/branch.cjs` の `BRANCH_DEFS` に追加し、`shared/branch.test.cjs` に
+  テストを足す（`npm test`）。**日本語の一般語を拾わないか実データで必ず確認すること**
+  （2026-08-26 に中国語ブロックリストで同種の誤爆事故あり）。
 
 ### 時間（time）・対象（ageRequirement）・締切（deadline）
 - `time`: `HH:MM～HH:MM`（波ダッシュは `～`）。終日開催は `終日`。**不明なら空**（推測で埋めない）。
@@ -273,6 +300,14 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - **地域マップ**: 8地域（北海道・東北・関東・中部・近畿・中国・四国・九州）
 - **都道府県 emblem**: `regionMap.js` の PREFECTURE_INFO と REGIONS 両方に同じ値が必要（全50件ユニーク）
 - **テーマ**: CSS 変数 `var(--bg)` / `var(--text)` / `var(--card)` / `var(--border)` でライト/ダーク切替
+- **起動時のテーマ確定（白フラッシュ対策）**: グローバルCSS は `main.jsx` が JS 実行時に注入するため、
+  それまで body はライト色のままで、ダーク利用者はコールドロードのたびに白い画面を経由していた。
+  `shared/bootTheme.cjs` の `<style>`＋`<script>` を `vite.config.js` の `bootThemeInject` が
+  `index.html` / `admin.html` の `<head>` 先頭へ注入し、**初回描画前に**テーマを確定させる
+  （CSS が OS 設定、script が `localStorage['jsdf-dark']` の明示指定を担当）。
+  ⚠️ **`index.html` に背景色を直接書かないこと**（ライト固定になり同じ事故が再発する）。
+  `BOOT_BG` は `globalStyles.js` の `--bg` と一致必須で、`shared/bootTheme.test.cjs` が実ファイルを
+  読んで検証している（ズレると起動直後と描画後で色が変わり、別の形でちらつく）。
 - **プッシュ通知**: ntfy.sh トピック `jsdf-chiiki-events-7928`
 
 ## オフライン対応（2026-08-26 導入）

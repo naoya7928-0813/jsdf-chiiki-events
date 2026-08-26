@@ -60,6 +60,30 @@ function sharedCjsDevInterop() {
   };
 }
 
+// 起動時の白フラッシュ対策。index.html / admin.html の <head> 先頭へ、
+// テーマを初回描画前に確定させる <style> と <script> を注入する。
+// 中身は shared/bootTheme.cjs（色は globalStyles.js の --bg と一致。テストで検証）。
+// dev サーバーでも同じ注入が走るので、開発と本番で見え方が変わらない。
+function bootThemeInject() {
+  const require_ = createRequire(import.meta.url);
+  return {
+    name: 'boot-theme-inject',
+    enforce: 'pre',  // 他プラグインの注入より前に <head> 先頭へ置く
+    transformIndexHtml: {
+      order: 'pre',
+      handler() {
+        // 毎回読み直す（dev で bootTheme.cjs を編集したら再起動なしで反映）
+        delete require_.cache[require_.resolve('./shared/bootTheme.cjs')];
+        const { bootThemeStyle, bootThemeScript } = require_('./shared/bootTheme.cjs');
+        return [
+          { tag: 'style',  children: bootThemeStyle(),  injectTo: 'head-prepend' },
+          { tag: 'script', children: bootThemeScript(), injectTo: 'head-prepend' },
+        ];
+      },
+    },
+  };
+}
+
 function adminManifestSwap() {
   return {
     name: 'admin-manifest-swap',
@@ -102,6 +126,7 @@ export default defineConfig({
   },
   plugins: [
     react(),
+    bootThemeInject(),
     sharedCjsDevInterop(),
     adminManifestSwap(),
     VitePWA({

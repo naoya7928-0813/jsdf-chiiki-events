@@ -1,5 +1,9 @@
 import { useMemo } from 'react';
 import { F } from './Shared';
+// 陸海空の判定は shared/branch.cjs に集約（運営テンプレ・API と共有）
+import { BRANCH_DEFS, matchesBranch } from '../../shared/branch.cjs';
+
+export { BRANCH_DEFS, matchesBranch };
 
 // メインカテゴリとして個別チップを表示するカテゴリ一覧
 export const STANDARD_CATEGORIES = [
@@ -13,6 +17,9 @@ export const PERIODS = [
   { id: 'today',     label: '今日'   },
   { id: 'weekend',   label: '今週末' },
   { id: 'thisWeek',  label: '今週'   },
+  // 今週が「今日から6日後まで」の相対期間なので、来週もその続き（7〜13日後）にする。
+  // 暦の月曜〜日曜にすると「今週」との間に隙間・重なりができて分かりにくい。
+  { id: 'nextWeek',  label: '来週'   },
   { id: 'thisMonth', label: '今月'   },
   { id: 'nextMonth', label: '来月'   },
 ];
@@ -69,7 +76,9 @@ export function calcPeriodCounts(events) {
   const lastDay = (y, m) => new Date(Date.UTC(y, m, 0)).getUTCDate();
   const pad = n => String(n).padStart(2, '0');
 
-  const wStr = addDays(tStr, 6);
+  const wStr  = addDays(tStr, 6);
+  const nwS   = addDays(tStr, 7);   // 来週のはじまり
+  const nwE   = addDays(tStr, 13);  // 来週のおわり
   const mStr = `${Y}-${pad(Mo)}-${pad(lastDay(Y, Mo))}`;
 
   // 来月（年またぎ対応）
@@ -87,6 +96,8 @@ export function calcPeriodCounts(events) {
     // 今週末：直近の土日に開催がかかるイベント（かつ終了前）
     weekend:   events.filter(e => inRange(e, satStr, sunStr) && (e.endDate ?? e.date) >= tStr).length,
     thisWeek:  events.filter(e => inRange(e, tStr,  wStr)).length,
+    // 来週：7〜13日後に開催がかかるもの
+    nextWeek:  events.filter(e => inRange(e, nwS,   nwE)).length,
     thisMonth: events.filter(e => inRange(e, tStr,  mStr)).length,
     // 来月：開始日ベースで判定
     nextMonth: events.filter(e => e.date >= nmSStr && e.date <= nmEStr).length,
@@ -117,9 +128,11 @@ export default function FilterBar({
   activeCategory,
   activeTag,
   activePeriod,
+  activeBranch,
   onCategoryChange,
   onTagChange,
   onPeriodChange,
+  onBranchChange,
   primary,
   // 折り畳み制御
   collapsed = false,
@@ -141,6 +154,12 @@ export default function FilterBar({
     [events]
   );
 
+  // 種別ごとの件数（陸海空。判定できないイベントはどこにも入らない）
+  const branchCounts = useMemo(() =>
+    Object.fromEntries(BRANCH_DEFS.map(b => [b.id, events.filter(ev => matchesBranch(ev, b.id)).length])),
+    [events]
+  );
+
   // 申請済みの件数（applied Set から直接カウント）
   const appliedCount = useMemo(
     () => events.filter(ev => applied?.has(ev.id)).length,
@@ -153,12 +172,14 @@ export default function FilterBar({
   const activeCount =
     (activePeriod !== 'all' ? 1 : 0) +
     (activeCategory !== 'all' ? 1 : 0) +
+    (activeBranch !== 'all' ? 1 : 0) +
     (activeTag !== 'all' ? 1 : 0);
 
   // 折り畳み時にサマリーとして表示するラベル
   const activePeriodLabel    = PERIODS.find(p => p.id === activePeriod)?.label;
   const activeCategoryLabel  = activeCategory === 'all' ? null : activeCategory;
   const activeTagLabel       = activeTag === 'all' ? null : activeTag;
+  const activeBranchDef      = BRANCH_DEFS.find(b => b.id === activeBranch) || null;
 
   const scrollRow = {
     display: 'flex', gap: 6,
@@ -218,6 +239,15 @@ export default function FilterBar({
                 {activePeriodLabel}
               </span>
             )}
+            {activeBranchDef && (
+              <span style={{
+                fontSize: 11, padding: '2px 9px', borderRadius: 10,
+                background: activeBranchDef.color, color: '#fff',
+                fontWeight: 600, flexShrink: 0, whiteSpace: 'nowrap',
+              }}>
+                {activeBranchDef.label}
+              </span>
+            )}
             {activeCategory !== 'all' && (
               <span style={{
                 fontSize: 11, padding: '2px 9px', borderRadius: 10,
@@ -274,6 +304,49 @@ export default function FilterBar({
                     fontSize: 10, fontFamily: F.mono, fontWeight: 600,
                     background: isOn ? `${primary}28` : 'var(--tag-bg)',
                     color: isOn ? primary : 'var(--text-muted)',
+                    borderRadius: 8, padding: '0 5px', lineHeight: '16px',
+                  }}>
+                    {cnt}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* 種別チップ行（陸・海・空）— もう一度押すと解除 */}
+          <div className="jsdf-hscroll" style={{ ...scrollRow, padding: '6px 16px 0' }} onWheel={onWheel}>
+            {BRANCH_DEFS.map(({ id, label, short, color }) => {
+              const isOn = activeBranch === id;
+              const cnt  = branchCounts[id];
+              return (
+                <button
+                  key={id}
+                  onClick={() => onBranchChange(isOn ? 'all' : id)}
+                  aria-pressed={isOn}
+                  style={{
+                    flexShrink: 0, cursor: 'pointer', whiteSpace: 'nowrap',
+                    fontFamily: F.sans, display: 'flex', alignItems: 'center', gap: 5,
+                    padding: '5px 12px', borderRadius: 20,
+                    border: `1.5px solid ${isOn ? color : cnt > 0 ? `${color}88` : 'var(--border)'}`,
+                    background: isOn ? color : 'var(--bg)',
+                    color: isOn ? '#fff' : cnt > 0 ? color : 'var(--text-muted)',
+                    fontSize: 12, fontWeight: isOn ? 700 : 400,
+                    opacity: cnt === 0 ? 0.4 : 1,
+                  }}
+                >
+                  <span style={{
+                    fontSize: 10, fontWeight: 700, lineHeight: '15px',
+                    width: 15, height: 15, borderRadius: 4, textAlign: 'center',
+                    background: isOn ? 'rgba(255,255,255,0.25)' : `${color}1f`,
+                    color: isOn ? '#fff' : color,
+                  }}>
+                    {short}
+                  </span>
+                  {label}
+                  <span style={{
+                    fontSize: 10, fontFamily: F.mono, fontWeight: 600,
+                    background: isOn ? 'rgba(255,255,255,0.25)' : 'var(--tag-bg)',
+                    color: isOn ? '#fff' : 'var(--text-muted)',
                     borderRadius: 8, padding: '0 5px', lineHeight: '16px',
                   }}>
                     {cnt}

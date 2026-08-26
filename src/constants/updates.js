@@ -5,6 +5,37 @@
  */
 export const UPDATE_NOTES = [
   {
+    date:    '2026-08-27',
+    version: '1.30.9',
+    type:    'improvement',
+    content: 'ダークモードで起動したときに、一瞬白い画面が表示される問題を修正しました。',
+  },
+  {
+    date:    '2026-08-27',
+    version: '1.30.8',
+    type:    'feature',
+    content: '絞り込みに「陸上・海上・航空」を追加しました。イベント名や会場から自動で見分けます。'
+           + '判断できないイベントは、誤った振り分けを避けるため種別を選ぶと表示されません。',
+  },
+  {
+    date:    '2026-08-27',
+    version: '1.29.8',
+    type:    'improvement',
+    content: '絞り込みの期間に「来週」を追加しました。',
+  },
+  {
+    date:    '2026-08-27',
+    version: '1.29.7',
+    type:    'fix',
+    content: '軽微な修正。',
+  },
+  {
+    date:    '2026-08-27',
+    version: '1.29.6',
+    type:    'improvement',
+    content: 'パソコンや横向きの画面で、イベント名の横に開催日と時間を表示するようにしました。',
+  },
+  {
     date:    '2026-08-26',
     version: '1.29.5',
     type:    'feature',

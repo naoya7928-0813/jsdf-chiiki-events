@@ -8,6 +8,7 @@
 // 保存先は Upstash Redis hash `manual:events`（field=id, value=JSON）。
 import { checkOrigin, noStore, requireSameOrigin, rateLimit, requireAuth, hasPermission, canManageScope, canPublish, redis, cleanText, writeAudit } from '../_security.js';
 import W from '../../shared/weather.cjs';
+import { normalizeBranches } from '../../shared/branch.cjs';
 
 const KEY = 'manual:events';
 const MAX_EVENTS = 500;
@@ -73,6 +74,7 @@ function buildEvent(input, account) {
   const address = cleanText(e.address, 100);
   // 天気用座標: 手動入力があれば accuracy:'manual'。無ければ未設定にして再ジオコーディング待ちにする
   // （会場/住所がある場合のみ。スクレイパー or 専用処理が weatherLocationNeedsUpdate を拾って付与）。
+  const branch = normalizeBranches(e.branch);
   const manualLoc = parseManualCoords(e.weatherLocation);
   const weather = manualLoc
     ? { weatherLocation: manualLoc }
@@ -90,6 +92,8 @@ function buildEvent(input, account) {
       time:    cleanText(e.time, 40),
       category: cleanText(e.category, 20) || '広報活動',
       tag:     cleanText(e.tag, 30),             // 申込要否（要予約/予約不要/入場無料 等）
+      // 自衛隊の種別（陸/海/空）。未指定なら持たせず、表示側で文面から推定させる
+      ...(branch.length ? { branch } : {}),
       ageRequirement: cleanText(e.ageRequirement, 100) || null, // 対象・年齢
       deadline: cleanText(e.deadline, 40) || null,              // 締切（例: 7月20日（金））
       url,
@@ -181,6 +185,11 @@ export default async function handler(req, res) {
           const v = cleanText(patch[f], TXT[f]);
           ev[f] = v || (['notes', 'ageRequirement', 'deadline'].includes(f) ? null : '');
         }
+      }
+      // 種別（陸/海/空）。空配列を送ると「指定なし」に戻し、文面からの推定に任せる
+      if (patch.branch !== undefined) {
+        const b = normalizeBranches(patch.branch);
+        if (b.length) ev.branch = b; else delete ev.branch;
       }
       if (patch.title !== undefined && !ev.title) return res.status(400).json({ error: 'タイトルは必須です' });
       if (patch.url !== undefined) {
