@@ -10,6 +10,8 @@ const {
   applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, cleanTimeText, cleanDeadlineText,
   isJunkOrStubTitle, isSuspiciousTitle, isStaleDatedEvent, dedupEvents,
   safeUrl,
+  toJapaneseKanji,
+  hasForeignChinese,
 } = require('./titleQuality.cjs');
 
 test('applyVerifiedOverrides: チラシ照合済みの修正がURLで適用される', () => {
@@ -600,4 +602,39 @@ test('safeUrl: 空・非文字列は空文字', () => {
   assert.strictEqual(safeUrl(undefined), '');
   assert.strictEqual(safeUrl(123), '');
   assert.strictEqual(safeUrl({}), '');
+});
+
+
+// ── 簡体字（中国語）の扱い ───────────────────────────────────────
+// 地本サイトは日本語だが、チラシOCRが日本語の漢字を簡体字として誤読することがある。
+// 単純に弾くと正規のイベントごと消えるため、まず日本語へ直してから判定する。
+test('toJapaneseKanji: 実際に化けた会場名を日本語へ直す', () => {
+  assert.strictEqual(toJapaneseKanji('关山演习場（新妙高市）'), '関山演習場（新妙高市）');
+  assert.strictEqual(toJapaneseKanji('门司港西海岸小頭1号岸壁'), '門司港西海岸小頭1号岸壁');
+  assert.strictEqual(toJapaneseKanji('募集要项'), '募集要項');
+  assert.strictEqual(toJapaneseKanji('海上自衛队舞鹤基地'), '海上自衛隊舞鶴基地');
+});
+
+test('toJapaneseKanji: 日本語はそのまま（誤変換しない）', () => {
+  for (const s of ['千歳のまちの航空祭', '陸上自衛隊高等工科学校 説明会', '護衛艦「いずも」一般公開']) {
+    assert.strictEqual(toJapaneseKanji(s), s);
+  }
+});
+
+test('cleanEventTitle / cleanPlaceText が簡体字を日本語へ直す', () => {
+  assert.strictEqual(cleanEventTitle('募集要项'), '募集要項');
+  assert.strictEqual(cleanPlaceText('关山演习場（新妙高市）'), '関山演習場（新妙高市）');
+});
+
+test('日本語へ直せない中国語は不正として弾く', () => {
+  assert.ok(hasForeignChinese('这是中国语的说明'));
+  assert.ok(isJunkOrStubTitle('这是中国语的说明会'));
+  assert.ok(isJunkOrStubTitle('四国大学交流亏'));   // 変換表に無いOCR残骸
+});
+
+test('日本語のイベント名は中国語判定に引っかからない', () => {
+  for (const s of ['千歳のまちの航空祭', '関山演習場での訓練見学', '門司港 艦艇一般公開', '募集要項の説明会']) {
+    assert.ok(!hasForeignChinese(s), s);
+    assert.ok(!isJunkOrStubTitle(s), s);
+  }
 });

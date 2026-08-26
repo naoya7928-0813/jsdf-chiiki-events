@@ -24,6 +24,7 @@ const {
   cleanPlaceText,
   cleanTimeText,
   cleanDeadlineText,
+  toJapaneseKanji,
 } = require('./titleQuality.cjs');
 
 // ── 正準の固定値 ───────────────────────────────────────────────
@@ -78,6 +79,12 @@ const EXTRACT_FIELDS = Object.keys(EVENT_JSON_SCHEMA.properties);
 // ── プロンプト ─────────────────────────────────────────────────
 // 「無ければ null」を最上位のルールとして繰り返し明示する。
 // LLM は空欄を埋めたがるため、ここを緩めると一次ソースに無い情報が混入する。
+// 出力は必ず日本語。モデルによっては簡体字（中国語）で返すことがあり、
+// そのまま載せると「关山演习場」のような表記が公開されてしまう。
+const JAPANESE_RULE = '【出力は必ず日本語】漢字は日本語の字体（新字体）で書くこと。'
+  + '簡体字・繁体字（中国語の字体）や中国語の語彙は使わない。'
+  + '資料が日本語なのだから、読み取った結果も日本語で返すこと。';
+
 const NULL_RULE = [
   '【最重要】資料（チラシ・ページ本文）に書かれていない情報は、絶対に推測せず必ず null にすること。',
   '「たぶんこうだろう」「一般的にはこう」で埋めてはならない。読み取れない・書かれていない＝null。',
@@ -118,6 +125,8 @@ function buildTextExtractPrompt({ prefLabel = '', today = '' } = {}) {
     '',
     NULL_RULE,
     '',
+    JAPANESE_RULE,
+    '',
     '各フィールドのルール:',
     FIELD_RULES,
     '',
@@ -142,6 +151,8 @@ function buildRecheckPrompt({ prefLabel = '', today = '' } = {}) {
     '',
     NULL_RULE,
     '',
+    JAPANESE_RULE,
+    '',
     '各フィールドのルール:',
     FIELD_RULES,
     '',
@@ -158,7 +169,9 @@ function nullify(v) {
   if (v === null || v === undefined) return null;
   if (typeof v === 'number') return String(v);
   if (typeof v !== 'string') return null;
-  const s = v.trim();
+  // モデルが簡体字で返してくることがあるため、ここで日本語へ寄せる
+  // （プロンプトでも指示しているが、守られる前提にしない）
+  const s = toJapaneseKanji(v).trim();
   if (!s) return null;
   if (/^(?:null|undefined|なし|不明|未定|該当なし|記載なし|N\/A|-|―|—)$/i.test(s)) return null;
   return s;
