@@ -18,6 +18,10 @@ export const GLOBAL_CSS = `
     --map-hover:       #c4c8d0;
     --notice-bg:       rgba(133,107,0,0.07);
     --notice-border:   rgba(133,107,0,0.15);
+    /* オフライン帯（「いつ時点の情報か」を示す常時表示バー） */
+    --offline-bg:      #fff8e6;
+    --offline-border:  #f0d9a0;
+    --offline-text:    #7a5b00;
     /* 角丸の2段階ルール（フィードバック§4-2⑤）:
        外側の容れ物（カード・モーダル・バナー）は大きめ、
        内側の要素（バッジ・チップ・タグ）は小さめ＝角ばった規格ラベル調に統一する。 */
@@ -43,6 +47,9 @@ export const GLOBAL_CSS = `
     --map-hover:       #3d4a5e;
     --notice-bg:       rgba(255,200,0,0.06);
     --notice-border:   rgba(255,200,0,0.12);
+    --offline-bg:      #2b2415;
+    --offline-border:  #4a3d1c;
+    --offline-text:    #e3c983;
   }
 
   /* ─── OS設定がダーク かつ data-theme 未指定の場合 ─── */
@@ -63,6 +70,9 @@ export const GLOBAL_CSS = `
       --map-hover:       #3d4a5e;
       --notice-bg:       rgba(255,200,0,0.06);
       --notice-border:   rgba(255,200,0,0.12);
+      --offline-bg:      #2b2415;
+      --offline-border:  #4a3d1c;
+      --offline-text:    #e3c983;
     }
   }
 

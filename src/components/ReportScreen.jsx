@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ScreenHeader, F } from './Shared';
+import { useOnline } from '../hooks/useOnline';
 
 /* global __APP_VERSION__ */
 
@@ -34,11 +35,14 @@ export default function ReportScreen({ theme, updatedAt, onBack, target }) {
   const [category, setCategory] = useState(target ? 'イベント情報の誤り' : 'バグ');
   const [content,  setContent]  = useState('');
   const [contact,  setContact]  = useState('');
-  const [status,   setStatus]   = useState('idle'); // idle | sending | done | error
+  const [status,   setStatus]   = useState('idle'); // idle | sending | done | error | rate
+  // 報告の送信はサーバーが必要。オフラインでは送信させず、その場で理由を示す
+  // （送信ボタンを押させてから失敗させない）。
+  const online = useOnline();
   const [showCtx,  setShowCtx]  = useState(false);
 
   const ctx = buildContext(updatedAt);
-  const canSend = content.trim().length >= 1 && status !== 'sending';
+  const canSend = content.trim().length >= 1 && status !== 'sending' && online;
 
   async function handleSubmit() {
     if (!canSend) return;
@@ -224,6 +228,17 @@ export default function ReportScreen({ theme, updatedAt, onBack, target }) {
               )}
             </div>
 
+            {!online && (
+              <div style={{
+                padding: '10px 13px', borderRadius: 10, marginBottom: 14,
+                background: 'var(--offline-bg)', border: '1px solid var(--offline-border)',
+                fontSize: 12.5, color: 'var(--offline-text)', lineHeight: 1.6,
+              }}>
+                オフラインのため送信できません。通信できる状態になってから、もう一度お試しください。
+                入力内容はこの画面を離れるまで保持されます。
+              </div>
+            )}
+
             {status === 'error' && (
               <div style={{
                 padding: '10px 13px', borderRadius: 10, marginBottom: 14,
@@ -251,7 +266,7 @@ export default function ReportScreen({ theme, updatedAt, onBack, target }) {
               color: canSend ? '#fff' : 'var(--text-muted)',
               transition: 'background 0.15s',
             }}>
-              {status === 'sending' ? '送信中…' : '送信する'}
+              {status === 'sending' ? '送信中…' : (online ? '送信する' : 'オフラインのため送信できません')}
             </button>
           </>
         )}

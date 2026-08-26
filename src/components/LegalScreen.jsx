@@ -3,7 +3,20 @@ import { TERMS_MD   } from '../constants/terms';
 import { PRIVACY_MD } from '../constants/privacy';
 
 // ─── マークダウン文字列を React 要素に変換するレンダラー ────────
-// 対応記法: # H1 / ## H2 / - 箇条書き / 通常テキスト
+// 対応記法: # H1 / ## H2 / - 箇条書き / **強調** / 通常テキスト
+
+// 行内の **強調** を <strong> に変換する。
+// 規約本文で注意喚起に使っているため、未対応だと「**」が記号のまま表示される。
+function inline(text, key = 0) {
+  const parts = String(text).split(/\*\*/);
+  if (parts.length < 3) return text;               // 対になっていなければそのまま
+  return parts.map((part, i) =>
+    i % 2 === 1
+      ? <strong key={`${key}-${i}`} style={{ fontWeight: 700 }}>{part}</strong>
+      : part
+  );
+}
+
 function renderMarkdown(md, primary) {
   const lines = md.split('\n');
   const nodes = [];
@@ -21,7 +34,7 @@ function renderMarkdown(md, primary) {
           borderBottom: `1px solid ${primary}22`,
           letterSpacing: 0.5,
         }}>
-          {line.slice(3)}
+          {inline(line.slice(3), key)}
         </div>
       );
     } else if (line.startsWith('- ')) {
@@ -31,7 +44,7 @@ function renderMarkdown(md, primary) {
           fontSize: 13, color: 'var(--text)', lineHeight: 1.75,
         }}>
           <span style={{ color: primary, flexShrink: 0 }}>•</span>
-          <span>{line.slice(2)}</span>
+          <span>{inline(line.slice(2), key)}</span>
         </div>
       );
     } else if (line.trim()) {
@@ -40,7 +53,7 @@ function renderMarkdown(md, primary) {
           fontSize: 13, color: 'var(--text)',
           lineHeight: 1.8, marginBottom: 6,
         }}>
-          {line}
+          {inline(line, key)}
         </div>
       );
     }

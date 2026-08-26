@@ -11,18 +11,28 @@ jsdf-chiiki-events/
 │   │   ├── HomeScreen.jsx      # 地図ホーム画面
 │   │   ├── JapanMap.jsx        # SVG 日本地図
 │   │   ├── ListScreen.jsx      # イベント一覧（都道府県タブ付き）
-│   │   └── Shared.jsx          # 共通コンポーネント
+│   │   ├── ConsentGate.jsx     # 規約同意ゲート（未同意ならアプリを表示しない）
+│   │   ├── NotFoundScreen.jsx  # 404画面（理由別文言＋直近イベントの提示）
+│   │   └── Shared.jsx          # 共通コンポーネント（OfflineBanner を含む）
+│   ├── constants/
+│   │   └── legal.js            # 規約・ポリシーの同意バージョン（改定時の再同意判定）
 │   ├── data/
 │   │   ├── regionMap.js        # 地域・都道府県マッピング（emblem フィールドあり）
 │   │   └── prefectureShapes.js # SVG パス + REGION_LABEL_POSITIONS
 │   └── hooks/
-│       └── useEvents.js        # events.json フェッチ + 通知管理
+│       ├── useEvents.js        # events.json フェッチ + 通知管理 + オフライン保持
+│       └── useOnline.js        # オンライン/オフライン状態の購読
 ├── scraper/                    # Node.js スクレイパー（Playwright + cheerio）
 │   ├── index.js                # エントリポイント・全府県ループ
+│   ├── lib/
+│   │   ├── llmClient.js        # 段1/段3 の LLM 呼び出し（Groq→Gemini）
+│   │   └── llmCache.js         # LLM 結果のキャッシュ（SHA-256 / TTL 90日）
 │   └── parsers/                # 都道府県別パーサー（50 ファイル）
 │       └── utils.js            # guessCategory / guessTag / isPast など共通関数
 ├── public/
+│   ├── 404.html                # 静的パス用の404ページ（/events/<県>.html 等）
 │   ├── data/events.json        # スクレイプ結果（全イベントデータ）
+│   ├── data/events-llm-recheck.json # 段3（一次ソース再検査）の自動修正レポート
 │   ├── events.html             # 全イベント一覧（SEO向け静的HTML）
 │   ├── events/                 # 都道府県別静的ページ（SEO向け・スクレイプ毎に生成）
 │   │   └── <pref>.html         # 例: kagawa.html, tokyo.html
@@ -77,6 +87,48 @@ OCRの優先順は、無料ローカルOCR（Tesseract → RapidOCR）を先に�
 - **OCR 段階の重複回避**: OCR 関数は実行前に `assetCache.getByHash(hash)` を確認し、`result` が存在すれば**OCR API を呼ばずにキャッシュ結果を返す**。URL が変わっても中身（ハッシュ）が同じ PDF/画像は再 OCR されない。
 - **TTL**: 90 日（`assetCache.js` の `TTL_DAYS`）。期限切れエントリは `load()` / `save()` 時に自動破棄。
 - 新しくアセットを取得する処理を書く場合は、必ず `downloadFile()` → ハッシュ照合 → `assetCache` 経由とし、生の `fetch` で PDF/画像を毎回取得し直す実装を追加しないこと。
+
+## LLM を挟んだ整形・検査（段1〜段3。2026-08-26 導入）
+
+スクレイピング/OCR の途中に LLM を挟み、「資料に書かれていることだけを、規定の JSON で」取り出す。
+**LLM は上乗せであって必須依存ではない**。APIキーが無い・全滅した場合も、従来の正規表現パイプラインだけで完動する。
+
+実装: `shared/llmExtract.cjs`（純粋ロジック・テスト付き）/ `scraper/lib/llmClient.js`（API呼び出し）/ `scraper/lib/llmCache.js`（キャッシュ）
+
+### 段1 LLM整形（`structureOcrText`）
+ローカルOCR（Tesseract/RapidOCR）の生テキストは行が分断され、正規表現 `parseTextToEvent` では取りこぼしが多い。
+先に LLM で規定スキーマへ整理し、駄目なら正規表現へ落とす。**LLM は「足す」だけで「引かない」**:
+- LLM が使えない/失敗 → 従来どおり正規表現の結果を使う
+- LLM がタイトルを取れなかった → 正規表現の結果を使う（今より悪くしない）
+- LLM が日付を取れず正規表現が取れた → 日付だけ補う
+
+### 段2 検査（`decideRecheck`。規則判定のみ・LLMを呼ばない）
+全イベントを規定スキーマと突き合わせ、`ok` / `recheck` / `junk` を決める。
+**再検査に回すのは「タイトル欄にタイトルでない値が入っている」場合と「開催日が取れていない」場合だけ。**
+- `time`/`tag`/`deadline` のような**任意項目の書式ズレは再検査の理由にしない**（整形で直すもの）。
+  ここを条件に入れると実測 179 件中 175 件が対象になり、再検査の上限を食い潰す（2026-08-26 に実測して修正）。
+- 欠損の表し方は経路により `null`/`undefined`/`''` とばらつくため、`nullify()` で一本化してから判定する。
+  空文字を「規定外の値」と誤判定しないこと。
+- タイトル長の上限は **45文字**（`scripts/check-event-titles.mjs` の「極端に長い」と揃える）。
+
+### 段3 再検査（一次ソース照合・LLM vision）
+段2が `recheck` と判定し、かつ一次ソース（チラシ画像・PDF）を持つイベントだけ、その資料を読み直して抽出し直す。
+- 取得は必ず `downloadFile()` 経由（＝assetCache の条件付きGETに乗るので重複DLしない）。304 のときはハッシュでキャッシュを引く
+- **差異があれば再抽出を採用する**（一次ソースを直接見た結果なので照合済み扱い）。`verifiedBy: 'llm-recheck'` を付与
+- **再抽出が null を返したフィールドは元の値を残さない**（裏付けの無い情報を消す）。
+  結果として必須項目（タイトル・開催日）が埋まらなければ**公開しない＝検疫**へ回す
+- 1実行あたりの上限は **30件**（`LLM_RECHECK_LIMIT`）。超過分は今回は手を触れず次回へ回す
+- 結果は `public/data/events-llm-recheck.json` に残し、scrape.yml が ntfy で管理者へ通知する
+
+### LLM の使い方の決めごと
+- **出力は必ず JSON**（Groq: `response_format: json_object` / Gemini: `responseMimeType: application/json`）。
+  そのうえで **`normalizeLlmEvent` が規定外の値を捨てる**。モデルが規定を守ることに依存しない
+- **資料に無い情報は必ず `null`**。推測で埋めさせない（埋めた値は「一次ソースに無い情報」＝誤情報）
+- プロバイダは **Groq 優先 → Gemini フォールバック**（無料枠の大きい方を先に使う）。
+  モデル廃止（404）は `OcrModelResolver` が候補の切り替えで追従する
+- キャッシュは `scraper/llm-cache.json`（`.gitignore` 対象・Actions cache で永続化）。
+  キーは 用途＋プロンプト版＋入力 の SHA-256。**プロンプトを変えたら `PROMPT_VERSION` を上げる**
+- 環境変数: `GROQ_LLM_MODEL` / `GEMINI_LLM_MODEL`（任意・モデル固定）、`LLM_RECHECK_LIMIT`（既定30）
 
 ## イベントカード記述ルール（正準仕様）
 
@@ -152,6 +204,8 @@ OCRの優先順は、無料ローカルOCR（Tesseract → RapidOCR）を先に�
 ```
 1. スクレイピング（定期 or 手動）
        ↓
+1.5 段1 LLM整形（OCRテキスト） … scraper/lib/llmClient.js
+       ↓
 2. 文字の整形【必須】 … shared/titleQuality.cjs
    - applyVerifiedOverrides（チラシ照合済み修正）
    - cleanEventTitle / cleanPlaceText（ゴミ除去・補完）
@@ -159,6 +213,9 @@ OCRの優先順は、無料ローカルOCR（Tesseract → RapidOCR）を先に�
    - dedupEvents（重複統合）
    ※ writeOutput が自動適用する。手動で events.json を触る場合も
      必ず同じ titleQuality パイプラインを通すこと
+       ↓
+2.5 段2 検査（規則・無料） → 段3 再検査（一次ソース・LLM）
+    タイトル欄にタイトルでない値／開催日が取れていないものだけチラシ実物で読み直す
        ↓
 3. 品質チェック … scripts/check-event-titles.mjs（CI でも自動実行）
        ↓
@@ -217,6 +274,56 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - **都道府県 emblem**: `regionMap.js` の PREFECTURE_INFO と REGIONS 両方に同じ値が必要（全50件ユニーク）
 - **テーマ**: CSS 変数 `var(--bg)` / `var(--text)` / `var(--card)` / `var(--border)` でライト/ダーク切替
 - **プッシュ通知**: ntfy.sh トピック `jsdf-chiiki-events-7928`
+
+## オフライン対応（2026-08-26 導入）
+
+通信できない状態でもイベントを閲覧できる。**「今見えている情報がいつ時点のものか」を必ず画面に出す**のが原則。
+
+- **データの永続化**: `useEvents` が取得成功データを `localStorage['jsdf-events-cache']`（約140KB）へ保存し、
+  起動時の初期値にする。SW キャッシュが失効・破棄されても空アプリにならない
+- **Service Worker**: `/data/events.json` は NetworkFirst のまま、**フォールバックの寿命を30日**にした。
+  以前は `maxAgeSeconds: 300` で、5分を過ぎたキャッシュが破棄されオフラインだと1件も出なかった。
+  maxAge は「鮮度の上限」ではなく「ネットワーク失敗時にどこまで古いものを出してよいか」の上限
+- **キャッシュ由来の判別**: SW の `markFromCache` プラグインがキャッシュから返す応答に `X-From-Cache: 1` を付ける。
+  これが無いと「オフラインなのに取得成功」と誤判定する（NetworkFirst のフォールバックは 200 で返るため）
+- **表示**: `OfflineBanner`（`Shared.jsx`）を全画面共通で上部に出す。
+  ブラウザがオフラインなら「オフラインです」、通信はできるが取得に失敗したなら「最新の情報を取得できませんでした」
+- **オフラインで動かない機能**は事前に代替表示へ切り替える（失敗させてから気付かせない）:
+  天気カード・Google マップ埋め込み（`useOnline`）・不具合報告の送信・通知の登録/解除
+- **復帰**: `online` イベントで自動的に再取得する
+
+⚠️ **Playwright の `context.setOffline(true)` は Service Worker のネットワークまでは遮断しない**（SW は別ターゲット）。
+オフラインの検証は**プレビューサーバー自体を停止**して行うこと。
+
+## 404 ページ（2026-08-26 刷新）
+
+| 経路 | 担当 | HTTPステータス |
+|---|---|---|
+| SPA の不明なURL・掲載終了イベント（`/event/:id`） | `src/components/NotFoundScreen.jsx` | 200（SPA のため）＋ `robots: noindex, follow` を動的付与 |
+| 静的パス（`/events/<県>.html`・`/data/*` 等） | `public/404.html` | 404（Vercel が自動で返す） |
+
+- `NotFoundScreen` は理由を出し分ける（`reason='event'`＝掲載終了の可能性 / `'path'`＝不明なURL）
+- 行き止まりにしないため、開催が近いイベントを最大4件提示する
+- `vercel.json` の rewrite 除外リストに `404\.html` を入れてある（入れないと rewrite に飲まれて index.html が返る）
+
+## 利用規約・プライバシーポリシーの同意（2026-08-26 導入）
+
+**規約・ポリシーを改定したら、各利用者に一度だけ再同意を求める。同意が得られなければアプリを使わせない。**
+
+- 判定: `src/constants/legal.js` の `LEGAL_VERSION` と `localStorage['jsdf-legal-accepted']` を比較
+  （記録なし＝初回 / 値が違う＝改定による再同意 / 一致＝不要）
+- 表示: `src/components/ConsentGate.jsx`。同意するまで**アプリ本体を描画しない**。運営者ページ（`/admin.html`）は対象外
+- 同意しない場合: 確認 → `window.close()` を試み、閉じられない環境では終了画面を出し続ける（実質的に利用不可）。
+  誤操作からの復帰用に「同意画面に戻る」だけ残している
+  （※ スクリプトが開いたタブでない限り `window.close()` はブラウザに拒否される。終了画面が実質の遮断）
+
+### 改定したときの手順（順番を守ること）
+1. `src/constants/privacy.js` / `terms.js` を修正する
+2. **`LEGAL_VERSION` を新しい日付に上げる**（上げ忘れると再同意が求められず、古い同意のまま使われる）
+3. `LEGAL_REVISED_AT`（表示用）と `LEGAL_CHANGES`（変更点の要約）を更新する
+4. 実装との整合を必ず確認する。**「使っていない」と書いたものを使っている状態を作らない**
+   （2026-08-26 の監査で、ポリシーが「アクセス解析は使用していません」と書く一方 `src/main.jsx` が
+   Vercel Analytics / Speed Insights を注入していた。ほかに位置情報・方位センサー・Google マップ埋め込みが未記載だった）
 
 ## 天気予報（イベント詳細）
 

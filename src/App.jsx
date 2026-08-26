@@ -4,10 +4,13 @@ import { useEvents } from './hooks/useEvents';
 import { lazyWithRecovery } from './utils/lazyChunk';
 import { COLOR_SCHEMES, DEFAULT_SCHEME } from './config';
 import { PREFECTURE_INFO } from './data/regionMap';
-import { OperatorNavContext } from './components/Shared';
+import { OperatorNavContext, OfflineBanner } from './components/Shared';
 import { useBreakpoint, LayoutModeContext, isPhoneSized } from './hooks/useBreakpoint';
 import { applyOrientationPreference } from './utils/orientation';
+import { consentStateFor, loadAcceptedLegalVersion } from './constants/legal';
 import SideNav from './components/SideNav';
+import ConsentGate from './components/ConsentGate';
+import NotFoundScreen from './components/NotFoundScreen';
 import { ICO }           from './components/Icons';
 import HomeScreen        from './components/HomeScreen';
 import ListScreen        from './components/ListScreen';
@@ -71,6 +74,13 @@ const ROUTE_SCREENS = {
 };
 
 export default function App({ operator = false }) {
+  // ── 規約・プライバシーポリシーへの同意 ────────────────────────
+  // 未同意（初回）・改定後の未再同意なら、アプリ本体を描画せず同意画面のみを出す。
+  // 運営者ページは対象外（担当者向けで、別途ログイン認証がある）。
+  const [consentState, setConsentState] = useState(
+    () => (operator ? 'none' : consentStateFor(loadAcceptedLegalVersion()))
+  );
+
   // ── スプラッシュ ──────────────────────────────────────────
   // 世界観の演出だが毎回2〜3秒は毎日使う利用者の負担になるため、
   // セッション内の初回のみ表示する（同一セッションのリロード・画面遷移では再生しない。
@@ -124,6 +134,8 @@ export default function App({ operator = false }) {
 
   // ── ナビゲーション ────────────────────────────────────────
   const [screen,      setScreen]      = useState('home');
+  // 404 の理由（'event'=掲載終了/存在しないイベント, 'path'=不明なURL）
+  const [notFoundReason, setNotFoundReason] = useState('path');
   const [detailEvent, setDetailEvent] = useState(null);
   const [detailBack,  setDetailBack]  = useState('region');
   const [legalDoc,    setLegalDoc]    = useState(null);
@@ -252,7 +264,8 @@ export default function App({ operator = false }) {
   }, [scheme.primary]);
 
   // ── データ取得 ────────────────────────────────────────────
-  const { events, loading, error, updatedAt, checkedAt, refresh } = useEvents(autoMode);
+  const { events, loading, error, updatedAt, checkedAt, refresh,
+          offline, stale, lastSyncedAt } = useEvents(autoMode);
 
   // ── URL同期（イベント個別URL /event/:id・戻るボタン・リロード復元） ──
   const popNav = useRef(false);       // popstate/初期解決による遷移中は pushState しない
@@ -276,15 +289,28 @@ export default function App({ operator = false }) {
       const ev = findEventById(decodeURIComponent(evm[1]));
       if (ev) { setDetailEvent(ev); setDetailBack('home'); setScreen('detail'); }
       else if (loading) pendingPath.current = pathname; // データ到着後に再解決
-      else setScreen('notfound');
+      else { setNotFoundReason('event'); setScreen('notfound'); }
       return;
     }
     const rgm = pathname.match(/^\/region\/([a-z]+)\/?$/);
     if (rgm) { setMapRegionId(rgm[1]); setScreen('region'); return; }
     const entry = Object.entries(ROUTE_SCREENS).find(([, p]) => p === pathname);
     if (entry) { if (entry[0] === 'list') setRegion('all'); setScreen(entry[0]); return; }
+    setNotFoundReason('path');
     setScreen('notfound');
   }, [findEventById, loading]);
+
+  // ── 404 は検索エンジンにインデックスさせない（ソフト404対策） ──
+  // SPA は不明なURLでも HTTP 200 を返すため、noindex を動的に付けて
+  // 「中身の無いページ」が検索結果に載るのを防ぐ。
+  useEffect(() => {
+    if (operator) return;
+    const tag = document.querySelector('meta[name="robots"]');
+    if (!tag) return;
+    const original = tag.getAttribute('content') || 'index, follow';
+    if (screen === 'notfound') tag.setAttribute('content', 'noindex, follow');
+    return () => { tag.setAttribute('content', original); };
+  }, [screen, operator]);
 
   // 初回ディープリンクの解決（イベントデータ到着後）
   useEffect(() => {
@@ -464,6 +490,19 @@ export default function App({ operator = false }) {
     position: 'relative', overflow: 'hidden',
   };
 
+  // ── 同意ゲート（同意が済むまでアプリを使わせない） ──
+  if (!operator && consentState !== 'none') {
+    return (
+      <div style={containerStyle}>
+        <ConsentGate
+          state={consentState}
+          theme={theme}
+          onAccepted={() => setConsentState('none')}
+        />
+      </div>
+    );
+  }
+
   // ── 運営者サイトはログイン必須。未ログインならログイン画面のみ表示 ──
   if (operator && !adminAuthed) {
     return (
@@ -503,6 +542,10 @@ export default function App({ operator = false }) {
       )}
 
       <div style={mainStyle}>
+      {/* ── オフライン帯（表示中のデータがいつ時点かを常に明示する） ── */}
+      {!operator && (
+        <OfflineBanner offline={offline} stale={stale} lastSyncedAt={lastSyncedAt} onRetry={refresh} />
+      )}
       {/* 遅延読込画面のフォールバックは null（既存画面が残らないよう軽量に） */}
       <Suspense fallback={null}>
       {screen === 'home' && (
@@ -693,17 +736,14 @@ export default function App({ operator = false }) {
 
       {/* ── 404（不明なURL・掲載終了イベントの共有リンク） ── */}
       {screen === 'notfound' && (
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 32, textAlign: 'center', background: 'var(--bg)' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>{ICO.search('var(--icon-muted, #9ca3af)', 40)}</div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)', marginBottom: 8 }}>ページが見つかりません</div>
-          <div style={{ fontSize: 12.5, color: 'var(--text-muted)', lineHeight: 1.8, marginBottom: 20 }}>
-            お探しのページ・イベントが見つかりませんでした。<br />
-            掲載期間が終了したイベントの可能性があります。
-          </div>
-          <button onClick={() => setScreen('home')} style={{ padding: '12px 28px', borderRadius: 10, border: 'none', fontSize: 14, fontWeight: 700, color: '#fff', background: scheme.primary, cursor: 'pointer' }}>
-            ホームへ戻る
-          </button>
-        </div>
+        <NotFoundScreen
+          reason={notFoundReason}
+          events={events}
+          theme={theme}
+          onOpenHome={() => setScreen('home')}
+          onOpenList={() => { handleRegionChange('all'); setScreen('list'); }}
+          onOpenDetail={(ev) => openDetail(ev, 'home')}
+        />
       )}
 
       {screen === 'favorites' && (
