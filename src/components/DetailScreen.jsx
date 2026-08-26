@@ -45,6 +45,9 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
   // （スマホ横向きの本文は約620pxで、660px だと選んでも一生効かないため）。
   const minSideWidth = weatherMapMode === 'side' ? 560 : 660;
   const sideBySide   = bodyWidth >= minSideWidth && wantSide;
+  // 見出しの横に日付を添える条件。横向き（縦の余白が乏しい）か、
+  // 2ペインになる程度に横幅がある場合（PC・タブレット）。
+  const showTitleDate = shortVp || bodyWidth >= 600;
 
   // ── 掲載元へ遷移 →「戻ってきたら」申請済みにする（設定でON/OFF） ──
   // 開いた瞬間ではなく復帰時に付ける。誤タップで即座に申請済みにならず、
@@ -113,6 +116,24 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
   const endSplit  = ev.endDate ? splitDate(ev.endDate) : null;
   const todayStr  = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
   const isOngoing = !!(ev.endDate && ev.date < todayStr);
+
+  // ── 見出しの横に日付を出すか ──────────────────────────────
+  // PC の2ペインではヒーローヘッダーが固定され、日付ブロックだけが
+  // 本文と一緒にスクロールして見えなくなる。横向きでも縦の余白が乏しく
+  // 日付までたどり着きにくい。どちらの場合もイベント名の横に日付を添える。
+  // 幅の狭い縦持ちスマホは従来どおり（下の日付ブロックがすぐ見える）。
+  const titleDate = (() => {
+    if (m === null) return '日程未定';
+    const wd  = ev.weekday    ? `（${ev.weekday}）`    : '';
+    const ewd = ev.endWeekday ? `（${ev.endWeekday}）` : '';
+    if (!endSplit) return `${m}/${d}${wd}`;
+    // 連日開催。月をまたぐときだけ終了側にも月を付ける
+    const end = endSplit.m !== m ? `${endSplit.m}/${endSplit.d}` : `${endSplit.d}`;
+    return `${m}/${d}${wd}〜${end}${ewd}`;
+  })();
+  // 時間も同じ行に添える。未取得なら「時間未定」と明示する（空欄にして
+  // 「時間の記載がない」のか「取れていない」のか分からなくしない）。
+  const titleTime = ev.time || '時間未定';
   const { primary, accent } = theme;
   const sourceLabel = officeSourceLabel(ev);
 
@@ -242,10 +263,34 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
           )}
         </div>
     
-        <div style={{ fontFamily: F.serif, fontSize: shortVp ? 17 : 21, fontWeight: 600, marginTop: shortVp ? 6 : 12, lineHeight: 1.3 }}>
-          {ev.title}
+        <div style={{
+          display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap',
+          marginTop: shortVp ? 6 : 12,
+        }}>
+          {showTitleDate && (
+            <div style={{
+              flexShrink: 0,
+              fontFamily: F.mono, fontSize: shortVp ? 12.5 : 14, fontWeight: 600,
+              padding: '3px 9px', borderRadius: 'var(--radius-element)',
+              background: 'rgba(255,255,255,0.16)', letterSpacing: 0.5,
+              whiteSpace: 'nowrap',
+            }}>
+              {isOngoing ? `開催中 ${titleDate}` : titleDate}
+              <span style={{ opacity: 0.55, margin: '0 6px' }}>|</span>
+              <span style={{ opacity: ev.time ? 1 : 0.7 }}>{titleTime}</span>
+            </div>
+          )}
+          <div style={{
+            fontFamily: F.serif, fontSize: shortVp ? 17 : 21, fontWeight: 600,
+            lineHeight: 1.3, minWidth: 0, flex: '1 1 auto',
+          }}>
+            {ev.title}
+          </div>
         </div>
     
+        {/* 日時ブロック。見出しの横に日付・時間を出しているときは重複するので描かない
+            （PC・横向きでは見出し行だけで日時が分かる） */}
+        {!showTitleDate && (
         <div style={{
           display: 'flex', alignItems: 'center', gap: 10, marginTop: shortVp ? 5 : 14,
           paddingTop: shortVp ? 5 : 14,
@@ -294,6 +339,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
             )}
           </div>
         </div>
+        )}
       </div>
     </div>
   );
