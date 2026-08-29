@@ -71,7 +71,7 @@ cd scraper && node index.js
 
 ## スクレイパー仕様
 
-- スケジュール: 日本時間 **06:43 / 10:43 / 16:43 開始**（1日3回）。スクレイプ実測 約63分＋GitHubのスケジュール遅延を見込み、**通知が 8:00 / 12:00 / 18:00 ごろに届く**よう逆算した開始時刻。cron は `:00` だとGitHub側遅延が大きいため `:43`（混雑回避）に設定（scrape.yml 参照）
+- スケジュール: 日本時間 **06:27 / 10:27 / 16:27 開始**（1日3回。scrape.yml の cron `27 21 / 27 1 / 27 7` = UTC）。スクレイプ実測 約63分＋GitHubのスケジュール遅延を見込み、**通知が 8:00 / 12:00 / 18:00 ごろに届く**よう逆算した開始時刻。cron は `:00` だとGitHub側の遅延が大きいため分をずらしている（混雑回避）
 - 対象: 47 都道府県の自衛隊地本公式サイト
 - 出力: `public/data/events.json`（`updatedAt` フィールド付き）
 - カテゴリ標準値: `説明会` / `採用イベント` / `一般公開` / `艦艇公開` / `体験` / `演奏会` / `記念行事` / `広報活動` / `地域参加`
@@ -539,7 +539,7 @@ ErrorBoundary（`src/components/ErrorBoundary.jsx`）のフォールバックが
 ### 4. デプロイ失敗・サイトに反映されない
 1. `gh run list --workflow=deploy.yml --limit 3` で状態確認。push 後に deploy.yml が発火するのは `src/` `public/` 等の変更時のみ
 2. 手動デプロイ: `gh workflow run deploy.yml`
-3. 反映が遅い場合は CDN キャッシュ（events.json は NetworkFirst 3分キャッシュ）を考慮して数分待つ
+3. 反映が遅い場合はキャッシュを考慮して数分待つ（events.json は CDN が `s-maxage=600`＝10分、Service Worker は NetworkFirst で通常は常に取りに行き、失敗時のみ最大30日の保存分を返す）
 
 ### 5. OCR 関連の不調
 - `pdf-parse` は **v2（クラスAPI: `new PDFParse({data})` → `getText()`/`getScreenshot()`）**。v1 の関数形式で呼ぶと常に失敗し OCR API に流れてクォータを浪費する
