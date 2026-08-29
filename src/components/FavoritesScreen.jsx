@@ -3,7 +3,7 @@ import { ICO } from './Icons';
 import { BottomTabBar, F, splitDate } from './Shared';
 import { SUPPORTED_PREFECTURES, PREFECTURE_INFO } from '../data/regionMap';
 import { useIsDesktop } from '../hooks/useBreakpoint';
-import { deadlineDaysUntil, daysUntil, daysLabel, daysColor } from '../utils/date';
+import { deadlineDaysUntil, daysUntil, daysLabel, daysColor, daysFgColor } from '../utils/date';
 
 // ─── お気に入り一覧画面 ───────────────────────────────────────
 // DetailScreen でスター登録したイベントを一覧表示する。
@@ -105,7 +105,7 @@ function FavCard({ ev, primary, accent, applied, onTap, inGrid = false }) {
   const { m, d }  = splitDate(ev.date);
   const endSplit  = ev.endDate ? splitDate(ev.endDate) : null;
   const isWeekend = /[土日祝]/.test(ev.weekday);
-  const dateColor = isWeekend ? accent : primary;
+  const dateColor = isWeekend ? 'var(--accent-fg)' : 'var(--brand-fg)';
   const todayStr  = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
   const isOngoing = !!(ev.endDate && ev.date < todayStr);
   const dlDays    = deadlineDaysUntil(ev.deadline);
@@ -152,7 +152,7 @@ function FavCard({ ev, primary, accent, applied, onTap, inGrid = false }) {
             )}
             <span style={{
               fontSize: 12, fontWeight: 600, padding: '2px 8px',
-              borderRadius: 3, background: 'var(--tag-bg)', color: primary, letterSpacing: 0.5,
+              borderRadius: 3, background: 'var(--tag-bg)', color: 'var(--brand-fg)', letterSpacing: 0.5,
             }}>{ev.category}</span>
             {ev.tag && <span style={{ fontSize: 12, color: 'var(--text-sub)' }}>{ev.tag}</span>}
             {applied?.has(ev.id) && (
@@ -179,7 +179,7 @@ function FavCard({ ev, primary, accent, applied, onTap, inGrid = false }) {
               <span style={{
                 fontSize: 11, fontWeight: 700, padding: '2px 7px', borderRadius: 3,
                 background: `${daysColor(eventDays, primary, accent)}18`,
-                color: daysColor(eventDays, primary, accent), fontFamily: F.mono, letterSpacing: 0.5,
+                color: daysFgColor(eventDays), fontFamily: F.mono, letterSpacing: 0.5,
               }}>
                 {daysLabel(eventDays, 'event')}
               </span>
@@ -206,7 +206,7 @@ function FavCard({ ev, primary, accent, applied, onTap, inGrid = false }) {
             background: `${accent}1a`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            {ICO.star(accent, 20, accent)}
+            {ICO.star('var(--accent-fg)', 20, 'var(--accent-fg)')}
           </div>
           {ICO.chev('var(--icon-muted)', 12)}
         </div>
@@ -239,7 +239,7 @@ function EmptyState({ primary, accent }) {
         <div>① 一覧からイベントをタップ</div>
         <div>② 詳細画面の右上{' '}
           <span style={{ display: 'inline-flex', verticalAlign: 'middle' }}>
-            {ICO.star(accent, 13, 'none')}
+            {ICO.star('var(--accent-fg)', 13, 'none')}
           </span>
           {' '}をタップして登録
         </div>

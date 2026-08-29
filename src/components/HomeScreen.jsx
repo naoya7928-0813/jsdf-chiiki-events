@@ -173,7 +173,7 @@ export default function HomeScreen({
                         <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.5 }}>
                           {supportedPrefs.length} 地本対応
                         </div>
-                        <div style={{ fontSize: 16, fontWeight: 700, color: primary, lineHeight: 1.3 }}>
+                        <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--brand-fg)', lineHeight: 1.3 }}>
                           {totalEventCount} 件のイベント
                         </div>
                       </div>
@@ -226,7 +226,7 @@ export default function HomeScreen({
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       flexShrink: 0,
                     }}>
-                      {ICO.map(primary, 18)}
+                      {ICO.map('var(--brand-fg)', 18)}
                     </div>
                     <div>
                       <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
@@ -240,7 +240,7 @@ export default function HomeScreen({
                     </div>
                     {/* 全体サマリー */}
                     <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-                      <div style={{ fontFamily: F.serif, fontSize: 22, fontWeight: 600, color: primary, lineHeight: 1 }}>
+                      <div style={{ fontFamily: F.serif, fontSize: 22, fontWeight: 600, color: 'var(--brand-fg)', lineHeight: 1 }}>
                         {totalEvents}
                       </div>
                       <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
@@ -253,13 +253,13 @@ export default function HomeScreen({
                     onClick={() => onOpenList()}
                     style={{
                       width: '100%', height: 38, borderRadius: 8, border: `1px solid ${primary}44`,
-                      background: `${primary}08`, color: primary,
+                      background: `${primary}08`, color: 'var(--brand-fg)',
                       fontSize: 13, fontWeight: 600, fontFamily: F.sans,
                       cursor: 'pointer', letterSpacing: 0.5, marginTop: 10,
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                     }}
                   >
-                    {ICO.cal(primary, 14)} 全イベント一覧を見る
+                    {ICO.cal('var(--brand-fg)', 14)} 全イベント一覧を見る
                   </button>
                 </div>
               )}
@@ -342,7 +342,7 @@ function RegionPanelDetail({ prefs, events, primary, onOpenList, onOpenDetail })
                       <span style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>イベントなし</span>
                     ) : (
                       <>
-                        <span style={{ fontSize: 13, color: primary, fontWeight: 700, fontFamily: F.mono }}>{p.count}</span>
+                        <span style={{ fontSize: 13, color: 'var(--brand-fg)', fontWeight: 700, fontFamily: F.mono }}>{p.count}</span>
                         {ICO.chev('var(--icon-muted)', 14)}
                       </>
                     )}
@@ -381,7 +381,7 @@ function RegionPanelDetail({ prefs, events, primary, onOpenList, onOpenDetail })
                     display: 'flex', flexDirection: 'column', lineHeight: 1.1,
                   }}>
                     <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: F.mono }}>{m}月</span>
-                    <span style={{ fontFamily: F.serif, fontSize: 17, fontWeight: 600, color: primary }}>{d}</span>
+                    <span style={{ fontFamily: F.serif, fontSize: 17, fontWeight: 600, color: 'var(--brand-fg)' }}>{d}</span>
                   </span>
                   {/* 本文 */}
                   <span style={{ minWidth: 0, flex: 1 }}>

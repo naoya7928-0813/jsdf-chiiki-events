@@ -414,7 +414,7 @@ function IntroView({ onConfirm, onCancel, primary }) {
           width: 60, height: 60, borderRadius: '50%',
           background: `${primary}18`, margin: '0 auto 14px',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>{ICO.pin(primary, 28)}</div>
+        }}>{ICO.pin('var(--brand-fg)', 28)}</div>
         <div style={{ fontFamily: F.serif, fontSize: 17, fontWeight: 700, color: 'var(--text)', lineHeight: 1.4 }}>
           現在地を使って施設を探す
         </div>
@@ -688,7 +688,7 @@ function OfficeCard({ office, rank, primary }) {
         </div>
         <div style={{
           flexShrink: 0, fontSize: 13, fontWeight: 700, fontFamily: F.mono,
-          color: isTop ? primary : 'var(--text-muted)',
+          color: isTop ? 'var(--brand-fg)' : 'var(--text-muted)',
         }}>
           {distText}
         </div>
@@ -730,7 +730,7 @@ function OfficeCard({ office, rank, primary }) {
       <div style={{ marginTop: 10, display: 'flex', gap: 8 }}>
         <a href={mapsUrl} target="_blank" rel="noopener noreferrer"
           style={btnStyle(`${primary}14`, `${primary}33`, primary)}>
-          {ICO.map(primary, 12)} 地図で開く
+          {ICO.map('var(--brand-fg)', 12)} 地図で開く
         </a>
         {office.tel && (
           <a href={`tel:${office.tel.replace(/[^\d+]/g, '')}`}

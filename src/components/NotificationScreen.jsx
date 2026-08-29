@@ -244,9 +244,9 @@ function NotifCard({ item, primary, accent, onTap, onDelete }) {
             {!item.read
               ? <div style={{ width: 8, height: 8, borderRadius: '50%', background: accent, marginBottom: 6 }} />
               : <div style={{ width: 8, height: 8, marginBottom: 6 }} />}
-            <div style={{ fontSize: 9, color: isWeekend ? accent : primary, fontFamily: F.mono, letterSpacing: 0.5 }}>{m}月</div>
-            <div style={{ fontFamily: F.serif, fontSize: 20, fontWeight: 600, lineHeight: 1, color: isWeekend ? accent : primary, marginTop: 1 }}>{d}</div>
-            <div style={{ fontSize: 9, color: isWeekend ? accent : primary, marginTop: 2 }}>{item.weekday}</div>
+            <div style={{ fontSize: 9, color: isWeekend ? 'var(--accent-fg)' : 'var(--brand-fg)', fontFamily: F.mono, letterSpacing: 0.5 }}>{m}月</div>
+            <div style={{ fontFamily: F.serif, fontSize: 20, fontWeight: 600, lineHeight: 1, color: isWeekend ? 'var(--accent-fg)' : 'var(--brand-fg)', marginTop: 1 }}>{d}</div>
+            <div style={{ fontSize: 9, color: isWeekend ? 'var(--accent-fg)' : 'var(--brand-fg)', marginTop: 2 }}>{item.weekday}</div>
           </div>
 
           <div style={{ width: 1, alignSelf: 'stretch', background: 'var(--border)', flexShrink: 0 }} />
@@ -257,7 +257,7 @@ function NotifCard({ item, primary, accent, onTap, onDelete }) {
               <span style={{
                 fontSize: 10, padding: '2px 7px', borderRadius: 3,
                 background: !item.read ? `${primary}1a` : 'var(--tag-bg)',
-                color: primary, fontWeight: 600, letterSpacing: 0.5,
+                color: 'var(--brand-fg)', fontWeight: 600, letterSpacing: 0.5,
               }}>{item.category}</span>
               <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: F.mono }}>
                 {regionLabel}

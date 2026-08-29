@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef, Suspense } from 'react';
+import { useState, useCallback, useEffect, useLayoutEffect, useRef, Suspense } from 'react';
 import { useEvents } from './hooks/useEvents';
 // 遅延読込は lazyWithRecovery 経由（旧チャンクが消えた時に自動復旧する。utils/lazyChunk.js）
 import { lazyWithRecovery } from './utils/lazyChunk';
@@ -8,6 +8,7 @@ import { OperatorNavContext } from './components/Shared';
 import { useBreakpoint, LayoutModeContext, isPhoneSized } from './hooks/useBreakpoint';
 import { applyOrientationPreference } from './utils/orientation';
 import { consentStateFor, loadAcceptedLegalVersion } from './constants/legal';
+import { foregroundOnDark } from '../shared/brandColors.cjs';
 import SideNav from './components/SideNav';
 import ConsentGate from './components/ConsentGate';
 import NotFoundScreen from './components/NotFoundScreen';
@@ -221,21 +222,31 @@ export default function App({ operator = false }) {
     try { localStorage.setItem('jsdf-auto-mode', String(enabled)); } catch {}
   }, []);
 
-  // data-theme 属性を documentElement に適用
-  useEffect(() => {
-    const apply = () => {
-      document.documentElement.dataset.theme = resolveIsDark(darkMode) ? 'dark' : 'light';
-    };
-    apply();
-    if (darkMode !== 'system') return;
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    mq.addEventListener('change', apply);
-    return () => mq.removeEventListener('change', apply);
-  }, [darkMode]);
-
   // ── テーマオブジェクト ────────────────────────────────────
   const scheme = COLOR_SCHEMES[schemeKey] ?? COLOR_SCHEMES[DEFAULT_SCHEME];
   const theme  = { ...scheme, schemeKey, darkMode };
+
+  // ── テーマの適用（data-theme と、ブランド色の「文字用」変数） ──────
+  // 配色の primary/accent は白地に置く前提の濃い色。そのままダークの面に
+  // 文字・アイコンとして置くとコントラストが 1.1〜1.9 しかなく読めないため
+  // （要 4.5）、文字用だけ色相を保ったまま明るくした色を CSS 変数へ流す。
+  // ヘッダー等の「背景としての濃い色」は変えない。
+  // 描画前に確定させたいので useLayoutEffect（useEffect だと一瞬元の色が出る）。
+  useLayoutEffect(() => {
+    const apply = () => {
+      const isDark = resolveIsDark(darkMode);
+      const root   = document.documentElement;
+      root.dataset.theme = isDark ? 'dark' : 'light';
+      root.style.setProperty('--brand-fg',  isDark ? foregroundOnDark(scheme.primary) : scheme.primary);
+      root.style.setProperty('--accent-fg', isDark ? foregroundOnDark(scheme.accent)  : scheme.accent);
+    };
+    apply();
+    if (darkMode !== 'system') return;
+    // OS 設定に追従する場合は、OS 側の切り替えでも塗り直す
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  }, [darkMode, scheme.primary, scheme.accent]);
 
   // 運営者ログイン状態。運営者ページ(/admin.html, operator=true)でのみ意味を持つ。
   // 公開アプリ(operator=false)では常に false 扱いで、編集機能・管理タブは一切出ない。

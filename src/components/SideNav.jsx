@@ -66,7 +66,7 @@ export default function SideNav({ active, onChange, primary, unreadCount = 0, on
                 border: 'none', cursor: 'pointer', textAlign: 'left',
                 borderRadius: 'var(--radius-container)',
                 background: isA ? 'var(--tag-bg)' : 'transparent',
-                color: isA ? primary : 'var(--text-sub)',
+                color: isA ? 'var(--brand-fg)' : 'var(--text-sub)',
                 fontFamily: F.sans, fontSize: 14,
                 fontWeight: isA ? 700 : 500,
                 transition: 'background 120ms ease',
@@ -74,7 +74,7 @@ export default function SideNav({ active, onChange, primary, unreadCount = 0, on
               onMouseEnter={e => { if (!isA) e.currentTarget.style.background = 'var(--sep)'; }}
               onMouseLeave={e => { if (!isA) e.currentTarget.style.background = 'transparent'; }}
             >
-              {t.icon(isA ? primary : 'var(--icon-muted)', 20, isA)}
+              {t.icon(isA ? 'var(--brand-fg)' : 'var(--icon-muted)', 20, isA)}
               <span>{t.label}</span>
             </button>
           );

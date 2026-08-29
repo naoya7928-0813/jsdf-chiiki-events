@@ -6,6 +6,12 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-08-29',
+    version: '1.30.12',
+    type:    'improvement',
+    content: 'ダークモードで、日付やタブなどの文字が背景に溶けて読みづらかったのを直しました。',
+  },
+  {
+    date:    '2026-08-29',
     version: '1.30.11',
     type:    'fix',
     content: '地域の画面でイベントが表示されないことがある不具合を修正しました。'

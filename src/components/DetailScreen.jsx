@@ -202,7 +202,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
             {/* 運営者ログイン時: イベントの編集（右上）。手動／自動収集どちらも可 */}
             {adminAuthed && onEditEvent && (
               <button onClick={() => onEditEvent(ev)} aria-label="このイベントを編集" style={{ ...iconBtnStyle, background: '#fff' }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-fg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
               </button>
             )}
             {/* 申請済みトグル */}
@@ -455,14 +455,14 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
               style={{
                 flex: 1, height: 42, borderRadius: 8, border: '1px solid var(--border)',
                 background: copied ? `${primary}18` : 'var(--tag-bg)',
-                color: copied ? primary : 'var(--text-muted)',
+                color: copied ? 'var(--brand-fg)' : 'var(--text-muted)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
                 fontSize: 11, fontWeight: 600, fontFamily: F.sans,
                 cursor: 'pointer', transition: 'background 0.2s, color 0.2s',
               }}
             >
               {copied
-                ? <>{ICO.check(primary, 12)} コピー済</>
+                ? <>{ICO.check('var(--brand-fg)', 12)} コピー済</>
                 : <>{ICO.copy('var(--text-muted)', 13)} URLをコピー</>
               }
             </button>
@@ -568,12 +568,12 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
                       style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                         marginTop: 8, padding: '10px 12px', borderRadius: 8,
-                        border: `1px solid ${primary}33`, color: primary,
+                        border: `1px solid ${primary}33`, color: 'var(--brand-fg)',
                         fontSize: 13, textDecoration: 'none', fontFamily: F.sans,
                         background: `${primary}06`,
                       }}
                     >
-                      {ICO.extLink(primary, 13)} Google Maps で開く
+                      {ICO.extLink('var(--brand-fg)', 13)} Google Maps で開く
                     </a>
                   </>
                 )}
@@ -604,12 +604,12 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
                     style={{
                       display: 'inline-flex', alignItems: 'center', gap: 5,
                       padding: '8px 16px', borderRadius: 8,
-                      border: `1px solid ${primary}33`, color: primary,
+                      border: `1px solid ${primary}33`, color: 'var(--brand-fg)',
                       fontSize: 12, textDecoration: 'none', fontFamily: F.sans,
                       background: `${primary}08`, fontWeight: 600,
                     }}
                   >
-                    {ICO.extLink(primary, 12)} 公式ページを確認する
+                    {ICO.extLink('var(--brand-fg)', 12)} 公式ページを確認する
                   </a>
                 )}
               </div>
@@ -631,13 +631,13 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
                   display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 14px',
                   borderBottom: ev.deadline ? '1px solid var(--sep)' : 'none',
                 }}>
-                  <div style={{ fontSize: 10, fontFamily: 'monospace', color: primary, fontWeight: 700, paddingTop: 2, minWidth: 52 }}>年齢</div>
+                  <div style={{ fontSize: 10, fontFamily: 'monospace', color: 'var(--brand-fg)', fontWeight: 700, paddingTop: 2, minWidth: 52 }}>年齢</div>
                   <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.6 }}>{ev.ageRequirement}</div>
                 </div>
               )}
               {ev.deadline && (
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 14px' }}>
-                  <div style={{ fontSize: 10, fontFamily: 'monospace', color: primary, fontWeight: 700, paddingTop: 2, minWidth: 52 }}>締切</div>
+                  <div style={{ fontSize: 10, fontFamily: 'monospace', color: 'var(--brand-fg)', fontWeight: 700, paddingTop: 2, minWidth: 52 }}>締切</div>
                   <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.6 }}>{ev.deadline}</div>
                 </div>
               )}
@@ -660,7 +660,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   flexShrink: 0, marginTop: 1,
                 }}>
-                  {ICO.check(primary, 12)}
+                  {ICO.check('var(--brand-fg)', 12)}
                 </div>
                 <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.75, flex: 1, whiteSpace: 'pre-line' }}>
                   {ev.notes}
@@ -683,7 +683,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   flexShrink: 0,
                 }}>
-                  {ICO.pin(primary, 16)}
+                  {ICO.pin('var(--brand-fg)', 16)}
                 </div>
                 <div style={{ fontSize: 13, color: 'var(--text)', fontWeight: 500 }}>{ev.place}</div>
               </div>
@@ -698,7 +698,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
               <div>
                 <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{hq.name}</div>
                 <a href={`tel:${hq.tel.replace(/-/g, '')}`} style={{
-                  fontSize: 12, color: primary, marginTop: 2, display: 'block',
+                  fontSize: 12, color: 'var(--brand-fg)', marginTop: 2, display: 'block',
                   fontFamily: F.mono, textDecoration: 'none',
                 }}>
                   {hq.tel}
@@ -738,13 +738,13 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                 padding: '9px 12px', borderRadius: 8,
-                border: `1px solid ${primary}33`, color: primary,
+                border: `1px solid ${primary}33`, color: 'var(--brand-fg)',
                 fontSize: 12, textDecoration: 'none', fontFamily: F.sans,
                 background: `${primary}06`, fontWeight: 600,
                 marginBottom: 10,
               }}
             >
-              {ICO.extLink(primary, 12)} 公式ページで確認
+              {ICO.extLink('var(--brand-fg)', 12)} 公式ページで確認
             </a>
             {/* 非公式サイトの注記 */}
             <div style={{

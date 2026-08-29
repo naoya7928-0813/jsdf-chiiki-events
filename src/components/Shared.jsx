@@ -82,8 +82,8 @@ export const F = {
 export function Emblem({ ch, size = 28, primary = '#0b2545' }) {
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden="true">
-      <circle cx="20" cy="20" r="18" fill="#fff" stroke={primary} strokeWidth="1.5" />
-      <circle cx="20" cy="20" r="13" fill="none" stroke={primary} strokeWidth="0.7" />
+      <circle cx="20" cy="20" r="18" fill="#fff" stroke="var(--brand-fg)" strokeWidth="1.5" />
+      <circle cx="20" cy="20" r="13" fill="none" stroke="var(--brand-fg)" strokeWidth="0.7" />
       <text x="20" y="25" textAnchor="middle"
         fontFamily={F.serif} fontSize="13" fontWeight="700" fill={primary}>
         {ch}
@@ -174,10 +174,10 @@ export function BottomTabBar({ active, onChange, primary }) {
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
             padding: '4px 12px', minHeight: 44,
           }}>
-            {t.icon(isA ? primary : 'var(--icon-muted)', 22, isA)}
+            {t.icon(isA ? 'var(--brand-fg)' : 'var(--icon-muted)', 22, isA)}
             <span style={{
               fontSize: 10, fontFamily: F.sans,
-              color: isA ? primary : 'var(--text-muted)',
+              color: isA ? 'var(--brand-fg)' : 'var(--text-muted)',
               fontWeight: isA ? 600 : 400,
             }}>{t.label}</span>
           </button>
@@ -203,7 +203,7 @@ export function Spinner({ primary }) {
       <div style={{
         width: 28, height: 28, borderRadius: '50%',
         border: `3px solid ${primary}22`,
-        borderTopColor: primary,
+        borderTopColor: 'var(--brand-fg)',
         animation: 'spin 0.8s linear infinite',
       }} />
     </div>

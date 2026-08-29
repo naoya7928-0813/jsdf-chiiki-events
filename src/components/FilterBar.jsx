@@ -211,7 +211,7 @@ export default function FilterBar({
 
         <span style={{
           fontSize: 12, fontWeight: activeCount > 0 ? 600 : 400,
-          color: activeCount > 0 ? primary : 'var(--text-muted)',
+          color: activeCount > 0 ? 'var(--brand-fg)' : 'var(--text-muted)',
         }}>
           絞り込み
         </span>
@@ -233,7 +233,7 @@ export default function FilterBar({
             {activePeriod !== 'all' && (
               <span style={{
                 fontSize: 11, padding: '2px 9px', borderRadius: 10,
-                background: `${primary}18`, color: primary,
+                background: `${primary}18`, color: 'var(--brand-fg)',
                 fontWeight: 600, flexShrink: 0, whiteSpace: 'nowrap',
               }}>
                 {activePeriodLabel}
@@ -261,7 +261,7 @@ export default function FilterBar({
             {activeTag !== 'all' && (
               <span style={{
                 fontSize: 11, padding: '2px 9px', borderRadius: 10,
-                background: `${primary}18`, color: primary,
+                background: `${primary}18`, color: 'var(--brand-fg)',
                 fontWeight: 600, flexShrink: 0, whiteSpace: 'nowrap',
                 maxWidth: 90, overflow: 'hidden', textOverflow: 'ellipsis',
               }}>
@@ -295,7 +295,7 @@ export default function FilterBar({
                     padding: '5px 12px', borderRadius: 20,
                     border: `1.5px solid ${isOn ? primary : 'var(--border)'}`,
                     background: isOn ? `${primary}18` : 'var(--bg)',
-                    color: isOn ? primary : 'var(--text-muted)',
+                    color: isOn ? 'var(--brand-fg)' : 'var(--text-muted)',
                     fontSize: 12, fontWeight: isOn ? 700 : 400,
                   }}
                 >
@@ -303,7 +303,7 @@ export default function FilterBar({
                   <span style={{
                     fontSize: 10, fontFamily: F.mono, fontWeight: 600,
                     background: isOn ? `${primary}28` : 'var(--tag-bg)',
-                    color: isOn ? primary : 'var(--text-muted)',
+                    color: isOn ? 'var(--brand-fg)' : 'var(--text-muted)',
                     borderRadius: 8, padding: '0 5px', lineHeight: '16px',
                   }}>
                     {cnt}

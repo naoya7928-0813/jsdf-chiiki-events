@@ -147,9 +147,9 @@ function Footnotes({ primary, extraNotes }) {
       </ul>
       <div style={{ marginTop: 6 }}>
         出典: 天気予報 <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer"
-          style={{ color: primary, textDecoration: 'none' }}>Open-Meteo</a>
+          style={{ color: 'var(--brand-fg)', textDecoration: 'none' }}>Open-Meteo</a>
         ／座標検索 <a href="https://www.gsi.go.jp/" target="_blank" rel="noopener noreferrer"
-          style={{ color: primary, textDecoration: 'none' }}>国土地理院</a>
+          style={{ color: 'var(--brand-fg)', textDecoration: 'none' }}>国土地理院</a>
       </div>
     </div>
   );
@@ -160,7 +160,7 @@ function Badge({ children, primary }) {
     <span style={{
       display: 'inline-block', fontSize: 10, fontWeight: 700, fontFamily: F.mono,
       padding: '3px 8px', borderRadius: 4, marginRight: 6, marginBottom: 6,
-      background: `${primary}12`, color: primary, letterSpacing: 1,
+      background: `${primary}12`, color: 'var(--brand-fg)', letterSpacing: 1,
     }}>{children}</span>
   );
 }

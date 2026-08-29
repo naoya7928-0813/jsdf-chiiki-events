@@ -104,7 +104,7 @@ export default function PresencePanel({ adminFetch, primary }) {
         </div>
         <button onClick={() => load()} style={{
           fontSize: 11.5, fontWeight: 600, cursor: 'pointer', borderRadius: 7, padding: '5px 10px',
-          color: primary, background: 'transparent', border: `1px solid ${primary}55`,
+          color: 'var(--brand-fg)', background: 'transparent', border: `1px solid ${primary}55`,
         }}>更新</button>
       </div>
 
@@ -146,7 +146,7 @@ export default function PresencePanel({ adminFetch, primary }) {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                       <span style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text)', fontFamily: F.mono }}>{m.displayId}</span>
-                      {m.self && <span style={{ fontSize: 9.5, fontWeight: 700, color: primary, background: `${primary}18`, borderRadius: 4, padding: '1px 6px' }}>自分</span>}
+                      {m.self && <span style={{ fontSize: 9.5, fontWeight: 700, color: 'var(--brand-fg)', background: `${primary}18`, borderRadius: 4, padding: '1px 6px' }}>自分</span>}
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
                       {ROLE_LABEL[m.role] || m.role || '—'}{m.office ? `・${m.office}` : ''}

@@ -80,8 +80,8 @@ export default function NotFoundScreen({
       {/* 幅に応じた出し分け（文字サイズ・提案の段組み）は globalStyles の .nf-* が持つ */}
       <div className="nf-wrap" style={{ textAlign: 'center' }}>
 
-        {/* 404 の記号 */}
-        <div className="nf-code" style={{ color: primary }}>404</div>
+        {/* 404 の記号（装飾。内容は下の見出しが伝えるので読み上げからは外す） */}
+        <div className="nf-code" aria-hidden="true" style={{ color: 'var(--brand-fg)' }}>404</div>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
           {ICO.search('var(--icon-muted, #9ca3af)', 32)}
         </div>

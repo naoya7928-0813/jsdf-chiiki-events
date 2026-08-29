@@ -301,6 +301,15 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - **地域マップ**: 8地域（北海道・東北・関東・中部・近畿・中国・四国・九州）
 - **都道府県 emblem**: `regionMap.js` の PREFECTURE_INFO と REGIONS 両方に同じ値が必要（全50件ユニーク）
 - **テーマ**: CSS 変数 `var(--bg)` / `var(--text)` / `var(--card)` / `var(--border)` でライト/ダーク切替
+- **ブランド色（陸/海/空の `primary`・`accent`）の使い分け**（2026-08-29 導入）:
+  - **背景として**使うとき（ヘッダー・選択中ボタン・白ピルの上の文字）は従来どおり `theme.primary` / `theme.accent`
+  - **文字・アイコンとして**テーマ面（`--bg`/`--card`/`--tag-bg`）の上に置くときは
+    **`var(--brand-fg)` / `var(--accent-fg)`** を使う。日数バッジは `daysFgColor()`（`src/utils/date.js`）
+  - 変数の値は `App.jsx` が配色とテーマから決めて `documentElement` に流す。
+    ダークの値は `shared/brandColors.cjs` の `foregroundOnDark()`＝色相を保ったまま
+    明度を上げて AA(4.5) を満たす色（`shared/brandColors.test.cjs` で検証）
+  - ⚠️ 濃いブランド色（陸 `#3a4130`・海 `#0b2545`・空 `#2a4a6b`）をダークの面に**文字として直接置かない**。
+    コントラストが 1.1〜1.9 しかなく読めない（2026-08-29 に全画面で発生していたのを修正）
 - **起動時のテーマ確定（白フラッシュ対策）**: グローバルCSS は `main.jsx` が JS 実行時に注入するため、
   それまで body はライト色のままで、ダーク利用者はコールドロードのたびに白い画面を経由していた。
   `shared/bootTheme.cjs` の `<style>`＋`<script>` を `vite.config.js` の `bootThemeInject` が

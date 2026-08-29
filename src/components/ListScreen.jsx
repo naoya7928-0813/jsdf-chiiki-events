@@ -4,7 +4,7 @@ import { useIsShortViewport } from '../hooks/useBreakpoint';
 import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle, StatusBadge } from './Shared';
 import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, weekendRange, matchesTag, matchesBranch, APPLIED_TAG_ID, ENDED_TAG_ID } from './FilterBar';
 import CalendarView from './CalendarView';
-import { daysUntil, deadlineDaysUntil, daysLabel, daysColor } from '../utils/date';
+import { daysUntil, deadlineDaysUntil, daysLabel, daysColor, daysFgColor } from '../utils/date';
 import { REGIONS, SUPPORTED_PREFECTURES, PREFECTURE_INFO, NEIGHBORS } from '../data/regionMap';
 
 // ── 地方タブ（第1段）─────────────────────────────────────────
@@ -616,7 +616,7 @@ export default function ListScreen({
                   const { m, d }   = ev.date ? splitDate(ev.date) : { m: null, d: null };
                   const endSplit   = ev.endDate ? splitDate(ev.endDate) : null;
                   const isWeekend  = /[土日祝]/.test(ev.weekday);
-                  const dateColor  = isWeekend ? accent : primary;
+                  const dateColor  = isWeekend ? 'var(--accent-fg)' : 'var(--brand-fg)';
                   const isOngoing  = !!(ev.endDate && ev.date < todayStr);
                   const eventDays  = daysUntil(ev.endDate || ev.date);
                   const dlDays     = deadlineDaysUntil(ev.deadline);
@@ -680,14 +680,14 @@ export default function ListScreen({
                               <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3, background: '#6b7280', color: '#fff', letterSpacing: 0.5, flexShrink: 0 }}>終了済み</span>
                             )}
                             {/* カテゴリは角ばったタグ型（装備品の規格ラベル調・フィードバック§4-2⑤） */}
-                            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 'var(--radius-tag)', background: 'var(--tag-bg)', color: primary, letterSpacing: 0.5 }}>
+                            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 'var(--radius-tag)', background: 'var(--tag-bg)', color: 'var(--brand-fg)', letterSpacing: 0.5 }}>
                               {ev.category}
                             </span>
                             {ev.tag && <span style={{ fontSize: 11, color: 'var(--text-sub)' }}>{ev.tag}</span>}
                             {sourceLabel && (
                               <span style={{
                                 fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3,
-                                background: `${primary}12`, color: primary,
+                                background: `${primary}12`, color: 'var(--brand-fg)',
                                 letterSpacing: 0.5, flexShrink: 0,
                               }}>
                                 {sourceLabel}
@@ -696,7 +696,7 @@ export default function ListScreen({
                             {favorites?.has(ev.id) && (
                               <span style={{
                                 fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 3,
-                                background: `${accent}22`, color: accent,
+                                background: `${accent}22`, color: 'var(--accent-fg)',
                                 letterSpacing: 0.5, flexShrink: 0,
                               }}>★</span>
                             )}
@@ -727,7 +727,7 @@ export default function ListScreen({
                               <span style={{
                                 fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3,
                                 background: `${daysColor(eventDays, primary, accent)}18`,
-                                color: daysColor(eventDays, primary, accent),
+                                color: daysFgColor(eventDays),
                                 fontFamily: F.mono, letterSpacing: 0.5,
                               }}>
                                 {daysLabel(eventDays, 'event')}
@@ -760,8 +760,8 @@ export default function ListScreen({
                           )}
                           {/* ④ URLあり → 公式ページ確認バッジ */}
                           {ev.url && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 5, fontSize: 10, color: primary, fontWeight: 600 }}>
-                              {ICO.extLink(primary, 10)} 公式ページで確認
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 5, fontSize: 10, color: 'var(--brand-fg)', fontWeight: 600 }}>
+                              {ICO.extLink('var(--brand-fg)', 10)} 公式ページで確認
                             </div>
                           )}
                         </div>
@@ -855,7 +855,7 @@ function EmptyState({ searchQuery, primary, prefId, events, onSelectPref }) {
               >
                 <Emblem ch={PREFECTURE_INFO[n.id]?.emblem ?? n.label.charAt(0)} size={15} primary={primary} />
                 <span>{n.label}</span>
-                <span style={{ fontSize: 11, fontFamily: F.mono, color: primary, fontWeight: 700 }}>{n.count}件</span>
+                <span style={{ fontSize: 11, fontFamily: F.mono, color: 'var(--brand-fg)', fontWeight: 700 }}>{n.count}件</span>
               </button>
             ))}
           </div>

@@ -119,7 +119,7 @@ export default function PastEventsPanel({ adminFetch, account, primary }) {
             <div key={ev.id} style={{ padding: '10px 12px', marginBottom: 8, background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                 <span style={{ fontSize: 10, fontWeight: 700, color: '#fff', background: STATUS_COLOR[ev.status] || '#888', borderRadius: 5, padding: '2px 6px' }}>{STATUS_LABEL[ev.status] || ev.status || '—'}</span>
-                <span style={{ fontSize: 10, fontWeight: 700, color: primary, background: `${primary}14`, borderRadius: 5, padding: '2px 6px' }}>{ev.source === 'manual' ? '手動' : 'スクレイピング'}</span>
+                <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--brand-fg)', background: `${primary}14`, borderRadius: 5, padding: '2px 6px' }}>{ev.source === 'manual' ? '手動' : 'スクレイピング'}</span>
                 <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{ev.title || '（無題）'}</div>
               </div>
               <div style={{ fontSize: 11.5, color: 'var(--text-muted)', margin: '4px 0 2px' }}>
@@ -127,7 +127,7 @@ export default function PastEventsPanel({ adminFetch, account, primary }) {
               </div>
               <div style={{ fontSize: 10.5, color: 'var(--text-muted)', opacity: 0.85, wordBreak: 'break-all' }}>
                 ID: {ev.id}{ev.updatedAt ? `・最終更新 ${fmtUpdated(ev.updatedAt)}` : ''}
-                {ev.url ? <> ・<a href={ev.url} target="_blank" rel="noopener noreferrer" style={{ color: primary }}>公式ページ</a></> : ''}
+                {ev.url ? <> ・<a href={ev.url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--brand-fg)' }}>公式ページ</a></> : ''}
               </div>
             </div>
           ))}

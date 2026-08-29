@@ -129,7 +129,7 @@ export default function ReportScreen({ theme, updatedAt, onBack, target }) {
                 marginBottom: 18, padding: '11px 13px', borderRadius: 10,
                 background: `${primary}0c`, border: `1px solid ${primary}33`,
               }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: primary, marginBottom: 5, letterSpacing: 0.3 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--brand-fg)', marginBottom: 5, letterSpacing: 0.3 }}>
                   報告対象のイベント
                 </div>
                 <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', lineHeight: 1.5 }}>
@@ -155,7 +155,7 @@ export default function ReportScreen({ theme, updatedAt, onBack, target }) {
                     fontSize: 13, fontWeight: on ? 700 : 500,
                     border: `1px solid ${on ? primary : 'var(--border)'}`,
                     background: on ? `${primary}14` : 'var(--card)',
-                    color: on ? primary : 'var(--text-sub)',
+                    color: on ? 'var(--brand-fg)' : 'var(--text-sub)',
                   }}>{c}</button>
                 );
               })}
@@ -208,7 +208,7 @@ export default function ReportScreen({ theme, updatedAt, onBack, target }) {
               </div>
               <button onClick={() => setShowCtx(v => !v)} style={{
                 marginTop: 8, padding: 0, background: 'none', border: 'none', cursor: 'pointer',
-                color: primary, fontSize: 11.5, fontWeight: 700, fontFamily: F.sans,
+                color: 'var(--brand-fg)', fontSize: 11.5, fontWeight: 700, fontFamily: F.sans,
               }}>
                 {showCtx ? '送信される情報を隠す' : '送信される情報を確認する'}
               </button>

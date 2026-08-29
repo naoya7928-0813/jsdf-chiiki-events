@@ -91,7 +91,7 @@ export default function ConsentGate({ state, theme, onAccepted }) {
           <button
             onClick={() => setDoc(null)}
             style={{
-              border: 'none', background: 'transparent', color: primary,
+              border: 'none', background: 'transparent', color: 'var(--brand-fg)',
               fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: 0, fontFamily: F.sans,
             }}
           >
@@ -156,7 +156,7 @@ export default function ConsentGate({ state, theme, onAccepted }) {
 
   // ── 同意のお願い（初回 / 改定） ──
   const linkStyle = {
-    border: 'none', background: 'transparent', color: primary,
+    border: 'none', background: 'transparent', color: 'var(--brand-fg)',
     fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: 0,
     textDecoration: 'underline', fontFamily: F.sans,
   };
@@ -196,12 +196,12 @@ export default function ConsentGate({ state, theme, onAccepted }) {
                 border: '1px solid var(--border)', borderRadius: 12,
                 padding: '14px 16px', marginBottom: 18, background: 'var(--card)',
               }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: primary, marginBottom: 8 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--brand-fg)', marginBottom: 8 }}>
                   {isRevised ? '主な変更点' : '要点'}
                 </div>
                 {items.map((c, i) => (
                   <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 6, fontSize: 12, lineHeight: 1.8 }}>
-                    <span style={{ color: primary, flexShrink: 0 }}>•</span>
+                    <span style={{ color: 'var(--brand-fg)', flexShrink: 0 }}>•</span>
                     <span>{c}</span>
                   </div>
                 ))}

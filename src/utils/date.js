@@ -64,6 +64,17 @@ export function daysLabel(days, type = 'event') {
 }
 
 /** 残り日数に応じた色を返す */
+/**
+ * 日数バッジの「文字・アイコン用」の色。
+ * ブランド色（primary/accent）は白地前提の濃い色で、ダークの面に文字として
+ * 置くと読めないため、テーマで切り替わる CSS 変数を使う。
+ * 背景の淡い塗り（`${色}18` のようにアルファを連結する用途）は
+ * 変数を文字列連結できないので、従来どおり daysColor(days, primary, accent) を使う。
+ */
+export function daysFgColor(days) {
+  return daysColor(days, 'var(--brand-fg)', 'var(--accent-fg)');
+}
+
 export function daysColor(days, primary, accent) {
   if (days <= 0)  return '#ef4444'; // 赤
   if (days <= 1)  return '#ef4444'; // 赤
