@@ -38,6 +38,7 @@ function officeSourceLabel(ev) {
 
 export default function ListScreen({
   events, loading, error, updatedAt, checkedAt, onRefresh,
+  stale, lastSyncedAt,   // 表示中のデータが最新でない（オフライン・取得失敗）／最後に取得できた日時
   region, onRegionChange,
   favorites, applied, onToggleApplied,
   onOpenHome, onOpenDetail, onOpenSettings, onOpenFavorites,
@@ -303,6 +304,9 @@ export default function ListScreen({
     year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit',
     timeZone: 'Asia/Tokyo',
   }).replace(',', '');
+  // オフライン・取得失敗のときに「確認 <今の時刻>」を出すと、最新を取れたように読める。
+  // その場合は最後に取得できた日時を示す（見えている情報がいつ時点かを取り違えさせない）。
+  const staleLabel   = stale && lastSyncedAt ? lastSyncedAt : null;
 
   // 更新ボタンの回転アニメーション（spin は main.jsx で定義済み）
   const spinStyle = (isRefreshing || loading)
@@ -326,7 +330,7 @@ export default function ListScreen({
             {/* ⑥ 更新時刻をヘッダーに表示（高さが足りないときは省く） */}
             {!shortVp && (
               <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', marginTop: 3, fontFamily: F.mono }}>
-                確認 {checkedLabel}
+                {staleLabel ? `最終取得 ${staleLabel}` : `確認 ${checkedLabel}`}
               </div>
             )}
           </div>

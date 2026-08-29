@@ -4,13 +4,14 @@ import { useEvents } from './hooks/useEvents';
 import { lazyWithRecovery } from './utils/lazyChunk';
 import { COLOR_SCHEMES, DEFAULT_SCHEME } from './config';
 import { PREFECTURE_INFO } from './data/regionMap';
-import { OperatorNavContext, OfflineBanner } from './components/Shared';
+import { OperatorNavContext } from './components/Shared';
 import { useBreakpoint, LayoutModeContext, isPhoneSized } from './hooks/useBreakpoint';
 import { applyOrientationPreference } from './utils/orientation';
 import { consentStateFor, loadAcceptedLegalVersion } from './constants/legal';
 import SideNav from './components/SideNav';
 import ConsentGate from './components/ConsentGate';
 import NotFoundScreen from './components/NotFoundScreen';
+import OfflineNotice from './components/OfflineNotice';
 import { ICO }           from './components/Icons';
 import HomeScreen        from './components/HomeScreen';
 import ListScreen        from './components/ListScreen';
@@ -265,7 +266,36 @@ export default function App({ operator = false }) {
 
   // ── データ取得 ────────────────────────────────────────────
   const { events, loading, error, updatedAt, checkedAt, refresh,
-          offline, stale, lastSyncedAt } = useEvents(autoMode);
+          offline, stale, lastSyncedAt, isMock } = useEvents(autoMode);
+
+  // 取得エラーの赤帯は「表示するデータが無い」ときだけ出す。
+  // 保存済みデータを表示できている場合は、赤帯（「サンプルデータを表示しています」）は
+  // 事実と違ううえ、オフラインのお知らせと二重になる。
+  const dataError = isMock ? error : null;
+
+  // ── オフラインのお知らせ ──────────────────────────────────
+  // 通信できない／最新を取得できないときに、ポップアップで一度だけ知らせる。
+  // 画面上下に帯を出し続けると狭い画面で一覧の領域を常時奪うため、
+  // 「いつ時点の情報か」はこのポップアップで伝え、閉じたあとは何も残さない。
+  //
+  // 発火は「サイト表示時（初回取得が決着した時点）」と「通信が切れた時」。
+  // stale はキャッシュ起動時の初期値が true のため、初回取得が決着（checkedAt が付く）
+  // するまで判定しない（決着前に出すと、取得に成功する場合でも一瞬出てしまう）。
+  const [offlineNoticeOpen, setOfflineNoticeOpen] = useState(false);
+  const offlineNoticeShown = useRef(false);  // 同じ切断のあいだは出し直さない
+  useEffect(() => {
+    if (operator) return;
+    const degraded = Boolean(checkedAt) && (offline || stale);
+    if (!degraded) {
+      // 復帰したら閉じ、次に切れたときはまた知らせる
+      offlineNoticeShown.current = false;
+      setOfflineNoticeOpen(false);
+      return;
+    }
+    if (offlineNoticeShown.current) return;
+    offlineNoticeShown.current = true;
+    setOfflineNoticeOpen(true);
+  }, [operator, checkedAt, offline, stale]);
 
   // ── URL同期（イベント個別URL /event/:id・戻るボタン・リロード復元） ──
   const popNav = useRef(false);       // popstate/初期解決による遷移中は pushState しない
@@ -530,6 +560,17 @@ export default function App({ operator = false }) {
         <SplashScreen schemeKey={schemeKey} onDone={handleSplashDone} />
       )}
 
+      {/* ── オフラインのお知らせ（スプラッシュが終わってから出す） ── */}
+      {!operator && !showSplash && offlineNoticeOpen && (
+        <OfflineNotice
+          offline={offline}
+          lastSyncedAt={lastSyncedAt}
+          theme={theme}
+          onRetry={refresh}
+          onClose={() => setOfflineNoticeOpen(false)}
+        />
+      )}
+
       {/* ── デスクトップの左サイドナビ（下部タブバーの代替） ── */}
       {isDesktopLayout && (
         <SideNav
@@ -542,15 +583,11 @@ export default function App({ operator = false }) {
       )}
 
       <div style={mainStyle}>
-      {/* ── オフライン帯（表示中のデータがいつ時点かを常に明示する） ── */}
-      {!operator && (
-        <OfflineBanner offline={offline} stale={stale} lastSyncedAt={lastSyncedAt} onRetry={refresh} />
-      )}
       {/* 遅延読込画面のフォールバックは null（既存画面が残らないよう軽量に） */}
       <Suspense fallback={null}>
       {screen === 'home' && (
         <HomeScreen
-          events={events} loading={loading} error={error}
+          events={events} loading={loading} error={dataError}
           theme={theme}
           favorites={favorites}
           unreadCount={unreadCount}
@@ -601,8 +638,9 @@ export default function App({ operator = false }) {
               borderRight: '1px solid var(--border)', position: 'relative',
             }}>
               <ListScreen
-                events={events} loading={loading} error={error}
+                events={events} loading={loading} error={dataError}
                 updatedAt={updatedAt} checkedAt={checkedAt} onRefresh={refresh}
+                stale={stale} lastSyncedAt={lastSyncedAt}
                 theme={theme}
                 region={region} onRegionChange={handleRegionChange}
                 favorites={favorites}
@@ -647,8 +685,9 @@ export default function App({ operator = false }) {
           </div>
         ) : (
           <ListScreen
-            events={events} loading={loading} error={error}
+            events={events} loading={loading} error={dataError}
             updatedAt={updatedAt} checkedAt={checkedAt} onRefresh={refresh}
+            stale={stale} lastSyncedAt={lastSyncedAt}
             theme={theme}
             region={region} onRegionChange={handleRegionChange}
             favorites={favorites}

@@ -18,7 +18,7 @@ export const GLOBAL_CSS = `
     --map-hover:       #c4c8d0;
     --notice-bg:       rgba(133,107,0,0.07);
     --notice-border:   rgba(133,107,0,0.15);
-    /* オフライン帯（「いつ時点の情報か」を示す常時表示バー） */
+    /* オフラインの配色（お知らせポップアップ・報告画面の注意書き） */
     --offline-bg:      #fff8e6;
     --offline-border:  #f0d9a0;
     --offline-text:    #7a5b00;

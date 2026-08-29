@@ -5,6 +5,13 @@
  */
 export const UPDATE_NOTES = [
   {
+    date:    '2026-08-29',
+    version: '1.30.10',
+    type:    'improvement',
+    content: '通信できないときのお知らせを、画面上部の帯からポップアップに変更しました。'
+           + '閉じたあとは画面が広く使えます。',
+  },
+  {
     date:    '2026-08-27',
     version: '1.30.9',
     type:    'improvement',
