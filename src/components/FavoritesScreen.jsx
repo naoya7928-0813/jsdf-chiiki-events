@@ -3,7 +3,7 @@ import { ICO } from './Icons';
 import { BottomTabBar, F, splitDate } from './Shared';
 import { SUPPORTED_PREFECTURES, PREFECTURE_INFO } from '../data/regionMap';
 import { useIsDesktop } from '../hooks/useBreakpoint';
-import { deadlineDaysUntil, daysUntil, daysLabel, daysColor, daysFgColor } from '../utils/date';
+import { deadlineDaysUntil, daysUntil, daysLabel, daysColor, daysFgColor, jstTodayStr } from '../utils/date';
 
 // ─── お気に入り一覧画面 ───────────────────────────────────────
 // DetailScreen でスター登録したイベントを一覧表示する。
@@ -106,7 +106,7 @@ function FavCard({ ev, primary, accent, applied, onTap, inGrid = false }) {
   const endSplit  = ev.endDate ? splitDate(ev.endDate) : null;
   const isWeekend = /[土日祝]/.test(ev.weekday);
   const dateColor = isWeekend ? 'var(--accent-fg)' : 'var(--brand-fg)';
-  const todayStr  = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
+  const todayStr  = jstTodayStr();
   const isOngoing = !!(ev.endDate && ev.date < todayStr);
   const dlDays    = deadlineDaysUntil(ev.deadline);
   const showDl    = dlDays != null && dlDays >= 0 && dlDays <= 3;

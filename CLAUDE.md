@@ -28,7 +28,7 @@ jsdf-chiiki-events/
 │   ├── lib/
 │   │   ├── llmClient.js        # 段1/段3 の LLM 呼び出し（Groq→Gemini）
 │   │   └── llmCache.js         # LLM 結果のキャッシュ（SHA-256 / TTL 90日）
-│   └── parsers/                # 都道府県別パーサー（50 ファイル）
+│   └── parsers/                # 都道府県別パーサー（51 県分＋utils.js）
 │       └── utils.js            # guessCategory / guessTag / isPast など共通関数
 ├── public/
 │   ├── 404.html                # 静的パス用の404ページ（/events/<県>.html 等）
@@ -66,7 +66,8 @@ cd scraper && node index.js
 - **scrape.yml**: データ変更時のみ Vercel デプロイ（`changed=true` の場合）
 - **deploy.yml**: `src/`, `public/`, `scripts/`, `index.html`, `vite.config.js`, `vercel.json`, `package.json` の変更時に自動デプロイ
 - 手動デプロイ: `gh workflow run deploy.yml`
-- 必要シークレット: `GROQ_API_KEY`, `GEMINI_API_KEY`, `MISTRAL_API_KEY`, `OCR_SPACE_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `NTFY_ADMIN_TOPIC`
+- 必要シークレット: `GROQ_API_KEY`, `GEMINI_API_KEY`, `MISTRAL_API_KEY`, `OCR_SPACE_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `NTFY_ADMIN_TOPIC`（管理者向け監視通知）, `NTFY_TOPIC`（旧・地域別の ntfy 配信。scrape.yml が使用）
+- **deploy.yml のトリガーには `shared/**` と `middleware.js` も含める**。フロントは `shared/*.cjs` を直接 import しているため、ここが漏れると shared だけの修正がサイトに反映されない（2026-08-29 に漏れていたのを修正）
 
 ## スクレイパー仕様
 
@@ -318,7 +319,9 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
   ⚠️ **`index.html` に背景色を直接書かないこと**（ライト固定になり同じ事故が再発する）。
   `BOOT_BG` は `globalStyles.js` の `--bg` と一致必須で、`shared/bootTheme.test.cjs` が実ファイルを
   読んで検証している（ズレると起動直後と描画後で色が変わり、別の形でちらつく）。
-- **プッシュ通知**: ntfy.sh トピック `jsdf-chiiki-events-7928`
+- **プッシュ通知**: Web Push（`/api/subscribe` に購読を保存 → `/api/notify` で配信）。
+  旧 ntfy.sh トピック方式（`NTFY_TOPIC` / NtfyGuideModal）はアプリ側では廃止済みで、
+  ntfy は scrape.yml からの管理者・地域別通知にのみ残っている（`src/config.js` 冒頭の注記を参照）
 
 ## オフライン対応（2026-08-26 導入）
 
@@ -378,6 +381,19 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 4. 実装との整合を必ず確認する。**「使っていない」と書いたものを使っている状態を作らない**
    （2026-08-26 の監査で、ポリシーが「アクセス解析は使用していません」と書く一方 `src/main.jsx` が
    Vercel Analytics / Speed Insights を注入していた。ほかに位置情報・方位センサー・Google マップ埋め込みが未記載だった）
+
+## 共通化のルール（重複定義を作らない）
+
+同じ値・同じ計算を2か所に書かないこと。過去に「片方だけ直してズレる」事故が起きている。
+
+| 対象 | 唯一の出どころ | 使う側 |
+|---|---|---|
+| 「終了済み」を残す日数 | `shared/eventStatus.cjs` の `ENDED_KEEP_DAYS`（7日） | `src/hooks/useEvents.js`（表示フィルター）／`scraper/index.js`（writeOutput の削除判定） |
+| JST の「今日」(YYYY-MM-DD) | `src/utils/date.js` の `jstTodayStr()` | 画面各所（以前は5ファイルで重複定義＋12か所にインライン展開されていた） |
+| 日数バッジの文字色 | `src/utils/date.js` の `daysFgColor()` | 一覧・地域・お気に入り（背景の淡い塗りは `daysColor()` を継続） |
+| 陸海空の判定 | `shared/branch.cjs` | フロントの絞り込み／運営テンプレ／管理API |
+| タイトル整形・不正判定 | `shared/titleQuality.cjs` / `shared/officeTitle.cjs` | スクレイパー／フロント／スクリプト |
+| ブランド色の文字用 | `shared/brandColors.cjs` ＋ CSS 変数 `--brand-fg`/`--accent-fg` | 全画面（上記「テーマ」参照） |
 
 ## 天気予報（イベント詳細）
 

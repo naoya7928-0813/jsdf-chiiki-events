@@ -4,7 +4,7 @@ import { useIsShortViewport } from '../hooks/useBreakpoint';
 import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle, StatusBadge } from './Shared';
 import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, weekendRange, matchesTag, matchesBranch, APPLIED_TAG_ID, ENDED_TAG_ID } from './FilterBar';
 import CalendarView from './CalendarView';
-import { daysUntil, deadlineDaysUntil, daysLabel, daysColor, daysFgColor } from '../utils/date';
+import { daysUntil, deadlineDaysUntil, daysLabel, daysColor, daysFgColor, jstTodayStr } from '../utils/date';
 import { REGIONS, SUPPORTED_PREFECTURES, PREFECTURE_INFO, NEIGHBORS } from '../data/regionMap';
 
 // ── 地方タブ（第1段）─────────────────────────────────────────
@@ -203,7 +203,7 @@ export default function ListScreen({
   // ── フィルター適用済みリスト（期間×カテゴリ×タグ×種別、開催日昇順） ──
   const filteredList = useMemo(() => {
     // JST の今日を YYYY-MM-DD 文字列で取得
-    const tStr = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+    const tStr = jstTodayStr();
     const Y  = Number(tStr.slice(0, 4));
     const Mo = Number(tStr.slice(5, 7)); // 1-indexed
 
@@ -297,7 +297,7 @@ export default function ListScreen({
   }, [grouped, searchQuery]);
 
   const { primary, accent } = theme;
-  const todayStr = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
+  const todayStr = jstTodayStr();
   // checkedAt: 更新ボタンを押した（または自動フェッチした）時刻（ローカル）
   // updatedAt: スクレイパーがデータを書いた時刻（JSON内）
   const checkedLabel = checkedAt ?? updatedAt ?? new Date().toLocaleString('ja-JP', {

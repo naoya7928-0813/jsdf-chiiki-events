@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { F } from './Shared';
 // 陸海空の判定は shared/branch.cjs に集約（運営テンプレ・API と共有）
 import { BRANCH_DEFS, matchesBranch } from '../../shared/branch.cjs';
+import { jstTodayStr } from '../utils/date';
 
 export { BRANCH_DEFS, matchesBranch };
 
@@ -62,7 +63,7 @@ export function matchesTag(ev, tagId) {
 // 期間ごとの件数を返すユーティリティ（ListScreen でも再利用）
 export function calcPeriodCounts(events) {
   // JST の今日を YYYY-MM-DD 文字列で取得（UTC+9 をオフセットして ISO 変換）
-  const tStr = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+  const tStr = jstTodayStr();
   const Y  = Number(tStr.slice(0, 4));
   const Mo = Number(tStr.slice(5, 7)); // 1-indexed
 

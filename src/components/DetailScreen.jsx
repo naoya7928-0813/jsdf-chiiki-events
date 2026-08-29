@@ -6,6 +6,7 @@ import WeatherCard from './WeatherCard';
 import { useElementWidth, isTouchPhone, useIsShortViewport } from '../hooks/useBreakpoint';
 import { googleCalendarUrl, downloadIcs } from '../utils/calendar';
 import { useOnline } from '../hooks/useOnline';
+import { jstTodayStr } from '../utils/date';
 
 function officeSourceLabel(ev) {
   if (!ev?.source_type) return null;
@@ -119,7 +120,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
   const isApplied  = applied?.has(ev.id) ?? false;
   const { m, d }  = ev.date ? splitDate(ev.date) : { m: null, d: null };
   const endSplit  = ev.endDate ? splitDate(ev.endDate) : null;
-  const todayStr  = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
+  const todayStr  = jstTodayStr();
   const isOngoing = !!(ev.endDate && ev.date < todayStr);
 
   // ── 見出しの横に日付を出すか ──────────────────────────────

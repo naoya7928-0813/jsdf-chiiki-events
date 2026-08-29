@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { ICO } from './Icons';
 import { F, ScreenHeader, BottomTabBar, splitDate } from './Shared';
 import { REGION_BY_ID, SUPPORTED_PREFECTURES } from '../data/regionMap';
-import { deadlineDaysUntil, daysUntil, daysLabel, daysColor, daysFgColor } from '../utils/date';
+import { deadlineDaysUntil, daysUntil, daysLabel, daysColor, daysFgColor, jstTodayStr } from '../utils/date';
 
 // ─── 地域画面（都道府県タブ + イベント一覧） ─────────────────────
 export default function RegionScreen({
@@ -171,7 +171,7 @@ export default function RegionScreen({
 
 // ─── イベントカード ───────────────────────────────────────────
 function EventCard({ ev, isFav, applied, primary, accent, onTap }) {
-  const TODAY_STR = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
+  const TODAY_STR = jstTodayStr();
   const { m, d }  = splitDate(ev.date);
   const endSplit  = ev.endDate ? splitDate(ev.endDate) : null;
   const isWeekend = /[土日祝]/.test(ev.weekday);

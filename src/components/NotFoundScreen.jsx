@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { F, Emblem } from './Shared';
 import { ICO } from './Icons';
 import { PREFECTURE_INFO } from '../data/regionMap';
+import { jstTodayStr } from '../utils/date';
 
 /**
  * NotFoundScreen — 404（お探しのページが見つかりません）
@@ -18,14 +19,11 @@ import { PREFECTURE_INFO } from '../data/regionMap';
 const MAX_SUGGESTIONS = 4;
 
 /** JST 今日の日付 "YYYY-MM-DD" */
-function jstToday() {
-  return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
-}
 
 /** 全地本を横断して、開催が近い順に数件返す */
 function pickUpcoming(events, limit = MAX_SUGGESTIONS) {
   if (!events || typeof events !== 'object') return [];
-  const today = jstToday();
+  const today = jstTodayStr();
   const flat = [];
   for (const list of Object.values(events)) {
     if (!Array.isArray(list)) continue;

@@ -2,11 +2,9 @@ import { useMemo, useState } from 'react';
 import { F } from './Shared';
 import { ICO } from './Icons';
 import { PREFECTURE_INFO } from '../data/regionMap';
+import { jstTodayStr } from '../utils/date';
 
 // ── JST 日付ユーティリティ（YYYY-MM-DD 文字列ベース。TZ非依存） ──
-function jstToday() {
-  return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
-}
 function ymd(y, m, d) {
   const p = n => String(n).padStart(2, '0');
   return `${y}-${p(m)}-${p(d)}`;
@@ -24,7 +22,7 @@ const WEEK = ['日', '月', '火', '水', '木', '金', '土'];
  * 連日開催（endDate）は期間中の各日に表示する。
  */
 export default function CalendarView({ events, onOpenDetail, primary, accent, favorites, applied, activePrefId }) {
-  const today = jstToday();
+  const today = jstTodayStr();
 
   // 表示中の月（既定は今日の月）。矢印で前後に移動。
   const [ym, setYm] = useState(() => ({ y: Number(today.slice(0, 4)), m: Number(today.slice(5, 7)) }));

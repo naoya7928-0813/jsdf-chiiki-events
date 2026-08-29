@@ -1,7 +1,12 @@
 // ─── 日付ユーティリティ（すべて JST 基準） ───────────────────────
 
 /** 現在の JST 日付を "YYYY-MM-DD" 文字列で返す */
-function jstTodayStr() {
+/**
+ * JST の「今日」を YYYY-MM-DD で返す。
+ * UTC+9 をオフセットして ISO 変換するため、実行環境のタイムゾーンに依存しない。
+ * ⚠ 同じ式を各画面に書かないこと（以前は5ファイルで重複定義・12か所でインライン展開されていた）。
+ */
+export function jstTodayStr() {
   return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
 }
 

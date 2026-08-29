@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { F, SectionTitle } from './Shared';
 import W from '../../shared/weather.cjs';
+import { jstTodayStr } from '../utils/date';
 
 // WMO weather code → 日本語名称 + アイコン種別（Open-Meteo の weather_code に対応）。
 // 端末で見た目が変わる絵文字を廃し、線画アイコン（WeatherGlyph）へ統一（フィードバック§4-2⑦）。
@@ -82,9 +83,6 @@ function WeatherGlyph({ cat, size = 40 }) {
 }
 
 /** JST 今日 "YYYY-MM-DD" */
-function jstToday() {
-  return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
-}
 function fmtFetched(iso) {
   try {
     return new Date(iso).toLocaleString('ja-JP', {
@@ -194,7 +192,7 @@ function Message({ heading, text, primary, extraNotes, open, onToggle }) {
 export default function WeatherCard({ event, theme }) {
   const primary = theme?.primary || '#0b2545';
   const ev = event;
-  const today = jstToday();
+  const today = jstTodayStr();
   const decision = W.decideWeatherDisplay(ev || {}, today);
 
   // 既定で開く。イベント詳細を開いたら天気は必ず見えている状態にする。
