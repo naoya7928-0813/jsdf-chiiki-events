@@ -701,7 +701,9 @@ export default function App({ operator = false }) {
         )
       )}
 
-      {screen === 'detail' && (
+      {/* detailEvent が無い状態で詳細を描かない（描くと DetailScreen が
+          早期 return し、フック数が変わって React が落ちる） */}
+      {screen === 'detail' && detailEvent && (
         <DetailScreen
           event={detailEvent}
           weatherMapMode={weatherMapMode}

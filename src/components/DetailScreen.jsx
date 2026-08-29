@@ -19,6 +19,11 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
   const [copied,    setCopied]    = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [mapOpen,   setMapOpen]   = useState(true);    // 地図は既定で開く（会場位置は毎回見たい情報のため）
+  // オフラインでは Google マップの埋め込みが読み込めず、枠内にブラウザの
+  // エラーページが出てしまう。事前に代替表示へ切り替える。
+  // ⚠ 早期 return（ev が無い場合）より前で呼ぶこと。後ろに置くとフックの数が
+  //    レンダーごとに変わり、React が「Rendered fewer hooks than expected」で落ちる。
+  const online = useOnline();
 
   // 本文の実寸で「天気」と「開催場所+地図」を横並びにするか決める。
   //
@@ -161,9 +166,6 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
   const primaryPlace = ev.place
     ? ev.place.replace(/×/g, '・').split(/[・\/]/)[0].trim()
     : '';
-  // オフラインでは Google マップの埋め込みが読み込めず、枠内にブラウザの
-  // エラーページが出てしまう。事前に代替表示へ切り替える。
-  const online      = useOnline();
   const mapQuery    = encodeURIComponent(
     [ev.address || primaryPlace].filter(Boolean).join(' ')
   );

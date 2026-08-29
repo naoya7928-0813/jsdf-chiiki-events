@@ -674,8 +674,10 @@ function ToggleRow({ label, sub, on, onChange, primary, last, loading }) {
           <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 3, lineHeight: 1.4 }}>{sub}</div>
         )}
       </div>
+      {/* スイッチ自体には文字が無いため、行の見出し（label）を読み上げ用の名前にする。
+          無いと読み上げでは「スイッチ」としか分からない。 */}
       <button
-        role="switch" aria-checked={on}
+        role="switch" aria-checked={on} aria-label={label}
         onClick={loading ? undefined : onChange}
         disabled={loading}
         style={{

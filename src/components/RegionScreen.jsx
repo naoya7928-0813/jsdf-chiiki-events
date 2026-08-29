@@ -145,6 +145,7 @@ export default function RegionScreen({
               key={ev.id}
               ev={ev}
               isFav={favorites.has(ev.id)}
+              applied={applied}
               primary={primary}
               accent={accent}
               onTap={() => onOpenDetail(ev)}
@@ -169,7 +170,7 @@ export default function RegionScreen({
 }
 
 // ─── イベントカード ───────────────────────────────────────────
-function EventCard({ ev, isFav, primary, accent, onTap }) {
+function EventCard({ ev, isFav, applied, primary, accent, onTap }) {
   const TODAY_STR = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
   const { m, d }  = splitDate(ev.date);
   const endSplit  = ev.endDate ? splitDate(ev.endDate) : null;
