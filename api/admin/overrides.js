@@ -8,6 +8,7 @@
 // サーバー側で実データ（Redis 手動イベント / events.json）から解決して権限判定する。
 import { checkOrigin, noStore, requireSameOrigin, rateLimit, requireAuth, hasPermission, canManageScope, redis, cleanText, writeAudit } from '../_security.js';
 import { normalizeBranches } from '../../shared/branch.cjs';
+import { normalizeTags } from '../../shared/tags.cjs';
 
 const OKEY = 'manual:overrides';
 const MKEY = 'manual:events';
@@ -73,6 +74,11 @@ function buildPatch(input) {
   if (e.branch !== undefined) {
     const b = normalizeBranches(e.branch);
     o.branch = b.length ? b : null;
+  }
+  // 属性タグ（複数可）。空配列を送ると「指定なし」に戻し、文面からの推定に任せる
+  if (e.tags !== undefined) {
+    const t = normalizeTags(e.tags);
+    o.tags = t.length ? t : null;
   }
   if (o.title !== undefined && !o.title) return { error: 'タイトルは必須です' };
   return { patch: o };

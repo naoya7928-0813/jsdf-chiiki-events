@@ -4,6 +4,8 @@ import { PREFECTURE_INFO } from '../data/regionMap';
 import { fetchOfficesData } from '../hooks/useOffices';
 import { facilitiesForPref, AGE_OPTIONS } from '../data/jsdfFacilities';
 import { BRANCH_DEFS, normalizeBranches } from '../../shared/branch.cjs';
+// 属性タグは公開サイトの絞り込みチップと同じ定義を使う（shared/tags.cjs が唯一の出どころ）
+import { TAG_DEFS, normalizeTags } from '../../shared/tags.cjs';
 import PastEventsPanel from './PastEventsPanel';
 import PresencePanel from './PresencePanel';
 import ReportsPanel from './ReportsPanel';
@@ -39,7 +41,45 @@ const EMPTY = {
   // 自衛隊の種別（陸/海/空）。合同開催があるため複数選択できる。
   // 未選択なら保存せず、表示側が文面から推定する（誤った断定より推定に任せる）
   branch: [],
+  // 属性タグ（公開サイトの絞り込みチップと同じ8種）。申込要否(tag)とは別物。
+  // 未選択なら保存せず、表示側がイベント名・備考から推定する
+  tags: [],
+  // 天気予報用の座標（任意）。空なら会場名・住所から自動で取得する
+  lat: '', lon: '',
 };
+
+/**
+ * 入力欄の緯度経度を検証して {latitude, longitude} にする。
+ * 両方が日本の範囲の数値のときだけ返す（片方だけ・範囲外は無視して自動取得に任せる）。
+ */
+function manualCoords(form) {
+  const lat = Number(String(form.lat ?? '').trim());
+  const lon = Number(String(form.lon ?? '').trim());
+  if (!String(form.lat ?? '').trim() || !String(form.lon ?? '').trim()) return null;
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+  if (lat < 20 || lat > 46 || lon < 122 || lon > 154) return null;   // 日本の範囲外は誤入力とみなす
+  return { latitude: lat, longitude: lon };
+}
+
+// 天気用座標の精度（weatherLocation.accuracy）の表示名
+const ACCURACY_LABEL = {
+  address: '住所から特定', venue: '会場名から特定', municipality: '市区町村まで',
+  prefecture: '都道府県のみ', manual: '手動入力',
+};
+
+/** フォームの区切り見出し。項目が多いので「どこまでが何の設定か」を示す */
+function SectionLabel({ children }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 8,
+      margin: '18px 0 10px', fontSize: 11.5, fontWeight: 700,
+      color: 'var(--brand-fg)', letterSpacing: 0.6,
+    }}>
+      <span style={{ flexShrink: 0 }}>{children}</span>
+      <span style={{ flex: 1, height: 1, background: 'var(--sep)' }} />
+    </div>
+  );
+}
 
 // 種別ID配列 → 表示用ラベル配列（未指定は空）
 function branchLabels(value) {
@@ -78,6 +118,8 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const [filter, setFilter] = useState(initialFilter); // all（追加修正＝公開系）| draft（下書き確認）
   const [editingId, setEditingId] = useState(null);
   const [editingDeadline, setEditingDeadline] = useState(null);
+  // 編集中イベントの現在の座標（表示専用。手動入力は form.lat/lon が持つ）
+  const [editingLocation, setEditingLocation] = useState(null);
   const [msg, setMsg] = useState(null);
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState(false);
@@ -167,11 +209,16 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
       timeStart: tm ? tm[1] : '', timeEnd: tm ? tm[2] : '',
       category: ev.category || '広報活動', tag: ev.tag || '', ageRequirement: ev.ageRequirement || '',
       deadline: '', url: ev.url || '', notes: ev.notes || '', branch: normalizeBranches(ev.branch),
+      tags: normalizeTags(ev.tags),
+      // 手動入力の座標のみ復元する（自動取得ぶんは空欄にし、下の「現在の座標」で示す）
+      lat: ev.weatherLocation?.accuracy === 'manual' ? String(ev.weatherLocation.latitude ?? '') : '',
+      lon: ev.weatherLocation?.accuracy === 'manual' ? String(ev.weatherLocation.longitude ?? '') : '',
     });
     setEditingId(ev.id); setEditingDeadline(ev.deadline || null); setPreview(false); setMsg(null);
+    setEditingLocation(ev.weatherLocation && ev.weatherLocation.latitude != null ? ev.weatherLocation : null);
     try { document.querySelector('[data-admin-scroll]')?.scrollTo({ top: 0, behavior: 'smooth' }); } catch { /* noop */ }
   }
-  function cancelEdit() { setEditingId(null); setEditingDeadline(null); setForm(f => ({ ...EMPTY, pref: f.pref })); setMsg(null); }
+  function cancelEdit() { setEditingId(null); setEditingDeadline(null); setEditingLocation(null); setForm(f => ({ ...EMPTY, pref: f.pref })); setMsg(null); }
 
   // 既存イベント（スクレイプ等）の上書きを取り消して元に戻す
   async function revertOverride() {
@@ -197,8 +244,12 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
           title: form.title, place: form.place, address: form.address, time: buildTime(form),
           category: form.category, tag: form.tag, ageRequirement: form.ageRequirement,
           branch: normalizeBranches(form.branch),
+          tags: normalizeTags(form.tags),
           url: form.url, notes: form.notes, date: form.date, endDate: form.multiDay ? form.endDate : '',
         };
+        // 座標は手動イベントのみ更新できる（スクレイプ品は自動取得に任せる）
+        const coords = manualCoords(form);
+        if (coords && String(editingId).startsWith('manual-')) patch.weatherLocation = coords;
         if (form.deadline) patch.deadline = toDeadlineStr(form.deadline);
         // 手動追加イベント(manual-…)は本体をPATCH。それ以外（スクレイプ等）はID単位の上書き保存。
         const isManual = String(editingId).startsWith('manual-');
@@ -211,8 +262,17 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
           setMsg({ type: 'ok', text: '更新しました（利用者への通知は送りません）。' }); cancelEdit(); loadList();
         } else setMsg({ type: 'err', text: j.error || '更新に失敗しました。' });
       } else {
-        const payload = { ...form, endDate: form.multiDay ? form.endDate : '', time: buildTime(form), deadline: toDeadlineStr(form.deadline) };
+        const payload = {
+          ...form,
+          endDate: form.multiDay ? form.endDate : '',
+          time: buildTime(form),
+          deadline: toDeadlineStr(form.deadline),
+          tags: normalizeTags(form.tags),
+          // 緯度経度が両方入っていれば手動座標として送る（片方だけなら送らない）
+          ...(manualCoords(form) ? { weatherLocation: manualCoords(form) } : {}),
+        };
         delete payload.multiDay; delete payload.timeStart; delete payload.timeEnd;
+        delete payload.lat; delete payload.lon;
         const r = await adminFetch('/api/admin/events', { method: 'POST', body: JSON.stringify({ event: { ...payload, status } }) });
         const j = await r.json().catch(() => ({}));
         if (r.ok) {
@@ -238,10 +298,14 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   function download(name, text, mime) { const b = new Blob([text], { type: mime }); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(u), 1000); }
   function exportJSON() { download(`jsdf-events-${Date.now()}.json`, JSON.stringify(list, null, 2), 'application/json'); }
   function exportCSV() {
-    const cols = ['id', 'pref', 'date', 'endDate', 'title', 'place', 'address', 'time', 'category', 'branch', 'tag', 'ageRequirement', 'deadline', 'url', 'notes', 'status'];
+    const cols = ['id', 'pref', 'date', 'endDate', 'title', 'place', 'address', 'time', 'category', 'branch', 'tag', 'tags', 'ageRequirement', 'deadline', 'url', 'notes', 'status'];
     const esc = v => { let s = v == null ? '' : String(v); if (/[",\n]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"'; return s; };
-    // branch は内部ID配列なので、CSV では日本語ラベル（例「陸上・海上」）に直す
-    const cell = (e, c) => (c === 'branch' ? branchLabels(e.branch).join('・') : e[c]);
+    // 配列の項目は CSV では「・」区切りに直す（branch は内部ID→日本語ラベル）
+    const cell = (e, c) => {
+      if (c === 'branch') return branchLabels(e.branch).join('・');
+      if (c === 'tags')   return normalizeTags(e.tags).join('・');
+      return e[c];
+    };
     const rows = [cols.join(',')].concat(list.map(e => cols.map(c => esc(cell(e, c))).join(',')));
     download(`jsdf-events-${Date.now()}.csv`, '﻿' + rows.join('\r\n'), 'text/csv;charset=utf-8');
   }
@@ -256,8 +320,16 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const prefOffices = useMemo(() => offices.filter(o => o.pref === form.pref), [offices, form.pref]);
   const facilities = useMemo(() => facilitiesForPref(form.pref), [form.pref]);
 
+  // 座標は「両方入っていて日本の範囲の数値」のときだけ保存する。片方だけ・範囲外は警告を出す
+  const coordsFilled  = Boolean(String(form.lat || '').trim() || String(form.lon || '').trim());
+  const coordsInvalid = coordsFilled && !manualCoords(form);
+  // 新規追加は手動イベント。編集時は manual-… だけが本体更新（それ以外は上書き修正）
+  const isManualEvent = !editingId || String(editingId).startsWith('manual-');
+
   const input ={ width: '100%', boxSizing: 'border-box', fontFamily: F.sans, fontSize: 14, color: 'var(--text)', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 10, padding: '11px 13px', outline: 'none', marginBottom: 12 };
   const label = { fontSize: 12, fontWeight: 700, color: 'var(--text-sub)', marginBottom: 6, letterSpacing: 0.3 };
+  // 入力欄の下に添える補助説明（何に使われる項目か・未入力だとどうなるかを書く）
+  const hint  = { fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7, margin: '-6px 0 14px' };
 
   // ── 自動ログイン確認中: ログイン画面のちらつきを防ぐローディング ──
   if (!account && checking) {
@@ -342,18 +414,27 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
           {editingId ? '既存イベントを編集中' : 'イベントを登録'}
         </div>
 
+        <SectionLabel>基本</SectionLabel>
+
         <div style={label}>地本</div>
         {isScoped ? <div style={{ ...input, background: 'var(--bg)', color: 'var(--text-muted)' }}>{prefLabel}（ログイン地本）</div>
           : <select value={form.pref} onChange={e => set('pref', e.target.value)} style={input}>{PREF_ENTRIES.map(([id, info]) => <option key={id} value={id}>{info.label}</option>)}</select>}
 
-        {/* 開催日: 1日 / 連日 */}
-        <div style={label}>開催日</div>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
+        <div style={label}>イベント名 *</div>
+        <input value={form.title} onChange={e => set('title', e.target.value)} placeholder="例: 〇〇駐屯地 創立記念行事" style={input} />
+        <div style={hint}>一覧・詳細の見出しになります。会場名や案内文は入れず、イベントの名称だけを入力してください。</div>
+
+        <SectionLabel>開催日時</SectionLabel>
+
+        {/* 日程: 1日 / 連日 */}
+        <div style={label}>日程</div>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
           {[['single', '1日のみ'], ['multi', '連日']].map(([v, jp]) => {
             const on = (v === 'multi') === form.multiDay;
             return <button key={v} onClick={() => set('multiDay', v === 'multi')} style={{ flex: 1, padding: '9px 0', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', border: `1px solid ${on ? primary : 'var(--border)'}`, background: on ? `${primary}18` : 'var(--card)', color: on ? 'var(--brand-fg)' : 'var(--text-sub)' }}>{jp}</button>;
           })}
         </div>
+
         {/* 連日は日付入力が幅を取るため縦に並べる（右マージン消失を防ぐ） */}
         <div style={label}>{form.multiDay ? '開始日 *' : '開催日 *'}</div>
         <input type="date" value={form.date} onChange={e => set('date', e.target.value)} style={input} />
@@ -362,13 +443,61 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
           <input type="date" value={form.endDate} onChange={e => set('endDate', e.target.value)} style={input} />
         </>}
 
-        <div style={label}>イベント名 *</div>
-        <input value={form.title} onChange={e => set('title', e.target.value)} placeholder="例: 〇〇駐屯地 創立記念行事" style={input} />
+        <div style={label}>時間</div>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 6 }}>
+          <input type="time" value={form.timeStart} onChange={e => set('timeStart', e.target.value)} style={{ ...input, marginBottom: 0, flex: 1, minWidth: 0 }} />
+          <span style={{ color: 'var(--text-muted)', fontSize: 14 }}>〜</span>
+          <input type="time" value={form.timeEnd} onChange={e => set('timeEnd', e.target.value)} style={{ ...input, marginBottom: 0, flex: 1, minWidth: 0 }} />
+        </div>
+        <div style={hint}>分からない場合は空のままにしてください（カードには「時間未定」と出ます）。推測で入れないでください。</div>
+
+        <div style={label}>申込締切</div>
+        <input type="date" value={form.deadline} onChange={e => set('deadline', e.target.value)} style={input} />
+        <div style={hint}>締切7日前からカードに残り日数が出ます。お気に入り登録者には通知のリマインダーも届きます。</div>
+
+        <SectionLabel>分類（公開サイトの絞り込みに使われます）</SectionLabel>
 
         <div style={{ display: 'flex', gap: 10 }}>
           {/* minWidth:0 で選択肢の長い select が縮む（無いと横はみ出しの原因になる） */}
           <div style={{ flex: 1, minWidth: 0 }}><div style={label}>イベント種別</div><select value={form.category} onChange={e => set('category', e.target.value)} style={input}>{CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
           <div style={{ flex: 1, minWidth: 0 }}><div style={label}>申込要否</div><select value={form.tag} onChange={e => set('tag', e.target.value)} style={input}>{APPLY_OPTS.map(o => <option key={o} value={o}>{o || '—'}</option>)}</select></div>
+        </div>
+        <div style={hint}>
+          イベント種別はカードのバッジと「種別」の絞り込みに使われます（9種から1つ）。
+          申込要否はカードに併記されます（1つ）。
+        </div>
+
+        {/* 属性タグ（複数選択）。公開サイトの絞り込みチップと同じ8種 */}
+        <div style={label}>タグ（複数選択可）</div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
+          {TAG_DEFS.map(({ id, label: tl }) => {
+            const isOn = normalizeTags(form.tags).includes(id);
+            return (
+              <button
+                key={id}
+                type="button"
+                aria-pressed={isOn}
+                onClick={() => setForm(prev => {
+                  const cur = normalizeTags(prev.tags);
+                  return { ...prev, tags: cur.includes(id) ? cur.filter(t => t !== id) : [...cur, id] };
+                })}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  padding: '7px 12px', borderRadius: 999, cursor: 'pointer',
+                  border: `1.5px solid ${isOn ? primary : 'var(--border)'}`,
+                  background: isOn ? `${primary}18` : 'var(--card)',
+                  color: isOn ? 'var(--brand-fg)' : 'var(--text-sub)',
+                  fontSize: 12.5, fontWeight: isOn ? 700 : 500, fontFamily: F.sans,
+                }}
+              >
+                {isOn ? '✓ ' : ''}{tl}
+              </button>
+            );
+          })}
+        </div>
+        <div style={hint}>
+          公開サイトの絞り込みチップと同じ項目です。未選択でもイベント名・備考に該当する語があれば
+          自動で絞り込みに出ますが、確実に出したいときはここで選んでください。
         </div>
 
         {/* 自衛隊の種別（陸/海/空）。合同開催は複数選択可。未選択なら文面から自動推定 */}
@@ -405,24 +534,17 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
             );
           })}
         </div>
-        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.6 }}>
+        <div style={hint}>
           未選択のままでも保存できます（イベント名・会場から自動で推定します）。
           推定が付かない場合は絞り込みの「陸上／海上／航空」に出ません。
         </div>
 
-        <div style={label}>時間</div>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 12 }}>
-          <input type="time" value={form.timeStart} onChange={e => set('timeStart', e.target.value)} style={{ ...input, marginBottom: 0, flex: 1, minWidth: 0 }} />
-          <span style={{ color: 'var(--text-muted)', fontSize: 14 }}>〜</span>
-          <input type="time" value={form.timeEnd} onChange={e => set('timeEnd', e.target.value)} style={{ ...input, marginBottom: 0, flex: 1, minWidth: 0 }} />
-        </div>
-
-        <div style={label}>申込締切</div>
-        <input type="date" value={form.deadline} onChange={e => set('deadline', e.target.value)} style={input} />
-
         <div style={label}>対象・年齢</div>
-        <select value={AGE_OPTIONS.includes(form.ageRequirement) ? form.ageRequirement : ''} onChange={e => set('ageRequirement', e.target.value)} style={input}>{AGE_OPTIONS.map(o => <option key={o} value={o}>{o || '—（自由入力は下欄）'}</option>)}</select>
+        <select value={AGE_OPTIONS.includes(form.ageRequirement) ? form.ageRequirement : ''} onChange={e => set('ageRequirement', e.target.value)} style={input}>{AGE_OPTIONS.map(o => <option key={o} value={o}>{o || '—（定型から選ぶ。自由入力は下欄）'}</option>)}</select>
         <input value={form.ageRequirement} onChange={e => set('ageRequirement', e.target.value)} placeholder="対象を自由入力（例: 中学生以上の男子）" style={input} />
+        <div style={hint}>詳細画面の「対象」に出ます。定型から選ぶか、下欄に自由入力してください（絞り込みには使いません）。</div>
+
+        <SectionLabel>会場</SectionLabel>
 
         {/* 会場: 駐屯地・基地・案内所から選択 */}
         <div style={label}>駐屯地・基地・案内所から選択</div>
@@ -442,10 +564,42 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         <input value={form.address} onChange={e => set('address', e.target.value)} placeholder="例: 東京都〇〇区…" style={input} />
         {(form.address || form.place) && <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(form.address || form.place)}`} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', margin: '-4px 0 14px', fontSize: 12, fontWeight: 600, color: 'var(--brand-fg)', textDecoration: 'none' }}>地図で確認</a>}
 
+        {/* 天気予報用の座標。通常は会場名・住所から自動取得されるので空のままでよい。
+            会場名が特定できず「都道府県どまり」になると詳細画面に天気が出ないため、
+            その場合だけ手動で入れられるようにする（サーバーは accuracy:'manual' で保存）。 */}
+        <div style={label}>天気予報用の座標（任意）</div>
+        {editingLocation && (
+          <div style={{ ...hint, margin: '-2px 0 8px' }}>
+            現在の座標: {editingLocation.label ? `${editingLocation.label} ` : ''}
+            {Number(editingLocation.latitude).toFixed(3)}, {Number(editingLocation.longitude).toFixed(3)}
+            （精度: {ACCURACY_LABEL[editingLocation.accuracy] || editingLocation.accuracy || '不明'}）
+            {editingLocation.accuracy === 'prefecture' && ' — この精度では天気を表示しません。下に座標を入れると表示されます。'}
+          </div>
+        )}
+        <div style={{ display: 'flex', gap: 10 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <input value={form.lat} onChange={e => set('lat', e.target.value)} placeholder="緯度（例: 35.681）" inputMode="decimal" style={input} />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <input value={form.lon} onChange={e => set('lon', e.target.value)} placeholder="経度（例: 139.767）" inputMode="decimal" style={input} />
+          </div>
+        </div>
+        <div style={hint}>
+          空欄なら会場名・住所から自動で取得します（通常はこのままで構いません）。
+          両方入れたときだけ手動の座標として保存します。
+          {coordsInvalid && <span style={{ color: '#ef4444', fontWeight: 700 }}>　※ 日本の範囲外か数値でないため保存されません。</span>}
+          {!isManualEvent && editingId && '　※ 自動収集イベントの座標は上書きできません（自動取得に任せます）。'}
+        </div>
+
+        <SectionLabel>詳細・リンク</SectionLabel>
+
         <div style={label}>公式URL</div>
         <input value={form.url} onChange={e => set('url', e.target.value)} placeholder="https://www.mod.go.jp/pco/..." inputMode="url" style={input} />
+        <div style={hint}>詳細画面の「公式ページで確認」ボタンの遷移先です。未入力なら地本の公式サイトへ案内します。</div>
+
         <div style={label}>備考</div>
-        <textarea value={form.notes} onChange={e => set('notes', e.target.value)} rows={2} placeholder="補足事項" style={{ ...input, resize: 'vertical' }} />
+        <textarea value={form.notes} onChange={e => set('notes', e.target.value)} rows={2} placeholder="補足事項（持ち物・雨天時の扱いなど）" style={{ ...input, resize: 'vertical' }} />
+        <div style={hint}>詳細画面に表示されます。ここに書いた語はタグの自動判定にも使われます（例:「抽選」「オンライン」）。</div>
         {editingId && editingDeadline && <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginBottom: 12 }}>現在の締切: {editingDeadline}（締切欄を空のままなら保持されます）</div>}
 
         <button onClick={() => setPreview(p => !p)} style={{ width: '100%', padding: 12, borderRadius: 10, marginBottom: 12, cursor: 'pointer', background: 'transparent', border: '1px solid var(--border)', color: 'var(--text)', fontSize: 13, fontWeight: 600 }}>{preview ? 'プレビューを隠す' : 'プレビュー（カード表示イメージ）'}</button>

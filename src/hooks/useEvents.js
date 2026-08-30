@@ -6,6 +6,8 @@ import { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } fr
 import { cleanTimeText, cleanDeadlineText, cleanPlaceText, splitPlaceAddress, safeUrl } from '../../shared/titleQuality.cjs';
 // 「終了済み」を残す日数はスクレイパーと共有（片方だけ変えると表示がズレる）
 import { ENDED_KEEP_DAYS } from '../../shared/eventStatus.cjs';
+// 運営が付けた属性タグ。既知のID以外は捨てる（配信データ・キャッシュ由来の混入対策）
+import { normalizeTags } from '../../shared/tags.cjs';
 import { jstTodayStr } from '../utils/date';
 
 const EMPTY = { updatedAt: null };
@@ -47,6 +49,8 @@ function normalizeEvent(ev) {
     deadline: cleanDeadlineText(ev.deadline) || undefined,
     category: str(ev.category),
     tag:      str(ev.tag),
+    // 運営が明示的に付けたタグ。既知のIDだけ残す（無ければ持たせない）
+    ...(normalizeTags(ev.tags).length ? { tags: normalizeTags(ev.tags) } : { tags: undefined }),
     // http(s) 以外（javascript: 等）は捨てる。リンク経由のスクリプト実行を防ぐ
     url:      safeUrl(ev.url),
     imageUrl: safeUrl(ev.imageUrl) || undefined,

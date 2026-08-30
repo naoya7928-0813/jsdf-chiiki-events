@@ -9,6 +9,7 @@
 import { checkOrigin, noStore, requireSameOrigin, rateLimit, requireAuth, hasPermission, canManageScope, canPublish, redis, cleanText, writeAudit } from '../_security.js';
 import W from '../../shared/weather.cjs';
 import { normalizeBranches } from '../../shared/branch.cjs';
+import { normalizeTags } from '../../shared/tags.cjs';
 
 const KEY = 'manual:events';
 const MAX_EVENTS = 500;
@@ -75,6 +76,9 @@ function buildEvent(input, account) {
   // 天気用座標: 手動入力があれば accuracy:'manual'。無ければ未設定にして再ジオコーディング待ちにする
   // （会場/住所がある場合のみ。スクレイパー or 専用処理が weatherLocationNeedsUpdate を拾って付与）。
   const branch = normalizeBranches(e.branch);
+  // 属性タグ（オンライン・家族向け・抽選 等）。公開側の絞り込みチップと同じ定義を使う。
+  // 申込要否(tag)とは別物なので混ぜない（tag は「要予約/予約不要/…」の単一値）。
+  const tags = normalizeTags(e.tags);
   const manualLoc = parseManualCoords(e.weatherLocation);
   const weather = manualLoc
     ? { weatherLocation: manualLoc }
@@ -92,6 +96,8 @@ function buildEvent(input, account) {
       time:    cleanText(e.time, 40),
       category: cleanText(e.category, 20) || '広報活動',
       tag:     cleanText(e.tag, 30),             // 申込要否（要予約/予約不要/入場無料 等）
+      // 属性タグ（複数可）。未指定なら持たせず、表示側で文面から推定させる
+      ...(tags.length ? { tags } : {}),
       // 自衛隊の種別（陸/海/空）。未指定なら持たせず、表示側で文面から推定させる
       ...(branch.length ? { branch } : {}),
       ageRequirement: cleanText(e.ageRequirement, 100) || null, // 対象・年齢

@@ -45,15 +45,39 @@ function guessTag(text) {
 }
 
 /**
+ * 入力値を既知のタグIDだけの配列に正規化する（運営の手動入力・保存データの防御）。
+ * 配列でもカンマ/読点/空白区切りの文字列でも受ける。重複は除き、並びは TAG_DEFS に揃える
+ * （保存のたびに順序が変わると差分・表示がぶれるため）。
+ */
+function normalizeTags(value) {
+  const raw = Array.isArray(value) ? value : String(value == null ? '' : value).split(/[,、\s]+/);
+  const wanted = new Set(raw.map(v => String(v || '').trim()).filter(Boolean));
+  return TAG_DEFS.filter(d => wanted.has(d.id)).map(d => d.id);
+}
+
+/**
+ * そのイベントに「明示的に付いている」タグ。
+ * 運営が複数選択した `tags` に加え、申込要否 `tag` が属性タグと同じ値
+ * （入場無料・要予約）のときはそれも含める。文面からの推定は含めない。
+ */
+function eventTags(ev) {
+  const explicit = new Set([...normalizeTags(ev?.tags), ...normalizeTags(ev?.tag)]);
+  return TAG_DEFS.filter(d => explicit.has(d.id)).map(d => d.id);
+}
+
+/**
  * イベントがタグに該当するか（絞り込み用）。
- * 保存済みの ev.tag だけでなく、タイトル・備考も見る（スクレイプは主タグ1つしか持たないため）。
- * 未知のタグIDは ev.tag の完全一致で判定する。
+ *   1. 運営が明示的に付けたタグ（tags / tag）に含まれる
+ *   2. または タイトル・備考・tag の文面が該当する
+ * スクレイプ品は主タグを1つしか持たないため、2 の文面判定を残している。
+ * 未知のタグIDは ev.tag の完全一致で判定する（申請済み等の特別IDを壊さない）。
  */
 function matchesTag(ev, tagId) {
   const def = TAG_DEFS.find(d => d.id === tagId);
   if (!def) return ev?.tag === tagId;
+  if (eventTags(ev).includes(tagId)) return true;
   const haystack = [ev?.title, ev?.notes, ev?.tag].filter(Boolean).join(' ');
   return def.rx.test(haystack);
 }
 
-module.exports = { TAG_DEFS, TAG_VALUES, guessTags, guessTag, matchesTag };
+module.exports = { TAG_DEFS, TAG_VALUES, guessTags, guessTag, matchesTag, normalizeTags, eventTags };
