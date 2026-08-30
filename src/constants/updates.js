@@ -6,6 +6,12 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-08-29',
+    version: '1.30.13',
+    type:    'improvement',
+    content: '絞り込みのタグに「個別」を追加しました（イベントには付いていたのに選べませんでした）。',
+  },
+  {
+    date:    '2026-08-29',
     version: '1.30.12',
     type:    'improvement',
     content: 'ダークモードで、日付やタブなどの文字が背景に溶けて読みづらかったのを直しました。',

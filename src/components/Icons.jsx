@@ -37,8 +37,6 @@ export const ICO = {
   radar:   (c = '#6b7280', s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="2" fill={c}/><path d="M12 12l6-6" stroke={c} strokeWidth="1.6" strokeLinecap="round"/><path d="M8.5 15.5a5 5 0 010-7" stroke={c} strokeWidth="1.6" strokeLinecap="round"/><path d="M6 18a9 9 0 010-12" stroke={c} strokeWidth="1.6" strokeLinecap="round"/></svg>,
   // 🔒 施錠（権限拒否など）
   lock:    (c = '#6b7280', s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><rect x="5" y="10.5" width="14" height="10" rx="2" stroke={c} strokeWidth="1.6"/><path d="M8 10.5V8a4 4 0 018 0v2.5" stroke={c} strokeWidth="1.6" strokeLinecap="round"/><circle cx="12" cy="15.5" r="1.4" fill={c}/></svg>,
-  // カード（一覧）表示切替アイコン（横並びの行）
-  cardsView: (c = '#6b7280', s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><rect x="3" y="4.5" width="18" height="6" rx="1.5" stroke={c} strokeWidth="1.6"/><rect x="3" y="13.5" width="18" height="6" rx="1.5" stroke={c} strokeWidth="1.6"/></svg>,
   // 📶 圏外（電波の弧に斜線）— オフラインのお知らせ用
   wifiOff: (c = '#6b7280', s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M2.5 8.5a15 15 0 0119 0" stroke={c} strokeWidth="1.6" strokeLinecap="round"/><path d="M6 12.2a10 10 0 0112 0" stroke={c} strokeWidth="1.6" strokeLinecap="round"/><path d="M9.3 15.8a5 5 0 015.4 0" stroke={c} strokeWidth="1.6" strokeLinecap="round"/><circle cx="12" cy="19.2" r="1.2" fill={c}/><path d="M3 3l18 18" stroke={c} strokeWidth="1.7" strokeLinecap="round"/></svg>,
   // 🏷 タグ（カテゴリ・絞り込み）
