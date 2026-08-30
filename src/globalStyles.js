@@ -18,10 +18,18 @@ export const GLOBAL_CSS = `
     --map-hover:       #c4c8d0;
     --notice-bg:       rgba(133,107,0,0.07);
     --notice-border:   rgba(133,107,0,0.15);
-    /* オフライン帯（「いつ時点の情報か」を示す常時表示バー） */
+    /* オフラインの配色（お知らせポップアップ・報告画面の注意書き） */
     --offline-bg:      #fff8e6;
     --offline-border:  #f0d9a0;
     --offline-text:    #7a5b00;
+    /* ブランド色を「文字・アイコン」として使うときの色（背景用の濃い色とは別）。
+       配色（陸/海/空）に合わせて App が上書きする。ここは既定配色（陸）の値。
+       ⚠ 濃いブランド色をダークの面に文字として置くとコントラストが1.1〜1.9しかなく
+         読めない。ダーク側の値は shared/brandColors.cjs の計算結果と一致させること。 */
+    --brand-fg:      #3a4130;
+    --accent-fg:     #8b5a2e;
+    /* 404 の大きな数字（装飾の透かし）。暗い面では同じ不透明度だと消えるため濃くする */
+    --watermark-opacity: 0.28;
     /* 角丸の2段階ルール（フィードバック§4-2⑤）:
        外側の容れ物（カード・モーダル・バナー）は大きめ、
        内側の要素（バッジ・チップ・タグ）は小さめ＝角ばった規格ラベル調に統一する。 */
@@ -50,6 +58,9 @@ export const GLOBAL_CSS = `
     --offline-bg:      #2b2415;
     --offline-border:  #4a3d1c;
     --offline-text:    #e3c983;
+    --brand-fg:      #769648;
+    --accent-fg:     #c07d40;
+    --watermark-opacity: 0.5;
   }
 
   /* ─── OS設定がダーク かつ data-theme 未指定の場合 ─── */
@@ -73,6 +84,9 @@ export const GLOBAL_CSS = `
       --offline-bg:      #2b2415;
       --offline-border:  #4a3d1c;
       --offline-text:    #e3c983;
+      --brand-fg:      #769648;
+      --accent-fg:     #c07d40;
+      --watermark-opacity: 0.5;
     }
   }
 
@@ -134,7 +148,7 @@ export const GLOBAL_CSS = `
     letter-spacing: clamp(3px, 1.6vw, 8px);
     line-height: 1;
     font-weight: 500;
-    opacity: 0.28;
+    opacity: var(--watermark-opacity, 0.28);
     margin-bottom: 4px;
   }
   .nf-title  { font-size: clamp(15px, 4.2vw, 19px); }

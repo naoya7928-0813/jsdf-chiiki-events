@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { F, Emblem } from './Shared';
 import { ICO } from './Icons';
 import { PREFECTURE_INFO } from '../data/regionMap';
+import { jstTodayStr } from '../utils/date';
 
 /**
  * NotFoundScreen — 404（お探しのページが見つかりません）
@@ -18,14 +19,11 @@ import { PREFECTURE_INFO } from '../data/regionMap';
 const MAX_SUGGESTIONS = 4;
 
 /** JST 今日の日付 "YYYY-MM-DD" */
-function jstToday() {
-  return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
-}
 
 /** 全地本を横断して、開催が近い順に数件返す */
 function pickUpcoming(events, limit = MAX_SUGGESTIONS) {
   if (!events || typeof events !== 'object') return [];
-  const today = jstToday();
+  const today = jstTodayStr();
   const flat = [];
   for (const list of Object.values(events)) {
     if (!Array.isArray(list)) continue;
@@ -80,8 +78,8 @@ export default function NotFoundScreen({
       {/* 幅に応じた出し分け（文字サイズ・提案の段組み）は globalStyles の .nf-* が持つ */}
       <div className="nf-wrap" style={{ textAlign: 'center' }}>
 
-        {/* 404 の記号 */}
-        <div className="nf-code" style={{ color: primary }}>404</div>
+        {/* 404 の記号（装飾。内容は下の見出しが伝えるので読み上げからは外す） */}
+        <div className="nf-code" aria-hidden="true" style={{ color: 'var(--brand-fg)' }}>404</div>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
           {ICO.search('var(--icon-muted, #9ca3af)', 32)}
         </div>

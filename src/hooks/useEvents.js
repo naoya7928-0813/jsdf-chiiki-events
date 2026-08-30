@@ -4,6 +4,9 @@ import { API_URL, REFRESH_INTERVAL_MS } from '../config';
 import { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } from '../../shared/officeTitle.cjs';
 // 時間・締切・場所の書式整形（旧データ／CDN・SWキャッシュ由来の "null" 等への防御）
 import { cleanTimeText, cleanDeadlineText, cleanPlaceText, splitPlaceAddress, safeUrl } from '../../shared/titleQuality.cjs';
+// 「終了済み」を残す日数はスクレイパーと共有（片方だけ変えると表示がズレる）
+import { ENDED_KEEP_DAYS } from '../../shared/eventStatus.cjs';
+import { jstTodayStr } from '../utils/date';
 
 const EMPTY = { updatedAt: null };
 
@@ -11,12 +14,8 @@ const isOfficeEvent = ev => typeof ev?.source_type === 'string' && ev.source_typ
 
 // ── JST 日付ユーティリティ ────────────────────────────────────
 /** 現在の JST 日付を "YYYY-MM-DD" で返す */
-function jstToday() {
-  return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
-}
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
-const ENDED_KEEP_DAYS = 7; // 終了したイベントを「終了済み」として公開表示し続ける日数
 
 /** "YYYY-MM-DD" の n 日前を "YYYY-MM-DD" で返す */
 function daysBefore(dateStr, n) {
@@ -181,7 +180,7 @@ export function useEvents(autoMode = true) {
   const [online,     setOnline]     = useState(navigatorOnline);
   const [syncedAtIso, setSyncedAtIso] = useState(() => cachedInit.current?.savedAt ?? null);
   /** JST 今日の日付。深夜0時に更新することでフィルターを再適用する */
-  const [jstDate,   setJstDate]   = useState(jstToday);
+  const [jstDate,   setJstDate]   = useState(jstTodayStr);
   const hasData = useRef(Boolean(cachedInit.current));
 
   const fetchEvents = useCallback(async () => {
@@ -283,7 +282,7 @@ export function useEvents(autoMode = true) {
       const delay            = Math.max(nextMidnightUTC - now, 1000);
 
       t = setTimeout(() => {
-        setJstDate(jstToday()); // フィルター日付を翌日に更新 → 当日終了イベントが消える
+        setJstDate(jstTodayStr()); // フィルター日付を翌日に更新 → 当日終了イベントが消える
         fetchEvents();          // サーバーからも最新データを取得
         scheduleNext();         // 翌日の0時を再スケジュール（毎日繰り返す）
       }, delay);

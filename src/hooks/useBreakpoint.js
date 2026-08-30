@@ -27,9 +27,6 @@ export const BP = {
   landscapeMaxHeight: 540,
 };
 
-/** 表示レイアウトの選択肢（設定画面から変更できる） */
-export const LAYOUT_MODES = ['auto', 'landscape', 'portrait'];
-
 function viewport() {
   try {
     return { w: window.innerWidth, h: window.innerHeight };

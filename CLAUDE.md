@@ -13,7 +13,8 @@ jsdf-chiiki-events/
 │   │   ├── ListScreen.jsx      # イベント一覧（都道府県タブ付き）
 │   │   ├── ConsentGate.jsx     # 規約同意ゲート（未同意ならアプリを表示しない）
 │   │   ├── NotFoundScreen.jsx  # 404画面（理由別文言＋直近イベントの提示）
-│   │   └── Shared.jsx          # 共通コンポーネント（OfflineBanner を含む）
+│   │   ├── OfflineNotice.jsx   # オフライン/取得失敗のお知らせポップアップ
+│   │   └── Shared.jsx          # 共通コンポーネント
 │   ├── constants/
 │   │   └── legal.js            # 規約・ポリシーの同意バージョン（改定時の再同意判定）
 │   ├── data/
@@ -27,7 +28,7 @@ jsdf-chiiki-events/
 │   ├── lib/
 │   │   ├── llmClient.js        # 段1/段3 の LLM 呼び出し（Groq→Gemini）
 │   │   └── llmCache.js         # LLM 結果のキャッシュ（SHA-256 / TTL 90日）
-│   └── parsers/                # 都道府県別パーサー（50 ファイル）
+│   └── parsers/                # 都道府県別パーサー（51 県分＋utils.js）
 │       └── utils.js            # guessCategory / guessTag / isPast など共通関数
 ├── public/
 │   ├── 404.html                # 静的パス用の404ページ（/events/<県>.html 等）
@@ -65,11 +66,23 @@ cd scraper && node index.js
 - **scrape.yml**: データ変更時のみ Vercel デプロイ（`changed=true` の場合）
 - **deploy.yml**: `src/`, `public/`, `scripts/`, `index.html`, `vite.config.js`, `vercel.json`, `package.json` の変更時に自動デプロイ
 - 手動デプロイ: `gh workflow run deploy.yml`
-- 必要シークレット: `GROQ_API_KEY`, `GEMINI_API_KEY`, `MISTRAL_API_KEY`, `OCR_SPACE_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `NTFY_ADMIN_TOPIC`
+- 必要シークレット: `GROQ_API_KEY`, `GEMINI_API_KEY`, `MISTRAL_API_KEY`, `OCR_SPACE_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `NTFY_ADMIN_TOPIC`（管理者向け監視通知）, `NTFY_TOPIC`（旧・地域別の ntfy 配信。scrape.yml が使用）
+- **deploy.yml のトリガーには `shared/**` と `middleware.js` も含める**。フロントは `shared/*.cjs` を直接 import しているため、ここが漏れると shared だけの修正がサイトに反映されない（2026-08-29 に漏れていたのを修正）
 
 ## スクレイパー仕様
 
-- スケジュール: 日本時間 **06:43 / 10:43 / 16:43 開始**（1日3回）。スクレイプ実測 約63分＋GitHubのスケジュール遅延を見込み、**通知が 8:00 / 12:00 / 18:00 ごろに届く**よう逆算した開始時刻。cron は `:00` だとGitHub側遅延が大きいため `:43`（混雑回避）に設定（scrape.yml 参照）
+- スケジュール: 日本時間 **05:33 / 09:33 / 15:33 開始**（1日3回。scrape.yml の cron `33 20 / 33 0 / 33 6` = UTC）
+  - **通知は 08:00 / 12:00 / 18:00(JST) のスロットで送る**。ジョブ内でスロットまで `sleep` してから送信するため、
+    スクレイプはスロットより前に終わらせておく必要がある（開始 = スロットの **147分前**）
+  - 根拠（2026-08-30 に Actions API で実測）: ジョブ全体 **61.6 / 62.3 / 63.4 分**（準備40秒＋本体約60分＋
+    検査・commit・デプロイ・CDN待機 約3分）。**LLM を挟んでも所要はほぼ変わらない**（導入前 62.5 / 62.7 / 63.6 分。
+    キャッシュ済みは呼ばず、段3は1実行30件上限のため）。GitHub の起動遅延は実測（直近30回）で
+    最小17分・中央値66分・p75 122分。147分前なら **83分の遅延まで定刻どおり**送れる（実測30回中20回＝67%。
+    従来の93分前では27%しかカバーできず、通知が 09:32 のような中途半端な時刻に出ていた）
+  - **cron を変えたら通知ステップの `TARGET_UTC` 対応表も必ず直す**（古いままだと待機が効かず、
+    スクレイプ完了と同時に通知が飛ぶ）。`timeout-minutes` は待機（最大約83分）を含めて 180 分
+  - 分を `:33` にしているのは `:00` が GitHub 側で最も遅延するため（混雑回避）
+  - 遅延がこれを超えてスロットを過ぎた場合は即時送信し、`::warning::` と実行サマリの「※定刻外」で分かるようにしている
 - 対象: 47 都道府県の自衛隊地本公式サイト
 - 出力: `public/data/events.json`（`updatedAt` フィールド付き）
 - カテゴリ標準値: `説明会` / `採用イベント` / `一般公開` / `艦艇公開` / `体験` / `演奏会` / `記念行事` / `広報活動` / `地域参加`
@@ -195,7 +208,8 @@ OCRの優先順は、無料ローカルOCR（Tesseract → RapidOCR）を先に�
 `説明会` / `採用イベント` / `一般公開` / `艦艇公開` / `体験` / `演奏会` / `記念行事` / `広報活動` / `地域参加`。`guessCategory()` で判定し、**9値以外は使わない**。判定不能は `広報活動`。
 
 ### タグ（tag）
-申込要否・属性。スクレイプは `guessTags()` で `入場無料`/`要予約`/`オンライン`/`家族向け`/`学生向け`/`抽選`/`個別`/`OB・OG`。手動入力の申込要否は `要予約`/`予約不要`/`事前申込制`/`入場無料`/`要問合せ`。
+申込要否・属性。**定義と判定は `shared/tags.cjs` に集約**（スクレイパーの `guessTags()` とフロントの絞り込みチップが同じ定義を使う）。値は `入場無料`/`要予約`/`オンライン`/`家族向け`/`学生向け`/`抽選`/`個別`/`OB・OG`。手動入力の申込要否は `要予約`/`予約不要`/`事前申込制`/`入場無料`/`要問合せ`。
+⚠️ パターンを `scraper/parsers/utils.js` や `FilterBar.jsx` に直接書かないこと。以前は二重管理で、スクレイパーだけが付ける `個別` に絞り込みチップが無かった（2026-08-29 に一本化）。
 
 ### 種別（branch）— 陸上 / 海上 / 航空
 判定は **`shared/branch.cjs` に集約**（フロントの絞り込み・運営テンプレ・管理API で共有）。
@@ -300,6 +314,15 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - **地域マップ**: 8地域（北海道・東北・関東・中部・近畿・中国・四国・九州）
 - **都道府県 emblem**: `regionMap.js` の PREFECTURE_INFO と REGIONS 両方に同じ値が必要（全50件ユニーク）
 - **テーマ**: CSS 変数 `var(--bg)` / `var(--text)` / `var(--card)` / `var(--border)` でライト/ダーク切替
+- **ブランド色（陸/海/空の `primary`・`accent`）の使い分け**（2026-08-29 導入）:
+  - **背景として**使うとき（ヘッダー・選択中ボタン・白ピルの上の文字）は従来どおり `theme.primary` / `theme.accent`
+  - **文字・アイコンとして**テーマ面（`--bg`/`--card`/`--tag-bg`）の上に置くときは
+    **`var(--brand-fg)` / `var(--accent-fg)`** を使う。日数バッジは `daysFgColor()`（`src/utils/date.js`）
+  - 変数の値は `App.jsx` が配色とテーマから決めて `documentElement` に流す。
+    ダークの値は `shared/brandColors.cjs` の `foregroundOnDark()`＝色相を保ったまま
+    明度を上げて AA(4.5) を満たす色（`shared/brandColors.test.cjs` で検証）
+  - ⚠️ 濃いブランド色（陸 `#3a4130`・海 `#0b2545`・空 `#2a4a6b`）をダークの面に**文字として直接置かない**。
+    コントラストが 1.1〜1.9 しかなく読めない（2026-08-29 に全画面で発生していたのを修正）
 - **起動時のテーマ確定（白フラッシュ対策）**: グローバルCSS は `main.jsx` が JS 実行時に注入するため、
   それまで body はライト色のままで、ダーク利用者はコールドロードのたびに白い画面を経由していた。
   `shared/bootTheme.cjs` の `<style>`＋`<script>` を `vite.config.js` の `bootThemeInject` が
@@ -308,7 +331,9 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
   ⚠️ **`index.html` に背景色を直接書かないこと**（ライト固定になり同じ事故が再発する）。
   `BOOT_BG` は `globalStyles.js` の `--bg` と一致必須で、`shared/bootTheme.test.cjs` が実ファイルを
   読んで検証している（ズレると起動直後と描画後で色が変わり、別の形でちらつく）。
-- **プッシュ通知**: ntfy.sh トピック `jsdf-chiiki-events-7928`
+- **プッシュ通知**: Web Push（`/api/subscribe` に購読を保存 → `/api/notify` で配信）。
+  旧 ntfy.sh トピック方式（`NTFY_TOPIC` / NtfyGuideModal）はアプリ側では廃止済みで、
+  ntfy は scrape.yml からの管理者・地域別通知にのみ残っている（`src/config.js` 冒頭の注記を参照）
 
 ## オフライン対応（2026-08-26 導入）
 
@@ -321,8 +346,17 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
   maxAge は「鮮度の上限」ではなく「ネットワーク失敗時にどこまで古いものを出してよいか」の上限
 - **キャッシュ由来の判別**: SW の `markFromCache` プラグインがキャッシュから返す応答に `X-From-Cache: 1` を付ける。
   これが無いと「オフラインなのに取得成功」と誤判定する（NetworkFirst のフォールバックは 200 で返るため）
-- **表示**: `OfflineBanner`（`Shared.jsx`）を全画面共通で上部に出す。
-  ブラウザがオフラインなら「オフラインです」、通信はできるが取得に失敗したなら「最新の情報を取得できませんでした」
+- **表示**: `OfflineNotice`（ポップアップ）で知らせる（2026-08-29 に常時表示の帯から変更）。
+  ブラウザがオフラインなら「現在オフラインです」、通信はできるが取得に失敗したなら「最新の情報を取得できませんでした」＋再試行。
+  **画面上下に帯を出し続けない**（狭い画面で一覧の領域を常時奪うため）。閉じたあとは何も残さない。
+  - 発火は「サイト表示時（初回取得が決着した時点）」と「通信が切れた時」の2つ。`App.jsx` が判定する。
+    ⚠️ `stale` はキャッシュ起動時の初期値が `true` なので、**`checkedAt` が付く（初回取得が決着する）まで判定しない**
+    （決着前に見ると、取得に成功する場合でも一瞬ポップアップが出る）。
+  - 同じ切断のあいだは出し直さない（`offlineNoticeShown` ref）。オンラインに戻ると自動で閉じ、次に切れたらまた知らせる。
+  - 閉じた状態は**保存しない**（端末に新たな保存項目を増やさない＝ポリシーの記載を増やさない）。
+    次にサイトを開いたときは、オフラインならまた知らせる。
+  - 帯を無くした代わりに、一覧ヘッダーの時刻表示を `stale` のとき「最終取得 …」に切り替える
+    （「確認 <今の時刻>」のままだと最新を取れたように読めてしまう）。
 - **オフラインで動かない機能**は事前に代替表示へ切り替える（失敗させてから気付かせない）:
   天気カード・Google マップ埋め込み（`useOnline`）・不具合報告の送信・通知の登録/解除
 - **復帰**: `online` イベントで自動的に再取得する
@@ -359,6 +393,20 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 4. 実装との整合を必ず確認する。**「使っていない」と書いたものを使っている状態を作らない**
    （2026-08-26 の監査で、ポリシーが「アクセス解析は使用していません」と書く一方 `src/main.jsx` が
    Vercel Analytics / Speed Insights を注入していた。ほかに位置情報・方位センサー・Google マップ埋め込みが未記載だった）
+
+## 共通化のルール（重複定義を作らない）
+
+同じ値・同じ計算を2か所に書かないこと。過去に「片方だけ直してズレる」事故が起きている。
+
+| 対象 | 唯一の出どころ | 使う側 |
+|---|---|---|
+| 「終了済み」を残す日数 | `shared/eventStatus.cjs` の `ENDED_KEEP_DAYS`（7日） | `src/hooks/useEvents.js`（表示フィルター）／`scraper/index.js`（writeOutput の削除判定） |
+| JST の「今日」(YYYY-MM-DD) | `src/utils/date.js` の `jstTodayStr()` | 画面各所（以前は5ファイルで重複定義＋12か所にインライン展開されていた） |
+| 日数バッジの文字色 | `src/utils/date.js` の `daysFgColor()` | 一覧・地域・お気に入り（背景の淡い塗りは `daysColor()` を継続） |
+| 陸海空の判定 | `shared/branch.cjs` | フロントの絞り込み／運営テンプレ／管理API |
+| タグ（申込要否・属性）の定義と判定 | `shared/tags.cjs` | スクレイパーの付与（`guessTags`）／フロントの絞り込みチップ・件数 |
+| タイトル整形・不正判定 | `shared/titleQuality.cjs` / `shared/officeTitle.cjs` | スクレイパー／フロント／スクリプト |
+| ブランド色の文字用 | `shared/brandColors.cjs` ＋ CSS 変数 `--brand-fg`/`--accent-fg` | 全画面（上記「テーマ」参照） |
 
 ## 天気予報（イベント詳細）
 
@@ -504,7 +552,7 @@ ErrorBoundary（`src/components/ErrorBoundary.jsx`）のフォールバックが
 ### 4. デプロイ失敗・サイトに反映されない
 1. `gh run list --workflow=deploy.yml --limit 3` で状態確認。push 後に deploy.yml が発火するのは `src/` `public/` 等の変更時のみ
 2. 手動デプロイ: `gh workflow run deploy.yml`
-3. 反映が遅い場合は CDN キャッシュ（events.json は NetworkFirst 3分キャッシュ）を考慮して数分待つ
+3. 反映が遅い場合はキャッシュを考慮して数分待つ（events.json は CDN が `s-maxage=600`＝10分、Service Worker は NetworkFirst で通常は常に取りに行き、失敗時のみ最大30日の保存分を返す）
 
 ### 5. OCR 関連の不調
 - `pdf-parse` は **v2（クラスAPI: `new PDFParse({data})` → `getText()`/`getScreenshot()`）**。v1 の関数形式で呼ぶと常に失敗し OCR API に流れてクォータを浪費する

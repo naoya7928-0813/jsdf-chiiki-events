@@ -2,6 +2,8 @@ import { useMemo } from 'react';
 import { F } from './Shared';
 // 陸海空の判定は shared/branch.cjs に集約（運営テンプレ・API と共有）
 import { BRANCH_DEFS, matchesBranch } from '../../shared/branch.cjs';
+import { TAG_DEFS, matchesTag } from '../../shared/tags.cjs';
+import { jstTodayStr } from '../utils/date';
 
 export { BRANCH_DEFS, matchesBranch };
 
@@ -41,28 +43,15 @@ export function weekendRange(tStr) {
 // ── タグ定義（固定リスト + 照合キーワード） ────────────────────
 // 各タグは title・notes・tag フィールドをまとめてキーワード検索する。
 // 単一値の ev.tag 完全一致より大幅に多くのイベントをヒットさせる。
-export const TAG_DEFS = [
-  { id: '要予約',   label: '要予約',   rx: /予約|申込|申し込み|事前|事前登録/ },
-  { id: '入場無料', label: '入場無料', rx: /無料|入場無料/                     },
-  { id: '家族向け', label: '家族向け', rx: /家族|子ども|お子|ファミリー|親子/   },
-  { id: '学生向け', label: '学生向け', rx: /高校生|中学生|学生|大学生|学校/    },
-  { id: '抽選',     label: '抽選',     rx: /抽選/                              },
-  { id: 'オンライン', label: 'オンライン', rx: /オンライン|Zoom|zoom|ウェブ/   },
-  { id: 'OB・OG',  label: 'OB・OG',  rx: /OB|OG|元自衛官/                   },
-];
-
-/** イベントがタグ定義にマッチするか（title + notes + tag を横断） */
-export function matchesTag(ev, tagId) {
-  const def = TAG_DEFS.find(d => d.id === tagId);
-  if (!def) return ev.tag === tagId;
-  const haystack = [ev.title, ev.notes, ev.tag].filter(Boolean).join(' ');
-  return def.rx.test(haystack);
-}
+// タグ定義・判定は shared/tags.cjs（スクレイパーの付与と同じ定義）を再輸出する。
+// ここに定義を持つと、スクレイパーだけが付けるタグ（例「個別」）の
+// 絞り込みチップが無い、といったズレが生まれる。
+export { TAG_DEFS, matchesTag };
 
 // 期間ごとの件数を返すユーティリティ（ListScreen でも再利用）
 export function calcPeriodCounts(events) {
   // JST の今日を YYYY-MM-DD 文字列で取得（UTC+9 をオフセットして ISO 変換）
-  const tStr = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+  const tStr = jstTodayStr();
   const Y  = Number(tStr.slice(0, 4));
   const Mo = Number(tStr.slice(5, 7)); // 1-indexed
 
@@ -211,7 +200,7 @@ export default function FilterBar({
 
         <span style={{
           fontSize: 12, fontWeight: activeCount > 0 ? 600 : 400,
-          color: activeCount > 0 ? primary : 'var(--text-muted)',
+          color: activeCount > 0 ? 'var(--brand-fg)' : 'var(--text-muted)',
         }}>
           絞り込み
         </span>
@@ -233,7 +222,7 @@ export default function FilterBar({
             {activePeriod !== 'all' && (
               <span style={{
                 fontSize: 11, padding: '2px 9px', borderRadius: 10,
-                background: `${primary}18`, color: primary,
+                background: `${primary}18`, color: 'var(--brand-fg)',
                 fontWeight: 600, flexShrink: 0, whiteSpace: 'nowrap',
               }}>
                 {activePeriodLabel}
@@ -261,7 +250,7 @@ export default function FilterBar({
             {activeTag !== 'all' && (
               <span style={{
                 fontSize: 11, padding: '2px 9px', borderRadius: 10,
-                background: `${primary}18`, color: primary,
+                background: `${primary}18`, color: 'var(--brand-fg)',
                 fontWeight: 600, flexShrink: 0, whiteSpace: 'nowrap',
                 maxWidth: 90, overflow: 'hidden', textOverflow: 'ellipsis',
               }}>
@@ -295,7 +284,7 @@ export default function FilterBar({
                     padding: '5px 12px', borderRadius: 20,
                     border: `1.5px solid ${isOn ? primary : 'var(--border)'}`,
                     background: isOn ? `${primary}18` : 'var(--bg)',
-                    color: isOn ? primary : 'var(--text-muted)',
+                    color: isOn ? 'var(--brand-fg)' : 'var(--text-muted)',
                     fontSize: 12, fontWeight: isOn ? 700 : 400,
                   }}
                 >
@@ -303,7 +292,7 @@ export default function FilterBar({
                   <span style={{
                     fontSize: 10, fontFamily: F.mono, fontWeight: 600,
                     background: isOn ? `${primary}28` : 'var(--tag-bg)',
-                    color: isOn ? primary : 'var(--text-muted)',
+                    color: isOn ? 'var(--brand-fg)' : 'var(--text-muted)',
                     borderRadius: 8, padding: '0 5px', lineHeight: '16px',
                   }}>
                     {cnt}

@@ -338,7 +338,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         </div>
 
         {showForm && (<>
-        <div style={{ fontSize: 13, fontWeight: 700, color: editingId ? primary : 'var(--text)', marginBottom: 12 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: editingId ? 'var(--brand-fg)' : 'var(--text)', marginBottom: 12 }}>
           {editingId ? '既存イベントを編集中' : 'イベントを登録'}
         </div>
 
@@ -351,7 +351,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
           {[['single', '1日のみ'], ['multi', '連日']].map(([v, jp]) => {
             const on = (v === 'multi') === form.multiDay;
-            return <button key={v} onClick={() => set('multiDay', v === 'multi')} style={{ flex: 1, padding: '9px 0', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', border: `1px solid ${on ? primary : 'var(--border)'}`, background: on ? `${primary}18` : 'var(--card)', color: on ? primary : 'var(--text-sub)' }}>{jp}</button>;
+            return <button key={v} onClick={() => set('multiDay', v === 'multi')} style={{ flex: 1, padding: '9px 0', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', border: `1px solid ${on ? primary : 'var(--border)'}`, background: on ? `${primary}18` : 'var(--card)', color: on ? 'var(--brand-fg)' : 'var(--text-sub)' }}>{jp}</button>;
           })}
         </div>
         {/* 連日は日付入力が幅を取るため縦に並べる（右マージン消失を防ぐ） */}
@@ -440,7 +440,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         <input value={form.place} onChange={e => set('place', e.target.value)} placeholder="例: 陸上自衛隊〇〇駐屯地" style={input} />
         <div style={label}>住所</div>
         <input value={form.address} onChange={e => set('address', e.target.value)} placeholder="例: 東京都〇〇区…" style={input} />
-        {(form.address || form.place) && <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(form.address || form.place)}`} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', margin: '-4px 0 14px', fontSize: 12, fontWeight: 600, color: primary, textDecoration: 'none' }}>地図で確認</a>}
+        {(form.address || form.place) && <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(form.address || form.place)}`} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', margin: '-4px 0 14px', fontSize: 12, fontWeight: 600, color: 'var(--brand-fg)', textDecoration: 'none' }}>地図で確認</a>}
 
         <div style={label}>公式URL</div>
         <input value={form.url} onChange={e => set('url', e.target.value)} placeholder="https://www.mod.go.jp/pco/..." inputMode="url" style={input} />
@@ -471,7 +471,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
           </div>
         ) : canAddDelete ? (
           <div style={{ display: 'flex', gap: 10, marginBottom: 26 }}>
-            <button onClick={() => submit('draft')} disabled={busy} style={{ flex: 1, padding: 15, borderRadius: 12, fontFamily: F.sans, fontSize: 15, fontWeight: 700, cursor: busy ? 'default' : 'pointer', background: 'var(--card)', border: `1px solid ${primary}`, color: primary }}>下書き保存</button>
+            <button onClick={() => submit('draft')} disabled={busy} style={{ flex: 1, padding: 15, borderRadius: 12, fontFamily: F.sans, fontSize: 15, fontWeight: 700, cursor: busy ? 'default' : 'pointer', background: 'var(--card)', border: `1px solid ${primary}`, color: 'var(--brand-fg)' }}>下書き保存</button>
             <button onClick={() => submit('published')} disabled={busy} style={{ flex: 1, padding: 15, borderRadius: 12, border: 'none', fontFamily: F.sans, fontSize: 15, fontWeight: 700, color: '#fff', background: busy ? 'var(--border)' : primary, cursor: busy ? 'default' : 'pointer' }}>公開する</button>
           </div>
         ) : (
@@ -549,7 +549,7 @@ function PreviewCard({ form, primary, prefLabel }) {
     <div style={{ marginBottom: 14, padding: 14, borderRadius: 12, background: 'var(--card)', border: `1px dashed ${primary}66` }}>
       <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 6 }}>プレビュー（公開時のカード表示イメージ）</div>
       <div style={{ display: 'flex', gap: 6, marginBottom: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-        <span style={{ fontSize: 10, fontWeight: 700, color: primary, background: `${primary}18`, borderRadius: 5, padding: '2px 7px' }}>{prefLabel}</span>
+        <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--brand-fg)', background: `${primary}18`, borderRadius: 5, padding: '2px 7px' }}>{prefLabel}</span>
         {form.category && <span style={{ fontSize: 11, color: 'var(--text-sub)' }}>{form.category}</span>}
         {form.tag && <span style={{ fontSize: 11, color: 'var(--text-sub)' }}>· {form.tag}</span>}
         {branchLabels(form.branch).length > 0 && (

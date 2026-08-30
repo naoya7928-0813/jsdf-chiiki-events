@@ -119,8 +119,8 @@ export default function SettingsScreen({
                 }}>
                   {/* ホーム画面追加アイコン */}
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <rect x="3" y="3" width="18" height="18" rx="3" stroke={primary} strokeWidth="1.7"/>
-                    <path d="M12 8v8M8 12h8" stroke={primary} strokeWidth="1.7" strokeLinecap="round"/>
+                    <rect x="3" y="3" width="18" height="18" rx="3" stroke="var(--brand-fg)" strokeWidth="1.7"/>
+                    <path d="M12 8v8M8 12h8" stroke="var(--brand-fg)" strokeWidth="1.7" strokeLinecap="round"/>
                   </svg>
                 </div>
                 <div>
@@ -437,7 +437,7 @@ export default function SettingsScreen({
                         <a
                           href={src.url} target="_blank" rel="noopener noreferrer"
                           style={{
-                            display: 'inline-block', fontSize: 11, color: primary,
+                            display: 'inline-block', fontSize: 11, color: 'var(--brand-fg)',
                             textDecoration: 'none', margin: '8px 0 4px', wordBreak: 'break-all',
                           }}
                         >
@@ -477,14 +477,14 @@ export default function SettingsScreen({
                                   WebkitTapHighlightColor: 'transparent',
                                 }}
                               >
-                                <span style={{ color: armed ? primary : 'var(--text)', fontWeight: armed ? 700 : 500 }}>
+                                <span style={{ color: armed ? 'var(--brand-fg)' : 'var(--text)', fontWeight: armed ? 700 : 500 }}>
                                   {o.name}
                                 </span>
                                 {o.type === 'hq' && (
-                                  <span style={{ color: primary, fontSize: 10, marginLeft: 5 }}>本部</span>
+                                  <span style={{ color: 'var(--brand-fg)', fontSize: 10, marginLeft: 5 }}>本部</span>
                                 )}
                                 {clickable && (
-                                  <span style={{ color: primary, fontSize: 10, marginLeft: 5, fontWeight: armed ? 700 : 400 }}>
+                                  <span style={{ color: 'var(--brand-fg)', fontSize: 10, marginLeft: 5, fontWeight: armed ? 700 : 400 }}>
                                     {armed ? 'もう一度タップで公式サイトへ ↗' : '↗'}
                                   </span>
                                 )}
@@ -674,8 +674,10 @@ function ToggleRow({ label, sub, on, onChange, primary, last, loading }) {
           <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 3, lineHeight: 1.4 }}>{sub}</div>
         )}
       </div>
+      {/* スイッチ自体には文字が無いため、行の見出し（label）を読み上げ用の名前にする。
+          無いと読み上げでは「スイッチ」としか分からない。 */}
       <button
-        role="switch" aria-checked={on}
+        role="switch" aria-checked={on} aria-label={label}
         onClick={loading ? undefined : onChange}
         disabled={loading}
         style={{

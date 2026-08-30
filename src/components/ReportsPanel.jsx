@@ -116,7 +116,7 @@ export default function ReportsPanel({ adminFetch, primary, account, onUnreadCha
   const miniBtn = (on) => ({
     padding: '5px 11px', borderRadius: 8, fontSize: 11.5, fontWeight: 700, cursor: 'pointer', fontFamily: F.sans,
     border: `1px solid ${on ? primary : 'var(--border)'}`,
-    background: on ? `${primary}14` : 'var(--card)', color: on ? primary : 'var(--text-sub)',
+    background: on ? `${primary}14` : 'var(--card)', color: on ? 'var(--brand-fg)' : 'var(--text-sub)',
   });
 
   return (

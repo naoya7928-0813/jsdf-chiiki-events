@@ -1,6 +1,6 @@
 import { precacheAndRoute, cleanupOutdatedCaches, createHandlerBoundToURL } from 'workbox-precaching';
 import { registerRoute, NavigationRoute } from 'workbox-routing';
-import { NetworkFirst, CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
+import { NetworkFirst, StaleWhileRevalidate } from 'workbox-strategies';
 import { ExpirationPlugin } from 'workbox-expiration';
 
 // ── 即時更新（古いバンドルが残り続けて新機能が出ない問題を防ぐ） ──
@@ -91,19 +91,6 @@ registerRoute(
     cacheName: 'weather-cache-v1',
     plugins: [new ExpirationPlugin({ maxEntries: 50, maxAgeSeconds: 600, purgeOnQuotaError: true })],
     networkTimeoutSeconds: 6,
-  })
-);
-
-registerRoute(
-  ({ url }) => url.hostname === 'fonts.googleapis.com',
-  new StaleWhileRevalidate({ cacheName: 'google-fonts-stylesheets' })
-);
-
-registerRoute(
-  ({ url }) => url.hostname === 'fonts.gstatic.com',
-  new CacheFirst({
-    cacheName: 'google-fonts-webfonts',
-    plugins: [new ExpirationPlugin({ maxAgeSeconds: 60 * 60 * 24 * 365 })],
   })
 );
 

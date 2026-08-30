@@ -114,12 +114,6 @@ export function facilitiesForPref(pref) {
   return JSDF_FACILITIES.filter(f => f.pref === pref);
 }
 
-// 時間帯の定型候補（プルダウン用。自由入力も併用）
-export const TIME_OPTIONS = [
-  '', '09:00～12:00', '09:00～15:00', '09:00～16:00', '10:00～12:00', '10:00～15:00',
-  '10:00～16:00', '13:00～15:00', '13:00～16:00', '13:30～16:00', '14:00～16:00', '終日',
-];
-
 // 年齢・対象の定型候補（ageRequirement に保存）
 export const AGE_OPTIONS = [
   '', '18歳以上33歳未満', '18歳以上33歳未満（採用対象）', '高校生以上', '中学生以上',

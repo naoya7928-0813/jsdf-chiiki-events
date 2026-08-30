@@ -13,6 +13,14 @@
 
 const { isRealDate } = require('./weather.cjs');
 
+/**
+ * 終了したイベントを「終了済み」として公開に残す日数。
+ * **スクレイパー（events.json の書き出し）と画面（表示フィルター）で同じ値を使う。**
+ * 片方だけ変えると「データには在るのに画面に出ない／その逆」が起きるため、
+ * ここを唯一の出どころにする。
+ */
+const ENDED_KEEP_DAYS = 7;
+
 const STATUS = Object.freeze({
   PUBLISHED: 'published',
   CLOSED: 'closed',
@@ -268,7 +276,7 @@ function mergeStatus(prevStatus, derived) {
 }
 
 module.exports = {
-  STATUS, STATUS_VALUES,
+  STATUS, STATUS_VALUES, ENDED_KEEP_DAYS,
   normalizeText, detectCancelled, detectClosedText,
   resolveDeadlineDate, weekdayChar, deriveStatus, mergeStatus,
 };

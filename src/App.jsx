@@ -1,16 +1,18 @@
-import { useState, useCallback, useEffect, useRef, Suspense } from 'react';
+import { useState, useCallback, useEffect, useLayoutEffect, useRef, Suspense } from 'react';
 import { useEvents } from './hooks/useEvents';
 // 遅延読込は lazyWithRecovery 経由（旧チャンクが消えた時に自動復旧する。utils/lazyChunk.js）
 import { lazyWithRecovery } from './utils/lazyChunk';
 import { COLOR_SCHEMES, DEFAULT_SCHEME } from './config';
 import { PREFECTURE_INFO } from './data/regionMap';
-import { OperatorNavContext, OfflineBanner } from './components/Shared';
+import { OperatorNavContext } from './components/Shared';
 import { useBreakpoint, LayoutModeContext, isPhoneSized } from './hooks/useBreakpoint';
 import { applyOrientationPreference } from './utils/orientation';
 import { consentStateFor, loadAcceptedLegalVersion } from './constants/legal';
+import { foregroundOnDark } from '../shared/brandColors.cjs';
 import SideNav from './components/SideNav';
 import ConsentGate from './components/ConsentGate';
 import NotFoundScreen from './components/NotFoundScreen';
+import OfflineNotice from './components/OfflineNotice';
 import { ICO }           from './components/Icons';
 import HomeScreen        from './components/HomeScreen';
 import ListScreen        from './components/ListScreen';
@@ -220,21 +222,31 @@ export default function App({ operator = false }) {
     try { localStorage.setItem('jsdf-auto-mode', String(enabled)); } catch {}
   }, []);
 
-  // data-theme 属性を documentElement に適用
-  useEffect(() => {
-    const apply = () => {
-      document.documentElement.dataset.theme = resolveIsDark(darkMode) ? 'dark' : 'light';
-    };
-    apply();
-    if (darkMode !== 'system') return;
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    mq.addEventListener('change', apply);
-    return () => mq.removeEventListener('change', apply);
-  }, [darkMode]);
-
   // ── テーマオブジェクト ────────────────────────────────────
   const scheme = COLOR_SCHEMES[schemeKey] ?? COLOR_SCHEMES[DEFAULT_SCHEME];
   const theme  = { ...scheme, schemeKey, darkMode };
+
+  // ── テーマの適用（data-theme と、ブランド色の「文字用」変数） ──────
+  // 配色の primary/accent は白地に置く前提の濃い色。そのままダークの面に
+  // 文字・アイコンとして置くとコントラストが 1.1〜1.9 しかなく読めないため
+  // （要 4.5）、文字用だけ色相を保ったまま明るくした色を CSS 変数へ流す。
+  // ヘッダー等の「背景としての濃い色」は変えない。
+  // 描画前に確定させたいので useLayoutEffect（useEffect だと一瞬元の色が出る）。
+  useLayoutEffect(() => {
+    const apply = () => {
+      const isDark = resolveIsDark(darkMode);
+      const root   = document.documentElement;
+      root.dataset.theme = isDark ? 'dark' : 'light';
+      root.style.setProperty('--brand-fg',  isDark ? foregroundOnDark(scheme.primary) : scheme.primary);
+      root.style.setProperty('--accent-fg', isDark ? foregroundOnDark(scheme.accent)  : scheme.accent);
+    };
+    apply();
+    if (darkMode !== 'system') return;
+    // OS 設定に追従する場合は、OS 側の切り替えでも塗り直す
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  }, [darkMode, scheme.primary, scheme.accent]);
 
   // 運営者ログイン状態。運営者ページ(/admin.html, operator=true)でのみ意味を持つ。
   // 公開アプリ(operator=false)では常に false 扱いで、編集機能・管理タブは一切出ない。
@@ -265,7 +277,36 @@ export default function App({ operator = false }) {
 
   // ── データ取得 ────────────────────────────────────────────
   const { events, loading, error, updatedAt, checkedAt, refresh,
-          offline, stale, lastSyncedAt } = useEvents(autoMode);
+          offline, stale, lastSyncedAt, isMock } = useEvents(autoMode);
+
+  // 取得エラーの赤帯は「表示するデータが無い」ときだけ出す。
+  // 保存済みデータを表示できている場合は、赤帯（「サンプルデータを表示しています」）は
+  // 事実と違ううえ、オフラインのお知らせと二重になる。
+  const dataError = isMock ? error : null;
+
+  // ── オフラインのお知らせ ──────────────────────────────────
+  // 通信できない／最新を取得できないときに、ポップアップで一度だけ知らせる。
+  // 画面上下に帯を出し続けると狭い画面で一覧の領域を常時奪うため、
+  // 「いつ時点の情報か」はこのポップアップで伝え、閉じたあとは何も残さない。
+  //
+  // 発火は「サイト表示時（初回取得が決着した時点）」と「通信が切れた時」。
+  // stale はキャッシュ起動時の初期値が true のため、初回取得が決着（checkedAt が付く）
+  // するまで判定しない（決着前に出すと、取得に成功する場合でも一瞬出てしまう）。
+  const [offlineNoticeOpen, setOfflineNoticeOpen] = useState(false);
+  const offlineNoticeShown = useRef(false);  // 同じ切断のあいだは出し直さない
+  useEffect(() => {
+    if (operator) return;
+    const degraded = Boolean(checkedAt) && (offline || stale);
+    if (!degraded) {
+      // 復帰したら閉じ、次に切れたときはまた知らせる
+      offlineNoticeShown.current = false;
+      setOfflineNoticeOpen(false);
+      return;
+    }
+    if (offlineNoticeShown.current) return;
+    offlineNoticeShown.current = true;
+    setOfflineNoticeOpen(true);
+  }, [operator, checkedAt, offline, stale]);
 
   // ── URL同期（イベント個別URL /event/:id・戻るボタン・リロード復元） ──
   const popNav = useRef(false);       // popstate/初期解決による遷移中は pushState しない
@@ -530,6 +571,17 @@ export default function App({ operator = false }) {
         <SplashScreen schemeKey={schemeKey} onDone={handleSplashDone} />
       )}
 
+      {/* ── オフラインのお知らせ（スプラッシュが終わってから出す） ── */}
+      {!operator && !showSplash && offlineNoticeOpen && (
+        <OfflineNotice
+          offline={offline}
+          lastSyncedAt={lastSyncedAt}
+          theme={theme}
+          onRetry={refresh}
+          onClose={() => setOfflineNoticeOpen(false)}
+        />
+      )}
+
       {/* ── デスクトップの左サイドナビ（下部タブバーの代替） ── */}
       {isDesktopLayout && (
         <SideNav
@@ -542,15 +594,11 @@ export default function App({ operator = false }) {
       )}
 
       <div style={mainStyle}>
-      {/* ── オフライン帯（表示中のデータがいつ時点かを常に明示する） ── */}
-      {!operator && (
-        <OfflineBanner offline={offline} stale={stale} lastSyncedAt={lastSyncedAt} onRetry={refresh} />
-      )}
       {/* 遅延読込画面のフォールバックは null（既存画面が残らないよう軽量に） */}
       <Suspense fallback={null}>
       {screen === 'home' && (
         <HomeScreen
-          events={events} loading={loading} error={error}
+          events={events} loading={loading} error={dataError}
           theme={theme}
           favorites={favorites}
           unreadCount={unreadCount}
@@ -601,8 +649,9 @@ export default function App({ operator = false }) {
               borderRight: '1px solid var(--border)', position: 'relative',
             }}>
               <ListScreen
-                events={events} loading={loading} error={error}
+                events={events} loading={loading} error={dataError}
                 updatedAt={updatedAt} checkedAt={checkedAt} onRefresh={refresh}
+                stale={stale} lastSyncedAt={lastSyncedAt}
                 theme={theme}
                 region={region} onRegionChange={handleRegionChange}
                 favorites={favorites}
@@ -647,8 +696,9 @@ export default function App({ operator = false }) {
           </div>
         ) : (
           <ListScreen
-            events={events} loading={loading} error={error}
+            events={events} loading={loading} error={dataError}
             updatedAt={updatedAt} checkedAt={checkedAt} onRefresh={refresh}
+            stale={stale} lastSyncedAt={lastSyncedAt}
             theme={theme}
             region={region} onRegionChange={handleRegionChange}
             favorites={favorites}
@@ -662,7 +712,9 @@ export default function App({ operator = false }) {
         )
       )}
 
-      {screen === 'detail' && (
+      {/* detailEvent が無い状態で詳細を描かない（描くと DetailScreen が
+          早期 return し、フック数が変わって React が落ちる） */}
+      {screen === 'detail' && detailEvent && (
         <DetailScreen
           event={detailEvent}
           weatherMapMode={weatherMapMode}

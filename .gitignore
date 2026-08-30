@@ -12,11 +12,16 @@ Thumbs.db
 # スクレイパーの依存パッケージ（本体の node_modules とは独立）
 scraper/node_modules/
 
-# スクレイパー開発用一時ファイル
+# スクレイパー開発用一時ファイル（ハイフン区切りも含める。
+# 以前 debug_*.js だけ書いてあり、実ファイル debug-*.js がコミットされていた）
 scraper/debug_*.js
+scraper/debug-*.js
 scraper/research_*.js
+scraper/research-*.js
 scraper/test_*.js
+scraper/test-*.js
 scraper/verify_*.js
+scraper/verify-*.js
 
 # OCRキャッシュ（大容量のためgit管理外・GitHub Actions Cacheで永続化）
 scraper/ocr-cache.json

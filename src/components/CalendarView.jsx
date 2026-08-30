@@ -2,11 +2,9 @@ import { useMemo, useState } from 'react';
 import { F } from './Shared';
 import { ICO } from './Icons';
 import { PREFECTURE_INFO } from '../data/regionMap';
+import { jstTodayStr } from '../utils/date';
 
 // ── JST 日付ユーティリティ（YYYY-MM-DD 文字列ベース。TZ非依存） ──
-function jstToday() {
-  return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
-}
 function ymd(y, m, d) {
   const p = n => String(n).padStart(2, '0');
   return `${y}-${p(m)}-${p(d)}`;
@@ -24,7 +22,7 @@ const WEEK = ['日', '月', '火', '水', '木', '金', '土'];
  * 連日開催（endDate）は期間中の各日に表示する。
  */
 export default function CalendarView({ events, onOpenDetail, primary, accent, favorites, applied, activePrefId }) {
-  const today = jstToday();
+  const today = jstTodayStr();
 
   // 表示中の月（既定は今日の月）。矢印で前後に移動。
   const [ym, setYm] = useState(() => ({ y: Number(today.slice(0, 4)), m: Number(today.slice(5, 7)) }));
@@ -96,13 +94,13 @@ export default function CalendarView({ events, onOpenDetail, primary, accent, fa
       {/* 月ナビゲーション */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 18, padding: '10px 0 8px' }}>
         <button onClick={() => goMonth(-1)} aria-label="前の月" style={navBtn}>
-          <svg width="9" height="15" viewBox="0 0 8 14"><path d="M7 1L1 7l6 6" stroke={primary} strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          <svg width="9" height="15" viewBox="0 0 8 14"><path d="M7 1L1 7l6 6" stroke="var(--brand-fg)" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </button>
         <div style={{ fontFamily: F.serif, fontSize: 17, fontWeight: 700, color: 'var(--text)', letterSpacing: 1, minWidth: 130, textAlign: 'center' }}>
           {ym.y}年 {ym.m}月
         </div>
         <button onClick={() => goMonth(1)} aria-label="次の月" style={navBtn}>
-          <svg width="9" height="15" viewBox="0 0 8 14"><path d="M1 1l6 6-6 6" stroke={primary} strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          <svg width="9" height="15" viewBox="0 0 8 14"><path d="M1 1l6 6-6 6" stroke="var(--brand-fg)" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </button>
       </div>
 
@@ -179,11 +177,11 @@ export default function CalendarView({ events, onOpenDetail, primary, accent, fa
               }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 4, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 'var(--radius-tag, 2px)', background: 'var(--tag-bg)', color: primary, letterSpacing: 0.5 }}>
+                  <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 'var(--radius-tag, 2px)', background: 'var(--tag-bg)', color: 'var(--brand-fg)', letterSpacing: 0.5 }}>
                     {ev.category}
                   </span>
                   {ev.endDate && ev.endDate !== ev.date && (
-                    <span style={{ fontSize: 10, fontWeight: 700, color: accent || primary, fontFamily: F.mono }}>連日開催</span>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--accent-fg)', fontFamily: F.mono }}>連日開催</span>
                   )}
                   {ev.ended && (
                     <span style={{ fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 3, background: '#6b7280', color: '#fff' }}>終了済み</span>
@@ -192,7 +190,7 @@ export default function CalendarView({ events, onOpenDetail, primary, accent, fa
                     <span style={{ fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 3, background: '#16a34a', color: '#fff', fontFamily: F.mono }}>✓ 申請済</span>
                   )}
                   {favorites?.has(ev.id) && (
-                    <span style={{ fontSize: 11, fontWeight: 700, color: accent || primary }}>★</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-fg)' }}>★</span>
                   )}
                 </div>
                 <div style={{

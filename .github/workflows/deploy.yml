@@ -7,6 +7,10 @@ on:
       - master
     paths:
       - 'src/**'
+      # フロントは shared/*.cjs を直接 import している（branch/weather/titleQuality/
+      # officeTitle/brandColors、bootTheme は vite.config 経由）。ここが無いと
+      # shared だけ直したときにサイトへ反映されない
+      - 'shared/**'
       - 'public/**'
       # 恒久アーカイブ（public/ の外・運営APIの関数バンドルへ同梱）。更新にはデプロイが必要
       - 'data/**'
@@ -14,6 +18,8 @@ on:
       - 'scripts/**'
       - 'index.html'
       - 'vite.config.js'
+      # イベント個別URLのOGP注入（Edge Middleware）。デプロイしないと反映されない
+      - 'middleware.js'
       - 'vercel.json'
       - 'package.json'
       - 'package-lock.json'

@@ -82,8 +82,8 @@ export const F = {
 export function Emblem({ ch, size = 28, primary = '#0b2545' }) {
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden="true">
-      <circle cx="20" cy="20" r="18" fill="#fff" stroke={primary} strokeWidth="1.5" />
-      <circle cx="20" cy="20" r="13" fill="none" stroke={primary} strokeWidth="0.7" />
+      <circle cx="20" cy="20" r="18" fill="#fff" stroke="var(--brand-fg)" strokeWidth="1.5" />
+      <circle cx="20" cy="20" r="13" fill="none" stroke="var(--brand-fg)" strokeWidth="0.7" />
       <text x="20" y="25" textAnchor="middle"
         fontFamily={F.serif} fontSize="13" fontWeight="700" fill={primary}>
         {ch}
@@ -174,10 +174,10 @@ export function BottomTabBar({ active, onChange, primary }) {
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
             padding: '4px 12px', minHeight: 44,
           }}>
-            {t.icon(isA ? primary : 'var(--icon-muted)', 22, isA)}
+            {t.icon(isA ? 'var(--brand-fg)' : 'var(--icon-muted)', 22, isA)}
             <span style={{
               fontSize: 10, fontFamily: F.sans,
-              color: isA ? primary : 'var(--text-muted)',
+              color: isA ? 'var(--brand-fg)' : 'var(--text-muted)',
               fontWeight: isA ? 600 : 400,
             }}>{t.label}</span>
           </button>
@@ -203,7 +203,7 @@ export function Spinner({ primary }) {
       <div style={{
         width: 28, height: 28, borderRadius: '50%',
         border: `3px solid ${primary}22`,
-        borderTopColor: primary,
+        borderTopColor: 'var(--brand-fg)',
         animation: 'spin 0.8s linear infinite',
       }} />
     </div>
@@ -211,6 +211,8 @@ export function Spinner({ primary }) {
 }
 
 // ─── エラーバナー ────────────────────────────────────────────
+// 表示できるデータが1件も無いときだけ出す（App の dataError）。
+// 保存済みデータを表示できているオフライン時は、オフラインのお知らせが担当する。
 export function ErrorBanner({ message }) {
   if (!message) return null;
   return (
@@ -223,51 +225,7 @@ export function ErrorBanner({ message }) {
       fontFamily: F.sans,
     }}>
       <span style={{ display: 'flex', marginTop: 1, flexShrink: 0 }}>{ICO.warn('#b91c1c', 13)}</span>
-      <span>データ取得に失敗しました。サンプルデータを表示しています。</span>
-    </div>
-  );
-}
-
-// ─── オフライン表示 ────────────────────────────────────────────
-// 通信できないとき／最新を取得できなかったときに、画面上部へ常時表示する。
-// 「今見えている情報がいつ時点のものか」を隠さないための帯。
-// データ自体は端末内に保持しているので、閲覧は続けられる。
-export function OfflineBanner({ offline, stale, lastSyncedAt, onRetry }) {
-  // 通信不能、または表示中のデータが最新でないときに出す
-  if (!offline && !stale) return null;
-  const isOffline = Boolean(offline);
-
-  return (
-    <div
-      role="status"
-      style={{
-        display: 'flex', alignItems: 'center', gap: 8,
-        padding: '7px 14px',
-        background: 'var(--offline-bg, #fff8e6)',
-        borderBottom: '1px solid var(--offline-border, #f0d9a0)',
-        fontSize: 11.5, lineHeight: 1.6, color: 'var(--offline-text, #7a5b00)',
-        fontFamily: F.sans, flexShrink: 0,
-      }}
-    >
-      <span style={{ display: 'flex', flexShrink: 0 }}>{ICO.warn('var(--offline-text, #7a5b00)', 13)}</span>
-      <span style={{ flex: 1, minWidth: 0 }}>
-        {isOffline ? 'オフラインです。' : '最新の情報を取得できませんでした。'}
-        {lastSyncedAt
-          ? `${lastSyncedAt} 時点の情報を表示しています。`
-          : '保存済みの情報を表示しています。'}
-      </span>
-      {onRetry && !isOffline && (
-        <button
-          onClick={onRetry}
-          style={{
-            flexShrink: 0, border: 'none', background: 'transparent',
-            color: 'var(--offline-text, #7a5b00)', fontSize: 11.5, fontWeight: 700,
-            textDecoration: 'underline', cursor: 'pointer', padding: 0, fontFamily: F.sans,
-          }}
-        >
-          再試行
-        </button>
-      )}
+      <span>イベント情報を取得できませんでした。通信状態をご確認のうえ、更新してください。</span>
     </div>
   );
 }

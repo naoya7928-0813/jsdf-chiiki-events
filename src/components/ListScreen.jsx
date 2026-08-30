@@ -4,7 +4,7 @@ import { useIsShortViewport } from '../hooks/useBreakpoint';
 import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle, StatusBadge } from './Shared';
 import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, weekendRange, matchesTag, matchesBranch, APPLIED_TAG_ID, ENDED_TAG_ID } from './FilterBar';
 import CalendarView from './CalendarView';
-import { daysUntil, deadlineDaysUntil, daysLabel, daysColor } from '../utils/date';
+import { daysUntil, deadlineDaysUntil, daysLabel, daysColor, daysFgColor, jstTodayStr } from '../utils/date';
 import { REGIONS, SUPPORTED_PREFECTURES, PREFECTURE_INFO, NEIGHBORS } from '../data/regionMap';
 
 // ── 地方タブ（第1段）─────────────────────────────────────────
@@ -38,6 +38,7 @@ function officeSourceLabel(ev) {
 
 export default function ListScreen({
   events, loading, error, updatedAt, checkedAt, onRefresh,
+  stale, lastSyncedAt,   // 表示中のデータが最新でない（オフライン・取得失敗）／最後に取得できた日時
   region, onRegionChange,
   favorites, applied, onToggleApplied,
   onOpenHome, onOpenDetail, onOpenSettings, onOpenFavorites,
@@ -202,7 +203,7 @@ export default function ListScreen({
   // ── フィルター適用済みリスト（期間×カテゴリ×タグ×種別、開催日昇順） ──
   const filteredList = useMemo(() => {
     // JST の今日を YYYY-MM-DD 文字列で取得
-    const tStr = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+    const tStr = jstTodayStr();
     const Y  = Number(tStr.slice(0, 4));
     const Mo = Number(tStr.slice(5, 7)); // 1-indexed
 
@@ -296,13 +297,16 @@ export default function ListScreen({
   }, [grouped, searchQuery]);
 
   const { primary, accent } = theme;
-  const todayStr = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
+  const todayStr = jstTodayStr();
   // checkedAt: 更新ボタンを押した（または自動フェッチした）時刻（ローカル）
   // updatedAt: スクレイパーがデータを書いた時刻（JSON内）
   const checkedLabel = checkedAt ?? updatedAt ?? new Date().toLocaleString('ja-JP', {
     year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit',
     timeZone: 'Asia/Tokyo',
   }).replace(',', '');
+  // オフライン・取得失敗のときに「確認 <今の時刻>」を出すと、最新を取れたように読める。
+  // その場合は最後に取得できた日時を示す（見えている情報がいつ時点かを取り違えさせない）。
+  const staleLabel   = stale && lastSyncedAt ? lastSyncedAt : null;
 
   // 更新ボタンの回転アニメーション（spin は main.jsx で定義済み）
   const spinStyle = (isRefreshing || loading)
@@ -326,7 +330,7 @@ export default function ListScreen({
             {/* ⑥ 更新時刻をヘッダーに表示（高さが足りないときは省く） */}
             {!shortVp && (
               <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', marginTop: 3, fontFamily: F.mono }}>
-                確認 {checkedLabel}
+                {staleLabel ? `最終取得 ${staleLabel}` : `確認 ${checkedLabel}`}
               </div>
             )}
           </div>
@@ -612,7 +616,7 @@ export default function ListScreen({
                   const { m, d }   = ev.date ? splitDate(ev.date) : { m: null, d: null };
                   const endSplit   = ev.endDate ? splitDate(ev.endDate) : null;
                   const isWeekend  = /[土日祝]/.test(ev.weekday);
-                  const dateColor  = isWeekend ? accent : primary;
+                  const dateColor  = isWeekend ? 'var(--accent-fg)' : 'var(--brand-fg)';
                   const isOngoing  = !!(ev.endDate && ev.date < todayStr);
                   const eventDays  = daysUntil(ev.endDate || ev.date);
                   const dlDays     = deadlineDaysUntil(ev.deadline);
@@ -676,14 +680,14 @@ export default function ListScreen({
                               <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3, background: '#6b7280', color: '#fff', letterSpacing: 0.5, flexShrink: 0 }}>終了済み</span>
                             )}
                             {/* カテゴリは角ばったタグ型（装備品の規格ラベル調・フィードバック§4-2⑤） */}
-                            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 'var(--radius-tag)', background: 'var(--tag-bg)', color: primary, letterSpacing: 0.5 }}>
+                            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 'var(--radius-tag)', background: 'var(--tag-bg)', color: 'var(--brand-fg)', letterSpacing: 0.5 }}>
                               {ev.category}
                             </span>
                             {ev.tag && <span style={{ fontSize: 11, color: 'var(--text-sub)' }}>{ev.tag}</span>}
                             {sourceLabel && (
                               <span style={{
                                 fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3,
-                                background: `${primary}12`, color: primary,
+                                background: `${primary}12`, color: 'var(--brand-fg)',
                                 letterSpacing: 0.5, flexShrink: 0,
                               }}>
                                 {sourceLabel}
@@ -692,7 +696,7 @@ export default function ListScreen({
                             {favorites?.has(ev.id) && (
                               <span style={{
                                 fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 3,
-                                background: `${accent}22`, color: accent,
+                                background: `${accent}22`, color: 'var(--accent-fg)',
                                 letterSpacing: 0.5, flexShrink: 0,
                               }}>★</span>
                             )}
@@ -723,7 +727,7 @@ export default function ListScreen({
                               <span style={{
                                 fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3,
                                 background: `${daysColor(eventDays, primary, accent)}18`,
-                                color: daysColor(eventDays, primary, accent),
+                                color: daysFgColor(eventDays),
                                 fontFamily: F.mono, letterSpacing: 0.5,
                               }}>
                                 {daysLabel(eventDays, 'event')}
@@ -756,8 +760,8 @@ export default function ListScreen({
                           )}
                           {/* ④ URLあり → 公式ページ確認バッジ */}
                           {ev.url && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 5, fontSize: 10, color: primary, fontWeight: 600 }}>
-                              {ICO.extLink(primary, 10)} 公式ページで確認
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 5, fontSize: 10, color: 'var(--brand-fg)', fontWeight: 600 }}>
+                              {ICO.extLink('var(--brand-fg)', 10)} 公式ページで確認
                             </div>
                           )}
                         </div>
@@ -851,7 +855,7 @@ function EmptyState({ searchQuery, primary, prefId, events, onSelectPref }) {
               >
                 <Emblem ch={PREFECTURE_INFO[n.id]?.emblem ?? n.label.charAt(0)} size={15} primary={primary} />
                 <span>{n.label}</span>
-                <span style={{ fontSize: 11, fontFamily: F.mono, color: primary, fontWeight: 700 }}>{n.count}件</span>
+                <span style={{ fontSize: 11, fontFamily: F.mono, color: 'var(--brand-fg)', fontWeight: 700 }}>{n.count}件</span>
               </button>
             ))}
           </div>

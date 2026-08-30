@@ -28,7 +28,7 @@ export function renderMarkdown(md, primary) {
     } else if (line.startsWith('## ')) {
       nodes.push(
         <div key={key++} style={{
-          fontSize: 13, fontWeight: 700, color: primary,
+          fontSize: 13, fontWeight: 700, color: 'var(--brand-fg)',
           marginTop: 20, marginBottom: 6,
           paddingBottom: 5,
           borderBottom: `1px solid ${primary}22`,
@@ -43,7 +43,7 @@ export function renderMarkdown(md, primary) {
           display: 'flex', gap: 8, marginBottom: 4,
           fontSize: 13, color: 'var(--text)', lineHeight: 1.75,
         }}>
-          <span style={{ color: primary, flexShrink: 0 }}>•</span>
+          <span style={{ color: 'var(--brand-fg)', flexShrink: 0 }}>•</span>
           <span>{inline(line.slice(2), key)}</span>
         </div>
       );

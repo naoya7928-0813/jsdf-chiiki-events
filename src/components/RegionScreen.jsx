@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { ICO } from './Icons';
 import { F, ScreenHeader, BottomTabBar, splitDate } from './Shared';
 import { REGION_BY_ID, SUPPORTED_PREFECTURES } from '../data/regionMap';
-import { deadlineDaysUntil, daysUntil, daysLabel, daysColor } from '../utils/date';
+import { deadlineDaysUntil, daysUntil, daysLabel, daysColor, daysFgColor, jstTodayStr } from '../utils/date';
 
 // ─── 地域画面（都道府県タブ + イベント一覧） ─────────────────────
 export default function RegionScreen({
@@ -145,6 +145,7 @@ export default function RegionScreen({
               key={ev.id}
               ev={ev}
               isFav={favorites.has(ev.id)}
+              applied={applied}
               primary={primary}
               accent={accent}
               onTap={() => onOpenDetail(ev)}
@@ -169,12 +170,12 @@ export default function RegionScreen({
 }
 
 // ─── イベントカード ───────────────────────────────────────────
-function EventCard({ ev, isFav, primary, accent, onTap }) {
-  const TODAY_STR = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
+function EventCard({ ev, isFav, applied, primary, accent, onTap }) {
+  const TODAY_STR = jstTodayStr();
   const { m, d }  = splitDate(ev.date);
   const endSplit  = ev.endDate ? splitDate(ev.endDate) : null;
   const isWeekend = /[土日祝]/.test(ev.weekday);
-  const dayColor  = isWeekend ? accent : primary;
+  const dayColor  = isWeekend ? 'var(--accent-fg)' : 'var(--brand-fg)';
   const isOngoing = !!(ev.endDate && ev.date < TODAY_STR);
   const dlDays       = deadlineDaysUntil(ev.deadline);
   const showUrgent   = dlDays != null && dlDays >= 0 && dlDays <= 3;
@@ -222,7 +223,7 @@ function EventCard({ ev, isFav, primary, accent, onTap }) {
             )}
             <span style={{
               fontSize: 10, padding: '2px 7px', borderRadius: 3,
-              background: `${primary}18`, color: primary,
+              background: `${primary}18`, color: 'var(--brand-fg)',
               fontWeight: 600, letterSpacing: 0.5,
             }}>
               {ev.category}
@@ -250,7 +251,7 @@ function EventCard({ ev, isFav, primary, accent, onTap }) {
             display: 'flex', alignItems: 'flex-start', gap: 4,
           }}>
             <span style={{ flex: 1 }}>{ev.title}</span>
-            {isFav && ICO.star(accent, 12, accent)}
+            {isFav && ICO.star('var(--accent-fg)', 12, 'var(--accent-fg)')}
             {applied?.has(ev.id) && (
               <span style={{
                 fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3,
@@ -270,11 +271,11 @@ function EventCard({ ev, isFav, primary, accent, onTap }) {
               marginTop: 6,
               display: 'inline-flex', alignItems: 'center', gap: 4,
               fontSize: 11, fontWeight: 600,
-              color: daysColor(dlDays, primary, accent),
+              color: daysFgColor(dlDays),
               background: `${daysColor(dlDays, primary, accent)}14`,
               padding: '2px 8px', borderRadius: 4,
             }}>
-              {ICO.clock(daysColor(dlDays, primary, accent), 11)}
+              {ICO.clock(daysFgColor(dlDays), 11)}
               締切 {daysLabel(dlDays, 'deadline')} — {ev.deadline}
             </div>
           )}
@@ -284,11 +285,11 @@ function EventCard({ ev, isFav, primary, accent, onTap }) {
               marginTop: 6,
               display: 'inline-flex', alignItems: 'center', gap: 4,
               fontSize: 11, fontWeight: 600,
-              color: daysColor(eventDays, primary, accent),
+              color: daysFgColor(eventDays),
               background: `${daysColor(eventDays, primary, accent)}14`,
               padding: '2px 8px', borderRadius: 4,
             }}>
-              {ICO.clock(daysColor(eventDays, primary, accent), 11)}
+              {ICO.clock(daysFgColor(eventDays), 11)}
               {daysLabel(eventDays, 'event')}
             </div>
           )}
@@ -314,8 +315,8 @@ function ComingSoon({ primary, prefLabel }) {
         marginBottom: 16,
       }}>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke={primary} strokeWidth="1.5" strokeOpacity="0.4"/>
-          <path d="M12 8v4l3 3" stroke={primary} strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.4"/>
+          <circle cx="12" cy="12" r="10" stroke="var(--brand-fg)" strokeWidth="1.5" strokeOpacity="0.4"/>
+          <path d="M12 8v4l3 3" stroke="var(--brand-fg)" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.4"/>
         </svg>
       </div>
       <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-muted)' }}>
