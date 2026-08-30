@@ -6,6 +6,8 @@ import WeatherCard from './WeatherCard';
 import { useElementWidth, isTouchPhone, useIsShortViewport } from '../hooks/useBreakpoint';
 import { googleCalendarUrl, downloadIcs } from '../utils/calendar';
 import { useOnline } from '../hooks/useOnline';
+// 運営が明示的に付けたタグ（公開の絞り込みチップと同じ定義）
+import { eventTags } from '../../shared/tags.cjs';
 import { jstTodayStr } from '../utils/date';
 
 function officeSourceLabel(ev) {
@@ -247,6 +249,15 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
             padding: '3px 8px', borderRadius: 'var(--radius-tag)',
             background: 'rgba(255,255,255,0.15)', letterSpacing: 1.5,
           }}>{ev.category}{ev.tag ? ` · ${ev.tag}` : ''}</div>
+          {/* 運営が明示的に付けたタグ（絞り込みチップと同じ項目）。
+              申込要否(tag)と重複する値は上のバッジに出ているので除く */}
+          {eventTags(ev).filter(t => t !== ev.tag).map(t => (
+            <div key={t} style={{
+              display: 'inline-block', fontSize: 10, fontFamily: F.mono,
+              padding: '3px 8px', borderRadius: 'var(--radius-tag)',
+              background: 'rgba(255,255,255,0.15)', letterSpacing: 1.2,
+            }}>{t}</div>
+          ))}
           {sourceLabel && (
             <div style={{
               display: 'inline-block', fontSize: 10, fontFamily: F.mono,

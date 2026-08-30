@@ -6,6 +6,12 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-08-30',
+    version: '1.30.15',
+    type:    'improvement',
+    content: '運営が設定したタグ（オンライン・家族向けなど）がイベント詳細に表示され、絞り込みでも確実に選べるようになりました。',
+  },
+  {
+    date:    '2026-08-30',
     version: '1.30.14',
     type:    'improvement',
     content: '新着のお知らせが、予定している時刻（8時・12時・18時ごろ）に届きやすくなりました。',
