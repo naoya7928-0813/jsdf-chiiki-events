@@ -1,13 +1,14 @@
 {
   "name": "jsdf-chiiki-events",
-  "version": "1.30.15",
+  "version": "1.34.16",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/generate-icons.mjs && node scripts/generate-events-html.mjs && vite build",
+    "build": "node scripts/generate-icons.mjs && node scripts/generate-manifests.mjs && node scripts/generate-events-html.mjs && vite build",
     "preview": "vite preview",
     "generate-icons": "node scripts/generate-icons.mjs",
+    "generate-manifests": "node scripts/generate-manifests.mjs",
     "test": "node --test shared/*.test.cjs"
   },
   "dependencies": {

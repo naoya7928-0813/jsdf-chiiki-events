@@ -6,6 +6,8 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 // 公開URLの唯一の出どころ（ドメイン移行は SITE_URL の設定だけで完了する）
 import { siteUrl, DEFAULT_SITE_URL } from './shared/siteUrl.cjs';
+// PWA の配色・アイコン・ショートカットの唯一の出どころ（配色ごとの manifest と同じ関数）
+import { buildManifest, DEFAULT_SCHEME } from './shared/pwaTheme.cjs';
 
 // package.json からバージョンを読み取り、ビルド時に __APP_VERSION__ として埋め込む
 const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url)));
@@ -95,13 +97,17 @@ function bootThemeInject() {
     enforce: 'pre',  // 他プラグインの注入より前に <head> 先頭へ置く
     transformIndexHtml: {
       order: 'pre',
-      handler() {
+      handler(html, ctx) {
         // 毎回読み直す（dev で bootTheme.cjs を編集したら再起動なしで反映）
         delete require_.cache[require_.resolve('./shared/bootTheme.cjs')];
+        delete require_.cache[require_.resolve('./shared/pwaTheme.cjs')];
         const { bootThemeStyle, bootThemeScript } = require_('./shared/bootTheme.cjs');
+        // 配色（陸/海/空）の PWA 反映は公開アプリだけ。運営者ページは
+        // 専用の admin.webmanifest / アイコンを使うため対象外。
+        const scheme = !/admin\.html$/.test(ctx?.path || ctx?.filename || '');
         return [
-          { tag: 'style',  children: bootThemeStyle(),  injectTo: 'head-prepend' },
-          { tag: 'script', children: bootThemeScript(), injectTo: 'head-prepend' },
+          { tag: 'style',  children: bootThemeStyle(),          injectTo: 'head-prepend' },
+          { tag: 'script', children: bootThemeScript({ scheme }), injectTo: 'head-prepend' },
         ];
       },
     },
@@ -161,29 +167,18 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: [
         'icons/icon.svg',
+        // 配色ごとの manifest（実行時に link を差し替えるためオフラインでも要る）
+        'manifest-jgsdf.webmanifest',
+        'manifest-jmsdf.webmanifest',
+        'manifest-jasdf.webmanifest',
         'icons/apple-touch-icon.png',
         'icons/apple-touch-icon-jgsdf.png',
         'icons/apple-touch-icon-jmsdf.png',
         'icons/apple-touch-icon-jasdf.png',
       ],
-      manifest: {
-        name: '地本イベント情報（非公式まとめ）',
-        short_name: '地本イベント',
-        description: '自衛隊地方協力本部のイベント情報をまとめた非公式アプリ',
-        theme_color: '#0b2545',
-        background_color: '#f5f6f8',
-        display: 'standalone',
-        orientation: 'portrait',
-        start_url: '/',
-        id: '/',
-        scope: '/',
-        lang: 'ja',
-        icons: [
-          { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-          { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
-        ],
-      },
+      // 既定の manifest（配色ごとの manifest-<scheme>.webmanifest と同じ関数で作る。
+      // 実行時に <link rel="manifest"> を選択中の配色のものへ差し替える）
+      manifest: buildManifest(DEFAULT_SCHEME),
       injectManifest: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
       },

@@ -9,15 +9,24 @@
     <meta name="robots" content="index, follow" />
 
     <!-- PWA: Apple -->
+    <!-- ホーム画面から起動したらブラウザのUIを使わず全画面をアプリに使う。
+         apple- 付きは iOS 用の旧指定で、標準名は mobile-web-app-capable。
+         標準名が無いと Chrome が非推奨警告を出し、環境によってはブラウザの
+         枠が残るため両方書く。 -->
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="地本イベント(非公式)" />
+    <!-- 既定（陸上）。選択中の配色へ shared/bootTheme.cjs が差し替える -->
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <!-- favicon（宣言が無いとブラウザが /favicon.ico を探して毎回404になる） -->
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
 
-    <!-- テーマカラー（vite-plugin-pwa が manifest に注入するが iOS 用に明示） -->
-    <meta name="theme-color" content="#0b2545" />
+    <!-- テーマカラー（ステータスバーの色）はここに書かない。
+         利用者が選んだ配色（陸/海/空）に合わせる必要があり、静的に書くと
+         「HTMLの既定色 → JSが上書き」で起動のたびに色が変わって見える。
+         <head> 先頭へ注入される shared/bootTheme.cjs が初回描画前に生成する
+         （同じスクリプトが manifest と apple-touch-icon も配色ごとに差し替える）。 -->
 
     <!-- 起動時のちらつき防止（FOUC対策・JS実行前から適用）
          グローバルCSSは main.jsx の injectGlobalStyles() でJS実行時に注入されるため、

@@ -2,6 +2,9 @@ import { precacheAndRoute, cleanupOutdatedCaches, createHandlerBoundToURL } from
 import { registerRoute, NavigationRoute } from 'workbox-routing';
 import { NetworkFirst, StaleWhileRevalidate } from 'workbox-strategies';
 import { ExpirationPlugin } from 'workbox-expiration';
+// ホーム画面アイコンの未読バッジ。アプリを閉じている間はここでしか更新できない
+// （件数は IndexedDB でアプリ側と共有する）。
+import { incrementBadgeCount, clearBadgeCount } from './utils/appBadge.js';
 
 // ── 即時更新（古いバンドルが残り続けて新機能が出ない問題を防ぐ） ──
 // skipWaiting + clients.claim で新しい SW を待たせず即有効化する。
@@ -102,7 +105,7 @@ self.addEventListener('push', event => {
 
   const { title = '自衛隊地本イベント', body = '新しいイベントが追加されました', url = '/', badge, icon } = payload;
 
-  event.waitUntil(
+  event.waitUntil(Promise.all([
     self.registration.showNotification(title, {
       body,
       icon:  icon  || '/icons/icon-192.png',
@@ -111,14 +114,21 @@ self.addEventListener('push', event => {
       tag:   'jsdf-event',
       renotify: true,
       vibrate: [100, 50, 100],
-    })
-  );
+    }),
+    // ホーム画面アイコンに未読の数字を出す。アプリを開いて「お知らせ」を読むと
+    // App.jsx が実際の未読件数で上書きするので、ここでは 1 件ずつ積むだけでよい。
+    incrementBadgeCount(),
+  ]));
 });
 
 // ── 通知クリック → アプリを開く ────────────────────────────────
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   const targetUrl = (event.notification.data && event.notification.data.url) || '/';
+
+  // 通知から開く＝新着を見に行くので、この時点でバッジを消す。
+  // アプリが起動すれば App.jsx が実際の未読件数で入れ直す。
+  event.waitUntil(clearBadgeCount());
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
