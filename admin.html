@@ -7,9 +7,14 @@
     <!-- 検索エンジンに載せない（運営者専用） -->
     <meta name="robots" content="noindex, nofollow" />
     <meta name="theme-color" content="#0b2545" />
-    <!-- iOS ホーム画面アイコン（運営用・「地」下に「運営用」） -->
+    <!-- ホーム画面から起動したらブラウザのUIを使わず全画面をアプリに使う。
+         apple- 付きは iOS 用の旧指定で、標準名は mobile-web-app-capable。
+         標準名が無いと Chrome が非推奨警告を出し、環境によってはブラウザの
+         枠が残るため両方書く。 -->
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="地本運営" />
+    <!-- iOS ホーム画面アイコン（運営用・「地」下に「運営用」） -->
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon-admin.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
   </head>

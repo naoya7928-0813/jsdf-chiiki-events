@@ -9,6 +9,10 @@ import { useBreakpoint, LayoutModeContext, isPhoneSized } from './hooks/useBreak
 import { applyOrientationPreference } from './utils/orientation';
 import { consentStateFor, loadAcceptedLegalVersion } from './constants/legal';
 import { foregroundOnDark } from '../shared/brandColors.cjs';
+// PWA（ホーム画面アプリ）の配色・manifest・アイコンは shared/pwaTheme.cjs が唯一の出どころ
+import { themeColorFor, manifestPathFor, appleTouchIconFor } from '../shared/pwaTheme.cjs';
+import { usePushSubscribed } from './hooks/usePushSubscribed';
+import { setBadgeCount } from './utils/appBadge';
 import SideNav from './components/SideNav';
 import ConsentGate from './components/ConsentGate';
 import NotFoundScreen from './components/NotFoundScreen';
@@ -269,11 +273,23 @@ export default function App({ operator = false }) {
     setScreen(back);
   }, [adminEditEvent]);
 
-  // Safari のステータスバー theme-color をテーマに合わせて更新
+  // ── PWA（ホーム画面アプリ）を選択中の配色に合わせる ────────────
+  // 初回描画前の分は shared/bootTheme.cjs が済ませている。ここは
+  // 「設定画面で配色を変えた」ときに、再読み込みせず追従させるためのもの。
+  //   theme-color      … ステータスバー／タイトルバーの色（Android は即座に変わる）
+  //   manifest         … 次にホーム画面へ追加したときのアイコン・スプラッシュの色
+  //   apple-touch-icon … iOS のホーム画面アイコン
+  // 運営者ページは専用の admin.webmanifest を使うため manifest は触らない。
   useEffect(() => {
     const metaTheme = document.querySelector('meta[name="theme-color"]');
-    if (metaTheme) metaTheme.setAttribute('content', scheme.primary);
-  }, [scheme.primary]);
+    if (metaTheme) metaTheme.setAttribute('content', themeColorFor(schemeKey));
+    if (operator) return;
+    document.documentElement.dataset.scheme = schemeKey;
+    const manifestLink = document.querySelector('link[rel="manifest"]');
+    if (manifestLink) manifestLink.setAttribute('href', manifestPathFor(schemeKey));
+    const appleIcon = document.querySelector('link[rel="apple-touch-icon"]');
+    if (appleIcon) appleIcon.setAttribute('href', appleTouchIconFor(schemeKey));
+  }, [schemeKey, operator]);
 
   // ── データ取得 ────────────────────────────────────────────
   const { events, loading, error, updatedAt, checkedAt, refresh,
@@ -475,6 +491,20 @@ export default function App({ operator = false }) {
   }, [updatedAt, loading, events]);
 
   const unreadCount = notifHistory.filter(n => !n.read).length;
+
+  // ── ホーム画面アイコンの未読バッジ（数字） ──────────────────
+  // 通知をオンにしている人だけに出す。オフの人にとっては「知らせてほしいと
+  // 言っていない数字」が勝手に付くだけになるため。
+  // アプリを閉じている間は Service Worker が push のたびに +1 しており、
+  // ここで実際の未読件数に入れ直す（既読にすれば消える）。
+  const pushSubscribed = usePushSubscribed();
+  useEffect(() => {
+    if (operator) return;
+    // null = 購読しているか判定中。ここで消すと、閉じている間に Service Worker が
+    // 数えたバッジを起動直後に一瞬失う。分かってから触る。
+    if (pushSubscribed === null) return;
+    setBadgeCount(pushSubscribed ? unreadCount : 0);
+  }, [pushSubscribed, unreadCount, operator]);
 
   const handleMarkAllRead = useCallback(() => {
     setNotifHistory(prev => {

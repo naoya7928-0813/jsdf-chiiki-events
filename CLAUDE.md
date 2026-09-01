@@ -20,9 +20,12 @@ jsdf-chiiki-events/
 │   ├── data/
 │   │   ├── regionMap.js        # 地域・都道府県マッピング（emblem フィールドあり）
 │   │   └── prefectureShapes.js # SVG パス + REGION_LABEL_POSITIONS
-│   └── hooks/
-│       ├── useEvents.js        # events.json フェッチ + 通知管理 + オフライン保持
-│       └── useOnline.js        # オンライン/オフライン状態の購読
+│   ├── hooks/
+│   │   ├── useEvents.js        # events.json フェッチ + 通知管理 + オフライン保持
+│   │   ├── usePushSubscribed.js # 通知をオンにしているかだけを見る（バッジ判定用）
+│   │   └── useOnline.js        # オンライン/オフライン状態の購読
+│   └── utils/
+│       └── appBadge.js         # ホーム画面アイコンの未読バッジ（SW と IndexedDB で共有）
 ├── scraper/                    # Node.js スクレイパー（Playwright + cheerio）
 │   ├── index.js                # エントリポイント・全府県ループ
 │   ├── lib/
@@ -42,7 +45,8 @@ jsdf-chiiki-events/
 │   └── google3d6aa643f6d363c1.html # Google Search Console 所有権確認ファイル
 ├── scripts/
 │   ├── generate-events-html.mjs # events.html / events/<pref>.html / sitemap.xml 生成
-│   └── generate-icons.mjs       # PWA アイコン生成
+│   ├── generate-manifests.mjs   # 配色ごとの manifest-<scheme>.webmanifest 生成
+│   └── generate-icons.mjs       # PWA アイコン・ショートカットアイコン生成
 └── .github/workflows/
     ├── scrape.yml              # スクレイプ自動化（1日3回 + Vercel デプロイ）
     └── deploy.yml              # フロントエンド変更時の自動デプロイ（push トリガー）
@@ -343,6 +347,54 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
   旧 ntfy.sh トピック方式（`NTFY_TOPIC` / NtfyGuideModal）はアプリ側では廃止済みで、
   ntfy は scrape.yml からの管理者・地域別通知にのみ残っている（`src/config.js` 冒頭の注記を参照）
 
+## PWA（ホーム画面アプリ）（2026-09-01 整備）
+
+ブラウザで見たときと、ホーム画面に追加したときで**見た目が変わらない**ようにする。
+配色（陸/海/空）は利用者が選べるため、OS 側が使う値も選んだ配色に追従させる。
+
+**`shared/pwaTheme.cjs` が唯一の出どころ**（色・アイコン・ショートカット・manifest 本体）。
+`vite.config.js`（既定の `manifest.webmanifest`）と `scripts/generate-manifests.mjs`
+（配色ごとの `public/manifest-<scheme>.webmanifest`）が同じ `buildManifest()` を使う。
+
+| OS が見る値 | 効くところ | 反映のしかた |
+|---|---|---|
+| `<meta name="theme-color">` | ステータスバー／タイトルバー | `shared/bootTheme.cjs` が**初回描画前**に生成。配色変更時は `App.jsx` が更新 |
+| manifest の `theme_color` | インストール時のバー色 | 配色ごとの manifest（`<link rel="manifest">` を実行時に差し替え） |
+| manifest の `background_color` | 起動時に OS が出すスプラッシュの地色 | 同上。**SplashScreen の暗い地色と揃える** |
+| manifest の `icons` | ホーム画面アイコン | 配色ごとに `icon-<scheme>-{192,512}.png` |
+| `<link rel="apple-touch-icon">` | iOS のホーム画面アイコン | `bootTheme.cjs` / `App.jsx` が差し替え |
+
+- ⚠️ **`index.html` に `<meta name="theme-color">` を直書きしないこと**。静的に書くと
+  「HTML の既定色 → JS が上書き」で起動のたびに色が変わって見える（`bootTheme.cjs` が生成する）
+- ⚠️ **`background_color` に明るい色を置かないこと**。アプリ側のスプラッシュはどの配色も暗いため、
+  白系だと起動のたびに白い画面を経由する（`#f5f6f8` 固定だった。2026-09-01 修正）
+- ⚠️ **manifest に `orientation` を書かないこと**。`portrait` に固定するとアプリ内の
+  「表示の向き」設定（縦/横/自由回転）がインストール版だけ効かず、横向きレイアウトを一切使えない
+- 全画面利用の宣言は `mobile-web-app-capable`（標準）と `apple-mobile-web-app-capable`（iOS 用の旧名）の
+  **両方**を書く。`viewport-fit=cover` ＋ `black-translucent` で内容をステータスバー下まで広げ、
+  各画面が `env(safe-area-inset-*)` で余白を取る
+- 色・パス・ショートカットを変えたら **`npm run generate-icons && npm run generate-manifests`**
+  （`npm run build` に組み込み済み）。`shared/pwaTheme.test.cjs` が
+  `src/config.js` の配色・SplashScreen の地色・`App.jsx` の ROUTE_SCREENS・生成済みファイル・
+  アイコンの実在を突き合わせ、ズレていれば CI を落とす
+
+### ショートカット（ホーム画面アイコンの長押し）
+`SHORTCUTS`（`shared/pwaTheme.cjs`）に定義。`/list`・`/favorites`・`/notifications`・`/settings`。
+**URL は `App.jsx` の `ROUTE_SCREENS` に実在するパスであること**（無いと404画面に着地する。テストで検証）。
+表示名はアプリ内の画面名と揃える（ランチャーと画面で呼び名が違うと迷う）。iOS は非対応。
+
+### 未読バッジ（アイコン右上の数字）
+`src/utils/appBadge.js`（Badging API）。**通知をオンにしている人にだけ出す**。
+- アプリを開いている間 … `App.jsx` が「お知らせの未読件数」を書き込む（既読にすると消える）
+- アプリを閉じている間 … `src/sw.js` の `push` ハンドラが受信のたびに +1 する
+- Service Worker は localStorage を読めないため、件数は **IndexedDB（`jsdf-badge`）で共有**する。
+  アプリ側が書くときに IndexedDB も揃えるので、既読にすれば SW 側の数え上げもリセットされる
+- ⚠️ `usePushSubscribed` は **true/false/null（判定前）の3値**。購読確認は非同期なので、
+  判定前に false 扱いで消すと SW が数えたバッジを起動直後に失う
+- 未対応環境（Firefox・iOS16.3以前・非インストール）では何も起きない。例外も投げない
+- ⚠️ 端末内の保存項目が増えるため、**プライバシーポリシーの記載と `LEGAL_VERSION` を更新済み**
+  （2026-09-01。localStorage だけと書いてあったところに IndexedDB を追記）
+
 ## オフライン対応（2026-08-26 導入）
 
 通信できない状態でもイベントを閲覧できる。**「今見えている情報がいつ時点のものか」を必ず画面に出す**のが原則。
@@ -415,6 +467,7 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 | タグ（申込要否・属性）の定義と判定 | `shared/tags.cjs` | スクレイパーの付与（`guessTags`）／フロントの絞り込みチップ・件数 |
 | タイトル整形・不正判定 | `shared/titleQuality.cjs` / `shared/officeTitle.cjs` | スクレイパー／フロント／スクリプト |
 | ブランド色の文字用 | `shared/brandColors.cjs` ＋ CSS 変数 `--brand-fg`/`--accent-fg` | 全画面（上記「テーマ」参照） |
+| PWA の色・アイコン・ショートカット | `shared/pwaTheme.cjs` | `vite.config.js`（既定 manifest）／`scripts/generate-manifests.mjs`（配色別）／`scripts/generate-icons.mjs`／`shared/bootTheme.cjs`／`src/App.jsx` |
 
 ## 天気予報（イベント詳細）
 

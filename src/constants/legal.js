@@ -14,10 +14,10 @@
  */
 
 /** 同意の版。この値が localStorage の記録と異なると再同意を求める */
-export const LEGAL_VERSION = '2026-08-26';
+export const LEGAL_VERSION = '2026-09-01';
 
 /** 表示用の改定日 */
-export const LEGAL_REVISED_AT = '2026年8月26日';
+export const LEGAL_REVISED_AT = '2026年9月1日';
 
 /** localStorage のキー（値＝同意した LEGAL_VERSION） */
 export const LEGAL_STORAGE_KEY = 'jsdf-legal-accepted';
@@ -27,12 +27,8 @@ export const LEGAL_STORAGE_KEY = 'jsdf-legal-accepted';
  * 再同意ダイアログに箇条書きで表示する。
  */
 export const LEGAL_CHANGES = [
-  '実際のアプリの動作に合わせて、記載を全面的に見直しました。',
-  '表示速度と使い勝手の改善のために利用状況の計測（Vercel Web Analytics / Speed Insights）を使用していることを明記しました。追跡用 Cookie は使用せず、個人の特定や他サイトをまたいだ追跡は行いません。',
-  '「近くの募集案内所」で使う位置情報と方位センサーについて、端末内でのみ処理し外部へ送信しないことを明記しました。',
-  'イベント詳細の地図が Google マップの埋め込みであり、表示時に Google 社へ IP アドレス等が送信されることを明記しました。',
-  '不具合報告の内容・連絡先を外部サービスへ送信しない運用（2026年7月に移行済み）に記載を合わせました。',
-  'オフラインでの閲覧のために、最後に取得したイベント情報を端末内に保持することを追記しました。',
+  'ホーム画面に追加したアプリのアイコンに、未読のお知らせの件数（数字）を表示できるようにしました。この件数は端末内（IndexedDB）にのみ保存し、外部へは送信しません。通知をオフにしている場合は使用しません。',
+  '端末内に保存する場所として localStorage に加えて IndexedDB を使うことを明記しました。保存する情報の中身と「外部へ送信しない」点はこれまでと変わりません。',
 ];
 
 /**

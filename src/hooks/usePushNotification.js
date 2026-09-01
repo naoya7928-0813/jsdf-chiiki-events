@@ -38,6 +38,19 @@ function detectEnv() {
   return { supported: true, reason: null };
 }
 
+/**
+ * 購読状態が変わったことを知らせるイベント名。
+ * 設定画面（このフック）と、バッジ表示のためだけに状態を見る側
+ * （usePushSubscribed）を、互いを知らないまま同期させる。
+ */
+export const PUSH_CHANGE_EVENT = 'jsdf-push-change';
+
+function emitPushChange(subscribed) {
+  try {
+    window.dispatchEvent(new CustomEvent(PUSH_CHANGE_EVENT, { detail: { subscribed } }));
+  } catch { /* CustomEvent 非対応環境では黙って諦める（バッジが出ないだけ） */ }
+}
+
 function urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64   = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -116,6 +129,7 @@ export function usePushNotification() {
       if (!saveRes.ok) throw new Error(`Subscribe API failed: ${saveRes.status}`);
 
       setSubscribed(true);
+      emitPushChange(true);
     } catch (err) {
       console.error('[usePushNotification] subscribe error', err);
       // エラー種別に応じてメッセージを分ける
@@ -152,6 +166,7 @@ export function usePushNotification() {
         await sub.unsubscribe();
       }
       setSubscribed(false);
+      emitPushChange(false);
     } catch (err) {
       console.error('[usePushNotification] unsubscribe error', err);
       setError('通知の解除に失敗しました。');
