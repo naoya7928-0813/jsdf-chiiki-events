@@ -5,6 +5,8 @@
 import { Redis } from '@upstash/redis';
 import authz from '../shared/authz.cjs';
 import sessionUtil from '../shared/session.cjs';
+// 許可オリジン（ドメイン移行時は SITE_URL / SITE_ORIGINS で切り替える）
+import { allowedOrigins } from '../shared/siteUrl.cjs';
 
 const redis = new Redis({
   url:   process.env.KV_REST_API_URL,
@@ -19,16 +21,9 @@ const redis = new Redis({
 // ローカルのページを起点にした書き込みが Origin 検証を素通りしてしまう
 // （SameSite=Strict Cookie と Sec-Fetch-Site でも止まるが、层を減らさない）。
 const IS_PRODUCTION = process.env.VERCEL_ENV === 'production';
-const DEV_ORIGINS = IS_PRODUCTION ? [] : [
-  'http://localhost:5173',  // vite dev
-  'http://localhost:4173',  // vite preview
-];
-const ALLOWED_ORIGINS = new Set([
-  'https://jsdf-chiiki-events.vercel.app',
-  ...DEV_ORIGINS,
-  ...String(process.env.SITE_ORIGINS || '')
-    .split(',').map(s => s.trim()).filter(s => /^https?:\/\//.test(s)),
-]);
+// 許可オリジンの組み立ては shared/siteUrl.cjs に集約している（ドメイン移行時に
+// ここを含め各所を書き換えて回らなくて済むように）。SITE_URL / SITE_ORIGINS で足せる。
+const ALLOWED_ORIGINS = new Set(allowedOrigins(process.env, !IS_PRODUCTION));
 
 /**
  * Origin ヘッダを検証する。

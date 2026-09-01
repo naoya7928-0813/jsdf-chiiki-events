@@ -7,10 +7,11 @@
 // JSX は使わず、Satori が解釈する要素オブジェクト（{type, props}）を素の JS で組み立てる
 // （api/*.jsx が関数として検出されない環境があるため .js に統一）。
 import { ImageResponse } from '@vercel/og';
+import { siteUrl, siteHost } from '../shared/siteUrl.cjs';
 
 export const config = { runtime: 'edge' };
 
-const SITE = 'https://jsdf-chiiki-events.vercel.app';
+const SITE = siteUrl(process.env);
 const FALLBACK_IMG = `${SITE}/icons/icon-512.png`;
 
 // Satori 用の軽量ハイパースクリプト（React 非依存）。children は文字列/配列/入れ子ノード可。
@@ -76,7 +77,7 @@ export default async function handler(req) {
       // 下部: ブランド / ドメイン
       h('div', { style: flex({ justifyContent: 'space-between', alignItems: 'flex-end', fontSize: 26 }) },
         h('div', { style: flex({}) }, brand),
-        h('div', { style: flex({}) }, 'jsdf-chiiki-events.vercel.app'),
+        h('div', { style: flex({}) }, siteHost(process.env)),
       ),
     );
 

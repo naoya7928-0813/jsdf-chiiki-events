@@ -14,6 +14,7 @@ import past from '../../shared/pastEvents.cjs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { normalizeOrigin, DEFAULT_SITE_URL } from '../../shared/siteUrl.cjs';
 
 const MKEY = 'manual:events';
 const OKEY = 'manual:overrides';
@@ -24,7 +25,10 @@ let scrapeCache = { at: 0, data: null, ok: false };
 async function loadScrape(req) {
   const now = Date.now();
   if (scrapeCache.data && now - scrapeCache.at < 60000) return { data: scrapeCache.data, ok: scrapeCache.ok };
-  const base = process.env.SITE_URL || (req.headers.host ? `https://${req.headers.host}` : 'https://jsdf-chiiki-events.vercel.app');
+  // SITE_URL が設定されていればそれを優先（従来どおり）。未設定なら自分のホスト、
+  // それも無ければ既定の公開URL。値の妥当性は normalizeOrigin で検証する
+  const base = normalizeOrigin(process.env.SITE_URL)
+    || (req.headers.host ? `https://${req.headers.host}` : DEFAULT_SITE_URL);
   let data = {};
   let ok = false;
   try {

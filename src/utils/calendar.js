@@ -72,7 +72,9 @@ export function buildIcs(ev) {
     'PRODID:-//jsdf-chiiki-events//JP',
     'CALSCALE:GREGORIAN',
     'BEGIN:VEVENT',
-    `UID:${ev.id || 'ev'}@jsdf-chiiki-events.vercel.app`,
+    // UID のドメイン部は「そのとき表示しているホスト」を使う。
+    // ドメイン移行後も書き換え不要にするため固定値を持たない
+    `UID:${ev.id || 'ev'}@${(typeof location !== 'undefined' && location.hostname) || 'jsdf-chiiki-events'}`,
     `DTSTAMP:${stamp}`,
     ...dt,
     `SUMMARY:${icsEscape(ev.title)}`,

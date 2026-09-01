@@ -11,11 +11,13 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { siteUrl, siteHost } from '../shared/siteUrl.cjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PUBLIC = join(__dirname, '../public');
-const HOST = 'jsdf-chiiki-events.vercel.app';
-const ORIGIN = `https://${HOST}`;
+// 通知先ホストは shared/siteUrl.cjs から（ドメイン移行時は SITE_URL を設定するだけ）
+const ORIGIN = siteUrl(process.env);
+const HOST = siteHost(process.env);
 
 // public/ 内の <32桁hex>.txt をキーファイルとして自動検出
 const keyFile = readdirSync(PUBLIC).find((f) => /^[a-f0-9]{32}\.txt$/.test(f));
