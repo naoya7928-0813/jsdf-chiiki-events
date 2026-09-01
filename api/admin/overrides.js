@@ -9,6 +9,7 @@
 import { checkOrigin, noStore, requireSameOrigin, rateLimit, requireAuth, hasPermission, canManageScope, redis, cleanText, writeAudit } from '../_security.js';
 import { normalizeBranches } from '../../shared/branch.cjs';
 import { normalizeTags } from '../../shared/tags.cjs';
+import { normalizeOrigin, DEFAULT_SITE_URL } from '../../shared/siteUrl.cjs';
 
 const OKEY = 'manual:overrides';
 const MKEY = 'manual:events';
@@ -21,7 +22,10 @@ let eventsMap = { at: 0, map: null };
 async function loadEventsMap(req) {
   const now = Date.now();
   if (eventsMap.map && now - eventsMap.at < 60000) return eventsMap.map;
-  const base = process.env.SITE_URL || (req.headers.host ? `https://${req.headers.host}` : 'https://jsdf-chiiki-events.vercel.app');
+  // SITE_URL が設定されていればそれを優先（従来どおり）。未設定なら自分のホスト、
+  // それも無ければ既定の公開URL。値の妥当性は normalizeOrigin で検証する
+  const base = normalizeOrigin(process.env.SITE_URL)
+    || (req.headers.host ? `https://${req.headers.host}` : DEFAULT_SITE_URL);
   const map = new Map();
   try {
     const r = await fetch(`${base}/data/events.json`, { signal: AbortSignal.timeout(5000) });

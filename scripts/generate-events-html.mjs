@@ -13,8 +13,13 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, unlink
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { REGIONS } from '../src/data/regionMap.js';
+import { siteUrl, DEFAULT_SITE_URL } from '../shared/siteUrl.cjs';
 
-const SITE_URL = 'https://jsdf-chiiki-events.vercel.app';
+// 公開URLは shared/siteUrl.cjs が唯一の出どころ（ドメイン移行は SITE_URL の設定だけで済む）
+const SITE_URL = siteUrl(process.env);
+// どのドメインで生成したかを必ずログに出す。scrape.yml は secrets.SITE_URL を渡すため、
+// 想定外の値が入っていた場合に canonical / sitemap が黙って変わるのを防ぐ
+console.log(`[generate-events-html] サイトURL: ${SITE_URL}${SITE_URL === DEFAULT_SITE_URL ? '（既定）' : '（SITE_URL で指定）'}`);
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const EVENTS_JSON = join(__dirname, '../public/data/events.json');
@@ -864,3 +869,21 @@ ${prefUrls}
 const sitemapPath = join(__dirname, '../public/sitemap.xml');
 writeFileSync(sitemapPath, sitemap, 'utf8');
 console.log(`[generate-events-html] sitemap.xml を更新（${Object.keys(PREF_LABELS).length + 3} URL）`);
+
+// ── ドメイン移行時に、手書きの静的ファイル内の絶対URLも合わせる ──────────
+// robots.txt（Sitemap 行）と llms.txt（各URL）は手で書いているため、SITE_URL を
+// 変えたときにここだけ旧ドメインのまま残ると、クローラーが旧URLを辿り続ける。
+// SITE_URL が既定と同じなら何もしない（＝通常のビルドでは差分が出ない）。
+if (SITE_URL !== DEFAULT_SITE_URL) {
+  for (const name of ['robots.txt', 'llms.txt']) {
+    const filePath = join(__dirname, '../public', name);
+    try {
+      const before = readFileSync(filePath, 'utf8');
+      const after = before.split(DEFAULT_SITE_URL).join(SITE_URL);
+      if (after !== before) {
+        writeFileSync(filePath, after, 'utf8');
+        console.log(`[generate-events-html] ${name} のドメインを ${SITE_URL} に更新`);
+      }
+    } catch { /* ファイルが無ければ何もしない */ }
+  }
+}

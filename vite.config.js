@@ -4,6 +4,8 @@ import { createRequire } from 'node:module';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+// 公開URLの唯一の出どころ（ドメイン移行は SITE_URL の設定だけで完了する）
+import { siteUrl, DEFAULT_SITE_URL } from './shared/siteUrl.cjs';
 
 // package.json からバージョンを読み取り、ビルド時に __APP_VERSION__ として埋め込む
 const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url)));
@@ -56,6 +58,28 @@ function sharedCjsDevInterop() {
         ].join('\n'),
         map: null,
       };
+    },
+  };
+}
+
+/**
+ * siteUrlInject — HTML 内の絶対URL（canonical / og:url / og:image / twitter:image）を
+ * 環境変数 SITE_URL のドメインへ差し替える。
+ *
+ * index.html には既定ドメインを書いたままにしておき、ビルド時にここで置換する。
+ * こうしておくとドメイン移行（例: .jp への移行）は SITE_URL を設定するだけで済み、
+ * HTML を書き換えて回る必要がない。SITE_URL 未設定なら何もしない（従来と同じ出力）。
+ */
+function siteUrlInject() {
+  const target = siteUrl(process.env);
+  return {
+    name: 'site-url-inject',
+    transformIndexHtml: {
+      order: 'pre',
+      handler(html) {
+        if (target === DEFAULT_SITE_URL) return html;
+        return html.split(DEFAULT_SITE_URL).join(target);
+      },
     },
   };
 }
@@ -126,6 +150,7 @@ export default defineConfig({
   },
   plugins: [
     react(),
+    siteUrlInject(),
     bootThemeInject(),
     sharedCjsDevInterop(),
     adminManifestSwap(),

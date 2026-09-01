@@ -499,7 +499,12 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 | `/api/admin/*`（管理） | サーバー側セッション認証（HttpOnly Cookie）＋ RBAC（deny-by-default）＋ スコープ強制＋ 監査ログ。下記参照 |
 
 - レートリミットは Upstash Redis（既存のKV）の INCR+TTL。Redis障害時はブロックしない（可用性優先）
-- 本番URLを変更（独自ドメイン化等）したら `api/_security.js` の `ALLOWED_ORIGINS` を更新すること
+- **本番URL（ドメイン）は `shared/siteUrl.cjs` が唯一の出どころ**。環境変数 `SITE_URL` を設定すると
+  canonical・OGP・sitemap・robots・llms・IndexNow・書き込みAPIの許可オリジンがすべて切り替わる。
+  コードにドメインを直書きしないこと（`shared/siteUrl.test.cjs` が直書きを検出して CI を落とす）。
+  ⚠ `vercel.json` の `Access-Control-Allow-Origin` だけは静的JSONのため手で直す（テストがズレを検出する）。
+  移行の手順・注意点（利用者の localStorage と Web Push 購読はオリジンが変わると失われる等）は
+  **`docs/DOMAIN_MIGRATION.md`** を参照
 
 ### 管理者認証・認可（2026-06-28 強化。詳細は SECURITY.md / OPERATIONS.md）
 - **総当り対策**: ログインは IP レート制限（10回/10分）＋**アカウント単位の指数バックオフ施錠**（5回失敗で5分→10分→20分→…最大60分。施錠中は資格情報を検証しない）。この施錠を迂回させないため、ヘッダ認証は既定で無効（上記 `LEGACY_HEADER_AUTH`）。認証を伴う管理APIには残らずレート制限を入れること（2026-08-26 に `presence` の抜けを追加）。
