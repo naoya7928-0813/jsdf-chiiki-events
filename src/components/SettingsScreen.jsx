@@ -554,6 +554,18 @@ export default function SettingsScreen({
                     <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>
                       {note.content}
                     </div>
+                    {/* 補足（機種によって動かない・条件付きで動く場合の注記）。
+                        本文と同じ大きさで並べると本文が2倍に見えるため、
+                        一段落として小さく淡く出す。 */}
+                    {note.note && (
+                      <div style={{
+                        display: 'flex', gap: 6, marginTop: 6,
+                        fontSize: 11.5, color: 'var(--text-muted)', lineHeight: 1.55,
+                      }}>
+                        <span aria-hidden="true" style={{ flexShrink: 0 }}>{ICO.warn('currentColor', 13)}</span>
+                        <span>{note.note}</span>
+                      </div>
+                    )}
                   </div>
                 );
               })}
