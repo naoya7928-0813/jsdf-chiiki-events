@@ -43,6 +43,8 @@ const { OcrModelResolver, isModelGoneError, discoverGroqModel, discoverGeminiMod
 const geocode             = require('./lib/geocode');
 // 募集案内所イベントのタイトル整形・非イベント判定（フロント/スクリプトと共通）
 const { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } = require('../shared/officeTitle.cjs');
+// 配信スロットに間に合わせる打ち切り（カットオフ）と、実行ごとの開始位置ずらし
+const { resolveDeadline, rotationOffset, keysNeedingCarryOver } = require('../shared/scrapeDeadline.cjs');
 // イベント名の品質管理（検証済み修正・整形・junk判定・年ズレ判定・重複統合）。最終出力の防御に使う
 const { applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, splitPlaceAddress, cleanTimeText, cleanDeadlineText, isJunkOrStubTitle, isSuspiciousTitle, isStaleDatedEvent, dedupEvents, isArchivableEvent, safeUrl } = require('../shared/titleQuality.cjs');
 // 受付終了/中止の状態判定・締切日解決（誤判定防止つき。shared/eventStatus.cjs）
@@ -839,6 +841,30 @@ async function structureOcrText(text, mode, engine, opts = {}) {
 }
 
 const OCR_STATS_PATH = path.join(__dirname, 'ocr-stats.json');
+// カットオフ（時間切れ打ち切り）の結果。ワークフローが実行サマリと管理者通知に使う
+const CUTOFF_REPORT_PATH = path.join(__dirname, 'cutoff-report.json');
+
+/** カットオフの結果を scraper/cutoff-report.json に書き出す */
+function writeCutoffReport(cutoff, skippedTasks) {
+  const report = {
+    enabled:  Boolean(cutoff && cutoff.enabled),
+    hit:      Boolean(cutoff && cutoff.hit),
+    deadline: cutoff && cutoff.deadlineMs ? new Date(cutoff.deadlineMs).toISOString() : null,
+    skippedPrefs: skippedTasks.map(t => ({ key: t.key, label: t.label })),
+    generatedAt: new Date().toISOString(),
+  };
+  try {
+    fs.writeFileSync(CUTOFF_REPORT_PATH, JSON.stringify(report, null, 2), 'utf8');
+  } catch (err) {
+    console.warn(`[カットオフ] レポート書き出し失敗: ${err.message}`);
+  }
+  if (report.hit) {
+    console.log(`[カットオフ] 時間切れで ${report.skippedPrefs.length} 地本を見送りました`
+      + `（${report.skippedPrefs.map(p => p.label).join('・') || 'なし'}）。見送った地本は前回データのままです`);
+  } else if (report.enabled) {
+    console.log('[カットオフ] 期限内に完了しました（打ち切りなし）');
+  }
+}
 
 /** OCR 稼働統計を scraper/ocr-stats.json に書き出し、サマリを標準出力にも出す */
 function writeOcrStats() {
@@ -3412,7 +3438,7 @@ async function ocrOfficeAssets(assets, meta, maxAssets = 2) {
  * HTML本文で日付とイベント語が取れるものはOCRなしで追加し、
  * PDF/画像チラシ候補だけ既存OCRパイプラインへ流す。
  */
-async function crawlNationwideOffices(withFreshContext) {
+async function crawlNationwideOffices(withFreshContext, cutoff) {
   if (!withFreshContext) return [];
   const pages = loadRecruitmentOfficePages({ excludePrefs: KANTO_PREFS });
   // 既定で全国全件巡回（OFFICE_CRAWL_MAX_PAGES 未指定なら全URLを対象にする）。
@@ -3430,6 +3456,12 @@ async function crawlNationwideOffices(withFreshContext) {
   console.log(`[OfficeOCR] 全国募集案内所 ${targetPages.length}/${pages.length} URLを巡回開始`);
   let index = 0;
   for (const meta of targetPages) {
+    // 配信スロットに間に合わせるための打ち切り。ここまでに拾えた案内所の分は
+    // そのまま使う（1拠点ごとに独立しているので途中で止めても壊れない）。
+    if (cutoff && cutoff.reached()) {
+      console.warn(`[OfficeOCR] 時間切れのため巡回を ${index}/${targetPages.length} で打ち切ります`);
+      break;
+    }
     index++;
     if (seenPages.has(meta.normalized)) continue;
     seenPages.add(meta.normalized);
@@ -3481,7 +3513,7 @@ async function crawlNationwideOffices(withFreshContext) {
  * 同一チラシは assetCache によりOCRが一度きりになるため、繰り返し巡回しても安価。
  * 戻り値: events[]（pref / source_type:'office_crawl' 付き）
  */
-async function crawlKantoOffices(withFreshContext) {
+async function crawlKantoOffices(withFreshContext, cutoff) {
   if (!await hasAnyOcrEngine()) {
     console.log('[KantoOffice] 利用可能なOCRエンジンがないためスキップ');
     return [];
@@ -3498,6 +3530,11 @@ async function crawlKantoOffices(withFreshContext) {
 
   const CRAWL_DELAY_MS = 3000; // 連続アクセスによる Cloudflare チャレンジ誘発を避ける
   for (const [pref, urls] of all) {
+    // 配信スロットの期限。ここまでに拾えた事務所の分はそのまま使う
+    if (cutoff && cutoff.reached()) {
+      console.warn('[KantoOffice] 時間切れのため巡回を打ち切ります');
+      break;
+    }
     const prefCode = pref.slice(0, 2);
     for (const url of urls) {
       visited++;
@@ -3567,7 +3604,7 @@ async function crawlKantoOffices(withFreshContext) {
  * 取得できなかった場合は「公式ページ参照」スタブイベントを生成する。
  * 戻り値: events[] (pref フィールド付き)
  */
-async function scrapeOfficeAssets(withFreshContext) {
+async function scrapeOfficeAssets(withFreshContext, cutoff) {
   if (!await hasAnyOcrEngine()) {
     console.log('[OfficeOCR] 利用可能なOCRエンジンがないためスキップ');
     return { events: [], exploredHqPrefs: new Set() };
@@ -3616,12 +3653,8 @@ async function scrapeOfficeAssets(withFreshContext) {
   } else if (hqEntries.length > 1) {
     // 時間上限内で全地本を回りきれないため、開始位置を実行ごとにローテーションする。
     // 固定順（北→南）だと毎回同じ地点で打ち切られ、西日本のHQが一度も探索されない。
-    // GitHub Actions では実行ごとに増える GITHUB_RUN_NUMBER を使い17ずつ進める
-    // （17は50と互いに素 → 1日3回で全50地本をカバー。cron遅延でも衝突しない）。
-    // ローカル等では8時間窓ベースにフォールバック。
-    const runSeq = Number.parseInt(process.env.GITHUB_RUN_NUMBER || '', 10);
-    const base   = Number.isFinite(runSeq) ? runSeq : Math.floor(Date.now() / (8 * 3600 * 1000));
-    const offset = (base * 17) % hqEntries.length;
+    // ずらし方は地本ループと同じ shared/scrapeDeadline.cjs の rotationOffset に集約。
+    const offset = rotationOffset(hqEntries.length, { runNumber: process.env.GITHUB_RUN_NUMBER });
     hqEntries = [...hqEntries.slice(offset), ...hqEntries.slice(0, offset)];
     console.log(`[OfficeOCR] HQ探索の開始位置: ${offset}番目（${hqEntries[0].name}）から`);
   }
@@ -3629,6 +3662,11 @@ async function scrapeOfficeAssets(withFreshContext) {
   for (const hq of hqEntries) {
     if (Date.now() - exploreStart > EXPLORE_TIMEOUT_MS) {
       console.log('[OfficeOCR] 時間上限に達したため探索を中断します');
+      break;
+    }
+    // 探索そのものの上限（25分）とは別に、配信スロットの期限でも打ち切る
+    if (cutoff && cutoff.reached()) {
+      console.warn('[OfficeOCR] 時間切れのため HQ 探索を打ち切ります');
       break;
     }
     console.log(`[OfficeOCR] 探索: ${hq.name} (${hq.pref}) ${hq.url}`);
@@ -3736,6 +3774,129 @@ async function scrapeOfficeAssets(withFreshContext) {
 
 // ── メイン処理 ───────────────────────────────────────────────
 
+/** PREF_TASKS を今回の開始位置から並べ替える（ずらし方は shared/scrapeDeadline.cjs） */
+function rotateTasks(tasks) {
+  const offset = rotationOffset(tasks.length, { runNumber: process.env.GITHUB_RUN_NUMBER });
+  if (!offset) return tasks;
+  const rotated = [...tasks.slice(offset), ...tasks.slice(0, offset)];
+  console.log(`[順番] 今回は「${rotated[0].label}」から開始します（${offset}番目。時間切れの偏りを防ぐため実行ごとにずらす）`);
+  return rotated;
+}
+
+// ── 配信スロットに間に合わせるための打ち切り（カットオフ） ──────────
+// 期限は shared/scrapeDeadline.cjs が cron から決める。
+// 期限が無い（手動実行・起動が遅すぎる）場合は無効になり、従来どおり最後まで走る。
+function createCutoff() {
+  const override = Number.parseInt(process.env.SCRAPE_DEADLINE_EPOCH || '', 10);
+  let deadlineMs = Number.isFinite(override) && override > 0 ? override : null;
+  let info = null;
+
+  if (deadlineMs === null) {
+    info = resolveDeadline({ schedule: process.env.SCRAPE_SCHEDULE || '', nowMs: Date.now() });
+    deadlineMs = info.deadlineMs;
+  }
+
+  if (deadlineMs === null) {
+    const why = info && info.reason === 'too-late'
+      ? `起動が遅く残り ${Math.round(info.availableMinutes)} 分しかないため（打ち切ると更新できる地本がわずかで、定刻を守る意味がない）`
+      : '狙う配信スロットが無いため（手動実行など）';
+    console.log(`[カットオフ] 無効: ${why}。最後まで実行します`);
+    return { enabled: false, deadlineMs: null, hit: false, reached: () => false };
+  }
+
+  const state = {
+    enabled: true,
+    deadlineMs,
+    hit: false,
+    reached() {
+      if (Date.now() < deadlineMs) return false;
+      if (!state.hit) {
+        state.hit = true;
+        console.warn(`[カットオフ] 期限（JST ${jstHm(deadlineMs)}）に達しました。ここまでの結果で公開します`);
+      }
+      return true;
+    },
+  };
+  const left = Math.round((deadlineMs - Date.now()) / 60000);
+  console.log(`[カットオフ] 期限 JST ${jstHm(deadlineMs)}（あと約 ${left} 分）まで取得し、間に合わない分は前回データを維持します`);
+  return state;
+}
+
+/** epoch(ms) を JST の HH:MM で表示する（ログ用） */
+function jstHm(ms) {
+  return new Date(ms + 9 * 3600 * 1000).toISOString().slice(11, 16);
+}
+
+// ── 地本の取得タスク一覧 ────────────────────────────────────────
+// 以前は50地本ぶんの try/catch を直線的に並べていた。次の2つのために、
+// 順番に並べた表にして1本のループで回す形へ変えた（並び順は従来と同一）。
+//   ・時間切れになったらそこで打ち切れる（shared/scrapeDeadline.cjs のカットオフ）
+//   ・実行ごとに開始位置をずらせる（打ち切りが常に同じ地本に当たるのを防ぐ）
+//
+// run は地本ごとの取得処理。既定では地本ごとに新しいブラウザコンテキストを渡す
+// （共有セッションだと Cloudflare に検知されるため）。iCal のようにブラウザが
+// 要らないものは noBrowser: true を付けて、無駄なコンテキスト生成を避ける。
+const PREF_TASKS = [
+  // 北海道
+  { key: 'sapporo',   label: '札幌',  run: ctx => fetchSapporo(ctx) },
+  { key: 'asahikawa', label: '旭川',  run: ctx => fetchHtmlPref(ctx, '旭川', URLS.asahikawa, parseAsahikawa) },
+  { key: 'obihiro',   label: '帯広',  run: ctx => fetchHtmlPref(ctx, '帯広', URLS.obihiro, parseObihiro) },
+  { key: 'hakodate',  label: '函館',  run: ctx => fetchHtmlPref(ctx, '函館', URLS.hakodate, parseHakodate) },
+  // 東北
+  { key: 'miyagi',    label: '宮城',  run: ctx => fetchMiyagi(ctx) },
+  { key: 'aomori',    label: '青森',  run: ctx => fetchAomori(ctx) },
+  { key: 'iwate',     label: '岩手',  run: ctx => fetchIwate(ctx) },
+  { key: 'yamagata',  label: '山形',  run: ctx => fetchYamagata(ctx) },
+  { key: 'fukushima', label: '福島',  run: ctx => fetchFukushima(ctx) },
+  { key: 'akita',     label: '秋田',  noBrowser: true, run: () => fetchAkita() },
+  // 関東
+  { key: 'kanagawa',  label: '神奈川', run: ctx => fetchKanagawa(ctx) },
+  { key: 'tokyo',     label: '東京',  run: ctx => fetchTokyo(ctx) },
+  { key: 'saitama',   label: '埼玉',  run: ctx => fetchSaitama(ctx) },
+  { key: 'gunma',     label: '群馬',  run: ctx => fetchGunma(ctx) },
+  { key: 'ibaraki',   label: '茨城',  run: ctx => fetchIbaraki(ctx) },
+  { key: 'chiba',     label: '千葉',  run: ctx => fetchChiba(ctx) },
+  { key: 'tochigi',   label: '栃木',  run: ctx => fetchTochigi(ctx) },
+  // 中部
+  { key: 'niigata',   label: '新潟',  run: ctx => fetchNiigata(ctx) },
+  { key: 'toyama',    label: '富山',  run: ctx => fetchToyama(ctx) },
+  { key: 'ishikawa',  label: '石川',  run: ctx => fetchIshikawa(ctx) },
+  { key: 'fukui',     label: '福井',  run: ctx => fetchFukui(ctx) },
+  { key: 'yamanashi', label: '山梨',  run: ctx => fetchYamanashi(ctx) },
+  { key: 'nagano',    label: '長野',  noBrowser: true, run: () => fetchNagano() },
+  { key: 'gifu',      label: '岐阜',  run: ctx => fetchGifu(ctx) },
+  { key: 'shizuoka',  label: '静岡',  run: ctx => fetchShizuoka(ctx) },
+  { key: 'aichi',     label: '愛知',  run: ctx => fetchAichi(ctx) },
+  // 近畿
+  { key: 'mie',       label: '三重',  run: ctx => fetchMie(ctx) },
+  { key: 'shiga',     label: '滋賀',  run: ctx => fetchShiga(ctx) },
+  { key: 'kyoto',     label: '京都',  run: ctx => fetchKyoto(ctx) },
+  { key: 'osaka',     label: '大阪',  run: ctx => fetchOsaka(ctx) },
+  { key: 'hyogo',     label: '兵庫',  run: ctx => fetchHyogo(ctx) },
+  { key: 'nara',      label: '奈良',  run: ctx => fetchNara(ctx) },
+  { key: 'wakayama',  label: '和歌山', run: ctx => fetchWakayama(ctx) },
+  // 四国
+  { key: 'ehime',     label: '愛媛',  run: ctx => fetchHtmlPref(ctx, '愛媛', URLS.ehime, parseEhime) },
+  { key: 'kagawa',    label: '香川',  run: ctx => fetchHtmlPref(ctx, '香川', URLS.kagawa, parseKagawa) },
+  { key: 'kochi',     label: '高知',  run: ctx => fetchHtmlPref(ctx, '高知', URLS.kochi, parseKochi) },
+  { key: 'tokushima', label: '徳島',  run: ctx => fetchHtmlPref(ctx, '徳島', URLS.tokushima, parseTokushima) },
+  // 中国
+  { key: 'tottori',   label: '鳥取',  run: ctx => fetchHtmlPref(ctx, '鳥取', URLS.tottori, parseTottori) },
+  { key: 'shimane',   label: '島根',  run: ctx => fetchHtmlPref(ctx, '島根', URLS.shimane, parseShimane) },
+  { key: 'okayama',   label: '岡山',  run: ctx => fetchHtmlPref(ctx, '岡山', URLS.okayama, parseOkayama) },
+  { key: 'hiroshima', label: '広島',  run: ctx => fetchHiroshima(ctx) },
+  { key: 'yamaguchi', label: '山口',  run: ctx => fetchHtmlPref(ctx, '山口', URLS.yamaguchi, parseYamaguchi) },
+  // 九州・沖縄
+  { key: 'fukuoka',   label: '福岡',  run: ctx => fetchHtmlPref(ctx, '福岡', URLS.fukuoka, parseFukuoka) },
+  { key: 'saga',      label: '佐賀',  run: ctx => fetchHtmlPref(ctx, '佐賀', URLS.saga, parseSaga) },
+  { key: 'nagasaki',  label: '長崎',  run: ctx => fetchHtmlPref(ctx, '長崎', URLS.nagasaki, parseNagasaki) },
+  { key: 'kumamoto',  label: '熊本',  run: ctx => fetchHtmlPref(ctx, '熊本', URLS.kumamoto, parseKumamoto) },
+  { key: 'oita',      label: '大分',  run: ctx => fetchHtmlPref(ctx, '大分', URLS.oita, parseOita) },
+  { key: 'miyazaki',  label: '宮崎',  run: ctx => fetchHtmlPref(ctx, '宮崎', URLS.miyazaki, parseMiyazaki) },
+  { key: 'kagoshima', label: '鹿児島', run: ctx => fetchHtmlPref(ctx, '鹿児島', URLS.kagoshima, parseKagoshima) },
+  { key: 'okinawa',   label: '沖縄',  run: ctx => fetchHtmlPref(ctx, '沖縄', URLS.okinawa, parseOkinawa) },
+];
+
 async function main() {
   const isMock = process.argv.includes('--mock');
 
@@ -3749,117 +3910,18 @@ async function main() {
   }
 
   // ── 実スクレイピングモード ──
-  let sapporoEvents   = [];
-  let asahikawaEvents = [];
-  let obihiroEvents   = [];
-  let hakodateEvents  = [];
-  let miyagiEvents    = [];
-  let aomoriEvents    = [];
-  let iwateEvents     = [];
-  let yamagataEvents  = [];
-  let fukushimaEvents = [];
-  let akitaEvents     = [];
-  let kanagawaEvents  = [];
-  let tokyoEvents     = [];
-  let saitamaEvents   = [];
-  let gunmaEvents     = [];
-  let tochigiEvents   = [];
-  let ibarakiEvents   = [];
-  let chibaEvents     = [];
-  let niigataEvents   = [];
-  let toyamaEvents    = [];
-  let ishikawaEvents  = [];
-  let fukuiEvents     = [];
-  let yamanashiEvents = [];
-  let naganoEvents    = [];
-  let gifuEvents      = [];
-  let shizuokaEvents  = [];
-  let aichiEvents     = [];
-  // 近畿地本
-  let mieEvents       = [];
-  let shigaEvents     = [];
-  let kyotoEvents     = [];
-  let osakaEvents     = [];
-  let hyogoEvents     = [];
-  let naraEvents      = [];
-  let wakayamaEvents  = [];
-  // 四国地本
-  let ehimeEvents     = [];
-  let kagawaEvents    = [];
-  let kochiEvents     = [];
-  let tokushimaEvents = [];
-  // 中国地本
-  let tottoriEvents   = [];
-  let shimaneEvents   = [];
-  let okayamaEvents   = [];
-  let hiroshimaEvents = [];
-  let yamaguchiEvents = [];
-  // 九州・沖縄地本
-  let fukuokaEvents   = [];
-  let sagaEvents      = [];
-  let nagasakiEvents  = [];
-  let kumamotoEvents  = [];
-  let oitaEvents      = [];
-  let miyazakiEvents  = [];
-  let kagoshimaEvents = [];
-  let okinawaEvents   = [];
+  // 地本ごとの取得結果と失敗フラグ（キーは PREF_TASKS の key）
+  const prefEvents = {};
+  const prefErrors = {};
+  for (const t of PREF_TASKS) { prefEvents[t.key] = []; prefErrors[t.key] = false; }
+  // 時間切れで取得しなかった地本（失敗とは区別してログ・サマリに出す）
+  const prefSkipped = [];
+  // 配信スロットに間に合わせるための打ち切り
+  const cutoff = createCutoff();
+
   let officeEvents    = [];
   let hqExploredPrefs = new Set(); // このrunでHQ探索した地本（未探索地本は前回officeイベントを維持）
   let kantoOfficeEvents = [];
-  let sapporoError   = false;
-  let asahikawaError = false;
-  let obihiroError   = false;
-  let hakodateError  = false;
-  let miyagiError    = false;
-  let aomoriError    = false;
-  let iwateError     = false;
-  let yamagataError  = false;
-  let fukushimaError = false;
-  let akitaError     = false;
-  let kanagawaError   = false;
-  let tokyoError      = false;
-  let saitamaError    = false;
-  let gunmaError      = false;
-  let tochigiError    = false;
-  let ibarakiError    = false;
-  let chibaError      = false;
-  let niigataError    = false;
-  let toyamaError     = false;
-  let ishikawaError   = false;
-  let fukuiError      = false;
-  let yamanashiError  = false;
-  let naganoError     = false;
-  let gifuError       = false;
-  let shizuokaError   = false;
-  let aichiError      = false;
-  // 近畿地本
-  let mieError        = false;
-  let shigaError      = false;
-  let kyotoError      = false;
-  let osakaError      = false;
-  let hyogoError      = false;
-  let naraError       = false;
-  let wakayamaError   = false;
-  // 四国地本
-  let ehimeError      = false;
-  let kagawaError     = false;
-  let kochiError      = false;
-  let tokushimaError  = false;
-  // 中国地本
-  let tottoriError    = false;
-  let shimaneError    = false;
-  let okayamaError    = false;
-  let hiroshimaError  = false;
-  let yamaguchiError  = false;
-  // 九州・沖縄地本
-  let fukuokaError    = false;
-  let sagaError       = false;
-  let nagasakiError   = false;
-  let kumamotoError   = false;
-  let oitaError       = false;
-  let miyazakiError   = false;
-  let kagoshimaError  = false;
-  let okinawaError    = false;
 
   const isLinux = process.platform === 'linux';
   const browser = await chromium.launch({
@@ -3880,518 +3942,41 @@ async function main() {
   }
 
   try {
-    // ── 北海道地本 ──
-    try {
-      sapporoEvents = await withFreshContext(ctx => fetchSapporo(ctx));
-    } catch (err) {
-      console.error(`[札幌] 取得失敗: ${err.message}`);
-      sapporoError = true;
+    // ── 地本を順に取得（時間切れなら打ち切り） ──────────────
+    // 開始位置は実行ごとにずらす。固定順のままだと打ち切りが常に後半
+    // （九州・沖縄）に当たり、そこだけ更新されなくなるため。
+    const order = rotateTasks(PREF_TASKS);
+    for (let i = 0; i < order.length; i++) {
+      const task = order[i];
+      if (cutoff.reached()) {
+        // 残りは前回データを引き継ぐ（取得失敗時と同じ扱い＝イベントは消えない）
+        prefSkipped.push(...order.slice(i));
+        console.warn(`[カットオフ] 時間切れのため残り ${order.length - i} 地本を見送ります: ${prefSkipped.map(t => t.label).join('・')}`);
+        break;
+      }
+      if (i > 0) {
+        console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
+        await sleep(BETWEEN_PAGES_MS);
+      }
+      try {
+        prefEvents[task.key] = task.noBrowser
+          ? await task.run()
+          : await withFreshContext(ctx => task.run(ctx));
+      } catch (err) {
+        console.error(`[${task.label}] 取得失敗: ${err.message}`);
+        prefErrors[task.key] = true;
+      }
     }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      asahikawaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '旭川', URLS.asahikawa, parseAsahikawa));
-    } catch (err) {
-      console.error(`[旭川] 取得失敗: ${err.message}`);
-      asahikawaError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      obihiroEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '帯広', URLS.obihiro, parseObihiro));
-    } catch (err) {
-      console.error(`[帯広] 取得失敗: ${err.message}`);
-      obihiroError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    // 函館はInstagram移行のため空配列（パーサーが [] を返す）
-    try {
-      hakodateEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '函館', URLS.hakodate, parseHakodate));
-    } catch (err) {
-      console.error(`[函館] 取得失敗: ${err.message}`);
-      hakodateError = true;
-    }
-
-    // ── 東北地本 ──
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      miyagiEvents = await withFreshContext(ctx => fetchMiyagi(ctx));
-    } catch (err) {
-      console.error(`[宮城] 取得失敗: ${err.message}`);
-      miyagiError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      aomoriEvents = await withFreshContext(ctx => fetchAomori(ctx));
-    } catch (err) {
-      console.error(`[青森] 取得失敗: ${err.message}`);
-      aomoriError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      iwateEvents = await withFreshContext(ctx => fetchIwate(ctx));
-    } catch (err) {
-      console.error(`[岩手] 取得失敗: ${err.message}`);
-      iwateError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      yamagataEvents = await withFreshContext(ctx => fetchYamagata(ctx));
-    } catch (err) {
-      console.error(`[山形] 取得失敗: ${err.message}`);
-      yamagataError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      fukushimaEvents = await withFreshContext(ctx => fetchFukushima(ctx));
-    } catch (err) {
-      console.error(`[福島] 取得失敗: ${err.message}`);
-      fukushimaError = true;
-    }
-
-    // 秋田は iCal fetch（Playwright 不要）
-    try {
-      akitaEvents = await fetchAkita();
-    } catch (err) {
-      console.error(`[秋田] 取得失敗: ${err.message}`);
-      akitaError = true;
-    }
-
-    // ── 関東地本 ──
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      kanagawaEvents = await withFreshContext(ctx => fetchKanagawa(ctx));
-    } catch (err) {
-      console.error(`[神奈川] 取得失敗: ${err.message}`);
-      kanagawaError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      tokyoEvents = await withFreshContext(ctx => fetchTokyo(ctx));
-    } catch (err) {
-      console.error(`[東京] 取得失敗: ${err.message}`);
-      tokyoError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      saitamaEvents = await withFreshContext(ctx => fetchSaitama(ctx));
-    } catch (err) {
-      console.error(`[埼玉] 取得失敗: ${err.message}`);
-      saitamaError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      gunmaEvents = await withFreshContext(ctx => fetchGunma(ctx));
-    } catch (err) {
-      console.error(`[群馬] 取得失敗: ${err.message}`);
-      gunmaError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      ibarakiEvents = await withFreshContext(ctx => fetchIbaraki(ctx));
-    } catch (err) {
-      console.error(`[茨城] 取得失敗: ${err.message}`);
-      ibarakiError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      chibaEvents = await withFreshContext(ctx => fetchChiba(ctx));
-    } catch (err) {
-      console.error(`[千葉] 取得失敗: ${err.message}`);
-      chibaError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      tochigiEvents = await withFreshContext(ctx => fetchTochigi(ctx));
-    } catch (err) {
-      console.error(`[栃木] 取得失敗: ${err.message}`);
-      tochigiError = true;
-    }
-
-    // ── 中部地本 ──
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      niigataEvents = await withFreshContext(ctx => fetchNiigata(ctx));
-    } catch (err) {
-      console.error(`[新潟] 取得失敗: ${err.message}`);
-      niigataError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      toyamaEvents = await withFreshContext(ctx => fetchToyama(ctx));
-    } catch (err) {
-      console.error(`[富山] 取得失敗: ${err.message}`);
-      toyamaError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      ishikawaEvents = await withFreshContext(ctx => fetchIshikawa(ctx));
-    } catch (err) {
-      console.error(`[石川] 取得失敗: ${err.message}`);
-      ishikawaError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      fukuiEvents = await withFreshContext(ctx => fetchFukui(ctx));
-    } catch (err) {
-      console.error(`[福井] 取得失敗: ${err.message}`);
-      fukuiError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      yamanashiEvents = await withFreshContext(ctx => fetchYamanashi(ctx));
-    } catch (err) {
-      console.error(`[山梨] 取得失敗: ${err.message}`);
-      yamanashiError = true;
-    }
-
-    // 長野は iCal fetch（Playwright 不要）
-    try {
-      naganoEvents = await fetchNagano();
-    } catch (err) {
-      console.error(`[長野] 取得失敗: ${err.message}`);
-      naganoError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      gifuEvents = await withFreshContext(ctx => fetchGifu(ctx));
-    } catch (err) {
-      console.error(`[岐阜] 取得失敗: ${err.message}`);
-      gifuError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      shizuokaEvents = await withFreshContext(ctx => fetchShizuoka(ctx));
-    } catch (err) {
-      console.error(`[静岡] 取得失敗: ${err.message}`);
-      shizuokaError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      aichiEvents = await withFreshContext(ctx => fetchAichi(ctx));
-    } catch (err) {
-      console.error(`[愛知] 取得失敗: ${err.message}`);
-      aichiError = true;
-    }
-
-    // ── 近畿地本 ──
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      mieEvents = await withFreshContext(ctx => fetchMie(ctx));
-    } catch (err) {
-      console.error(`[三重] 取得失敗: ${err.message}`);
-      mieError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      shigaEvents = await withFreshContext(ctx => fetchShiga(ctx));
-    } catch (err) {
-      console.error(`[滋賀] 取得失敗: ${err.message}`);
-      shigaError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      kyotoEvents = await withFreshContext(ctx => fetchKyoto(ctx));
-    } catch (err) {
-      console.error(`[京都] 取得失敗: ${err.message}`);
-      kyotoError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      osakaEvents = await withFreshContext(ctx => fetchOsaka(ctx));
-    } catch (err) {
-      console.error(`[大阪] 取得失敗: ${err.message}`);
-      osakaError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      hyogoEvents = await withFreshContext(ctx => fetchHyogo(ctx));
-    } catch (err) {
-      console.error(`[兵庫] 取得失敗: ${err.message}`);
-      hyogoError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      naraEvents = await withFreshContext(ctx => fetchNara(ctx));
-    } catch (err) {
-      console.error(`[奈良] 取得失敗: ${err.message}`);
-      naraError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      wakayamaEvents = await withFreshContext(ctx => fetchWakayama(ctx));
-    } catch (err) {
-      console.error(`[和歌山] 取得失敗: ${err.message}`);
-      wakayamaError = true;
-    }
-
-    // ── 四国地本 ──
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      ehimeEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '愛媛', URLS.ehime, parseEhime));
-    } catch (err) {
-      console.error(`[愛媛] 取得失敗: ${err.message}`);
-      ehimeError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      kagawaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '香川', URLS.kagawa, parseKagawa));
-    } catch (err) {
-      console.error(`[香川] 取得失敗: ${err.message}`);
-      kagawaError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      kochiEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '高知', URLS.kochi, parseKochi));
-    } catch (err) {
-      console.error(`[高知] 取得失敗: ${err.message}`);
-      kochiError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      tokushimaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '徳島', URLS.tokushima, parseTokushima));
-    } catch (err) {
-      console.error(`[徳島] 取得失敗: ${err.message}`);
-      tokushimaError = true;
-    }
-
-    // ── 中国地本 ──
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      tottoriEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '鳥取', URLS.tottori, parseTottori));
-    } catch (err) {
-      console.error(`[鳥取] 取得失敗: ${err.message}`);
-      tottoriError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      shimaneEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '島根', URLS.shimane, parseShimane));
-    } catch (err) {
-      console.error(`[島根] 取得失敗: ${err.message}`);
-      shimaneError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      okayamaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '岡山', URLS.okayama, parseOkayama));
-    } catch (err) {
-      console.error(`[岡山] 取得失敗: ${err.message}`);
-      okayamaError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      hiroshimaEvents = await withFreshContext(ctx => fetchHiroshima(ctx));
-    } catch (err) {
-      console.error(`[広島] 取得失敗: ${err.message}`);
-      hiroshimaError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      yamaguchiEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '山口', URLS.yamaguchi, parseYamaguchi));
-    } catch (err) {
-      console.error(`[山口] 取得失敗: ${err.message}`);
-      yamaguchiError = true;
-    }
-
-    // ── 九州・沖縄地本 ──
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      fukuokaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '福岡', URLS.fukuoka, parseFukuoka));
-    } catch (err) {
-      console.error(`[福岡] 取得失敗: ${err.message}`);
-      fukuokaError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      sagaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '佐賀', URLS.saga, parseSaga));
-    } catch (err) {
-      console.error(`[佐賀] 取得失敗: ${err.message}`);
-      sagaError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      nagasakiEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '長崎', URLS.nagasaki, parseNagasaki));
-    } catch (err) {
-      console.error(`[長崎] 取得失敗: ${err.message}`);
-      nagasakiError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      kumamotoEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '熊本', URLS.kumamoto, parseKumamoto));
-    } catch (err) {
-      console.error(`[熊本] 取得失敗: ${err.message}`);
-      kumamotoError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      oitaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '大分', URLS.oita, parseOita));
-    } catch (err) {
-      console.error(`[大分] 取得失敗: ${err.message}`);
-      oitaError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      miyazakiEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '宮崎', URLS.miyazaki, parseMiyazaki));
-    } catch (err) {
-      console.error(`[宮崎] 取得失敗: ${err.message}`);
-      miyazakiError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      kagoshimaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '鹿児島', URLS.kagoshima, parseKagoshima));
-    } catch (err) {
-      console.error(`[鹿児島] 取得失敗: ${err.message}`);
-      kagoshimaError = true;
-    }
-
-    console.log(`[wait] ${BETWEEN_PAGES_MS / 1000} 秒待機...`);
-    await sleep(BETWEEN_PAGES_MS);
-
-    try {
-      okinawaEvents = await withFreshContext(ctx => fetchHtmlPref(ctx, '沖縄', URLS.okinawa, parseOkinawa));
-    } catch (err) {
-      console.error(`[沖縄] 取得失敗: ${err.message}`);
-      okinawaError = true;
-    }
-
     // ── 募集案内所ページから PDF/画像 OCR でイベントを収集 ────────
     // browser.close() の前に呼ぶ必要あり（Playwright が必要なため）
     console.log('[wait] 募集案内所探索を開始します...');
-    const officeScrape = await scrapeOfficeAssets(withFreshContext);
+    const officeScrape = await scrapeOfficeAssets(withFreshContext, cutoff);
     officeEvents    = officeScrape.events;
     hqExploredPrefs = officeScrape.exploredHqPrefs;
     try {
       officeEvents = [
         ...officeEvents,
-        ...await crawlNationwideOffices(withFreshContext),
+        ...await crawlNationwideOffices(withFreshContext, cutoff),
       ];
     } catch (err) {
       console.warn(`[OfficeOCR] 全国募集案内所巡回失敗: ${err.message}`);
@@ -4399,7 +3984,7 @@ async function main() {
 
     // ── 関東 各事務所ページの先回り巡回（中央未掲載イベントの収集）──
     try {
-      kantoOfficeEvents = await crawlKantoOffices(withFreshContext);
+      kantoOfficeEvents = await crawlKantoOffices(withFreshContext, cutoff);
     } catch (err) {
       console.warn(`[KantoOffice] 巡回失敗: ${err.message}`);
     }
@@ -4408,20 +3993,16 @@ async function main() {
   }
 
   // 全地本エラーの場合のみ終了
-  const allErrors = [
-    sapporoError, asahikawaError, obihiroError, hakodateError,
-    miyagiError, aomoriError, iwateError, yamagataError, fukushimaError, akitaError,
-    kanagawaError, tokyoError, saitamaError, gunmaError, ibarakiError, chibaError, tochigiError,
-    niigataError, toyamaError, ishikawaError, fukuiError, yamanashiError, naganoError,
-    gifuError, shizuokaError, aichiError,
-    mieError, shigaError, kyotoError, osakaError, hyogoError, naraError, wakayamaError,
-    ehimeError, kagawaError, kochiError, tokushimaError,
-    tottoriError, shimaneError, okayamaError, hiroshimaError, yamaguchiError,
-    fukuokaError, sagaError, nagasakiError, kumamotoError, oitaError,
-    miyazakiError, kagoshimaError, okinawaError,
-  ];
-  if (allErrors.every(Boolean)) {
-    console.warn('[警告] 全地本ともに取得エラーが発生しました。ファイルを更新しません。');
+  // 取得を試みた地本が全滅した場合のみ中止する。
+  // 時間切れで見送った地本（prefSkipped）は「失敗」ではないので数に入れない
+  // （カットオフ直後に打ち切られただけで全滅と誤判定しないため）。
+  const attempted = PREF_TASKS.filter(t => !prefSkipped.includes(t));
+  if (attempted.length > 0 && attempted.every(t => prefErrors[t.key])) {
+    console.warn('[警告] 取得を試みた全地本でエラーが発生しました。ファイルを更新しません。');
+    process.exit(1);
+  }
+  if (attempted.length === 0) {
+    console.warn('[警告] 時間切れで1地本も取得できませんでした。ファイルを更新しません。');
     process.exit(1);
   }
 
@@ -4452,140 +4033,44 @@ async function main() {
     if (kept) console.log(`[OfficeOCR] HQ未探索地本の前回officeイベント ${kept} 件を維持`);
   }
 
-  const fallback = (flag, label, events, key) => {
-    if (!flag) return events;
-    console.warn(`[${label}] エラーのため前回データを維持します`);
-    return prev[key] ?? [];
-  };
-
-  sapporoEvents   = fallback(sapporoError,   '札幌',   sapporoEvents,   'sapporo');
-  asahikawaEvents = fallback(asahikawaError, '旭川',   asahikawaEvents, 'asahikawa');
-  obihiroEvents   = fallback(obihiroError,   '帯広',   obihiroEvents,   'obihiro');
-  hakodateEvents  = fallback(hakodateError,  '函館',   hakodateEvents,  'hakodate');
-  miyagiEvents    = fallback(miyagiError,    '宮城',   miyagiEvents,    'miyagi');
-  aomoriEvents    = fallback(aomoriError,    '青森',   aomoriEvents,    'aomori');
-  iwateEvents     = fallback(iwateError,     '岩手',   iwateEvents,     'iwate');
-  yamagataEvents  = fallback(yamagataError,  '山形',   yamagataEvents,  'yamagata');
-  fukushimaEvents = fallback(fukushimaError, '福島',   fukushimaEvents, 'fukushima');
-  akitaEvents     = fallback(akitaError,     '秋田',   akitaEvents,     'akita');
-  kanagawaEvents  = fallback(kanagawaError,  '神奈川', kanagawaEvents,  'kanagawa');
-  tokyoEvents     = fallback(tokyoError,     '東京',   tokyoEvents,     'tokyo');
-  saitamaEvents   = fallback(saitamaError,   '埼玉',   saitamaEvents,   'saitama');
-  gunmaEvents     = fallback(gunmaError,     '群馬',   gunmaEvents,     'gunma');
-  ibarakiEvents   = fallback(ibarakiError,   '茨城',   ibarakiEvents,   'ibaraki');
-  chibaEvents     = fallback(chibaError,     '千葉',   chibaEvents,     'chiba');
-  tochigiEvents   = fallback(tochigiError,   '栃木',   tochigiEvents,   'tochigi');
-  niigataEvents   = fallback(niigataError,   '新潟',   niigataEvents,   'niigata');
-  toyamaEvents    = fallback(toyamaError,    '富山',   toyamaEvents,    'toyama');
-  ishikawaEvents  = fallback(ishikawaError,  '石川',   ishikawaEvents,  'ishikawa');
-  fukuiEvents     = fallback(fukuiError,     '福井',   fukuiEvents,     'fukui');
-  yamanashiEvents = fallback(yamanashiError, '山梨',   yamanashiEvents, 'yamanashi');
-  naganoEvents    = fallback(naganoError,    '長野',   naganoEvents,    'nagano');
-  gifuEvents      = fallback(gifuError,      '岐阜',   gifuEvents,      'gifu');
-  shizuokaEvents  = fallback(shizuokaError,  '静岡',   shizuokaEvents,  'shizuoka');
-  aichiEvents     = fallback(aichiError,     '愛知',   aichiEvents,     'aichi');
-  mieEvents       = fallback(mieError,       '三重',   mieEvents,       'mie');
-  shigaEvents     = fallback(shigaError,     '滋賀',   shigaEvents,     'shiga');
-  kyotoEvents     = fallback(kyotoError,     '京都',   kyotoEvents,     'kyoto');
-  // 大阪: エラー時フォールバック＋準備中（0件）の場合も前回データを保持
-  osakaEvents = fallback(osakaError, '大阪', osakaEvents, 'osaka');
-  if (!osakaError && osakaEvents.length === 0 && (prev['osaka'] ?? []).length > 0) {
-    console.warn('[大阪] イベント0件（準備中）→ 前回データを維持');
-    osakaEvents = prev['osaka'] ?? [];
-  }
-  hyogoEvents     = fallback(hyogoError,     '兵庫',   hyogoEvents,     'hyogo');
-  naraEvents      = fallback(naraError,      '奈良',   naraEvents,      'nara');
-  wakayamaEvents  = fallback(wakayamaError,  '和歌山', wakayamaEvents,  'wakayama');
-
-  // ── 近畿WP系地本 + 京都: チラシ（PDF/画像）から日付・タイトルを OCR で補完 ──
-  // OCR全件失敗時は前回データを保持する（クォータ枯渇対策）
-  const enrichWithFallback = async (events, label, prevKey) => {
-    const hadStubs = events.some(e => e._flyerUrl);
-    const enriched = await enrichFromFlyer(events, label);
-    if (hadStubs && enriched.length === 0 && (prev[prevKey] ?? []).length > 0) {
-      console.warn(`[${label}] OCR全件失敗 → 前回データを維持 (${(prev[prevKey] ?? []).length}件)`);
-      return prev[prevKey] ?? [];
+  // ── 取得できなかった地本は前回データを維持する ────────────
+  // 「取得失敗」と「時間切れで見送り」は原因が違うだけで、扱いは同じ。
+  // ここで前回データに戻さないと、公開時にその地本のイベントが丸ごと消える。
+  {
+    const skippedKeys = prefSkipped.map(t => t.key);
+    const labels = Object.fromEntries(PREF_TASKS.map(t => [t.key, t.label]));
+    const carryOver = keysNeedingCarryOver({
+      keys: PREF_TASKS.map(t => t.key),
+      errors: prefErrors,
+      skippedKeys,
+    });
+    for (const key of carryOver) {
+      const why = skippedKeys.includes(key) ? '時間切れ' : 'エラー';
+      console.warn(`[${labels[key]}] ${why}のため前回データを維持します`);
+      prefEvents[key] = prev[key] ?? [];
     }
-    return enriched;
-  };
+  }
 
-  kyotoEvents    = await enrichWithFallback(kyotoEvents,    '京都',  'kyoto');
-  mieEvents      = await enrichWithFallback(mieEvents,      '三重',  'mie');
-  shigaEvents    = await enrichWithFallback(shigaEvents,    '滋賀',  'shiga');
-  naraEvents     = await enrichWithFallback(naraEvents,     '奈良',  'nara');
-  wakayamaEvents = await enrichWithFallback(wakayamaEvents, '和歌山','wakayama');
-  ehimeEvents     = fallback(ehimeError,     '愛媛',   ehimeEvents,     'ehime');
-  kagawaEvents    = fallback(kagawaError,    '香川',   kagawaEvents,    'kagawa');
-  kochiEvents     = fallback(kochiError,     '高知',   kochiEvents,     'kochi');
-  tokushimaEvents = fallback(tokushimaError, '徳島',   tokushimaEvents, 'tokushima');
-  tottoriEvents   = fallback(tottoriError,   '鳥取',   tottoriEvents,   'tottori');
-  shimaneEvents   = fallback(shimaneError,   '島根',   shimaneEvents,   'shimane');
-  okayamaEvents   = fallback(okayamaError,   '岡山',   okayamaEvents,   'okayama');
-  hiroshimaEvents = fallback(hiroshimaError, '広島',   hiroshimaEvents, 'hiroshima');
-  yamaguchiEvents = fallback(yamaguchiError, '山口',   yamaguchiEvents, 'yamaguchi');
-  fukuokaEvents   = fallback(fukuokaError,   '福岡',   fukuokaEvents,   'fukuoka');
-  sagaEvents      = fallback(sagaError,      '佐賀',   sagaEvents,      'saga');
-  nagasakiEvents  = fallback(nagasakiError,  '長崎',   nagasakiEvents,  'nagasaki');
-  kumamotoEvents  = fallback(kumamotoError,  '熊本',   kumamotoEvents,  'kumamoto');
-  oitaEvents      = fallback(oitaError,      '大分',   oitaEvents,      'oita');
-  miyazakiEvents  = fallback(miyazakiError,  '宮崎',   miyazakiEvents,  'miyazaki');
-  kagoshimaEvents = fallback(kagoshimaError, '鹿児島', kagoshimaEvents, 'kagoshima');
-  okinawaEvents   = fallback(okinawaError,   '沖縄',   okinawaEvents,   'okinawa');
-
-  // ── PDF OCR（ev.url が .pdf のイベントを対象） ──
-  iwateEvents  = await enrichWithPdfOcr(iwateEvents);
-  aomoriEvents = await enrichWithPdfOcr(aomoriEvents);
-
-  // ── 画像 OCR（全地本対象）──
-  // imageUrl または url が画像ファイルのイベントのみ実行。それ以外はパススルーで無害。
-  sapporoEvents   = await enrichWithOcr(sapporoEvents);
-  asahikawaEvents = await enrichWithOcr(asahikawaEvents);
-  obihiroEvents   = await enrichWithOcr(obihiroEvents);
-  hakodateEvents  = await enrichWithOcr(hakodateEvents);
-  miyagiEvents    = await enrichWithOcr(miyagiEvents);
-  yamagataEvents  = await enrichWithOcr(yamagataEvents);
-  fukushimaEvents = await enrichWithOcr(fukushimaEvents);
-  akitaEvents     = await enrichWithOcr(akitaEvents);
-  kanagawaEvents  = await enrichWithOcr(kanagawaEvents);
-  tokyoEvents     = await enrichWithOcr(tokyoEvents);
-  saitamaEvents   = await enrichWithOcr(saitamaEvents);
-  gunmaEvents     = await enrichWithOcr(gunmaEvents);
-  tochigiEvents   = await enrichWithOcr(tochigiEvents);
-  ibarakiEvents   = await enrichWithOcr(ibarakiEvents);
-  chibaEvents     = await enrichWithOcr(chibaEvents);
-  niigataEvents   = await enrichWithOcr(niigataEvents);
-  toyamaEvents    = await enrichWithOcr(toyamaEvents);
-  ishikawaEvents  = await enrichWithOcr(ishikawaEvents);
-  fukuiEvents     = await enrichWithOcr(fukuiEvents);
-  yamanashiEvents = await enrichWithOcr(yamanashiEvents);
-  naganoEvents    = await enrichWithOcr(naganoEvents);
-  gifuEvents      = await enrichWithOcr(gifuEvents);
-  shizuokaEvents  = await enrichWithOcr(shizuokaEvents);
-  aichiEvents     = await enrichWithOcr(aichiEvents);
-  mieEvents       = await enrichWithOcr(mieEvents);
-  shigaEvents     = await enrichWithOcr(shigaEvents);
-  kyotoEvents     = await enrichWithOcr(kyotoEvents);
-  osakaEvents     = await enrichWithOcr(osakaEvents);
-  hyogoEvents     = await enrichWithOcr(hyogoEvents);
-  naraEvents      = await enrichWithOcr(naraEvents);
-  wakayamaEvents  = await enrichWithOcr(wakayamaEvents);
-  ehimeEvents     = await enrichWithOcr(ehimeEvents);
-  kagawaEvents    = await enrichWithOcr(kagawaEvents);
-  kochiEvents     = await enrichWithOcr(kochiEvents);
-  tokushimaEvents = await enrichWithOcr(tokushimaEvents);
-  tottoriEvents   = await enrichWithOcr(tottoriEvents);
-  shimaneEvents   = await enrichWithOcr(shimaneEvents);
-  okayamaEvents   = await enrichWithOcr(okayamaEvents);
-  hiroshimaEvents = await enrichWithOcr(hiroshimaEvents);
-  yamaguchiEvents = await enrichWithOcr(yamaguchiEvents);
-  fukuokaEvents   = await enrichWithOcr(fukuokaEvents);
-  sagaEvents      = await enrichWithOcr(sagaEvents);
-  nagasakiEvents  = await enrichWithOcr(nagasakiEvents);
-  kumamotoEvents  = await enrichWithOcr(kumamotoEvents);
-  oitaEvents      = await enrichWithOcr(oitaEvents);
-  miyazakiEvents  = await enrichWithOcr(miyazakiEvents);
-  kagoshimaEvents = await enrichWithOcr(kagoshimaEvents);
-  okinawaEvents   = await enrichWithOcr(okinawaEvents);
+  // ── OCR による補完（PDF / 画像） ──────────────────────
+  // 岩手・青森は掲載が PDF 中心なので PDF から、それ以外は画像チラシから拾う。
+  // ここは1件ごとに OCR（と段1の LLM 整形）が走るため時間がかかる。
+  // 時間切れになったら、そこまで補完できた分で先へ進む
+  // （OCR は「あれば足す」処理なので、途中で止めても既存の情報は失われない）。
+  {
+    const PDF_OCR_PREFS = new Set(['iwate', 'aomori']);
+    let done = 0;
+    for (const t of PREF_TASKS) {
+      if (prefEvents[t.key].length === 0) continue;
+      if (cutoff.reached()) {
+        console.warn(`[カットオフ] 時間切れのため残り ${PREF_TASKS.length - done} 地本の OCR 補完を見送ります`);
+        break;
+      }
+      prefEvents[t.key] = PDF_OCR_PREFS.has(t.key)
+        ? await enrichWithPdfOcr(prefEvents[t.key])
+        : await enrichWithOcr(prefEvents[t.key]);
+      done++;
+    }
+  }
 
   // officeEvents は try ブロック内（browser.close前）で収集済み
 
@@ -4643,64 +4128,22 @@ async function main() {
   }
 
   const output = {
-    sapporo:   mergeAllOfficeEvents(sapporoEvents,   'sapporo').map(strip),
-    asahikawa: mergeAllOfficeEvents(asahikawaEvents, 'asahikawa').map(strip),
-    obihiro:   mergeAllOfficeEvents(obihiroEvents,   'obihiro').map(strip),
-    hakodate:  mergeAllOfficeEvents(hakodateEvents,  'hakodate').map(strip),
-    miyagi:    mergeAllOfficeEvents(miyagiEvents,    'miyagi').map(strip),
-    aomori:    mergeAllOfficeEvents(aomoriEvents,    'aomori').map(strip),
-    iwate:     mergeAllOfficeEvents(iwateEvents,     'iwate').map(strip),
-    yamagata:  mergeAllOfficeEvents(yamagataEvents,  'yamagata').map(strip),
-    fukushima: mergeAllOfficeEvents(fukushimaEvents, 'fukushima').map(strip),
-    akita:     mergeAllOfficeEvents(akitaEvents,     'akita').map(strip),
-    kanagawa:  mergeAllOfficeEvents(kanagawaEvents,  'kanagawa').map(strip),
-    tokyo:     mergeAllOfficeEvents(tokyoEvents,     'tokyo').map(strip),
-    saitama:   mergeAllOfficeEvents(saitamaEvents,   'saitama').map(strip),
-    gunma:     mergeAllOfficeEvents(gunmaEvents,     'gunma').map(strip),
-    tochigi:   mergeAllOfficeEvents(tochigiEvents,   'tochigi').map(strip),
-    ibaraki:   mergeAllOfficeEvents(ibarakiEvents,   'ibaraki').map(strip),
-    chiba:     mergeAllOfficeEvents(chibaEvents,     'chiba').map(strip),
-    niigata:   mergeAllOfficeEvents(niigataEvents,   'niigata').map(strip),
-    toyama:    mergeAllOfficeEvents(toyamaEvents,    'toyama').map(strip),
-    ishikawa:  mergeAllOfficeEvents(ishikawaEvents,  'ishikawa').map(strip),
-    fukui:     mergeAllOfficeEvents(fukuiEvents,     'fukui').map(strip),
-    yamanashi: mergeAllOfficeEvents(yamanashiEvents, 'yamanashi').map(strip),
-    nagano:    mergeAllOfficeEvents(naganoEvents,    'nagano').map(strip),
-    gifu:      mergeAllOfficeEvents(gifuEvents,      'gifu').map(strip),
-    shizuoka:  mergeAllOfficeEvents(shizuokaEvents,  'shizuoka').map(strip),
-    aichi:     mergeAllOfficeEvents(aichiEvents,     'aichi').map(strip),
-    mie:       mergeAllOfficeEvents(mieEvents,       'mie').map(strip),
-    shiga:     mergeAllOfficeEvents(shigaEvents,     'shiga').map(strip),
-    kyoto:     mergeAllOfficeEvents(kyotoEvents,     'kyoto').map(strip),
-    osaka:     mergeAllOfficeEvents(osakaEvents,     'osaka').map(strip),
-    hyogo:     mergeAllOfficeEvents(hyogoEvents,     'hyogo').map(strip),
-    nara:      mergeAllOfficeEvents(naraEvents,      'nara').map(strip),
-    wakayama:  mergeAllOfficeEvents(wakayamaEvents,  'wakayama').map(strip),
-    ehime:     mergeAllOfficeEvents(ehimeEvents,     'ehime').map(strip),
-    kagawa:    mergeAllOfficeEvents(kagawaEvents,    'kagawa').map(strip),
-    kochi:     mergeAllOfficeEvents(kochiEvents,     'kochi').map(strip),
-    tokushima: mergeAllOfficeEvents(tokushimaEvents, 'tokushima').map(strip),
-    tottori:   mergeAllOfficeEvents(tottoriEvents,   'tottori').map(strip),
-    shimane:   mergeAllOfficeEvents(shimaneEvents,   'shimane').map(strip),
-    okayama:   mergeAllOfficeEvents(okayamaEvents,   'okayama').map(strip),
-    hiroshima: mergeAllOfficeEvents(hiroshimaEvents, 'hiroshima').map(strip),
-    yamaguchi: mergeAllOfficeEvents(yamaguchiEvents, 'yamaguchi').map(strip),
-    fukuoka:   mergeAllOfficeEvents(fukuokaEvents,   'fukuoka').map(strip),
-    saga:      mergeAllOfficeEvents(sagaEvents,      'saga').map(strip),
-    nagasaki:  mergeAllOfficeEvents(nagasakiEvents,  'nagasaki').map(strip),
-    kumamoto:  mergeAllOfficeEvents(kumamotoEvents,  'kumamoto').map(strip),
-    oita:      mergeAllOfficeEvents(oitaEvents,      'oita').map(strip),
-    miyazaki:  mergeAllOfficeEvents(miyazakiEvents,  'miyazaki').map(strip),
-    kagoshima: mergeAllOfficeEvents(kagoshimaEvents, 'kagoshima').map(strip),
-    okinawa:   mergeAllOfficeEvents(okinawaEvents,   'okinawa').map(strip),
+    // PREF_TASKS の並び（＝従来の出力順）でキーを組み立てる。
+    // 時間切れ・取得失敗の地本は prefEvents が空配列のままで、
+    // mergeAllOfficeEvents → writeOutput の「前回データ引き継ぎ」に乗る。
+    ...Object.fromEntries(PREF_TASKS.map(t =>
+      [t.key, mergeAllOfficeEvents(prefEvents[t.key], t.key).map(strip)]
+    )),
     updatedAt: nowJST(),
   };
   // OCRキャッシュを保存（スキャン済みURLを記録 → 次回以降の再スキャンを防ぐ）
   assetCache.save();
   // OCR層の稼働状況を書き出す（ワークフローの健全性チェックが読む）
   writeOcrStats();
+  // カットオフの結果を残す（ワークフローが実行サマリと管理者通知に使う）
+  writeCutoffReport(cutoff, prefSkipped);
 
-  await writeOutput(output);
+  await writeOutput(output, cutoff);
   // 段1〜3で使ったLLM結果を保存（次回は変化した分だけ呼ぶ）
   llmCache.save();
   llmClient.logStats();
@@ -4774,7 +4217,7 @@ async function recheckFromPrimarySource(ev, prefLabel, today) {
  * 全イベントに段2の検査をかけ、必要なものだけ段3で再検査する。
  * data は破壊的に更新する（修正の採用・検疫マークの付与）。
  */
-async function llmReviewEvents(data, today, cutoff = '0000-00-00') {
+async function llmReviewEvents(data, today, keepFrom = '0000-00-00', timeCutoff = null) {
   const outcome = {
     checked: 0, flagged: 0, attempted: 0, corrected: 0,
     unverified: 0, noSource: 0, overBudget: 0, changes: [],
@@ -4793,7 +4236,7 @@ async function llmReviewEvents(data, today, cutoff = '0000-00-00') {
       const ev = list[i];
       if (!ev || !ev.title) continue;
       // 終了から1週間を過ぎたものはこの後の公開判定で削除される。再検査の予算を使わない
-      if ((ev.endDate || ev.date || '') < cutoff) continue;
+      if ((ev.endDate || ev.date || '') < keepFrom) continue;
       outcome.checked++;
 
       const verdict = decideRecheck(ev);
@@ -4802,6 +4245,12 @@ async function llmReviewEvents(data, today, cutoff = '0000-00-00') {
 
       if (!verdict.hasSource) { outcome.noSource++; continue; }
       if (budget <= 0)        { outcome.overBudget++; continue; }
+      // 配信スロットの期限。段3は1件ずつ一次ソースを読み直すため時間がかかる。
+      // 間に合わない分は再検査せず、従来の規則判定のまま公開する（品質の上乗せを諦めるだけ）。
+      if (timeCutoff && timeCutoff.reached()) {
+        outcome.timedOut = (outcome.timedOut || 0) + 1;
+        continue;
+      }
       budget--;
       outcome.attempted++;
 
@@ -4840,7 +4289,7 @@ async function llmReviewEvents(data, today, cutoff = '0000-00-00') {
   return outcome;
 }
 
-async function writeOutput(data) {
+async function writeOutput(data, timeCutoff = null) {
   // ディレクトリが無ければ作成
   const dir = path.dirname(OUTPUT_PATH);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
@@ -4884,7 +4333,7 @@ async function writeOutput(data) {
   // タイトル欄にタイトルでない値が入っている／開催日が取れていないイベントだけを
   // チラシ実物で読み直す。差異は再抽出を採用し、裏付けが取れないものは公開しない。
   // cutoff を渡して、この後どのみち削除される過去イベントに予算を使わないようにする。
-  const llmOutcome = await llmReviewEvents(data, today, cutoff);
+  const llmOutcome = await llmReviewEvents(data, today, cutoff, timeCutoff);
 
   // ── 公開判定（既存の規則 + 段3の結果） ─────────────────────────
   for (const key of Object.keys(data)) {

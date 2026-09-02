@@ -36,3 +36,6 @@ scraper/push-payload.json
 
 # OCR稼働統計（実行ごとの成果物。ワークフローが実行中に読む）
 scraper/ocr-stats.json
+
+# カットオフ（時間切れ打ち切り）の結果。実行ごとの一時ファイル
+scraper/cutoff-report.json
