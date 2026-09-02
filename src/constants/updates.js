@@ -5,6 +5,12 @@
  */
 export const UPDATE_NOTES = [
   {
+    date:    '2026-09-02',
+    version: '1.34.17',
+    type:    'improvement',
+    content: '新着のお知らせが予定時刻（8時・12時・18時ごろ）に届きやすくなりました。情報の収集が予定時刻までに終わらない場合は、そこまでに集まった分をお届けします。',
+  },
+  {
     date:    '2026-09-01',
     version: '1.34.16',
     type:    'improvement',

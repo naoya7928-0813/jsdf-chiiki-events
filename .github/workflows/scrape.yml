@@ -2,8 +2,19 @@ name: スクレイピング & データ更新
 
 on:
   # 【通知は必ず 08:00 / 12:00 / 18:00(JST) のスロットで送る設計】
-  #   通知ステップ内で「目標スロットまで待ってから送信」する（下部参照）。そのため
+  #   通知ステップ内で「目標スロットまで待ってから送信」する。そのため
   #   スクレイプはスロットより十分前に開始し、スロット到達前に終わらせておく。
+  #
+  #   ■ 間に合わなかった場合（カットオフ。2026-09-02 導入）
+  #     以前は最後まで走らせていたため、OCR や LLM が長引くと 09:32 や 12:40 と
+  #     いった中途半端な時刻に配信されていた。現在は **スロットの6分前で
+  #     スクレイプを打ち切り、そこまでに取れた分で公開する**。
+  #     打ち切りの判断は shared/scrapeDeadline.cjs（cron→スロットの対応もここが唯一の出どころ）。
+  #     ・取得を見送った地本は前回データを引き継ぐ（イベントは消えない）
+  #     ・打ち切りは地本の切れ目・案内所巡回・OCR補完・LLM再検査の各所で効く
+  #     ・毎回同じ後半が切られないよう、地本の開始位置は実行ごとにずらす
+  #     ・起動が遅すぎて使える時間が15分未満なら**締切を外して最後まで走らせる**
+  #       （打ち切っても更新できる地本がわずかで、定刻を守る意味がないため）
   #
   #   ■ 開始時刻の根拠（2026-08-30 に Actions API の実測で再計算）
   #     実行時間: ジョブ全体で 61.6 / 62.3 / 63.4 分（直近3回）。
@@ -13,16 +24,16 @@ on:
   #     起動遅延: GitHub のスケジュールは定刻に起動しない。実測（直近30回）で
   #       最小17分・中央値66分・p75 122分。まれに数時間ずれる（GitHub側の混雑）。
   #     → 必要な余裕 = 実行 64分 + 吸収したい遅延。**スロットの147分前**に開始すると
-  #       83分の遅延まで定刻どおり通知でき、実測30回中20回（67%）をカバーする
-  #       （従来の93分前では8回＝27%しかカバーできず、通知が 09:32 のように
-  #        中途半端な時刻に出ていた）。これ以上前倒ししてもカバー率は 70% で頭打ちになり、
-  #        通知時点のデータが古くなるだけなので 147分前で止める。
+  #       83分の遅延まで「打ち切りなしで」定刻どおり通知でき、実測30回中20回（67%）を
+  #       カバーする。これを超えて遅れた回は、カットオフが効いて取れた分だけを定刻に出す。
   #     分は :00 だと GitHub 側の遅延が最も大きいため :33 にずらす（混雑回避）。
   #
   #   開始(JST)  → 約64分で完了 → スロットまで待機(約83分) → 通知
   #   05:33      → 約06:37        → 08:00 に送信
   #   09:33      → 約10:37        → 12:00 に送信
   #   15:33      → 約16:37        → 18:00 に送信
+  #   ⚠ cron を変えたら shared/scrapeDeadline.cjs の SLOTS も直すこと
+  #     （shared/scrapeDeadline.test.cjs がこのファイルを読んでズレを検出する）
   schedule:
     - cron: '33 20 * * *'  # JST 05:33 開始 → 通知 08:00
     - cron: '33 0 * * *'   # JST 09:33 開始 → 通知 12:00
@@ -154,6 +165,10 @@ jobs:
           echo "STAGE=scrape" >> "$GITHUB_ENV"
           node index.js
         env:
+          # 配信スロット（08:00/12:00/18:00 JST）に間に合わせるための打ち切り。
+          # cron からスロットと締切を決める（shared/scrapeDeadline.cjs）。
+          # 手動実行では空になり、締切なしで最後まで走る。
+          SCRAPE_SCHEDULE:  ${{ github.event.schedule }}
           GROQ_API_KEY:     ${{ secrets.GROQ_API_KEY }}
           GEMINI_API_KEY:   ${{ secrets.GEMINI_API_KEY }}
           MISTRAL_API_KEY:  ${{ secrets.MISTRAL_API_KEY }}
@@ -162,6 +177,41 @@ jobs:
           NOTIFY_SECRET:    ${{ secrets.NOTIFY_SECRET }}
           HQ_EXPLORE_PREFS:       ${{ github.event.inputs.hq_explore_prefs || '' }}
           HQ_EXPLORE_TIMEOUT_MIN: ${{ github.event.inputs.hq_explore_timeout_min || '' }}
+
+      # ── カットオフ（時間切れ打ち切り）の結果を読む ──────────────
+      # 配信スロットに間に合わせるため、間に合わない地本は取得を見送っている。
+      # 見送った地本は前回データのままなので公開データは壊れないが、
+      # 「毎回どこかを切っている」状態は取り逃しなので気づけるようにする。
+      - name: カットオフの結果を確認
+        run: |
+          echo "STAGE=cutoff_check" >> "$GITHUB_ENV"
+          if [ ! -f scraper/cutoff-report.json ]; then
+            echo "[カットオフ] レポートなし（打ち切りの仕組みが動いていない可能性）"
+            echo "CUTOFF_RESULT=レポートなし" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          HIT=$(node -p "require('./scraper/cutoff-report.json').hit")
+          ENABLED=$(node -p "require('./scraper/cutoff-report.json').enabled")
+          SKIPPED=$(node -p "require('./scraper/cutoff-report.json').skippedPrefs.map(p=>p.label).join('・')||'なし'")
+          COUNT=$(node -p "require('./scraper/cutoff-report.json').skippedPrefs.length")
+          if [ "$HIT" = "true" ]; then
+            echo "::warning::配信スロットに間に合わせるため ${COUNT} 地本の取得を見送りました（${SKIPPED}）。見送った地本は前回データのままです"
+            echo "CUTOFF_RESULT=打ち切りあり（${COUNT} 地本を見送り: ${SKIPPED}）" >> "$GITHUB_ENV"
+            curl -sS --fail-with-body --retry 3 --retry-all-errors --connect-timeout 10 --max-time 30 \
+              -H "Title: ⏱ スクレイプを時間内で打ち切りました" \
+              -H "Tags: hourglass" \
+              -H "Priority: default" \
+              -H "Content-Type: text/plain; charset=utf-8" \
+              -d "配信スロットに間に合わせるため ${COUNT} 地本の取得を見送りました（${SKIPPED}）。見送った地本は前回データのまま公開しています。 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+              "https://ntfy.sh/${{ secrets.NTFY_ADMIN_TOPIC }}" \
+              || echo "::warning::管理者通知（カットオフ）の送信に失敗しました（本来の処理には影響しません）"
+          elif [ "$ENABLED" = "true" ]; then
+            echo "[カットオフ] 期限内に完了（打ち切りなし）"
+            echo "CUTOFF_RESULT=期限内に完了" >> "$GITHUB_ENV"
+          else
+            echo "[カットオフ] 無効（手動実行、または起動が遅く締切を外した回）"
+            echo "CUTOFF_RESULT=無効（最後まで実行）" >> "$GITHUB_ENV"
+          fi
 
       # ── データ健全性チェック（スクレイプ成功でも取得結果が異常なら警告）──
       - name: データ健全性チェック
@@ -412,6 +462,8 @@ jobs:
 
       - name: プッシュ通知を送信
         if: steps.commit.outputs.changed == 'true'
+        env:
+          SCRAPE_SCHEDULE: ${{ github.event.schedule }}
         run: |
           echo "STAGE=notification" >> "$GITHUB_ENV"
           cat > /tmp/check_notify.js << 'JSEOF'
@@ -502,19 +554,17 @@ jobs:
             # スクレイプが早く終わっても、トリガー元 cron に対応する目標スロットまで
             # 待ってから送信する。GitHub 起動が遅延し既にスロットを過ぎている場合
             # （WAIT<=0）や、想定外に遠い場合（>3h）は待たず即送信。手動実行も即送信。
-            #   TZ非依存で確実にするため UTC で目標を持つ（JST=UTC+9）:
-            #   08:00JST=23:00UTC / 12:00JST=03:00UTC / 18:00JST=09:00UTC
-            #   各スロットのUTC時刻は、その枠のジョブが動く UTC 同日内に必ず来る。
-            #   ⚠ cron を変えたらこの対応表も必ず直すこと（古いままだと待機が効かず、
-            #      スクレイプ完了と同時＝中途半端な時刻に通知が飛ぶ）
-            case "${{ github.event.schedule }}" in
-              "33 20 * * *") TARGET_UTC="23:00" ;;  # → 08:00 JST
-              "33 0 * * *")  TARGET_UTC="03:00" ;;  # → 12:00 JST
-              "33 6 * * *")  TARGET_UTC="09:00" ;;  # → 18:00 JST
-              *)             TARGET_UTC="" ;;
-            esac
-            if [ -n "$TARGET_UTC" ]; then
-              TARGET_EPOCH=$(date -u -d "$(date -u +%Y-%m-%d) $TARGET_UTC:00" +%s)
+            #   cron とスロットの対応は shared/scrapeDeadline.cjs が唯一の出どころ。
+            #   ここに手書きの対応表を置くと cron を変えたときにズレて待機が効かなくなる
+            #   （実際にそうなり、通知が 09:32 のような中途半端な時刻に出ていた）。
+            #   TZ非依存で確実にするため UTC の epoch で受け取る。
+            TARGET_EPOCH=$(node -e "
+              const { slotForSchedule, slotTargetEpoch } = require('./shared/scrapeDeadline.cjs');
+              const slot = slotForSchedule(process.env.SCRAPE_SCHEDULE || '');
+              process.stdout.write(slot ? String(Math.floor(slotTargetEpoch(slot, Date.now()) / 1000)) : '');
+            ")
+            if [ -n "$TARGET_EPOCH" ]; then
+              TARGET_UTC=$(date -u -d "@${TARGET_EPOCH}" +%H:%M)
               WAIT=$(( TARGET_EPOCH - $(date -u +%s) ))
               if [ "$WAIT" -gt 0 ] && [ "$WAIT" -le 10800 ]; then
                 echo "[通知] 目標スロット(UTC ${TARGET_UTC}) まで ${WAIT}s 待機してから送信します"
@@ -642,6 +692,7 @@ jobs:
             echo "| --- | --- |"
             echo "| スクレイピング | ${TOTAL_EVENTS:+成功（${TOTAL_EVENTS} 件取得）}${TOTAL_EVENTS:-未到達 or 失敗} |"
             echo "| イベント総数 | ${TOTAL_EVENTS:-N/A} 件（前回 ${PREV_EVENTS:-N/A} 件） |"
+            echo "| カットオフ | ${CUTOFF_RESULT:-未実行} |"
             echo "| データ健全性 | ${HEALTH_ALERT:-異常なし} |"
             echo "| 品質警告数（イベント名） | ${TITLE_WARNINGS:-0} 件 |"
             echo "| 検疫（公開保留） | ${QUARANTINED:-0} 件 |"
