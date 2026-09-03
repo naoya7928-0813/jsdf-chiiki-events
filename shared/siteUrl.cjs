@@ -47,9 +47,22 @@ function normalizeOrigin(value) {
   return u.origin;   // 末尾スラッシュ・パス・クエリを落とす
 }
 
-/** 公開サイトの URL（末尾スラッシュなし）。env.SITE_URL があればそれを使う */
+/**
+ * 公開サイトの URL（末尾スラッシュなし）。env.SITE_URL があればそれを使う。
+ *
+ * ⚠ ただし **`LEGACY_ORIGINS`（＝移行元として捨てたドメイン）は採用しない**。
+ *   `SITE_URL` はコードの既定より優先されるため、移行後にシークレットの更新を
+ *   忘れると静的ページ・sitemap が旧ドメインで生成され、scrape.yml が
+ *   それをコミットして**移行が丸ごと巻き戻る**（1日3回走るので必ず起きる）。
+ *   「捨てたドメインを公開URLとして指定する」は設定として成立しないので、
+ *   ここで既定へ落とす。設定の直し忘れは scripts/check-site-url.mjs が警告する。
+ *   旧ドメインへ戻したいときは移行コミットを revert する（vercel.json の CORS や
+ *   index.html の canonical は静的で、環境変数では戻らないため）。
+ */
 function siteUrl(env = process.env) {
-  return normalizeOrigin(env && env.SITE_URL) || DEFAULT_SITE_URL;
+  const value = normalizeOrigin(env && env.SITE_URL);
+  if (!value || LEGACY_ORIGINS.includes(value)) return DEFAULT_SITE_URL;
+  return value;
 }
 
 /** 公開サイトのホスト名（例 example.jp）。IndexNow 等ホストだけ要る用途向け */

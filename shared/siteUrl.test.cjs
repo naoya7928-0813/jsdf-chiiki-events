@@ -22,6 +22,27 @@ test('siteUrl: 不正な値は無視して既定に落ちる（設定ミスで�
   }
 });
 
+test('siteUrl: 移行元のドメインを SITE_URL に指定しても採用しない', () => {
+  // ドメイン移行後にシークレットの更新を忘れると、SITE_URL が既定より優先されるため
+  // 静的ページ・sitemap が旧ドメインで生成され、scrape.yml の自動コミットで
+  // 移行が丸ごと巻き戻る（1日3回走るので必ず起きる）。捨てたドメインを公開URLに
+  // 指定するのは設定として成立しないので、既定へ落とす。
+  for (const legacy of S.LEGACY_ORIGINS) {
+    assert.strictEqual(S.siteUrl({ SITE_URL: legacy }), S.DEFAULT_SITE_URL);
+    assert.strictEqual(S.siteUrl({ SITE_URL: `${legacy}/` }), S.DEFAULT_SITE_URL);
+    assert.strictEqual(S.siteHost({ SITE_URL: legacy }), new URL(S.DEFAULT_SITE_URL).host);
+  }
+  // 旧ドメインは「公開URL」にはならないが、書き込みAPIの許可オリジンには残る
+  // （旧ドメインを開いたままの利用者の操作を 403 にしないため）
+  for (const legacy of S.LEGACY_ORIGINS) {
+    assert.ok(S.allowedOrigins({}, false).includes(legacy));
+  }
+});
+
+test('siteUrl: 移行元以外の上書きはこれまでどおり効く（検証環境・別ドメイン）', () => {
+  assert.strictEqual(S.siteUrl({ SITE_URL: 'https://staging.example.jp' }), 'https://staging.example.jp');
+});
+
 test('allowedOrigins: 新ドメイン・SITE_ORIGINS・旧ドメインを含み、重複しない', () => {
   const list = S.allowedOrigins(
     { SITE_URL: 'https://example.jp', SITE_ORIGINS: 'https://www.example.jp, https://example.jp' },

@@ -22,18 +22,27 @@
 | `public/robots.txt` `public/llms.txt` | 手書きのURL |
 | `public/events.html` `public/events/*.html` `public/topics/*.html` `public/guide.html` `public/sitemap.xml` | 再生成済み |
 | `.github/workflows/deploy.yml` | ビルドと IndexNow へ `SITE_URL` を渡すよう追加（従来は渡していなかった）|
-| `scripts/check-site-url.mjs` | `SITE_URL` に旧ドメインが残っていたら CI を落とす（下記の事故を防ぐ）|
+| `scripts/check-site-url.mjs` | `SITE_URL` に旧ドメインが残っていたら警告する（下記）|
 
-### ⚠ `SITE_URL` シークレットの更新は必須
+### `SITE_URL` シークレットの更新漏れ対策
 
-`SITE_URL` は**コードの既定より優先される**。GitHub Secrets に旧ドメインが残ったままだと、
+`SITE_URL` は**コードの既定より優先される**。何もしなければ、GitHub Secrets に
+旧ドメインが残ったままだと次が起きる。
 
 1. `deploy.yml` のビルドが旧ドメインで canonical・OGP を生成する
 2. `scrape.yml` が旧ドメインで静的ページ・sitemap を生成し、**それをコミットする**
    → 次のスクレイプ（1日3回）で移行が丸ごと巻き戻る
 
-`scripts/check-site-url.mjs` が両ワークフローの冒頭で検出してジョブを失敗させるので、
-気づかないまま巻き戻ることはない。**シークレットを新ドメインへ更新するか、削除する**
+そこで **`siteUrl()` は `LEGACY_ORIGINS`（＝移行元として捨てたドメイン）を
+公開URLとして採用しない**（既定へ落とす）。捨てたドメインを公開URLに指定するのは
+設定として成立しないため。これで出力は常に新ドメインになる。
+
+`scripts/check-site-url.mjs` が両ワークフローの冒頭で警告を出すが、
+**ジョブは落とさない**（落とすとスクレイプが止まり、データが更新されないほうが害が大きい）。
+
+ただし **`scrape.yml` の Web Push 送信先（`${SITE_URL}/api/notify`）はシークレットを
+直接使っている**ため、旧ドメインを閉じると通知が送れなくなる。
+結局のところ**シークレットは新ドメインへ更新するか削除すること**
 （削除すればコードの既定＝新ドメインが使われる）。
 
 ---
@@ -127,7 +136,7 @@ localStorage の設定を URL フラグメントで受け渡す導線を検討�
 ### 7. 切り戻し
 
 **`SITE_URL` を旧URLに戻す方法は使わない**（`vercel.json` の CORS と `index.html` の
-canonical は静的なので環境変数では戻らず、`check-site-url.mjs` が失敗させる）。
+canonical は静的なので環境変数では戻らず、`siteUrl()` も移行元のドメインは採用しない）。
 移行コミットを `git revert` して `deploy.yml` を実行する。
 DNS を戻す場合は TTL 分の待ちが必要。
 

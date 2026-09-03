@@ -3,20 +3,20 @@
  * check-site-url — 公開URLの設定ズレを CI で止める
  *
  * 公開URLは `shared/siteUrl.cjs` の `DEFAULT_SITE_URL` が既定で、環境変数
- * `SITE_URL` があればそちらが勝つ。この「環境変数が勝つ」性質がドメイン移行では
- * 事故になる:
+ * `SITE_URL` があればそちらが勝つ。ドメイン移行のあとシークレットに旧ドメインが
+ * 残っていると、本来なら静的ページ・sitemap が旧ドメインで生成され、scrape.yml が
+ * それをコミットして移行が巻き戻る。
  *
- *   GitHub Secrets の SITE_URL に**旧ドメイン**が残ったままだと、
- *   コードを新ドメインへ直しても scrape.yml / deploy.yml のビルドは旧ドメインで
- *   生成される。しかも scrape.yml は生成物をコミットするため、
- *   **次のスクレイプで静的ページ・sitemap が丸ごと旧ドメインへ戻る**。
- *   ログを見ないと気づけないので、ここで止める。
+ * 実害のほうは `siteUrl()` 側で塞いである（移行元＝`LEGACY_ORIGINS` の値は
+ * 採用せず既定へ落とす）ので、**ここは設定の直し忘れを知らせるだけ**。
+ * ジョブは落とさない。落とすとスクレイプが丸ごと止まり、データが更新されなく
+ * なるほうが害が大きいため（生成物は既に正しい新ドメインで出る）。
  *
  * 判定:
- *   - SITE_URL 未設定           … OK（DEFAULT_SITE_URL を使う）
- *   - DEFAULT_SITE_URL と同じ   … OK
- *   - 移行元（LEGACY_ORIGINS）  … **エラー**（＝シークレットの更新漏れ）
- *   - それ以外                  … 警告のみ（検証環境など意図的な上書き）
+ *   - SITE_URL 未設定           … 何もしない（DEFAULT_SITE_URL を使う）
+ *   - DEFAULT_SITE_URL と同じ   … 何もしない
+ *   - 移行元（LEGACY_ORIGINS）  … 警告（＝シークレットの更新漏れ。値は無視される）
+ *   - それ以外                  … 警告（検証環境など意図的な上書き）
  *
  * 切り戻しは SITE_URL を旧ドメインへ戻すのではなく、移行コミットを revert する
  * （vercel.json の CORS・index.html の canonical は静的なので環境変数では戻らない）。
@@ -43,14 +43,14 @@ if (value === DEFAULT_SITE_URL) {
 
 if (LEGACY_ORIGINS.includes(value)) {
   console.log(
-    `::error::SITE_URL が移行前のドメイン（${value}）のままです。`
-    + `コードの公開URLは ${DEFAULT_SITE_URL} です。`
-    + 'このままビルドすると canonical・OGP・sitemap・静的ページが旧ドメインで生成され、'
-    + 'スクレイプの自動コミットで移行が巻き戻ります。'
+    `::warning::SITE_URL が移行前のドメイン（${value}）のままです。`
+    + `この値は無視して ${DEFAULT_SITE_URL} で生成するため出力は正しくなりますが、`
     + 'GitHub Secrets と Vercel の環境変数 SITE_URL を新ドメインへ更新してください'
-    + '（削除しても既定値で正しく動きます）。',
+    + '（削除しても既定値で正しく動きます）。'
+    + 'scrape.yml の Web Push 送信先はこのシークレットを直接使っているため、'
+    + '旧ドメインが閉じられると通知が送れなくなります。',
   );
-  process.exit(1);
+  process.exit(0);
 }
 
 console.log(

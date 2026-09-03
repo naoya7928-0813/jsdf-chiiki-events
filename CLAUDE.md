@@ -591,7 +591,11 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
   旧ドメインは `LEGACY_ORIGINS` に残してあり、書き込みAPIは当面どちらのオリジンからも通る
 - ⚠ **`SITE_URL` は「コードの既定より優先される」ため、シークレットに旧ドメインが残っていると
   静的ページ・sitemap が旧ドメインで生成され、スクレイプの自動コミットで移行が巻き戻る**。
-  `scripts/check-site-url.mjs` が scrape.yml / deploy.yml の冒頭でこれを検出して失敗させる。
+  これを防ぐため **`siteUrl()` は `LEGACY_ORIGINS` の値を公開URLとして採用しない**
+  （捨てたドメインを公開URLに指定するのは設定として成立しないため既定へ落とす）。
+  `scripts/check-site-url.mjs` が scrape.yml / deploy.yml の冒頭で更新漏れを警告する
+  （**ジョブは落とさない**。落とすとスクレイプが止まりデータが更新されない方が害が大きい）。
+  ただし scrape.yml の Web Push 送信先はシークレットを直接使うため、更新は結局必要。
   切り戻すときは `SITE_URL` を旧URLに戻すのではなく**移行コミットを revert する**
   （`vercel.json` の CORS と `index.html` の canonical は静的なので環境変数では戻らない）
 

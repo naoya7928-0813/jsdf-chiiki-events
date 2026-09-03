@@ -53,7 +53,7 @@ jobs:
         run: npm test
 
       # SITE_URL（シークレット）はコードの既定より優先される。移行後に古い値が
-      # 残っていると canonical・OGP・sitemap が旧ドメインで生成されるため先に止める。
+      # 残っていないかを知らせる（値の無視自体は siteUrl() が行う）。
       - name: 公開URLの確認
         run: node scripts/check-site-url.mjs
         env:
