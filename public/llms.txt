@@ -6,7 +6,7 @@
 ## サービス概要
 
 - サービス名: 自衛隊地本イベント情報
-- URL: https://jsdf-chiiki-events.vercel.app/
+- URL: https://jsdf-chiiki-events.jp/
 - 種別: PWA（Progressive Web App）/ 非公式まとめサービス
 - 更新頻度: 1日3回自動更新（8:00 / 12:00 / 18:00 JST）
 
@@ -41,7 +41,7 @@
 ## データへのアクセス
 
 ### JSONデータ（機械読み取り用）
-https://jsdf-chiiki-events.vercel.app/data/events.json
+https://jsdf-chiiki-events.jp/data/events.json
 
 形式:
 ```
@@ -54,16 +54,16 @@ https://jsdf-chiiki-events.vercel.app/data/events.json
 ```
 
 ### 静的HTMLページ（検索エンジン・ブラウザ向け）
-- 全国一覧: https://jsdf-chiiki-events.vercel.app/events.html
-- 参加ガイド（説明会の流れ・持ち物・申込・体験搭乗の探し方）: https://jsdf-chiiki-events.vercel.app/guide.html
+- 全国一覧: https://jsdf-chiiki-events.jp/events.html
+- 参加ガイド（説明会の流れ・持ち物・申込・体験搭乗の探し方）: https://jsdf-chiiki-events.jp/guide.html
 - 都道府県別（例）:
-  - https://jsdf-chiiki-events.vercel.app/events/tokyo.html
-  - https://jsdf-chiiki-events.vercel.app/events/sapporo.html
-  - https://jsdf-chiiki-events.vercel.app/events/miyagi.html
+  - https://jsdf-chiiki-events.jp/events/tokyo.html
+  - https://jsdf-chiiki-events.jp/events/sapporo.html
+  - https://jsdf-chiiki-events.jp/events/miyagi.html
   - （その他50地本分）
 
 ### サイトマップ
-https://jsdf-chiiki-events.vercel.app/sitemap.xml
+https://jsdf-chiiki-events.jp/sitemap.xml
 
 ## 対応地方協力本部（全50地本）
 

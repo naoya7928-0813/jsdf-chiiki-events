@@ -56,7 +56,12 @@ async function call(method, headers = {}, query = {}) {
   await handler({ method, headers, query }, res);
   return res;
 }
-const AUTH = { 'x-admin-user': 'nat', 'x-admin-pass': 'pw', origin: 'https://jsdf-chiiki-events.vercel.app' };
+// オリジンは公開URLの出どころ（shared/siteUrl.cjs）から取る。直書きするとドメイン移行時に
+// 旧ドメイン（LEGACY_ORIGINS で通る）のまま検証し続けてしまい、移行漏れに気付けない。
+const AUTH = {
+  'x-admin-user': 'nat', 'x-admin-pass': 'pw',
+  origin: require('./siteUrl.cjs').DEFAULT_SITE_URL,
+};
 
 test('未認証は401＋no-store', async () => {
   const res = await call('GET', {});

@@ -1,8 +1,8 @@
 /**
  * siteUrl — 公開サイトの URL / オリジンの唯一の出どころ
  *
- * ドメインを移行するとき（例: vercel.app → 独自の .jp ドメイン）に
- * コードを書き換えて回らずに済むよう、参照を1か所へ集約する。
+ * ドメインを移行するとき（2026-09-03 に vercel.app → .jp を実施）に
+ * コードを書き換えて回らずに済むよう、参照を1か所へ集約している。
  * 切り替えは環境変数 `SITE_URL` を設定するだけでよい。
  *
  * 使う側:
@@ -18,8 +18,11 @@
  */
 'use strict';
 
-/** 既定（現行の公開URL）。SITE_URL 未設定時はこれを使う */
-const DEFAULT_SITE_URL = 'https://jsdf-chiiki-events.vercel.app';
+/**
+ * 既定（現行の公開URL）。SITE_URL 未設定時はこれを使う。
+ * 2026-09-03 に vercel.app から独自ドメイン（.jp）へ移行した。
+ */
+const DEFAULT_SITE_URL = 'https://jsdf-chiiki-events.jp';
 
 /**
  * 移行後も書き込みAPIで許可し続けるオリジン。

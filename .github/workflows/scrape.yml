@@ -97,6 +97,15 @@ jobs:
           cache: 'pip'
           cache-dependency-path: scraper/requirements-ocr.txt
 
+      # ── 公開URLの確認（生成物をコミットする前に） ────────────────
+      # このワークフローは静的ページ・sitemap を生成して**コミットする**ため、
+      # SITE_URL（シークレット）に古いドメインが残っていると、コードを新ドメインへ
+      # 直しても次のスクレイプで丸ごと旧ドメインへ巻き戻る。走り出す前に止める。
+      - name: 公開URLの確認
+        run: node scripts/check-site-url.mjs
+        env:
+          SITE_URL: ${{ secrets.SITE_URL }}
+
       # ── scraper の依存パッケージをインストール ───────────────
       - name: scraper の依存パッケージをインストール
         working-directory: scraper
