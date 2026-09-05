@@ -14,10 +14,10 @@
  */
 
 /** 同意の版。この値が localStorage の記録と異なると再同意を求める */
-export const LEGAL_VERSION = '2026-09-01';
+export const LEGAL_VERSION = '2026-09-05';
 
 /** 表示用の改定日 */
-export const LEGAL_REVISED_AT = '2026年9月1日';
+export const LEGAL_REVISED_AT = '2026年9月5日';
 
 /** localStorage のキー（値＝同意した LEGAL_VERSION） */
 export const LEGAL_STORAGE_KEY = 'jsdf-legal-accepted';
@@ -27,8 +27,8 @@ export const LEGAL_STORAGE_KEY = 'jsdf-legal-accepted';
  * 再同意ダイアログに箇条書きで表示する。
  */
 export const LEGAL_CHANGES = [
-  'ホーム画面に追加したアプリのアイコンに、未読のお知らせの件数（数字）を表示できるようにしました。この件数は端末内（IndexedDB）にのみ保存し、外部へは送信しません。通知をオフにしている場合は使用しません。',
-  '端末内に保存する場所として localStorage に加えて IndexedDB を使うことを明記しました。保存する情報の中身と「外部へ送信しない」点はこれまでと変わりません。',
+  'サイトのアドレスが jsdf-chiiki-events.jp に変わりました。これに伴い、移行のお知らせを閉じたかどうかの記録を端末内に保存することを明記しました（同じお知らせを繰り返し表示しないためのものです）。',
+  'アドレスが変わるため、お気に入り・配色などの設定・通知の登録は引き継がれません。これらはブラウザがアドレスごとに分けて保存しているためで、当方が情報を移すことはできません。お手数ですが登録し直してください。',
 ];
 
 /**
