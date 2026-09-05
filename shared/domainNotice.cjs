@@ -60,9 +60,26 @@ function currentHost() {
   return hostOf(DEFAULT_SITE_URL);
 }
 
-/** いま見ているのが移行元（捨てた）ドメインか */
+/**
+ * いま見ているのが移行元（捨てた）ドメインか。
+ *
+ * ⚠ `LEGACY_ORIGINS` との完全一致だけでは足りない。Vercel は1つのプロジェクトに
+ *   `<name>.vercel.app` のほか `<name>-<チーム>.vercel.app` や
+ *   `<name>-<ハッシュ>-<チーム>.vercel.app` も割り当てる。利用者のブックマークが
+ *   そちらだと判定から外れ、「移行の案内が出ず、代わりに誤った『オフラインです』が
+ *   出る」という一番まずい状態になる（2026-09-05 に実際に発生）。
+ *   `.vercel.app` は移行元のドメインそのものなので、サブドメインを問わず旧扱いにする。
+ *
+ * ⚠ ここを書き込みAPIの許可オリジン（shared/siteUrl.cjs の allowedOrigins）に
+ *   流用しないこと。あちらは完全一致のままでよい（緩めると第三者の
+ *   `*.vercel.app` からの書き込みまで通ってしまう）。
+ */
 function isLegacyHost(host) {
-  return legacyHosts().includes(String(host || '').toLowerCase());
+  const h = String(host || '').toLowerCase();
+  if (!h) return false;
+  if (legacyHosts().includes(h)) return true;
+  // 移行元のホスティングが割り当てるURL一式（末尾のポートは付かない）
+  return /(^|\.)vercel\.app$/.test(h);
 }
 
 /**
@@ -87,6 +104,8 @@ function decideDomainNotice({ host, dismissed, today }) {
   // ここは移行が済んだドメインで、閉じたあとに残るのは
   // 「オフラインです」という誤った説明だけになるため。
   if (isLegacyHost(h)) return { show: true, mode: 'moved-away', newUrl: DEFAULT_SITE_URL };
+  // 新ドメインより先に旧ドメインを見る。両方に当たることは無いが、
+  // 判定漏れで「オフラインです」が出る事故を繰り返さないため順序を固定する。
 
   // 新ドメインは一度閉じたら出さない（毎回出す必要はない）
   if (dismissed === NOTICE_VERSION) return none;
