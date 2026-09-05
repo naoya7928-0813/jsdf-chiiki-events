@@ -9,7 +9,9 @@ process.env.KV_REST_API_URL = process.env.KV_REST_API_URL || 'https://example.in
 process.env.KV_REST_API_TOKEN = process.env.KV_REST_API_TOKEN || 'x';
 // 管理機能を「設定済み」にする（空アカウント配列）。CSRF通過後は資格不一致で401になる。
 process.env.ADMIN_ACCOUNTS_B64 = process.env.ADMIN_ACCOUNTS_B64 || Buffer.from('[]').toString('base64');
-const ALLOWED = 'https://jsdf-chiiki-events.vercel.app';
+// 許可オリジンは shared/siteUrl.cjs が唯一の出どころ。ここへ直書きすると
+// ドメイン移行のたびに直し漏れる（旧ドメインは LEGACY_ORIGINS で通ってしまい気付けない）。
+const ALLOWED = require('./siteUrl.cjs').DEFAULT_SITE_URL;
 // Redis(Upstash) への実通信を避ける: fetch を即時に空結果(result:null)で返す。
 // 例外を投げると Upstash がリトライ/バックオフして遅くなるため、成功応答を装って高速化する。
 // （目的は認可/CSRF判定の検証。Redis値は使わない経路のみ）

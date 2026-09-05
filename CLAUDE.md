@@ -587,6 +587,17 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
   ⚠ `vercel.json` の `Access-Control-Allow-Origin` だけは静的JSONのため手で直す（テストがズレを検出する）。
   移行の手順・注意点（利用者の localStorage と Web Push 購読はオリジンが変わると失われる等）は
   **`docs/DOMAIN_MIGRATION.md`** を参照
+- **現在の公開URL: `https://jsdf-chiiki-events.jp`**（2026-09-03 に `*.vercel.app` から移行）。
+  旧ドメインは `LEGACY_ORIGINS` に残してあり、書き込みAPIは当面どちらのオリジンからも通る
+- ⚠ **`SITE_URL` は「コードの既定より優先される」ため、シークレットに旧ドメインが残っていると
+  静的ページ・sitemap が旧ドメインで生成され、スクレイプの自動コミットで移行が巻き戻る**。
+  これを防ぐため **`siteUrl()` は `LEGACY_ORIGINS` の値を公開URLとして採用しない**
+  （捨てたドメインを公開URLに指定するのは設定として成立しないため既定へ落とす）。
+  `scripts/check-site-url.mjs` が scrape.yml / deploy.yml の冒頭で更新漏れを警告する
+  （**ジョブは落とさない**。落とすとスクレイプが止まりデータが更新されない方が害が大きい）。
+  ただし scrape.yml の Web Push 送信先はシークレットを直接使うため、更新は結局必要。
+  切り戻すときは `SITE_URL` を旧URLに戻すのではなく**移行コミットを revert する**
+  （`vercel.json` の CORS と `index.html` の canonical は静的なので環境変数では戻らない）
 
 ### 管理者認証・認可（2026-06-28 強化。詳細は SECURITY.md / OPERATIONS.md）
 - **総当り対策**: ログインは IP レート制限（10回/10分）＋**アカウント単位の指数バックオフ施錠**（5回失敗で5分→10分→20分→…最大60分。施錠中は資格情報を検証しない）。この施錠を迂回させないため、ヘッダ認証は既定で無効（上記 `LEGACY_HEADER_AUTH`）。認証を伴う管理APIには残らずレート制限を入れること（2026-08-26 に `presence` の抜けを追加）。
