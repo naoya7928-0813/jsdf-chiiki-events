@@ -3783,8 +3783,8 @@ function rotateTasks(tasks) {
   return rotated;
 }
 
-// ── 配信スロットに間に合わせるための打ち切り（カットオフ） ──────────
-// 期限は shared/scrapeDeadline.cjs が cron から決める。
+// ── 配信枠（08:00〜09:00 等）に間に合わせるための打ち切り（カットオフ） ──
+// 期限は shared/scrapeDeadline.cjs が cron から決める（枠の終わりから逆算）。
 // 期限が無い（手動実行・起動が遅すぎる）場合は無効になり、従来どおり最後まで走る。
 function createCutoff() {
   const override = Number.parseInt(process.env.SCRAPE_DEADLINE_EPOCH || '', 10);
@@ -3798,8 +3798,8 @@ function createCutoff() {
 
   if (deadlineMs === null) {
     const why = info && info.reason === 'too-late'
-      ? `起動が遅く残り ${Math.round(info.availableMinutes)} 分しかないため（打ち切ると更新できる地本がわずかで、定刻を守る意味がない）`
-      : '狙う配信スロットが無いため（手動実行など）';
+      ? `起動が遅く残り ${Math.round(info.availableMinutes)} 分しかないため（打ち切ると更新できる地本がわずかで、枠を守る意味がない）`
+      : '狙う配信枠が無いため（手動実行など）';
     console.log(`[カットオフ] 無効: ${why}。最後まで実行します`);
     return { enabled: false, deadlineMs: null, hit: false, reached: () => false };
   }
@@ -3818,7 +3818,10 @@ function createCutoff() {
     },
   };
   const left = Math.round((deadlineMs - Date.now()) / 60000);
-  console.log(`[カットオフ] 期限 JST ${jstHm(deadlineMs)}（あと約 ${left} 分）まで取得し、間に合わない分は前回データを維持します`);
+  const win = info && info.targetMs
+    ? `配信枠 JST ${jstHm(info.targetMs)}〜${jstHm(info.windowEndMs)} / `
+    : '';
+  console.log(`[カットオフ] ${win}期限 JST ${jstHm(deadlineMs)}（あと約 ${left} 分）まで取得し、間に合わない分は前回データを維持します`);
   return state;
 }
 

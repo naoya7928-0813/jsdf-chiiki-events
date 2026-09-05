@@ -561,33 +561,44 @@ jobs:
           node /tmp/check_notify.js
 
           if [ -f /tmp/notify_data.json ]; then
-            # ── 通知を必ず 08:00 / 12:00 / 18:00(JST) スロットで送る ──
-            # スクレイプが早く終わっても、トリガー元 cron に対応する目標スロットまで
-            # 待ってから送信する。GitHub 起動が遅延し既にスロットを過ぎている場合
-            # （WAIT<=0）や、想定外に遠い場合（>3h）は待たず即送信。手動実行も即送信。
-            #   cron とスロットの対応は shared/scrapeDeadline.cjs が唯一の出どころ。
+            # ── 通知は配信枠（08:00〜09:00 / 12:00〜13:00 / 18:00〜19:00 JST）で送る ──
+            # 運用の考え方は「枠の中で掲載する」であって、開始時刻ちょうどを狙うのではない。
+            #   - 枠の開始より前に終わった → 開始まで待ってから送る（早すぎる配信をしない）
+            #   - 枠の中で終わった         → そのまま送る（これが想定どおり）
+            #   - 枠の終わりを過ぎた       → 即送信しつつ「定刻外」として警告に残す
+            # 手動実行・想定外に遠い場合は待たず即送信。
+            #   cron と枠の対応は shared/scrapeDeadline.cjs が唯一の出どころ。
             #   ここに手書きの対応表を置くと cron を変えたときにズレて待機が効かなくなる
             #   （実際にそうなり、通知が 09:32 のような中途半端な時刻に出ていた）。
             #   TZ非依存で確実にするため UTC の epoch で受け取る。
-            TARGET_EPOCH=$(node -e "
-              const { slotForSchedule, slotTargetEpoch } = require('./shared/scrapeDeadline.cjs');
+            read -r TARGET_EPOCH WINDOW_END_EPOCH <<< "$(node -e "
+              const { slotForSchedule, slotTargetEpoch, slotWindowEndEpoch } = require('./shared/scrapeDeadline.cjs');
               const slot = slotForSchedule(process.env.SCRAPE_SCHEDULE || '');
-              process.stdout.write(slot ? String(Math.floor(slotTargetEpoch(slot, Date.now()) / 1000)) : '');
-            ")
+              if (!slot) { process.stdout.write(' '); }
+              else {
+                const s = Math.floor(slotTargetEpoch(slot, Date.now()) / 1000);
+                const e = Math.floor(slotWindowEndEpoch(slot, Date.now()) / 1000);
+                process.stdout.write(\`\${s} \${e}\`);
+              }
+            ")"
             if [ -n "$TARGET_EPOCH" ]; then
               TARGET_UTC=$(date -u -d "@${TARGET_EPOCH}" +%H:%M)
-              WAIT=$(( TARGET_EPOCH - $(date -u +%s) ))
+              END_UTC=$(date -u -d "@${WINDOW_END_EPOCH}" +%H:%M)
+              NOW=$(date -u +%s)
+              WAIT=$(( TARGET_EPOCH - NOW ))
               if [ "$WAIT" -gt 0 ] && [ "$WAIT" -le 10800 ]; then
-                echo "[通知] 目標スロット(UTC ${TARGET_UTC}) まで ${WAIT}s 待機してから送信します"
+                echo "[通知] 配信枠の開始(UTC ${TARGET_UTC}) まで ${WAIT}s 待機してから送信します（枠: ${TARGET_UTC}〜${END_UTC}）"
                 sleep "$WAIT"
-              elif [ "$WAIT" -le 0 ]; then
-                # 起動遅延でスロットを過ぎた。次のスロットまでは4〜14時間あり待てないため
-                # 即時送信するが、定刻を外したことが分かるよう警告に残す。
-                echo "::warning::目標スロット(UTC ${TARGET_UTC} / JST $(date -u -d "@$(( TARGET_EPOCH + 32400 ))" +%H:%M)) を $(( -WAIT / 60 ))分 過ぎたため即時送信します（GitHub のスケジュール起動遅延）"
-                echo "[通知] 待機なしで即送信（WAIT=${WAIT}s）"
-                OFF_SLOT=1
+              elif [ "$WAIT" -gt 10800 ]; then
+                echo "[通知] 待機なしで即送信（WAIT=${WAIT}s＝想定外に遠い枠）"
+              elif [ "$NOW" -le "$WINDOW_END_EPOCH" ]; then
+                # 枠の中で終わった。これが想定どおりなので警告は出さない。
+                echo "[通知] 配信枠(UTC ${TARGET_UTC}〜${END_UTC}) の中のため即送信します"
               else
-                echo "[通知] 待機なしで即送信（WAIT=${WAIT}s＝想定外に遠いスロット）"
+                # 枠の終わりも過ぎた。次の枠までは4〜14時間あり待てないため即時送信するが、
+                # 枠を外したことが分かるよう警告に残す。
+                echo "::warning::配信枠(UTC ${TARGET_UTC}〜${END_UTC} / JST $(date -u -d "@$(( TARGET_EPOCH + 32400 ))" +%H:%M)〜$(date -u -d "@$(( WINDOW_END_EPOCH + 32400 ))" +%H:%M)) の終わりを $(( (NOW - WINDOW_END_EPOCH) / 60 ))分 過ぎたため即時送信します（GitHub のスケジュール起動遅延）"
+                OFF_SLOT=1
               fi
             fi
 

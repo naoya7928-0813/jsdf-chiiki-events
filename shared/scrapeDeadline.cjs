@@ -2,13 +2,15 @@
 /**
  * scrapeDeadline — 「配信スロット」と「スクレイプの打ち切り期限」の唯一の出どころ
  *
- * 新着通知は 08:00 / 12:00 / 18:00(JST) のスロットで送る設計になっている。
- * ところが GitHub のスケジュール起動は定刻に来ない（実測: 中央値66分・p75 122分の遅延）。
+ * 運用の考え方は「**08:00〜09:00 の間に掲載する**」（12:00〜13:00 / 18:00〜19:00 も同様）。
+ * 点ではなく **1時間の窓** で、開始より早くは配信せず、窓の終わりまでに掲載する。
+ *
+ * GitHub のスケジュール起動は定刻に来ない（実測: 中央値66分・p75 122分の遅延）。
  * さらにスクレイプ本体は OCR と LLM を挟むため約60分かかる。結果として
- * 「09:32 に届く」「12:40 に届く」といった中途半端な配信が起きていた。
+ * 「09:32 に届く」「12:40 に届く」といった枠を外れた配信が起きていた。
  *
  * そこで **スクレイプ側に締切を持たせる**:
- *   スロットの少し前（RESERVE_MINUTES 前）になったら、そこまでに取れた分で打ち切り、
+ *   窓の終わりの少し前（RESERVE_MINUTES 前）になったら、そこまでに取れた分で打ち切り、
  *   残りは前回データを引き継いだまま公開する。取得できなかった地本のイベントが
  *   消えるわけではない（既存のエラー時と同じ扱い）。
  *
@@ -27,8 +29,8 @@
 /**
  * 配信スロット。cron（UTC）と、その回が狙う配信時刻の対応。
  *   cron      … scrape.yml の schedule と完全一致させること
- *   targetUtc … 配信スロットの UTC 時刻（JST = UTC+9）
- *   labelJst  … 表示用
+ *   targetUtc … 配信枠の**開始**時刻（UTC。JST = UTC+9）
+ *   labelJst  … 表示用（配信枠の開始・JST）
  * 各スロットの UTC 時刻は、その枠のジョブが動く UTC 同日内に必ず来る並びにしてある。
  */
 const SLOTS = [
@@ -38,7 +40,21 @@ const SLOTS = [
 ];
 
 /**
- * スロットの何分前にスクレイプを打ち切るか。
+ * 配信枠の長さ（分）。
+ *
+ * 運用の考え方は「**08:00〜09:00 の間に掲載する**」（他のスロットも同様）で、
+ * 08:00 ちょうどを狙うのではない。開始時刻より早く配信しない一方、
+ * 枠の終わりまでは取得を続けてよい。
+ *
+ * 点ではなく窓にすることで:
+ *   - 打ち切りの締切が60分うしろへ延び、見送る地本が大きく減る
+ *   - GitHub の起動遅延（実測 中央値66分・p75 122分）を吸収できる幅が
+ *     60分増え、「定刻外」になる回が減る
+ */
+const WINDOW_MINUTES = 60;
+
+/**
+ * 配信枠の終わりの何分前にスクレイプを打ち切るか。
  * 打ち切ったあとに「品質チェック → コミット → Vercel デプロイ → CDN 伝播待機(60秒)」が
  * 必要で、実測で約3分。デプロイの混雑で伸びても間に合うよう倍の余裕を見て6分にする。
  */
@@ -69,6 +85,16 @@ function slotTargetEpoch(slot, nowMs) {
 }
 
 /**
+ * 配信枠の終わり（epoch ms）。
+ *
+ * 開始時刻からの相対で出す。絶対時刻の文字列を持たせると 08:00 枠（UTC 23:00 開始）の
+ * 終わりが翌 UTC 日の 00:00 になり、「now と同じ UTC 日付」で解決できなくなる。
+ */
+function slotWindowEndEpoch(slot, nowMs, windowMinutes = WINDOW_MINUTES) {
+  return slotTargetEpoch(slot, nowMs) + windowMinutes * 60_000;
+}
+
+/**
  * スクレイプの締切を決める。
  *
  * @param {object}  opts
@@ -77,10 +103,11 @@ function slotTargetEpoch(slot, nowMs) {
  * @param {number} [opts.reserveMinutes]
  * @param {number} [opts.minUsefulMinutes]
  * @returns {{
- *   deadlineMs: number|null,  // 打ち切り時刻。null = 締切なし（最後まで走る）
- *   targetMs:   number|null,  // 配信スロットの時刻
- *   slot:       object|null,
- *   reason:     'ok'|'no-slot'|'too-late',
+ *   deadlineMs:  number|null, // 打ち切り時刻。null = 締切なし（最後まで走る）
+ *   targetMs:    number|null, // 配信枠の開始（これより早く配信しない）
+ *   windowEndMs: number|null, // 配信枠の終わり（ここまでに掲載する）
+ *   slot:        object|null,
+ *   reason:      'ok'|'no-slot'|'too-late',
  *   availableMinutes: number|null,
  * }}
  */
@@ -90,22 +117,28 @@ function resolveDeadline(opts = {}) {
     nowMs = Date.now(),
     reserveMinutes   = RESERVE_MINUTES,
     minUsefulMinutes = MIN_USEFUL_MINUTES,
+    windowMinutes    = WINDOW_MINUTES,
   } = opts;
 
   const slot = slotForSchedule(schedule);
-  // 手動実行・未知の cron には狙うスロットが無い。締切もかけない。
-  if (!slot) return { deadlineMs: null, targetMs: null, slot: null, reason: 'no-slot', availableMinutes: null };
+  // 手動実行・未知の cron には狙う枠が無い。締切もかけない。
+  if (!slot) {
+    return { deadlineMs: null, targetMs: null, windowEndMs: null, slot: null, reason: 'no-slot', availableMinutes: null };
+  }
 
-  const targetMs   = slotTargetEpoch(slot, nowMs);
-  const deadlineMs = targetMs - reserveMinutes * 60_000;
+  const targetMs    = slotTargetEpoch(slot, nowMs);
+  const windowEndMs = slotWindowEndEpoch(slot, nowMs, windowMinutes);
+  // 締切は枠の**終わり**から逆算する。枠の中で掲載できればよく、
+  // 開始時刻ちょうどに間に合わせる必要はない。
+  const deadlineMs  = windowEndMs - reserveMinutes * 60_000;
   const availableMinutes = (deadlineMs - nowMs) / 60_000;
 
-  // 起動が遅すぎる（すでにスロットを過ぎた／使える時間がわずか）。
+  // 起動が遅すぎる（すでに枠の終わりが近い／過ぎた）。
   // 締切を外し、最後まで実行して遅れて配信する。
   if (availableMinutes < minUsefulMinutes) {
-    return { deadlineMs: null, targetMs, slot, reason: 'too-late', availableMinutes };
+    return { deadlineMs: null, targetMs, windowEndMs, slot, reason: 'too-late', availableMinutes };
   }
-  return { deadlineMs, targetMs, slot, reason: 'ok', availableMinutes };
+  return { deadlineMs, targetMs, windowEndMs, slot, reason: 'ok', availableMinutes };
 }
 
 // ── 打ち切りに伴う2つの決めごと ────────────────────────────────
@@ -156,7 +189,7 @@ function keysNeedingCarryOver({ keys = [], errors = {}, skippedKeys = [] } = {})
 }
 
 module.exports = {
-  SLOTS, RESERVE_MINUTES, MIN_USEFUL_MINUTES, ROTATION_STEP,
-  slotForSchedule, slotTargetEpoch, resolveDeadline,
+  SLOTS, WINDOW_MINUTES, RESERVE_MINUTES, MIN_USEFUL_MINUTES, ROTATION_STEP,
+  slotForSchedule, slotTargetEpoch, slotWindowEndEpoch, resolveDeadline,
   rotationOffset, keysNeedingCarryOver,
 };

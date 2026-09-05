@@ -12,8 +12,8 @@ const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
 
 const {
-  SLOTS, RESERVE_MINUTES, MIN_USEFUL_MINUTES, ROTATION_STEP,
-  slotForSchedule, slotTargetEpoch, resolveDeadline,
+  SLOTS, WINDOW_MINUTES, RESERVE_MINUTES, MIN_USEFUL_MINUTES, ROTATION_STEP,
+  slotForSchedule, slotTargetEpoch, slotWindowEndEpoch, resolveDeadline,
   rotationOffset, keysNeedingCarryOver,
 } = require('./scrapeDeadline.cjs');
 
@@ -52,39 +52,52 @@ test('slotTargetEpoch: 実行中の UTC 日の目標時刻を返す', () => {
 });
 
 // ── 締切の決定 ──────────────────────────────────────────────
-test('定刻どおり起動: スロットの RESERVE_MINUTES 前が締切になる', () => {
+test('定刻どおり起動: 配信枠の終わりの RESERVE_MINUTES 前が締切になる', () => {
+  // 締切は枠の「開始」ではなく「終わり」から逆算する。
+  // 08:00〜09:00 の枠なら 09:00 の RESERVE_MINUTES 前まで取得してよい。
   const r = resolveDeadline({ schedule: '33 20 * * *', nowMs: utc(20, 33) });
   assert.equal(r.reason, 'ok');
-  assert.equal(r.targetMs, utc(23, 0));
-  assert.equal(r.deadlineMs, utc(23, 0) - RESERVE_MINUTES * 60_000);
-  assert.equal(Math.round(r.availableMinutes), 147 - RESERVE_MINUTES);
+  assert.equal(r.targetMs, utc(23, 0), '枠の開始');
+  assert.equal(r.windowEndMs, utc(23, 0) + WINDOW_MINUTES * 60_000, '枠の終わり');
+  assert.equal(r.deadlineMs, r.windowEndMs - RESERVE_MINUTES * 60_000);
+  assert.equal(Math.round(r.availableMinutes), 147 + WINDOW_MINUTES - RESERVE_MINUTES);
 });
 
 test('少し遅れて起動: 締切は同じで、使える時間だけ減る', () => {
-  const r = resolveDeadline({ schedule: '33 0 * * *', nowMs: utc(2, 0) });   // 目標 03:00 UTC
+  const r = resolveDeadline({ schedule: '33 0 * * *', nowMs: utc(2, 0) });   // 枠 03:00〜04:00 UTC
   assert.equal(r.reason, 'ok');
-  assert.equal(r.deadlineMs, utc(3, 0) - RESERVE_MINUTES * 60_000);
-  assert.equal(Math.round(r.availableMinutes), 60 - RESERVE_MINUTES);
+  assert.equal(r.deadlineMs, utc(3, 0) + WINDOW_MINUTES * 60_000 - RESERVE_MINUTES * 60_000);
+  assert.equal(Math.round(r.availableMinutes), 60 + WINDOW_MINUTES - RESERVE_MINUTES);
+});
+
+test('枠の開始を過ぎても、終わりまで余裕があれば締切を使う', () => {
+  // 窓にしたことで拾えるようになった回。開始(03:00)は過ぎているが
+  // 終わり(04:00)まで50分あるので、打ち切りを効かせたまま枠の中で掲載できる。
+  const r = resolveDeadline({ schedule: '33 0 * * *', nowMs: utc(3, 10) });
+  assert.equal(r.reason, 'ok');
+  assert.equal(r.deadlineMs, utc(4, 0) - RESERVE_MINUTES * 60_000);
+  assert.ok(r.availableMinutes > MIN_USEFUL_MINUTES);
 });
 
 test('起動が遅すぎる: 締切を使わず最後まで走らせる', () => {
-  // 目標 03:00 UTC の 10 分前に起動 → 実質使えるのは 4 分。ここで打ち切ると
-  // 更新できる地本がほぼ無いまま「定刻に新着ゼロ」を配信することになる。
-  const r = resolveDeadline({ schedule: '33 0 * * *', nowMs: utc(2, 50) });
+  // 枠の終わり 04:00 UTC の 10 分前に起動 → 実質使えるのは 4 分。ここで打ち切ると
+  // 更新できる地本がほぼ無いまま「枠内だが新着ゼロ」を配信することになる。
+  const r = resolveDeadline({ schedule: '33 0 * * *', nowMs: utc(3, 50) });
   assert.equal(r.reason, 'too-late');
   assert.equal(r.deadlineMs, null, '締切を無効にしていません');
-  assert.equal(r.targetMs, utc(3, 0), '狙っていたスロット自体は分かるようにしておく');
+  assert.equal(r.targetMs, utc(3, 0), '狙っていた枠自体は分かるようにしておく');
+  assert.equal(r.windowEndMs, utc(4, 0));
 });
 
-test('スロットを既に過ぎている: 締切を使わず最後まで走らせる', () => {
-  const r = resolveDeadline({ schedule: '33 0 * * *', nowMs: utc(4, 30) });  // 目標 03:00 を1.5h超過
+test('枠の終わりも過ぎている: 締切を使わず最後まで走らせる', () => {
+  const r = resolveDeadline({ schedule: '33 0 * * *', nowMs: utc(5, 30) });  // 枠 03:00〜04:00 を1.5h超過
   assert.equal(r.reason, 'too-late');
   assert.equal(r.deadlineMs, null);
   assert.ok(r.availableMinutes < 0);
 });
 
 test('境界: ちょうど MIN_USEFUL_MINUTES 残っていれば締切を使う', () => {
-  const target = utc(3, 0);
+  const target = utc(3, 0) + WINDOW_MINUTES * 60_000;   // 枠の終わりから逆算する
   const nowMs  = target - (RESERVE_MINUTES + MIN_USEFUL_MINUTES) * 60_000;
   const on  = resolveDeadline({ schedule: '33 0 * * *', nowMs });
   const off = resolveDeadline({ schedule: '33 0 * * *', nowMs: nowMs + 60_000 });
@@ -99,11 +112,13 @@ test('手動実行（スロットなし）は締切をかけない', () => {
   assert.equal(r.targetMs, null);
 });
 
-test('reserveMinutes / minUsefulMinutes は上書きできる', () => {
+test('reserveMinutes / minUsefulMinutes / windowMinutes は上書きできる', () => {
   const r = resolveDeadline({ schedule: '33 0 * * *', nowMs: utc(2, 0), reserveMinutes: 30 });
-  assert.equal(r.deadlineMs, utc(3, 0) - 30 * 60_000);
-  const r2 = resolveDeadline({ schedule: '33 0 * * *', nowMs: utc(2, 50), minUsefulMinutes: 1 });
+  assert.equal(r.deadlineMs, utc(3, 0) + WINDOW_MINUTES * 60_000 - 30 * 60_000);
+  const r2 = resolveDeadline({ schedule: '33 0 * * *', nowMs: utc(3, 50), minUsefulMinutes: 1 });
   assert.equal(r2.reason, 'ok', '閾値を下げれば締切を使える');
+  const r3 = resolveDeadline({ schedule: '33 0 * * *', nowMs: utc(2, 0), windowMinutes: 0 });
+  assert.equal(r3.deadlineMs, utc(3, 0) - RESERVE_MINUTES * 60_000, '窓を0にすると従来（点）と同じ');
 });
 
 test('余裕は「デプロイ〜CDN反映（実測約3分）」より長い', () => {
@@ -242,4 +257,54 @@ test('打ち切りは地本ループだけでなく重い処理すべてに効�
   const hits = (idx.match(/cutoff(?:\.reached\(\)| && cutoff\.reached\(\))/g) || []).length;
   assert.ok(hits >= 5, `打ち切りの判定箇所が ${hits} か所しかありません`);
   assert.ok(idx.includes('timeCutoff.reached()'), 'LLM再検査に打ち切りが効いていません');
+});
+
+// ── 配信枠（窓）の扱い（2026-09-05 導入） ─────────────────────
+// 運用は「08:00〜09:00 の間に掲載する」であって 08:00 ちょうどを狙うのではない。
+// 点から窓へ変えたことで、締切が60分うしろへ延び、起動遅延の吸収幅も60分増えた。
+
+test('slotWindowEndEpoch: 枠の終わりは開始 + WINDOW_MINUTES', () => {
+  for (const slot of SLOTS) {
+    const now = Date.UTC(2026, 8, 5, 12, 0, 0);
+    assert.equal(
+      slotWindowEndEpoch(slot, now),
+      slotTargetEpoch(slot, now) + WINDOW_MINUTES * 60_000,
+    );
+  }
+});
+
+test('slotWindowEndEpoch: 日付をまたぐ枠でも開始より後になる', () => {
+  // 08:00 枠は UTC 23:00 開始で、終わりは翌 UTC 日の 00:00。
+  // 絶対時刻の文字列で持つと「now と同じ UTC 日付」で解決できず開始より前になる。
+  const slot = SLOTS.find(s => s.labelJst === '08:00');
+  const now  = Date.UTC(2026, 8, 5, 21, 0, 0);
+  assert.ok(slotWindowEndEpoch(slot, now) > slotTargetEpoch(slot, now));
+});
+
+test('窓にしたぶん、締切は従来より WINDOW_MINUTES うしろへ延びる', () => {
+  const nowMs = utc(1, 0);
+  const wide   = resolveDeadline({ schedule: '33 0 * * *', nowMs });
+  const narrow = resolveDeadline({ schedule: '33 0 * * *', nowMs, windowMinutes: 0 });
+  assert.equal(wide.deadlineMs - narrow.deadlineMs, WINDOW_MINUTES * 60_000);
+  // 取得に使える時間がそのぶん増える＝打ち切りで見送る地本が減る
+  assert.equal(Math.round(wide.availableMinutes - narrow.availableMinutes), WINDOW_MINUTES);
+});
+
+test('起動遅延の吸収幅が実測 p75（122分）を超える', () => {
+  // GitHub のスケジュール起動遅延は実測で中央値66分・p75 122分。
+  // 「起動 + 本体60分」が枠の終わりまでに収まる遅延の上限を確認する。
+  const BODY_MINUTES = 60;                      // スクレイプ本体（実測）
+  const START_TO_WINDOW_END = 147 + WINDOW_MINUTES;   // cron から枠の終わりまで
+  const tolerance = START_TO_WINDOW_END - BODY_MINUTES;
+  assert.ok(tolerance >= 122, `吸収できる遅延は ${tolerance} 分で、実測 p75(122分) に届きません`);
+});
+
+test('scrape.yml が枠の終わりを見て「定刻外」を判定している', () => {
+  // 枠の開始を過ぎただけで警告を出すと、想定どおりの配信まで「定刻外」になる。
+  const yml = read('.github/workflows/scrape.yml');
+  assert.ok(yml.includes('slotWindowEndEpoch'), 'scrape.yml が枠の終わりを取得していません');
+  assert.ok(
+    /WINDOW_END_EPOCH/.test(yml),
+    'scrape.yml が枠の終わりを使って判定していません（開始超過だけで定刻外になります）',
+  );
 });
