@@ -638,3 +638,62 @@ test('日本語のイベント名は中国語判定に引っかからない', ()
     assert.ok(!isJunkOrStubTitle(s), s);
   }
 });
+
+// ── 表記ゆれの正規化（2026-09-05 追加） ─────────────────────────
+// 地本サイトとチラシOCRから来る文字は出どころがばらばらで、同じ内容でも
+// 見た目が揃わない。カード上で不揃いに見えるものだけをならす。
+
+const { normalizeJaText, SIMPLIFIED_TO_JP } = require('./titleQuality.cjs');
+
+test('normalizeJaText: 半角カナを全角へ（濁点も正しく合成する）', () => {
+  assert.strictEqual(normalizeJaText('｢はたらく車大集合｣'), '「はたらく車大集合」');
+  assert.strictEqual(normalizeJaText('ﾊﾞｽ ｶﾞｲﾄﾞ ﾊﾟﾝ'), 'バス ガイド パン');
+  assert.strictEqual(normalizeJaText('ｱｲｳ ｦﾝ'), 'アイウ ヲン');
+});
+
+test('normalizeJaText: 日本語以外の中点を「・」へ', () => {
+  // ·(U+00B7) は欧文・中国語の区切りで、日本語の ・(U+30FB) とは別字
+  assert.strictEqual(normalizeJaText('中高校生·大学'), '中高校生・大学');
+  assert.strictEqual(normalizeJaText('陸•海•空'), '陸・海・空');
+});
+
+test('normalizeJaText: 全角の記号・英数字は変えない（出典の表記を壊さない）', () => {
+  // 文字列全体に NFKC をかけると「（）」→「()」のように出典の表記まで変わる。
+  // 半角カナの連なりだけに限定していることの確認。
+  const s = '普通の日本語（全角）～ＡＢＣ１２３';
+  assert.strictEqual(normalizeJaText(s), s);
+});
+
+test('cleanEventTitle / cleanPlaceText が表記ゆれをならす', () => {
+  assert.strictEqual(
+    cleanEventTitle('｢はたらく車大集合｣に自衛隊ブース出展します'),
+    '「はたらく車大集合」に自衛隊ブース出展します',
+  );
+  assert.strictEqual(cleanPlaceText('中高校生·大学'), '中高校生・大学');
+});
+
+test('簡体字の追加分が日本語へ直る（実データの取りこぼし）', () => {
+  // 公開データに「专用八無料送迎。」（专＝専）が出ていた
+  assert.strictEqual(toJapaneseKanji('专用'), '専用');
+  assert.strictEqual(toJapaneseKanji('自卫队広报'), '自衛隊広報');
+  assert.strictEqual(toJapaneseKanji('第1师团 指挥所'), '第1師団 指揮所');
+  assert.strictEqual(toJapaneseKanji('横滨 岛根 泽'), '横浜 島根 沢');
+});
+
+test('変換表に日本語と同じ字を入れない（自己写像は無意味で誤解を招く）', () => {
+  const self = Object.entries(SIMPLIFIED_TO_JP).filter(([k, v]) => k === v);
+  assert.deepStrictEqual(self, [], `自己写像が残っている: ${self.map(([k]) => k).join(' ')}`);
+});
+
+test('変換表は日本語の常用字を壊さない（誤変換の再発防止）', () => {
+  // 2026-08-27 に「潜・横・里・谷・条」を巻き込んで正規イベント67件を消した事故がある。
+  // 日本語として普通に使う字が変換で変わっていないことを確認する。
+  const jp = '潜横里谷条無個後広湾称独猪誉静続温泉画学来条件担当参加';
+  assert.strictEqual(toJapaneseKanji(jp), jp);
+});
+
+test('isSuspiciousTitle: 句点で終わるタイトルは本文の断片として検疫する', () => {
+  assert.equal(isSuspiciousTitle('専用八無料送迎。'), true);
+  // イベント語があるものは素通し（誤検疫しない）
+  assert.equal(isSuspiciousTitle('自衛隊音楽まつり'), false);
+});
