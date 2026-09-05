@@ -11,12 +11,15 @@ import { consentStateFor, loadAcceptedLegalVersion } from './constants/legal';
 import { foregroundOnDark } from '../shared/brandColors.cjs';
 // PWA（ホーム画面アプリ）の配色・manifest・アイコンは shared/pwaTheme.cjs が唯一の出どころ
 import { themeColorFor, manifestPathFor, appleTouchIconFor } from '../shared/pwaTheme.cjs';
+import { decideDomainNotice, isLegacyHost, NOTICE_KEY, NOTICE_VERSION } from '../shared/domainNotice.cjs';
+import { jstTodayStr } from './utils/date';
 import { usePushSubscribed } from './hooks/usePushSubscribed';
 import { setBadgeCount } from './utils/appBadge';
 import SideNav from './components/SideNav';
 import ConsentGate from './components/ConsentGate';
 import NotFoundScreen from './components/NotFoundScreen';
 import OfflineNotice from './components/OfflineNotice';
+import DomainNotice from './components/DomainNotice';
 import { ICO }           from './components/Icons';
 import HomeScreen        from './components/HomeScreen';
 import ListScreen        from './components/ListScreen';
@@ -312,6 +315,10 @@ export default function App({ operator = false }) {
   const offlineNoticeShown = useRef(false);  // 同じ切断のあいだは出し直さない
   useEffect(() => {
     if (operator) return;
+    // 旧ドメインでは出さない。移行後の旧ドメインは最新データを取得できないため
+    // 必ず「オフラインです」になるが、原因は通信ではなく引っ越したこと。
+    // ここで誤った説明を出すと、正しい案内（DomainNotice）が埋もれる。
+    if (isLegacyHost(window.location.host)) return;
     const degraded = Boolean(checkedAt) && (offline || stale);
     if (!degraded) {
       // 復帰したら閉じ、次に切れたときはまた知らせる
@@ -323,6 +330,24 @@ export default function App({ operator = false }) {
     offlineNoticeShown.current = true;
     setOfflineNoticeOpen(true);
   }, [operator, checkedAt, offline, stale]);
+
+  // ── ドメイン移行のお知らせ（開いたときに一度だけ） ──
+  // オリジンが変わるとブラウザの保存領域は別物になるため、利用者から見ると
+  // お気に入り・設定・通知の登録が消えたように見える。理由を説明しないと
+  // 「壊れた」と受け取られる。出す条件と文面は shared/domainNotice.cjs が決める。
+  const [domainNotice, setDomainNotice] = useState(null);
+  useEffect(() => {
+    if (operator) return;
+    let dismissed = null;
+    try { dismissed = localStorage.getItem(NOTICE_KEY); } catch { /* 読めなくても出せばよい */ }
+    const d = decideDomainNotice({ host: window.location.host, dismissed, today: jstTodayStr() });
+    if (d.show) setDomainNotice(d);
+  }, [operator]);
+
+  const closeDomainNotice = useCallback(() => {
+    setDomainNotice(null);
+    try { localStorage.setItem(NOTICE_KEY, NOTICE_VERSION); } catch { /* 保存できなければ次回も出る */ }
+  }, []);
 
   // ── URL同期（イベント個別URL /event/:id・戻るボタン・リロード復元） ──
   const popNav = useRef(false);       // popstate/初期解決による遷移中は pushState しない
@@ -601,8 +626,20 @@ export default function App({ operator = false }) {
         <SplashScreen schemeKey={schemeKey} onDone={handleSplashDone} />
       )}
 
+      {/* ── ドメイン移行のお知らせ（スプラッシュが終わってから出す） ──
+          オフラインのお知らせより先に出す。お気に入りが空な理由の説明が先で、
+          窓が2つ重なると読まずに閉じられる。 */}
+      {!operator && !showSplash && domainNotice && (
+        <DomainNotice
+          mode={domainNotice.mode}
+          newUrl={domainNotice.newUrl}
+          theme={theme}
+          onClose={closeDomainNotice}
+        />
+      )}
+
       {/* ── オフラインのお知らせ（スプラッシュが終わってから出す） ── */}
-      {!operator && !showSplash && offlineNoticeOpen && (
+      {!operator && !showSplash && !domainNotice && offlineNoticeOpen && (
         <OfflineNotice
           offline={offline}
           lastSyncedAt={lastSyncedAt}

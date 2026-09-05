@@ -497,6 +497,8 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 | ブランド色の文字用 | `shared/brandColors.cjs` ＋ CSS 変数 `--brand-fg`/`--accent-fg` | 全画面（上記「テーマ」参照） |
 | PWA の色・アイコン・ショートカット | `shared/pwaTheme.cjs` | `vite.config.js`（既定 manifest）／`scripts/generate-manifests.mjs`（配色別）／`scripts/generate-icons.mjs`／`shared/bootTheme.cjs`／`src/App.jsx` |
 | 配信スロット・打ち切り期限・開始位置のずらし | `shared/scrapeDeadline.cjs` | `scraper/index.js`（締切・ローテーション・前回データ引き継ぎ）／`.github/workflows/scrape.yml`（通知の待機時刻） |
+| 公開URL・許可オリジン | `shared/siteUrl.cjs` | 全体（上記「セキュリティ構成」参照）／`shared/domainNotice.cjs` |
+| ドメイン移行のお知らせを出すか | `shared/domainNotice.cjs` | `src/App.jsx`（`src/components/DomainNotice.jsx` を出す判断） |
 
 ## 天気予報（イベント詳細）
 
