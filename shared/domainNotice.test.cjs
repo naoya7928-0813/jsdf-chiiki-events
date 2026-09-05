@@ -44,11 +44,40 @@ test('開発・プレビュー・www では出さない', () => {
   }
 });
 
-test('一度閉じたら出さない（版が一致するときだけ）', () => {
+test('新ドメインは一度閉じたら出さない（版が一致するときだけ）', () => {
   assert.equal(decide({ host: NEW_HOST, dismissed: D.NOTICE_VERSION }).show, false);
   // 版を上げたら作り直したお知らせとしてもう一度出す
   assert.equal(decide({ host: NEW_HOST, dismissed: '2020-01-01' }).show, true);
   assert.equal(decide({ host: NEW_HOST, dismissed: '' }).show, true);
+});
+
+test('旧ドメインは閉じても毎回出す', () => {
+  // 移行後の旧ドメインは最新データを取得できず、アプリが「オフラインです」と
+  // 表示してしまう。原因は通信ではなく引っ越したこと。一度閉じたら黙る作りだと
+  // 間違った説明だけが残るため、正しい案内を出し続ける。
+  assert.equal(decide({ host: OLD_HOST, dismissed: D.NOTICE_VERSION }).show, true);
+  assert.equal(decide({ host: OLD_HOST, dismissed: D.NOTICE_VERSION }).mode, 'moved-away');
+});
+
+test('isLegacyHost: 旧ドメインだけを真とする', () => {
+  assert.equal(D.isLegacyHost(OLD_HOST), true);
+  assert.equal(D.isLegacyHost(OLD_HOST.toUpperCase()), true);
+  assert.equal(D.isLegacyHost(NEW_HOST), false);
+  assert.equal(D.isLegacyHost('localhost:5173'), false);
+  assert.equal(D.isLegacyHost(''), false);
+  assert.equal(D.isLegacyHost(undefined), false);
+});
+
+test('App.jsx は旧ドメインでオフラインのお知らせを出さない', () => {
+  // 旧ドメインで「オフラインです」を出すと、引っ越しの案内が埋もれるうえ
+  // 原因の説明としても誤り。判定を消していないか実ファイルで確認する。
+  const { readFileSync } = require('node:fs');
+  const { join } = require('node:path');
+  const app = readFileSync(join(__dirname, '..', 'src', 'App.jsx'), 'utf8');
+  assert.ok(
+    /isLegacyHost\(window\.location\.host\)/.test(app),
+    'App.jsx が旧ドメインの判定をしていません（オフラインのお知らせが誤表示されます）',
+  );
 });
 
 test('期限を過ぎたら出さない（消し忘れ防止）', () => {

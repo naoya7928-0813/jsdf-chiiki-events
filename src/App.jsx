@@ -11,7 +11,7 @@ import { consentStateFor, loadAcceptedLegalVersion } from './constants/legal';
 import { foregroundOnDark } from '../shared/brandColors.cjs';
 // PWA（ホーム画面アプリ）の配色・manifest・アイコンは shared/pwaTheme.cjs が唯一の出どころ
 import { themeColorFor, manifestPathFor, appleTouchIconFor } from '../shared/pwaTheme.cjs';
-import { decideDomainNotice, NOTICE_KEY, NOTICE_VERSION } from '../shared/domainNotice.cjs';
+import { decideDomainNotice, isLegacyHost, NOTICE_KEY, NOTICE_VERSION } from '../shared/domainNotice.cjs';
 import { jstTodayStr } from './utils/date';
 import { usePushSubscribed } from './hooks/usePushSubscribed';
 import { setBadgeCount } from './utils/appBadge';
@@ -315,6 +315,10 @@ export default function App({ operator = false }) {
   const offlineNoticeShown = useRef(false);  // 同じ切断のあいだは出し直さない
   useEffect(() => {
     if (operator) return;
+    // 旧ドメインでは出さない。移行後の旧ドメインは最新データを取得できないため
+    // 必ず「オフラインです」になるが、原因は通信ではなく引っ越したこと。
+    // ここで誤った説明を出すと、正しい案内（DomainNotice）が埋もれる。
+    if (isLegacyHost(window.location.host)) return;
     const degraded = Boolean(checkedAt) && (offline || stale);
     if (!degraded) {
       // 復帰したら閉じ、次に切れたときはまた知らせる

@@ -13,6 +13,12 @@
  *     「引っ越しました」＋新しいURLへ移動するボタン。まだリダイレクトを
  *     設定していない期間の導線。ここを見ている人は移行を知らない
  *
+ *     ⚠ 旧ドメインでは**閉じた記録を無視して毎回出す**。移行後の旧ドメインは
+ *       最新データを取れず、アプリが「オフラインです」と表示してしまう
+ *       （通信の問題ではなく、引っ越したことが原因）。一度閉じたら黙る作りだと
+ *       間違った説明だけが残るので、正しい案内を出し続ける。
+ *       あわせて App.jsx は旧ドメインでオフラインのお知らせを出さない。
+ *
  *   新ドメイン（DEFAULT_SITE_URL）… `moved-here`
  *     「アドレスが変わりました。設定は引き継がれません」。
  *     お気に入りが空になっている理由を説明する
@@ -54,6 +60,11 @@ function currentHost() {
   return hostOf(DEFAULT_SITE_URL);
 }
 
+/** いま見ているのが移行元（捨てた）ドメインか */
+function isLegacyHost(host) {
+  return legacyHosts().includes(String(host || '').toLowerCase());
+}
+
 /**
  * お知らせを出すか、出すならどちらの文面かを決める。
  *
@@ -69,14 +80,17 @@ function decideDomainNotice({ host, dismissed, today }) {
   // 期限切れ。文字列比較で足りる（どちらも YYYY-MM-DD）
   if (!today || today > SHOW_UNTIL) return none;
 
-  // 一度閉じたら出さない
-  if (dismissed === NOTICE_VERSION) return none;
-
   const h = String(host || '').toLowerCase();
   if (!h) return none;
 
-  if (legacyHosts().includes(h)) return { show: true, mode: 'moved-away', newUrl: DEFAULT_SITE_URL };
-  if (h === currentHost())       return { show: true, mode: 'moved-here', newUrl: DEFAULT_SITE_URL };
+  // 旧ドメインは「閉じた記録」を見ない（毎回出す）。
+  // ここは移行が済んだドメインで、閉じたあとに残るのは
+  // 「オフラインです」という誤った説明だけになるため。
+  if (isLegacyHost(h)) return { show: true, mode: 'moved-away', newUrl: DEFAULT_SITE_URL };
+
+  // 新ドメインは一度閉じたら出さない（毎回出す必要はない）
+  if (dismissed === NOTICE_VERSION) return none;
+  if (h === currentHost()) return { show: true, mode: 'moved-here', newUrl: DEFAULT_SITE_URL };
 
   // localhost・プレビュー・www など。移行の当事者ではないので出さない
   return none;
@@ -84,5 +98,5 @@ function decideDomainNotice({ host, dismissed, today }) {
 
 module.exports = {
   NOTICE_KEY, NOTICE_VERSION, SHOW_UNTIL,
-  hostOf, legacyHosts, currentHost, decideDomainNotice,
+  hostOf, legacyHosts, currentHost, isLegacyHost, decideDomainNotice,
 };

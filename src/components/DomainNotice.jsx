@@ -100,12 +100,13 @@ export default function DomainNotice({ mode, newUrl, onClose, theme }) {
           {movedAway ? (
             <>
               当サイトは新しいアドレスへ移りました。
+              <b style={{ color: 'var(--text)' }}>このアドレスでは最新のイベント情報を取得できません。</b>
               <div style={{ marginTop: 8 }}>
                 新しいアドレス:{' '}
                 <b style={{ color: 'var(--text)', fontFamily: F.mono, wordBreak: 'break-all' }}>{host}</b>
               </div>
               <div style={{ marginTop: 8 }}>
-                お手数ですが、ブックマークやホーム画面のアイコンを登録し直してください。
+                お手数ですが、下のボタンから移動し、ブックマークやホーム画面のアイコンを登録し直してください。
                 アドレスが変わるため、お気に入り・配色などの設定・通知の登録は引き継がれません。
               </div>
             </>
