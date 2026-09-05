@@ -32,16 +32,45 @@ test('新ドメインでは「アドレスが変わりました」を出す', ()
   assert.equal(r.mode, 'moved-here');
 });
 
-test('開発・プレビュー・www では出さない', () => {
+test('開発中・www では出さない', () => {
   // ここで出しても移行の当事者ではない。www は apex へリダイレクトされる
-  for (const host of [
-    'localhost:5173', '127.0.0.1:4173',
-    `www.${NEW_HOST}`,
-    'jsdf-chiiki-events-1r6giktrk-nao3485s-projects.vercel.app',   // プレビュー
-    '', null, undefined,
-  ]) {
+  for (const host of ['localhost:5173', '127.0.0.1:4173', `www.${NEW_HOST}`, '', null, undefined]) {
     assert.equal(decide({ host }).show, false, `host=${host}`);
   }
+});
+
+test('vercel.app のURLはサブドメインを問わず旧ドメイン扱いにする', () => {
+  // Vercel は1プロジェクトに複数の *.vercel.app を割り当てる。完全一致だけで見ると
+  // 利用者のブックマークがそちらだったときに判定が外れ、移行の案内が出ないうえ
+  // 誤って「オフラインです」が出る（2026-09-05 に実際に発生した）。
+  for (const host of [
+    OLD_HOST,
+    'jsdf-chiiki-events-nao3485s-projects.vercel.app',
+    'jsdf-chiiki-events-1r6giktrk-nao3485s-projects.vercel.app',
+    'JSDF-CHIIKI-EVENTS.VERCEL.APP',
+  ]) {
+    assert.equal(D.isLegacyHost(host), true, `host=${host}`);
+    assert.equal(decide({ host }).mode, 'moved-away', `host=${host}`);
+  }
+  // 紛らわしい別ドメインは旧扱いにしない
+  for (const host of ['vercel.app.example.com', 'notvercel.app.jp', NEW_HOST]) {
+    assert.equal(D.isLegacyHost(host), false, `host=${host}`);
+  }
+});
+
+test('許可オリジン（書き込みAPI）は緩めない', () => {
+  // 判定を広げたのは案内の表示だけ。allowedOrigins まで広げると
+  // 第三者の *.vercel.app からの書き込みが通ってしまう。
+  const { allowedOrigins } = require('./siteUrl.cjs');
+  const list = allowedOrigins({}, false);
+  // 案内では旧扱いにするホストでも、書き込みは許可しない
+  assert.ok(D.isLegacyHost('jsdf-chiiki-events-nao3485s-projects.vercel.app'));
+  assert.ok(
+    !list.includes('https://jsdf-chiiki-events-nao3485s-projects.vercel.app'),
+    '許可オリジンまで広がっています（第三者の *.vercel.app から書き込めてしまう）',
+  );
+  assert.ok(list.includes(LEGACY_ORIGINS[0]), '移行元の正規オリジンは許可したまま');
+  assert.deepEqual(list, [DEFAULT_SITE_URL, ...LEGACY_ORIGINS], '許可オリジンは完全一致のみ');
 });
 
 test('新ドメインは一度閉じたら出さない（版が一致するときだけ）', () => {
