@@ -903,6 +903,14 @@
     "source": "gsi",
     "geocodedAt": "2026-07-08T08:23:31.199+09:00"
   },
+  "fukushima|神奈川県横須賀市西逸見町1丁目|海上自衛隊 横須賀基地": {
+    "latitude": 35.285,
+    "longitude": 139.651,
+    "label": "神奈川県横須賀市",
+    "accuracy": "address",
+    "source": "gsi",
+    "geocodedAt": "2026-09-18T21:37:37.102+09:00"
+  },
   "fukushima|福島市花園町5番17号|福島第二合同庁舎 1階会議室": {
     "latitude": 37.762,
     "longitude": 140.473,
@@ -1166,6 +1174,14 @@
     "accuracy": "venue",
     "source": "gsi",
     "geocodedAt": "2026-09-11T15:06:39.590+09:00"
+  },
+  "hiroshima||尾道市ONOMICHI U2南側岸壁": {
+    "latitude": 34.409,
+    "longitude": 133.206,
+    "label": "広島県尾道市",
+    "accuracy": "venue",
+    "source": "gsi",
+    "geocodedAt": "2026-09-18T21:37:37.537+09:00"
   },
   "hiroshima||広島コンベンションホール": {
     "latitude": 34.385,
@@ -2518,6 +2534,22 @@
     "accuracy": "venue",
     "source": "gsi",
     "geocodedAt": "2026-07-23T19:48:44.760+09:00"
+  },
+  "nagasaki||出島メッセ長崎(お仕事体験コーナー)": {
+    "latitude": 32.75,
+    "longitude": 129.867,
+    "label": "長崎県",
+    "accuracy": "venue",
+    "source": "gsi",
+    "geocodedAt": "2026-09-18T21:37:37.956+09:00"
+  },
+  "nagasaki||新みなと地区・三浦地区・倉島岸壁": {
+    "latitude": 32.984,
+    "longitude": 129.073,
+    "label": "長崎県新みなと地区",
+    "accuracy": "venue",
+    "source": "gsi",
+    "geocodedAt": "2026-09-18T21:37:38.268+09:00"
   },
   "nagasaki||長崎会場...防衛省長崎合同庁舎4階 大村会場...大村地域事務所": {
     "latitude": 32.75,
