@@ -591,7 +591,7 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 | `/api/subscribe`（購読の登録/解除） | オリジン検証（自サイトのみ。CORS「*」廃止）＋ push endpoint のURL検証（正規プッシュサービスのみ）＋ 保存フィールド限定 ＋ IPレートリミット（20回/10分） |
 | `/api/notify`（通知送信） | `NOTIFY_SECRET`（**タイミングセーフ比較**）＋ IPレートリミット（10回/10分） |
 | 全ページ | セキュリティヘッダ（nosniff / X-Frame-Options DENY / Referrer-Policy / Permissions-Policy / HSTS）を vercel.json で付与 |
-| `/api/report`（バグ報告） | オリジン検証。ntfyトピック名は**サーバー環境変数 `NTFY_BUG_TOPIC` のみ**。固定フォールバック無し＝未設定時は503で安全に失敗 |
+| `/api/report`（バグ報告） | 投稿は同一オリジン必須（CSRF）＋IPレートリミット（5件/10分）。報告本体は Redis のみに保存（TTL既定60日）し、外部（ntfy等）へは送らない。閲覧は `report:read`、連絡先実値・削除は `report:manage` |
 | `/api/admin/*`（管理） | サーバー側セッション認証（HttpOnly Cookie）＋ RBAC（deny-by-default）＋ スコープ強制＋ 監査ログ。下記参照 |
 
 - レートリミットは Upstash Redis（既存のKV）の INCR+TTL。Redis障害時はブロックしない（可用性優先）
@@ -654,7 +654,7 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - 移行フラグ: `LEGACY_PLAINTEXT_PASSWORDS`(既定true→正式運用前 false), **`LEGACY_HEADER_AUTH`(既定false。2026-08-26 に既定を反転)**, `LEGACY_ADMIN_SECRET`(既定false。ADMIN_SECRET経路を使う移行時のみtrue), `ENABLE_DEV_STAFF`(既定false)
   - ヘッダ認証（`x-admin-user`/`x-admin-pass` を毎リクエストに付ける旧方式）を既定で許すと、**ログイン画面のロック（回数制限・指数バックオフ）を通らずに管理APIへ資格情報を投げ続けられ、総当りが実質無制限になる**。管理画面はセッション Cookie のみを使うため通常運用では不要。移行で必要な場合だけ `true` にする。
 - 監査: `AUDIT_MAX`(既定5000)
-- 既存: `KV_REST_API_URL`/`KV_REST_API_TOKEN`(Upstash), `NOTIFY_SECRET`, `NTFY_BUG_TOPIC`, `NTFY_ADMIN_TOPIC`, `VERCEL_*`, OCR各種, `SITE_URL`
+- 既存: `KV_REST_API_URL`/`KV_REST_API_TOKEN`(Upstash), `NOTIFY_SECRET`, `NTFY_ADMIN_TOPIC`（`NTFY_BUG_TOPIC` は廃止）, `VERCEL_*`, OCR各種, `SITE_URL`
 
 ## エラー発生時の対処ガイド
 

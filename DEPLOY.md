@@ -30,7 +30,7 @@ Vercel プロジェクト設定 → Environment Variables（Production / Preview
 | `KV_REST_API_URL` / `KV_REST_API_TOKEN` | Upstash Redis（Vercel-Upstash 連携で自動設定） |
 | `ADMIN_ACCOUNTS_B64` | 管理者アカウント（base64 の JSON 配列。下記） |
 | `NOTIFY_SECRET` | `/api/notify` 認証（スクレイパーからの通知送信） |
-| `NTFY_BUG_TOPIC` | 誤情報報告の ntfy トピック（未設定だと `/api/report` は503） |
+| ~~`NTFY_BUG_TOPIC`~~ | **廃止**（2026-07-17 に報告は Redis＋管理画面方式へ移行。設定不要・残っていれば削除可） |
 | `NTFY_ADMIN_TOPIC` | 運営者向けアラート（GitHub Actions から使用） |
 | `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` | Web Push（`npx web-push generate-vapid-keys` で生成） |
 
@@ -71,7 +71,7 @@ JSON 配列を base64 化して設定。各要素:
 > GitHub Actions（scrape.yml / deploy.yml）は `ADMIN_SECRET` / `ADMIN_ACCOUNTS_B64` を `vercel -e` で注入します。GitHub Secrets に登録すること。
 
 ## GitHub Secrets
-`VERCEL_TOKEN`（改行混入に注意・CLIで除去済み）, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `ADMIN_ACCOUNTS_B64`, `ADMIN_SECRET`(任意), `NTFY_BUG_TOPIC`, `NTFY_ADMIN_TOPIC`, OCR各種キー。
+`VERCEL_TOKEN`（改行混入に注意・CLIで除去済み）, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `ADMIN_ACCOUNTS_B64`, `ADMIN_SECRET`(任意・旧方式), `NTFY_ADMIN_TOPIC`, OCR各種キー。
 
 ## 本番 / 開発の分離
 - Vercel の Production と Preview/Development で環境変数を分ける。開発・検証には**本番とは別の** Upstash DB / ntfy トピック / 管理アカウントを使うこと。
@@ -96,6 +96,6 @@ JSON 配列を base64 化して設定。各要素:
 - [ ] office ロールのアカウントに `office` を設定（未設定だと deny-by-default で操作不可。pco_admin が office を割当）
 - [ ] `ENABLE_DEV_STAFF` 未設定（旧個人番号を無効）
 - [ ] 本番用 Upstash / ntfy / 管理アカウントを開発用と分離
-- [ ] `NTFY_BUG_TOPIC` / VAPID / `NOTIFY_SECRET` を設定
+- [ ] VAPID / `NOTIFY_SECRET` を設定
 - [ ] master ブランチ保護・PR必須・本番デプロイ承認の検討
 - [ ] `npm test` と `node scripts/check-data-quality.mjs` がCIで通る

@@ -426,8 +426,6 @@ jobs:
       # ── Vercel に本番デプロイ ─────────────────────────────
       - name: Vercel に本番デプロイ
         if: steps.commit.outputs.changed == 'true'
-        # バグ報告の ntfy トピックを実行時環境変数として渡す（deploy.yml と同様）。
-        # これがないとスクレイプ起点のデプロイで環境変数が失われ旧トピックに退避する。
         # トークンは別名 env で受け取り改行を除去してから --token に渡す
         # （VERCEL_TOKEN シークレットに改行が混入しており CLI が拒否するため）
         # デプロイは push 済みデータの再実行で冪等なため、一時的な通信断
@@ -436,7 +434,6 @@ jobs:
           echo "STAGE=deploy" >> "$GITHUB_ENV"
           CLEAN_TOKEN=$(printf '%s' "$VTOKEN" | tr -d '\r\n')
           ARGS=""
-          if [ -n "$NTFY_BUG_TOPIC" ]; then ARGS="$ARGS -e NTFY_BUG_TOPIC=$NTFY_BUG_TOPIC"; fi
           if [ -n "$ADMIN_SECRET" ];   then ARGS="$ARGS -e ADMIN_SECRET=$ADMIN_SECRET"; fi
           if [ -n "$ADMIN_ACCOUNTS_B64" ]; then ARGS="$ARGS -e ADMIN_ACCOUNTS_B64=$ADMIN_ACCOUNTS_B64"; fi
           ATTEMPTS=3
@@ -462,7 +459,6 @@ jobs:
           VTOKEN:            ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          NTFY_BUG_TOPIC:    ${{ secrets.NTFY_BUG_TOPIC }}
           ADMIN_SECRET:      ${{ secrets.ADMIN_SECRET }}
           ADMIN_ACCOUNTS_B64: ${{ secrets.ADMIN_ACCOUNTS_B64 }}
 

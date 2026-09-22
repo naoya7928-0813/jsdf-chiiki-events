@@ -17,18 +17,19 @@ export default async function handler(req, res) {
       : [])
       // 下書きは公開しない。status 未設定（旧データ）は公開扱い。
       .filter(e => e && e.status !== 'draft')
-      // 担当官名など裏側情報は公開しない（createdBy/updatedBy/タイムスタンプ/再取得フラグを除去）
-      .map(({ createdBy, updatedBy, createdAt, updatedAt, status, weatherLocationNeedsUpdate, ...pub }) => pub);
+      // 担当官名など裏側情報は公開しない（createdBy/updatedBy/タイムスタンプ/再取得フラグ/
+      // 権限判定用の事務所 office を除去。公開画面は office を使わない）
+      .map(({ createdBy, updatedBy, createdAt, updatedAt, status, weatherLocationNeedsUpdate, office, ...pub }) => pub);
 
-    // 既存イベントの上書き（スクレイプイベント等）。表示フィールドのみ公開（_by/_at は除去）
+    // 既存イベントの上書き（スクレイプイベント等）。表示フィールドのみ公開する。
+    // 「_」で始まる管理用メタ（_by/_at/_pref/_office 等）はすべて除去（今後増えても漏れない）
     let overrides = {};
     try {
       const oraw = await redis.hgetall(OKEY);
       if (oraw) {
         for (const [id, v] of Object.entries(oraw)) {
           const o = typeof v === 'string' ? JSON.parse(v) : v;
-          const { _by, _at, ...pub } = o || {};
-          overrides[id] = pub;
+          overrides[id] = Object.fromEntries(Object.entries(o || {}).filter(([k]) => !k.startsWith('_')));
         }
       }
     } catch { /* 取得失敗は無視 */ }
