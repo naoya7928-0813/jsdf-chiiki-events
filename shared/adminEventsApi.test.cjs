@@ -4,6 +4,7 @@
 // - 開始日だけ後ろへずらして「終了日 < 開始日」になる PATCH は 400
 // - office ロールで office 未設定のアカウントは POST できない（作っても自分で扱えないため）
 // - 公開 API（/api/manual-events）は office や上書きの管理用メタ（_pref/_office/_by/_at）を返さない
+// - 公開 API は status を返す（中止/受付終了のバッジ表示に必要）。公開可能な状態のみ許可リストで通す
 const { test } = require('node:test');
 const assert = require('node:assert');
 const S = require('./session.cjs');
@@ -111,6 +112,23 @@ test('公開 API: office と上書きの管理用メタを返さない', async (
   assert.equal(res.statusCode, 200);
   const ev = res.body.events.find(e => e.id === c.body.event.id);
   assert.ok(ev, '公開イベントが返っていない');
-  for (const k of ['office', 'createdBy', 'updatedBy', 'status']) assert.ok(!(k in ev), `${k} が公開されている`);
+  for (const k of ['office', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt']) assert.ok(!(k in ev), `${k} が公開されている`);
+  assert.equal(ev.status, 'published');
   assert.deepEqual(res.body.overrides['scrape-1'], { title: '修正後' });
+});
+
+test('公開 API: 中止・受付終了は status 付きで公開、下書き・未知の状態は非公開', async () => {
+  const mk = async (status) => (await admin('POST', 'nat', { event: { ...base, title: `状態${status}`, status: 'published' } })).body.event.id;
+  const cancelled = await mk('cancelled');
+  assert.equal((await admin('PATCH', 'nat', { id: cancelled, patch: { status: 'cancelled' } })).statusCode, 200);
+  const draft = await mk('draft');
+  assert.equal((await admin('PATCH', 'nat', { id: draft, patch: { status: 'draft' } })).statusCode, 200);
+  // 将来追加される状態（例: 承認待ち）は、許可リストに足さない限り公開されないこと
+  const unknown = 'manual-tokyo-unknown';
+  run(['hset', 'manual:events', unknown, JSON.stringify({ ...base, id: unknown, status: 'pending_review' })]);
+  const res = await publicList();
+  const byId = Object.fromEntries(res.body.events.map(e => [e.id, e]));
+  assert.equal(byId[cancelled]?.status, 'cancelled', '中止バッジ用の status が公開されていない');
+  assert.ok(!byId[draft], '下書きが公開されている');
+  assert.ok(!byId[unknown], '未知の状態が公開されている');
 });
