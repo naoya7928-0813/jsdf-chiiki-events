@@ -23,6 +23,20 @@
 - イベント／オーバーライドの所属地本は**サーバー側で実データから解決**して判定（IDOR 対策）。存在しない対象は拒否。
 - **過去イベント閲覧**（`GET /api/admin/past-events`）も同じ `canManageScope` で範囲を限定（閲覧専用・`no-store`）。office ロールは自office一致のみ（スクレイプは office 欄が無いため pco_admin 以上のみ）、pco=自地本、national=全国。監査ログ閲覧権限とは別（過去イベント≠監査ログ）。
 
+## 重要操作の再認証（step-up）
+- バックアップ作成・監査ログ出力などの重要操作は、**直前のパスワード再入力**（`POST /api/admin/login {op:'step-up'}`）から一定時間（`STEP_UP_TTL_SEC`、既定5分）だけ実行できる。判定は `shared/stepUp.cjs`、記録はサーバー側セッションの `stepUpAt`。
+- 再入力の失敗はログインと同じ失敗回数・ロックに合算する（総当りの抜け道にしない）。成功・失敗・拒否は監査ログに残る。
+- セッション Cookie 認証が前提（旧ヘッダ認証では重要操作は常に拒否）。将来の MFA も同じ判定に載せる。
+
+## バックアップ
+- 「システム」タブ（`backup:export`＝national_admin / system_admin）から、手動イベント・上書き・アカウント・監査ログを1ファイルで出力する（`api/admin/system.js`、形式は `shared/backupFormat.cjs`）。
+- **パスワード・ハッシュ・MFA・セッション・トークン・鍵・利用者の連絡先は含めない**（許可リスト方式＋全体の再帰検査で、混入時は作成を止める）。
+- 検証は `node scripts/verify-backup.mjs <ファイル>`（件数・schemaVersion・checksum・作成日時・秘密項目の不在）。保管先は運営管理の暗号化ストレージ（リポジトリは公開のため置かない）。
+
+## 検証環境（Preview）の分離
+- Preview 環境は、本番と別の Redis を設定し `PREVIEW_DATA_ISOLATED=true` を Preview だけに設定するまで、管理 API・報告・購読の書き込みを 503 で止める（`previewWriteBlocked`）。Vercel-Upstash 連携は既定で本番と同じ KV を Preview にも設定するため。手順は `docs/PREVIEW_ENVIRONMENT.md`。
+- Preview デプロイ（`.github/workflows/preview.yml`）は本番の `ADMIN_ACCOUNTS_B64` を渡さない。
+
 ## 監査ログ（追記専用）
 - 管理操作・ログイン成功/失敗・権限拒否を `manual:history` に追記（`writeAudit`）。記録項目: 日時・requestId・操作者(仮名 displayId)・accountId・地本・事務所・action・対象ID・result・変更前後。
 - **削除APIは廃止**（`/api/admin/history` の DELETE は 405）。改ざん防止のため追記専用。
@@ -46,5 +60,5 @@
 - パスワードの scrypt 化は任意（移行期は平文許容）。**正式運用前に全アカウントをハッシュ化し `LEGACY_PLAINTEXT_PASSWORDS=false` にすること**（平文で認証が通るとサーバーログに警告が出る）。
 - `LEGACY_HEADER_AUTH` は **2026-08-26 に既定を false（拒否）へ反転**した。ヘッダ認証を許すとログイン施錠を迂回して総当りできるため、移行で必要な場合のみ明示的に `true` にする。
 - 監査ログは Redis リスト（上限 `AUDIT_MAX`）。長期保全のため**外部ログ保管への転送**は今後の課題。
-- 重要操作の再認証（step-up）・アカウント管理UI・承認フローのUIは未実装（API/データ構造は準備）。
+- 重要操作の再認証（step-up）はパスワード再入力で実装済み（MFA は未実装）。アカウント管理UI・承認フローのUI・バックアップからの復元は未実装。
 - 依存監査（npm audit / Dependabot / CodeQL / Secret scanning / SBOM）・アクションSHA固定・PR必須・本番承認環境は段階導入を推奨。

@@ -43,6 +43,8 @@ const CASES = [
   ['events', 'OPTIONS'],
   ['history', 'OPTIONS'],
   ['overrides', 'OPTIONS'],
+  ['system', 'OPTIONS'],
+  ['system', 'POST'],   // 状態変更は受け付けない（405）
 ];
 
 for (const [name, method] of CASES) {

@@ -5,6 +5,7 @@
 import { Redis } from '@upstash/redis';
 import authz from '../shared/authz.cjs';
 import sessionUtil from '../shared/session.cjs';
+import stepUp from '../shared/stepUp.cjs';
 // 許可オリジン（ドメイン移行時は SITE_URL / SITE_ORIGINS で切り替える）
 import { allowedOrigins } from '../shared/siteUrl.cjs';
 
@@ -63,6 +64,13 @@ export function noStore(res) {
  * 失敗時は 403（内部情報を含めない）＋ 監査ログ（denied）を記録して false。
  */
 export async function requireSameOrigin(req, res) {
+  // Preview（検証）環境の事故防止: 本番と別の Redis を使うと確認できるまで、状態変更を受け付けない。
+  // Vercel と Upstash の連携は既定で Production/Preview に同じ KV を設定するため、
+  // Preview で書き込むと本番データ（手動イベント・監査ログ・セッション）を汚してしまう。
+  if (previewWriteBlocked(req.method)) {
+    res.status(503).json({ error: 'preview_not_isolated', message: 'Preview 環境は本番と別の Redis に切り替えるまで書き込みできません（docs/PREVIEW_ENVIRONMENT.md）' });
+    return false;
+  }
   const origin = req.headers.origin;
   const sec = req.headers['x-internal-secret'];
   const internalSecretOk = !!(process.env.INTERNAL_API_SECRET && sec &&
@@ -87,6 +95,17 @@ export async function requireSameOrigin(req, res) {
   });
   res.status(403).json({ error: 'Forbidden' });
   return false;
+}
+
+/**
+ * Preview（検証）環境で、本番と別の Redis を使うと明示されていない間は状態変更を止める。
+ * Preview 用の環境変数に本番と別の KV_REST_API_URL / KV_REST_API_TOKEN を設定したうえで、
+ * PREVIEW_DATA_ISOLATED=true を **Preview 環境だけに** 設定すると解除される。本番（production）には影響しない。
+ */
+export function previewWriteBlocked(method) {
+  if (process.env.VERCEL_ENV !== 'preview') return false;
+  if (process.env.PREVIEW_DATA_ISOLATED === 'true') return false;
+  return sessionUtil.STATE_CHANGING.has(String(method || 'GET').toUpperCase());
 }
 
 /** 正規の Web Push サービスの endpoint かを検証する（Redis汚染防止） */
@@ -329,6 +348,43 @@ export async function requireAuth(req, res) {
   const r = await authenticate(req);
   if (!r) { res.status(401).json({ error: 'Unauthorized' }); return null; }
   return r.account;
+}
+
+// ── 重要操作の再認証（step-up。判定は shared/stepUp.cjs） ──────────────
+// パスワード再入力に成功した時刻をサーバー側セッションの stepUpAt に記録し、一定時間だけ重要操作を許す。
+// セッション Cookie による認証が前提（旧ヘッダ認証では step-up できない＝重要操作は常に拒否）。
+
+/** リクエストのセッション（トークンと Redis 上のデータ）。無ければ null。 */
+async function readSession(req) {
+  const token = sessionUtil.getSessionToken(req);
+  if (!token) return null;
+  try {
+    const raw = await redis.get(SESSION_PREFIX + token);
+    if (!raw) return null;
+    return { token, data: typeof raw === 'string' ? JSON.parse(raw) : raw };
+  } catch { return null; }
+}
+
+/** 再認証の成功を記録する（呼び出し側でパスワード検証済みであること）。 */
+export async function markStepUp(req, account) {
+  const s = await readSession(req);
+  if (!s || !account || s.data.userId !== account.userId) return false;
+  s.data.stepUpAt = Date.now();
+  try { await redis.set(SESSION_PREFIX + s.token, JSON.stringify(s.data), { ex: SESSION_ABS_TTL }); return true; }
+  catch { return false; }
+}
+
+/**
+ * 重要操作の直前に呼ぶ。再認証が無い・期限切れなら 401 {error:'step_up_required'} を返して false。
+ * 画面はこの応答を受けてパスワード再入力ダイアログを出し、成功後に元の操作を再送する。
+ */
+export async function requireStepUp(req, res, account, op) {
+  const s = await readSession(req);
+  const d = stepUp.stepUpDecision({ stepUpAt: s && s.data.userId === account.userId ? s.data.stepUpAt : null, now: Date.now() });
+  if (d.ok) return true;
+  await writeAudit(account, { action: op, result: 'denied', note: `再認証が必要（${d.reason}）` });
+  res.status(401).json({ error: 'step_up_required', reason: d.reason, message: '重要な操作のため、パスワードを再入力してください' });
+  return false;
 }
 
 /** 後方互換: 同期のアカウント解決（ヘッダのみ）。 */

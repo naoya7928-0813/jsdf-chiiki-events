@@ -1,0 +1,75 @@
+name: Preview デプロイ（検証環境）
+
+# 本番と別の検証環境（Vercel Preview）へデプロイする。手動実行のみ。
+#   Actions → 「Preview デプロイ（検証環境）」→ Run workflow → 対象ブランチを選ぶ
+#
+# 検証環境は Vercel の「Preview」用環境変数だけで動く（本番と別の Redis・テスト用アカウント・別シークレット）。
+# 本番のアカウント（GitHub Secret の ADMIN_ACCOUNTS_B64）は**渡さない**（deploy.yml と違う点）。
+# Preview 用 KV を本番と分けた後、Preview 環境だけに PREVIEW_DATA_ISOLATED=true を設定するまで、
+# 管理 API の書き込みは api/_security.js が 503 で止める（本番データを汚さないための安全装置）。
+# 手順: docs/PREVIEW_ENVIRONMENT.md
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preview-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    name: Vercel Preview デプロイ
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v5
+
+      - name: Node.js 22 をセットアップ
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: 依存パッケージをインストール
+        run: npm ci
+
+      # 本番デプロイと同じゲートを通ったものだけを検証環境へ出す
+      - name: テスト
+        run: npm test
+
+      - name: ビルド
+        run: npm run build
+
+      - name: データ品質チェック
+        run: node scripts/check-data-quality.mjs
+
+      - name: 依存関係の脆弱性監査（本番依存のみ）
+        run: npm audit --omit=dev
+
+      - name: Vercel に Preview デプロイ
+        id: deploy
+        # --prod を付けない＝Preview 環境（Vercel の Preview 用環境変数）で動く。
+        # 本番の ADMIN_ACCOUNTS_B64 / ADMIN_SECRET を -e で渡さないこと。
+        run: |
+          CLEAN_TOKEN=$(printf '%s' "$VTOKEN" | tr -d '\r\n')
+          URL=$(npx vercel --token "$CLEAN_TOKEN" --yes | tail -n 1)
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Preview デプロイ"
+            echo ""
+            echo "- ブランチ: \`${GITHUB_REF_NAME}\`（${GITHUB_SHA::8}）"
+            echo "- URL: $URL"
+            echo "- 運営画面: $URL/admin.html"
+            echo ""
+            echo "書き込みが 503（preview_not_isolated）になる場合は、Preview 用 Redis の分離が未設定です（docs/PREVIEW_ENVIRONMENT.md）。"
+          } >> "$GITHUB_STEP_SUMMARY"
+        env:
+          VTOKEN:            ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}

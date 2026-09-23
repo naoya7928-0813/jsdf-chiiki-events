@@ -32,7 +32,7 @@ Vercel プロジェクト設定 → Environment Variables（Production / Preview
 | `NOTIFY_SECRET` | `/api/notify` 認証（スクレイパーからの通知送信） |
 | ~~`NTFY_BUG_TOPIC`~~ | **廃止**（2026-07-17 に報告は Redis＋管理画面方式へ移行。設定不要・残っていれば削除可） |
 | `NTFY_ADMIN_TOPIC` | 運営者向けアラート（GitHub Actions から使用） |
-| `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` | Web Push（`npx web-push generate-vapid-keys` で生成） |
+| `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_EMAIL` | Web Push（`npx web-push generate-vapid-keys` で生成。`VAPID_EMAIL` は連絡先メール。`api/notify.js` が `mailto:` を付けて使う） |
 
 ### 任意（OCR・移行・調整）
 | 変数 | 用途 |
@@ -40,12 +40,17 @@ Vercel プロジェクト設定 → Environment Variables（Production / Preview
 | `GROQ_API_KEY` / `GEMINI_API_KEY` / `MISTRAL_API_KEY` / `OCR_SPACE_API_KEY` | 多段OCR（無ければローカルOCRのみ） |
 | `ADMIN_SESSION_TTL`(既定28800) / `ADMIN_SESSION_IDLE`(既定3600) | セッション絶対期限/無操作失効（秒） |
 | `LEGACY_PLAINTEXT_PASSWORDS`(既定true) | 平文パスワード許可（**正式運用前に false**） |
-| `LEGACY_HEADER_AUTH`(既定true) | ヘッダ認証の後方互換（**正式運用前に false**） |
+| `LEGACY_HEADER_AUTH`(既定false) | ヘッダ認証（`x-admin-user`/`x-admin-pass`）の後方互換。**2026-08-26 に既定を false へ反転済み**（ログインのロックを迂回できるため）。移行で必要な場合のみ `true` |
 | `LEGACY_ADMIN_SECRET`(既定false) | 旧 `ADMIN_SECRET`（任意ユーザー名＋共通PWで national_admin）の許可。**既定で無効**。移行時のみ `true`。正式運用では本フラグを設定せず `ADMIN_SECRET` 自体を削除 |
 | `ENABLE_DEV_STAFF`(既定false) | 旧個人番号(001/002/003)を開発時のみ有効化 |
 | `AUDIT_MAX`(既定5000) | 監査ログ保持件数 |
 | `SITE_URL` | オーバーライド所属解決の events.json 取得元（既定は本番URL） |
 | `SESSION_INSECURE` | ローカルHTTP検証時のみ true（Secure属性を外す） |
+| `SITE_ORIGINS` | 追加で許可するオリジン（カンマ区切り。ドメイン移行時） |
+| `INTERNAL_API_SECRET` | Origin の無い正当な非ブラウザ経路（`x-internal-secret`）の認証 |
+| `REPORT_TTL_DAYS`(既定60) | 利用者報告（個人情報を含み得る）の保存日数 |
+| `STEP_UP_TTL_SEC`(既定300) | 重要操作の再認証（パスワード再入力）の有効秒数 |
+| `PREVIEW_DATA_ISOLATED` | **Preview 環境だけ**に `true`。本番と別の Redis を設定したことの確認。未設定の Preview は管理 API の書き込みを 503 で止める（`docs/PREVIEW_ENVIRONMENT.md`） |
 
 ### 管理者アカウント（`ADMIN_ACCOUNTS_B64`）
 JSON 配列を base64 化して設定。各要素:
