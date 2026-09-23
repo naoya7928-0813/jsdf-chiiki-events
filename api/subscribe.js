@@ -7,7 +7,7 @@
 // - endpoint は正規のプッシュサービスURLのみ許可（Redisへの任意データ注入防止）
 // - IPごとのレートリミット（購読の大量登録・総当たり解除の抑止）
 import { Redis } from '@upstash/redis';
-import { checkOrigin, isValidPushEndpoint, rateLimit } from './_security.js';
+import { checkOrigin, isValidPushEndpoint, rateLimit, previewWriteBlocked } from './_security.js';
 
 const redis = new Redis({
   url:   process.env.KV_REST_API_URL,
@@ -20,6 +20,8 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(204).end();
+  // Preview（検証）環境で本番の Redis に購読を書き込まない（docs/PREVIEW_ENVIRONMENT.md）
+  if (previewWriteBlocked(req.method)) return res.status(503).json({ error: 'preview_not_isolated' });
 
   // ── VAPID 公開鍵の取得（購読前にフロントが取得する。旧 /api/vapid-public-key を統合） ──
   if (req.method === 'GET') {

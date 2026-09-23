@@ -675,6 +675,13 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - UI: 運営画面に「現在・今後／下書き／**過去イベント**」タブ（`src/components/PastEventsPanel.jsx`、閲覧専用）。監査履歴は別表示。
 - 将来のイベントID移行・恒久アーカイブ設計とは別課題（本機能は現存データの閲覧のみ）。
 
+### 重要操作の再認証・バックアップ・検証環境（2026-09-23 導入）
+- 重要操作は `requireStepUp(req, res, account, 'op名')`（api/_security.js）を必ず通す。判定は `shared/stepUp.cjs`、再入力は `POST /api/admin/login {op:'step-up', pass}`。画面は 401 `step_up_required` を受けてダイアログを出し、成功後に同じ操作をやり直す（`src/components/SystemPanel.jsx`）。
+- バックアップ: `api/admin/system.js`（`?op=backup-core` / `?op=backup-audit&page=N`）＋ `shared/backupFormat.cjs`（作成・検証・秘密項目の除外）＋ `shared/backupAssemble.cjs`（ブラウザで1ファイルに組み立て。node:crypto 非依存）。検証は `scripts/verify-backup.mjs`。
+  **バックアップに新しいデータを足すときは、許可リスト（`ACCOUNT_FIELDS` 等）と `SECRET_KEY_RE` を見直し、`backupFormat.test.cjs` に「秘密項目が含まれない」テストを足す。** 運営データの構造を変えたら `SCHEMA_VERSION` を上げる。
+- 検証環境（Preview）: `.github/workflows/preview.yml`（手動実行）。Preview では `PREVIEW_DATA_ISOLATED=true` まで書き込みを止める（`previewWriteBlocked`）。新しい書き込み API を作るときは `requireSameOrigin` を通すこと（この停止も効く）。
+- 基盤変更の本番反映は `docs/RELEASE_RUNBOOK.md` の順番（CI → 移行確認 → バックアップ → Preview → 本番 → スモーク → スクレイプ完走）を守る。
+
 ### データ品質ゲート（CI）
 - `shared/dataQuality.cjs` + `scripts/check-data-quality.mjs`。ID重複/構造破損/不正・非実在日付/endDate<date/タイトル欠落/pref-キー不一致/座標範囲/accuracy値/手動-スクレイプID衝突/総数異常減少を**エラー（デプロイ停止）**、長すぎるタイトル・会場欠落・URL形式・OCR疑い等を**警告**として検出。
 - 2026-09-23 から前回（git HEAD）の events.json 全体と比較する差分検査を追加（地本件数・重要項目の消失・未終了イベントの消失。判定は `shared/eventRegression.cjs`、詳細は「イベントデータの非退行原則」）。結果は GitHub Actions のジョブサマリにも表で出る。
