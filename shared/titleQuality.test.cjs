@@ -779,3 +779,36 @@ test('isSuspiciousTitle: 句点で終わるタイトルは本文の断片とし�
     assert.equal(Q.isEligibleForStructuredEvent({ ...ok, date: '2029-01-01', source_type: 'office_ocr' }, '2026-09-23'), false);
   });
 }
+
+// ── 別経路で重複取得した同一イベントの判定（2026-09-23 山梨の重複・石川の取りこぼし） ──
+{
+  const Q = require('./titleQuality.cjs');
+  const office = (title, place, date = '2026-09-26', label = place) =>
+    ({ date, title, place, notes: `掲載元: ${label}`, source_type: 'office_html' });
+
+  test('isLikelySameEvent: 案内所巡回の「広報活動 ふじざくらFC」@案内所名 と地本の「ふじざくらＦＣ」@実会場 は同一', () => {
+    assert.equal(Q.isPlaceholderPlace(office('広報活動 ふじざくらFC', '巨摩募集案内所')), true);
+    assert.equal(Q.isLikelySameEvent(
+      { date: '2026-09-26', title: 'ふじざくらＦＣ', place: '小瀬スポーツ公園' },
+      office('広報活動 ふじざくらFC', '巨摩募集案内所')), true);
+    assert.equal(Q.isLikelySameEvent(
+      { date: '2026-09-26', title: '富士急ハイランド防災フェス', place: '富士急ハイランド' },
+      office('広報活動 富士急ハイランド防災フェス', '巨摩募集案内所')), true);
+  });
+
+  test('isLikelySameEvent: 同じ日でも会場が違う同名イベント（ハローワーク違いの職業説明会）は別', () => {
+    assert.equal(Q.isLikelySameEvent(
+      { date: '2026-10-27', title: '自衛隊職業説明会', place: 'ハローワーク西宮' },
+      { date: '2026-10-27', title: '自衛隊職業説明会', place: 'ハローワーク尼崎', notes: '掲載元: 西宮地域事務所' }), false);
+    assert.equal(Q.isLikelySameEvent(
+      { date: '2026-10-27', title: '「自衛隊職業説明会」ハローワーク西宮' },
+      { date: '2026-10-27', title: '「自衛隊職業説明会」ハローワーク尼崎' }), false);
+  });
+
+  test('isLikelySameEvent: 開催日が違う・短すぎるタイトル・別名のイベントは同一としない', () => {
+    assert.equal(Q.isLikelySameEvent({ date: '2026-10-03', title: '防災フェスタ' }, { date: '2026-10-04', title: '防災フェスタ' }), false);
+    assert.equal(Q.isLikelySameEvent({ date: '2026-10-03', title: '防災フェスタ' }, { date: '2026-10-03', title: '防災フェア' }), false);
+    assert.equal(Q.isSameEventTitle('祭', '祭'), false);
+    assert.equal(Q.isSameEventTitle('小松市どんどん祭り', '徳田まつり'), false);
+  });
+}
