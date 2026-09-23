@@ -347,6 +347,38 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - **新種の不正パターンを見つけたら `titleQuality.cjs` に追加し、`shared/titleQuality.test.cjs` にテストケースを足す**（`npm test` で検証）
 - 既存 `events.json` の汚染は再スクレイプを待たず、titleQuality を使ったスクリプトで直接クリーンアップ → `node scripts/generate-events-html.mjs` → commit/push で即デプロイできる（deploy.yml が public/ 変更で自動発火）
 
+### イベントデータの非退行原則（2026-09-23 導入・恒久ルール）
+2026-09-23 の事故（山梨 3→0 件・東京「宇都宮/習志野駐屯地見学」の time 消失・埼玉「入間航空祭/音楽まつり」の
+締切・年齢条件消失・愛知の会場/対象消失。全国 246→219 件でも「半減」未満のため CI を通過）の再発防止。
+
+- **同一イベントで前回取得済みの重要情報を、次回の抽出失敗だけを理由に空値で上書きしない**（absence is not deletion）。
+  - `shared/eventRegression.cjs` の `mergeNonRegressiveEvent` を `writeOutput` の「整形・除外・検疫・重複統合の後、status 導出の前」に適用。
+  - 対象: time / place / address / notes（完全に空のときだけ）/ ageRequirement / deadline＋deadlineDate（組で）/ weatherLocation（会場が同じときだけ）。
+  - 同一判定は厳格（id・pref・開催日が一致 かつ 同じ公式URL か正規化タイトル一致）。中止・終了済み・「時間未定/締切なし/年齢不問」等の明示的な削除には戻さない。
+  - OCR の文字落ち（「横須賀基地」→「横賀基地」）は前回値へ戻す（`restored_degraded`）。
+- **前回未終了イベントが存在する地本が突然0件になった場合、正常と確認できなければそのまま公開しない**。
+  `writeOutput` が前回の未終了イベントを引き継ぎ（`carryOverVanishedPrefs`）、`scraper/regression-report.json` に記録する。
+- 募集案内所イベントの前回データ維持は「その情報源（ページ/チラシURL）を今回読み直したか」で判定する（`revisitedSources`）。
+  以前の「地本HQを探索したか」だけの判定では、全国巡回が時間切れで届かなかった地本のイベントが丸ごと消えた。
+- パーサーの成功は「HTTP 200」ではなく内容で判定する。本文に今日以降の日付が複数あるのに 0 件なら
+  **パーサー失敗**として前回データを維持する（`shared/parserHealth.cjs` / `assertParseHealthy`）。
+- 地本本体のチラシ OCR 補完は、重い募集案内所巡回より**先に**行う（巡回で時間を使い切った回に全地本の補完が見送られていた）。
+- CI（`check-data-quality.mjs`）は前回 events.json 全体と比較し、次をエラー（コミット・デプロイ停止）にする:
+  地本の未終了イベント 前回2件以上→0件 / 前回5件以上→4割未満、同一 id の重要項目の消失（抽出失敗と判定されるもの）、
+  同じ地本で原因不明の消失3件以上かつ3割以上、全国総数35%以上減（20%以上は警告）。ログは `[pref:id] 項目 が消失: "前" -> "後"` 形式。
+- 構造化データ（JSON-LD Event）は公開より厳しく、`isEligibleForStructuredEvent`（titleQuality.cjs）を満たすものだけ出力する。
+
+### 非イベントの混入防止（2026-09-23 追加）
+- `isJunkOrStubTitle`: 誘導ボタン文言（詳しくみる／詳細はこちら 等）、サイト規約（コンテンツ利用について／利用規約 等）、
+  本文断片（（14:00受付終了）等）、募集告知（募集中 【○○】募集）、採用案内冊子（OCR 崩れ「探用案内」含む）。
+- `isNonEventDocument`: 福利厚生・待遇・給与等の資料、求人企業向け案内、放送の音声ファイル（.wav 等）。
+  タイトルに明確なイベント語（説明会・見学 等）があれば救済（「福利厚生説明会」は公開）。該当は検疫へ。
+- `suspiciousFutureDate`: OCR 由来で開催年の裏付けが無い1年以上先は警告、2年以上先・ファイル名に開催年より前の年がある場合は検疫。
+- **junk / 非イベントのルールを足すときは `titleQuality.cjs`・`titleQuality.test.cjs`・本書（CLAUDE.md）を同時に更新する**。
+  正規タイトル（県民の日・つばめのチカラ・100円商店街・トラックの日・女子会イベント・防災フェア）が通ることをテストで確認済み。
+- 検疫の履歴は `data/events-quarantine-history.jsonl`（追記専用・1行1レコード・quarantined/released）に残る。
+  ※ リポジトリは公開のため、data/ 配下も GitHub 上では誰でも読める（公開サイトから配信しないだけ）。
+
 ### 検疫（quarantine）— 新種のゴミを公開前に止める仕組み（2026-07-03 導入）
 既知ルール（isJunkOrStubTitle）をすり抜ける**新種のゴミパターンがルール追加まで公開され続けた事故**
 （岩手: 艦艇公開ページの表の行「乗艦受付時刻」等が3日間公開）の再発防止。**安全側デフォルト＝疑わしきは公開しない**。
@@ -645,6 +677,7 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 
 ### データ品質ゲート（CI）
 - `shared/dataQuality.cjs` + `scripts/check-data-quality.mjs`。ID重複/構造破損/不正・非実在日付/endDate<date/タイトル欠落/pref-キー不一致/座標範囲/accuracy値/手動-スクレイプID衝突/総数異常減少を**エラー（デプロイ停止）**、長すぎるタイトル・会場欠落・URL形式・OCR疑い等を**警告**として検出。
+- 2026-09-23 から前回（git HEAD）の events.json 全体と比較する差分検査を追加（地本件数・重要項目の消失・未終了イベントの消失。判定は `shared/eventRegression.cjs`、詳細は「イベントデータの非退行原則」）。結果は GitHub Actions のジョブサマリにも表で出る。
 - deploy.yml / scrape.yml で `npm test` ＋ このチェックが通った場合のみデプロイ。
 
 ### 主な環境変数（Vercel / GitHub Secrets）

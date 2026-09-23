@@ -3,7 +3,8 @@
 'use strict';
 
 const { isRealDate } = require('./weather.cjs');
-const { isJunkOrStubTitle } = require('./titleQuality.cjs');
+const { isJunkOrStubTitle, isSuspiciousTitle, isNonEventDocument, suspiciousFutureDate, isEligibleForStructuredEvent } = require('./titleQuality.cjs');
+const reg = require('./eventRegression.cjs');
 const { STATUS_VALUES } = require('./eventStatus.cjs');
 
 // 内部 office ID の許容形式（小文字英数・ハイフン）。表示名や日本語は不可。
@@ -26,14 +27,22 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 /**
  * @param {object} data events.json（pref キー → 配列、updatedAt）
- * @param {object} [opts] { prevTotal?:number, manualIds?:Set<string>, dropRatio?:number }
- * @returns {{errors:string[], warnings:string[], total:number, byAccuracy:object}}
+ * @param {object} [opts]
+ *   prevTotal?:number        前回の総数（総数の急減検査）
+ *   prevData?:object         前回の events.json 全体（地本件数・項目の回帰・消失の検査）
+ *   today?:string            YYYY-MM-DD（未終了の判定・未来日の検査。省略時は JST 今日）
+ *   quarantineIds?:Set       今回検疫されたイベントID（消失理由の分類）
+ *   manualIds?:Set<string>
+ *   dropRatio?:number        指定時は従来どおり「総数がこの比率未満でエラー」（後方互換）
+ * @returns {{errors:string[], warnings:string[], total:number, byAccuracy:object, regression:object|null}}
  */
 function validateEventsData(data, opts = {}) {
   const errors = [];
   const warnings = [];
   const ids = new Map(); // id → "pref/title" 最初の出現
   let total = 0;
+  let structuredIneligible = 0;
+  const today = opts.today || new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
   const byAccuracy = { address: 0, venue: 0, municipality: 0, prefecture: 0, manual: 0, missing: 0 };
 
   if (!data || typeof data !== 'object' || Array.isArray(data)) {
@@ -86,6 +95,12 @@ function validateEventsData(data, opts = {}) {
         if (isJunkOrStubTitle(title)) warnings.push(`${loc} 疑わしいタイトル（OCR断片/住所/様式の可能性）: "${title.slice(0, 30)}"`);
         if (title.length > 80) warnings.push(`${loc} タイトルが極端に長い（${title.length}字）`);
       }
+
+      // 非イベント文書・不自然な未来日・構造化データ対象外（警告。公開前の除外は writeOutput が行う）
+      if (title && isNonEventDocument(ev)) warnings.push(`${loc} 非イベント文書の疑い: "${title.slice(0, 30)}"`);
+      const future = suspiciousFutureDate(ev, today);
+      if (future) warnings.push(`${loc} OCR由来の不自然な未来日(${future === 'strong' ? '2年以上先' : '1年以上先'}): ${ev.date} "${title.slice(0, 30)}"`);
+      if (title && !isEligibleForStructuredEvent(ev, today)) structuredIneligible++;
 
       // URL 形式（警告）
       if (ev.url && !/^https?:\/\//i.test(String(ev.url))) warnings.push(`${loc} URL 形式が不正: "${ev.url}"`);
@@ -162,15 +177,74 @@ function validateEventsData(data, opts = {}) {
     });
   }
 
-  // 総数の異常減少（前回比）
+  // 総数の異常減少（前回比）。季節変動があるため補助判定（主判定は地本単位・項目単位）。
   if (typeof opts.prevTotal === 'number' && opts.prevTotal > 0) {
-    const ratio = opts.dropRatio || 0.5; // 既定: 半減でエラー
-    if (total < opts.prevTotal * ratio) {
-      errors.push(`イベント総数が異常に減少: 前回 ${opts.prevTotal} → 今回 ${total}`);
+    if (opts.dropRatio) {
+      if (total < opts.prevTotal * opts.dropRatio) errors.push(`イベント総数が異常に減少: 前回 ${opts.prevTotal} → 今回 ${total}`);
+    } else {
+      const d = reg.analyzeTotalDrop(opts.prevTotal, total);
+      const pct = Math.round((d ? d.drop : 0) * 100);
+      if (d && d.level === 'error') errors.push(`イベント総数が異常に減少（前回比 ${pct}% 減）: 前回 ${opts.prevTotal} → 今回 ${total}`);
+      else if (d) warnings.push(`イベント総数が前回比 ${pct}% 減少: 前回 ${opts.prevTotal} → 今回 ${total}`);
     }
   }
+  if (structuredIneligible) warnings.push(`構造化データ(JSON-LD)の対象外: ${structuredIneligible} 件（品質基準により Event として出力しない）`);
 
-  return { errors, warnings, total, byAccuracy };
+  const regression = opts.prevData ? checkRegressions(opts.prevData, data, { today, quarantineIds: opts.quarantineIds }, errors, warnings) : null;
+  return { errors, warnings, total, byAccuracy, regression };
+}
+
+/** 前回との比較で「現行の品質基準なら公開される」イベントか（品質ルール追加による正当な減少を除く）。 */
+function isCountableEvent(ev) {
+  return !!(ev && ev.title && !isJunkOrStubTitle(ev.title) && !isSuspiciousTitle(ev.title) && !isNonEventDocument(ev)
+    && ev.source_type !== 'office_notice');
+}
+
+const shortVal = (v) => (v == null ? 'null' : JSON.stringify(v));
+
+/**
+ * 前回データとの差分検査（地本件数・重要項目・イベント消失）。errors/warnings に追記し、集計を返す。
+ * ログは「どの地本の・どのイベントの・どの項目が・何から何へ」を1行で分かる形にする。
+ */
+function checkRegressions(prevData, data, { today, quarantineIds = new Set() } = {}, errors = [], warnings = []) {
+  const isCountable = isCountableEvent;
+  const prefAlerts = reg.analyzePrefCountRegressions(prevData, data, { today, isCountable });
+  for (const a of prefAlerts) {
+    const msg = `[${a.pref}] 未終了イベントが ${a.previous} → ${a.current}（${a.rule}）`;
+    (a.level === 'error' ? errors : warnings).push(msg);
+  }
+  const ev = reg.analyzeEventRegressions(prevData, data, { today });
+  for (const r of ev.fields) {
+    const msg = `[${r.pref}:${r.id}] ${r.field} が消失: ${r.previous == null ? 'null' : JSON.stringify(r.previous)} -> ${shortVal(r.current)}（${r.title ? r.title.slice(0, 24) : ''}）`;
+    // 保護すべき消失（抽出失敗）はエラー。中止・明示削除・会場変更による消失は正当な変更として警告に留める
+    if (r.protectable) errors.push(msg); else warnings.push(`${msg} [${r.reason}]`);
+  }
+  for (const n of ev.notes) {
+    const why = [n.lostKeywords.length ? `重要語の消失: ${n.lostKeywords.join('・')}` : '', n.shrunk ? `${n.previousLength}→${n.currentLength}字` : ''].filter(Boolean).join(' / ');
+    warnings.push(`[${n.pref}:${n.id}] notes が大きく変化（${why}）`);
+  }
+  const missing = reg.analyzeMissingEvents(prevData, data, { today, quarantineIds, isCountable });
+  for (const m of missing.filter(x => x.reason === 'unexplained')) {
+    warnings.push(`[${m.pref}:${m.id}] 未終了イベントが消失: ${m.date} "${String(m.title || '').slice(0, 30)}"（${m.source_type || '-'}）`);
+  }
+  const missingByPref = reg.summarizeMissingByPref(missing, prevData, { today, isCountable });
+  for (const s of missingByPref.filter(x => x.level === 'error')) {
+    errors.push(`[${s.pref}] 原因不明の未終了イベント消失が ${s.missing} 件（前回 ${s.previous} 件中）`);
+  }
+  return {
+    prefAlerts,
+    fieldRegressions: ev.fields,
+    notesChanges: ev.notes,
+    missingEvents: missing,
+    summary: {
+      prefErrors: prefAlerts.filter(a => a.level === 'error').length,
+      prefWarnings: prefAlerts.filter(a => a.level === 'warning').length,
+      fieldErrors: ev.fields.filter(r => r.protectable).length,
+      fieldWarnings: ev.fields.filter(r => !r.protectable).length,
+      missingUnexplained: missing.filter(m => m.reason === 'unexplained').length,
+      missingTotal: missing.length,
+    },
+  };
 }
 
 /**
@@ -195,4 +269,4 @@ function uniquifyIds(data) {
   return changed;
 }
 
-module.exports = { validateEventsData, uniquifyIds, PREF_KEYS, ACCURACY_OK };
+module.exports = { validateEventsData, checkRegressions, isCountableEvent, uniquifyIds, PREF_KEYS, ACCURACY_OK };
