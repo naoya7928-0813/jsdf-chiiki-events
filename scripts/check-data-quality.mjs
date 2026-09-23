@@ -17,8 +17,8 @@ import dq from '../shared/dataQuality.cjs';
 const { validateEventsData } = dq;
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const EVENTS = path.join(root, 'public/data/events.json');
-const QUARANTINE = path.join(root, 'public/data/events-quarantine.json');
-const LLM_RECHECK = path.join(root, 'public/data/events-llm-recheck.json');
+const QUARANTINE = path.join(root, 'data/events-quarantine.json');
+const LLM_RECHECK = path.join(root, 'data/events-llm-recheck.json');
 const REGRESSION_REPORT = path.join(root, 'scraper/regression-report.json');
 
 function readJson(p) {

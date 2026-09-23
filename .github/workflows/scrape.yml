@@ -281,10 +281,10 @@ jobs:
       # 正規イベントなら shared/titleQuality.cjs の APPROVED_TITLES へ追加で公開される。
       - name: 検疫レポート（公開保留イベントの通知）
         run: |
-          QN=$(node -e "try{console.log(require('./public/data/events-quarantine.json').count||0)}catch{console.log(0)}")
+          QN=$(node -e "try{console.log(require('./data/events-quarantine.json').count||0)}catch{console.log(0)}")
           echo "QUARANTINED=${QN}" >> "$GITHUB_ENV"
           if [ "$QN" -gt 0 ]; then
-            LIST=$(node -e "const q=require('./public/data/events-quarantine.json');q.events.slice(0,10).forEach(e=>console.log(\`[\${e.pref}] \${e.date} \${e.title}\`))")
+            LIST=$(node -e "const q=require('./data/events-quarantine.json');q.events.slice(0,10).forEach(e=>console.log(\`[\${e.pref}] \${e.date} \${e.title}\`))")
             echo "::warning::疑わしいタイトル ${QN} 件を公開保留（検疫）にしました"
             printf '%s\n' "$LIST"
             curl -sS --fail-with-body --retry 3 --retry-all-errors --connect-timeout 10 --max-time 30 \
@@ -304,9 +304,9 @@ jobs:
       # 読み直して修正している。何がどう書き換わったかを管理者が検証できるよう通知する。
       - name: LLM再検査レポート（自動修正の通知）
         run: |
-          CN=$(node -e "try{console.log(require('./public/data/events-llm-recheck.json').summary.corrected||0)}catch{console.log(0)}")
+          CN=$(node -e "try{console.log(require('./data/events-llm-recheck.json').summary.corrected||0)}catch{console.log(0)}")
           if [ "$CN" -gt 0 ]; then
-            LIST=$(node -e "const r=require('./public/data/events-llm-recheck.json');r.corrections.slice(0,10).forEach(c=>console.log(\`[\${c.pref}] \${c.changes.map(x=>\`\${x.field}: \${x.from??'なし'} → \${x.to??'なし'}\`).join(' / ')}\`))")
+            LIST=$(node -e "const r=require('./data/events-llm-recheck.json');r.corrections.slice(0,10).forEach(c=>console.log(\`[\${c.pref}] \${c.changes.map(x=>\`\${x.field}: \${x.from??'なし'} → \${x.to??'なし'}\`).join(' / ')}\`))")
             echo "::warning::一次ソース再検査により ${CN} 件を自動修正しました"
             printf '%s\n' "$LIST"
             curl -sS --fail-with-body --retry 3 --retry-all-errors --connect-timeout 10 --max-time 30 \
@@ -341,7 +341,7 @@ jobs:
           #   書き換わる。これを add し忘れると未ステージの追跡変更として残り、後続の
           #   `git rebase` が "cannot rebase: You have unstaged changes" で失敗していた
           #   （2026-06-28 の天気/ジオコーディング機能導入以降、毎回 push 前に停止）。
-          git add public/data/events.json public/data/events-quarantine.json public/data/events-llm-recheck.json data/events-archive.json public/events.html public/events/ public/sitemap.xml scraper/geocode-cache.json
+          git add public/data/events.json data/events-quarantine.json data/events-llm-recheck.json data/events-archive.json public/events.html public/events/ public/sitemap.xml scraper/geocode-cache.json
           # 検疫の履歴（追記専用 JSONL）。隔離・解除があった回だけ作成・追記されるため、存在するときだけ追加する
           if [ -f data/events-quarantine-history.jsonl ]; then git add data/events-quarantine-history.jsonl; fi
           # 前回値の引き継ぎが連続している項目の状態（次回実行へ持ち越す。公開サイトからは配信しない）
