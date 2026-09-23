@@ -9,6 +9,15 @@ import { TAG_DEFS, normalizeTags } from '../../shared/tags.cjs';
 import PastEventsPanel from './PastEventsPanel';
 import PresencePanel from './PresencePanel';
 import ReportsPanel from './ReportsPanel';
+import { useIsDesktop } from '../hooks/useBreakpoint';
+
+// 広い画面での本文の最大幅（公開ページと同じ判定・設定でレイアウトを切り替える）。
+// デスクトップでは「入力フォーム（左）＋一覧（右）」の2列、それ以外は従来どおり1列。
+const CONTENT_MAX = 1180;
+const FORM_COL = 560;
+// 2列にするのは本文の実幅がこれ以上あるときだけ（フォーム 560 ＋ 一覧 最低約 320 ＋ 間隔）。
+// ウィンドウ幅で決めると、1024px（サイドナビ込み）で一覧が約200pxに潰れるため、置かれた場所の実寸で判断する。
+const TWO_COL_MIN = 900;
 
 /**
  * 運営者管理画面。
@@ -131,6 +140,19 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const canSeePresence = perms.has('account:read'); // 在席状況（所長・担当官のみ）
   const canSeeReports = perms.has('report:read'); // 利用者からの報告（所長・担当官のみ）
   const org = account?.organization ?? account?.pref ?? '*';
+  // 画面幅の区分は公開ページと共通（useBreakpoint・表示の向き設定を含む）
+  const isDesktop = useIsDesktop();
+  const centered = isDesktop ? { maxWidth: CONTENT_MAX, width: '100%', margin: '0 auto', boxSizing: 'border-box' } : null;
+  // 本文（スクロール領域）の実幅。管理画面の本体はログイン確認の後に現れるため、要素を state で受けて計測する
+  const [scrollEl, setScrollEl] = useState(null);
+  const [scrollWidth, setScrollWidth] = useState(0);
+  useEffect(() => {
+    if (!scrollEl || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(entries => { for (const e of entries) setScrollWidth(e.contentRect.width); });
+    ro.observe(scrollEl);
+    setScrollWidth(scrollEl.getBoundingClientRect().width);
+    return () => ro.disconnect();
+  }, [scrollEl]);
 
   useEffect(() => { fetchOfficesData().then(d => setOffices(Array.isArray(d) ? d : (d?.offices || []))).catch(() => {}); }, []);
 
@@ -346,7 +368,8 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
     return (
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)', fontFamily: F.sans }}>
         <ScreenHeader primary={primary} title="運営者ログイン" subtitle="ADMIN" onBack={onBack} />
-        <div style={{ flex: 1, overflowY: 'auto', padding: '24px 18px' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: isDesktop ? '48px 18px' : '24px 18px' }}>
+          <div style={{ maxWidth: 420, margin: '0 auto' }}>
           <div style={label}>ユーザー名</div>
           <input value={uInput} autoFocus onChange={e => setUInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleLogin(); }} placeholder="例: tokyo" style={input} />
           <div style={label}>パスワード</div>
@@ -354,6 +377,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
           {authErr && <div style={{ color: '#ef4444', fontSize: 12.5, marginBottom: 12 }}>{authErr}</div>}
           <button onClick={handleLogin} disabled={busy || !uInput || !pInput} style={{ width: '100%', padding: 13, borderRadius: 12, border: 'none', fontFamily: F.sans, fontSize: 15, fontWeight: 700, color: '#fff', background: (busy || !uInput || !pInput) ? 'var(--border)' : primary, cursor: (busy || !uInput || !pInput) ? 'default' : 'pointer' }}>{busy ? '確認中…' : 'ログイン'}</button>
           <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 14, lineHeight: 1.7 }}>ログイン後は通常の画面に戻ります。管理メニューは「設定」内に表示されます。</div>
+          </div>
         </div>
       </div>
     );
@@ -372,6 +396,11 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   if (canSeePresence) TABS.push(['presence', '在席状況']);
   // 下書き確認ページでは登録フォームを出さない（編集時のみ表示）。追加修正ページは常時表示。
   const showForm = (filter === 'all') || !!editingId; // 'draft'・'past' ではフォームを出さない（編集時を除く）
+  // 2列にするのは「フォーム」と「一覧」を同時に出す画面だけ（過去・在席・報告の各パネルは1列で広く使う）
+  const twoCol = isDesktop && scrollWidth >= TWO_COL_MIN && showForm && !isPastView && !isPresenceView && !isReportsView;
+  // 本文の枠: 2列・各パネルは CONTENT_MAX まで。フォームを1列で出すときは設定画面と同じ 720px に抑える
+  const contentBox = !isDesktop ? undefined
+    : { ...centered, maxWidth: (showForm && !twoCol) ? 720 : CONTENT_MAX };
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)', fontFamily: F.sans }}>
       <ScreenHeader primary={primary} title={editingId ? '編集' : (filter === 'draft' ? '下書き確認' : filter === 'past' ? '過去イベント' : filter === 'presence' ? '在席状況' : filter === 'reports' ? '利用者からの報告' : 'イベント追加・修正')} subtitle="ADMIN"
@@ -379,7 +408,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         trailing={<button onClick={logout} style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', borderRadius: 8, fontSize: 12, padding: '6px 10px', cursor: 'pointer' }}>ログアウト</button>} />
       {/* タブ（追加・修正／下書き／過去／在席状況）。1ページで全機能にアクセス */}
       {showTabs && !editingId && (
-        <div style={{ display: 'flex', gap: 8, padding: '10px 16px 0', flexShrink: 0, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 8, padding: '10px 16px 0', flexShrink: 0, flexWrap: 'wrap', ...(contentBox ? { ...contentBox, maxWidth: contentBox.maxWidth + 32 } : {}) }}>
           {TABS.map(([v, jp]) => {
             const on = filter === v;
             return (
@@ -395,7 +424,8 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
       {/* overflowX:hidden = 横方向のドラッグ/遊びを抑止（overflowY:auto のみだと
           CSS仕様で overflow-x が auto になり、はみ出し時に横スクロールが生じる）。
           フォーム内の要素は各自 width:100%/minWidth:0 で縮むため内容は欠けない。 */}
-      <div data-admin-scroll style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '16px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 28px)' }}>
+      <div data-admin-scroll ref={setScrollEl} style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '16px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 28px)' }}>
+        <div style={contentBox}>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10 }}>ログイン中: <strong style={{ color: 'var(--text)' }}>{account.label}</strong>（担当: {prefLabel}）</div>
 
         {/* 権限はサーバー側のロールで決定（操作者ID＝displayId・氏名は表示しない） */}
@@ -409,6 +439,9 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
           </div>
         </div>
 
+        {/* デスクトップ: 入力フォーム（左）＋一覧・各パネル（右）の2列。それ以外は従来どおり縦に1列 */}
+        <div style={twoCol ? { display: 'grid', gridTemplateColumns: `minmax(0, ${FORM_COL}px) minmax(0, 1fr)`, gap: 24, alignItems: 'start' } : undefined}>
+        <div style={twoCol ? { minWidth: 0 } : undefined}>
         {showForm && (<>
         <div style={{ fontSize: 13, fontWeight: 700, color: editingId ? 'var(--brand-fg)' : 'var(--text)', marginBottom: 12 }}>
           {editingId ? '既存イベントを編集中' : 'イベントを登録'}
@@ -635,6 +668,8 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         )}
         </>)}
 
+        </div>
+        <div style={twoCol ? { minWidth: 0 } : undefined}>
         {/* 過去イベント（閲覧専用。「現在・今後」「監査履歴」とは別画面） */}
         {isPastView && <PastEventsPanel adminFetch={adminFetch} account={account} primary={primary} />}
 
@@ -689,6 +724,9 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
             </div>
           ))}
         </>)}
+        </div>
+        </div>
+        </div>
       </div>
     </div>
   );
