@@ -367,6 +367,34 @@ function analyzeTotalDrop(prevTotal, total) {
   return null;
 }
 
+// ── 引き継ぎの長期化（stale）の追跡 ─────────────────────────────
+// 前回値の保護は正しいが、同じ項目が一次ソースから何回も取れないまま引き継がれ続けると、
+// 公式側の変更に気づけない。項目ごとに「連続して引き継いだ回数」と「引き継ぎ開始日」を残し、
+// 一定回数を超えたものを要確認（stale）として報告する（公開データには影響しない）。
+// 1日3回実行なので 9 回 ≒ 3日間、一次ソースから直接確認できていない。
+const STALE_CARRY_RUNS = 9;
+
+/**
+ * 引き継ぎ状態を更新する（純粋）。今回引き継いだ項目だけを残し、回数を +1 する。
+ * 今回引き継がなかった項目（＝一次ソースから取れた、またはイベントが無くなった）は状態から消える。
+ * @param {object} prevState { "<id>|<field>": { count, since, last } }
+ * @param {Array<{id, field}>} carried 今回 mergeNonRegressiveEvent が引き継いだ項目
+ * @param {string} today YYYY-MM-DD
+ * @returns {{ state: object, stale: Array<{id, field, count, since}> }}
+ */
+function updateCarryState(prevState, carried, today) {
+  const state = {};
+  for (const c of carried || []) {
+    const key = `${c.id}|${c.field}`;
+    const p = (prevState && prevState[key]) || null;
+    state[key] = { count: (p ? Number(p.count) || 0 : 0) + 1, since: (p && p.since) || today, last: today };
+  }
+  const stale = Object.entries(state)
+    .filter(([, v]) => v.count >= STALE_CARRY_RUNS)
+    .map(([key, v]) => { const i = key.lastIndexOf('|'); return { id: key.slice(0, i), field: key.slice(i + 1), count: v.count, since: v.since }; });
+  return { state, stale };
+}
+
 /** 公開データから内部専用のメタデータ（__ で始まる項目）を除く。 */
 function stripInternalFields(ev) {
   const out = {};
@@ -376,7 +404,7 @@ function stripInternalFields(ev) {
 
 module.exports = {
   PROTECTED_FIELDS, CRITICAL_FIELDS, NOTES_KEYWORDS, PREF_THRESHOLDS, TOTAL_THRESHOLDS,
-  MISSING_ERROR_MIN, MISSING_ERROR_RATIO,
+  MISSING_ERROR_MIN, MISSING_ERROR_RATIO, STALE_CARRY_RUNS, updateCarryState,
   isBlankValue, isValidLocation, isMissingField, canonicalUrl, buildEventIndex, isEnded, isCancelledEvent,
   sameSource, sameEventIdentity, isExplicitlyRemoved, samePlace, isDegradedVariant, lostNotesKeywords,
   mergeNonRegressiveEvent, futureEventsByPref, analyzePrefCountRegressions, carryOverVanishedPrefs,

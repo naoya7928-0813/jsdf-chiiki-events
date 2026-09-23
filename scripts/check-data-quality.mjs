@@ -88,6 +88,7 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     ['未終了イベントの消失（原因不明 / 全体）', regression ? `${s.missingUnexplained} / ${s.missingTotal}` : '—'],
     ['スクレイパーが前回値を保護した項目', rr ? rr.summary.fieldsCarriedOver : '—'],
     ['スクレイパーが引き継いだ0件化地本', rr ? rr.summary.prefCountAlerts : '—'],
+    ['一次ソースで長く確認できていない項目（連続引き継ぎ）', rr ? (rr.summary.staleCarries ?? 0) : '—'],
     ['検疫（公開保留）', (quarantine.events || []).length],
     ['LLM 再検査（要再検査 / 実施）', llm && llm.summary ? `${llm.summary.flagged} / ${llm.summary.attempted}` : '—'],
     ['判定', errors.length ? `❌ エラー ${errors.length} 件` : '✅ 合格'],

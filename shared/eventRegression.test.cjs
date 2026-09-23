@@ -245,3 +245,26 @@ test('保護と CI 判定は一致する: 保護後の公開データは「保�
 test('内部メタデータ（__ で始まる項目）は公開データから除く', () => {
   assert.deepEqual(R.stripInternalFields({ id: 'a', __fieldState: { time: 'removed' }, __llmUnverified: 'x', title: 't' }), { id: 'a', title: 't' });
 });
+
+// ── 引き継ぎの長期化（stale）の追跡 ─────────────────────────────
+test('updateCarryState: 連続して引き継いだ回数と開始日を数え、取れた項目は状態から消える', () => {
+  const c = (id, field) => ({ id, field });
+  let st = {};
+  for (let i = 0; i < R.STALE_CARRY_RUNS - 1; i++) {
+    const r = R.updateCarryState(st, [c('t-1', 'time'), c('t-1', 'deadline')], `2026-09-${String(20 + Math.floor(i / 3)).padStart(2, '0')}`);
+    st = r.state;
+    assert.deepEqual(r.stale, [], 'しきい値未満は stale にしない');
+  }
+  // 次の回で time はまだ取れず（9回目）、deadline は一次ソースから取れた
+  const r = R.updateCarryState(st, [c('t-1', 'time')], '2026-09-23');
+  assert.deepEqual(r.stale, [{ id: 't-1', field: 'time', count: R.STALE_CARRY_RUNS, since: '2026-09-20' }]);
+  assert.equal(r.state['t-1|deadline'], undefined, '取れた項目は連続回数をリセット');
+  // 次の回で time も取れたら状態は空
+  assert.deepEqual(R.updateCarryState(r.state, [], '2026-09-24').state, {});
+});
+
+test('updateCarryState: id に | を含んでも項目名を正しく分ける', () => {
+  const st = { 'a|b|time': { count: R.STALE_CARRY_RUNS - 1, since: '2026-09-20' } };
+  const r = R.updateCarryState(st, [{ id: 'a|b', field: 'time' }], '2026-09-23');
+  assert.deepEqual(r.stale.map(x => [x.id, x.field]), [['a|b', 'time']]);
+});

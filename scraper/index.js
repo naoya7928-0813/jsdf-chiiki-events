@@ -139,6 +139,8 @@ const ARCHIVE_PATH = path.join(__dirname, '../data/events-archive.json');
 const QUARANTINE_HISTORY_PATH = path.join(__dirname, '../data/events-quarantine-history.jsonl');
 // 前回値との比較結果（前回値を保護した項目・0件化した地本・消失イベント）。CI のサマリが読む（コミットしない）
 const REGRESSION_REPORT_PATH = path.join(__dirname, 'regression-report.json');
+// 前回値の引き継ぎが連続している項目の状態（{"<id>|<field>": {count, since, last}}）。次回実行へ持ち越すためコミットする。
+const FIELD_CARRY_STATE_PATH = path.join(__dirname, '../data/field-carry-state.json');
 // 保持設定（環境変数で調整可）。既定: 開催日が約2年以内、かつ最大2万件。
 // 運営のアーカイブは期限で切らずに蓄積する（収集したデータを残すのが目的）。
 // ARCHIVE_RETENTION_DAYS を明示的に設定した場合だけ、その日数より古いものを落とす。
@@ -4554,6 +4556,10 @@ async function writeOutput(data, timeCutoff = null) {
         console.warn(`  - [${c.pref}:${c.id}] ${c.field}: ${JSON.stringify(c.previous)} ← ${JSON.stringify(c.current)}（${c.action}）`);
       }
     }
+
+    // (3) 引き継ぎの長期化（stale）の追跡。同じ項目が連続して何回、いつから一次ソースで確認できていないかを残す。
+    //     公開データは変えない（要確認として報告するだけ）。モック・リプレイでは状態を更新しない。
+    regressionReport.staleCarries = updateFieldCarryState(regressionReport.carriedFields, today);
   }
 
   // ── 検疫ファイルの書き出し（毎回、今回の疑わしい件で全置換） ──────────
@@ -4776,6 +4782,7 @@ function writeRegressionReport(prevData, data, report, quarantined, today) {
         fieldsCarriedOver: report.carriedFields.length,
         missingEvents: missing.filter(m => m.reason === 'unexplained').length,
         prefCountAlerts: report.prefAlerts.length,
+        staleCarries: (report.staleCarries || []).length,
       },
       fieldRegressions: [
         ...report.carriedFields,
@@ -4783,6 +4790,8 @@ function writeRegressionReport(prevData, data, report, quarantined, today) {
       ],
       missingEvents: missing,
       prefCountAlerts: report.prefAlerts,
+      // 一次ソースで長く確認できていない（連続して前回値を引き継いでいる）項目。公式側の変更の見落としに注意
+      staleCarries: report.staleCarries || [],
     };
     fs.writeFileSync(REGRESSION_REPORT_PATH, JSON.stringify(out, null, 2), 'utf8');
     const unexplained = missing.filter(x => x.reason === 'unexplained');
@@ -4793,6 +4802,28 @@ function writeRegressionReport(prevData, data, report, quarantined, today) {
       }
     }
   } catch (e) { console.warn('[非退行] レポートの書き出しに失敗:', e.message); }
+}
+
+/**
+ * 引き継ぎの長期化を追跡する（data/field-carry-state.json を読み、今回の引き継ぎで更新して書き戻す）。
+ * 判定は shared/eventRegression.cjs の updateCarryState。モック・リプレイでは読み取りだけで書き戻さない。
+ * @returns {Array<{id, field, count, since}>} 連続 STALE_CARRY_RUNS 回以上引き継いでいる項目
+ */
+function updateFieldCarryState(carriedFields, today) {
+  try {
+    let prevState = {};
+    try { if (fs.existsSync(FIELD_CARRY_STATE_PATH)) prevState = JSON.parse(fs.readFileSync(FIELD_CARRY_STATE_PATH, 'utf8')).fields || {}; }
+    catch { /* 破損時は初期化 */ }
+    const { state, stale } = eventRegression.updateCarryState(prevState, carriedFields, today);
+    if (!process.argv.includes('--mock') && !process.argv.includes('--replay')) {
+      fs.writeFileSync(FIELD_CARRY_STATE_PATH, JSON.stringify({ updatedAt: today, fields: state }, null, 2) + '\n', 'utf8');
+    }
+    if (stale.length) {
+      console.warn(`[非退行] 一次ソースで ${eventRegression.STALE_CARRY_RUNS} 回以上続けて確認できず、前回値を使い続けている項目 ${stale.length} 件（公式側の変更に注意）:`);
+      for (const x of stale.slice(0, 20)) console.warn(`  - [${x.id}] ${x.field}: ${x.count} 回連続（${x.since} から）`);
+    }
+    return stale;
+  } catch (e) { console.warn('[非退行] 引き継ぎ状態の更新に失敗:', e.message); return []; }
 }
 
 /**
