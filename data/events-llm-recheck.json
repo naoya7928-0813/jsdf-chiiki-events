@@ -2,9 +2,9 @@
   "updatedAt": "2026-09-24",
   "limit": 30,
   "summary": {
-    "checked": 259,
-    "flagged": 12,
-    "attempted": 2,
+    "checked": 246,
+    "flagged": 11,
+    "attempted": 0,
     "corrected": 0,
     "unverified": 0,
     "noSource": 3,
@@ -12,7 +12,7 @@
     "skippedNoSource": 3,
     "skippedNotEligible": 7,
     "skippedProviderUnavailable": 0,
-    "skippedCutoff": 0
+    "skippedCutoff": 1
   },
   "corrections": [],
   "skipped": [
@@ -35,6 +35,11 @@
       "id": "ya-20261025-c4z5s",
       "pref": "yamagata",
       "reason": "no_source"
+    },
+    {
+      "id": "s-20261121-5372q",
+      "pref": "saitama",
+      "reason": "cutoff"
     },
     {
       "id": "os-office-20260926-hw000",
