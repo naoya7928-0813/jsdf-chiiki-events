@@ -268,3 +268,24 @@ test('updateCarryState: id に | を含んでも項目名を正しく分ける',
   const r = R.updateCarryState(st, [{ id: 'a|b', field: 'time' }], '2026-09-23');
   assert.deepEqual(r.stale.map(x => [x.id, x.field]), [['a|b', 'time']]);
 });
+
+// ── 座標はジオコーディング後に判定する（抽出段階で数えると毎回ほぼ全件が引き継ぎになる） ──
+test('mergeNonRegressiveEvent: skipFields で座標を対象外にできる（既定は従来どおり対象）', () => {
+  const r = R.mergeNonRegressiveEvent(base({ weatherLocation: loc }), base({ weatherLocation: null }), { today: TODAY, skipFields: ['weatherLocation'] });
+  assert.equal(r.event.weatherLocation, null);
+  assert.deepEqual(r.carried, []);
+});
+
+test('restoreLostLocation: ジオコーディング後も座標が無い同一イベントだけ前回の座標を戻す', () => {
+  const r = R.restoreLostLocation(base({ weatherLocation: loc }), base({ weatherLocation: null }), { today: TODAY });
+  assert.deepEqual(r.event.weatherLocation, loc);
+  assert.deepEqual(r.carried.map(c => c.field), ['weatherLocation']);
+  // ジオコーディングで付いたものはそのまま（引き継ぎとして数えない）
+  const got = { ...loc, latitude: 36.6 };
+  assert.deepEqual(R.restoreLostLocation(base({ weatherLocation: loc }), base({ weatherLocation: got }), { today: TODAY }).carried, []);
+  // 会場が変わった・中止・終了・別イベントには戻さない
+  assert.deepEqual(R.restoreLostLocation(base({ weatherLocation: loc }), base({ place: '朝霞駐屯地', weatherLocation: null }), { today: TODAY }).carried, []);
+  assert.deepEqual(R.restoreLostLocation(base({ weatherLocation: loc }), base({ status: 'cancelled', weatherLocation: null }), { today: TODAY }).carried, []);
+  assert.deepEqual(R.restoreLostLocation(base({ date: '2026-09-01', weatherLocation: loc }), base({ date: '2026-09-01', weatherLocation: null }), { today: TODAY }).carried, []);
+  assert.deepEqual(R.restoreLostLocation(base({ weatherLocation: loc }), base({ id: 't-2', weatherLocation: null }), { today: TODAY }).carried, []);
+});

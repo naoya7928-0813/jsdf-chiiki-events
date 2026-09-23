@@ -178,7 +178,8 @@ const brief = (v) => {
  * 前回値を保護して今回のイベントを返す（next は変更しない）。
  * @returns {{ event:object, carried:Array<{field,previous,current,action}>, skipped?:string }}
  */
-function mergeNonRegressiveEvent(prev, next, { today } = {}) {
+function mergeNonRegressiveEvent(prev, next, { today, skipFields = [] } = {}) {
+  const skip = new Set(skipFields);
   const none = (skipped) => ({ event: next, carried: [], ...(skipped ? { skipped } : {}) });
   if (!prev || !next) return none();
   if (!sameEventIdentity(prev, next)) return none('identity_mismatch');
@@ -207,11 +208,30 @@ function mergeNonRegressiveEvent(prev, next, { today } = {}) {
     carry('deadline');
     if (!isBlankValue(prev.deadlineDate) && isBlankValue(next.deadlineDate)) carry('deadlineDate');
   }
-  // 座標は会場・住所が実質同じときだけ（会場が変わったら古い座標を使わない）
-  if (isValidLocation(prev.weatherLocation) && !isValidLocation(next.weatherLocation) && samePlace(prev, out)) {
+  // 座標は会場・住所が実質同じときだけ（会場が変わったら古い座標を使わない）。
+  // スクレイパーは座標をジオコーディングで後から付けるため、writeOutput は skipFields で外し、
+  // ジオコーディング後に restoreLostLocation で「それでも付かなかった」ものだけを戻す。
+  if (!skip.has('weatherLocation') && isValidLocation(prev.weatherLocation) && !isValidLocation(next.weatherLocation) && samePlace(prev, out)) {
     carry('weatherLocation');
   }
   return { event: out, carried };
+}
+
+/**
+ * ジオコーディング後に座標が付かなかったイベントへ、前回の座標を戻す（会場・住所が同じときだけ）。
+ * 抽出段階では座標が無いのが普通（ジオコーディングで付ける）なので、その段階で数えると
+ * 毎回ほぼ全件が「引き継ぎ」になり、長期引き継ぎ（stale）の追跡も誤報になる（2026-09-23 手動実行で194件）。
+ * @returns {{ event:object, carried:Array }}
+ */
+function restoreLostLocation(prev, next, { today } = {}) {
+  const none = { event: next, carried: [] };
+  if (!prev || !next || isValidLocation(next.weatherLocation) || !isValidLocation(prev.weatherLocation)) return none;
+  if (!sameEventIdentity(prev, next) || isEnded(next, today) || isCancelledEvent(next)) return none;
+  if (!samePlace(prev, next)) return none;
+  return {
+    event: { ...next, weatherLocation: clone(prev.weatherLocation) },
+    carried: [{ field: 'weatherLocation', previous: brief(prev.weatherLocation), current: null, action: 'carried_over' }],
+  };
 }
 
 /** events.json の地本ごとの「未終了・中止以外」のイベント（isCountable で品質条件を追加できる）。 */
@@ -407,6 +427,6 @@ module.exports = {
   MISSING_ERROR_MIN, MISSING_ERROR_RATIO, STALE_CARRY_RUNS, updateCarryState,
   isBlankValue, isValidLocation, isMissingField, canonicalUrl, buildEventIndex, isEnded, isCancelledEvent,
   sameSource, sameEventIdentity, isExplicitlyRemoved, samePlace, isDegradedVariant, lostNotesKeywords,
-  mergeNonRegressiveEvent, futureEventsByPref, analyzePrefCountRegressions, carryOverVanishedPrefs,
+  mergeNonRegressiveEvent, restoreLostLocation, futureEventsByPref, analyzePrefCountRegressions, carryOverVanishedPrefs,
   analyzeEventRegressions, analyzeMissingEvents, summarizeMissingByPref, analyzeTotalDrop, stripInternalFields,
 };
