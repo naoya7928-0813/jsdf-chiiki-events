@@ -105,21 +105,21 @@ export default function App({ operator = false }) {
 
   // ── デスクトップ2ペイン判定（フィードバック§2-2-8） ──────────────
   // 広い画面では一覧の余白が大きいため、一覧（左）＋詳細（右）の2ペインにする。
-  // 運営者ページは対象外。
+  // 運営者ページ(/admin.html)も公開ページと同じ判定・同じ設定で切り替える（2026-09-23〜。
+  // 以前は運営者ページだけ 430px の縦長固定で、PC では画面の大半が空いていた）。
   const [isWide, setIsWide] = useState(() => {
-    try { return !operator && window.matchMedia('(min-width: 1000px)').matches; } catch { return false; }
+    try { return window.matchMedia('(min-width: 1000px)').matches; } catch { return false; }
   });
   useEffect(() => {
-    if (operator) return;
     const mq = window.matchMedia('(min-width: 1000px)');
     const apply = () => setIsWide(mq.matches);
     apply();
     mq.addEventListener('change', apply);
     return () => mq.removeEventListener('change', apply);
-  }, [operator]);
+  }, []);
 
   // 画面幅の区分。デスクトップ(1024px～)では左サイドナビ + 各画面の横幅活用に切り替える。
-  // 運営者ページは従来の縦長レイアウトのままにする。
+  // 運営者ページも同じ（サイドナビには運営者用の「管理」が加わる）。
   // 表示の向き（自動 / 横向き / 縦向き）。スマホでの見え方を利用者が選べる。
   const [layoutMode, setLayoutMode] = useState(loadLayoutMode);
   const handleLayoutModeChange = useCallback((mode) => {
@@ -139,7 +139,7 @@ export default function App({ operator = false }) {
   }, []);
 
   const breakpoint      = useBreakpoint(layoutMode);
-  const isDesktopLayout = !operator && breakpoint === 'desktop';
+  const isDesktopLayout = breakpoint === 'desktop';
 
   // ── ナビゲーション ────────────────────────────────────────
   const [screen,      setScreen]      = useState('home');
@@ -601,8 +601,9 @@ export default function App({ operator = false }) {
 
   // ── 運営者サイトはログイン必須。未ログインならログイン画面のみ表示 ──
   if (operator && !adminAuthed) {
+    // ログイン前はサイドナビを出さないので、デスクトップでも縦並び（ログイン欄は画面側で中央寄せ）
     return (
-      <div style={containerStyle}>
+      <div style={{ ...containerStyle, flexDirection: 'column' }}>
         <Suspense fallback={null}>
           <AdminScreen
             theme={theme}
