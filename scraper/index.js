@@ -121,9 +121,9 @@ const OUTPUT_PATH = path.join(__dirname, '../public/data/events.json');
 const OFFICES_PATH = path.join(__dirname, '../public/data/offices.json');
 // 検疫: 「疑わしい」タイトルのイベントを公開せず隔離する先（git コミット・管理者レビュー用）。
 // 新種のゴミパターンがルール追加まで公開され続けた事故（2026-07-03 岩手）の再発防止。
-const QUARANTINE_PATH = path.join(__dirname, '../public/data/events-quarantine.json');
+const QUARANTINE_PATH = path.join(__dirname, '../data/events-quarantine.json');
 // 段3（一次ソース再検査）の結果レポート。管理者が「何が自動で直ったか」を後から検証できるようにする
-const LLM_RECHECK_PATH = path.join(__dirname, '../public/data/events-llm-recheck.json');
+const LLM_RECHECK_PATH = path.join(__dirname, '../data/events-llm-recheck.json');
 // Web Push ペイロード（git管理外）。スクレイパーは書き出しのみ行い、送信は
 // scrape.yml の「CDN 伝播待機」後のステップが行う（Issue #16: デプロイ前に通知が
 // 届くと、タップ時にまだ旧データが表示される問題の解消）。
