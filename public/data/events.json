@@ -16,6 +16,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-27",
       "weatherLocation": {
         "latitude": 43.771,
         "longitude": 142.365,
@@ -23,33 +24,6 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:08.267+09:00"
-      },
-      "firstSeen": "2026-08-27"
-    },
-    {
-      "id": "as-off-20270128-xp1ck",
-      "pref": "asahikawa",
-      "date": "2027-01-28",
-      "weekday": "木",
-      "title": "自衛官募集ホームページ <自衛官募集X",
-      "place": "防衛大学",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/asahikawa/01_recruit/r8_nitteihyou.pdf",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-09-24",
-      "weatherLocation": {
-        "latitude": 43.771,
-        "longitude": 142.365,
-        "label": "北海道旭川市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-31T16:01:31.345+09:00"
       }
     },
     {
@@ -68,6 +42,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_ocr",
+      "firstSeen": "2026-08-27",
       "weatherLocation": {
         "latitude": 43.771,
         "longitude": 142.365,
@@ -75,8 +50,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-27T10:57:17.749+09:00"
-      },
-      "firstSeen": "2026-08-27"
+      }
     }
   ],
   "obihiro": [
@@ -95,6 +69,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-25",
       "weatherLocation": {
         "latitude": 42.924,
         "longitude": 143.196,
@@ -102,38 +77,10 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-25T18:07:32.174+09:00"
-      },
-      "firstSeen": "2026-08-25"
-    }
-  ],
-  "hakodate": [
-    {
-      "id": "ha-off-20270128-xp1ck",
-      "pref": "hakodate",
-      "date": "2027-01-28",
-      "weekday": "木",
-      "title": "自衛官募集ホームページ <自衛官募集X",
-      "place": "防衛大学",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/hakodate/dl_etc/R8saiyouannnai.pdf",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-09-24",
-      "weatherLocation": {
-        "latitude": 41.769,
-        "longitude": 140.729,
-        "label": "北海道函館市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-31T16:01:32.047+09:00"
       }
     }
   ],
+  "hakodate": [],
   "miyagi": [],
   "aomori": [],
   "iwate": [
@@ -153,6 +100,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-17",
       "weatherLocation": {
         "latitude": 39.704,
         "longitude": 141.153,
@@ -160,8 +108,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:11.802+09:00"
-      },
-      "firstSeen": "2026-09-17"
+      }
     },
     {
       "id": "iw-office-20260926-6o1mw",
@@ -179,6 +126,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-02",
       "weatherLocation": {
         "latitude": 39.704,
         "longitude": 141.153,
@@ -186,8 +134,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:11.802+09:00"
-      },
-      "firstSeen": "2026-09-02"
+      }
     },
     {
       "id": "iw-office-20261101-j6z07",
@@ -205,6 +152,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_ocr",
+      "firstSeen": "2026-09-17",
       "weatherLocation": {
         "latitude": 39.704,
         "longitude": 141.153,
@@ -212,8 +160,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:11.802+09:00"
-      },
-      "firstSeen": "2026-09-17"
+      }
     }
   ],
   "yamagata": [
@@ -232,6 +179,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-07",
       "weatherLocation": {
         "latitude": 38.765,
         "longitude": 140.302,
@@ -239,8 +187,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-07T15:08:31.505+09:00"
-      },
-      "firstSeen": "2026-09-07"
+      }
     },
     {
       "id": "ya-20261003-zufjf",
@@ -257,6 +204,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-15",
       "weatherLocation": {
         "latitude": 38.24,
         "longitude": 140.364,
@@ -264,8 +212,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-15T15:13:40.414+09:00"
-      },
-      "firstSeen": "2026-09-15"
+      }
     },
     {
       "id": "ya-20261003-tv2k1",
@@ -282,6 +229,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-15",
       "weatherLocation": {
         "latitude": 38.255,
         "longitude": 140.34,
@@ -289,8 +237,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-15T15:13:40.928+09:00"
-      },
-      "firstSeen": "2026-09-15"
+      }
     },
     {
       "id": "ya-20261003-1kpvi",
@@ -307,6 +254,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-15",
       "weatherLocation": {
         "latitude": 38.85,
         "longitude": 139.904,
@@ -314,8 +262,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-15T15:13:41.388+09:00"
-      },
-      "firstSeen": "2026-09-15"
+      }
     },
     {
       "id": "ya-20261004-9q6qe",
@@ -332,6 +279,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-15",
       "weatherLocation": {
         "latitude": 38.362,
         "longitude": 140.378,
@@ -339,8 +287,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-15T15:13:41.758+09:00"
-      },
-      "firstSeen": "2026-09-15"
+      }
     },
     {
       "id": "ya-20261010-ghyby",
@@ -357,6 +304,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-15",
       "weatherLocation": {
         "latitude": 38.765,
         "longitude": 140.302,
@@ -364,8 +312,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-15T15:13:42.297+09:00"
-      },
-      "firstSeen": "2026-09-15"
+      }
     },
     {
       "id": "ya-20261010-zc3pr",
@@ -382,6 +329,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-15",
       "weatherLocation": {
         "latitude": 38.002,
         "longitude": 140.189,
@@ -389,8 +337,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-15T15:13:42.686+09:00"
-      },
-      "firstSeen": "2026-09-15"
+      }
     },
     {
       "id": "ya-20261010-6n8qu",
@@ -407,6 +354,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-15",
       "weatherLocation": {
         "latitude": 38.601,
         "longitude": 140.407,
@@ -414,8 +362,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-15T15:13:43.155+09:00"
-      },
-      "firstSeen": "2026-09-15"
+      }
     },
     {
       "id": "ya-20261010-xw9fy",
@@ -432,6 +379,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-15",
       "weatherLocation": {
         "latitude": 38.24,
         "longitude": 140.364,
@@ -439,8 +387,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:15.368+09:00"
-      },
-      "firstSeen": "2026-09-15"
+      }
     },
     {
       "id": "ya-20261011-xwh20",
@@ -457,6 +404,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-15",
       "weatherLocation": {
         "latitude": 38.255,
         "longitude": 140.34,
@@ -464,8 +412,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-15T15:13:43.517+09:00"
-      },
-      "firstSeen": "2026-09-15"
+      }
     },
     {
       "id": "ya-20261011-vraky",
@@ -482,6 +429,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-15",
       "weatherLocation": {
         "latitude": 38.15,
         "longitude": 140.268,
@@ -489,8 +437,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-15T15:13:43.875+09:00"
-      },
-      "firstSeen": "2026-09-15"
+      }
     },
     {
       "id": "ya-20261011-gl5ga",
@@ -507,6 +454,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-15",
       "weatherLocation": {
         "latitude": 38.333,
         "longitude": 140.283,
@@ -514,8 +462,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-15T15:13:44.316+09:00"
-      },
-      "firstSeen": "2026-09-15"
+      }
     },
     {
       "id": "ya-20261011-oi7jq",
@@ -532,6 +479,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-15",
       "weatherLocation": {
         "latitude": 38.255,
         "longitude": 140.34,
@@ -539,8 +487,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-15T15:13:44.737+09:00"
-      },
-      "firstSeen": "2026-09-15"
+      }
     },
     {
       "id": "ya-20261017-x70rz",
@@ -557,6 +504,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-15",
       "weatherLocation": {
         "latitude": 38.291,
         "longitude": 140.355,
@@ -564,8 +512,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-15T15:13:45.098+09:00"
-      },
-      "firstSeen": "2026-09-15"
+      }
     },
     {
       "id": "ya-20261018-tr9y4",
@@ -582,6 +529,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-15",
       "weatherLocation": {
         "latitude": 38.002,
         "longitude": 140.189,
@@ -589,8 +537,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-15T15:13:45.450+09:00"
-      },
-      "firstSeen": "2026-09-15"
+      }
     },
     {
       "id": "ya-20261018-rg6wb",
@@ -607,6 +554,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-15",
       "weatherLocation": {
         "latitude": 38.184,
         "longitude": 140.098,
@@ -614,8 +562,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-15T15:13:45.815+09:00"
-      },
-      "firstSeen": "2026-09-15"
+      }
     },
     {
       "id": "ya-20261024-waz1q",
@@ -632,6 +579,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-15",
       "weatherLocation": {
         "latitude": 38.24,
         "longitude": 140.364,
@@ -639,8 +587,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-15T15:13:46.255+09:00"
-      },
-      "firstSeen": "2026-09-15"
+      }
     },
     {
       "id": "ya-20261025-j3vn5",
@@ -657,6 +604,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-15",
       "weatherLocation": {
         "latitude": 37.945,
         "longitude": 140.138,
@@ -664,8 +612,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-15T15:13:46.616+09:00"
-      },
-      "firstSeen": "2026-09-15"
+      }
     },
     {
       "id": "ya-20261025-c4z5s",
@@ -682,6 +629,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-15",
       "weatherLocation": {
         "latitude": 38.24,
         "longitude": 140.364,
@@ -689,8 +637,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-15T15:13:46.971+09:00"
-      },
-      "firstSeen": "2026-09-15"
+      }
     },
     {
       "id": "ya-20261025-0p9d3",
@@ -707,6 +654,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-15",
       "weatherLocation": {
         "latitude": 38.847,
         "longitude": 139.906,
@@ -714,8 +662,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-15T15:13:47.324+09:00"
-      },
-      "firstSeen": "2026-09-15"
+      }
     },
     {
       "id": "ya-off-20270128-xp1ck",
@@ -760,6 +707,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-06",
       "weatherLocation": {
         "latitude": 35.693,
         "longitude": 139.73,
@@ -767,8 +715,7 @@
         "accuracy": "address",
         "source": "gsi",
         "geocodedAt": "2026-07-08T08:23:31.199+09:00"
-      },
-      "firstSeen": "2026-08-06"
+      }
     },
     {
       "id": "fs-20261004-2n5mk",
@@ -785,6 +732,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-02",
       "weatherLocation": {
         "latitude": 36.945,
         "longitude": 140.916,
@@ -792,8 +740,7 @@
         "accuracy": "address",
         "source": "gsi",
         "geocodedAt": "2026-09-04T15:00:30.765+09:00"
-      },
-      "firstSeen": "2026-09-02"
+      }
     },
     {
       "id": "fs-20261220-x26s1",
@@ -810,6 +757,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-18",
       "weatherLocation": {
         "latitude": 35.285,
         "longitude": 139.651,
@@ -817,8 +765,7 @@
         "accuracy": "address",
         "source": "gsi",
         "geocodedAt": "2026-09-18T21:37:37.102+09:00"
-      },
-      "firstSeen": "2026-09-18"
+      }
     }
   ],
   "akita": [
@@ -864,6 +811,7 @@
       "url": "https://www.mod.go.jp/pco/kanagawa/kouho/event/event-tokubetukoukai.html",
       "notes": null,
       "deadline": null,
+      "firstSeen": "2026-09-07",
       "weatherLocation": {
         "latitude": 35.448,
         "longitude": 139.643,
@@ -871,8 +819,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:18.454+09:00"
-      },
-      "firstSeen": "2026-09-07"
+      }
     },
     {
       "id": "k-20261024-06dkc",
@@ -888,6 +835,7 @@
       "url": "https://www.mod.go.jp/pco/kanagawa/mado/hiratuka/hiratuka.html",
       "notes": null,
       "deadline": null,
+      "firstSeen": "2026-09-07",
       "weatherLocation": {
         "latitude": 35.335,
         "longitude": 139.35,
@@ -895,8 +843,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:16.920+09:00"
-      },
-      "firstSeen": "2026-09-07"
+      }
     },
     {
       "id": "ka-off-20261010-fh50j",
@@ -914,6 +861,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_ocr",
+      "firstSeen": "2026-09-07",
       "weatherLocation": {
         "latitude": 35.281,
         "longitude": 139.672,
@@ -921,8 +869,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-07T22:54:55.939+09:00"
-      },
-      "firstSeen": "2026-09-07"
+      }
     }
   ],
   "tokyo": [
@@ -978,6 +925,12 @@
       "notes": "・訓練見学\n・体験搭乗（停止状態）\n・体験喫食",
       "source_type": "office_html",
       "address": "",
+      "firstSeen": "2026-08-06",
+      "deadlineDate": "2026-08-31",
+      "status": "closed",
+      "statusReason": "締切日経過",
+      "statusSource": "html",
+      "statusUpdatedAt": "2026-09-24",
       "weatherLocation": {
         "latitude": 35.673,
         "longitude": 139.817,
@@ -985,13 +938,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-02T08:50:36.640+09:00"
-      },
-      "firstSeen": "2026-08-06",
-      "deadlineDate": "2026-08-31",
-      "status": "closed",
-      "statusReason": "締切日経過",
-      "statusSource": "html",
-      "statusUpdatedAt": "2026-09-24"
+      }
     },
     {
       "id": "t-20261003-zfqw9",
@@ -1009,6 +956,12 @@
       "notes": "・戦車体験搭乗\n・記念式典見学\n・訓練展示\n・自衛隊説明\n抽選40名。出時間07:00、解散時間17:00予定。",
       "source_type": "office_html",
       "address": "",
+      "firstSeen": "2026-09-11",
+      "deadlineDate": "2026-09-14",
+      "status": "closed",
+      "statusReason": "締切日経過",
+      "statusSource": "html",
+      "statusUpdatedAt": "2026-09-24",
       "weatherLocation": {
         "latitude": 35.664,
         "longitude": 139.698,
@@ -1016,13 +969,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-27T21:38:20.863+09:00"
-      },
-      "firstSeen": "2026-09-11",
-      "deadlineDate": "2026-09-14",
-      "status": "closed",
-      "statusReason": "締切日経過",
-      "statusSource": "html",
-      "statusUpdatedAt": "2026-09-24"
+      }
     },
     {
       "id": "t-20261019-oyo8x",
@@ -1040,6 +987,8 @@
       "notes": "・部隊見学\n・装備品見学\n・体験喫食等\n多数の場合、抽選。日本国籍有方。",
       "source_type": "office_html",
       "address": "",
+      "firstSeen": "2026-09-15",
+      "deadlineDate": "2026-10-12",
       "weatherLocation": {
         "latitude": 35.673,
         "longitude": 139.817,
@@ -1047,9 +996,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-02T08:50:36.640+09:00"
-      },
-      "firstSeen": "2026-09-15",
-      "deadlineDate": "2026-10-12"
+      }
     },
     {
       "id": "to-off-20270128-xp1ck",
@@ -1120,6 +1067,7 @@
       "notes": "抽選、当選方限定",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-17",
       "weatherLocation": {
         "latitude": 35.857,
         "longitude": 139.649,
@@ -1127,8 +1075,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-11T21:40:03.518+09:00"
-      },
-      "firstSeen": "2026-09-17"
+      }
     },
     {
       "id": "s-20261010-hpq8v",
@@ -1222,6 +1169,7 @@
       "notes": "JR網部無料送迎有",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-16",
       "weatherLocation": {
         "latitude": 35.857,
         "longitude": 139.649,
@@ -1229,8 +1177,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-16T15:08:11.798+09:00"
-      },
-      "firstSeen": "2026-09-16"
+      }
     },
     {
       "id": "s-20261103-ld6it",
@@ -1247,6 +1194,8 @@
       "notes": "日本国籍有る方",
       "ageRequirement": "18～32歳以下",
       "deadline": "10月2日（金）",
+      "firstSeen": "2026-09-17",
+      "deadlineDate": "2026-10-02",
       "weatherLocation": {
         "latitude": 35.857,
         "longitude": 139.649,
@@ -1254,9 +1203,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-17T15:14:26.401+09:00"
-      },
-      "firstSeen": "2026-09-17",
-      "deadlineDate": "2026-10-02"
+      }
     },
     {
       "id": "s-20261121-5372q",
@@ -1273,6 +1220,8 @@
       "notes": "日本国籍有る方",
       "ageRequirement": "18歳以上32歳以下",
       "deadline": "10月7日（水）",
+      "firstSeen": "2026-09-17",
+      "deadlineDate": "2026-10-07",
       "weatherLocation": {
         "latitude": 35.908,
         "longitude": 139.339,
@@ -1280,9 +1229,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-17T15:14:27.539+09:00"
-      },
-      "firstSeen": "2026-09-17",
-      "deadlineDate": "2026-10-07"
+      }
     }
   ],
   "gunma": [
@@ -1301,6 +1248,7 @@
       "notes": "広報展示ブース制服試着記念撮影OK",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-02",
       "weatherLocation": {
         "latitude": 36.391,
         "longitude": 139.06,
@@ -1308,8 +1256,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-07-27T14:52:18.494+09:00"
-      },
-      "firstSeen": "2026-09-02"
+      }
     },
     {
       "id": "gu-20260927-8vgoz",
@@ -1326,6 +1273,7 @@
       "notes": "広報展示ブース装備品展示制服試着記念撮影OK",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-21",
       "weatherLocation": {
         "latitude": 36.391,
         "longitude": 139.06,
@@ -1333,8 +1281,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-07-27T14:52:18.494+09:00"
-      },
-      "firstSeen": "2026-08-21"
+      }
     },
     {
       "id": "gu-20260927-eq802",
@@ -1351,6 +1298,7 @@
       "notes": "広報展示ブース装備品展示制服試着記念撮影OK",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-21",
       "weatherLocation": {
         "latitude": 36.391,
         "longitude": 139.06,
@@ -1358,8 +1306,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-07-27T14:52:18.494+09:00"
-      },
-      "firstSeen": "2026-08-21"
+      }
     },
     {
       "id": "gu-20260927-p2p31",
@@ -1376,6 +1323,7 @@
       "notes": "広報展示ブース装備品展示制服試着記念撮影OK",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-21",
       "weatherLocation": {
         "latitude": 36.391,
         "longitude": 139.06,
@@ -1383,8 +1331,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-07-27T14:52:18.494+09:00"
-      },
-      "firstSeen": "2026-08-21"
+      }
     },
     {
       "id": "gu-20260927-bbscm",
@@ -1401,6 +1348,7 @@
       "notes": "広報展示ブース装備品展示制服試着記念撮影OK",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-21",
       "weatherLocation": {
         "latitude": 36.391,
         "longitude": 139.06,
@@ -1408,8 +1356,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-07-27T14:52:18.494+09:00"
-      },
-      "firstSeen": "2026-08-21"
+      }
     }
   ],
   "ibaraki": [],
@@ -1569,6 +1516,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-24",
       "weatherLocation": {
         "latitude": 37.636,
         "longitude": 138.962,
@@ -1576,8 +1524,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-24T18:10:58.210+09:00"
-      },
-      "firstSeen": "2026-08-24"
+      }
     },
     {
       "id": "ni-20260926-ikegs",
@@ -1594,6 +1541,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-24",
       "weatherLocation": {
         "latitude": 37.902,
         "longitude": 139.023,
@@ -1601,8 +1549,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-24T18:10:58.565+09:00"
-      },
-      "firstSeen": "2026-08-24"
+      }
     },
     {
       "id": "ni-20260927-fbk5g",
@@ -1619,6 +1566,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-24",
       "weatherLocation": {
         "latitude": 37.902,
         "longitude": 139.023,
@@ -1626,8 +1574,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-24T18:10:58.918+09:00"
-      },
-      "firstSeen": "2026-08-24"
+      }
     },
     {
       "id": "ni-20261003-pvjia",
@@ -1644,6 +1591,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-16",
       "weatherLocation": {
         "latitude": 37.902,
         "longitude": 139.023,
@@ -1651,8 +1599,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-16T21:55:40.308+09:00"
-      },
-      "firstSeen": "2026-09-16"
+      }
     },
     {
       "id": "ni-20261004-ubopo",
@@ -1669,6 +1616,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-16",
       "weatherLocation": {
         "latitude": 37.651,
         "longitude": 138.901,
@@ -1676,8 +1624,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-16T21:55:40.649+09:00"
-      },
-      "firstSeen": "2026-09-16"
+      }
     },
     {
       "id": "ni-20261004-71tlw",
@@ -1694,6 +1641,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-16",
       "weatherLocation": {
         "latitude": 37.902,
         "longitude": 139.023,
@@ -1701,8 +1649,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-16T21:55:40.984+09:00"
-      },
-      "firstSeen": "2026-09-16"
+      }
     },
     {
       "id": "ni-20261004-ihdmk",
@@ -1719,6 +1666,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-16",
       "weatherLocation": {
         "latitude": 37.902,
         "longitude": 139.023,
@@ -1726,191 +1674,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-16T21:55:41.472+09:00"
-      },
-      "firstSeen": "2026-09-16"
-    },
-    {
-      "id": "ni-office-20261104-bh7nj",
-      "pref": "niigata",
-      "date": "2026-11-04",
-      "weekday": "水",
-      "title": "ハローワーク新発田職業説明会",
-      "place": "上越地域事務所",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/niigata/HP/setumeikai.html",
-      "notes": "掲載元: 上越地域事務所",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html",
-      "weatherLocation": {
-        "latitude": 37.148,
-        "longitude": 138.236,
-        "label": "新潟県上越市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:23.699+09:00"
-      },
-      "firstSeen": "2026-09-17"
-    },
-    {
-      "id": "ni-office-20261007-ijsko",
-      "pref": "niigata",
-      "date": "2026-10-07",
-      "weekday": "水",
-      "title": "ハローワーク村上主催 職業説明会 ・8日：～・15日： ～事前申込制",
-      "place": "上越地域事務所",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "要予約",
-      "url": "https://www.mod.go.jp/pco/niigata/HP/setumeikai.html",
-      "notes": "掲載元: 上越地域事務所",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html",
-      "weatherLocation": {
-        "latitude": 37.148,
-        "longitude": 138.236,
-        "label": "新潟県上越市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:23.699+09:00"
-      },
-      "firstSeen": "2026-09-17"
-    },
-    {
-      "id": "ni-office-20261011-ss3vp",
-      "pref": "niigata",
-      "date": "2026-10-11",
-      "weekday": "日",
-      "title": "自衛隊就職説明会",
-      "place": "上越地域事務所",
-      "address": "",
-      "time": "",
-      "category": "採用イベント",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/niigata/HP/setumeikai.html",
-      "notes": "掲載元: 上越地域事務所",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html",
-      "weatherLocation": {
-        "latitude": 37.148,
-        "longitude": 138.236,
-        "label": "新潟県上越市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:23.699+09:00"
-      },
-      "firstSeen": "2026-09-17"
-    },
-    {
-      "id": "ni-office-20270916-sk1es",
-      "pref": "niigata",
-      "date": "2027-09-16",
-      "weekday": "木",
-      "title": "転職をお考えの方へ自衛隊説明会",
-      "place": "上越地域事務所",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/niigata/HP/setumeikai.html",
-      "notes": "掲載元: 上越地域事務所",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_html",
-      "weatherLocation": {
-        "latitude": 37.148,
-        "longitude": 138.236,
-        "label": "新潟県上越市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-28T22:18:23.699+09:00"
-      },
-      "firstSeen": "2026-09-17"
-    },
-    {
-      "id": "ni-office-20261104-0661w",
-      "pref": "niigata",
-      "date": "2026-11-04",
-      "weekday": "水",
-      "title": "自衛隊職業説明会",
-      "place": "パルムート新発田",
-      "address": "",
-      "time": "10:00～12:00",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/niigata/images/honbu/r8.11.4shibatahwsetumeikai.jpg",
-      "notes": "掲載元: 上越地域事務所\n予約不要、当日参加可能",
-      "ageRequirement": "18歳以上33歳未満",
-      "deadline": null,
-      "source_type": "office_ocr",
-      "weatherLocation": {
-        "latitude": 37.902,
-        "longitude": 139.023,
-        "label": "新潟県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-09-10T21:41:47.937+09:00"
-      },
-      "firstSeen": "2026-09-23"
-    },
-    {
-      "id": "ni-office-20261007-eg5h3",
-      "pref": "niigata",
-      "date": "2026-10-07",
-      "weekday": "水",
-      "title": "職業説明会",
-      "place": "パルパーク村上 2会議室",
-      "address": "",
-      "time": "14:00～15:00",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/niigata/images/honbu/r8.10.7-15murakamihwsetumeikai.jpg",
-      "notes": "掲載元: 上越地域事務所\n要事前申込。複数日程あり。",
-      "ageRequirement": "18歳以上33歳未満",
-      "deadline": "10月13日（火）",
-      "source_type": "office_ocr",
-      "weatherLocation": {
-        "latitude": 37.902,
-        "longitude": 139.023,
-        "label": "新潟県パルパーク村",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-09-10T21:41:48.816+09:00"
-      },
-      "firstSeen": "2026-09-23",
-      "deadlineDate": "2025-10-13"
-    },
-    {
-      "id": "ni-office-20261011-p1tdr",
-      "pref": "niigata",
-      "date": "2026-10-11",
-      "weekday": "日",
-      "title": "自衛隊就職説明会",
-      "place": "小五泉",
-      "address": "",
-      "time": "10:00～16:00",
-      "category": "採用イベント",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/niigata/images/honbu/r8.10.11-18kamosetumeikai.jpg",
-      "notes": "掲載元: 加茂地域事務所\n参加費不要",
-      "ageRequirement": "中学生32",
-      "deadline": null,
-      "source_type": "office_ocr",
-      "weatherLocation": {
-        "latitude": 37.314,
-        "longitude": 138.795,
-        "label": "新潟県小千谷市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-09-07T22:54:56.670+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     },
     {
       "id": "ni-off-20270315-bk9qc",
@@ -1989,6 +1753,189 @@
         "source": "gsi",
         "geocodedAt": "2026-08-31T16:01:34.060+09:00"
       }
+    },
+    {
+      "id": "ni-off-20261104-cj4te",
+      "pref": "niigata",
+      "date": "2026-11-04",
+      "weekday": "水",
+      "title": "自衛隊職業説明会",
+      "place": "パルムート新発田",
+      "address": "",
+      "time": "10:00～12:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/niigata/images/honbu/r8.11.4shibatahwsetumeikai.jpg",
+      "notes": "予約不要、当日参加可能",
+      "ageRequirement": "18歳以上33歳未満",
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-09-24",
+      "weatherLocation": {
+        "latitude": 37.902,
+        "longitude": 139.023,
+        "label": "新潟県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-09-10T21:41:47.937+09:00"
+      }
+    },
+    {
+      "id": "ni-off-20261007-9otej",
+      "pref": "niigata",
+      "date": "2026-10-07",
+      "weekday": "水",
+      "title": "職業説明会",
+      "place": "パルパーク村上 2会議室",
+      "address": "",
+      "time": "14:00～15:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/niigata/images/honbu/r8.10.7-15murakamihwsetumeikai.jpg",
+      "notes": "要事前申込。複数日程あり。",
+      "ageRequirement": "18歳以上33歳未満",
+      "deadline": "10月13日（火）",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-09-24",
+      "deadlineDate": "2025-10-13",
+      "weatherLocation": {
+        "latitude": 37.902,
+        "longitude": 139.023,
+        "label": "新潟県パルパーク村",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-09-10T21:41:48.816+09:00"
+      }
+    },
+    {
+      "id": "ni-off-20261011-tuj17",
+      "pref": "niigata",
+      "date": "2026-10-11",
+      "weekday": "日",
+      "title": "自衛隊就職説明会",
+      "place": "小五泉",
+      "address": "",
+      "time": "10:00～16:00",
+      "category": "採用イベント",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/niigata/images/honbu/r8.10.11-18kamosetumeikai.jpg",
+      "notes": "参加費不要",
+      "ageRequirement": "中学生32",
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-09-24",
+      "weatherLocation": {
+        "latitude": 37.314,
+        "longitude": 138.795,
+        "label": "新潟県小千谷市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-09-07T22:54:56.670+09:00"
+      }
+    },
+    {
+      "id": "ni-office-20261104-bh7nj",
+      "pref": "niigata",
+      "date": "2026-11-04",
+      "weekday": "水",
+      "title": "ハローワーク新発田職業説明会",
+      "place": "上越地域事務所",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/niigata/HP/setumeikai.html",
+      "notes": "掲載元: 上越地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html",
+      "firstSeen": "2026-09-17",
+      "weatherLocation": {
+        "latitude": 37.148,
+        "longitude": 138.236,
+        "label": "新潟県上越市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:23.699+09:00"
+      }
+    },
+    {
+      "id": "ni-office-20261007-ijsko",
+      "pref": "niigata",
+      "date": "2026-10-07",
+      "weekday": "水",
+      "title": "ハローワーク村上主催 職業説明会 ・8日：～・15日： ～事前申込制",
+      "place": "上越地域事務所",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "要予約",
+      "url": "https://www.mod.go.jp/pco/niigata/HP/setumeikai.html",
+      "notes": "掲載元: 上越地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html",
+      "firstSeen": "2026-09-17",
+      "weatherLocation": {
+        "latitude": 37.148,
+        "longitude": 138.236,
+        "label": "新潟県上越市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:23.699+09:00"
+      }
+    },
+    {
+      "id": "ni-office-20261011-ss3vp",
+      "pref": "niigata",
+      "date": "2026-10-11",
+      "weekday": "日",
+      "title": "自衛隊就職説明会",
+      "place": "上越地域事務所",
+      "address": "",
+      "time": "",
+      "category": "採用イベント",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/niigata/HP/setumeikai.html",
+      "notes": "掲載元: 上越地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html",
+      "firstSeen": "2026-09-17",
+      "weatherLocation": {
+        "latitude": 37.148,
+        "longitude": 138.236,
+        "label": "新潟県上越市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:23.699+09:00"
+      }
+    },
+    {
+      "id": "ni-office-20270916-sk1es",
+      "pref": "niigata",
+      "date": "2027-09-16",
+      "weekday": "木",
+      "title": "転職をお考えの方へ自衛隊説明会",
+      "place": "上越地域事務所",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/niigata/HP/setumeikai.html",
+      "notes": "掲載元: 上越地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html",
+      "firstSeen": "2026-09-17",
+      "weatherLocation": {
+        "latitude": 37.148,
+        "longitude": 138.236,
+        "label": "新潟県上越市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:23.699+09:00"
+      }
     }
   ],
   "toyama": [],
@@ -2008,6 +1955,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-11",
       "weatherLocation": {
         "latitude": 36.595,
         "longitude": 136.626,
@@ -2015,8 +1963,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-18T17:50:23.825+09:00"
-      },
-      "firstSeen": "2026-09-11"
+      }
     },
     {
       "id": "is-office-20261003-ma1l8",
@@ -2034,6 +1981,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-17",
       "weatherLocation": {
         "latitude": 36.595,
         "longitude": 136.626,
@@ -2041,8 +1989,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-11T08:42:32.643+09:00"
-      },
-      "firstSeen": "2026-09-17"
+      }
     },
     {
       "id": "is-office-20261004-3f1e7",
@@ -2060,6 +2007,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-17",
       "weatherLocation": {
         "latitude": 36.595,
         "longitude": 136.626,
@@ -2067,8 +2015,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-11T08:42:33.330+09:00"
-      },
-      "firstSeen": "2026-09-17"
+      }
     },
     {
       "id": "is-office-20261010-kbfl8",
@@ -2086,6 +2033,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-17",
       "weatherLocation": {
         "latitude": 36.595,
         "longitude": 136.626,
@@ -2093,8 +2041,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-11T08:42:33.767+09:00"
-      },
-      "firstSeen": "2026-09-17"
+      }
     },
     {
       "id": "is-office-20261010-ue41t",
@@ -2112,6 +2059,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-17",
       "weatherLocation": {
         "latitude": 36.409,
         "longitude": 136.446,
@@ -2119,8 +2067,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-11T08:42:34.094+09:00"
-      },
-      "firstSeen": "2026-09-17"
+      }
     },
     {
       "id": "is-office-20261011-hydwn",
@@ -2138,6 +2085,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-17",
       "weatherLocation": {
         "latitude": 37.31,
         "longitude": 137.148,
@@ -2145,8 +2093,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-11T08:42:34.424+09:00"
-      },
-      "firstSeen": "2026-09-17"
+      }
     },
     {
       "id": "is-office-20261024-sp6m1",
@@ -2164,6 +2111,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-17",
       "weatherLocation": {
         "latitude": 36.561,
         "longitude": 136.656,
@@ -2171,8 +2119,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-11T08:42:34.759+09:00"
-      },
-      "firstSeen": "2026-09-17"
+      }
     }
   ],
   "fukui": [
@@ -2191,6 +2138,7 @@
       "notes": "自衛隊車両展示・広報ブース等",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-07",
       "weatherLocation": {
         "latitude": 36.064,
         "longitude": 136.22,
@@ -2198,8 +2146,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-17T22:00:03.272+09:00"
-      },
-      "firstSeen": "2026-08-07"
+      }
     },
     {
       "id": "fu-20261011-7k5c1",
@@ -2216,6 +2163,7 @@
       "notes": "自衛隊車両展示・広報ブース等",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-17",
       "weatherLocation": {
         "latitude": 36.065,
         "longitude": 136.222,
@@ -2223,8 +2171,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-17T22:00:03.624+09:00"
-      },
-      "firstSeen": "2026-09-17"
+      }
     },
     {
       "id": "fu-20261011-1cg3l",
@@ -2241,6 +2188,7 @@
       "notes": "自衛隊車両展示・広報ブース等",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-17",
       "weatherLocation": {
         "latitude": 36.065,
         "longitude": 136.222,
@@ -2248,8 +2196,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-17T22:00:10.756+09:00"
-      },
-      "firstSeen": "2026-09-17"
+      }
     },
     {
       "id": "fu-office-20261122-mkikb",
@@ -2267,6 +2214,8 @@
       "ageRequirement": "17未満の方、保護者、福井出身の学生、中学校教等",
       "deadline": "11月6日（金）",
       "source_type": "office_ocr",
+      "firstSeen": "2026-09-22",
+      "deadlineDate": "2026-11-06",
       "weatherLocation": {
         "latitude": 36.064,
         "longitude": 136.22,
@@ -2274,9 +2223,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-17T22:00:11.188+09:00"
-      },
-      "firstSeen": "2026-09-22",
-      "deadlineDate": "2026-11-06"
+      }
     }
   ],
   "yamanashi": [
@@ -2295,6 +2242,7 @@
       "notes": "無料ガチャ、ボディシールなど",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 35.76,
         "longitude": 138.94,
@@ -2302,8 +2250,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-23T23:02:18.730+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     },
     {
       "id": "ya-20260926-vjy1e",
@@ -2320,6 +2267,7 @@
       "notes": "車両展示",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 35.63,
         "longitude": 139.109,
@@ -2327,8 +2275,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-23T23:02:19.311+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     },
     {
       "id": "ya-20260926-0hlsc",
@@ -2345,6 +2292,7 @@
       "notes": "車両・装備品展示、土のう作製、",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 35.497,
         "longitude": 138.755,
@@ -2352,8 +2300,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-23T23:02:19.664+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     }
   ],
   "nagano": [
@@ -2372,6 +2319,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-26",
       "weatherLocation": {
         "latitude": 36.328,
         "longitude": 138.426,
@@ -2379,83 +2327,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-26T18:08:20.628+09:00"
-      },
-      "firstSeen": "2026-08-26"
-    },
-    {
-      "id": "na-20261003-pxjeh",
-      "pref": "nagano",
-      "date": "2026-10-03",
-      "weekday": "土",
-      "title": "【御代田町】商工会フェスタ",
-      "place": "",
-      "address": "御代田町",
-      "time": "",
-      "category": "地域参加",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.323,
-        "longitude": 138.506,
-        "label": "長野県御代田町",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-08-26T18:08:21.041+09:00"
-      },
-      "firstSeen": "2026-08-26"
-    },
-    {
-      "id": "na-20261003-6wbnn",
-      "pref": "nagano",
-      "date": "2026-10-03",
-      "weekday": "土",
-      "title": "【長野市】おてんきぼうさい教室",
-      "place": "",
-      "address": "長野市",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.649,
-        "longitude": 138.195,
-        "label": "長野県長野市",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-08-25T12:35:39.581+09:00"
-      },
-      "firstSeen": "2026-08-25"
-    },
-    {
-      "id": "na-20261003-lc0f7",
-      "pref": "nagano",
-      "date": "2026-10-03",
-      "weekday": "土",
-      "title": "【伊那市】フェ・マンfestival2026",
-      "place": "伊那商工会議所",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "フェ・マンfestival2026 １０：００～１５：００ ハンドメイド、飲食、美容、占いなどで 輪を広げ地元の活性化につなげていくイベント。 自衛隊も参加者します！ 車両展示 ・中型トラック ・偵察用バイク ブースも出展予定。 お楽しみに！",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 35.827,
-        "longitude": 137.954,
-        "label": "長野県伊那市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-26T12:41:54.352+09:00"
-      },
-      "firstSeen": "2026-08-26"
+      }
     },
     {
       "id": "na-20261003-kkjxa",
@@ -2472,6 +2344,7 @@
       "notes": "場所：安曇野スイス村サンモリッツ駐車場内 時間：１０：００～１５：００ 内容：車両展示（高機動車など） シール釣り 階級章展示など トラック協会主催トラックの日イベントに参加いたします。 楽しいイベント盛りだくさん！ ご家族でも楽しめます 自衛隊ブースにぜひお立ち寄りください。",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-06",
       "weatherLocation": {
         "latitude": 36.304,
         "longitude": 137.906,
@@ -2479,8 +2352,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-14T15:21:37.972+09:00"
-      },
-      "firstSeen": "2026-08-06"
+      }
     },
     {
       "id": "na-20261003-37wm4",
@@ -2497,6 +2369,7 @@
       "notes": "場所：イオンモール松本 空庭屋外やまびこ広場 時間：１０：００～１６：００ 内容：車両展示 迷彩服試着 お子さまがさまざまなお仕事を体験できる『まちのおしごと体験』に参加いたします。 自衛隊グッズご用意しております自衛隊ブースにぜひお立ち寄りください。",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-06",
       "weatherLocation": {
         "latitude": 36.651,
         "longitude": 138.181,
@@ -2504,8 +2377,57 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-14T15:21:37.609+09:00"
-      },
-      "firstSeen": "2026-08-06"
+      }
+    },
+    {
+      "id": "na-20261003-pxjeh",
+      "pref": "nagano",
+      "date": "2026-10-03",
+      "weekday": "土",
+      "title": "【御代田町】商工会フェスタ",
+      "place": "",
+      "address": "御代田町",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-26",
+      "weatherLocation": {
+        "latitude": 36.323,
+        "longitude": 138.506,
+        "label": "長野県御代田町",
+        "accuracy": "municipality",
+        "source": "gsi",
+        "geocodedAt": "2026-08-26T18:08:21.041+09:00"
+      }
+    },
+    {
+      "id": "na-20261003-lc0f7",
+      "pref": "nagano",
+      "date": "2026-10-03",
+      "weekday": "土",
+      "title": "【伊那市】フェ・マンfestival2026",
+      "place": "伊那商工会議所",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "フェ・マンfestival2026 １０：００～１５：００ ハンドメイド、飲食、美容、占いなどで 輪を広げ地元の活性化につなげていくイベント。 自衛隊も参加者します！ 車両展示 ・中型トラック ・偵察用バイク ブースも出展予定。 お楽しみに！",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-26",
+      "weatherLocation": {
+        "latitude": 35.827,
+        "longitude": 137.954,
+        "label": "長野県伊那市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-26T12:41:54.352+09:00"
+      }
     },
     {
       "id": "na-20261003-o91ba",
@@ -2522,6 +2444,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-26",
       "weatherLocation": {
         "latitude": 36.402,
         "longitude": 138.249,
@@ -2529,8 +2452,32 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-26T18:08:21.562+09:00"
-      },
-      "firstSeen": "2026-08-26"
+      }
+    },
+    {
+      "id": "na-20261003-6wbnn",
+      "pref": "nagano",
+      "date": "2026-10-03",
+      "weekday": "土",
+      "title": "【長野市】おてんきぼうさい教室",
+      "place": "",
+      "address": "長野市",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-25",
+      "weatherLocation": {
+        "latitude": 36.649,
+        "longitude": 138.195,
+        "label": "長野県長野市",
+        "accuracy": "municipality",
+        "source": "gsi",
+        "geocodedAt": "2026-08-25T12:35:39.581+09:00"
+      }
     },
     {
       "id": "na-20261004-xixpo",
@@ -2547,6 +2494,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-25",
       "weatherLocation": {
         "latitude": 36.68,
         "longitude": 138.363,
@@ -2554,8 +2502,7 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-08-25T12:35:42.508+09:00"
-      },
-      "firstSeen": "2026-08-25"
+      }
     },
     {
       "id": "na-20261010-jcj0l",
@@ -2572,6 +2519,7 @@
       "notes": "調整中",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-06",
       "weatherLocation": {
         "latitude": 36.238,
         "longitude": 137.972,
@@ -2579,83 +2527,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-29T14:30:38.136+09:00"
-      },
-      "firstSeen": "2026-08-06"
-    },
-    {
-      "id": "na-20261010-4oeph",
-      "pref": "nagano",
-      "date": "2026-10-10",
-      "weekday": "土",
-      "title": "【駒ケ根市】駒ヶ根商工祭",
-      "place": "",
-      "address": "駒ケ根市",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 35.729,
-        "longitude": 137.934,
-        "label": "長野県駒ヶ根市",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-07-18T08:05:17.140+09:00"
-      },
-      "firstSeen": "2026-08-06"
-    },
-    {
-      "id": "na-20261010-1uch9",
-      "pref": "nagano",
-      "date": "2026-10-10",
-      "weekday": "土",
-      "title": "【上田市】道と川の駅イベント",
-      "place": "道の駅 上田 道と川の駅 おとぎの里",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-26T18:08:22.282+09:00"
-      },
-      "firstSeen": "2026-08-26"
-    },
-    {
-      "id": "na-20261010-64rcm",
-      "pref": "nagano",
-      "date": "2026-10-10",
-      "weekday": "土",
-      "title": "【上田市】げんきまるこ産業フェスタ",
-      "place": "丸子文化会館セレスホール",
-      "address": "",
-      "time": "",
-      "category": "地域参加",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-09-02T14:58:10.930+09:00"
-      },
-      "firstSeen": "2026-09-02"
+      }
     },
     {
       "id": "na-20261010-ktz7v",
@@ -2672,6 +2544,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-25",
       "weatherLocation": {
         "latitude": 36.649,
         "longitude": 138.195,
@@ -2679,8 +2552,82 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-08-25T12:35:39.581+09:00"
-      },
-      "firstSeen": "2026-08-25"
+      }
+    },
+    {
+      "id": "na-20261010-4oeph",
+      "pref": "nagano",
+      "date": "2026-10-10",
+      "weekday": "土",
+      "title": "【駒ケ根市】駒ヶ根商工祭",
+      "place": "",
+      "address": "駒ケ根市",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-06",
+      "weatherLocation": {
+        "latitude": 35.729,
+        "longitude": 137.934,
+        "label": "長野県駒ヶ根市",
+        "accuracy": "municipality",
+        "source": "gsi",
+        "geocodedAt": "2026-07-18T08:05:17.140+09:00"
+      }
+    },
+    {
+      "id": "na-20261010-1uch9",
+      "pref": "nagano",
+      "date": "2026-10-10",
+      "weekday": "土",
+      "title": "【上田市】道と川の駅イベント",
+      "place": "道の駅 上田 道と川の駅 おとぎの里",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-26",
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-26T18:08:22.282+09:00"
+      }
+    },
+    {
+      "id": "na-20261010-64rcm",
+      "pref": "nagano",
+      "date": "2026-10-10",
+      "weekday": "土",
+      "title": "【上田市】げんきまるこ産業フェスタ",
+      "place": "丸子文化会館セレスホール",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-09-02",
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-09-02T14:58:10.930+09:00"
+      }
     },
     {
       "id": "na-20261011-vabv2",
@@ -2697,6 +2644,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-25",
       "weatherLocation": {
         "latitude": 36.649,
         "longitude": 138.195,
@@ -2704,8 +2652,7 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-08-25T12:35:39.581+09:00"
-      },
-      "firstSeen": "2026-08-25"
+      }
     },
     {
       "id": "na-20261011-tmngn",
@@ -2722,6 +2669,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-26",
       "weatherLocation": {
         "latitude": 36.402,
         "longitude": 138.249,
@@ -2729,83 +2677,7 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-08-26T18:08:19.121+09:00"
-      },
-      "firstSeen": "2026-08-26"
-    },
-    {
-      "id": "na-20261017-2h17g",
-      "pref": "nagano",
-      "date": "2026-10-17",
-      "weekday": "土",
-      "title": "【佐久市】中込駅イベント",
-      "place": "中込駅",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 35.635,
-        "longitude": 137.946,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-26T18:08:22.687+09:00"
-      },
-      "firstSeen": "2026-08-26"
-    },
-    {
-      "id": "na-20261017-c5eer",
-      "pref": "nagano",
-      "date": "2026-10-17",
-      "weekday": "土",
-      "title": "【小布施町】六斎市",
-      "place": "",
-      "address": "小布施町",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.697,
-        "longitude": 138.312,
-        "label": "長野県小布施町",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-08-25T12:35:42.861+09:00"
-      },
-      "firstSeen": "2026-08-25"
-    },
-    {
-      "id": "na-20261017-uzf61",
-      "pref": "nagano",
-      "date": "2026-10-17",
-      "weekday": "土",
-      "title": "【松本市】松本大学 梓乃森祭",
-      "place": "松本大学",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.238,
-        "longitude": 137.972,
-        "label": "長野県松本市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-25T12:35:43.215+09:00"
-      },
-      "firstSeen": "2026-08-25"
+      }
     },
     {
       "id": "na-20261017-4mxbx",
@@ -2822,6 +2694,7 @@
       "notes": "自衛隊車両がドン・キホーテにやって来る！ １０：００～１５：００ 細部、調整中",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-06",
       "weatherLocation": {
         "latitude": 36.651,
         "longitude": 138.181,
@@ -2829,17 +2702,41 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-06T19:57:01.631+09:00"
-      },
-      "firstSeen": "2026-08-06"
+      }
     },
     {
-      "id": "na-20261024-e58tt",
+      "id": "na-20261017-2h17g",
       "pref": "nagano",
-      "date": "2026-10-24",
+      "date": "2026-10-17",
       "weekday": "土",
-      "title": "【松本市】松本市防災訓練",
-      "place": "",
-      "address": "松本市",
+      "title": "【佐久市】中込駅イベント",
+      "place": "中込駅",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-26",
+      "weatherLocation": {
+        "latitude": 35.635,
+        "longitude": 137.946,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-26T18:08:22.687+09:00"
+      }
+    },
+    {
+      "id": "na-20261017-uzf61",
+      "pref": "nagano",
+      "date": "2026-10-17",
+      "weekday": "土",
+      "title": "【松本市】松本大学 梓乃森祭",
+      "place": "松本大学",
+      "address": "",
       "time": "",
       "category": "広報活動",
       "tag": "",
@@ -2847,15 +2744,40 @@
       "notes": "調整中",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-25",
       "weatherLocation": {
         "latitude": 36.238,
         "longitude": 137.972,
         "label": "長野県松本市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-25T12:35:43.215+09:00"
+      }
+    },
+    {
+      "id": "na-20261017-c5eer",
+      "pref": "nagano",
+      "date": "2026-10-17",
+      "weekday": "土",
+      "title": "【小布施町】六斎市",
+      "place": "",
+      "address": "小布施町",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-25",
+      "weatherLocation": {
+        "latitude": 36.697,
+        "longitude": 138.312,
+        "label": "長野県小布施町",
         "accuracy": "municipality",
         "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:37.753+09:00"
-      },
-      "firstSeen": "2026-08-06"
+        "geocodedAt": "2026-08-25T12:35:42.861+09:00"
+      }
     },
     {
       "id": "na-20261024-vu6k6",
@@ -2872,6 +2794,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-26",
       "weatherLocation": {
         "latitude": 35.975,
         "longitude": 138.578,
@@ -2879,17 +2802,16 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-26T18:08:23.037+09:00"
-      },
-      "firstSeen": "2026-08-26"
+      }
     },
     {
-      "id": "na-20261025-rv0ey",
+      "id": "na-20261024-e58tt",
       "pref": "nagano",
-      "date": "2026-10-25",
-      "weekday": "日",
-      "title": "【大町市】県統合防災訓練",
+      "date": "2026-10-24",
+      "weekday": "土",
+      "title": "【松本市】松本市防災訓練",
       "place": "",
-      "address": "大町市",
+      "address": "松本市",
       "time": "",
       "category": "広報活動",
       "tag": "",
@@ -2897,40 +2819,15 @@
       "notes": "調整中",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-06",
       "weatherLocation": {
-        "latitude": 36.503,
-        "longitude": 137.851,
-        "label": "長野県大町",
+        "latitude": 36.238,
+        "longitude": 137.972,
+        "label": "長野県松本市",
         "accuracy": "municipality",
         "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:38.512+09:00"
-      },
-      "firstSeen": "2026-08-06"
-    },
-    {
-      "id": "na-20261025-5plfp",
-      "pref": "nagano",
-      "date": "2026-10-25",
-      "weekday": "日",
-      "title": "【伊那市】防災イベント（仮称）",
-      "place": "かんてんぱぱ くぬぎの杜",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "細部、調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-06T19:57:02.477+09:00"
-      },
-      "firstSeen": "2026-08-06"
+        "geocodedAt": "2026-07-29T14:30:37.753+09:00"
+      }
     },
     {
       "id": "na-20261025-3il78",
@@ -2947,6 +2844,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-25",
       "weatherLocation": {
         "latitude": 36.742,
         "longitude": 138.369,
@@ -2954,8 +2852,32 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-08-25T12:35:43.575+09:00"
-      },
-      "firstSeen": "2026-08-25"
+      }
+    },
+    {
+      "id": "na-20261025-5plfp",
+      "pref": "nagano",
+      "date": "2026-10-25",
+      "weekday": "日",
+      "title": "【伊那市】防災イベント（仮称）",
+      "place": "かんてんぱぱ くぬぎの杜",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "細部、調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-06",
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-06T19:57:02.477+09:00"
+      }
     },
     {
       "id": "na-20261025-hz7ka",
@@ -2972,6 +2894,7 @@
       "notes": "調整中",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-06",
       "weatherLocation": {
         "latitude": 36.651,
         "longitude": 138.181,
@@ -2979,8 +2902,32 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-29T14:30:38.884+09:00"
-      },
-      "firstSeen": "2026-08-06"
+      }
+    },
+    {
+      "id": "na-20261025-rv0ey",
+      "pref": "nagano",
+      "date": "2026-10-25",
+      "weekday": "日",
+      "title": "【大町市】県統合防災訓練",
+      "place": "",
+      "address": "大町市",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-06",
+      "weatherLocation": {
+        "latitude": 36.503,
+        "longitude": 137.851,
+        "label": "長野県大町",
+        "accuracy": "municipality",
+        "source": "gsi",
+        "geocodedAt": "2026-07-29T14:30:38.512+09:00"
+      }
     },
     {
       "id": "na-20261031-p8gme",
@@ -2997,6 +2944,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-25",
       "weatherLocation": {
         "latitude": 36.649,
         "longitude": 138.195,
@@ -3004,11 +2952,37 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-08-25T12:35:39.581+09:00"
-      },
-      "firstSeen": "2026-08-25"
+      }
     }
   ],
-  "gifu": [],
+  "gifu": [
+    {
+      "id": "gi-off-20270128-xp1ck",
+      "pref": "gifu",
+      "date": "2027-01-28",
+      "weekday": "木",
+      "title": "自衛官募集ホームページ <自衛官募集X",
+      "place": "防衛大学",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/gifu/recruit/image/jieikanbosyu_R8.pdf",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-09-24",
+      "weatherLocation": {
+        "latitude": 35.391,
+        "longitude": 136.724,
+        "label": "岐阜県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-09-01T00:16:01.242+09:00"
+      }
+    }
+  ],
   "shizuoka": [],
   "aichi": [
     {
@@ -3027,6 +3001,7 @@
       "ageRequirement": null,
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-08-24",
       "weatherLocation": {
         "latitude": 35.18,
         "longitude": 136.907,
@@ -3034,8 +3009,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:28.766+09:00"
-      },
-      "firstSeen": "2026-08-24"
+      }
     },
     {
       "id": "ai-20260927-bccfa",
@@ -3053,6 +3027,7 @@
       "ageRequirement": "18歳以上53歳未満（保護者同伴可）",
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-08-06",
       "weatherLocation": {
         "latitude": 35.083,
         "longitude": 137.156,
@@ -3060,8 +3035,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-18T08:05:18.470+09:00"
-      },
-      "firstSeen": "2026-08-06"
+      }
     },
     {
       "id": "ai-20260927-taqak",
@@ -3079,6 +3053,7 @@
       "ageRequirement": null,
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-08-24",
       "weatherLocation": {
         "latitude": 35.18,
         "longitude": 136.907,
@@ -3086,8 +3061,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:28.766+09:00"
-      },
-      "firstSeen": "2026-08-24"
+      }
     },
     {
       "id": "ai-20260928-xn4nj",
@@ -3105,6 +3079,7 @@
       "ageRequirement": null,
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-08-06",
       "weatherLocation": {
         "latitude": 35.18,
         "longitude": 136.907,
@@ -3112,8 +3087,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:28.766+09:00"
-      },
-      "firstSeen": "2026-08-06"
+      }
     },
     {
       "id": "ai-20261004-n0567",
@@ -3131,6 +3105,7 @@
       "ageRequirement": "18歳以上55歳未満",
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-09-16",
       "weatherLocation": {
         "latitude": 35.083,
         "longitude": 137.156,
@@ -3138,8 +3113,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-16T21:55:41.810+09:00"
-      },
-      "firstSeen": "2026-09-16"
+      }
     },
     {
       "id": "ai-20261009-vj94o",
@@ -3157,6 +3131,7 @@
       "ageRequirement": null,
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-08-24",
       "weatherLocation": {
         "latitude": 35.18,
         "longitude": 136.907,
@@ -3164,8 +3139,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:28.766+09:00"
-      },
-      "firstSeen": "2026-08-24"
+      }
     },
     {
       "id": "ai-20261010-6pvf4",
@@ -3183,6 +3157,7 @@
       "ageRequirement": null,
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-08-24",
       "weatherLocation": {
         "latitude": 35.18,
         "longitude": 136.907,
@@ -3190,8 +3165,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:28.766+09:00"
-      },
-      "firstSeen": "2026-08-24"
+      }
     },
     {
       "id": "ai-20261010-a8coa",
@@ -3209,6 +3183,7 @@
       "ageRequirement": "18歳以上55歳未満",
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-09-16",
       "weatherLocation": {
         "latitude": 35.083,
         "longitude": 137.156,
@@ -3216,8 +3191,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-16T21:55:41.810+09:00"
-      },
-      "firstSeen": "2026-09-16"
+      }
     },
     {
       "id": "ai-20261017-0it05",
@@ -3235,6 +3209,7 @@
       "ageRequirement": "高校3年生～33歳未満",
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-08-06",
       "weatherLocation": {
         "latitude": 35.18,
         "longitude": 136.907,
@@ -3242,8 +3217,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:29.793+09:00"
-      },
-      "firstSeen": "2026-08-06"
+      }
     },
     {
       "id": "ai-20261017-oqmrb",
@@ -3261,6 +3235,7 @@
       "ageRequirement": null,
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-08-24",
       "weatherLocation": {
         "latitude": 35.18,
         "longitude": 136.907,
@@ -3268,8 +3243,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:28.766+09:00"
-      },
-      "firstSeen": "2026-08-24"
+      }
     },
     {
       "id": "ai-20261017-mnjgt",
@@ -3287,6 +3261,7 @@
       "ageRequirement": "18歳以上55歳未満",
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-09-16",
       "weatherLocation": {
         "latitude": 35.083,
         "longitude": 137.156,
@@ -3294,8 +3269,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-16T21:55:41.810+09:00"
-      },
-      "firstSeen": "2026-09-16"
+      }
     },
     {
       "id": "ai-20261018-jljx6",
@@ -3313,6 +3287,7 @@
       "ageRequirement": "高校3年生～33歳未満",
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-08-06",
       "weatherLocation": {
         "latitude": 35.18,
         "longitude": 136.907,
@@ -3320,8 +3295,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:29.793+09:00"
-      },
-      "firstSeen": "2026-08-06"
+      }
     },
     {
       "id": "ai-20261018-qyijc",
@@ -3339,6 +3313,7 @@
       "ageRequirement": null,
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-08-24",
       "weatherLocation": {
         "latitude": 35.18,
         "longitude": 136.907,
@@ -3346,8 +3321,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:28.766+09:00"
-      },
-      "firstSeen": "2026-08-24"
+      }
     },
     {
       "id": "ai-20261020-7dmp5",
@@ -3365,6 +3339,7 @@
       "ageRequirement": "18歳以上55歳未満",
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-09-16",
       "weatherLocation": {
         "latitude": 35.083,
         "longitude": 137.156,
@@ -3372,8 +3347,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-16T21:55:41.810+09:00"
-      },
-      "firstSeen": "2026-09-16"
+      }
     },
     {
       "id": "ai-20261108-3xxia",
@@ -3391,6 +3365,7 @@
       "ageRequirement": "18歳以上55歳未満",
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-09-16",
       "weatherLocation": {
         "latitude": 35.083,
         "longitude": 137.156,
@@ -3398,8 +3373,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-16T21:55:41.810+09:00"
-      },
-      "firstSeen": "2026-09-16"
+      }
     },
     {
       "id": "ai-20261114-7cps6",
@@ -3417,6 +3391,7 @@
       "ageRequirement": "高等工科学校希望学生及び保護者様、豊田市及び市内高校・中学校教員等",
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-08-06",
       "weatherLocation": {
         "latitude": 35.18,
         "longitude": 136.907,
@@ -3424,8 +3399,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-03T09:01:51.995+09:00"
-      },
-      "firstSeen": "2026-08-06"
+      }
     },
     {
       "id": "ai-20261115-3gtce",
@@ -3443,6 +3417,7 @@
       "ageRequirement": "18歳以上55歳未満",
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-09-16",
       "weatherLocation": {
         "latitude": 35.083,
         "longitude": 137.156,
@@ -3450,8 +3425,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-16T21:55:41.810+09:00"
-      },
-      "firstSeen": "2026-09-16"
+      }
     },
     {
       "id": "ai-20261121-n7kg9",
@@ -3469,6 +3443,7 @@
       "ageRequirement": "18歳以上55歳未満",
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-09-16",
       "weatherLocation": {
         "latitude": 35.083,
         "longitude": 137.156,
@@ -3476,8 +3451,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-16T21:55:41.810+09:00"
-      },
-      "firstSeen": "2026-09-16"
+      }
     },
     {
       "id": "ai-20261128-yj0bk",
@@ -3495,6 +3469,7 @@
       "ageRequirement": "18歳以上55歳未満",
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-09-16",
       "weatherLocation": {
         "latitude": 35.083,
         "longitude": 137.156,
@@ -3502,8 +3477,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-16T21:55:41.810+09:00"
-      },
-      "firstSeen": "2026-09-16"
+      }
     },
     {
       "id": "ai-20261130-5imll",
@@ -3521,6 +3495,7 @@
       "ageRequirement": "18歳以上55歳未満",
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-09-16",
       "weatherLocation": {
         "latitude": 35.083,
         "longitude": 137.156,
@@ -3528,8 +3503,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-16T21:55:41.810+09:00"
-      },
-      "firstSeen": "2026-09-16"
+      }
     },
     {
       "id": "ai-20261205-itnlb",
@@ -3547,6 +3521,7 @@
       "ageRequirement": "15才から30才までの公安系公務員に興味がある方（保護者同伴可能）",
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-08-06",
       "weatherLocation": {
         "latitude": 35.181,
         "longitude": 136.907,
@@ -3554,8 +3529,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-19T07:57:21.238+09:00"
-      },
-      "firstSeen": "2026-08-06"
+      }
     },
     {
       "id": "ai-20261206-6h2zz",
@@ -3573,6 +3547,7 @@
       "ageRequirement": "18歳以上55歳未満",
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-09-16",
       "weatherLocation": {
         "latitude": 35.083,
         "longitude": 137.156,
@@ -3580,8 +3555,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-16T21:55:41.810+09:00"
-      },
-      "firstSeen": "2026-09-16"
+      }
     },
     {
       "id": "ai-20261212-mcui2",
@@ -3599,6 +3573,7 @@
       "ageRequirement": "18歳以上55歳未満",
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-09-16",
       "weatherLocation": {
         "latitude": 35.083,
         "longitude": 137.156,
@@ -3606,8 +3581,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-16T21:55:41.810+09:00"
-      },
-      "firstSeen": "2026-09-16"
+      }
     },
     {
       "id": "ai-20261219-1tezd",
@@ -3625,6 +3599,7 @@
       "ageRequirement": "高校3年生～33歳未満",
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-08-06",
       "weatherLocation": {
         "latitude": 35.18,
         "longitude": 136.907,
@@ -3632,8 +3607,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:29.793+09:00"
-      },
-      "firstSeen": "2026-08-06"
+      }
     },
     {
       "id": "ai-20261219-sufi9",
@@ -3651,6 +3625,7 @@
       "ageRequirement": "18歳以上55歳未満",
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-09-16",
       "weatherLocation": {
         "latitude": 35.083,
         "longitude": 137.156,
@@ -3658,8 +3633,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-16T21:55:41.810+09:00"
-      },
-      "firstSeen": "2026-09-16"
+      }
     },
     {
       "id": "ai-20261220-6720j",
@@ -3677,6 +3651,7 @@
       "ageRequirement": "高校3年生～33歳未満",
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-08-06",
       "weatherLocation": {
         "latitude": 35.18,
         "longitude": 136.907,
@@ -3684,8 +3659,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:29.793+09:00"
-      },
-      "firstSeen": "2026-08-06"
+      }
     },
     {
       "id": "ai-20261227-klt70",
@@ -3703,6 +3677,7 @@
       "ageRequirement": "18歳以上55歳未満",
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-09-16",
       "weatherLocation": {
         "latitude": 35.083,
         "longitude": 137.156,
@@ -3710,8 +3685,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-16T21:55:41.810+09:00"
-      },
-      "firstSeen": "2026-09-16"
+      }
     },
     {
       "id": "ai-20270220-svd60",
@@ -3729,6 +3703,7 @@
       "ageRequirement": "15才から30才までの公安系公務員に興味がある方（保護者同伴可能）",
       "deadline": null,
       "endDate": null,
+      "firstSeen": "2026-08-06",
       "weatherLocation": {
         "latitude": 35.181,
         "longitude": 136.907,
@@ -3736,8 +3711,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-19T07:57:21.238+09:00"
-      },
-      "firstSeen": "2026-08-06"
+      }
     },
     {
       "id": "ai-office-20270128-ve5lk",
@@ -3755,6 +3729,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_ocr",
+      "firstSeen": "2026-09-22",
       "weatherLocation": {
         "latitude": 35.18,
         "longitude": 136.907,
@@ -3762,8 +3737,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-31T08:58:59.575+09:00"
-      },
-      "firstSeen": "2026-09-22"
+      }
     }
   ],
   "mie": [],
@@ -3784,6 +3758,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_ocr",
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 34.966,
         "longitude": 136.166,
@@ -3791,8 +3766,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-17T22:00:11.546+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     }
   ],
   "kyoto": [
@@ -3998,6 +3972,8 @@
       "notes": "完全予約制。各回1時間、第1回～第6回実施。",
       "ageRequirement": null,
       "deadline": "9月27日（日）",
+      "firstSeen": "2026-09-10",
+      "deadlineDate": "2026-09-27",
       "weatherLocation": {
         "latitude": 34.766,
         "longitude": 134.791,
@@ -4005,9 +3981,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-09T15:04:42.959+09:00"
-      },
-      "firstSeen": "2026-09-10",
-      "deadlineDate": "2026-09-27"
+      }
     },
     {
       "id": "hy-20261004-yfvvg",
@@ -4024,6 +3998,7 @@
       "notes": "最終受付15:30",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-10",
       "weatherLocation": {
         "latitude": 34.766,
         "longitude": 134.791,
@@ -4031,8 +4006,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-09T15:04:42.959+09:00"
-      },
-      "firstSeen": "2026-09-10"
+      }
     },
     {
       "id": "hy-office-20261025-svhnx",
@@ -4050,6 +4024,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 34.691,
         "longitude": 135.183,
@@ -4057,8 +4032,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-07-02T15:00:02.899+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     },
     {
       "id": "hy-office-20261028-0bbc5",
@@ -4076,6 +4050,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 34.691,
         "longitude": 135.183,
@@ -4083,8 +4058,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-07-02T15:00:02.899+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     },
     {
       "id": "hy-office-20261115-bzh7a",
@@ -4102,6 +4076,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 34.691,
         "longitude": 135.183,
@@ -4109,8 +4084,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-07-02T15:00:02.899+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     },
     {
       "id": "hy-office-20261027-wbtqt",
@@ -4128,6 +4102,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 34.691,
         "longitude": 135.183,
@@ -4135,8 +4110,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-07-02T15:00:02.899+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     },
     {
       "id": "hy-office-20261124-1ilg5",
@@ -4154,6 +4128,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 34.691,
         "longitude": 135.183,
@@ -4161,8 +4136,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-07-02T15:00:02.899+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     },
     {
       "id": "hy-office-20261222-ox2tx",
@@ -4180,6 +4154,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 34.691,
         "longitude": 135.183,
@@ -4187,8 +4162,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-07-02T15:00:02.899+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     },
     {
       "id": "hy-office-20261006-jcv1z",
@@ -4206,6 +4180,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 34.691,
         "longitude": 135.183,
@@ -4213,8 +4188,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-07-02T15:00:02.899+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     },
     {
       "id": "hy-office-20261003-qepfp",
@@ -4232,6 +4206,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 34.757,
         "longitude": 134.841,
@@ -4239,8 +4214,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-10T15:07:42.097+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     },
     {
       "id": "hy-office-20261004-a5y9h",
@@ -4258,6 +4232,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 34.757,
         "longitude": 134.841,
@@ -4265,8 +4240,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-10T15:07:42.097+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     },
     {
       "id": "hy-office-20260928-vorim",
@@ -4284,6 +4258,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 34.691,
         "longitude": 135.183,
@@ -4291,8 +4266,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-07-02T15:00:02.899+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     },
     {
       "id": "hy-office-20261001-2mepa",
@@ -4310,6 +4284,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 34.691,
         "longitude": 135.183,
@@ -4317,8 +4292,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-07-02T15:00:02.899+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     },
     {
       "id": "hy-office-20261111-igv4e",
@@ -4336,6 +4310,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 34.691,
         "longitude": 135.183,
@@ -4343,8 +4318,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-07-02T15:00:02.899+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     }
   ],
   "nara": [],
@@ -4365,6 +4339,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-17",
       "weatherLocation": {
         "latitude": 33.839,
         "longitude": 132.766,
@@ -4372,8 +4347,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-17T15:14:28.574+09:00"
-      },
-      "firstSeen": "2026-09-17"
+      }
     },
     {
       "id": "em-20260926-ysrni",
@@ -4390,6 +4364,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-08",
       "weatherLocation": {
         "latitude": 33.842,
         "longitude": 132.766,
@@ -4397,8 +4372,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-08T21:36:21.996+09:00"
-      },
-      "firstSeen": "2026-09-08"
+      }
     },
     {
       "id": "eh-off-20261017-616pj",
@@ -4495,6 +4469,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-06",
       "weatherLocation": {
         "latitude": 34.34,
         "longitude": 134.043,
@@ -4502,8 +4477,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-24T14:33:37.510+09:00"
-      },
-      "firstSeen": "2026-08-06"
+      }
     },
     {
       "id": "kg-20260927-393p6",
@@ -4520,6 +4494,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-06",
       "weatherLocation": {
         "latitude": 34.34,
         "longitude": 134.043,
@@ -4527,8 +4502,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-24T14:33:37.838+09:00"
-      },
-      "firstSeen": "2026-08-06"
+      }
     },
     {
       "id": "ka-off-20270128-xp1ck",
@@ -4577,6 +4551,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-06",
       "weatherLocation": {
         "latitude": 35.123,
         "longitude": 134.178,
@@ -4584,8 +4559,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-31T14:42:37.279+09:00"
-      },
-      "firstSeen": "2026-08-06"
+      }
     },
     {
       "id": "ok-20260927-tqrg0",
@@ -4602,6 +4576,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-06",
       "weatherLocation": {
         "latitude": 34.662,
         "longitude": 133.935,
@@ -4609,8 +4584,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-02T08:50:44.084+09:00"
-      },
-      "firstSeen": "2026-08-06"
+      }
     },
     {
       "id": "ok-20261010-c0j24",
@@ -4627,6 +4601,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-01",
       "weatherLocation": {
         "latitude": 34.655,
         "longitude": 133.92,
@@ -4634,8 +4609,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-01T09:58:12.327+09:00"
-      },
-      "firstSeen": "2026-09-01"
+      }
     },
     {
       "id": "ok-20261011-90vsq",
@@ -4652,6 +4626,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-01",
       "weatherLocation": {
         "latitude": 35.042,
         "longitude": 134.116,
@@ -4659,8 +4634,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-01T09:58:13.128+09:00"
-      },
-      "firstSeen": "2026-09-01"
+      }
     },
     {
       "id": "ok-20261011-jiss7",
@@ -4677,6 +4651,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-01",
       "weatherLocation": {
         "latitude": 34.662,
         "longitude": 133.935,
@@ -4684,8 +4659,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-01T09:58:13.478+09:00"
-      },
-      "firstSeen": "2026-09-01"
+      }
     },
     {
       "id": "ok-20261017-z61kb",
@@ -4702,6 +4676,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-01",
       "weatherLocation": {
         "latitude": 34.662,
         "longitude": 133.935,
@@ -4709,8 +4684,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-01T09:58:13.821+09:00"
-      },
-      "firstSeen": "2026-09-01"
+      }
     },
     {
       "id": "ok-20261025-tyysm",
@@ -4727,6 +4701,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-01",
       "weatherLocation": {
         "latitude": 34.662,
         "longitude": 133.935,
@@ -4734,8 +4709,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-01T09:58:14.173+09:00"
-      },
-      "firstSeen": "2026-09-01"
+      }
     },
     {
       "id": "ok-20261025-f8yr0",
@@ -4752,6 +4726,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-01",
       "weatherLocation": {
         "latitude": 34.662,
         "longitude": 133.935,
@@ -4759,39 +4734,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-02T14:58:11.995+09:00"
-      },
-      "firstSeen": "2026-09-01"
-    },
-    {
-      "id": "ok-off-20261003-rvqfi",
-      "pref": "okayama",
-      "date": "2026-10-03",
-      "weekday": "土",
-      "title": "陸上自衛隊高等工科学校説明会",
-      "place": "陸上自衛隊高等工科学校 錬武館",
-      "address": "",
-      "time": "09:00～14:00",
-      "category": "説明会",
-      "tag": "学生向け",
-      "url": "https://www.mod.go.jp/pco/okayama/img/koutou_setumei.pdf",
-      "notes": "事前予約制。スリッパをご持参ください。",
-      "ageRequirement": "高工校に興味のある方",
-      "deadline": "9月15日（火）",
-      "source_type": "office_ocr",
-      "weatherLocation": {
-        "latitude": 34.662,
-        "longitude": 133.935,
-        "label": "岡山県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-31T16:01:35.578+09:00"
-      },
-      "firstSeen": "2026-09-23",
-      "deadlineDate": "2026-09-15",
-      "status": "closed",
-      "statusReason": "締切日経過",
-      "statusSource": "ocr",
-      "statusUpdatedAt": "2026-09-24"
+      }
     },
     {
       "id": "ok-office-20260925-zxwzd",
@@ -4809,6 +4752,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 34.662,
         "longitude": 133.935,
@@ -4816,8 +4760,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     },
     {
       "id": "ok-office-20261003-ey5ls",
@@ -4835,6 +4778,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 34.662,
         "longitude": 133.935,
@@ -4842,8 +4786,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     },
     {
       "id": "ok-office-20261009-r87pa",
@@ -4861,6 +4804,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 34.662,
         "longitude": 133.935,
@@ -4868,8 +4812,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     },
     {
       "id": "ok-office-20261009-25ir2",
@@ -4887,6 +4830,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 34.662,
         "longitude": 133.935,
@@ -4894,8 +4838,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     },
     {
       "id": "ok-office-20261022-z6r4u",
@@ -4913,6 +4856,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 34.662,
         "longitude": 133.935,
@@ -4920,8 +4864,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     },
     {
       "id": "ok-office-20261015-em8ti",
@@ -4939,6 +4882,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 34.662,
         "longitude": 133.935,
@@ -4946,8 +4890,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     },
     {
       "id": "ok-office-20261008-fk4jx",
@@ -4965,6 +4908,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 34.662,
         "longitude": 133.935,
@@ -4972,8 +4916,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
     },
     {
       "id": "ok-office-20261002-7q9x9",
@@ -4991,6 +4934,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-23",
       "weatherLocation": {
         "latitude": 34.662,
         "longitude": 133.935,
@@ -4998,8 +4942,38 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
-      },
-      "firstSeen": "2026-09-23"
+      }
+    },
+    {
+      "id": "ok-office-20261003-r9wzr",
+      "pref": "okayama",
+      "date": "2026-10-03",
+      "weekday": "土",
+      "title": "陸上自衛隊高等工科学校説明会",
+      "place": "陸上自衛隊高等工科学校 錬武館",
+      "address": "",
+      "time": "09:00～14:00",
+      "category": "説明会",
+      "tag": "学生向け",
+      "url": "https://www.mod.go.jp/pco/okayama/img/koutou_setumei.pdf",
+      "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点\n事前予約制。スリッパをご持参ください。",
+      "ageRequirement": "高工校に興味のある方",
+      "deadline": "9月15日（火）",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-09-24",
+      "deadlineDate": "2026-09-15",
+      "status": "closed",
+      "statusReason": "締切日経過",
+      "statusSource": "ocr",
+      "statusUpdatedAt": "2026-09-24",
+      "weatherLocation": {
+        "latitude": 34.662,
+        "longitude": 133.935,
+        "label": "岡山県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-31T16:01:35.578+09:00"
+      }
     }
   ],
   "hiroshima": [
@@ -5018,6 +4992,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-27",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5025,8 +5000,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-08-27"
+      }
     },
     {
       "id": "hi-20261003-kfcti",
@@ -5043,6 +5017,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-07",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5050,8 +5025,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-09-07"
+      }
     },
     {
       "id": "hi-20261003-3bm6m",
@@ -5068,6 +5042,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-11",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5075,8 +5050,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-09-11"
+      }
     },
     {
       "id": "hi-20261003-kua44",
@@ -5093,6 +5067,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-27",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5100,8 +5075,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-08-27"
+      }
     },
     {
       "id": "hi-20261004-hasl3",
@@ -5118,6 +5092,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-07",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5125,8 +5100,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-09-07"
+      }
     },
     {
       "id": "hi-20261004-flmuf",
@@ -5143,6 +5117,7 @@
       "notes": "雨天時の場合は屋外イベントを中止し、一部のイベントをフジグラン安芸センターコートで実施します。",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-27",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5150,8 +5125,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-11T15:06:40.920+09:00"
-      },
-      "firstSeen": "2026-08-27"
+      }
     },
     {
       "id": "hi-20261011-qcxpz",
@@ -5168,6 +5142,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-07",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5175,8 +5150,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-09-07"
+      }
     },
     {
       "id": "hi-20261012-zqiok",
@@ -5193,6 +5167,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-07",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5200,8 +5175,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-09-07"
+      }
     },
     {
       "id": "hi-20261012-yi9bt",
@@ -5218,6 +5192,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-27",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5225,8 +5200,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-08-27"
+      }
     },
     {
       "id": "hi-20261017-259ng",
@@ -5243,6 +5217,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-11",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5250,8 +5225,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-09-11"
+      }
     },
     {
       "id": "hi-20261017-o981a",
@@ -5268,6 +5242,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-11",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5275,8 +5250,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-09-11"
+      }
     },
     {
       "id": "hi-20261017-fxcfx",
@@ -5293,6 +5267,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-11",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5300,8 +5275,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-09-11"
+      }
     },
     {
       "id": "hi-20261017-4y02r",
@@ -5318,6 +5292,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-11",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5325,8 +5300,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-09-11"
+      }
     },
     {
       "id": "hi-20261018-mhoe0",
@@ -5343,6 +5317,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-27",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5350,8 +5325,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-08-27"
+      }
     },
     {
       "id": "hi-20261018-0mwyf",
@@ -5368,6 +5342,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-27",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5375,8 +5350,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-08-27"
+      }
     },
     {
       "id": "hi-20261018-cti3w",
@@ -5393,6 +5367,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-07",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5400,8 +5375,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-09-07"
+      }
     },
     {
       "id": "hi-20261019-65ebk",
@@ -5418,6 +5392,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-11",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5425,8 +5400,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-09-11"
+      }
     },
     {
       "id": "hi-20261024-tfexg",
@@ -5443,6 +5417,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-11",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5450,8 +5425,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-09-11"
+      }
     },
     {
       "id": "hi-20261024-lguk1",
@@ -5468,6 +5442,7 @@
       "notes": "艇見学受付時手荷物検査あり。車椅子・松杖・足不自由者対応あり。",
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-18",
       "weatherLocation": {
         "latitude": 34.409,
         "longitude": 133.206,
@@ -5475,8 +5450,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-18T21:37:37.537+09:00"
-      },
-      "firstSeen": "2026-09-18"
+      }
     },
     {
       "id": "hi-20261024-11uir",
@@ -5493,6 +5467,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-27",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5500,8 +5475,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-08-27"
+      }
     },
     {
       "id": "hi-20261024-o8xgj",
@@ -5518,6 +5492,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-11",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5525,8 +5500,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-09-11"
+      }
     },
     {
       "id": "hi-20261025-r7dxi",
@@ -5543,6 +5517,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-11",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5550,8 +5525,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-09-11"
+      }
     },
     {
       "id": "hi-20261025-rntx0",
@@ -5568,6 +5542,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-11",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5575,8 +5550,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-09-11"
+      }
     },
     {
       "id": "hi-20261025-jxnjz",
@@ -5593,6 +5567,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-11",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5600,8 +5575,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-09-11"
+      }
     },
     {
       "id": "hi-20261025-6ahch",
@@ -5618,6 +5592,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-11",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5625,8 +5600,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-09-11"
+      }
     },
     {
       "id": "hi-20261025-tux0e",
@@ -5643,6 +5617,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-27",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5650,8 +5625,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-08-27"
+      }
     },
     {
       "id": "hi-20261031-b9gm0",
@@ -5668,6 +5642,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-08-27",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5675,8 +5650,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-08-27"
+      }
     },
     {
       "id": "hi-20261031-ftd3q",
@@ -5693,6 +5667,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-07",
       "weatherLocation": {
         "latitude": 34.397,
         "longitude": 132.46,
@@ -5700,8 +5675,7 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
-      },
-      "firstSeen": "2026-09-07"
+      }
     }
   ],
   "yamaguchi": [
@@ -5720,6 +5694,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-09",
       "weatherLocation": {
         "latitude": 34.178,
         "longitude": 131.473,
@@ -5727,8 +5702,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-09T15:04:44.031+09:00"
-      },
-      "firstSeen": "2026-09-09"
+      }
     },
     {
       "id": "ya-off-20260929-19h6n",
@@ -5853,6 +5827,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-18",
       "weatherLocation": {
         "latitude": 33.265,
         "longitude": 129.881,
@@ -5860,8 +5835,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-18T15:07:16.244+09:00"
-      },
-      "firstSeen": "2026-09-18"
+      }
     }
   ],
   "nagasaki": [
@@ -5880,6 +5854,7 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
+      "firstSeen": "2026-09-18",
       "weatherLocation": {
         "latitude": 32.984,
         "longitude": 129.073,
@@ -5887,8 +5862,7 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-18T21:37:38.268+09:00"
-      },
-      "firstSeen": "2026-09-18"
+      }
     },
     {
       "id": "na-office-20261103-nef5s",
@@ -5906,6 +5880,7 @@
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_html",
+      "firstSeen": "2026-09-05",
       "weatherLocation": {
         "latitude": 32.696,
         "longitude": 128.841,
@@ -5913,41 +5888,13 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-08-19T07:57:24.867+09:00"
-      },
-      "firstSeen": "2026-09-05"
+      }
     }
   ],
   "kumamoto": [],
   "oita": [],
   "miyazaki": [],
   "kagoshima": [],
-  "okinawa": [
-    {
-      "id": "ok-off-20270128-xp1ck",
-      "pref": "okinawa",
-      "date": "2027-01-28",
-      "weekday": "木",
-      "title": "自衛官募集ホームページ <自衛官募集X",
-      "place": "防衛大学",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/okinawa/file/r8.saiyou_annai.pdf",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-09-24",
-      "weatherLocation": {
-        "latitude": 26.212,
-        "longitude": 127.681,
-        "label": "沖縄県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-31T08:59:01.001+09:00"
-      }
-    }
-  ],
-  "updatedAt": "2026/09/24 02:38"
+  "okinawa": [],
+  "updatedAt": "2026/09/24 03:47"
 }
