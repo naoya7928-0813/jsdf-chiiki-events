@@ -31,11 +31,11 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
     "openai": "^6.39.0",
-    "sharp": "^0.35.0",
+    "sharp": "^0.35.4",
     "vite": "^6.3.2",
     "vite-plugin-pwa": "^0.21.1"
   },
   "overrides": {
-    "sharp": "^0.35.0"
+    "sharp": "^0.35.4"
   }
 }

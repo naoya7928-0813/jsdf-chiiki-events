@@ -163,11 +163,14 @@ jobs:
         run: |
           echo "STAGE=smoke" >> "$GITHUB_ENV"
           node --check scraper/index.js
+          # パーサーの実ページ回帰テスト（cheerio が要るためスクレイパー依存の入ったここで実行。
+          # ルートの npm test では cheerio 未導入のためスキップされる）
+          node --test shared/yamanashiParser.test.cjs shared/tokyoCalendar.test.cjs
           node scraper/index.js --mock
           # モック出力が実データ（前回データ維持・PREV_EVENTS の基準）を
           # 汚さないよう、書き出されたファイルを復元する
-          git checkout -- public/ scraper/geocode-cache.json
-          rm -f scraper/push-payload.json
+          git checkout -- public/ data/ scraper/geocode-cache.json
+          rm -f scraper/push-payload.json scraper/regression-report.json
 
       # ── スクレイピング実行 ────────────────────────────────────
       - name: イベントデータをスクレイピング
@@ -339,6 +342,10 @@ jobs:
           #   `git rebase` が "cannot rebase: You have unstaged changes" で失敗していた
           #   （2026-06-28 の天気/ジオコーディング機能導入以降、毎回 push 前に停止）。
           git add public/data/events.json public/data/events-quarantine.json public/data/events-llm-recheck.json data/events-archive.json public/events.html public/events/ public/sitemap.xml scraper/geocode-cache.json
+          # 検疫の履歴（追記専用 JSONL）。隔離・解除があった回だけ作成・追記されるため、存在するときだけ追加する
+          if [ -f data/events-quarantine-history.jsonl ]; then git add data/events-quarantine-history.jsonl; fi
+          # 前回値の引き継ぎが連続している項目の状態（次回実行へ持ち越す。公開サイトからは配信しない）
+          if [ -f data/field-carry-state.json ]; then git add data/field-carry-state.json; fi
 
           # 変更判定は「ステージ済み差分」で行う（個別ファイル列挙だと archive/quarantine 等の
           # 追加ファイルの検知漏れが起きるため）。デプロイ要否は public/ と data/ の変更で決める
