@@ -4556,7 +4556,8 @@ async function writeOutput(data, timeCutoff = null) {
     for (const key of Object.keys(data)) {
       if (!Array.isArray(data[key])) continue;
       data[key] = data[key].map(ev => {
-        const r = eventRegression.mergeNonRegressiveEvent(prevIdx.get(ev.id), ev, { today });
+        // 座標（weatherLocation）はこの後のジオコーディングで付くため、ここでは戻さない（ジオコーディング後に判定）
+        const r = eventRegression.mergeNonRegressiveEvent(prevIdx.get(ev.id), ev, { today, skipFields: ['weatherLocation'] });
         for (const c of r.carried) {
           regressionReport.carriedFields.push({ id: ev.id, pref: ev.pref, date: ev.date, title: ev.title, ...c });
         }
@@ -4570,9 +4571,6 @@ async function writeOutput(data, timeCutoff = null) {
       }
     }
 
-    // (3) 引き継ぎの長期化（stale）の追跡。同じ項目が連続して何回、いつから一次ソースで確認できていないかを残す。
-    //     公開データは変えない（要確認として報告するだけ）。モック・リプレイでは状態を更新しない。
-    regressionReport.staleCarries = updateFieldCarryState(regressionReport.carriedFields, today);
   }
 
   // ── 検疫ファイルの書き出し（毎回、今回の疑わしい件で全置換） ──────────
@@ -4685,6 +4683,29 @@ async function writeOutput(data, timeCutoff = null) {
   } catch (e) {
     console.warn('[geocode] ジオコーディングに失敗しました:', e.message);
   }
+
+  // ── 座標の非退行（ジオコーディング後）── ジオコーディングしても座標が付かなかった同一イベントに、
+  //    会場・住所が前回と同じなら前回の座標を戻す（shared/eventRegression.cjs restoreLostLocation）
+  {
+    const prevIdx = eventRegression.buildEventIndex(prevData);
+    let restored = 0;
+    for (const key of Object.keys(data)) {
+      if (!Array.isArray(data[key])) continue;
+      data[key] = data[key].map(ev => {
+        const r = eventRegression.restoreLostLocation(prevIdx.get(ev.id), ev, { today });
+        for (const c of r.carried) {
+          regressionReport.carriedFields.push({ id: ev.id, pref: ev.pref, date: ev.date, title: ev.title, ...c });
+          restored++;
+        }
+        return r.event;
+      });
+    }
+    if (restored) console.warn(`[非退行] ジオコーディングで座標が付かなかった ${restored} 件に前回の座標を戻しました`);
+  }
+
+  // 引き継ぎの長期化（stale）の追跡。同じ項目が連続して何回、いつから一次ソースで確認できていないかを残す。
+  // 公開データは変えない（要確認として報告するだけ）。モック・リプレイでは状態を更新しない。
+  regressionReport.staleCarries = updateFieldCarryState(regressionReport.carriedFields, today);
 
   // ── 過去イベントのアーカイブ（終了したイベントを恒久保存） ──────────
   // 候補は「前回 events.json の過去イベント」＋「今回の出力に残る終了済みイベント」。
