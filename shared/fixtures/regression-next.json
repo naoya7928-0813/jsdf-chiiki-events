@@ -1,0 +1,116 @@
+{
+  "updatedAt": "2026/09/23 08:54",
+  "tokyo": [
+    {
+      "id": "t-20260929-4e639",
+      "pref": "tokyo",
+      "date": "2026-09-29",
+      "weekday": "火",
+      "title": "習志野駐屯地見学",
+      "place": "江東出張所",
+      "time": "",
+      "category": "体験",
+      "tag": "",
+      "ageRequirement": "日本国籍を持つ15歳～32歳以下の方",
+      "deadline": "8月31日（月）",
+      "url": "https://www.mod.go.jp/pco/tokyo/koutou/index.html#0929",
+      "notes": "・訓練見学\n・体験搭乗（停止状態）\n・体験喫食",
+      "source_type": "office_html",
+      "address": "",
+      "firstSeen": "2026-08-06",
+      "deadlineDate": "2026-08-31",
+      "status": "closed",
+      "statusReason": "締切日経過",
+      "statusSource": "html",
+      "statusUpdatedAt": "2026-09-23",
+      "weatherLocation": {
+        "latitude": 35.673,
+        "longitude": 139.817,
+        "label": "東京都江東区",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-02T08:50:36.640+09:00"
+      }
+    },
+    {
+      "id": "t-20261019-oyo8x",
+      "pref": "tokyo",
+      "date": "2026-10-19",
+      "weekday": "月",
+      "title": "宇都宮駐屯地見学",
+      "place": "江東出張所",
+      "time": "",
+      "category": "体験",
+      "tag": "",
+      "ageRequirement": "日本国籍を持つ15歳以上32歳以下の方",
+      "deadline": "10月12日（月）",
+      "url": "https://www.mod.go.jp/pco/tokyo/koutou/index.html#1019",
+      "notes": "・部隊見学\n・装備品見学\n・体験喫食等",
+      "source_type": "office_html",
+      "address": "",
+      "firstSeen": "2026-09-15",
+      "deadlineDate": "2026-10-12",
+      "weatherLocation": {
+        "latitude": 35.673,
+        "longitude": 139.817,
+        "label": "東京都江東区",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-02T08:50:36.640+09:00"
+      }
+    }
+  ],
+  "saitama": [
+    {
+      "id": "s-20261103-ld6it",
+      "pref": "saitama",
+      "date": "2026-11-03",
+      "weekday": "火・祝",
+      "title": "入間航空祭 航空祭の飛行展示を特等席で観ませんか？",
+      "place": "航空自衛隊入間基地",
+      "address": "",
+      "time": "08:00～15:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/saitama/event/img/8.11.3iruma.jpg",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-09-17",
+      "weatherLocation": {
+        "latitude": 35.857,
+        "longitude": 139.649,
+        "label": "埼玉県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-09-17T15:14:26.401+09:00"
+      }
+    },
+    {
+      "id": "s-20261121-5372q",
+      "pref": "saitama",
+      "date": "2026-11-21",
+      "weekday": "土",
+      "title": "令和8年度自衛隊音楽まつり 招待席応募ご案内",
+      "place": "日本武道館",
+      "address": "",
+      "time": "09:30～11:20（第3回公演）",
+      "category": "地域参加",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/saitama/event/img/8.11.21ongaku.jpg",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-09-17",
+      "weatherLocation": {
+        "latitude": 35.908,
+        "longitude": 139.339,
+        "label": "埼玉県日高市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-09-17T15:14:27.539+09:00"
+      }
+    }
+  ],
+  "yamanashi": []
+}

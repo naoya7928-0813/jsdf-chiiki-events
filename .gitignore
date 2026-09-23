@@ -39,3 +39,6 @@ scraper/ocr-stats.json
 
 # カットオフ（時間切れ打ち切り）の結果。実行ごとの一時ファイル
 scraper/cutoff-report.json
+
+# 前回値との比較結果（非退行の保護・0件化地本・消失イベント）。実行ごとの一時ファイル。CI のジョブサマリが読む
+scraper/regression-report.json

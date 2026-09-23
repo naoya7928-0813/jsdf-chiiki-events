@@ -45,8 +45,11 @@ const geocode             = require('./lib/geocode');
 const { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } = require('../shared/officeTitle.cjs');
 // 配信スロットに間に合わせる打ち切り（カットオフ）と、実行ごとの開始位置ずらし
 const { resolveDeadline, rotationOffset, keysNeedingCarryOver } = require('../shared/scrapeDeadline.cjs');
+const parserHealth = require('../shared/parserHealth.cjs');
 // イベント名の品質管理（検証済み修正・整形・junk判定・年ズレ判定・重複統合）。最終出力の防御に使う
-const { applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, splitPlaceAddress, cleanTimeText, cleanDeadlineText, isJunkOrStubTitle, isSuspiciousTitle, isStaleDatedEvent, dedupEvents, isArchivableEvent, safeUrl } = require('../shared/titleQuality.cjs');
+const { applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, splitPlaceAddress, cleanTimeText, cleanDeadlineText, isJunkOrStubTitle, isSuspiciousTitle, isStaleDatedEvent, dedupEvents, isArchivableEvent, safeUrl, isNonEventDocument, suspiciousFutureDate } = require('../shared/titleQuality.cjs');
+const eventRegression = require('../shared/eventRegression.cjs');
+const { isCountableEvent } = require('../shared/dataQuality.cjs');
 // 受付終了/中止の状態判定・締切日解決（誤判定防止つき。shared/eventStatus.cjs）
 const eventStatus = require('../shared/eventStatus.cjs');
 
@@ -131,6 +134,11 @@ const PUSH_PAYLOAD_PATH = path.join(__dirname, 'push-payload.json');
 // 誰でも全履歴を取得できてしまい、「公開サイトは1週間・運営は蓄積」という
 // 保存方針が成り立たない。運営APIはファイルシステムから読む。
 const ARCHIVE_PATH = path.join(__dirname, '../data/events-archive.json');
+// 検疫の履歴（追記専用 JSONL。public/ の外＝公開サイトからは配信しない）。
+// events-quarantine.json は「今回の検疫状態」で毎回全置換されるため、いつ何を隔離・解除したかはこちらに残す。
+const QUARANTINE_HISTORY_PATH = path.join(__dirname, '../data/events-quarantine-history.jsonl');
+// 前回値との比較結果（前回値を保護した項目・0件化した地本・消失イベント）。CI のサマリが読む（コミットしない）
+const REGRESSION_REPORT_PATH = path.join(__dirname, 'regression-report.json');
 // 保持設定（環境変数で調整可）。既定: 開催日が約2年以内、かつ最大2万件。
 // 運営のアーカイブは期限で切らずに蓄積する（収集したデータを残すのが目的）。
 // ARCHIVE_RETENTION_DAYS を明示的に設定した場合だけ、その日数より古いものを落とす。
@@ -2080,7 +2088,57 @@ async function fetchTokyo(context) {
   console.log(`[東京] ${events.length} 件取得 (calendar.js)`);
   // 0件は構造変化/取得失敗の可能性 → 例外にして前回データを維持（誤って空にしない）
   if (events.length === 0) throw new Error('東京 calendar.js から 0 件（取得失敗 or 構造変化）');
+  await enrichTokyoFromOfficePages(events, context);
   return events;
+}
+
+/**
+ * 東京: calendar.js に時刻が無いイベントは、リンク先の事務所ページ（koutou/index.html 等）の
+ * イベント表から時刻を補う。ページは1回ずつだけ取得する。取得に失敗しても何もしない
+ * （時刻は空のまま → writeOutput の前回値保護・チラシ OCR が補う）。
+ */
+async function enrichTokyoFromOfficePages(events, context) {
+  const { extractOfficePageDetails } = require('./parsers/tokyoCalendar');
+  const byPage = new Map();
+  for (const ev of events) {
+    if (ev.time || !/^https?:\/\//.test(ev.url || '')) continue;
+    const page = ev.url.split('#')[0];
+    if (!byPage.has(page)) byPage.set(page, []);
+    byPage.get(page).push(ev);
+  }
+  let filled = 0;
+  // calendar.js の link は index.html#1019 だが、詳細の表は同じ階層の event.html にある
+  // （2026-09 江東: index.html はお知らせ一覧のみ）。両方を順に見る。
+  const pagesToTry = [];
+  for (const [linkPage, list] of byPage) {
+    const sibling = linkPage.replace(/[^/]*$/, 'event.html');
+    for (const page of [...new Set([linkPage, sibling])]) pagesToTry.push([page, list]);
+  }
+  for (const [page, all] of pagesToTry.slice(0, 30)) {
+    const list = all.filter(ev => !ev.time);
+    if (!list.length) continue;
+    try {
+      const res = await fetchWithTimeout(page, {
+        headers: {
+          'User-Agent':      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'Accept':          'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
+          'Referer':         'https://www.mod.go.jp/pco/tokyo/event2/index.html',
+        },
+      });
+      // mod.go.jp の HTML は素の fetch だと 403 になることがあるため、Playwright で取り直す
+      const $ = res.ok
+        ? cheerio.load(await res.text(), { decodeEntities: false })
+        : (context ? await fetchPagePlaywright(context, page) : null);
+      if (!$) continue;
+      for (const ev of list) {
+        const d = extractOfficePageDetails($, ev);
+        if (d && d.time) { ev.time = d.time; filled++; }
+      }
+    } catch { /* 事務所ページが読めなくても本体は続行 */ }
+    await sleep(1000);
+  }
+  if (byPage.size) console.log(`[東京] 事務所ページから時刻を補完: ${filled} 件（対象ページ ${byPage.size}）`);
 }
 
 /**
@@ -2141,6 +2199,19 @@ async function fetchSaitama(context) {
 }
 
 /** 共通: HTML ページを Playwright → fetch の順で取得してパーサーに渡す */
+/**
+ * パース結果の健全性を確認する。本文に今日以降の日付が並んでいるのに 0 件なら
+ * パーサー失敗（ページ構造の変更）として例外を投げ、呼び出し側（地本ループ）で
+ * 「取得失敗＝前回データ維持」に乗せる。HTTP 200 で 0 件＝正常 とはみなさない。
+ */
+function assertParseHealthy(prefLabel, $, events) {
+  const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+  const text = $('body').text();
+  const h = parserHealth.assessParseResult({ text, eventCount: events.length, today });
+  console.log(`[${prefLabel}] 診断: 本文の今日以降の日付 ${h.futureDateMarkers} 件 / 取得 ${h.parsedEvents} 件`);
+  if (!h.ok) throw new Error(`パーサー失敗の疑い: ${h.reason}`);
+}
+
 async function fetchHtmlPref(context, prefLabel, url, parserFn) {
   console.log(`[${prefLabel}] アクセス: ${url}`);
   const page = await context.newPage();
@@ -2180,6 +2251,7 @@ async function fetchHtmlPref(context, prefLabel, url, parserFn) {
     console.log(`[${prefLabel}] selectors: section.subSec=${subSec} div.post-h3=${postH3}`);
     const events = parserFn($);
     console.log(`[${prefLabel}] ${events.length} 件取得 (Playwright)`);
+    assertParseHealthy(prefLabel, $, events);
     return events;
   } catch (err) {
     console.warn(`[${prefLabel}] Playwright 失敗: ${err.message} → fetch にフォールバック`);
@@ -2200,6 +2272,7 @@ async function fetchHtmlPref(context, prefLabel, url, parserFn) {
   const $      = cheerio.load(html, { decodeEntities: false });
   const events = parserFn($);
   console.log(`[${prefLabel}] ${events.length} 件取得 (fetch fallback)`);
+  assertParseHealthy(prefLabel, $, events);
   return events;
 }
 
@@ -3407,12 +3480,27 @@ function extractOfficeCandidateAssets($, pageUrl) {
   return candidates;
 }
 
+// ── このrunで実際に読み直した情報源（ページURL・チラシURL） ──────────────
+// 前回の募集案内所イベントを「捨ててよい」のは、その情報源を今回きちんと読み直した場合だけ。
+// 以前は「地本HQを探索したか」だけで判定していたため、HQ探索は済んだが全国巡回が時間切れで
+// 届かなかった地本（2026-09-23 山梨・兵庫・岡山）の前回イベントが丸ごと消えた。
+const revisitedSources = new Set();
+function markRevisited(url) {
+  const n = normalizeUrl(url);
+  if (n) revisitedSources.add(n);
+}
+function wasRevisited(url) {
+  const n = normalizeUrl(url);
+  return !!n && revisitedSources.has(n);
+}
+
 async function ocrOfficeAssets(assets, meta, maxAssets = 2) {
   const events = [];
   const sorted = sortByPriority(assets).filter(a => a.priority !== 'low').slice(0, maxAssets);
   for (const asset of sorted) {
     const ocr = await ocrFlyerFull(asset.url);
     await sleep(1500);
+    if (ocr) markRevisited(asset.url); // 読めた＝今回の結果が正（読めなかったら前回を維持）
     const parsed = ocr ? parseOcrDate(ocr.date) : null;
     if (!parsed || isPast(parsed.dateStr)) continue;
     const title = (ocr.title && fixOcrTitle(safeStr(ocr.title))) || asset.linkText || asset.text || '募集案内所イベント';
@@ -3450,7 +3538,9 @@ async function crawlNationwideOffices(withFreshContext, cutoff) {
   const delayMs = Number.parseInt(process.env.OFFICE_CRAWL_DELAY_MS || '1800', 10);
   const ocrReady = await hasAnyOcrEngine();
   const events = [];
-  const seenPages = new Set();
+  // 地本の専用パーサーが読むページ（URLS）はここでは読まない。汎用抽出で読むと、
+  // 会場を案内所名で埋めた低品質な重複イベント（2026-09 山梨「広報活動 ふじざくらFC」@巨摩募集案内所）が生まれる。
+  const seenPages = new Set(Object.values(URLS).map(u => normalizeUrl(u)).filter(Boolean));
   const targetPages = pages.slice(0, maxPages);
 
   console.log(`[OfficeOCR] 全国募集案内所 ${targetPages.length}/${pages.length} URLを巡回開始`);
@@ -3470,6 +3560,7 @@ async function crawlNationwideOffices(withFreshContext, cutoff) {
 
     const $ = await withFreshContext(ctx => fetchPagePlaywright(ctx, meta.url));
     if (!$) continue;
+    markRevisited(meta.url);
 
     events.push(...extractOfficeHtmlEvents($, meta.url, meta));
     if (ocrReady) {
@@ -3494,6 +3585,7 @@ async function crawlNationwideOffices(withFreshContext, cutoff) {
       await sleep(Math.max(800, Math.floor(delayMs / 2)));
       const $sub = await withFreshContext(ctx => fetchPagePlaywright(ctx, sub.url));
       if (!$sub) continue;
+      markRevisited(sub.url);
       events.push(...extractOfficeHtmlEvents($sub, sub.url, meta));
       if (ocrReady) {
         events.push(...await ocrOfficeAssets(extractOfficeCandidateAssets($sub, sub.url), meta, maxAssets));
@@ -3568,6 +3660,7 @@ async function crawlKantoOffices(withFreshContext, cutoff) {
       const uniq = [...new Map(candidates.map(c => [c.url, c])).values()].slice(0, 3);
       for (const c of uniq) {
         const ocr    = await ocrFlyerFull(c.url);
+        if (ocr) markRevisited(c.url);
         const parsed = ocr ? parseOcrDate(ocr.date) : null;
         if (!parsed || isPast(parsed.dateStr)) continue;
         const title = (ocr.title && fixOcrTitle(safeStr(ocr.title))) || c.text || '(タイトル不明)';
@@ -3697,6 +3790,7 @@ async function scrapeOfficeAssets(withFreshContext, cutoff) {
       for (const asset of assets) {
         const ocr    = await ocrFlyerFull(asset.url);
         await sleep(2000);
+        if (ocr) markRevisited(asset.url);
         const parsed = ocr ? parseOcrDate(ocr.date) : null;
 
         if (parsed && !isPast(parsed.dateStr)) {
@@ -3912,6 +4006,22 @@ async function main() {
     return;
   }
 
+  // ── リプレイモード（開発・検証用）──
+  // 保存しておいたスクレイプ結果（events.json と同じ形）を、公開処理（writeOutput: 整形・検疫・
+  // 前回値保護・status・出力）にだけ通す。HTTP アクセスなし。前回データは現在の public/data/events.json。
+  // 例: 事故時のデータを再生して非退行の保護が効くか確かめる
+  //   git show <前回>:public/data/events.json > public/data/events.json
+  //   git show <事故回>:public/data/events.json > /tmp/scraped.json
+  //   node scraper/index.js --replay /tmp/scraped.json
+  const replayIdx = process.argv.indexOf('--replay');
+  if (replayIdx >= 0) {
+    const file = process.argv[replayIdx + 1];
+    const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+    console.log(`[replay] ${file} を公開処理に通します（HTTP アクセスなし）`);
+    await writeOutput({ ...data, updatedAt: nowJST() });
+    return;
+  }
+
   // ── 実スクレイピングモード ──
   // 地本ごとの取得結果と失敗フラグ（キーは PREF_TASKS の key）
   const prefEvents = {};
@@ -3965,11 +4075,38 @@ async function main() {
         prefEvents[task.key] = task.noBrowser
           ? await task.run()
           : await withFreshContext(ctx => task.run(ctx));
+        // 地本の専用パーサーで読めたページは「今回読み直した情報源」（同じページ由来の前回 office イベントを置き換える）
+        if (URLS[task.key]) markRevisited(URLS[task.key]);
       } catch (err) {
         console.error(`[${task.label}] 取得失敗: ${err.message}`);
         prefErrors[task.key] = true;
       }
     }
+
+    // ── OCR による補完（PDF / 画像） ──────────────────────
+    // 岩手・青森は掲載が PDF 中心なので PDF から、それ以外は画像チラシから拾う。
+    // 各地本の本体イベントの時刻・締切・対象は、チラシの OCR でしか取れないものが多い
+    // （東京・埼玉など）。そのため重い募集案内所巡回より**先に**行う。以前は巡回の後に置いていたため、
+    // 巡回で時間を使い切った回に全地本の補完が見送られ、時刻・締切・年齢条件が空で公開された（2026-09-23）。
+    // OCR 結果は画像の内容ハッシュでキャッシュされるので、変化の無いチラシは即時に終わる。
+    // 時間切れになったら、そこまで補完できた分で先へ進む（取れなかった項目は writeOutput が前回値で保護する）。
+    // 取得失敗・見送りで前回データを使う地本はこの時点では空（補完済みの前回値をそのまま使う）。
+    {
+      const PDF_OCR_PREFS = new Set(['iwate', 'aomori']);
+      let done = 0;
+      for (const t of PREF_TASKS) {
+        if (prefEvents[t.key].length === 0) continue;
+        if (cutoff.reached()) {
+          console.warn(`[カットオフ] 時間切れのため残り ${PREF_TASKS.length - done} 地本の OCR 補完を見送ります（取れなかった項目は前回値で保護）`);
+          break;
+        }
+        prefEvents[t.key] = PDF_OCR_PREFS.has(t.key)
+          ? await enrichWithPdfOcr(prefEvents[t.key])
+          : await enrichWithOcr(prefEvents[t.key]);
+        done++;
+      }
+    }
+
     // ── 募集案内所ページから PDF/画像 OCR でイベントを収集 ────────
     // browser.close() の前に呼ぶ必要あり（Playwright が必要なため）
     console.log('[wait] 募集案内所探索を開始します...');
@@ -4013,27 +4150,32 @@ async function main() {
   let prev = {};
   try { prev = JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8')); } catch { /* ファイル未存在は無視 */ }
 
-  // ── HQ探索ローテーションの補完 ──────────────────────────────
-  // HQ探索は時間上限のためローテーション制（1runで全地本は回らない）。
-  // 今回HQを探索しなかった地本は、前回の office イベント（office_notice除く）を
-  // 維持して「探索された回だけイベントが現れる」ちらつきを防ぐ。
+  // ── 募集案内所イベントの前回データ維持 ──────────────────────────
+  // HQ探索・全国巡回・関東巡回はいずれも時間上限・打ち切りがあり、1runで全情報源は回らない。
+  // 前回の office イベント（office_notice除く）は、その情報源（ページ/チラシURL）を
+  // 今回読み直した場合に限って最新の巡回結果に置き換え、読み直せなかったものは維持する
+  // （「巡回された回だけイベントが現れる」ちらつき・途中打ち切りによる消失を防ぐ）。
+  // 例外: HQ探索由来のチラシ（id に -off- を含む office_ocr）は、その地本のHQを探索した回は
+  // 最新の探索結果を正とする（掲載から外れたチラシはページを読んでも URL が出てこないため）。
   // 過去日付・不正タイトルは writeOutput の最終フィルタで除外される。
   {
     const officeIds = new Set([...officeEvents, ...kantoOfficeEvents].map(e => e.id));
     let kept = 0;
     for (const [key, arr] of Object.entries(prev)) {
       if (!Array.isArray(arr)) continue;
-      if (hqExploredPrefs.has(key)) continue; // 今回探索済み → 最新の巡回結果が正
       for (const e of arr) {
         const st = e.source_type || '';
         if (!st.startsWith('office_') || st === 'office_notice') continue;
         if (!e.date || !e.id || officeIds.has(e.id)) continue;
+        if (wasRevisited(e.url)) continue; // 今回読み直した情報源 → 最新の巡回結果が正
+        const hqFlyer = st === 'office_ocr' && String(e.id).includes('-off-');
+        if (hqFlyer && hqExploredPrefs.has(key)) continue;
         officeEvents.push(e);
         officeIds.add(e.id);
         kept++;
       }
     }
-    if (kept) console.log(`[OfficeOCR] HQ未探索地本の前回officeイベント ${kept} 件を維持`);
+    if (kept) console.log(`[OfficeOCR] 今回読み直せなかった情報源の前回officeイベント ${kept} 件を維持`);
   }
 
   // ── 取得できなかった地本は前回データを維持する ────────────
@@ -4051,27 +4193,6 @@ async function main() {
       const why = skippedKeys.includes(key) ? '時間切れ' : 'エラー';
       console.warn(`[${labels[key]}] ${why}のため前回データを維持します`);
       prefEvents[key] = prev[key] ?? [];
-    }
-  }
-
-  // ── OCR による補完（PDF / 画像） ──────────────────────
-  // 岩手・青森は掲載が PDF 中心なので PDF から、それ以外は画像チラシから拾う。
-  // ここは1件ごとに OCR（と段1の LLM 整形）が走るため時間がかかる。
-  // 時間切れになったら、そこまで補完できた分で先へ進む
-  // （OCR は「あれば足す」処理なので、途中で止めても既存の情報は失われない）。
-  {
-    const PDF_OCR_PREFS = new Set(['iwate', 'aomori']);
-    let done = 0;
-    for (const t of PREF_TASKS) {
-      if (prefEvents[t.key].length === 0) continue;
-      if (cutoff.reached()) {
-        console.warn(`[カットオフ] 時間切れのため残り ${PREF_TASKS.length - done} 地本の OCR 補完を見送ります`);
-        break;
-      }
-      prefEvents[t.key] = PDF_OCR_PREFS.has(t.key)
-        ? await enrichWithPdfOcr(prefEvents[t.key])
-        : await enrichWithOcr(prefEvents[t.key]);
-      done++;
     }
   }
 
@@ -4179,13 +4300,18 @@ const LLM_RECHECK_LIMIT = Number(process.env.LLM_RECHECK_LIMIT || 30);
  * 取得は downloadFile 経由（＝assetCache の条件付きGETに乗るので重複DLしない）。
  * @returns {Promise<Object|null>} normalizeLlmEvent 済みの再抽出結果
  */
+/** 段3で読み直せる一次ソース（チラシ画像・PDF）を持つか。HTML ページは画像として読ませられないため対象外。 */
+function hasRecheckableSource(ev) {
+  const src = String(ev.imageUrl || ev.url || '');
+  if (!/^https?:/i.test(src)) return false;
+  return /\.pdf(\?|$)/i.test(src) || isImageUrl(src);
+}
+
 async function recheckFromPrimarySource(ev, prefLabel, today) {
   const src = String(ev.imageUrl || ev.url || '');
-  if (!/^https?:/i.test(src)) return null;
+  if (!hasRecheckableSource(ev)) return null;
 
   const looksPdf = /\.pdf(\?|$)/i.test(src);
-  // HTML ページは画像として読ませられないため対象外（チラシ実物のみ）
-  if (!looksPdf && !isImageUrl(src)) return null;
 
   let dl;
   try { dl = await downloadFile(src); } catch { return null; }
@@ -4221,14 +4347,20 @@ async function recheckFromPrimarySource(ev, prefLabel, today) {
  * data は破壊的に更新する（修正の採用・検疫マークの付与）。
  */
 async function llmReviewEvents(data, today, keepFrom = '0000-00-00', timeCutoff = null) {
+  // 見送り理由は件数と明細（skipped）の両方に残す。「要再検査なのに1件も再検査していない」ときに
+  // 理由を後から追えるようにするため（理由別件数の合計＝ flagged − attempted になる）。
   const outcome = {
     checked: 0, flagged: 0, attempted: 0, corrected: 0,
     unverified: 0, noSource: 0, overBudget: 0, changes: [],
+    skippedNoSource: 0, skippedNotEligible: 0, skippedProviderUnavailable: 0, skippedCutoff: 0,
+    skipped: [],
   };
-  if (!llmClient.hasLlm()) {
-    console.log('[LLM検査] APIキーが無いためスキップ（従来の規則判定のみで動作します）');
-    return outcome;
-  }
+  const hasLlm = llmClient.hasLlm();
+  if (!hasLlm) console.log('[LLM検査] APIキーが無いため再検査は行いません（要再検査の件数と理由だけ記録します）');
+  const skip = (ev, key, reason, counter) => {
+    outcome[counter]++;
+    outcome.skipped.push({ id: ev.id, pref: key, reason });
+  };
 
   let budget = LLM_RECHECK_LIMIT;
 
@@ -4246,12 +4378,16 @@ async function llmReviewEvents(data, today, keepFrom = '0000-00-00', timeCutoff 
       if (verdict.action !== 'recheck') continue;
       outcome.flagged++;
 
-      if (!verdict.hasSource) { outcome.noSource++; continue; }
-      if (budget <= 0)        { outcome.overBudget++; continue; }
+      if (!verdict.hasSource) { outcome.noSource++; skip(ev, key, 'no_source', 'skippedNoSource'); continue; }
+      // 一次ソースが HTML ページ（チラシ画像・PDF ではない）なら読み直せない
+      if (!hasRecheckableSource(ev)) { skip(ev, key, 'not_eligible', 'skippedNotEligible'); continue; }
+      if (!hasLlm) { skip(ev, key, 'provider_unavailable', 'skippedProviderUnavailable'); continue; }
+      if (budget <= 0) { outcome.overBudget++; outcome.skipped.push({ id: ev.id, pref: key, reason: 'over_budget' }); continue; }
       // 配信スロットの期限。段3は1件ずつ一次ソースを読み直すため時間がかかる。
       // 間に合わない分は再検査せず、従来の規則判定のまま公開する（品質の上乗せを諦めるだけ）。
       if (timeCutoff && timeCutoff.reached()) {
         outcome.timedOut = (outcome.timedOut || 0) + 1;
+        skip(ev, key, 'cutoff', 'skippedCutoff');
         continue;
       }
       budget--;
@@ -4288,7 +4424,8 @@ async function llmReviewEvents(data, today, keepFrom = '0000-00-00', timeCutoff 
 
   console.log(`[LLM検査] ${outcome.checked} 件を検査 / 要再検査 ${outcome.flagged} 件`
     + ` → 再検査 ${outcome.attempted} 件（修正 ${outcome.corrected} / 裏付けなし ${outcome.unverified}）`
-    + ` / 一次ソース無し ${outcome.noSource} 件 / 上限超過 ${outcome.overBudget} 件`);
+    + ` / 一次ソース無し ${outcome.noSource} 件 / 上限超過 ${outcome.overBudget} 件`
+    + ` / 見送り: 対象外 ${outcome.skippedNotEligible} 件・APIなし ${outcome.skippedProviderUnavailable} 件・時間切れ ${outcome.skippedCutoff} 件`);
   return outcome;
 }
 
@@ -4305,6 +4442,12 @@ async function writeOutput(data, timeCutoff = null) {
   const cutoff = new Date(jstNow.getTime() - ENDED_KEEP_DAYS * 86400000).toISOString().slice(0, 10);
   let removedCount = 0;
   const quarantined = []; // 「疑わしい」タイトルで公開を保留したイベント（管理者レビュー用）
+
+  // 前回の公開データ（この時点の OUTPUT_PATH はまだ上書き前）。一度だけ読み、
+  // 前回値の保護・status の粘着・firstSeen・アーカイブ・差分レポートで共有する。
+  let prevData = {};
+  try { if (fs.existsSync(OUTPUT_PATH)) prevData = JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8')); }
+  catch (e) { console.warn('[前回データ] events.json の読み込みに失敗:', e.message); }
   // ★ ここが全イベントカードの最終整形・検証ゲート。各フィールドの書式・記述ルールの
   //    正準は CLAUDE.md「イベントカード記述ルール（正準仕様）」。実装は shared/titleQuality.cjs
   //    （+ 募集案内所は shared/officeTitle.cjs、カテゴリ/タグ/曜日は parsers/utils.js）。
@@ -4353,6 +4496,10 @@ async function writeOutput(data, timeCutoff = null) {
       if (isStaleDatedEvent(ev)) return false;
       // 段3で一次ソースの裏付けが取れなかったものは公開しない
       if (ev.__llmUnverified) { quarantined.push(ev); return false; }
+      // 非イベント文書（福利厚生・待遇資料、規約、放送音声 等）は公開せず検疫へ
+      if (isNonEventDocument(ev)) { quarantined.push({ ...ev, __quarantineReason: '非イベント文書の疑い' }); return false; }
+      // OCR 由来で2年以上先の日付（開催年の裏付けなし）は日付の誤読の疑いが強いので検疫へ
+      if (suspiciousFutureDate(ev, today) === 'strong') { quarantined.push({ ...ev, __quarantineReason: 'OCR由来の不自然な未来日' }); return false; }
       // 検疫: 新種のゴミの可能性が高い「疑わしい」タイトルは公開せず隔離。
       // 正規イベントと確認できたら titleQuality の APPROVED_TITLES へ追加すると公開される。
       if (isSuspiciousTitle(ev.title)) { quarantined.push(ev); return false; }
@@ -4373,6 +4520,42 @@ async function writeOutput(data, timeCutoff = null) {
   }
   if (removedCount > 0) console.log(`[フィルタ] 過去イベント ${removedCount} 件を削除`);
 
+  // ── 前回値の保護（非退行）── shared/eventRegression.cjs ─────────────────
+  // 原則: 取れなかった ≠ 公式が消した。整形・除外・検疫・重複統合の後、status 導出の前に行う
+  // （引き継いだ締切から deadlineDate/status を再計算させるため）。
+  const regressionReport = { carriedFields: [], prefAlerts: [] };
+  {
+    // (1) 未終了イベントが突然0件になった地本は前回の未終了イベントを引き継ぐ
+    //     （2026-09-23 山梨: 公式に3件掲載があるのに 0 件で公開された）。
+    //     前回分も現行の公開基準（不正タイトル・検疫・非イベント文書・年ズレ）を満たすものだけ。
+    const isCountable = (ev) => isCountableEvent(ev) && !isStaleDatedEvent(ev) && (ev.endDate || ev.date || '') >= cutoff;
+    const { carried, alerts } = eventRegression.carryOverVanishedPrefs(prevData, data, { today, isCountable });
+    for (const [pref, evs] of Object.entries(carried)) {
+      data[pref] = [...(data[pref] || []), ...evs];
+      console.warn(`[非退行] ${pref}: 未終了イベントが ${evs.length} → 0 件になったため前回の ${evs.length} 件を維持します`);
+    }
+    regressionReport.prefAlerts = alerts;
+
+    // (2) 同一イベントの重要項目（時間・会場・締切・年齢条件・座標 等）が今回だけ空になったら前回値を維持
+    const prevIdx = eventRegression.buildEventIndex(prevData);
+    for (const key of Object.keys(data)) {
+      if (!Array.isArray(data[key])) continue;
+      data[key] = data[key].map(ev => {
+        const r = eventRegression.mergeNonRegressiveEvent(prevIdx.get(ev.id), ev, { today });
+        for (const c of r.carried) {
+          regressionReport.carriedFields.push({ id: ev.id, pref: ev.pref, date: ev.date, title: ev.title, ...c });
+        }
+        return r.event;
+      });
+    }
+    if (regressionReport.carriedFields.length) {
+      console.warn(`[非退行] 抽出できなかった項目 ${regressionReport.carriedFields.length} 件を前回値で維持しました`);
+      for (const c of regressionReport.carriedFields.slice(0, 40)) {
+        console.warn(`  - [${c.pref}:${c.id}] ${c.field}: ${JSON.stringify(c.previous)} ← ${JSON.stringify(c.current)}（${c.action}）`);
+      }
+    }
+  }
+
   // ── 検疫ファイルの書き出し（毎回、今回の疑わしい件で全置換） ──────────
   // ルール追加・APPROVED_TITLES 登録で解消した項目は次回から自動的に消える。
   // CI（scrape.yml）がこのファイルを読んで管理者へ ntfy 通知する。
@@ -4382,8 +4565,9 @@ async function writeOutput(data, timeCutoff = null) {
       title: e.title || '', place: e.place || '', url: e.url || '',
       source_type: e.source_type || '', quarantinedAt: today,
       // 段3で裏付けが取れなかった場合はその理由（規則による検疫のときは空）
-      reason: e.__llmUnverified || '',
+      reason: e.__llmUnverified || e.__quarantineReason || '',
     }));
+    appendQuarantineHistory(qEvents, today, data);
     fs.writeFileSync(QUARANTINE_PATH, JSON.stringify({ updatedAt: today, count: qEvents.length, events: qEvents }, null, 2), 'utf8');
     if (qEvents.length > 0) {
       console.log(`[検疫] 疑わしいタイトル ${qEvents.length} 件を公開保留にしました:`);
@@ -4406,8 +4590,14 @@ async function writeOutput(data, timeCutoff = null) {
         unverified: llmOutcome.unverified,
         noSource:   llmOutcome.noSource,
         overBudget: llmOutcome.overBudget,
+        // 見送り理由別（flagged − attempted と一致する。CI が整合を確認する）
+        skippedNoSource:            llmOutcome.skippedNoSource,
+        skippedNotEligible:         llmOutcome.skippedNotEligible,
+        skippedProviderUnavailable: llmOutcome.skippedProviderUnavailable,
+        skippedCutoff:              llmOutcome.skippedCutoff,
       },
       corrections: llmOutcome.changes,
+      skipped: llmOutcome.skipped,
     }, null, 2), 'utf8');
   } catch (e) { console.warn('[LLM再検査] レポート書き出しに失敗:', e.message); }
 
@@ -4419,19 +4609,14 @@ async function writeOutput(data, timeCutoff = null) {
   // 初回掲載日（firstSeen）。構造化データ（JSON-LD）の offers.validFrom に使うため、
   // 一度付いた日付は前回 events.json から引き継いで変化させない。
   const prevFirstSeenById = new Map();
-  try {
-    if (fs.existsSync(OUTPUT_PATH)) {
-      const prev = JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8'));
-      for (const k of Object.keys(prev)) {
-        if (!Array.isArray(prev[k])) continue;
-        for (const e of prev[k]) {
-          if (!e || !e.id) continue;
-          if (e.status) prevStatusById.set(e.id, e.status);
-          if (/^\d{4}-\d{2}-\d{2}$/.test(String(e.firstSeen ?? ''))) prevFirstSeenById.set(e.id, e.firstSeen);
-        }
-      }
+  for (const k of Object.keys(prevData)) {
+    if (!Array.isArray(prevData[k])) continue;
+    for (const e of prevData[k]) {
+      if (!e || !e.id) continue;
+      if (e.status) prevStatusById.set(e.id, e.status);
+      if (/^\d{4}-\d{2}-\d{2}$/.test(String(e.firstSeen ?? ''))) prevFirstSeenById.set(e.id, e.firstSeen);
     }
-  } catch (e) { console.warn('[status] 前回 events.json の読み込みに失敗:', e.message); }
+  }
 
   let closedCount = 0, cancelledCount = 0, deadlineDateCount = 0, lowConfCount = 0;
   const statusSourceOf = (ev) => {
@@ -4491,21 +4676,23 @@ async function writeOutput(data, timeCutoff = null) {
   try {
     const candidates = [];
     const isPastEv = (e) => e && e.id && e.date && (e.endDate || e.date) < today;
-    try {
-      if (fs.existsSync(OUTPUT_PATH)) {
-        const prevOut = JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8'));
-        for (const k of Object.keys(prevOut)) {
-          if (!Array.isArray(prevOut[k])) continue;
-          for (const e of prevOut[k]) if (isPastEv(e)) candidates.push(e);
-        }
-      }
-    } catch (e) { console.warn('[アーカイブ] 前回 events.json 読み込み失敗:', e.message); }
+    for (const k of Object.keys(prevData)) {
+      if (!Array.isArray(prevData[k])) continue;
+      for (const e of prevData[k]) if (isPastEv(e)) candidates.push(e);
+    }
     for (const k of Object.keys(data)) {
       if (!Array.isArray(data[k])) continue;
       for (const e of data[k]) if (isPastEv(e)) candidates.push(e);
     }
     archivePastEvents(candidates, today);
   } catch (e) { console.warn('[アーカイブ] 退避に失敗:', e.message); }
+
+  // 内部専用のメタデータ（__fieldState 等）は公開データに出さない
+  for (const k of Object.keys(data)) {
+    if (Array.isArray(data[k])) data[k] = data[k].map(eventRegression.stripInternalFields);
+  }
+
+  writeRegressionReport(prevData, data, regressionReport, quarantined, today);
 
   fs.writeFileSync(OUTPUT_PATH, JSON.stringify(data, null, 2), 'utf8');
   console.log(`[出力] ${OUTPUT_PATH}`);
@@ -4571,6 +4758,78 @@ async function writeOutput(data, timeCutoff = null) {
 }
 
 /**
+ * 前回値との比較レポートを書き出す（scraper/regression-report.json。CI のジョブサマリが読む）。
+ * 「なぜ前回値を維持したか」「どの地本が0件化したか」「どの未終了イベントが消えたか」を後から追えるようにする。
+ */
+function writeRegressionReport(prevData, data, report, quarantined, today) {
+  try {
+    const quarantineIds = new Set(quarantined.map(e => e.id));
+    const missing = eventRegression.analyzeMissingEvents(prevData, data, { today, quarantineIds, isCountable: isCountableEvent });
+    const remaining = eventRegression.analyzeEventRegressions(prevData, data, { today }).fields;
+    const nextIdx = eventRegression.buildEventIndex(data);
+    const compared = [...eventRegression.buildEventIndex(prevData).keys()].filter(id => nextIdx.has(id)).length;
+    const out = {
+      updatedAt: today,
+      summary: {
+        compared,
+        fieldRegressions: remaining.length,
+        fieldsCarriedOver: report.carriedFields.length,
+        missingEvents: missing.filter(m => m.reason === 'unexplained').length,
+        prefCountAlerts: report.prefAlerts.length,
+      },
+      fieldRegressions: [
+        ...report.carriedFields,
+        ...remaining.map(r => ({ ...r, action: r.protectable ? 'not_protected' : `accepted:${r.reason}` })),
+      ],
+      missingEvents: missing,
+      prefCountAlerts: report.prefAlerts,
+    };
+    fs.writeFileSync(REGRESSION_REPORT_PATH, JSON.stringify(out, null, 2), 'utf8');
+    const unexplained = missing.filter(x => x.reason === 'unexplained');
+    if (unexplained.length) {
+      console.warn(`[非退行] 原因不明で消えた未終了イベント ${unexplained.length} 件:`);
+      for (const m of unexplained.slice(0, 30)) {
+        console.warn(`  - [${m.pref}:${m.id}] ${m.date} ${String(m.title || '').slice(0, 30)}（${m.source_type || '-'}）`);
+      }
+    }
+  } catch (e) { console.warn('[非退行] レポートの書き出しに失敗:', e.message); }
+}
+
+/**
+ * 検疫の履歴を追記する（data/events-quarantine-history.jsonl。1行1レコード・追記専用）。
+ * 前回の検疫ファイルと比べ、新たに隔離したもの（quarantined）と、隔離が解けたもの（released）を記録する。
+ * released には、解除後に公開されたか（published）を付ける。
+ */
+function appendQuarantineHistory(qEvents, today, data) {
+  // モック・リプレイ実行（CI のスモークテスト・検証）は実運用の結果ではないので履歴に残さない
+  if (process.argv.includes('--mock') || process.argv.includes('--replay')) return;
+  try {
+    const prevById = new Map();
+    try {
+      if (fs.existsSync(QUARANTINE_PATH)) {
+        for (const e of (JSON.parse(fs.readFileSync(QUARANTINE_PATH, 'utf8')).events || [])) prevById.set(e.id, e);
+      }
+    } catch { /* 初回・破損時は全件を新規として扱う */ }
+    const nowIds = new Set(qEvents.map(e => e.id));
+    const published = eventRegression.buildEventIndex(data);
+    const ts = new Date().toISOString();
+    const rec = (e, action, extra = {}) => JSON.stringify({
+      timestamp: ts, id: e.id, pref: e.pref, date: e.date, title: e.title || '', url: e.url || '',
+      reason: e.reason || '', action, ...extra,
+    });
+    const lines = [
+      ...qEvents.filter(e => !prevById.has(e.id)).map(e => rec(e, 'quarantined')),
+      ...[...prevById.values()].filter(e => !nowIds.has(e.id)).map(e => rec(e, 'released', { published: published.has(e.id) })),
+    ];
+    if (lines.length) {
+      fs.mkdirSync(path.dirname(QUARANTINE_HISTORY_PATH), { recursive: true });
+      fs.appendFileSync(QUARANTINE_HISTORY_PATH, lines.join('\n') + '\n', 'utf8');
+      console.log(`[検疫] 履歴に ${lines.length} 件を追記しました（${path.basename(QUARANTINE_HISTORY_PATH)}）`);
+    }
+  } catch (e) { console.warn('[検疫] 履歴の追記に失敗:', e.message); }
+}
+
+/**
  * 終了したイベント（候補=前回 events.json＋今回出力の過去イベント）を恒久アーカイブへ退避する。
  * - 保存先 data/events-archive.json（git コミット・**public/ の外**なので公開配信されない。
  *   運営「過去イベント」だけが /api/admin/past-events 経由で閲覧する）。
@@ -4578,7 +4837,7 @@ async function writeOutput(data, timeCutoff = null) {
  * - 品質防御: 不正タイトル・office_notice スタブは持ち込まない。
  * - 保持: 既定は無期限（蓄積）。ARCHIVE_RETENTION_DAYS を設定した場合のみ日数で打ち切る。
  *   件数は ARCHIVE_MAX（暴走防止の安全弁）まで。
- * - 天気座標など表示に不要な大きいフィールドは載せない（サイズ抑制）。
+ * - 当時の掲載内容を復元できるよう、公開していた項目を一通り保存する（内部用項目は除く）。
  */
 function archivePastEvents(candidates, today) {
   if (!Array.isArray(candidates) || candidates.length === 0) return;
@@ -4591,13 +4850,21 @@ function archivePastEvents(candidates, today) {
     }
   } catch (e) { console.warn('[アーカイブ] 既存読み込み失敗（新規作成）:', e.message); }
 
-  // 保存する項目（運営一覧に必要な最小限。weatherLocation 等は除外）
+  // 保存する項目: 当時の掲載内容を後から完全に復元できるよう、公開していた項目をすべて残す
+  // （2026-09 までは一覧表示に必要な最小限のみ。既存エントリは項目が欠けていても読める）。
+  // 内部用（imageUrl・__*）は含めない。
   const pick = (e) => ({
     id: e.id, pref: e.pref, office: e.office || '',
-    date: e.date, endDate: e.endDate || '',
-    title: e.title || '', place: e.place || '', url: e.url || '',
-    category: e.category || '', status: e.status || '',
-    source_type: e.source_type || '', archivedAt: today,
+    date: e.date, endDate: e.endDate || '', weekday: e.weekday || '',
+    title: e.title || '', place: e.place || '', address: e.address || '', time: e.time || '',
+    category: e.category || '', tag: e.tag || '', url: e.url || '',
+    notes: e.notes ?? null, ageRequirement: e.ageRequirement ?? null,
+    deadline: e.deadline ?? null, deadlineDate: e.deadlineDate ?? null,
+    status: e.status || '', statusReason: e.statusReason || '', statusSource: e.statusSource || '',
+    statusUpdatedAt: e.statusUpdatedAt || '',
+    source_type: e.source_type || '', firstSeen: e.firstSeen || '',
+    ...(e.weatherLocation ? { weatherLocation: e.weatherLocation } : {}),
+    archivedAt: today,
   });
 
   const byId = new Map(archive.events.map(e => [e.id, e]));

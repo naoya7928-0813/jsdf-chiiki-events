@@ -697,3 +697,85 @@ test('isSuspiciousTitle: 句点で終わるタイトルは本文の断片とし�
   // イベント語があるものは素通し（誤検疫しない）
   assert.equal(isSuspiciousTitle('自衛隊音楽まつり'), false);
 });
+
+// ── 2026-09 データ品質事故の再発防止（CTA・規約・本文断片・非イベント文書・未来日） ──
+{
+  const Q = require('./titleQuality.cjs');
+
+  test('TEST9: 誘導ボタンの文言（詳しくみる 等）の単独タイトルは不正', () => {
+    for (const t of ['詳しくみる', '詳しく見る', '詳細を見る', '詳細はこちら', 'もっと見る', 'こちらから', '申込はこちら', 'お申し込みはこちら', '詳しくみる＞']) {
+      assert.equal(Q.isJunkOrStubTitle(t), true, t);
+    }
+    // 文言を含むだけの正規タイトルは通す（アンカー付き）
+    assert.equal(Q.isJunkOrStubTitle('詳しく見る自衛隊の仕事説明会'), false);
+  });
+
+  test('TEST10: サイトの規約・利用案内は不正（イベント語を含んでも公開しない）', () => {
+    for (const t of ['自衛隊兵庫地方協力本部ホームページのコンテンツ利用について', '利用規約', 'サイトポリシー', 'プライバシーポリシー', '個人情報保護方針', '著作権について', 'リンクについて']) {
+      assert.equal(Q.isJunkOrStubTitle(t), true, t);
+    }
+  });
+
+  test('本文断片（受付時刻の注記）の単独タイトルは不正', () => {
+    for (const t of ['（14:00受付終了）', '受付終了', '最終受付15:30', '(14:00受付終了)']) assert.equal(Q.isJunkOrStubTitle(t), true, t);
+    assert.equal(Q.isJunkOrStubTitle('艦艇一般公開（受付終了後も見学可）'), false);
+  });
+
+  test('募集告知・採用案内冊子・OCR 崩れの募集種目名は不正', () => {
+    for (const t of ['募集中 【一般曹候補生】募集', '【防衛大学校（一般）】募集', '今和8年度自衛官等探用案内', '令和8年度自衛官等採用案内', '医科・菌科韓部']) {
+      assert.equal(Q.isJunkOrStubTitle(t), true, t);
+    }
+    assert.equal(Q.isJunkOrStubTitle('自衛官採用説明会'), false);
+    assert.equal(Q.isJunkOrStubTitle('採用案内説明会'), false);
+  });
+
+  test('TEST11: 福利厚生・待遇の資料、放送音声、求人企業向け案内は非イベント文書', () => {
+    assert.equal(Q.isNonEventDocument({ title: '陸海空自衛官', place: '調機の充足完了及び空調が整備されていない駐屯地',
+      url: 'https://www.mod.go.jp/pco/niigata/files/top/fukurikousei-kaizen.pdf' }), true);
+    assert.equal(Q.isNonEventDocument({ title: '第19回：放送「自衛官の生活環境や待遇について」',
+      url: 'https://www.mod.go.jp/pco/hyogo/jimusyo/radio/20251017FMmikkixi.wav' }), true);
+    assert.equal(Q.isNonEventDocument({ title: '第7回：放送「自衛官って休みあるん？あります！！」',
+      url: 'https://www.mod.go.jp/pco/hyogo/jimusyo/radio/20241011FMmikkixi.wav' }), true);
+    assert.equal(Q.isNonEventDocument({ title: '退職自衛官の求人をお考えの企業 様', url: 'https://example.jp/onegai.pdf' }), true);
+    assert.equal(Q.isNonEventDocument({ title: 'お知らせ', url: 'https://www.mod.go.jp/pco/hyogo/pdf/riyoukiyaku.pdf' }), true);
+  });
+
+  test('TEST12: 正規イベント（福利厚生説明会 等）は非イベント文書として誤除外しない', () => {
+    assert.equal(Q.isNonEventDocument({ title: '福利厚生説明会', url: 'https://example.jp/fukurikousei.pdf' }), false);
+    assert.equal(Q.isNonEventDocument({ title: '自衛官の待遇・給与説明会' }), false);
+    assert.equal(Q.isNonEventDocument({ title: '駐屯地見学', notes: '給与や手当についてもご説明します' }), false);
+  });
+
+  test('正規タイトル（イベント語なしの固有名を含む）はどの判定でも除外しない', () => {
+    for (const t of ['県民の日', 'つばめのチカラ', '100円商店街', 'トラックの日', '女子会イベント', '防災フェア']) {
+      const ev = { title: t, date: '2026-10-10', url: 'https://www.mod.go.jp/pco/x/event.html', source_type: 'office_html' };
+      assert.equal(Q.isJunkOrStubTitle(t), false, `junk: ${t}`);
+      assert.equal(Q.isSuspiciousTitle(t), false, `suspicious: ${t}`);
+      assert.equal(Q.isNonEventDocument(ev), false, `non-event: ${t}`);
+      assert.equal(Q.isEligibleForStructuredEvent(ev, '2026-09-23'), true, `json-ld: ${t}`);
+    }
+  });
+
+  test('TEST15: OCR 由来で開催年の裏付けが無い遠い未来日を検出する', () => {
+    const ev = (date, extra = {}) => ({ title: '高等工科学校生徒説明会', date, source_type: 'office_ocr', url: 'https://example.jp/seminar.jpg', ...extra });
+    assert.equal(Q.suspiciousFutureDate(ev('2028-10-01'), '2026-09-23'), 'strong');   // 2年以上先
+    assert.equal(Q.suspiciousFutureDate(ev('2027-10-01'), '2026-09-23'), 'warn');     // 1年以上先
+    assert.equal(Q.suspiciousFutureDate(ev('2027-03-01'), '2026-09-23'), null);       // 半年先は通常
+    // ファイル名に開催年より前の年月（2026年6月）＝日付の誤読の裏付け（2026-09 愛知の実例）
+    assert.equal(Q.suspiciousFutureDate(ev('2028-06-20', { url: 'https://www.mod.go.jp/pco/aichi/toyota/seminar/toyota_se202606_11.jpg' }), '2026-09-23'), 'strong');
+    // 開催年の裏付け（タイトル・URL に 2028 / 令和10）があれば問題にしない
+    assert.equal(Q.suspiciousFutureDate(ev('2028-10-01', { title: '2028年 航空祭' }), '2026-09-23'), null);
+    assert.equal(Q.suspiciousFutureDate(ev('2028-10-01', { url: 'https://example.jp/R10_kokusai.pdf' }), '2026-09-23'), null);
+    // HTML 由来（OCR ではない）は対象外
+    assert.equal(Q.suspiciousFutureDate(ev('2028-10-01', { source_type: 'office_html' }), '2026-09-23'), null);
+  });
+
+  test('構造化データ（JSON-LD）対象: 不正・検疫・非イベント・不自然な未来日を除く', () => {
+    const ok = { title: '駐屯地一般公開', date: '2026-10-10', url: 'https://example.jp/a.html' };
+    assert.equal(Q.isEligibleForStructuredEvent(ok, '2026-09-23'), true);
+    assert.equal(Q.isEligibleForStructuredEvent({ ...ok, title: '詳しくみる' }, '2026-09-23'), false);
+    assert.equal(Q.isEligibleForStructuredEvent({ ...ok, title: '乗艦受付時刻' }, '2026-09-23'), false);
+    assert.equal(Q.isEligibleForStructuredEvent({ ...ok, url: 'https://example.jp/radio.wav' }, '2026-09-23'), false);
+    assert.equal(Q.isEligibleForStructuredEvent({ ...ok, date: '2029-01-01', source_type: 'office_ocr' }, '2026-09-23'), false);
+  });
+}

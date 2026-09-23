@@ -14,6 +14,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { REGIONS } from '../src/data/regionMap.js';
 import { siteUrl, DEFAULT_SITE_URL } from '../shared/siteUrl.cjs';
+import { isEligibleForStructuredEvent } from '../shared/titleQuality.cjs';
 
 // 公開URLは shared/siteUrl.cjs が唯一の出どころ（ドメイン移行は SITE_URL の設定だけで済む）
 const SITE_URL = siteUrl(process.env);
@@ -68,6 +69,11 @@ for (const [pref, events] of Object.entries(data)) {
   }
 }
 allEvents.sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''));
+
+// 構造化データ（Schema.org Event）へ出してよいか。一覧（UI）に出すこととは別に、公開より厳しく判定する
+// （不正タイトル・検疫相当・非イベント文書・OCR 由来の不自然な未来日は Event として出さない）。
+// 判定は shared/titleQuality.cjs の isEligibleForStructuredEvent に一本化し、ここに規則を重複させない。
+const ldEligible = (ev) => isEligibleForStructuredEvent(ev, today);
 
 // 都道府県ごとにグループ化
 const byPref = {};
@@ -412,8 +418,9 @@ const sections = Object.entries(byPref).map(([label, events]) => {
 }).join('\n\n');
 
 // JSON-LD は整形(インデント)不要。クローラーは圧縮JSONも同等に解釈するため非整形で出力し軽量化。
+const structuredEvents = allEvents.filter(ldEligible);
 const allJsonLd = jsonLdSafe(
-  allEvents.map(ev => toEventSchema(ev, ev.prefLabel))
+  structuredEvents.map(ev => toEventSchema(ev, ev.prefLabel))
 );
 
 const mainHtml = `<!DOCTYPE html>
@@ -505,7 +512,7 @@ for (const [prefKey, prefLabel] of Object.entries(PREF_LABELS)) {
   // 構造化データ: パンくず + FAQ（常時）+ Event（イベントがある時のみ）
   const schemas = [breadcrumbSchema(prefLabel, prefKey), faqSchema(prefLabel)];
   if (hasEvents) {
-    for (const ev of events) schemas.push(toEventSchema(ev, prefLabel));
+    for (const ev of events.filter(ldEligible)) schemas.push(toEventSchema(ev, prefLabel));
   }
   const prefJsonLd = jsonLdSafe(schemas);
 
@@ -638,7 +645,7 @@ for (const t of CATEGORY_TOPICS) {
       { '@type': 'ListItem', position: 1, name: '自衛隊地本イベント', item: `${SITE_URL}/events.html` },
       { '@type': 'ListItem', position: 2, name: t.h1, item: `${SITE_URL}/topics/${t.slug}.html` },
     ] },
-    ...evs.map(ev => toEventSchema(ev, ev.prefLabel)),
+    ...evs.filter(ldEligible).map(ev => toEventSchema(ev, ev.prefLabel)),
   ];
   const topicJsonLd = jsonLdSafe(schemas);
   const desc = `全国の自衛隊「${t.cat}」イベントを横断でまとめた非公式ページ。${t.lead.slice(0, 60)}（${esc(updatedAt)}更新・${evs.length}件）`;
@@ -885,5 +892,19 @@ if (SITE_URL !== DEFAULT_SITE_URL) {
         console.log(`[generate-events-html] ${name} のドメインを ${SITE_URL} に更新`);
       }
     } catch { /* ファイルが無ければ何もしない */ }
+  }
+}
+
+// ── 構造化データ（JSON-LD Event）の件数検査 ─────────────────────────────
+// 品質基準で一部を除外するため公開件数との完全一致は求めないが、極端に少ない場合は
+// 判定の暴走（正規イベントまで除外している）か入力データの破損なので、ビルドを止める。
+{
+  const pub = allEvents.length;
+  const ld = structuredEvents.length;
+  console.log(`[generate-events-html] 構造化データ Event: ${ld} 件 / 公開 ${pub} 件（対象外 ${pub - ld} 件）`);
+  const MIN_PUBLIC = 20, MIN_RATIO = 0.5;
+  if (pub >= MIN_PUBLIC && ld < pub * MIN_RATIO) {
+    console.error(`::error title=generate-events-html::構造化データの Event が公開件数に比べて極端に少ない（${ld} / ${pub}）`);
+    process.exit(1);
   }
 }

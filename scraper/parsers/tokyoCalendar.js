@@ -80,6 +80,50 @@ function formatDeadline(raw, year) {
   return wd ? `${mo}月${d}日（${wd}）` : `${mo}月${d}日`;
 }
 
+const toHalf = (s) => String(s || '')
+  .replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xfee0))
+  .replace(/：/g, ':').replace(/[〜~]/g, '～');
+
+/**
+ * 文字列から時刻（「10:00～15:00」「12:00」）を取り出す。無ければ ''。
+ * 日付部分（年月日・曜日）の後ろだけを見る（日付の数字を時刻と誤認しないため）。
+ */
+function extractTime(raw) {
+  const s = toHalf(raw);
+  const afterDate = s.replace(/^.*?\d{1,2}月\d{1,2}日(?:[（(][^）)]*[）)])?/, '');
+  const m = afterDate.match(/(\d{1,2}):(\d{2})(?:\s*～\s*(\d{1,2}):(\d{2}))?/);
+  if (!m) return '';
+  const pad = (n) => String(n).padStart(2, '0');
+  return m[3] ? `${pad(m[1])}:${m[2]}～${pad(m[3])}:${m[4]}` : `${pad(m[1])}:${m[2]}`;
+}
+
+/**
+ * 事務所ページ（例: koutou/index.html。calendar.js の link 先）のイベント表から、
+ * タイトルと開催日が一致する行の本文を探して時刻を取り出す。
+ *   <td class="section_title">宇都宮駐屯地見学</td>
+ *   <td><p>令和８年１０月１９日（月）10:00～15:00<br>締切 １０月１２日（月）まで …</p></td>
+ * calendar.js には開催日しか無いイベントが多く、時刻は事務所ページにだけ書かれている
+ * （2026-09-23: チラシ OCR が時間切れで見送られた回に time が空で公開された）。
+ * @param {import('cheerio').CheerioAPI} $
+ * @param {{ title:string, date:string }} ev
+ * @returns {{ time:string }|null}
+ */
+function extractOfficePageDetails($, ev) {
+  const norm = (t) => toHalf(t).replace(/[\s　]/g, '');
+  const want = norm(ev.title);
+  const [, mo, d] = String(ev.date || '').split('-').map(Number);
+  if (!want || !mo || !d) return null;
+  let found = null;
+  $('td.section_title, th.section_title').each((_i, el) => {
+    if (found) return;
+    if (norm($(el).text()) !== want) return;
+    const body = toHalf($(el).nextAll('td').first().text());
+    if (!new RegExp(`(?:^|\\D)${mo}月\\s*${d}日`).test(body)) return; // 同名の別日程を取り違えない
+    found = { time: extractTime(body) };
+  });
+  return found;
+}
+
 /**
  * calendar.js のテキストを受け取り、東京のイベント配列（整形前）を返す。
  * 整形・不正除外・重複統合・ジオコーディングは writeOutput の共通パイプラインで行う。
@@ -131,7 +175,9 @@ function parseTokyoCalendar(jsText) {
           ...(endDate ? { endWeekday: calcWeekday(endDate) } : {}),
           title,
           place,
-          time: '', // カレンダーは開催「期間」のみ。時刻は不明なので空（推測しない）
+          // 期間に時刻が書かれていれば使う（「2026年10月3日（土）12：00」）。無ければ空で返し、
+          // 呼び出し側（fetchTokyo）が事務所ページの表から補う（推測はしない）
+          time: extractTime(ev.period),
           category: guessCategory(text) || '広報活動',
           tag: guessTag(`${text} ${deadlineRaw}`) || '',
           ageRequirement: String(ev.target || '').trim() || null,
@@ -147,4 +193,4 @@ function parseTokyoCalendar(jsText) {
   return out;
 }
 
-module.exports = { parseTokyoCalendar, extractEventsObject, formatDeadline, CALENDAR_URL };
+module.exports = { parseTokyoCalendar, extractEventsObject, formatDeadline, extractTime, extractOfficePageDetails, CALENDAR_URL };

@@ -275,13 +275,25 @@ function isJunkOrStubTitle(title) {
   // 教育機関名のみ（種別なし。「防衛医科大学校」単独等。説明会・オープンキャンパス付きは通す）
   if (/^(?:防衛医科大学校|防衛大学校|(?:陸上自衛隊)?高等工科学校)$/.test(t)) return true;
   // 募集種目名のみ（受験案内PDFのOCR。例:「一般曹候補生」「幹部候補生・幹部候補曹」）
-  if (/^(?:一般曹候補生|自衛官候補生|幹部候補生|予備自衛官補?|医科・?歯科幹部|技術曹|貸費学生)(?:[・,、][一-鿿ァ-ヶa-zA-Z・]{0,15})?$/.test(t)) return true;
+  // （「医科・菌科韓部」のような OCR の字形崩れ＝歯→菌・幹→韓 も同じ扱い）
+  if (/^(?:一般曹候補生|自衛官候補生|幹部候補生|予備自衛官補?|医科・?[歯菌]科[幹韓]部|技術曹|貸費学生)(?:[・,、][一-鿿ァ-ヶa-zA-Z・]{0,15})?$/.test(t)) return true;
   // 住所の混入（「○丁目35-8」等。県名なしの「德島市…」形式は従来の住所ルールを素通りした）
   if (/丁目[\d０-９]{1,3}[-－‐][\d０-９]/.test(t)) return true;
   if (/入札公告|オープンカウンター|実施要領|仕様書|契約担当官/.test(t)) return true; // 調達・契約文書（イベントではない）
   if (/チラシを参照|参照願います/.test(t))      return true; // 注記文の混入
   // リンク文言の単独タイトル（「ダウンロード」「こちら」等）
   if (/^(?:ダウンロード|詳細|詳しくは|こちら|チラシ[\d０-９]*|PDF|画像|リンク)$/i.test(t)) return true;
+  // 誘導ボタンの文言が単独でタイトル化したもの（2026-09 福岡「詳しくみる」）。完全一致のみ
+  if (/^(?:詳しく(?:みる|見る)|詳細を(?:みる|見る)|詳細はこちら|もっと(?:みる|見る)|こちらから|(?:お?申し?込み?|申込|お申し込み)はこちら)[>＞›»→\s]*$/.test(t)) return true;
+  // サイトの規約・利用案内（イベント語を含んでいても文書であってイベントではない。
+  // 2026-09 兵庫「自衛隊兵庫地方協力本部ホームページのコンテンツ利用について」）
+  if (/(?:コンテンツ(?:の)?利用について|利用規約|サイトポリシー|プライバシーポリシー|個人情報(?:の)?保護方針|著作権について|リンクについて)$/.test(t)) return true;
+  // 本文の断片（受付時刻の注記）が単独でタイトル化したもの（「（14:00受付終了）」）
+  if (/^[（(]?\s*(?:\d{1,2}[:：]\d{2}\s*)?(?:受付終了|最終受付\s*\d{1,2}[:：]\d{2})\s*[）)]?$/.test(t)) return true;
+  // 募集告知（受付期間の告知でありイベントではない。「募集中 【一般曹候補生】募集」）
+  if (/^(?:募集中[\s　]*)?【[^】]{2,30}】[\s　]*募集$/.test(t)) return true;
+  // 採用案内の冊子（OCR 崩れ「今和8年度自衛官等探用案内」＝令和/採用 を含む）
+  if (/(?:採用|探用)案内$/.test(t) && !/説明会|相談会|ガイダンス|セミナー|フェア/.test(t)) return true;
   if (/申込み?リンク|応募リンク|広報申込み/.test(t)) return true; // リンク案内の混入
   // ラベル行がタイトル化（「主催:○○」「開催場所:○○」等）
   if (/^(?:主催|共催|開催場所|場所|会場|日時|日程|お問合せ先?)\s*[:：]/.test(t)) return true;
@@ -377,6 +389,7 @@ function isArchivableEvent(ev) {
   if (ev.source_type === 'office_notice') return false;
   if (isJunkOrStubTitle(ev.title)) return false;
   if (isSuspiciousTitle(ev.title)) return false;
+  if (isNonEventDocument(ev)) return false;
   return true;
 }
 
@@ -418,6 +431,99 @@ function isStaleDatedEvent(ev) {
     if (base + parseInt(m[2], 10) < evYear) return true;
   }
   return false;
+}
+
+// ── 非イベント文書の判定 ─────────────────────────────────────────
+// タイトルだけでは防げない「文書」の混入（福利厚生・待遇の資料、規約、求人企業向け案内、
+// ラジオ放送の音声ファイル等）を、URL・会場欄・備考も合わせて判定する。
+// 2026-09 新潟「陸海空自衛官」（福利厚生PDF。会場欄に本文「調機の充足完了及び空調が…」）、
+// 兵庫のラジオ放送（.wav）が公開されていた事故の再発防止。
+
+// 文書であることを強く示す語（タイトル・会場欄・URL で判定）
+const NON_EVENT_DOC_RE = /福利厚生|待遇|給与|手当|共済|年金|宿舎|服務|利用規約|サイトポリシー|コンテンツ利用|著作権|求人をお考えの企業|退職自衛官の求人|採用案内冊子/;
+// URL のファイル名に出る文書の目印（ローマ字表記）
+const NON_EVENT_URL_RE = /fukuri|kousei-kaizen|riyoukiyaku|kiyaku|privacy|sitepolicy|copyright|kyuyo|teate|kyosai/i;
+// 音声・動画ファイル（放送の録音であって参加するイベントではない）
+const MEDIA_URL_RE = /\.(?:wav|mp3|m4a|aac|ogg|mp4|mov|wmv)(?:[?#]|$)/i;
+// 正式タイトルに明確なイベント語があれば文書扱いしない（「福利厚生説明会」等を救済）
+const DOC_RESCUE_RE = /説明会|見学|体験|フェス|まつり|祭|公開|展示|演奏|相談会|イベント|ツアー|大会|式典|行事|オープンキャンパス|セミナー|ガイダンス|フェア/;
+
+/**
+ * イベントではない文書・媒体か（公開しない）。
+ * @param {object} ev { title, place, notes, url, imageUrl }
+ */
+function isNonEventDocument(ev) {
+  if (!ev) return false;
+  const title = toHalfAlnum(String(ev.title || ''));
+  let url = String(ev.url || '');
+  try { url = decodeURIComponent(url); } catch { /* keep raw */ }
+  if (MEDIA_URL_RE.test(url)) return true;
+  if (DOC_RESCUE_RE.test(title)) return false;
+  if (NON_EVENT_DOC_RE.test(title) || NON_EVENT_DOC_RE.test(String(ev.place || ''))) return true;
+  if (NON_EVENT_URL_RE.test(url.split(/[?#]/)[0].split('/').pop() || '')) return true;
+  // 備考は本文の説明で文書語が出やすいので、規約系の強い語だけを見る
+  if (/利用規約|サイトポリシー|コンテンツ利用/.test(String(ev.notes || ''))) return true;
+  return false;
+}
+
+// ── OCR 由来の不自然な未来日 ───────────────────────────────────────
+// チラシ中の別の日付（締切・過年度の実績・電話番号の断片）を開催日と誤読すると、
+// 1〜2年先の日付で登録される（2026-09 愛知「高等工科学校生徒説明会」2028-06-20）。
+// 一律に消さず、根拠となる年がタイトル/URLに無い OCR 由来のものだけを判定する。
+const OCR_SOURCE_RE = /^office_ocr|^office_crawl|ocr/;
+
+/** タイトル/URL に開催年（西暦・令和）の裏付けがあるか。 */
+function hasYearEvidence(ev, year) {
+  let url = String(ev.url || '');
+  try { url = decodeURIComponent(url); } catch { /* keep raw */ }
+  const text = `${toHalfAlnum(String(ev.title || ''))} ${url}`;
+  if (new RegExp(`(?:^|\\D)${year}(?:\\D|$)`).test(text)) return true;
+  const reiwa = year - 2018;
+  if (new RegExp(`令和\\s*${reiwa}(?:\\D|$)|(?:^|[^A-Za-z0-9])R${reiwa}[._\\-年]`, 'i').test(text)) return true;
+  return false;
+}
+
+/** タイトル/URL のファイル名に、開催年より前の西暦（20YY または 20YYMM）が書かれているか。 */
+function hasEarlierYearStamp(ev, year) {
+  let url = String(ev.url || '');
+  try { url = decodeURIComponent(url); } catch { /* keep raw */ }
+  const text = `${toHalfAlnum(String(ev.title || ''))} ${url.split(/[?#]/)[0].split('/').pop() || ''}`;
+  for (const m of text.matchAll(/(?:^|\D)(20\d{2})(?:0[1-9]|1[0-2])?(?:\D|$)/g)) {
+    if (parseInt(m[1], 10) < year) return true;
+  }
+  return false;
+}
+
+/**
+ * 不自然な未来日か。'strong'（2年以上先、または開催年より前の年の記載あり）/'warn'（1年以上先）/null。
+ * @param {object} ev
+ * @param {string} today YYYY-MM-DD
+ */
+function suspiciousFutureDate(ev, today) {
+  if (!ev || !ev.date || !today) return null;
+  if (!OCR_SOURCE_RE.test(String(ev.source_type || ''))) return null;
+  const days = (Date.parse(`${ev.date}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 86400000;
+  if (!Number.isFinite(days) || days < 365) return null;
+  const year = parseInt(ev.date.slice(0, 4), 10);
+  if (hasYearEvidence(ev, year)) return null;
+  // タイトル/URL に開催年より前の年（「toyota_se202606_11.jpg」＝2026年6月）が書かれている＝日付の誤読の裏付け
+  if (hasEarlierYearStamp(ev, year)) return 'strong';
+  return days >= 730 ? 'strong' : 'warn';
+}
+
+/**
+ * 公開（PWA 表示）とは別に、Schema.org Event（JSON-LD）へ出してよいか。
+ * 検索結果に誤った「イベント」を出さないよう、公開より厳しくする。
+ * @param {object} ev
+ * @param {string} [today] YYYY-MM-DD（未来日の判定に使う。省略時は未来日判定なし）
+ */
+function isEligibleForStructuredEvent(ev, today) {
+  if (!ev || !ev.title || !ev.date) return false;
+  if (isJunkOrStubTitle(ev.title)) return false;
+  if (isSuspiciousTitle(ev.title)) return false;
+  if (isNonEventDocument(ev)) return false;
+  if (today && suspiciousFutureDate(ev, today)) return false;
+  return true;
 }
 
 /** 重複判定用の正規化（括弧内・空白・記号・軍種プレフィックスを除去） */
@@ -720,6 +826,9 @@ module.exports = {
   isSuspiciousTitle,
   isArchivableEvent,
   isStaleDatedEvent,
+  isNonEventDocument,
+  suspiciousFutureDate,
+  isEligibleForStructuredEvent,
   dedupEvents,
   normForDedup,
   toHalfAlnum,
