@@ -1,7 +1,9 @@
 name: Preview デプロイ（検証環境）
 
-# 本番と別の検証環境（Vercel Preview）へデプロイする。手動実行のみ。
-#   Actions → 「Preview デプロイ（検証環境）」→ Run workflow → 対象ブランチを選ぶ
+# 本番と別の検証環境（Vercel Preview）へデプロイする。本番（master）には一切影響しない。
+#   - Actions → 「Preview デプロイ（検証環境）」→ Run workflow → 対象ブランチを選ぶ（このファイルが master にある場合）
+#   - または検証したいブランチを preview/<名前> として push する（master へのマージ前でも使える）
+#       git push origin HEAD:preview/<名前>
 #
 # 検証環境は Vercel の「Preview」用環境変数だけで動く（本番と別の Redis・テスト用アカウント・別シークレット）。
 # 本番のアカウント（GitHub Secret の ADMIN_ACCOUNTS_B64）は**渡さない**（deploy.yml と違う点）。
@@ -10,6 +12,9 @@ name: Preview デプロイ（検証環境）
 # 手順: docs/PREVIEW_ENVIRONMENT.md
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - 'preview/**'
 
 permissions:
   contents: read

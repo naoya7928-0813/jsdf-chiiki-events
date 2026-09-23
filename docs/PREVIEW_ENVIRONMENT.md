@@ -40,7 +40,14 @@
 
 ## 2. デプロイ
 
-GitHub → Actions → **「Preview デプロイ（検証環境）」** → Run workflow → 対象ブランチを選んで実行。
+次のどちらかで実行する（本番には影響しない）。
+
+- GitHub → Actions → **「Preview デプロイ（検証環境）」** → Run workflow → 対象ブランチを選ぶ
+- 検証したいブランチを `preview/<名前>` として push する（master へマージする前の PR でも使える）
+  ```bash
+  git push origin HEAD:preview/<名前>
+  ```
+
 テスト・ビルド・データ品質・依存監査を通ったものだけがデプロイされ、URL はジョブサマリに出る。
 
 `.github/workflows/preview.yml` は本番の `ADMIN_ACCOUNTS_B64` を**渡さない**。Preview は Vercel の Preview 用環境変数だけで動く。
