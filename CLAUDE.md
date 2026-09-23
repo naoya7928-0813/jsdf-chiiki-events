@@ -36,7 +36,7 @@ jsdf-chiiki-events/
 ├── public/
 │   ├── 404.html                # 静的パス用の404ページ（/events/<県>.html 等）
 │   ├── data/events.json        # スクレイプ結果（全イベントデータ）
-│   ├── data/events-llm-recheck.json # 段3（一次ソース再検査）の自動修正レポート
+│   ├── （data/events-llm-recheck.json に移動。公開サイトでは配信しない）
 │   ├── events.html             # 全イベント一覧（SEO向け静的HTML）
 │   ├── events/                 # 都道府県別静的ページ（SEO向け・スクレイプ毎に生成）
 │   │   └── <pref>.html         # 例: kagawa.html, tokyo.html
@@ -167,7 +167,7 @@ OCRの優先順は、無料ローカルOCR（Tesseract → RapidOCR）を先に�
 - **再抽出が null を返したフィールドは元の値を残さない**（裏付けの無い情報を消す）。
   結果として必須項目（タイトル・開催日）が埋まらなければ**公開しない＝検疫**へ回す
 - 1実行あたりの上限は **30件**（`LLM_RECHECK_LIMIT`）。超過分は今回は手を触れず次回へ回す
-- 結果は `public/data/events-llm-recheck.json` に残し、scrape.yml が ntfy で管理者へ通知する
+- 結果は `data/events-llm-recheck.json`（公開サイトでは配信しない） に残し、scrape.yml が ntfy で管理者へ通知する
 
 ### LLM の使い方の決めごと
 - **出力は必ず JSON**（Groq: `response_format: json_object` / Gemini: `responseMimeType: application/json`）。
@@ -385,7 +385,7 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 
 - `isSuspiciousTitle`（titleQuality.cjs）: イベント語（説明会/見学/体験/まつり等）を含まず、かつ
   非イベント兆候（ラベル語終わり・組織名のみ・装備スペック・述語断片・様式行）があるタイトルを「疑わしい」と判定
-- `writeOutput`: 疑わしいイベントは events.json に**載せず** `public/data/events-quarantine.json` へ隔離
+- `writeOutput`: 疑わしいイベントは events.json に**載せず** `data/events-quarantine.json` へ隔離（公開サイトでは配信しない）
   （毎回全置換。ルール追加や承認で解消すると次回から自動的に消える）
 - `scrape.yml`「検疫レポート」ステップ: 検疫が発生したら ntfy で管理者へタイトル一覧を通知＋Summary に件数
 - **検疫されたのが正規イベントだった場合**: `titleQuality.cjs` の **`APPROVED_TITLES`** に部分一致パターンを
