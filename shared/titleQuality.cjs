@@ -542,6 +542,42 @@ function normForDedup(s) {
 }
 
 /**
+ * 同じ日の2件が同じイベントの別表記か（正規化タイトルが一致、または一方が他方を含む）。
+ * 例: 募集案内所巡回の「広報活動 ふじざくらFC」と地本パーサーの「ふじざくらＦＣ」。
+ * 3文字未満の短いタイトルは誤一致を避けるため比較しない。呼び出し側で開催日の一致を確認すること。
+ */
+function isSameEventTitle(a, b) {
+  const x = normForDedup(a || ''), y = normForDedup(b || '');
+  if (x.length < 3 || y.length < 3) return false;
+  return x === y || x.includes(y) || y.includes(x);
+}
+
+/**
+ * 会場欄が「掲載元の案内所名」で埋められただけか（実際の会場が不明）。
+ * 募集案内所巡回は会場が取れないとき案内所名を入れ、備考に「掲載元: ○○」を残す
+ * （2026-09 山梨「広報活動 ふじざくらFC」の会場「巨摩募集案内所」。実際は小瀬スポーツ公園）。
+ */
+function isPlaceholderPlace(ev) {
+  const place = String((ev && ev.place) || '').trim();
+  if (!place) return true;
+  return String((ev && ev.notes) || '').includes(`掲載元: ${place}`);
+}
+
+/**
+ * 2件が同じイベントの別表記か（別経路で重複取得したもの）。
+ * 開催日が同じ・タイトルが同一か一方が他方を含む・会場が矛盾しない（どちらかが不明／一致／一方が他方を含む）。
+ * 会場まで見るのは、同じ日の「自衛隊職業説明会」がハローワーク違いで複数ある場合に別イベントを消さないため。
+ */
+function isLikelySameEvent(a, b) {
+  if (!a || !b || !a.date || a.date !== b.date) return false;
+  if (!isSameEventTitle(a.title, b.title)) return false;
+  if (isPlaceholderPlace(a) || isPlaceholderPlace(b)) return true;
+  const pa = normForDedup(a.place), pb = normForDedup(b.place);
+  if (!pa || !pb) return true;
+  return pa === pb || pa.includes(pb) || pb.includes(pa);
+}
+
+/**
  * 同一地本内の重複イベントを統合する。
  * 同一日付で、名称が一致（または一方が他方を含む）し、場所が両立する
  * （どちらか空・一致・包含）場合のみ重複とみなす。
@@ -831,5 +867,8 @@ module.exports = {
   isEligibleForStructuredEvent,
   dedupEvents,
   normForDedup,
+  isSameEventTitle,
+  isPlaceholderPlace,
+  isLikelySameEvent,
   toHalfAlnum,
 };

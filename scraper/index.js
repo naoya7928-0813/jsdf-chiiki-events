@@ -47,7 +47,7 @@ const { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } = r
 const { resolveDeadline, rotationOffset, keysNeedingCarryOver } = require('../shared/scrapeDeadline.cjs');
 const parserHealth = require('../shared/parserHealth.cjs');
 // イベント名の品質管理（検証済み修正・整形・junk判定・年ズレ判定・重複統合）。最終出力の防御に使う
-const { applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, splitPlaceAddress, cleanTimeText, cleanDeadlineText, isJunkOrStubTitle, isSuspiciousTitle, isStaleDatedEvent, dedupEvents, isArchivableEvent, safeUrl, isNonEventDocument, suspiciousFutureDate } = require('../shared/titleQuality.cjs');
+const { applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, splitPlaceAddress, cleanTimeText, cleanDeadlineText, isJunkOrStubTitle, isSuspiciousTitle, isStaleDatedEvent, dedupEvents, isArchivableEvent, safeUrl, isNonEventDocument, suspiciousFutureDate, isLikelySameEvent } = require('../shared/titleQuality.cjs');
 const eventRegression = require('../shared/eventRegression.cjs');
 const { isCountableEvent } = require('../shared/dataQuality.cjs');
 // 受付終了/中止の状態判定・締切日解決（誤判定防止つき。shared/eventStatus.cjs）
@@ -3540,9 +3540,10 @@ async function crawlNationwideOffices(withFreshContext, cutoff) {
   const delayMs = Number.parseInt(process.env.OFFICE_CRAWL_DELAY_MS || '1800', 10);
   const ocrReady = await hasAnyOcrEngine();
   const events = [];
-  // 地本の専用パーサーが読むページ（URLS）はここでは読まない。汎用抽出で読むと、
-  // 会場を案内所名で埋めた低品質な重複イベント（2026-09 山梨「広報活動 ふじざくらFC」@巨摩募集案内所）が生まれる。
-  const seenPages = new Set(Object.values(URLS).map(u => normalizeUrl(u)).filter(Boolean));
+  // 地本の専用パーサーが読むページ（URLS）もここで読む。専用パーサーが一部しか取れないページがあるため
+  // （2026-09-23 石川: 本文に今後の日付10件・パーサー1件。巡回が補っていた6件を読まないようにした結果、
+  //  品質ゲートで停止した）。パーサーと同じイベントの重複は mergeOfficeEvents の同日タイトル照合で除く。
+  const seenPages = new Set();
   const targetPages = pages.slice(0, maxPages);
 
   console.log(`[OfficeOCR] 全国募集案内所 ${targetPages.length}/${pages.length} URLを巡回開始`);
@@ -4077,8 +4078,6 @@ async function main() {
         prefEvents[task.key] = task.noBrowser
           ? await task.run()
           : await withFreshContext(ctx => task.run(ctx));
-        // 地本の専用パーサーで読めたページは「今回読み直した情報源」（同じページ由来の前回 office イベントを置き換える）
-        if (URLS[task.key]) markRevisited(URLS[task.key]);
       } catch (err) {
         console.error(`[${task.label}] 取得失敗: ${err.message}`);
         prefErrors[task.key] = true;
@@ -4207,6 +4206,15 @@ async function main() {
     return rest;
   };
 
+  // 日付 → その日の既存イベント（同日照合用。O(n)）
+  function eventsByDate(list) {
+    const m = new Map();
+    for (const e of list) { if (!m.has(e.date)) m.set(e.date, []); m.get(e.date).push(e); }
+    return m;
+  }
+  // 既存（地本側）に同じイベントの別表記があるか（shared/titleQuality の isLikelySameEvent）
+  const hasSameDayTwin = (sameDay, e) => (sameDay.get(e.date) || []).some(x => isLikelySameEvent(x, e));
+
   // 関東の先回り巡回で得た事務所イベントを、中央ページの既存イベントへ統合する。
   // 中央ページと事務所ページで同一イベントが重複しないよう、id だけでなく
   // 「日付＋タイトル先頭」「日付＋場所先頭」でも重複判定して除外する。
@@ -4217,8 +4225,10 @@ async function main() {
     const ids   = new Set(existing.map(e => e.id));
     const tKeys = new Set(existing.map(e => `${e.date}|${norm(e.title).slice(0, 8)}`));
     const pKeys = new Set(existing.filter(e => e.place).map(e => `${e.date}|${norm(e.place).slice(0, 8)}`));
+    const sameDay = eventsByDate(existing);
     const add = crawled.filter(e => {
       if (ids.has(e.id)) return false;
+      if (hasSameDayTwin(sameDay, e)) return false;
       if (tKeys.has(`${e.date}|${norm(e.title).slice(0, 8)}`)) return false;
       if (e.place && pKeys.has(`${e.date}|${norm(e.place).slice(0, 8)}`)) return false;
       return true;
@@ -4236,8 +4246,11 @@ async function main() {
     const norm = s => (s || '').replace(/\s+/g, '').replace(/[（(].*?[）)]/g, '');
     const tKeys = new Set(existing.map(e => `${e.date}|${norm(e.title).slice(0, 8)}`));
     const pKeys = new Set(existing.filter(e => e.place).map(e => `${e.date}|${norm(e.place).slice(0, 8)}`));
+    const sameDay = eventsByDate(existing);
     const deduped = fromOffice.filter(e => {
       if (allIds.has(e.id)) return false;
+      // 同じ日に同じイベントの別表記がある（「広報活動 ふじざくらFC」と「ふじざくらＦＣ」）→ 地本側を優先
+      if (hasSameDayTwin(sameDay, e)) return false;
       // 既存イベントがある地本にはスタブを追加しない（通知ノイズ防止）
       if (e.source_type === 'office_notice' && existing.length > 0) return false;
       if (tKeys.has(`${e.date}|${norm(e.title).slice(0, 8)}`)) return false;
