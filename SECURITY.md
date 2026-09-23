@@ -29,14 +29,14 @@
 
 ## シークレット管理
 - すべてのシークレットは Vercel 環境変数 / GitHub Secrets で管理し、リポジトリ・バンドルに含めない。
-- ntfy トピックは環境変数のみ。固定フォールバックを持たず、未設定時は安全側（503）で失敗。
+- 運営者向け ntfy トピック（`NTFY_ADMIN_TOPIC`、GitHub Actions のみ）は Secrets のみで管理。利用者の報告は ntfy 等の外部へ送らない（Redis＋管理画面）。
 - ローテーション手順は [DEPLOY.md](DEPLOY.md) を参照。
 
 ## 多層防御
 - セキュリティヘッダ（CSP / X-Frame-Options DENY / nosniff / Referrer-Policy / HSTS / Permissions-Policy）を `vercel.json` で付与。
 - オリジン検証（自サイト以外のブラウザ書き込みを拒否）。
 - IPレートリミット（Upstash Redis。障害時は可用性優先で通す）。
-- master ブランチ保護。デプロイ前に `npm test` ＋ データ品質チェックをゲート。
+- master ブランチ保護は **force push・ブランチ削除の禁止のみ**（2026-09-23 確認）。PR 必須・必須チェック・本番承認は未設定（下記「既知の制約」）。デプロイ前に `npm test` ＋ データ品質チェックをゲート。
 
 ## 脆弱性の報告
 - セキュリティ上の問題は、公開 Issue ではなく運営者へ非公開で連絡してください（連絡先は運営者間で共有）。報告には再現手順・影響範囲を含めてください。

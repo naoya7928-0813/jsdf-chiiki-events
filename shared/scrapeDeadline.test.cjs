@@ -130,7 +130,8 @@ test('余裕は「デプロイ〜CDN反映（実測約3分）」より長い', (
 // ── 実ファイルとの突き合わせ ──────────────────────────────────
 test('SLOTS の cron が scrape.yml の schedule と一致する', () => {
   const yml = read('.github/workflows/scrape.yml');
-  const block = /schedule:\n((?:\s*- cron: .*\n)+)/.exec(yml);
+  // Windows（core.autocrlf=true）で取り出すと CRLF になるため \r? を許容する
+  const block = /schedule:\r?\n((?:\s*- cron: .*\r?\n)+)/.exec(yml);
   assert.ok(block, 'scrape.yml の schedule を読み取れませんでした');
   const crons = [...block[1].matchAll(/- cron: '([^']+)'/g)].map(m => m[1]);
   assert.deepEqual(

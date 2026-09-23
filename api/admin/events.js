@@ -3,8 +3,8 @@
 //   GET                          → 一覧（自分の担当地本のみ。* は全件）
 //   PATCH  { id, patch }         → 部分更新（status 変更=公開/下書き/締切/中止 等）
 //   DELETE { id }                → 削除
-// 認証は x-admin-user/x-admin-pass（または後方互換の x-admin-secret）。
-// 地本スコープ: pref!=='*' のアカウントは自分の地本のみ操作可。
+// 認証はサーバー側セッション Cookie（requireAuth）。旧ヘッダ認証は LEGACY_HEADER_AUTH=true の時のみ。
+// スコープ: shared/authz.cjs の canManageScope（地本・事務所、deny-by-default）。
 // 保存先は Upstash Redis hash `manual:events`（field=id, value=JSON）。
 import { checkOrigin, noStore, requireSameOrigin, rateLimit, requireAuth, hasPermission, canManageScope, canPublish, redis, cleanText, writeAudit } from '../_security.js';
 import W from '../../shared/weather.cjs';
@@ -142,6 +142,12 @@ export default async function handler(req, res) {
     if (!hasPermission(account, 'event:create')) { await writeAudit(account, { action: 'event.create', result: 'denied', note: '権限不足' }); return res.status(403).json({ error: 'イベントを追加する権限がありません' }); }
     const built = buildEvent(req.body?.event, account);
     if (built.error) return res.status(400).json({ error: built.error });
+    // 作成するイベントが自分の管理範囲に入るかを保存前に確認する（deny-by-default）。
+    // office ロールで office 未設定のアカウントは、作っても自分で見られない・直せないイベントになるため拒否。
+    if (!canManageScope(account, { pref: built.event.pref, office: built.event.office })) {
+      await writeAudit(account, { action: 'event.create', result: 'denied', organization: built.event.pref, note: '担当範囲外（office未設定を含む）' });
+      return res.status(403).json({ error: '担当範囲が設定されていないため登録できません（管理者に事務所の設定を依頼してください）' });
+    }
     // 公開で登録するには公開権限が必要（office_editor は下書きのみ）
     if (built.event.status === 'published' && !canPublish(account)) {
       await writeAudit(account, { action: 'event.create', result: 'denied', note: '公開権限なし' });
@@ -197,6 +203,11 @@ export default async function handler(req, res) {
         const b = normalizeBranches(patch.branch);
         if (b.length) ev.branch = b; else delete ev.branch;
       }
+      // 属性タグ（オンライン・家族向け 等）。空配列を送ると「指定なし」に戻し、文面からの推定に任せる
+      if (patch.tags !== undefined) {
+        const t = normalizeTags(patch.tags);
+        if (t.length) ev.tags = t; else delete ev.tags;
+      }
       if (patch.title !== undefined && !ev.title) return res.status(400).json({ error: 'タイトルは必須です' });
       if (patch.url !== undefined) {
         const u = String(patch.url || '').trim();
@@ -210,6 +221,8 @@ export default async function handler(req, res) {
         if (ed && DATE_RE.test(ed) && ed >= ev.date) { ev.endDate = ed; ev.endWeekday = weekdayOf(ed); }
         else { delete ev.endDate; delete ev.endWeekday; }
       }
+      // 開始日だけを後ろへずらした場合に「終了日 < 開始日」のまま保存しない
+      if (ev.endDate && ev.endDate < ev.date) return res.status(400).json({ error: '終了日が開始日より前になっています' });
       // 天気用座標の更新:
       //  1) 手動座標が送られたら accuracy:'manual' で確定（再取得フラグは解除）
       //  2) 場所/住所が変わったら既存座標を無効化し、再ジオコーディング待ちにする

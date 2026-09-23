@@ -148,4 +148,4 @@ node -e "console.log(Buffer.from(require('fs').readFileSync('accounts.json','utf
 - パスワードが漏れた疑いがあるときは、手順5で変更し `sessionVersion` を上げてください。
 - これらの設定・変更は、**正規の運営担当者ご自身**が行ってください（開発者は手順の支援のみ。実際のパスワードは開発者へ共有しないでください）。
 
-> 関連資料: 詳細な運用は [OPERATIONS.md](OPERATIONS.md)、環境変数・反映手順は [DEPLOY.md](DEPLOY.md)、安全設計は [SECURITY.md](SECURITY.md) を参照。
+> 関連資料: 詳細な運用は [OPERATIONS.md](../OPERATIONS.md)、環境変数・反映手順は [DEPLOY.md](../DEPLOY.md)、安全設計は [SECURITY.md](../SECURITY.md) を参照。
