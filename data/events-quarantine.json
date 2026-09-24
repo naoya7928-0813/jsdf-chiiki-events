@@ -1,7 +1,19 @@
 {
   "updatedAt": "2026-09-24",
-  "count": 3,
+  "count": 6,
   "events": [
+    {
+      "id": "to-off-20260925-dfb1t",
+      "pref": "tokyo",
+      "date": "2026-09-25",
+      "endDate": "",
+      "title": "自衛隊中央病院では、下記により任期付自衛官を募集します。",
+      "place": "自衛隊中央病院（三宿駐屯地",
+      "url": "https://www.mod.go.jp/pco/tokyo/saiyou/bosyuannai/0925-30_ninkituki.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-09-24",
+      "reason": ""
+    },
     {
       "id": "ai-office-20280620-ghetd",
       "pref": "aichi",
@@ -35,6 +47,30 @@
       "place": "青野原分駐所",
       "url": "https://www.mod.go.jp/pco/hyogo/jimusyo/radio/20251017FMmikkixi.wav",
       "source_type": "office_html",
+      "quarantinedAt": "2026-09-24",
+      "reason": "非イベント文書の疑い"
+    },
+    {
+      "id": "wa-office-20260924-og3ga",
+      "pref": "wakayama",
+      "date": "2026-09-24",
+      "endDate": "",
+      "title": "1本、才方式実施要項基手統必要。",
+      "place": "",
+      "url": "https://www.mod.go.jp/pco/wakayama/2020/wp-content/uploads/2026/09/69bd27770efd5481565922c6f7e50eb2.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-09-24",
+      "reason": ""
+    },
+    {
+      "id": "mi-off-20261001-9tske",
+      "pref": "miyazaki",
+      "date": "2026-10-01",
+      "endDate": "",
+      "title": "退職自衛官の求人をお考えの企業 様",
+      "place": "",
+      "url": "https://www.mod.go.jp/pco/miyazaki/event/miyazaki_pco_r7_onegai_7310.pdf",
+      "source_type": "office_ocr",
       "quarantinedAt": "2026-09-24",
       "reason": "非イベント文書の疑い"
     }
