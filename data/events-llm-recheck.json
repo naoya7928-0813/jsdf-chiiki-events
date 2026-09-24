@@ -2,15 +2,15 @@
   "updatedAt": "2026-09-24",
   "limit": 30,
   "summary": {
-    "checked": 262,
-    "flagged": 13,
+    "checked": 267,
+    "flagged": 14,
     "attempted": 3,
     "corrected": 0,
     "unverified": 0,
     "noSource": 3,
     "overBudget": 0,
     "skippedNoSource": 3,
-    "skippedNotEligible": 7,
+    "skippedNotEligible": 8,
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
@@ -35,6 +35,11 @@
       "id": "ya-20261025-c4z5s",
       "pref": "yamagata",
       "reason": "no_source"
+    },
+    {
+      "id": "mi-office-20260924-a10yl",
+      "pref": "mie",
+      "reason": "not_eligible"
     },
     {
       "id": "os-office-20260926-hw000",
