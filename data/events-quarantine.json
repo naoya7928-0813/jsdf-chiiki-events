@@ -1,6 +1,6 @@
 {
   "updatedAt": "2026-09-25",
-  "count": 5,
+  "count": 8,
   "events": [
     {
       "id": "to-off-20260925-dfb1t",
@@ -10,6 +10,54 @@
       "title": "自衛隊中央病院では、下記により任期付自衛官を募集します。",
       "place": "自衛隊中央病院（三宿駐屯地",
       "url": "https://www.mod.go.jp/pco/tokyo/saiyou/bosyuannai/0925-30_ninkituki.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-09-25",
+      "reason": ""
+    },
+    {
+      "id": "ni-off-20270101-19282",
+      "pref": "niigata",
+      "date": "2027-01-01",
+      "endDate": "",
+      "title": "陸海空自衛官",
+      "place": "調機の充足完了及び空調が整備されていない駐屯地",
+      "url": "https://www.mod.go.jp/pco/niigata/files/top/fukurikousei-kaizen.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-09-25",
+      "reason": "非イベント文書の疑い"
+    },
+    {
+      "id": "sh-off-20260925-gne40",
+      "pref": "shizuoka",
+      "date": "2026-09-25",
+      "endDate": "",
+      "title": "自衛隊静岡地方協力本部",
+      "place": "",
+      "url": "https://www.mod.go.jp/pco/sizuoka/bosyu/pdf/530.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-09-25",
+      "reason": ""
+    },
+    {
+      "id": "sh-off-20260925-gne40",
+      "pref": "shizuoka",
+      "date": "2026-09-25",
+      "endDate": "",
+      "title": "自衛隊静岡地方協力本部",
+      "place": "",
+      "url": "https://www.mod.go.jp/pco/sizuoka/bosyu/pdf/530.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-09-25",
+      "reason": ""
+    },
+    {
+      "id": "sh-off-20260925-gne40",
+      "pref": "shizuoka",
+      "date": "2026-09-25",
+      "endDate": "",
+      "title": "自衛隊静岡地方協力本部",
+      "place": "",
+      "url": "https://www.mod.go.jp/pco/sizuoka/bosyu/pdf/530.pdf",
       "source_type": "office_ocr",
       "quarantinedAt": "2026-09-25",
       "reason": ""
@@ -47,18 +95,6 @@
       "place": "青野原分駐所",
       "url": "https://www.mod.go.jp/pco/hyogo/jimusyo/radio/20251017FMmikkixi.wav",
       "source_type": "office_html",
-      "quarantinedAt": "2026-09-25",
-      "reason": "非イベント文書の疑い"
-    },
-    {
-      "id": "mi-off-20261001-9tske",
-      "pref": "miyazaki",
-      "date": "2026-10-01",
-      "endDate": "",
-      "title": "退職自衛官の求人をお考えの企業 様",
-      "place": "",
-      "url": "https://www.mod.go.jp/pco/miyazaki/event/miyazaki_pco_r7_onegai_7310.pdf",
-      "source_type": "office_ocr",
       "quarantinedAt": "2026-09-25",
       "reason": "非イベント文書の疑い"
     }
