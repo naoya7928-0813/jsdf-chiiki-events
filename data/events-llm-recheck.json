@@ -1,10 +1,10 @@
 {
-  "updatedAt": "2026-09-25",
+  "updatedAt": "2026-09-26",
   "limit": 30,
   "summary": {
-    "checked": 272,
-    "flagged": 16,
-    "attempted": 5,
+    "checked": 248,
+    "flagged": 12,
+    "attempted": 0,
     "corrected": 0,
     "unverified": 0,
     "noSource": 3,
@@ -12,7 +12,7 @@
     "skippedNoSource": 3,
     "skippedNotEligible": 8,
     "skippedProviderUnavailable": 0,
-    "skippedCutoff": 0
+    "skippedCutoff": 1
   },
   "corrections": [],
   "skipped": [
@@ -35,6 +35,11 @@
       "id": "ya-20261025-c4z5s",
       "pref": "yamagata",
       "reason": "no_source"
+    },
+    {
+      "id": "s-20261121-5372q",
+      "pref": "saitama",
+      "reason": "cutoff"
     },
     {
       "id": "mi-office-20260924-a10yl",

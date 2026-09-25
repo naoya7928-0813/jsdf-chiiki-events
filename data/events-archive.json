@@ -1,6 +1,108 @@
 {
-  "updatedAt": "2026-09-25",
+  "updatedAt": "2026-09-26",
   "events": [
+    {
+      "id": "sa-off-20260925-fzp0o",
+      "pref": "saitama",
+      "office": "",
+      "date": "2026-09-25",
+      "endDate": "",
+      "weekday": "金",
+      "title": "自衛隊職業説明会",
+      "place": "八口一一朝霞",
+      "address": "",
+      "time": "13:30～16:30",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "予約不要、持参物不要\n予約不要、持参物不要",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-09-08",
+      "weatherLocation": {
+        "latitude": 35.822,
+        "longitude": 139.84,
+        "label": "埼玉県八潮市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-09-08T08:54:10.496+09:00"
+      },
+      "archivedAt": "2026-09-26"
+    },
+    {
+      "id": "ni-off-20260925-dagbz",
+      "pref": "niigata",
+      "office": "",
+      "date": "2026-09-25",
+      "endDate": "",
+      "weekday": "金",
+      "title": "歩兵第16聯隊の奮戦記録",
+      "place": "元新発田駐屯地",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/niigata/files/sirakabe/sirakabe2.pdf",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-08-31",
+      "weatherLocation": {
+        "latitude": 37.902,
+        "longitude": 139.023,
+        "label": "新潟県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-31T16:01:34.060+09:00"
+      },
+      "archivedAt": "2026-09-26"
+    },
+    {
+      "id": "ok-office-20260925-zxwzd",
+      "pref": "okayama",
+      "office": "",
+      "date": "2026-09-25",
+      "endDate": "",
+      "weekday": "金",
+      "title": "自衛隊幹部候補生（一般）】募集",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/gsdf/jieikanbosyu/about/recruit/jieitaikambukoho.html",
+      "notes": "掲載元: 岡山募集案内所・高梁地域事務所・倉敷地域事務所 ほか1拠点",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_html",
+      "firstSeen": "2026-09-23",
+      "weatherLocation": {
+        "latitude": 34.662,
+        "longitude": 133.935,
+        "label": "岡山県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.000+09:00"
+      },
+      "archivedAt": "2026-09-26"
+    },
     {
       "id": "mi-office-20260924-7hopm",
       "pref": "mie",
@@ -33,7 +135,7 @@
         "source": "gsi",
         "geocodedAt": "2026-07-13T07:58:32.830+09:00"
       },
-      "archivedAt": "2026-09-25"
+      "archivedAt": "2026-09-26"
     },
     {
       "id": "mi-office-20260924-a10yl",
@@ -67,7 +169,7 @@
         "source": "gsi",
         "geocodedAt": "2026-07-13T07:58:32.830+09:00"
       },
-      "archivedAt": "2026-09-25"
+      "archivedAt": "2026-09-26"
     },
     {
       "id": "sh-office-20260924-xeb66",
@@ -161,7 +263,7 @@
       "statusUpdatedAt": "",
       "source_type": "office_html",
       "firstSeen": "2026-08-27",
-      "archivedAt": "2026-09-25"
+      "archivedAt": "2026-09-26"
     },
     {
       "id": "gu-20260923-ey832",
@@ -255,7 +357,7 @@
       "statusUpdatedAt": "",
       "source_type": "office_html",
       "firstSeen": "2026-08-27",
-      "archivedAt": "2026-09-25"
+      "archivedAt": "2026-09-26"
     },
     {
       "id": "ky-office-20260922-wsf3n",
