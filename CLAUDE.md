@@ -763,6 +763,22 @@ ErrorBoundary（`src/components/ErrorBoundary.jsx`）のフォールバックが
 - `public/events/<pref>.html` — イベントがある都道府県分（JSON-LD・canonical付き）
 - `public/sitemap.xml` — 全URLを含む更新済みサイトマップ
 
+## 3D隊舎（試験公開・`/corridor/`）（2026-09-25 追加）
+
+ホーム画面ヘッダー／PC サイドナビの「地本イベントナビ」の文字を押すと、新しいタブで
+`/corridor/index.html`（`src/config.js` の `CORRIDOR_TRIAL_URL`）が開く。
+中身は別プロジェクト `corridor-site`（Three.js + GSAP）の**ビルド成果物**で、このリポジトリではソースを持たない。
+
+- **更新手順**: corridor-site で `npm run build:corridor`（`--base /corridor/`）→ `dist-corridor/` の中身で
+  `public/corridor/` を丸ごと置き換える（古いハッシュ名のファイルを残さない）→ 本リポジトリで build / test
+- 除外設定（どれか1つでも抜けると `/corridor/` がアプリ本体や 404 画面になる／全員に先読みされる）:
+  - `vercel.json` の SPA rewrite 除外に `corridor`（`/corridor/assets/*` は immutable キャッシュ）
+  - `src/sw.js` の NavigationRoute `denylist` に `/^\/corridor(\/|$)/`
+  - `vite.config.js` の `injectManifest.globIgnores` に `corridor/**`（約0.9MB を precache しない）
+- 新しいタブで開くのは、iPhone のホーム画面アプリに戻るボタンが無く、同じ画面で開くと戻れないため
+- 試験公開のため corridor-site 側の `index.html` に `noindex, nofollow` を入れてある（sitemap にも載せない）
+- 端末への保存・外部送信は無い（プライバシーポリシーの記載は不要。追加するなら規約改定手順に従う）
+
 ## 更新ノートの運用ルール
 
 設定画面に表示される更新ノート（`src/constants/updates.js`）の管理ルール。

@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import { ICO } from './Icons';
 import { F, OperatorNavContext } from './Shared';
+import { CORRIDOR_TRIAL_URL } from '../config';
 
 /**
  * デスクトップ用の左サイドナビ。
@@ -41,9 +42,19 @@ export default function SideNav({ active, onChange, primary, unreadCount = 0, on
         padding: '20px 20px 16px',
         borderBottom: '1px solid var(--sep)',
       }}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', letterSpacing: '0.01em' }}>
+        {/* タイトルを押すと 3D隊舎（試験公開）を新しいタブで開く（HomeScreen と同じ） */}
+        <a
+          href={CORRIDOR_TRIAL_URL}
+          target="_blank"
+          rel="noopener"
+          title="3D隊舎（試験公開）を開く"
+          style={{
+            display: 'block', textDecoration: 'none',
+            fontSize: 15, fontWeight: 700, color: 'var(--text)', letterSpacing: '0.01em',
+          }}
+        >
           地本イベントナビ
-        </div>
+        </a>
         <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 3 }}>
           非公式・有志運営
         </div>

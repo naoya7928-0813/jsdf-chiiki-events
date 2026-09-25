@@ -181,6 +181,9 @@ export default defineConfig({
       manifest: buildManifest(DEFAULT_SCHEME),
       injectManifest: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // 3D隊舎（public/corridor/・約0.9MB）は開いた人だけが読み込む。
+        // precache に入れると全利用者のインストール時に落ちてくるため除外する。
+        globIgnores: ['**/node_modules/**/*', 'corridor/**'],
       },
     }),
   ],

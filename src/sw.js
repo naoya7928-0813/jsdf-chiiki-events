@@ -18,9 +18,9 @@ cleanupOutdatedCaches();
 precacheAndRoute(self.__WB_MANIFEST);
 
 // ── SPAナビゲーション（/event/:id 等の個別URLをオフライン/PWAでも解決） ──
-// 拡張子付きパス（静的HTML/画像/JSON等）・API・運営者ページは対象外。
+// 拡張子付きパス（静的HTML/画像/JSON等）・API・運営者ページ・3D隊舎（/corridor/）は対象外。
 registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html'), {
-  denylist: [/^\/api\//, /^\/admin/, /\.[a-z0-9]+$/i],
+  denylist: [/^\/api\//, /^\/admin/, /^\/corridor(\/|$)/, /\.[a-z0-9]+$/i],
 }));
 
 // ── キャッシュ由来の応答に印を付ける ──────────────────────────

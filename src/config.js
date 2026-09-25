@@ -14,6 +14,12 @@ export const API_URL = '/data/events.json';
 // 自動リフレッシュ間隔（ミリ秒）
 export const REFRESH_INTERVAL_MS = 5 * 60 * 1000; // 5分
 
+// ─── 3D隊舎（試験公開） ─────────────────────────────────────────
+// ホーム／サイドナビの「地本イベントナビ」を押すと開く別ページ（public/corridor/）。
+// 拡張子付きで指すのは、更新前の Service Worker（拡張子なしの遷移を index.html で
+// 返す）が残っている端末でも横取りされずに届くようにするため。
+export const CORRIDOR_TRIAL_URL = '/corridor/index.html';
+
 // ─── カラースキーム ───────────────────────────────────────────
 export const COLOR_SCHEMES = {
   jgsdf: { primary: '#3a4130', accent: '#8b5a2e', label: '陸上自衛隊', sub: 'JGSDF' },

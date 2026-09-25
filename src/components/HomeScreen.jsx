@@ -4,6 +4,7 @@ import { BottomTabBar, F, Spinner, ErrorBanner, splitDate } from './Shared';
 import JapanMap from './JapanMap';
 import { useIsDesktop } from '../hooks/useBreakpoint';
 import NearbyOfficesModal from './NearbyOfficesModal';
+import { CORRIDOR_TRIAL_URL } from '../config';
 import { REGION_BY_ID, SUPPORTED_PREFECTURES, countEventsByRegion, getSupportedPrefsByRegion } from '../data/regionMap';
 
 
@@ -66,9 +67,20 @@ export default function HomeScreen({
             <div style={{ fontSize: 10, letterSpacing: 1.5, color: 'rgba(255,255,255,0.65)', fontWeight: 500 }}>
               Main Page
             </div>
-            <div style={{ fontFamily: F.serif, fontSize: 22, fontWeight: 600, letterSpacing: 1, marginTop: 4 }}>
+            {/* タイトルを押すと 3D隊舎（試験公開）を新しいタブで開く。
+                ホーム画面アプリ（iPhone）には戻るボタンが無いため同じ画面では開かない */}
+            <a
+              href={CORRIDOR_TRIAL_URL}
+              target="_blank"
+              rel="noopener"
+              title="3D隊舎（試験公開）を開く"
+              style={{
+                display: 'block', color: 'inherit', textDecoration: 'none',
+                fontFamily: F.serif, fontSize: 22, fontWeight: 600, letterSpacing: 1, marginTop: 4,
+              }}
+            >
               地本イベントナビ
-            </div>
+            </a>
           </div>
 
           {/* ヘッダー右側ボタン群 */}
