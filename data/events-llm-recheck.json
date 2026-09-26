@@ -1,10 +1,10 @@
 {
-  "updatedAt": "2026-09-26",
+  "updatedAt": "2026-09-27",
   "limit": 30,
   "summary": {
-    "checked": 265,
+    "checked": 232,
     "flagged": 12,
-    "attempted": 1,
+    "attempted": 0,
     "corrected": 0,
     "unverified": 0,
     "noSource": 3,
@@ -12,7 +12,7 @@
     "skippedNoSource": 3,
     "skippedNotEligible": 8,
     "skippedProviderUnavailable": 0,
-    "skippedCutoff": 0
+    "skippedCutoff": 1
   },
   "corrections": [],
   "skipped": [
@@ -37,17 +37,22 @@
       "reason": "no_source"
     },
     {
+      "id": "s-20261121-5372q",
+      "pref": "saitama",
+      "reason": "cutoff"
+    },
+    {
       "id": "mi-office-20260924-a10yl",
       "pref": "mie",
       "reason": "not_eligible"
     },
     {
-      "id": "os-office-20260926-hw000",
+      "id": "os-office-20261017-5u6ep",
       "pref": "osaka",
       "reason": "not_eligible"
     },
     {
-      "id": "os-office-20261017-5u6ep",
+      "id": "os-office-20260926-hw000",
       "pref": "osaka",
       "reason": "not_eligible"
     },
