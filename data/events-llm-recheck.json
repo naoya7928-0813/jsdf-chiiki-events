@@ -2,15 +2,15 @@
   "updatedAt": "2026-09-29",
   "limit": 30,
   "summary": {
-    "checked": 283,
-    "flagged": 16,
+    "checked": 282,
+    "flagged": 17,
     "attempted": 4,
     "corrected": 0,
     "unverified": 0,
     "noSource": 3,
     "overBudget": 0,
     "skippedNoSource": 3,
-    "skippedNotEligible": 9,
+    "skippedNotEligible": 10,
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
@@ -58,6 +58,11 @@
     },
     {
       "id": "hy-office-20261027-wbtqt",
+      "pref": "hyogo",
+      "reason": "not_eligible"
+    },
+    {
+      "id": "hy-office-20261001-jm41q",
       "pref": "hyogo",
       "reason": "not_eligible"
     },
