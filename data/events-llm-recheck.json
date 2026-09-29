@@ -2,15 +2,15 @@
   "updatedAt": "2026-09-29",
   "limit": 30,
   "summary": {
-    "checked": 250,
-    "flagged": 14,
-    "attempted": 3,
+    "checked": 283,
+    "flagged": 16,
+    "attempted": 4,
     "corrected": 0,
     "unverified": 0,
     "noSource": 3,
     "overBudget": 0,
     "skippedNoSource": 3,
-    "skippedNotEligible": 8,
+    "skippedNotEligible": 9,
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
@@ -64,6 +64,11 @@
     {
       "id": "hy-office-20260928-vorim",
       "pref": "hyogo",
+      "reason": "not_eligible"
+    },
+    {
+      "id": "ok-20261115-b75qj",
+      "pref": "okayama",
       "reason": "not_eligible"
     },
     {
