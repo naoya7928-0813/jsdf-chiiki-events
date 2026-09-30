@@ -2,14 +2,14 @@
   "updatedAt": "2026-09-30",
   "limit": 30,
   "summary": {
-    "checked": 280,
-    "flagged": 17,
+    "checked": 305,
+    "flagged": 18,
     "attempted": 4,
     "corrected": 0,
     "unverified": 0,
-    "noSource": 3,
+    "noSource": 4,
     "overBudget": 0,
-    "skippedNoSource": 3,
+    "skippedNoSource": 4,
     "skippedNotEligible": 10,
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
@@ -34,6 +34,11 @@
     {
       "id": "ya-20261025-c4z5s",
       "pref": "yamagata",
+      "reason": "no_source"
+    },
+    {
+      "id": "ak-20261012-az8iw",
+      "pref": "akita",
       "reason": "no_source"
     },
     {

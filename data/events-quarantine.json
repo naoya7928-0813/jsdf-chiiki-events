@@ -1,7 +1,19 @@
 {
   "updatedAt": "2026-09-30",
-  "count": 4,
+  "count": 5,
   "events": [
+    {
+      "id": "ni-off-20270101-19282",
+      "pref": "niigata",
+      "date": "2027-01-01",
+      "endDate": "",
+      "title": "陸海空自衛官",
+      "place": "調機の充足完了及び空調が整備されていない駐屯地",
+      "url": "https://www.mod.go.jp/pco/niigata/files/top/fukurikousei-kaizen.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-09-30",
+      "reason": "非イベント文書の疑い"
+    },
     {
       "id": "ai-office-20280620-ghetd",
       "pref": "aichi",
