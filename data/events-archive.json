@@ -1,6 +1,40 @@
 {
-  "updatedAt": "2026-09-29",
+  "updatedAt": "2026-09-30",
   "events": [
+    {
+      "id": "t-20260929-4e639",
+      "pref": "tokyo",
+      "office": "",
+      "date": "2026-09-29",
+      "endDate": "",
+      "weekday": "火",
+      "title": "習志野駐屯地見学",
+      "place": "江東出張所",
+      "address": "",
+      "time": "10:00～15:00",
+      "category": "体験",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tokyo/koutou/index.html#0929",
+      "notes": "・訓練見学\n・体験搭乗（停止状態）\n・体験喫食",
+      "ageRequirement": "日本国籍を持つ15歳～32歳以下の方",
+      "deadline": "8月31日（月）",
+      "deadlineDate": "2026-08-31",
+      "status": "closed",
+      "statusReason": "締切日経過",
+      "statusSource": "html",
+      "statusUpdatedAt": "2026-09-30",
+      "source_type": "office_html",
+      "firstSeen": "2026-08-06",
+      "weatherLocation": {
+        "latitude": 35.673,
+        "longitude": 139.817,
+        "label": "東京都江東区",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-02T08:50:36.640+09:00"
+      },
+      "archivedAt": "2026-09-30"
+    },
     {
       "id": "fs-20260928-ysdga",
       "pref": "fukushima",
@@ -85,7 +119,7 @@
         "source": "gsi",
         "geocodedAt": "2026-07-02T15:00:02.899+09:00"
       },
-      "archivedAt": "2026-09-29"
+      "archivedAt": "2026-09-30"
     },
     {
       "id": "ya-20260927-r7yhh",
@@ -1071,7 +1105,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:31.252+09:00"
       },
-      "archivedAt": "2026-09-29"
+      "archivedAt": "2026-09-30"
     },
     {
       "id": "em-20260926-ysrni",
@@ -1377,7 +1411,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-09-29"
+      "archivedAt": "2026-09-30"
     },
     {
       "id": "mi-office-20260924-7hopm",
@@ -1411,7 +1445,7 @@
         "source": "gsi",
         "geocodedAt": "2026-07-13T07:58:32.830+09:00"
       },
-      "archivedAt": "2026-09-29"
+      "archivedAt": "2026-09-30"
     },
     {
       "id": "mi-office-20260924-a10yl",
@@ -1445,7 +1479,7 @@
         "source": "gsi",
         "geocodedAt": "2026-07-13T07:58:32.830+09:00"
       },
-      "archivedAt": "2026-09-29"
+      "archivedAt": "2026-09-30"
     },
     {
       "id": "sh-office-20260924-xeb66",
@@ -1539,7 +1573,7 @@
       "statusUpdatedAt": "",
       "source_type": "office_html",
       "firstSeen": "2026-08-27",
-      "archivedAt": "2026-09-29"
+      "archivedAt": "2026-09-30"
     },
     {
       "id": "gu-20260923-ey832",
@@ -1633,7 +1667,7 @@
       "statusUpdatedAt": "",
       "source_type": "office_html",
       "firstSeen": "2026-08-27",
-      "archivedAt": "2026-09-29"
+      "archivedAt": "2026-09-30"
     },
     {
       "id": "ky-office-20260922-wsf3n",
