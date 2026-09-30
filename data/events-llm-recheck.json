@@ -2,20 +2,25 @@
   "updatedAt": "2026-09-30",
   "limit": 30,
   "summary": {
-    "checked": 305,
-    "flagged": 18,
+    "checked": 302,
+    "flagged": 19,
     "attempted": 4,
     "corrected": 0,
     "unverified": 0,
     "noSource": 4,
     "overBudget": 0,
     "skippedNoSource": 4,
-    "skippedNotEligible": 10,
+    "skippedNotEligible": 11,
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
   "corrections": [],
   "skipped": [
+    {
+      "id": "ob-office-20260930-xetg0",
+      "pref": "obihiro",
+      "reason": "not_eligible"
+    },
     {
       "id": "iw-office-20261101-hx61v",
       "pref": "iwate",
