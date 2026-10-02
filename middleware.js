@@ -1,4 +1,5 @@
-// イベント個別ページ（/event/:id）の OGP メタを動的に差し込む Edge Middleware。
+// 旧 Vercel 本番URLを現行 .jp へ恒久転送しつつ、イベント個別ページ
+// （/event/:id）の OGP メタを動的に差し込む Edge Middleware。
 // SPA は任意パスで同じ index.html を返すため、そのままだと共有プレビューが
 // 全イベントで同じ（トップの汎用OGP）になる。ここで対象イベントの
 // タイトル・日付・会場・動的OGP画像(/api/og)を index.html に注入して返す。
@@ -7,8 +8,13 @@
 // 実ユーザーにも注入済み HTML を返すが、SPA は URL を見て通常どおり詳細を描画するため
 // 表示は変わらない。何らかの失敗時は素通し（return）して通常配信にフォールバックし、
 // ページを決して壊さない。
+const LEGACY_PRODUCTION_HOST = 'jsdf-chiiki-events.vercel.app';
+const CURRENT_ORIGIN = 'https://jsdf-chiiki-events.jp';
+
 export const config = {
-  matcher: ['/event/:id*'],
+  // 旧ドメインは任意パスから転送する必要があるため全リクエストを対象にする。
+  // 現行ドメインでは /event/:id 以外は直ちに素通しする。
+  matcher: ['/:path*'],
 };
 
 function esc(s) {
@@ -32,6 +38,15 @@ const PREF_LABELS = {
 export default async function middleware(request) {
   try {
     const url = new URL(request.url);
+
+    // 公開用の旧 Vercel ドメインだけを 308 で現行 .jp へ移す。
+    // Preview の *.vercel.app は検証用途なので巻き込まない。
+    // パスとクエリは維持する（URL フラグメントはHTTPリクエストに送られないため対象外）。
+    if (url.hostname.toLowerCase() === LEGACY_PRODUCTION_HOST) {
+      const target = new URL(url.pathname + url.search, CURRENT_ORIGIN);
+      return Response.redirect(target, 308);
+    }
+
     const m = url.pathname.match(/^\/event\/([^/]+)\/?$/);
     if (!m) return; // 対象外は素通し
     const id = decodeURIComponent(m[1]);
