@@ -101,6 +101,24 @@ test('vercel.json の CORS 許可オリジンが公開URLと一致している',
   }
 });
 
+test('middleware: 旧 vercel.app は現行 .jp へ 308 でパス・クエリを保って転送する', () => {
+  const src = fs.readFileSync(root('middleware.js'), 'utf8');
+  const legacyHost = new URL(S.LEGACY_ORIGINS[0]).host;
+
+  assert.ok(src.includes(`const LEGACY_PRODUCTION_HOST = '${legacyHost}'`),
+    'middleware の旧ホストが shared/siteUrl.cjs と一致していない');
+  assert.ok(src.includes(`const CURRENT_ORIGIN = '${S.DEFAULT_SITE_URL}'`),
+    'middleware の転送先が shared/siteUrl.cjs と一致していない');
+  assert.match(src, /matcher:\s*\['\/:path\*'\]/,
+    '旧ドメインの任意パスを捕捉できる matcher になっていない');
+  assert.match(src, /url\.hostname\.toLowerCase\(\) === LEGACY_PRODUCTION_HOST/,
+    '旧本番ホストだけを判定していない');
+  assert.match(src, /new URL\(url\.pathname \+ url\.search, CURRENT_ORIGIN\)/,
+    '転送時にパス・クエリを維持していない');
+  assert.match(src, /Response\.redirect\(target, 308\)/,
+    '恒久リダイレクト（308）になっていない');
+});
+
 test('index.html の絶対URLは既定ドメインのまま（ビルド時に SITE_URL へ置換する）', () => {
   const html = fs.readFileSync(root('index.html'), 'utf8');
   const urls = html.match(/https:\/\/[a-z0-9.-]+\.(app|jp|com)/gi) || [];
