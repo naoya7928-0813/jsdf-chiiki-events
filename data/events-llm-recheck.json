@@ -1,18 +1,18 @@
 {
-  "updatedAt": "2026-10-01",
+  "updatedAt": "2026-10-04",
   "limit": 30,
   "summary": {
-    "checked": 310,
-    "flagged": 20,
-    "attempted": 5,
+    "checked": 309,
+    "flagged": 19,
+    "attempted": 0,
     "corrected": 0,
     "unverified": 0,
-    "noSource": 4,
+    "noSource": 5,
     "overBudget": 0,
-    "skippedNoSource": 4,
-    "skippedNotEligible": 11,
+    "skippedNoSource": 5,
+    "skippedNotEligible": 9,
     "skippedProviderUnavailable": 0,
-    "skippedCutoff": 0
+    "skippedCutoff": 5
   },
   "corrections": [],
   "skipped": [
@@ -47,17 +47,32 @@
       "reason": "no_source"
     },
     {
-      "id": "mi-office-20260924-a10yl",
-      "pref": "mie",
-      "reason": "not_eligible"
+      "id": "s-20261121-5372q",
+      "pref": "saitama",
+      "reason": "cutoff"
+    },
+    {
+      "id": "gu-20261004-c0ttm",
+      "pref": "gunma",
+      "reason": "no_source"
+    },
+    {
+      "id": "to-off-20261010-5i4vf",
+      "pref": "tochigi",
+      "reason": "cutoff"
+    },
+    {
+      "id": "ni-office-20261018-rq3i4",
+      "pref": "niigata",
+      "reason": "cutoff"
+    },
+    {
+      "id": "to-office-20261011-kgvg3",
+      "pref": "toyama",
+      "reason": "cutoff"
     },
     {
       "id": "os-office-20261017-5u6ep",
-      "pref": "osaka",
-      "reason": "not_eligible"
-    },
-    {
-      "id": "os-office-20260926-hw000",
       "pref": "osaka",
       "reason": "not_eligible"
     },
@@ -80,6 +95,11 @@
       "id": "hy-office-20260928-vorim",
       "pref": "hyogo",
       "reason": "not_eligible"
+    },
+    {
+      "id": "eh-off-20261018-hib7d",
+      "pref": "ehime",
+      "reason": "cutoff"
     },
     {
       "id": "ok-20261115-b75qj",
