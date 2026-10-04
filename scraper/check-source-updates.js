@@ -3,11 +3,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const { chromium } = require('playwright-extra');
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+const { chromium } = require('playwright');
 const { hashHtml, classifyChange } = require('./lib/sourceMonitor');
-
-chromium.use(StealthPlugin());
 
 const ROOT = path.join(__dirname, '..');
 const OFFICES_PATH = path.join(ROOT, 'public/data/offices.json');
@@ -15,10 +12,14 @@ const INDEX_PATH = path.join(__dirname, 'index.js');
 const STATE_PATH = process.env.SOURCE_UPDATE_STATE_PATH || path.join(__dirname, 'source-update-state.json');
 const REPORT_PATH = process.env.SOURCE_UPDATE_REPORT_PATH || path.join(__dirname, 'source-update-report.json');
 
-const TIMEOUT_MS = positiveInt(process.env.SOURCE_MONITOR_TIMEOUT_MS, 20_000);
-const SETTLE_MS = positiveInt(process.env.SOURCE_MONITOR_SETTLE_MS, 500);
-const CONCURRENCY = positiveInt(process.env.SOURCE_MONITOR_CONCURRENCY, 6);
+const TIMEOUT_MS = positiveInt(process.env.SOURCE_MONITOR_TIMEOUT_MS, 15_000);
+const REQUEST_GAP_MS = positiveInt(process.env.SOURCE_MONITOR_REQUEST_GAP_MS, 3_000);
+const CONCURRENCY = positiveInt(process.env.SOURCE_MONITOR_CONCURRENCY, 1);
 const MAX_PAGES = nonNegativeInt(process.env.SOURCE_MONITOR_MAX_PAGES, 0);
+
+const blockedHosts = new Set();
+const hostFailures = new Map();
+let lastRequestStartedAt = 0;
 
 function positiveInt(value, fallback) {
   const n = Number.parseInt(value || '', 10);
@@ -28,6 +29,34 @@ function positiveInt(value, fallback) {
 function nonNegativeInt(value, fallback) {
   const n = Number.parseInt(value || '', 10);
   return Number.isFinite(n) && n >= 0 ? n : fallback;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function waitForRequestSlot() {
+  const waitMs = Math.max(0, lastRequestStartedAt + REQUEST_GAP_MS - Date.now());
+  if (waitMs > 0) await sleep(waitMs);
+  lastRequestStartedAt = Date.now();
+}
+
+function hostOf(url) {
+  try { return new URL(url).hostname; } catch { return ''; }
+}
+
+function noteHostFailure(host, hardBlock = false) {
+  if (!host) return;
+  const count = (hostFailures.get(host) || 0) + 1;
+  hostFailures.set(host, count);
+  if (hardBlock || count >= 3) {
+    blockedHosts.add(host);
+    console.warn(`[SourceMonitor] ${host} はこの実行中の巡回を停止します（failures=${count}）`);
+  }
+}
+
+function noteHostSuccess(host) {
+  if (host) hostFailures.set(host, 0);
 }
 
 function normalizePageUrl(raw) {
@@ -120,17 +149,22 @@ function loadState() {
 async function takeSnapshot(context, source) {
   const page = await context.newPage();
   try {
+    // 相手サイトへの瞬間負荷を抑えるため、全URLで開始間隔を必ず空ける。
+    await waitForRequestSlot();
     const response = await page.goto(source.url, {
       waitUntil: 'domcontentloaded',
       timeout: TIMEOUT_MS,
     });
-    if (SETTLE_MS > 0) await page.waitForTimeout(SETTLE_MS);
 
     const status = response ? response.status() : 0;
-    // 404/410 はページ廃止という有効な変更。403/429/5xx は一時障害として扱う。
-    if (status === 403 || status === 429 || status >= 500) {
-      throw new Error(`HTTP ${status}`);
+    // 404/410 はページ廃止という有効な変更。
+    // 403/429 はアクセス抑制の意思表示とみなし、同一ホストをこの実行中は以後巡回しない。
+    if (status === 403 || status === 429) {
+      const err = new Error(`HTTP ${status}`);
+      err.hardBlock = true;
+      throw err;
     }
+    if (status >= 500) throw new Error(`HTTP ${status}`);
 
     const html = await page.content();
     if (!html || html.length < 40) throw new Error('HTMLが空です');
@@ -174,14 +208,15 @@ async function main() {
   });
   const context = await browser.newContext({
     locale: 'ja-JP',
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/130 Safari/537.36',
+    javaScriptEnabled: false,
+    userAgent: 'Mozilla/5.0 (compatible; jsdf-chiiki-events source monitor; +https://github.com/naoya7928-0813/jsdf-chiiki-events)',
   });
 
-  // HTML差分を見るだけなので画像・動画・フォント本体は不要。
-  // img/src や a/href はDOMに残るため、チラシURLの更新検知には影響しない。
+  // 更新監視に必要なのはHTML文書だけ。
+  // JavaScript・CSS・画像・フォント・XHR等のサブリソースは取得しない。
+  // a[href] / img[src] はHTML自体に残るため、チラシURL変更の検知は可能。
   await context.route('**/*', async (route) => {
-    const type = route.request().resourceType();
-    if (type === 'image' || type === 'media' || type === 'font') {
+    if (route.request().resourceType() !== 'document') {
       await route.abort();
       return;
     }
@@ -194,8 +229,22 @@ async function main() {
       if (index >= sources.length) return;
       const source = sources[index];
       const key = source.normalizedUrl;
+      const host = hostOf(source.url);
+
+      if (host && blockedHosts.has(host)) {
+        failures.push({
+          url: source.url,
+          prefs: source.prefs,
+          names: source.names,
+          error: '同一ホストの保護停止により未取得',
+          skipped: true,
+        });
+        continue;
+      }
+
       try {
         const snapshot = await takeSnapshot(context, source);
+        noteHostSuccess(host);
         const prior = previous.pages?.[key] || null;
         const state = classifyChange(prior, snapshot);
 
@@ -227,14 +276,17 @@ async function main() {
           changedAt: state === 'changed' ? now : (prior?.changedAt || null),
         };
       } catch (err) {
+        noteHostFailure(host, err.hardBlock === true);
         failures.push({
           url: source.url,
           prefs: source.prefs,
           names: source.names,
           error: err.message,
+          skipped: false,
         });
         console.warn(`[SourceMonitor] FAIL ${source.url} -> ${err.message}`);
         // 失敗したURLは前回状態を保持し、一時障害を「更新」と誤認しない。
+        // 403/429 は即時、その他の失敗も同一ホストで3回続いたら以後を停止する。
       }
     }
   }
