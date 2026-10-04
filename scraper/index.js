@@ -89,7 +89,7 @@ const { parseNagano }        = require('./parsers/nagano');
 // 近畿地本
 const { parseKyoto, parseKyotoSetsumeikai }   = require('./parsers/kyoto');
 const { parseOsaka, parseOsakaSession }       = require('./parsers/osaka');
-const { parseHyogoImages }                    = require('./parsers/hyogo');
+const { parseHyogoEvents, parseHyogoSetsumeikai } = require('./parsers/hyogo');
 const { parseMiePost,      parseMiePostUrls }      = require('./parsers/mie');
 const { parseShigaPost,    parseShigaPostUrls }    = require('./parsers/shiga');
 const { parseNaraPost,     parseNaraPostUrls }     = require('./parsers/nara');
@@ -193,6 +193,8 @@ const URLS = {
   osaka:     'https://www.mod.go.jp/pco/osaka/experience/event.html',
   osakaSession: 'https://www.mod.go.jp/pco/osaka/recruit/session/menu.html',
   hyogo:     'https://www.mod.go.jp/pco/hyogo/',
+  hyogoEvent: 'https://www.mod.go.jp/pco/hyogo/event/index.html',
+  hyogoSetsumeikai: 'https://www.mod.go.jp/pco/hyogo/want/setumeikai.html',
   nara:      'https://www.mod.go.jp/pco/nara/events/',
   wakayama:  'https://www.mod.go.jp/pco/wakayama/category/event/',
   // 四国地本
@@ -2865,99 +2867,113 @@ const fetchNara     = (ctx) => fetchWpPosts(ctx, '奈良',   'nara',     'na',  
 const fetchWakayama = (ctx) => fetchWpPosts(ctx, '和歌山', 'wakayama', 'wk',  URLS.wakayama, parseWakayamaPostUrls, parseWakayamaPost, 5);
 
 /**
- * 兵庫地本: TOP ページからイベントバナー画像を取得し OCR でイベントを抽出する。
- * 利用可能なOCRエンジンがない場合は空配列を返す。
+ * 兵庫地本（2026-10-01 リニューアル後）:
+ * 1) イベント詳細ページ / 説明会まとめページのHTMLを直接解析
+ * 2) 各イベントボックス内の画像/PDFだけOCRし、HTMLで不足する項目を補完
+ * 3) HTML構造が再変更され「将来日付があるのに0件」になった場合は
+ *    fetchHtmlPref の健全性判定で失敗扱いにし、前回データを保護する
+ *
+ * TOP画像だけに依存しない。HTMLを一次情報、OCRを補助情報として扱う。
  */
 async function fetchHyogo(context) {
-  console.log(`[兵庫] アクセス: ${URLS.hyogo}`);
+  console.log('[兵庫] 新HP: イベント/説明会のHTMLボックスを直接解析します');
 
-  const page = await context.newPage();
-  let imageUrls = [];
-  try {
-    await page.goto(URLS.hyogo, { waitUntil: 'domcontentloaded', timeout: 30_000 });
-    try {
-      await page.waitForFunction(
-        () => { const t = document.title; return t.length > 0 && !t.includes('Just a moment') && !t.includes('しばらくお待ちください'); },
-        { timeout: 90_000 }
-      );
-    } catch {}
-    await page.waitForTimeout(2000);
-    const html = await page.content();
-    const $    = cheerio.load(html, { decodeEntities: false });
-    imageUrls  = parseHyogoImages($);
-    console.log(`[兵庫] ${imageUrls.length} 件の画像を検出`);
-  } catch (err) {
-    console.warn(`[兵庫] Playwright 失敗: ${err.message}`);
-  } finally {
-    await page.close();
-  }
+  // どちらか一方でも取得・解析に失敗したら例外を伝播させる。
+  // 「片方だけ0件で公開」より前回の兵庫データを丸ごと維持する方が安全。
+  const eventEvents = await fetchHtmlPref(
+    context, '兵庫(イベント)', URLS.hyogoEvent, parseHyogoEvents,
+  );
 
-  if (!await hasAnyOcrEngine()) {
-    console.log('[兵庫] 利用可能なOCRエンジンがないため OCR スキップ');
-    return [];
-  }
-  if (imageUrls.length === 0) return [];
+  await sleep(BETWEEN_PAGES_MS);
 
-  const events = [];
-  let idx = 0;
-  for (const imgUrl of imageUrls) {
-    console.log(`[兵庫 OCR] ${imgUrl}`);
-    const ocr = await ocrImageFull(imgUrl);
-    // 2秒待機（Groq: 30RPM、キャッシュヒット時はほぼ即時）
-    await sleep(2000);
-    if (!ocr) continue;
+  const briefingEvents = await fetchHtmlPref(
+    context, '兵庫(説明会)', URLS.hyogoSetsumeikai, parseHyogoSetsumeikai,
+  );
 
-    for (const item of expandOcrResult(ocr)) {
-      const rawDate = toHalfWidth((item.date || '').replace(/\s+/g, ' ').trim());
-      const dtMatch = rawDate.match(/令和\s*(元|\d+)\s*年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/)
-        || rawDate.match(/(\d{4})年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/);
+  const htmlEvents = [...eventEvents, ...briefingEvents];
+  console.log(`[兵庫] HTML直接取得: ${htmlEvents.length} 件（イベント ${eventEvents.length} / 説明会 ${briefingEvents.length}）`);
 
-      let dateStr = '', weekday = '';
-      if (dtMatch && dtMatch[0].startsWith('令和')) {
-        const year = reiwaToAD(reiwaNum(dtMatch[1]));
-        dateStr  = `${year}-${padTwo(parseInt(dtMatch[2], 10))}-${padTwo(parseInt(dtMatch[3], 10))}`;
-        weekday  = dtMatch[4];
-      } else if (dtMatch) {
-        dateStr  = `${dtMatch[1]}-${padTwo(parseInt(dtMatch[2], 10))}-${padTwo(parseInt(dtMatch[3], 10))}`;
-        weekday  = dtMatch[4];
-      } else {
-        // ファイル名から日付を推定（例: 0530aono_banner.png → 5月30日）
-        const fnMatch = imgUrl.match(/(\d{2})(\d{2})[a-z]/i);
-        if (fnMatch) {
-          const now = new Date();
-          const m = parseInt(fnMatch[1], 10), d = parseInt(fnMatch[2], 10);
-          const inFut = m > now.getMonth() + 1 || (m === now.getMonth() + 1 && d >= now.getDate());
-          dateStr = `${inFut ? now.getFullYear() : now.getFullYear() + 1}-${padTwo(m)}-${padTwo(d)}`;
-        }
+  // 各ボックスに実際に含まれる画像/PDFだけをOCR対象にする。
+  // 同じチラシが複数開催日のカードに紐づく場合はURL単位で1回だけ処理する。
+  const assets = new Map();
+  for (const ev of htmlEvents) {
+    for (const assetUrl of ev._hyogoAssets || []) {
+      if (!assets.has(assetUrl)) {
+        assets.set(assetUrl, {
+          sourceUrl: ev.url || URLS.hyogo,
+          fallbackTitle: ev.title,
+          fallbackCategory: ev.category,
+        });
       }
-
-      if (!dateStr || isPast(dateStr)) continue;
-
-      const title = item.title ? fixOcrTitle(item.title.trim()) : '';
-      if (!title) continue;
-
-      events.push({
-        id:             `hy-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
-        pref:           'hyogo',
-        date:           dateStr,
-        weekday,
-        title,
-        place:          (item.place          || '').trim(),
-        address:        '',
-        time:           (item.time           || '').trim(),
-        category:       guessCategory(toHalfWidth(title)),
-        tag:            guessTag(title),
-        url:            URLS.hyogo,
-        notes:          item.notes          || null,
-        ageRequirement: item.ageRequirement || null,
-        deadline:       item.deadline       || null,
-        imageUrl:       '',
-      });
     }
   }
 
-  console.log(`[兵庫] ${events.length} 件取得 (OCR)`);
-  return events.sort((a, b) => a.date.localeCompare(b.date));
+  const ocrEvents = [];
+  if (assets.size > 0 && await hasAnyOcrEngine()) {
+    console.log(`[兵庫] イベントボックス内の画像/PDF ${assets.size} 件をOCR確認します`);
+    for (const [assetUrl, meta] of assets) {
+      console.log(`[兵庫 チラシOCR] ${assetUrl}`);
+      const ocr = await ocrFlyerFull(assetUrl);
+      await sleep(2000);
+      if (!ocr) continue;
+
+      for (const item of expandOcrResult(ocr)) {
+        const parsed = parseOcrDate(safeStr(item.date));
+        if (!parsed?.dateStr || isPast(parsed.dateStr)) continue;
+
+        const title = fixOcrTitle(safeStr(item.title)) || meta.fallbackTitle;
+        if (!title) continue;
+
+        ocrEvents.push({
+          id:             `hy-${parsed.dateStr.replace(/-/g, '')}-${titleHash(parsed.dateStr, title)}`,
+          pref:           'hyogo',
+          date:           parsed.dateStr,
+          weekday:        parsed.weekday || '',
+          title,
+          place:          safeStr(item.place),
+          address:        '',
+          time:           safeStr(item.time),
+          category:       meta.fallbackCategory || guessCategory(toHalfWidth(title)),
+          tag:            guessTag(title),
+          url:            meta.sourceUrl,
+          notes:          safeStr(item.notes) || null,
+          ageRequirement: safeStr(item.ageRequirement) || null,
+          deadline:       safeStr(item.deadline) || null,
+          imageUrl:       '',
+          source_type:    'hyogo_box_ocr',
+        });
+      }
+    }
+  } else if (assets.size > 0) {
+    console.log('[兵庫] OCRエンジンが利用できないため、HTML取得結果のみ使用します');
+  }
+
+  // OCRはHTMLの代替ではなく補完。同日同一イベントなら空欄だけ埋め、
+  // HTMLに存在しないチラシイベントだけ追加する。
+  const merged = htmlEvents.map(ev => {
+    const { _hyogoAssets, ...clean } = ev;
+    clean.source_type = clean.source_type || 'hyogo_html';
+    return clean;
+  });
+
+  for (const ocrEv of ocrEvents) {
+    const twin = merged.find(ev => ev.date === ocrEv.date && isLikelySameEvent(ev, ocrEv));
+    if (twin) {
+      if (!twin.place && ocrEv.place) twin.place = ocrEv.place;
+      if (!twin.time && ocrEv.time) twin.time = ocrEv.time;
+      if (!twin.ageRequirement && ocrEv.ageRequirement) twin.ageRequirement = ocrEv.ageRequirement;
+      if (!twin.deadline && ocrEv.deadline) twin.deadline = ocrEv.deadline;
+      if (!twin.notes && ocrEv.notes) twin.notes = ocrEv.notes;
+      continue;
+    }
+    merged.push(ocrEv);
+  }
+
+  const unique = dedupEvents(merged).sort((a, b) =>
+    (a.date || '').localeCompare(b.date || '') || (a.title || '').localeCompare(b.title || '', 'ja')
+  );
+  console.log(`[兵庫] 合計 ${unique.length} 件取得（HTML優先 + OCR補完）`);
+  return unique;
 }
 
 /**
