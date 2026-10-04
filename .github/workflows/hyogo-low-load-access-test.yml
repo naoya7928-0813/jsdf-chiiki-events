@@ -35,6 +35,7 @@ jobs:
         working-directory: scraper
         run: |
           node <<'NODE'
+          (async () => {
           const { chromium } = require('playwright');
 
           const target = 'https://www.mod.go.jp/pco/hyogo/want/setumeikai.html';
@@ -116,6 +117,7 @@ jobs:
 
           console.log('HYOGO_METHOD_RESULTS=' + JSON.stringify(results));
           require('fs').writeFileSync('/tmp/hyogo-method-results.json', JSON.stringify(results, null, 2));
+          })().catch(err => { console.error(err); process.exit(1); });
           NODE
 
       - name: 比較結果
