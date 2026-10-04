@@ -34,7 +34,7 @@ function isEventHeadingText(text) {
 
 function elementId($, el) {
   let cur = $(el);
-  for (let i = 0; i < 4 && cur.length; i++, cur = cur.parent()) {
+  for (let i = 0; i < 6 && cur.length; i++, cur = cur.parent()) {
     const id = cur.attr('id') || cur.attr('name');
     if (id) return id;
   }
@@ -45,43 +45,130 @@ function toAbs(raw, base) {
   try { return new URL(raw, base).href; } catch { return ''; }
 }
 
+function extractAssetsFromScope($, scope) {
+  const assets = [];
+  const add = raw => { if (raw && !assets.includes(raw)) assets.push(raw); };
+
+  if (scope.is('img[src]')) add(scope.attr('src'));
+  scope.find('img[src]').each((_i, el) => add($(el).attr('src') || ''));
+
+  const inspectLink = el => {
+    const href = $(el).attr('href') || '';
+    if (/\.(?:pdf|jpe?g|png|webp)(?:[?#].*)?$/i.test(href)) add(href);
+  };
+  if (scope.is('a[href]')) inspectLink(scope);
+  scope.find('a[href]').each((_i, el) => inspectLink(el));
+  return assets;
+}
+
 /**
- * h3/h4/h5 のイベント見出しを境界として、次のイベント見出しまでを1ボックスとして切り出す。
- * CSSクラス名ではなく見出し＋「日時/場所」ラベルを基準にするため、サイトの装飾変更に強い。
+ * イベント見出しの最小の親要素のうち、「日時」を含むものをイベントボックスとみなす。
+ *
+ * 兵庫新HPは、事務所名(h3)の下にイベント名(h4)があり、そのイベント単位の
+ * li/div 等の中に「日時・場所・対象・締切」がまとまっている。ページによっては
+ * 同じイベント名が外側と内側で二重に見出し化されるため、CSSクラスや単純な
+ * 「次の見出しまで」ではなく、実際に項目を内包する最小コンテナを採用する。
  */
-function eventSections($) {
+function nearestEventBox($, heading) {
+  let cur = $(heading).parent();
+  let fallback = null;
+
+  for (let depth = 0; depth < 8 && cur.length; depth++, cur = cur.parent()) {
+    if (cur.is('html,body')) break;
+
+    const text = compact(cur.text());
+    const hasDateField = /日\s*時/.test(text);
+    if (hasDateField) {
+      fallback = cur;
+      const eventHeadingCount = cur.find('h3,h4,h5').toArray()
+        .filter(el => isEventHeadingText($(el).text())).length;
+
+      // 通常は1見出し。新HPには同一タイトルが二重に置かれる箇所があるので2までは許容。
+      // 3以上なら複数イベントを抱える大きな親コンテナの可能性が高く、さらに小さい
+      // fallback が無ければ最後の手段としてのみ使う。
+      if (eventHeadingCount <= 2) return cur;
+    }
+
+    if (cur.is('main,[role="main"]')) break;
+  }
+  return fallback;
+}
+
+function fallbackSectionFromDocumentOrder($, heading, headings) {
   const root = $.root().get(0);
   const flat = flattenDom(root);
   const index = new Map(flat.map((node, i) => [node, i]));
-  const headings = $('h3,h4,h5').toArray()
-    .filter(el => isEventHeadingText($(el).text()))
-    .sort((a, b) => index.get(a) - index.get(b));
   const headingSet = new Set(headings);
+  const start = index.get(heading);
+  const later = headings
+    .map(h => index.get(h))
+    .filter(i => Number.isInteger(i) && i > start)
+    .sort((a, b) => a - b);
+  const end = later.length ? later[0] : flat.length;
 
-  return headings.map((heading, i) => {
-    const start = index.get(heading);
-    const end = i + 1 < headings.length ? index.get(headings[i + 1]) : flat.length;
-    const text = [];
-    const assets = [];
-    for (let p = start; p < end; p++) {
-      const node = flat[p];
-      if (p !== start && headingSet.has(node)) break;
-      if (node.type === 'text' && node.data) text.push(node.data);
-      if (node.type === 'tag' && node.attribs) {
-        if (node.name === 'img' && node.attribs.src) assets.push(node.attribs.src);
-        if (node.name === 'a' && node.attribs.href && /\.(?:pdf|jpe?g|png|webp)(?:[?#].*)?$/i.test(node.attribs.href)) {
-          assets.push(node.attribs.href);
-        }
+  const text = [];
+  const assets = [];
+  for (let p = start; p < end; p++) {
+    const node = flat[p];
+    if (p !== start && headingSet.has(node)) break;
+    if (node.type === 'text' && node.data) text.push(node.data);
+    if (node.type === 'tag' && node.attribs) {
+      if (node.name === 'img' && node.attribs.src) assets.push(node.attribs.src);
+      if (node.name === 'a' && node.attribs.href && /\.(?:pdf|jpe?g|png|webp)(?:[?#].*)?$/i.test(node.attribs.href)) {
+        assets.push(node.attribs.href);
       }
     }
-    return {
-      heading,
-      title: compact($(heading).text()),
-      text: compact(text.join(' ')),
-      id: elementId($, heading),
-      assets: [...new Set(assets)],
-    };
-  });
+  }
+
+  return {
+    heading,
+    title: compact($(heading).text()),
+    text: compact(text.join(' ')),
+    id: elementId($, heading),
+    assets: [...new Set(assets)],
+  };
+}
+
+/**
+ * 新HP上のイベント/説明会ボックスを抽出する。
+ * まず「イベント見出しを含み、日時フィールドを持つ最小親要素」を使い、
+ * ラッパーが無いページだけ文書順の範囲抽出へフォールバックする。
+ */
+function eventSections($) {
+  const headings = $('h3,h4,h5').toArray()
+    .filter(el => isEventHeadingText($(el).text()));
+
+  const sections = [];
+  const seen = new Set();
+
+  for (const heading of headings) {
+    const box = nearestEventBox($, heading);
+    let section;
+
+    if (box?.length) {
+      section = {
+        heading,
+        title: compact($(heading).text()),
+        text: compact(box.text()),
+        id: box.attr('id') || box.attr('name') || elementId($, heading),
+        assets: extractAssetsFromScope($, box),
+      };
+    } else {
+      section = fallbackSectionFromDocumentOrder($, heading, headings);
+    }
+
+    // 同一ボックス内に同じイベント見出しが二重に存在する新HP構造を重複排除する。
+    const key = [
+      section.id || '',
+      section.title.replace(/\s/g, ''),
+      section.text.replace(/\s/g, '').slice(0, 240),
+    ].join('|');
+    if (seen.has(key)) continue;
+    seen.add(key);
+    sections.push(section);
+  }
+
+  return sections;
 }
 
 function field(text, labelPattern) {
