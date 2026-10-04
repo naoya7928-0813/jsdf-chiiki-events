@@ -50,5 +50,8 @@ jobs:
       - name: データ品質チェック
         run: node scripts/check-data-quality.mjs
 
+      - name: 募集窓口の保存データ・公式照合記録チェック
+        run: node scripts/check-offices.mjs
+
       - name: 依存関係の脆弱性監査（本番依存のみ）
         run: npm audit --omit=dev
