@@ -42,7 +42,7 @@ const {
 const { OcrModelResolver, isModelGoneError, discoverGroqModel, discoverGeminiModel } = require('./lib/ocrModel');
 const geocode             = require('./lib/geocode');
 // 募集案内所イベントのタイトル整形・非イベント判定（フロント/スクリプトと共通）
-const { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } = require('../shared/officeTitle.cjs');
+const { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta, officeAnchorDateMismatch } = require('../shared/officeTitle.cjs');
 // 配信スロットに間に合わせる打ち切り（カットオフ）と、実行ごとの開始位置ずらし
 const { resolveDeadline, rotationOffset, keysNeedingCarryOver } = require('../shared/scrapeDeadline.cjs');
 const parserHealth = require('../shared/parserHealth.cjs');
@@ -4520,7 +4520,9 @@ async function main() {
     // 時間切れ・取得失敗の地本は prefEvents が空配列のままで、
     // mergeAllOfficeEvents → writeOutput の「前回データ引き継ぎ」に乗る。
     ...Object.fromEntries(PREF_TASKS.map(t =>
-      [t.key, mergeAllOfficeEvents(prefEvents[t.key], t.key).map(strip)]
+      [t.key, mergeAllOfficeEvents(prefEvents[t.key], t.key)
+        .filter(e => !officeAnchorDateMismatch(e))
+        .map(strip)]
     )),
     updatedAt: nowJST(),
   };
