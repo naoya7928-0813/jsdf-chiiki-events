@@ -35,6 +35,7 @@ jobs:
         run: |
           node <<'NODE'
           const { chromium } = require('playwright');
+          (async () => {
           const SUMMARY = 'https://www.mod.go.jp/pco/hyogo/want/setumeikai.html';
           const TOP = 'https://www.mod.go.jp/pco/hyogo/';
           const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -99,4 +100,5 @@ jobs:
           } finally {
             await browser.close();
           }
+          })().catch(err => { console.error(err); process.exit(1); });
           NODE
