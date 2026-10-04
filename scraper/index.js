@@ -2426,26 +2426,21 @@ async function fetchSapporo(context) {
   const allEvs = [];
 
   for (const sp of subPages) {
-    const page = await context.newPage();
     try {
-      await page.goto(sp.url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
-      try {
-        await page.waitForFunction(
-          () => { const t = document.title; return t.length > 0 && !t.includes('Just a moment') && !t.includes('しばらくお待ちください'); },
-          { timeout: 60_000 }
-        );
-      } catch { /* ok */ }
-      await page.waitForTimeout(2000);
-      const html  = await page.content();
-      const $     = cheerio.load(html, { decodeEntities: false });
-      const evs   = parseSapporoPage($, sp.cat, sp.id, state, sp.url);
-      console.log(`[札幌] ${sp.url.split('/').pop()} → ${evs.length} 件`);
+      // 札幌イベントページは通常ブラウザ実行時に本文表が取れないことがある。
+      // 兵庫で実証済みの document-only 方式を使い、静的HTMLだけを1回取得する。
+      const $ = await fetchStaticDocumentOnce(
+        context,
+        `札幌(${sp.id})`,
+        sp.url,
+      );
+      const evs = parseSapporoPage($, sp.cat, sp.id, state, sp.url);
+      console.log(`[札幌] ${sp.url.split('/').pop()} → ${evs.length} 件 (document-only)`);
       allEvs.push(...evs);
     } catch (err) {
-      console.warn(`[札幌] ${sp.url} 失敗: ${err.message.substring(0, 60)}`);
-    } finally {
-      await page.close();
+      console.warn(`[札幌] ${sp.url} 失敗: ${err.message.substring(0, 90)}`);
     }
+    // 同一ホスト4ページを連続取得しない。
     await sleep(3000);
   }
 
@@ -2879,17 +2874,18 @@ function shouldRefreshHyogoDetailSources() {
 }
 
 /**
- * 兵庫向けの最小負荷HTML取得。
+ * mod.go.jp の静的HTML向け最小負荷取得。
  *
- * 実測（GitHub Actions / 2026-10-04）:
+ * 兵庫での実測（GitHub Actions / 2026-10-04）:
  * - native fetch: 403
  * - 通常Playwright(JS有効): Cloudflare challenge
  * - JS無効 + main documentのみ: 200でHTML取得成功
  *
- * そのため、WAFを突破しようとせず「HTML documentを1回だけ」取得する。
+ * WAFを突破しようとせず「HTML documentを1回だけ」取得する。
+ * 同じ静的HTML型の地本（札幌等）でも、通常ブラウザDOMが不安定な場合に使用する。
  * CSS/JS/画像/フォント/XHR/iframe等は一切要求しない。
  */
-async function fetchHyogoDocumentOnly(context, prefLabel, url) {
+async function fetchStaticDocumentOnce(context, prefLabel, url) {
   console.log(`[${prefLabel}] document-only低負荷アクセス（1回のみ）: ${url}`);
 
   const browser = context.browser();
@@ -2951,7 +2947,7 @@ async function fetchHyogoDocumentOnly(context, prefLabel, url) {
  * - 403/429/Cloudflare challenge は尊重して即失敗
  */
 async function fetchHyogoHtmlOnce(context, prefLabel, url, parserFn) {
-  const $ = await fetchHyogoDocumentOnly(context, prefLabel, url);
+  const $ = await fetchStaticDocumentOnce(context, prefLabel, url);
   const events = parserFn($);
   console.log(`[${prefLabel}] ${events.length} 件取得 (document-only)`);
   assertParseHealthy(prefLabel, $, events);
@@ -3743,7 +3739,7 @@ async function crawlNationwideOffices(withFreshContext, cutoff) {
     if (hyogoLowImpact) {
       try {
         $ = await withFreshContext(ctx =>
-          fetchHyogoDocumentOnly(ctx, `兵庫募集窓口:${officeNamesLabel(meta.officeNames)}`, meta.url)
+          fetchStaticDocumentOnce(ctx, `兵庫募集窓口:${officeNamesLabel(meta.officeNames)}`, meta.url)
         );
       } catch (err) {
         // 403/429は尊重し、同一runで別方式へ再試行しない。
