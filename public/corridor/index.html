@@ -9,8 +9,40 @@
     <title>CORRIDOR</title>
     <script type="module" crossorigin src="/corridor/assets/index-h-NXzE8y.js"></script>
     <link rel="stylesheet" crossorigin href="/corridor/assets/index-nEDqYRs6.css">
+    <style>
+      .site-return {
+        position: fixed;
+        z-index: 30;
+        top: max(16px, env(safe-area-inset-top));
+        left: max(16px, env(safe-area-inset-left));
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-sizing: border-box;
+        padding: 0 18px;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        border-radius: 999px;
+        background: rgba(28, 30, 27, 0.62);
+        color: #f5f3ec;
+        font: 600 14px/1 "Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", "Meiryo", system-ui, -apple-system, sans-serif;
+        letter-spacing: 0.06em;
+        text-decoration: none;
+        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);
+        transition: background-color .2s, transform .2s;
+      }
+      .site-return:hover { background: rgba(28, 30, 27, 0.8); }
+      .site-return:active { transform: translateY(1px); }
+      .site-return:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: 3px;
+      }
+    </style>
   </head>
   <body>
+    <a class="site-return" href="/" aria-label="地本イベントナビに戻る">← サイトに戻る</a>
     <div id="app"></div>
     <noscript>このサイトの表示にはJavaScriptが必要です。</noscript>
   </body>
