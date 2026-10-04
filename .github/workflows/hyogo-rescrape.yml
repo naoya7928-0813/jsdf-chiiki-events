@@ -8,6 +8,7 @@ on:
       - master
     paths:
       - 'scraper/parsers/hyogo.js'
+      - '.github/workflows/hyogo-rescrape.yml'
 
 concurrency:
   group: hyogo-parser-rescrape
@@ -25,6 +26,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh workflow run scrape.yml --ref master \
+          gh workflow run scrape.yml --repo naoya7928-0813/jsdf-chiiki-events --ref master \
             -f hq_explore_prefs=hyogo \
             -f source_update_mode=true
