@@ -170,7 +170,7 @@ jobs:
           node --check scraper/index.js
           # パーサーの実ページ回帰テスト（cheerio が要るためスクレイパー依存の入ったここで実行。
           # ルートの npm test では cheerio 未導入のためスキップされる）
-          node --test shared/yamanashiParser.test.cjs shared/hyogoParser.test.cjs shared/tokyoCalendar.test.cjs
+          node --test shared/yamanashiParser.test.cjs shared/hyogoParser.test.cjs shared/hokkaidoHyogoRegression.test.cjs shared/tokyoCalendar.test.cjs
           node scraper/index.js --mock
           # モック出力が実データ（前回データ維持・PREV_EVENTS の基準）を
           # 汚さないよう、書き出されたファイルを復元する
