@@ -128,4 +128,21 @@ function cleanOfficePlace(raw) {
   return p;
 }
 
-module.exports = { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta, OFFICE_NONEVENT_RE, navMenuHits, weekdayCount };
+
+
+/**
+ * 東京地本の募集窓口イベントURLで #MMDD がイベント日を表す場合、
+ * event.date とアンカーが食い違う古い/誤抽出イベントを検出する。
+ * 例: .../koutou/event.html#1120 なのに date=2026-11-29 → 不整合。
+ */
+function officeAnchorDateMismatch(ev) {
+  if (!ev || !String(ev.source_type || '').startsWith('office_')) return false;
+  const url = String(ev.url || '');
+  if (!/^https:\/\/www\.mod\.go\.jp\/pco\/tokyo\//i.test(url)) return false;
+  const m = url.match(/#(\d{2})(\d{2})$/);
+  if (!m || !/^\d{4}-\d{2}-\d{2}$/.test(String(ev.date || ''))) return false;
+  const [, month, day] = String(ev.date).match(/^\d{4}-(\d{2})-(\d{2})$/) || [];
+  return !!month && (month !== m[1] || day !== m[2]);
+}
+
+module.exports = { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta, officeAnchorDateMismatch, OFFICE_NONEVENT_RE, navMenuHits, weekdayCount };
