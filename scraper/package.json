@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "mock": "node index.js --mock",
-    "monitor": "node check-source-updates.js"
+    "mock": "node index.js --mock"
   },
   "dependencies": {
     "cheerio": "^1.0.0",
