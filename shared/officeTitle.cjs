@@ -35,6 +35,7 @@ function officeIsJunk(title) {
   if (/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/.test(t)) return true;     // メールアドレス混入
   if (/毎日実施|随時実施/.test(t)) return true;                                  // 常時開催の案内
   if (/Event\s*&\s*Seminar|各種説明会|＆各種/i.test(t)) return true;             // 複数イベントの見出し塊
+  if (/(?:キャリア採用幹部|技術陸曹)/.test(t) && /応募|こちら/.test(t) && !/説明会|相談会|セミナー|イベント/.test(t)) return true; // 採用制度ページ
   if (/[一-龥]{2,3}[都道府県][一-龥]{1,10}[市区郡].{0,18}(丁目|番地|ビル|庁舎|[0-9０-９]+階|第[0-9０-９]+)/.test(t)) return true; // 住所塊
   if (/0[0-9０-９]{1,4}[-－—][0-9０-９]{1,4}[-－—][0-9０-９]{3,4}/.test(t)) return true; // 電話番号混入
   if (weekdayCount(t) >= 4) return true;                                          // カレンダー表の塊

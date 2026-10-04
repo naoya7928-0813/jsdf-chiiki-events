@@ -2453,6 +2453,20 @@ async function fetchSapporo(context) {
 }
 
 /**
+ * 帯広地本: イベントカレンダーの静的HTML表だけを低負荷で取得する。
+ * ページ全体には募集期限等の将来日付も含まれるため、汎用の本文日付健全性判定は使わない。
+ * イベント表が存在して正常解析できた結果が0件なら「現在将来イベントなし」として正常扱いする。
+ */
+async function fetchObihiro(context) {
+  const $ = await fetchStaticDocumentOnce(context, '帯広', URLS.obihiro);
+  const tableCount = $('#col_main table, .conteiner table, table').length;
+  if (tableCount === 0) throw new Error('イベント表が見つかりません（ページ構造変更の疑い）');
+  const events = parseObihiro($);
+  console.log(`[帯広] ${events.length} 件取得 (document-only / event tables=${tableCount})`);
+  return events;
+}
+
+/**
  * 秋田地本: Google カレンダー iCal 2 本を fetch して統合する。
  */
 async function fetchAkita() {
@@ -4151,7 +4165,7 @@ const PREF_TASKS = [
   // 北海道
   { key: 'sapporo',   label: '札幌',  run: ctx => fetchSapporo(ctx) },
   { key: 'asahikawa', label: '旭川',  run: ctx => fetchHtmlPref(ctx, '旭川', URLS.asahikawa, parseAsahikawa) },
-  { key: 'obihiro',   label: '帯広',  run: ctx => fetchHtmlPref(ctx, '帯広', URLS.obihiro, parseObihiro) },
+  { key: 'obihiro',   label: '帯広',  run: ctx => fetchObihiro(ctx) },
   { key: 'hakodate',  label: '函館',  run: ctx => fetchHtmlPref(ctx, '函館', URLS.hakodate, parseHakodate) },
   // 東北
   { key: 'miyagi',    label: '宮城',  run: ctx => fetchMiyagi(ctx) },
