@@ -3922,6 +3922,16 @@ async function scrapeOfficeAssets(withFreshContext, cutoff) {
     }
   } catch { /* offices.json がなければスキップ */ }
 
+  // 兵庫は専用パーサーがイベントページを直接解析し、必要なチラシだけOCRする。
+  // 説明会は document-only、募集窓口も document-only で別途取得するため、
+  // 汎用HQ探索は同じ公式サイトを再訪してロゴ/ナビ/PDF等まで候補化するだけで重複する。
+  // 相手サイトへの不要なアクセスを避けるため、兵庫HQは汎用探索の対象外とする。
+  const beforeHyogoSkip = hqEntries.length;
+  hqEntries = hqEntries.filter(h => h.pref !== 'hyogo');
+  if (hqEntries.length !== beforeHyogoSkip) {
+    console.log('[OfficeOCR] 兵庫HQは専用HTML/OCR＋document-only募集窓口で処理するため汎用HQ探索を省略');
+  }
+
   // ── 既スクレイプURL集合（自動探索の重複除去に使用） ──────────────
   const alreadyScraped = new Set(
     Object.values(URLS).map(u => normalizeUrl(u)).filter(Boolean)
