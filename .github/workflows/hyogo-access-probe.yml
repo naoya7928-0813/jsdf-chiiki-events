@@ -1,0 +1,61 @@
+name: 兵庫低負荷アクセス確認
+
+on:
+  push:
+    branches:
+      - test/hyogo-low-load-access
+    paths:
+      - '.github/workflows/hyogo-access-probe.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Node.js 22
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: 静的HTTPを各1回だけ確認
+        run: |
+          node <<'NODE'
+          const targets = [
+            ['central', 'https://www.mod.go.jp/pco/hyogo/want/setumeikai.html'],
+            ['office', 'https://www.mod.go.jp/pco/hyogo/jimusyo/nishinomiya.html'],
+          ];
+          const sleep = ms => new Promise(r => setTimeout(r, ms));
+          for (let i = 0; i < targets.length; i++) {
+            if (i > 0) await sleep(30000);
+            const [label, url] = targets[i];
+            const started = Date.now();
+            let res;
+            try {
+              res = await fetch(url, {
+                redirect: 'follow',
+                signal: AbortSignal.timeout(15000),
+                headers: {
+                  'User-Agent': 'jsdf-chiiki-events/1.0 (+https://github.com/naoya7928-0813/jsdf-chiiki-events)',
+                  'Accept': 'text/html,application/xhtml+xml',
+                  'Accept-Language': 'ja-JP,ja;q=0.9',
+                },
+              });
+              const body = await res.text();
+              const title = (body.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1] || '';
+              const hasDate = /日\s*時|１０月|10月/.test(body);
+              console.log(JSON.stringify({
+                label,
+                status: res.status,
+                bytes: Buffer.byteLength(body),
+                ms: Date.now() - started,
+                title: title.trim().slice(0, 80),
+                hasDate,
+              }));
+            } catch (e) {
+              console.log(JSON.stringify({ label, error: e.message, ms: Date.now() - started }));
+            }
+          }
+          NODE
