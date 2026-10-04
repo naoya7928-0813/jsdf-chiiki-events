@@ -23,16 +23,23 @@ jobs:
         run: npm ci
       - working-directory: scraper
         run: npx playwright install chromium --with-deps
-      - name: 西宮地域事務所を軽量ブラウザで1回だけ確認
+      - name: Stealth軽量ブラウザで西宮を1回だけ確認
         working-directory: scraper
         run: |
           node <<'NODE'
-          const { chromium } = require('playwright');
+          const { chromium } = require('playwright-extra');
+          const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+          chromium.use(StealthPlugin());
+
           (async () => {
             const url = 'https://www.mod.go.jp/pco/hyogo/jimusyo/nishinomiya.html';
             const browser = await chromium.launch({ headless: true });
             try {
-              const ctx = await browser.newContext({ locale: 'ja-JP', timezoneId: 'Asia/Tokyo' });
+              const ctx = await browser.newContext({
+                userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+                locale: 'ja-JP',
+                timezoneId: 'Asia/Tokyo',
+              });
               await ctx.route('**/*', route => {
                 const t = route.request().resourceType();
                 if (['image','stylesheet','font','media'].includes(t)) return route.abort();
@@ -41,11 +48,11 @@ jobs:
               const page = await ctx.newPage();
               const started = Date.now();
               const res = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 });
-              await page.waitForTimeout(5000);
+              await page.waitForTimeout(2500);
               const title = await page.title();
               const text = await page.locator('body').innerText().catch(() => '');
               console.log(JSON.stringify({
-                label: 'office-light-browser',
+                label: 'office-stealth-light',
                 status: res?.status() ?? null,
                 ms: Date.now() - started,
                 title: title.slice(0,80),
