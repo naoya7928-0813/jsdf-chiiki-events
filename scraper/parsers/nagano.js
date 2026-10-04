@@ -97,6 +97,7 @@ function parseDtstart(dtstart) {
 function parseICalEvents(icsText, prefId) {
   const vevents = parseIcal(icsText);
   const events  = [];
+  const seenIds = new Set();
 
   for (const ve of vevents) {
     const parsed = parseDtstart(ve.dtstart);
@@ -124,8 +125,14 @@ function parseICalEvents(icsText, prefId) {
     const notes = rawDesc || null;
     const shortId = prefId.slice(0, 2);
 
+    const id = `${shortId}-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`;
+    // Google Calendar 側で同一VEVENTが重複して返る場合がある。
+    // 同じIDを複数出力すると全体の品質ゲートを止めるため、完全同一IDは1件にまとめる。
+    if (seenIds.has(id)) continue;
+    seenIds.add(id);
+
     events.push({
-      id:             `${shortId}-${dateStr.replace(/-/g, '')}-${titleHash(dateStr, title)}`,
+      id,
       pref:           prefId,
       date:           dateStr,
       weekday,
