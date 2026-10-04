@@ -2878,20 +2878,41 @@ const fetchWakayama = (ctx) => fetchWpPosts(ctx, '和歌山', 'wakayama', 'wk', 
 async function fetchHyogo(context) {
   console.log('[兵庫] 新HP: イベント/説明会のHTMLボックスを直接解析します');
 
-  // どちらか一方でも取得・解析に失敗したら例外を伝播させる。
-  // 「片方だけ0件で公開」より前回の兵庫データを丸ごと維持する方が安全。
-  const eventEvents = await fetchHtmlPref(
-    context, '兵庫(イベント)', URLS.hyogoEvent, parseHyogoEvents,
-  );
+  // 新HPのイベントページと説明会ページは Cloudflare の判定が独立して揺れることがある。
+  // 片方が一時的に403でも、もう片方の正常取得結果は捨てない。
+  // 説明会は後段の兵庫県内募集窓口巡回でも重複取得できるため、
+  // 「1サブページ失敗 = 兵庫全体失敗」とせず部分成功として継続する。
+  // ただし両方とも失敗した場合だけ地本取得失敗として前回値保護に乗せる。
+  let eventEvents = [];
+  let briefingEvents = [];
+  const sourceErrors = [];
+
+  try {
+    eventEvents = await fetchHtmlPref(
+      context, '兵庫(イベント)', URLS.hyogoEvent, parseHyogoEvents,
+    );
+  } catch (err) {
+    sourceErrors.push(`イベント: ${err.message}`);
+    console.warn(`[兵庫] イベントページ取得失敗（他経路を継続）: ${err.message}`);
+  }
 
   await sleep(BETWEEN_PAGES_MS);
 
-  const briefingEvents = await fetchHtmlPref(
-    context, '兵庫(説明会)', URLS.hyogoSetsumeikai, parseHyogoSetsumeikai,
-  );
+  try {
+    briefingEvents = await fetchHtmlPref(
+      context, '兵庫(説明会)', URLS.hyogoSetsumeikai, parseHyogoSetsumeikai,
+    );
+  } catch (err) {
+    sourceErrors.push(`説明会: ${err.message}`);
+    console.warn(`[兵庫] 説明会ページ取得失敗（募集窓口巡回で補完）: ${err.message}`);
+  }
+
+  if (eventEvents.length === 0 && briefingEvents.length === 0 && sourceErrors.length >= 2) {
+    throw new Error(`兵庫の主要HTML情報源を取得できませんでした: ${sourceErrors.join(' / ')}`);
+  }
 
   const htmlEvents = [...eventEvents, ...briefingEvents];
-  console.log(`[兵庫] HTML直接取得: ${htmlEvents.length} 件（イベント ${eventEvents.length} / 説明会 ${briefingEvents.length}）`);
+  console.log(`[兵庫] HTML直接取得: ${htmlEvents.length} 件（イベント ${eventEvents.length} / 説明会 ${briefingEvents.length} / 取得失敗 ${sourceErrors.length}）`);
 
   // 各ボックスに実際に含まれる画像/PDFだけをOCR対象にする。
   // 同じチラシが複数開催日のカードに紐づく場合はURL単位で1回だけ処理する。
