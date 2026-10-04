@@ -3005,6 +3005,7 @@ async function fetchHyogo(context) {
     eventEvents = await fetchHtmlPref(
       context, '兵庫(イベント)', URLS.hyogoEvent, parseHyogoEvents,
     );
+    if (eventEvents.length > 0) markRevisited(URLS.hyogoEvent);
   } catch (err) {
     sourceErrors.push(`イベント: ${err.message}`);
     console.warn(`[兵庫] イベントページ取得失敗（他経路を継続）: ${err.message}`);
@@ -3018,6 +3019,7 @@ async function fetchHyogo(context) {
       briefingEvents = await fetchHyogoHtmlOnce(
         context, '兵庫(説明会)', URLS.hyogoSetsumeikai, parseHyogoSetsumeikai,
       );
+      if (briefingEvents.length > 0) markRevisited(URLS.hyogoSetsumeikai);
     } catch (err) {
       sourceErrors.push(`説明会: ${err.message}`);
       console.warn(`[兵庫] 説明会ページ取得失敗: ${err.message} → 同一runでは再試行しません`);
@@ -4392,13 +4394,37 @@ async function main() {
   // 過去日付・不正タイトルは writeOutput の最終フィルタで除外される。
   {
     const officeIds = new Set([...officeEvents, ...kantoOfficeEvents].map(e => e.id));
+    // 兵庫は専用パーサー＋document-only募集窓口へ移行済み。
+    // 旧HQ探索が作った office_ocr や、現在の正式な情報源ではないHTML由来データは、
+    // 専用兵庫取得が成功した回に限って引き継がない。
+    // 403等で読めなかった正式な説明会/募集窓口ページは従来どおり前回値を保護する。
+    const hyogoDedicatedOk = !prefErrors.hyogo
+      && Array.isArray(prefEvents.hyogo)
+      && prefEvents.hyogo.length > 0;
+    const hyogoAuthoritativeOfficeSources = new Set([
+      normalizeUrl(URLS.hyogoSetsumeikai),
+      ...loadRecruitmentOfficePages()
+        .filter(p => p.pref === 'hyogo')
+        .map(p => p.normalized),
+    ].filter(Boolean));
+
     let kept = 0;
+    let retiredHyogoLegacy = 0;
     for (const [key, arr] of Object.entries(prev)) {
       if (!Array.isArray(arr)) continue;
       for (const e of arr) {
         const st = e.source_type || '';
         if (!st.startsWith('office_') || st === 'office_notice') continue;
         if (!e.date || !e.id || officeIds.has(e.id)) continue;
+
+        if (key === 'hyogo' && hyogoDedicatedOk) {
+          const src = normalizeUrl(e.url);
+          if (!src || !hyogoAuthoritativeOfficeSources.has(src)) {
+            retiredHyogoLegacy++;
+            continue;
+          }
+        }
+
         if (wasRevisited(e.url)) continue; // 今回読み直した情報源 → 最新の巡回結果が正
         const hqFlyer = st === 'office_ocr' && String(e.id).includes('-off-');
         if (hqFlyer && hqExploredPrefs.has(key)) continue;
@@ -4406,6 +4432,9 @@ async function main() {
         officeIds.add(e.id);
         kept++;
       }
+    }
+    if (retiredHyogoLegacy) {
+      console.log(`[OfficeOCR] 兵庫の旧HQ/旧汎用巡回データ ${retiredHyogoLegacy} 件を専用取得へ置換`);
     }
     if (kept) console.log(`[OfficeOCR] 今回読み直せなかった情報源の前回officeイベント ${kept} 件を維持`);
   }
