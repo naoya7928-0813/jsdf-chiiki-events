@@ -32,6 +32,15 @@ jobs:
       - name: テスト
         run: npm test
 
+      # ルート依存だけでは cheerio が無く、実HTMLパーサー回帰テストが
+      # skip されるため、スクレイパー側の依存を入れて明示的に実行する。
+      - name: scraper の依存パッケージをインストール
+        working-directory: scraper
+        run: npm ci
+
+      - name: 実HTMLパーサー回帰テスト
+        run: node --test shared/yamanashiParser.test.cjs shared/hyogoParser.test.cjs shared/tokyoCalendar.test.cjs
+
       - name: ビルド
         run: npm run build
 
