@@ -200,7 +200,9 @@ function makeEventsFromSection(section, sourceUrl, defaultCategory) {
   const deadline = field(section.text, '締め切り|締切|申し?込み期限|申込期限').slice(0, 120);
   const time = timeFrom(dateText);
   const sectionUrl = section.id ? `${sourceUrl}#${section.id}` : sourceUrl;
-  const notes = /[～〜~\-]/.test(dateText) && dates.length === 1 ? `開催期間: ${dateText.slice(0, 100)}` : null;
+  // 時刻の「09:00～16:00」を期間開催と誤認しない。日付同士を波線で結ぶ表記だけ対象。
+  const dateRange = /(?:\d{1,2}月\s*)?\d{1,2}日(?:\s*\([^)]*\))?\s*[～〜~\-]\s*(?:\d{1,2}月\s*)?\d{1,2}日/.test(toHalfWidth(dateText));
+  const notes = dateRange && dates.length === 1 ? `開催期間: ${dateText.slice(0, 100)}` : null;
   const assets = section.assets.map(raw => toAbs(raw, sourceUrl)).filter(Boolean);
 
   return dates.map(({ date, weekday }) => ({
