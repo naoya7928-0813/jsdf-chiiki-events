@@ -1,0 +1,37 @@
+name: 募集窓口名称監査
+
+on:
+  push:
+    branches:
+      - audit/office-names-20261004
+    paths:
+      - 'scraper/audit-office-names.js'
+      - '.github/workflows/office-name-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: scraper依存をインストール
+        working-directory: scraper
+        run: npm ci
+      - name: 公式一覧を低負荷監査
+        working-directory: scraper
+        run: node audit-office-names.js
+      - name: 結果
+        if: always()
+        run: |
+          echo '## 募集窓口名称監査' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '公式の各地本リンクを起点に各地本1ページだけ取得。再試行なし、1.8秒間隔。' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          cat /tmp/office-name-audit.json >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
