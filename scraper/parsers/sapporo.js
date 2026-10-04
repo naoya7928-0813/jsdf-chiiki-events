@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo, jstYear } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, reiwaNum, padTwo, jstYear, resolveYearByWeekday } = require('./utils');
 
 /**
  * 札幌地本イベントページのパーサー
@@ -25,85 +25,96 @@ const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo, jstYear
 function parseSapporoPage($, categoryHint, prefixId, state, sourceUrl = '') {
   const events = [];
 
-  $('table').each((_i, tbl) => {
-    $(tbl).find('tbody tr').each((_j, row) => {
-      const $row   = $(row);
-      const $cells = $row.children('td, th');
-      if ($cells.length < 2) return;
+  function parseDate(raw) {
+    const text = toHalfWidth(String(raw || '').replace(/\s+/g, ' ').trim());
+    let m = text.match(/令和\s*(元|\d{1,2})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日(?:\s*[（(]\s*([月火水木金土日祝・]+)\s*[）)])?/);
+    if (m) {
+      return {
+        dateStr: `${reiwaToAD(reiwaNum(m[1]))}-${padTwo(Number(m[2]))}-${padTwo(Number(m[3]))}`,
+        weekday: m[4] || '',
+        raw: text,
+      };
+    }
 
-      // 日付: th[scope="row"] 優先
-      const $dateTh = $row.find('th[scope="row"]');
-      const rawDateFull = toHalfWidth(
-        ($dateTh.length ? $dateTh : $cells.eq(0))
-          .text().replace(/\s+/g, ' ').trim()
-      );
+    m = text.match(/(20\d{2})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日(?:\s*[（(]\s*([月火水木金土日祝・]+)\s*[）)])?/);
+    if (m) {
+      return {
+        dateStr: `${m[1]}-${padTwo(Number(m[2]))}-${padTwo(Number(m[3]))}`,
+        weekday: m[4] || '',
+        raw: text,
+      };
+    }
 
-      // 先頭の日付を取得（範囲 "A日～B日" の場合は A の部分）
-      let dateStr, weekday;
-
-      // パターン1: YYYY年M月D日（曜日） または 2026年7月25日（土）
-      const gregFull = rawDateFull.match(/(\d{4})年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/);
-      // パターン2: 令和Y年M月D日（曜日）
-      const reiwaFull = rawDateFull.match(/令和(\d+)年(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/);
-      // パターン3: MM月DD日（曜日）（年なし）
-      const monthOnly = rawDateFull.match(/^(\d+)月(\d+)日[（(]([月火水木金土日祝・]+)[）)]/);
-
-      if (reiwaFull) {
-        const year = reiwaToAD(parseInt(reiwaFull[1], 10));
-        dateStr  = `${year}-${padTwo(parseInt(reiwaFull[2], 10))}-${padTwo(parseInt(reiwaFull[3], 10))}`;
-        weekday  = reiwaFull[4];
-      } else if (gregFull) {
-        dateStr  = `${gregFull[1]}-${padTwo(parseInt(gregFull[2], 10))}-${padTwo(parseInt(gregFull[3], 10))}`;
-        weekday  = gregFull[4];
-      } else if (monthOnly) {
-        const month = parseInt(monthOnly[1], 10);
-        const day   = parseInt(monthOnly[2], 10);
-        const year  = jstYear();
-        dateStr = `${year}-${padTwo(month)}-${padTwo(day)}`;
-        weekday = monthOnly[3];
-      } else {
-        return; // 日付なし行スキップ
-      }
-
-      if (isPast(dateStr)) return;
-
-      // タイトル: th[scope="row"] がある場合は td[0]、ない場合は td[1]
-      const titleIdx = $dateTh.length ? 0 : 1;
-      const $titleCell = $cells.filter('td').eq(titleIdx);
-      const title = $titleCell.clone()
-        .find('a').each((_k, a) => $(a).replaceWith($(a).text())).end()
-        .text().replace(/\s+/g, ' ').trim();
-      if (!title) return;
-
-      // 場所: タイトルの次のtd
-      const placeIdx = titleIdx + 1;
-      const place = $cells.filter('td').eq(placeIdx)
-        .clone().find('br').replaceWith(' ').end()
-        .text().replace(/\s+/g, ' ').trim();
-
-      // 時間: 日付フィールド内のHH:MM～HH:MM
-      const timeMatch = rawDateFull.match(/(\d+:\d+[～〜]\d+:\d+)/);
-      const time = timeMatch ? timeMatch[1] : '';
-
-      const cat = guessCategory(toHalfWidth(title)) || categoryHint;
-
-      events.push({
-        id:             `sp-${prefixId}-${dateStr.replace(/-/g, '')}-${++state.counter}`,
-        pref:           'sapporo',
-        date:           dateStr,
+    m = text.match(/(?:^|[^\d])(\d{1,2})\s*月\s*(\d{1,2})\s*日(?:\s*[（(]\s*([月火水木金土日祝・]+)\s*[）)])?/);
+    if (m) {
+      const month = Number(m[1]);
+      const day = Number(m[2]);
+      const weekday = m[3] || '';
+      const year = resolveYearByWeekday(month, day, weekday, jstYear()) || jstYear();
+      return {
+        dateStr: `${year}-${padTwo(month)}-${padTwo(day)}`,
         weekday,
-        title,
-        place,
-        address:        '',
-        time,
-        category:       cat,
-        tag:            guessTag(title),
-        url:            sourceUrl,
-        notes:          null,
-        ageRequirement: null,
-        deadline:       null,
-        imageUrl:       '',
-      });
+        raw: text,
+      };
+    }
+    return null;
+  }
+
+  $('table tr').each((_j, row) => {
+    const $cells = $(row).children('td, th');
+    if ($cells.length < 2) return;
+
+    const cells = $cells.toArray().map(el => ({
+      el,
+      text: $(el).text().replace(/\s+/g, ' ').trim(),
+    }));
+
+    // HTML改修で th/td や scope 属性が変わっても耐えるよう、
+    // 行内から「実際に日付として解釈できるセル」を探す。
+    let dateIdx = -1;
+    let parsed = null;
+    for (let i = 0; i < Math.min(cells.length, 3); i++) {
+      const candidate = parseDate(cells[i].text);
+      if (candidate) {
+        dateIdx = i;
+        parsed = candidate;
+        break;
+      }
+    }
+    if (!parsed || isPast(parsed.dateStr)) return;
+
+    const titleCell = cells[dateIdx + 1];
+    if (!titleCell) return;
+    const title = $(titleCell.el).clone()
+      .find('a').each((_k, a) => $(a).replaceWith($(a).text())).end()
+      .text().replace(/\s+/g, ' ').trim();
+    if (!title || /^(行事名|イベント名|内容)$/.test(title)) return;
+
+    const placeCell = cells[dateIdx + 2];
+    const place = placeCell
+      ? $(placeCell.el).clone().find('br').replaceWith(' ').end().text().replace(/\s+/g, ' ').trim()
+      : '';
+
+    const timeMatch = parsed.raw.match(/(\d{1,2}:\d{2}\s*[～〜~\-]\s*\d{1,2}:\d{2})/);
+    const time = timeMatch ? timeMatch[1].replace(/\s+/g, '').replace(/[〜~]/g, '～') : '';
+    const cat = guessCategory(toHalfWidth(title)) || categoryHint;
+
+    events.push({
+      id:             `sp-${prefixId}-${parsed.dateStr.replace(/-/g, '')}-${++state.counter}`,
+      pref:           'sapporo',
+      date:           parsed.dateStr,
+      weekday:        parsed.weekday,
+      title,
+      place,
+      address:        '',
+      time,
+      category:       cat,
+      tag:            guessTag(title),
+      url:            sourceUrl,
+      notes:          null,
+      ageRequirement: null,
+      deadline:       null,
+      imageUrl:       '',
     });
   });
 
