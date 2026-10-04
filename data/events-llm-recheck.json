@@ -2,9 +2,9 @@
   "updatedAt": "2026-10-04",
   "limit": 30,
   "summary": {
-    "checked": 309,
-    "flagged": 19,
-    "attempted": 0,
+    "checked": 324,
+    "flagged": 21,
+    "attempted": 7,
     "corrected": 0,
     "unverified": 0,
     "noSource": 5,
@@ -12,7 +12,7 @@
     "skippedNoSource": 5,
     "skippedNotEligible": 9,
     "skippedProviderUnavailable": 0,
-    "skippedCutoff": 5
+    "skippedCutoff": 0
   },
   "corrections": [],
   "skipped": [
@@ -47,29 +47,9 @@
       "reason": "no_source"
     },
     {
-      "id": "s-20261121-5372q",
-      "pref": "saitama",
-      "reason": "cutoff"
-    },
-    {
       "id": "gu-20261004-c0ttm",
       "pref": "gunma",
       "reason": "no_source"
-    },
-    {
-      "id": "to-off-20261010-5i4vf",
-      "pref": "tochigi",
-      "reason": "cutoff"
-    },
-    {
-      "id": "ni-office-20261018-rq3i4",
-      "pref": "niigata",
-      "reason": "cutoff"
-    },
-    {
-      "id": "to-office-20261011-kgvg3",
-      "pref": "toyama",
-      "reason": "cutoff"
     },
     {
       "id": "os-office-20261017-5u6ep",
@@ -95,11 +75,6 @@
       "id": "hy-office-20260928-vorim",
       "pref": "hyogo",
       "reason": "not_eligible"
-    },
-    {
-      "id": "eh-off-20261018-hib7d",
-      "pref": "ehime",
-      "reason": "cutoff"
     },
     {
       "id": "ok-20261115-b75qj",
