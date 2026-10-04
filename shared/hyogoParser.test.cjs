@@ -90,6 +90,7 @@ test('兵庫新HP: イベント詳細ボックスから日時・場所・対象�
 test('兵庫新HP: 説明会ボックスの複数日・期間・毎週開催を欠落なく解釈', { skip }, () => {
   withNow('2026-10-04T10:00:00+09:00', ({ parseHyogoSetsumeikai }) => {
     const evs = parseHyogoSetsumeikai(cheerio.load(briefingHtml, { decodeEntities: false }));
+    console.log('[hyogo-test-debug]', JSON.stringify(evs.map(e => ({ date:e.date, title:e.title, place:e.place }))));
     const school = evs.filter(e => e.title === '陸上自衛隊高等工科学校説明会');
     assert.deepEqual(school.map(e => e.date), ['2026-10-10']);
 
