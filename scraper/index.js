@@ -2867,6 +2867,83 @@ const fetchNara     = (ctx) => fetchWpPosts(ctx, '奈良',   'nara',     'na',  
 const fetchWakayama = (ctx) => fetchWpPosts(ctx, '和歌山', 'wakayama', 'wk',  URLS.wakayama, parseWakayamaPostUrls, parseWakayamaPost, 5);
 
 /**
+ * 兵庫の説明会まとめは GitHub Actions から 403/Cloudflare challenge になりやすい。
+ * 相手サイトへの負荷とWAFへの不要な再試行を避けるため、通常定期実行では
+ * 05:33 UTC? ではなく JST 05:33 開始の第1便（cron: 33 20 * * *）だけ更新確認する。
+ * 手動実行・更新監視起動（SCRAPE_SCHEDULE が空）は必要時の実行なので確認する。
+ */
+function shouldRefreshHyogoDetailSources() {
+  const schedule = String(process.env.SCRAPE_SCHEDULE || '').trim();
+  if (!schedule) return true;
+  return schedule === '33 20 * * *';
+}
+
+/**
+ * 説明会ページ専用の低負荷取得。
+ * - Playwright 1回だけ（native fetch への即時リトライをしない）
+ * - 画像/CSS/フォント/動画を取得しない
+ * - 403/429/Cloudflare challenge は尊重して即失敗
+ * - challenge 解消待ちを長時間行わない
+ */
+async function fetchHyogoHtmlOnce(context, prefLabel, url, parserFn) {
+  console.log(`[${prefLabel}] 低負荷アクセス（1回のみ）: ${url}`);
+  const page = await context.newPage();
+  try {
+    await page.route('**/*', route => {
+      const type = route.request().resourceType();
+      if (['image', 'stylesheet', 'font', 'media'].includes(type)) return route.abort();
+      return route.continue();
+    });
+
+    const response = await page.goto(url, {
+      waitUntil: 'domcontentloaded',
+      timeout: 15_000,
+    });
+    await page.waitForTimeout(2_500);
+
+    const status = response?.status() || 0;
+    const html = await page.content();
+    const title = (html.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1] || '(no title)';
+    console.log(`[${prefLabel}] status=${status} title=${title.trim().substring(0, 70)}`);
+
+    if (status === 403 || status === 429 || isChallengeTitle(title)) {
+      throw new Error(`アクセス制御 ${status || ''} ${title.trim()}`.trim());
+    }
+    if (status >= 400) throw new Error(`HTTP ${status}`);
+
+    const $ = cheerio.load(html, { decodeEntities: false });
+    const events = parserFn($);
+    console.log(`[${prefLabel}] ${events.length} 件取得 (single Playwright)`);
+    assertParseHealthy(prefLabel, $, events);
+    return events;
+  } finally {
+    await page.close().catch(() => {});
+  }
+}
+
+/**
+ * 説明会ページが403のときに、前回の同ページ由来イベントだけを維持する。
+ * HTTP 403を「0件」と解釈して説明会を消さないためのキャッシュフォールバック。
+ */
+function loadPreviousHyogoBriefings() {
+  try {
+    const prev = JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8'));
+    const base = normalizeUrl(URLS.hyogoSetsumeikai);
+    const events = (prev.hyogo || []).filter(ev => {
+      if (!ev?.date || isPast(ev.date) || !ev.url) return false;
+      const url = normalizeUrl(String(ev.url).split('#')[0]);
+      return !!base && url === base;
+    });
+    if (events.length) {
+      console.log(`[兵庫(説明会)] 前回取得済み ${events.length} 件を維持（403時の再アクセスなし）`);
+    }
+    return events;
+  } catch {
+    return [];
+  }
+}
+
+/**
  * 兵庫地本（2026-10-01 リニューアル後）:
  * 1) イベント詳細ページ / 説明会まとめページのHTMLを直接解析
  * 2) 各イベントボックス内の画像/PDFだけOCRし、HTMLで不足する項目を補完
@@ -2898,13 +2975,19 @@ async function fetchHyogo(context) {
 
   await sleep(BETWEEN_PAGES_MS);
 
-  try {
-    briefingEvents = await fetchHtmlPref(
-      context, '兵庫(説明会)', URLS.hyogoSetsumeikai, parseHyogoSetsumeikai,
-    );
-  } catch (err) {
-    sourceErrors.push(`説明会: ${err.message}`);
-    console.warn(`[兵庫] 説明会ページ取得失敗（募集窓口巡回で補完）: ${err.message}`);
+  if (shouldRefreshHyogoDetailSources()) {
+    try {
+      briefingEvents = await fetchHyogoHtmlOnce(
+        context, '兵庫(説明会)', URLS.hyogoSetsumeikai, parseHyogoSetsumeikai,
+      );
+    } catch (err) {
+      sourceErrors.push(`説明会: ${err.message}`);
+      console.warn(`[兵庫] 説明会ページ取得失敗: ${err.message} → 同一runでは再試行しません`);
+      briefingEvents = loadPreviousHyogoBriefings();
+    }
+  } else {
+    console.log('[兵庫(説明会)] 定期第2・第3便は再アクセスせず前回値を利用します');
+    briefingEvents = loadPreviousHyogoBriefings();
   }
 
   if (eventEvents.length === 0 && briefingEvents.length === 0 && sourceErrors.length >= 2) {
@@ -3604,8 +3687,18 @@ async function crawlNationwideOffices(withFreshContext, cutoff) {
     }
     index++;
     if (seenPages.has(meta.normalized)) continue;
+
+    // 兵庫は専用パーサー＋イベントページOCRを持つため、募集窓口の汎用巡回は
+    // 1日1回（第1便）だけにする。第2・第3便では前回officeイベントを維持し、
+    // 同じ公式ページへ何度もアクセスしない。
+    const hyogoLowImpact = meta.pref === 'hyogo';
+    if (hyogoLowImpact && !shouldRefreshHyogoDetailSources()) {
+      console.log(`[OfficeOCR] 兵庫 ${officeNamesLabel(meta.officeNames)}: 第2・第3便は前回値維持（アクセス省略）`);
+      continue;
+    }
+
     seenPages.add(meta.normalized);
-    if (index > 1) await sleep(delayMs);
+    if (index > 1) await sleep(hyogoLowImpact ? Math.max(delayMs, 3000) : delayMs);
     console.log(`[OfficeOCR] ${index}/${targetPages.length} ${meta.pref} ${officeNamesLabel(meta.officeNames)}: ${meta.url}`);
 
     const $ = await withFreshContext(ctx => fetchPagePlaywright(ctx, meta.url));
@@ -3613,6 +3706,15 @@ async function crawlNationwideOffices(withFreshContext, cutoff) {
     markRevisited(meta.url);
 
     events.push(...extractOfficeHtmlEvents($, meta.url, meta));
+
+    // 兵庫の募集窓口ページは説明会情報がHTML本文に掲載されている。
+    // 専用イベントページ側で既に画像/PDF OCRを行うため、ここではHTMLだけ読み、
+    // 画像/PDFのダウンロードとサブページ巡回をしない（サイト負荷を最小化）。
+    if (hyogoLowImpact) {
+      console.log('[OfficeOCR] 兵庫: HTML本文のみ取得（画像/PDF OCR・サブページ巡回なし）');
+      continue;
+    }
+
     if (ocrReady) {
       const directAssets = extractOfficeCandidateAssets($, meta.url);
       if (directAssets.length > 0) {
