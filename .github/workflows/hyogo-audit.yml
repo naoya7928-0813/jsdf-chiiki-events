@@ -1,0 +1,141 @@
+name: 兵庫限定フル監査
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - 'scraper/index.js'
+      - '.github/workflows/hyogo-audit.yml'
+
+# 公開データへ push しない読み取り検証なので、本番スクレイプとは別枠で安全に実行する。
+concurrency:
+  group: hyogo-targeted-audit
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: 兵庫 HTML・OCR・募集窓口を全経路確認
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v5
+
+      - name: Node.js 22 をセットアップ
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Python 3.11 をセットアップ
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: scraper/requirements-ocr.txt
+
+      - name: scraper の依存パッケージをインストール
+        working-directory: scraper
+        run: npm ci
+
+      - name: RapidOCR をインストール
+        continue-on-error: true
+        run: python -m pip install -r scraper/requirements-ocr.txt
+
+      - name: OCRキャッシュを復元
+        uses: actions/cache@v5
+        with:
+          path: scraper/ocr-cache.json
+          key: hyogo-audit-ocr-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            ocr-cache-${{ runner.os }}-
+
+      - name: LLMキャッシュを復元
+        uses: actions/cache@v5
+        with:
+          path: scraper/llm-cache.json
+          key: hyogo-audit-llm-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            llm-cache-${{ runner.os }}-
+
+      - name: Playwright Chromium キャッシュを復元
+        id: pw-cache
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('scraper/package-lock.json') }}
+
+      - name: Tesseract OCR + poppler-utils をインストール
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tesseract-ocr tesseract-ocr-jpn poppler-utils
+
+      - name: Playwright Chromium をインストール
+        working-directory: scraper
+        run: npx playwright install chromium --with-deps
+
+      - name: 兵庫限定でフルパイプラインを実行
+        working-directory: scraper
+        run: node index.js
+        env:
+          # 兵庫の本体取得・OCRだけを対象化。他県は前回値を維持する。
+          SCRAPE_ONLY_PREFS: hyogo
+          # HQ探索も兵庫だけ。
+          HQ_EXPLORE_PREFS: hyogo
+          HQ_EXPLORE_TIMEOUT_MIN: '15'
+          # 全国募集窓口巡回も兵庫県内だけ。
+          OFFICE_CRAWL_PREFS: hyogo
+          OFFICE_CRAWL_MAX_SUBPAGES: '4'
+          OFFICE_CRAWL_MAX_ASSETS: '4'
+          OFFICE_CRAWL_DELAY_MS: '2500'
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          OCR_SPACE_API_KEY: ${{ secrets.OCR_SPACE_API_KEY }}
+          SITE_URL: ${{ secrets.SITE_URL }}
+          NOTIFY_SECRET: ${{ secrets.NOTIFY_SECRET }}
+
+      - name: 兵庫取得結果を確認
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const d = JSON.parse(fs.readFileSync('public/data/events.json', 'utf8'));
+          const evs = d.hyogo || [];
+          console.log(`[兵庫監査] 最終出力 ${evs.length} 件 / updatedAt=${d.updatedAt}`);
+          const bySource = {};
+          for (const e of evs) {
+            const k = e.source_type || 'main';
+            bySource[k] = (bySource[k] || 0) + 1;
+            console.log(`[兵庫監査] ${e.date} | ${e.title} | ${e.place || '-'} | ${e.source_type || 'main'} | ${e.url || '-'}`);
+          }
+          console.log('[兵庫監査] source_type別:', JSON.stringify(bySource));
+          if (evs.length === 0) {
+            console.error('::error::兵庫の最終出力が0件です');
+            process.exit(1);
+          }
+          NODE
+
+      - name: 変更は公開しないことを確認
+        run: |
+          echo "このWorkflowは監査専用です。git push / deploy / 通知は実行しません。"
+          git status --short
+
+      - name: 監査結果サマリ
+        if: always()
+        run: |
+          COUNT=$(node -e "try{const d=require('./public/data/events.json');console.log((d.hyogo||[]).length)}catch{console.log('N/A')}")
+          {
+            echo "## 兵庫限定フル監査"
+            echo ""
+            echo "- 対象: 兵庫地方協力本部"
+            echo "- 経路: 新HP HTML直接解析 / ボックス内画像・PDF OCR / HQ探索 / 県内募集窓口HTML・OCR / 最終整形・品質処理"
+            echo "- 最終イベント数: ${COUNT} 件"
+            echo "- 公開データへの push: なし（監査専用）"
+          } >> "$GITHUB_STEP_SUMMARY"

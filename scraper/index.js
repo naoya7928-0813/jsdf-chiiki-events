@@ -3546,7 +3546,17 @@ async function ocrOfficeAssets(assets, meta, maxAssets = 2) {
  */
 async function crawlNationwideOffices(withFreshContext, cutoff) {
   if (!withFreshContext) return [];
-  const pages = loadRecruitmentOfficePages({ excludePrefs: KANTO_PREFS });
+  let pages = loadRecruitmentOfficePages({ excludePrefs: KANTO_PREFS });
+
+  // 診断・補完実行では対象都道府県だけに限定できる。
+  // 通常実行は未指定なので従来どおり全国を巡回する。
+  const officeOnlyPrefs = (process.env.OFFICE_CRAWL_PREFS || '')
+    .split(',').map(v => v.trim()).filter(Boolean);
+  if (officeOnlyPrefs.length) {
+    pages = pages.filter(p => officeOnlyPrefs.includes(p.pref));
+    console.log(`[OfficeOCR] OFFICE_CRAWL_PREFS 指定により ${pages.length} URLに限定: ${officeOnlyPrefs.join(',')}`);
+  }
+
   // 既定で全国全件巡回（OFFICE_CRAWL_MAX_PAGES 未指定なら全URLを対象にする）。
   // 環境変数で上限を指定した場合のみその件数に絞る。
   const maxPagesEnv = Number.parseInt(process.env.OFFICE_CRAWL_MAX_PAGES || '', 10);
@@ -4046,8 +4056,24 @@ async function main() {
   const prefEvents = {};
   const prefErrors = {};
   for (const t of PREF_TASKS) { prefEvents[t.key] = []; prefErrors[t.key] = false; }
-  // 時間切れで取得しなかった地本（失敗とは区別してログ・サマリに出す）
+  // 時間切れ・限定実行で取得しなかった地本。
+  // 限定実行でも前回データを確実に維持するため、対象外地本は skipped 扱いにする。
   const prefSkipped = [];
+  const onlyPrefKeys = (process.env.SCRAPE_ONLY_PREFS || '')
+    .split(',').map(v => v.trim()).filter(Boolean);
+  const onlyPrefSet = new Set(onlyPrefKeys);
+  const activeTasks = onlyPrefSet.size
+    ? PREF_TASKS.filter(t => onlyPrefSet.has(t.key))
+    : PREF_TASKS;
+  if (onlyPrefSet.size && activeTasks.length === 0) {
+    throw new Error(`SCRAPE_ONLY_PREFS に有効な地本がありません: ${onlyPrefKeys.join(',')}`);
+  }
+  if (onlyPrefSet.size) {
+    const inactive = PREF_TASKS.filter(t => !onlyPrefSet.has(t.key));
+    prefSkipped.push(...inactive);
+    console.log(`[限定実行] 対象: ${activeTasks.map(t => t.label).join('・')} / その他 ${inactive.length} 地本は前回データ維持`);
+  }
+
   // 配信スロットに間に合わせるための打ち切り
   const cutoff = createCutoff();
 
@@ -4077,7 +4103,7 @@ async function main() {
     // ── 地本を順に取得（時間切れなら打ち切り） ──────────────
     // 開始位置は実行ごとにずらす。固定順のままだと打ち切りが常に後半
     // （九州・沖縄）に当たり、そこだけ更新されなくなるため。
-    const order = rotateTasks(PREF_TASKS);
+    const order = rotateTasks(activeTasks);
     for (let i = 0; i < order.length; i++) {
       const task = order[i];
       if (cutoff.reached()) {
@@ -4111,10 +4137,10 @@ async function main() {
     {
       const PDF_OCR_PREFS = new Set(['iwate', 'aomori']);
       let done = 0;
-      for (const t of PREF_TASKS) {
+      for (const t of activeTasks) {
         if (prefEvents[t.key].length === 0) continue;
         if (cutoff.reached()) {
-          console.warn(`[カットオフ] 時間切れのため残り ${PREF_TASKS.length - done} 地本の OCR 補完を見送ります（取れなかった項目は前回値で保護）`);
+          console.warn(`[カットオフ] 時間切れのため残り ${activeTasks.length - done} 地本の OCR 補完を見送ります（取れなかった項目は前回値で保護）`);
           break;
         }
         prefEvents[t.key] = PDF_OCR_PREFS.has(t.key)
@@ -4140,10 +4166,16 @@ async function main() {
     }
 
     // ── 関東 各事務所ページの先回り巡回（中央未掲載イベントの収集）──
-    try {
-      kantoOfficeEvents = await crawlKantoOffices(withFreshContext, cutoff);
-    } catch (err) {
-      console.warn(`[KantoOffice] 巡回失敗: ${err.message}`);
+    const needsKantoOfficeCrawl = !onlyPrefSet.size
+      || [...onlyPrefSet].some(pref => KANTO_PREFS.has(pref));
+    if (needsKantoOfficeCrawl) {
+      try {
+        kantoOfficeEvents = await crawlKantoOffices(withFreshContext, cutoff);
+      } catch (err) {
+        console.warn(`[KantoOffice] 巡回失敗: ${err.message}`);
+      }
+    } else {
+      console.log('[KantoOffice] 限定実行の対象外のためスキップ');
     }
   } finally {
     await browser.close();
@@ -4207,7 +4239,9 @@ async function main() {
       skippedKeys,
     });
     for (const key of carryOver) {
-      const why = skippedKeys.includes(key) ? '時間切れ' : 'エラー';
+      const why = onlyPrefSet.size && !onlyPrefSet.has(key)
+        ? '限定実行の対象外'
+        : (skippedKeys.includes(key) ? '時間切れ' : 'エラー');
       console.warn(`[${labels[key]}] ${why}のため前回データを維持します`);
       prefEvents[key] = prev[key] ?? [];
     }
