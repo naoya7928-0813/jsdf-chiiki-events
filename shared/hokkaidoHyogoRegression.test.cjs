@@ -51,6 +51,7 @@ test('札幌: 令和8年10月24日の北部方面隊音楽まつりを静的HTML
     assert.equal(evs[0].weekday, '土');
     assert.equal(evs[0].title, '陸上自衛隊北部方面隊音楽まつり');
     assert.equal(evs[0].place, '札幌コンサートホールKitaura');
+    assert.equal(evs[0].category, '演奏会');
   });
 });
 
