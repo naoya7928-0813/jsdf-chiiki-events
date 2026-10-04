@@ -38,6 +38,9 @@ jobs:
         working-directory: scraper
         run: npm ci
 
+      - name: スクレイパー構文チェック
+        run: node --check scraper/index.js
+
       - name: 実HTMLパーサー回帰テスト
         run: node --test shared/yamanashiParser.test.cjs shared/hyogoParser.test.cjs shared/tokyoCalendar.test.cjs
 
