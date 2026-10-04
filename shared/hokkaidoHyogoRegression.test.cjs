@@ -60,3 +60,33 @@ test('兵庫: 募集案内所イベント名の先頭誘導矢印を除去', () 
   assert.equal(cleanOfficeTitle('☛「自衛隊職業説明会」ハローワーク西宮'), '「自衛隊職業説明会」ハローワーク西宮');
   assert.equal(cleanOfficeTitle('☞～「自衛隊個別説明会」川西地域事務所'), '「自衛隊個別説明会」川西地域事務所');
 });
+
+test('帯広: 現在のイベント表が過去日付のみなら0件を正常に返す', { skip }, () => {
+  const html = `
+    <div id="col_main"><table><tbody>
+      <tr><td>十勝</td><td>8月22日（土）14:00～15:30</td><td>女子会！</td><td>帯広募集案内所</td></tr>
+    </tbody></table></div>`;
+  const RealDate = Date;
+  const fixed = new RealDate('2026-10-04T20:00:00+09:00').getTime();
+  global.Date = class extends RealDate {
+    constructor(...a) { super(...(a.length ? a : [fixed])); }
+    static now() { return fixed; }
+  };
+  try {
+    delete require.cache[require.resolve('../scraper/parsers/obihiro')];
+    delete require.cache[require.resolve('../scraper/parsers/utils')];
+    const { parseObihiro } = require('../scraper/parsers/obihiro');
+    assert.deepEqual(parseObihiro(cheerio.load(html, { decodeEntities: false })), []);
+  } finally {
+    global.Date = RealDate;
+  }
+});
+
+test('帯広: 採用制度ページの文言はイベント扱いしない', () => {
+  const { officeIsJunk } = require('./officeTitle.cjs');
+  assert.equal(
+    officeIsJunk('キャリア採用幹部・技術陸曹 応募まで キャリア採用幹部はこちら 技術陸曹'),
+    true,
+  );
+});
+
