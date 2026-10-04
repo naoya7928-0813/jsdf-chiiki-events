@@ -1,0 +1,130 @@
+name: 兵庫・低負荷アクセス方式比較
+
+on:
+  push:
+    branches:
+      - test/hyogo-low-load-access-2
+    paths:
+      - '.github/workflows/hyogo-low-load-access-test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    name: 1回ずつ低負荷比較
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: scraper依存をインストール
+        working-directory: scraper
+        run: npm ci
+
+      - name: Chromiumをインストール
+        working-directory: scraper
+        run: npx playwright install chromium --with-deps
+
+      - name: 3方式を各1回だけ比較
+        working-directory: scraper
+        run: |
+          node <<'NODE'
+          const { chromium } = require('playwright');
+
+          const target = 'https://www.mod.go.jp/pco/hyogo/want/setumeikai.html';
+          const office = 'https://www.mod.go.jp/pco/hyogo/jimusyo/nishinomiya.html';
+          const ua = 'Mozilla/5.0 (compatible; jsdf-chiiki-events low-load checker; +https://github.com/naoya7928-0813/jsdf-chiiki-events)';
+          const sleep = ms => new Promise(r => setTimeout(r, ms));
+          const futureDateHits = text => (text.match(/(?:10|11|12)月\s*\d{1,2}日/g) || []).length;
+          const summarize = (label, status, title, body) => ({
+            method: label,
+            status,
+            title: String(title || '').slice(0, 80),
+            bytes: Buffer.byteLength(String(body || '')),
+            futureDateHits: futureDateHits(String(body || '')),
+            hasBriefingKeyword: /説明会|相談会|職業説明/.test(String(body || '')),
+          });
+
+          const results = [];
+
+          try {
+            const res = await fetch(target, {
+              redirect: 'follow',
+              signal: AbortSignal.timeout(15000),
+              headers: {
+                'User-Agent': ua,
+                'Accept': 'text/html,application/xhtml+xml',
+                'Accept-Language': 'ja-JP,ja;q=0.9',
+              },
+            });
+            const body = await res.text();
+            const title = (body.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1] || '';
+            results.push(summarize('A_native_fetch', res.status, title, body));
+          } catch (e) {
+            results.push({method:'A_native_fetch', error:e.message});
+          }
+
+          await sleep(20000);
+
+          let browser;
+          try {
+            browser = await chromium.launch({headless:true});
+            const context = await browser.newContext({
+              javaScriptEnabled: false,
+              locale: 'ja-JP',
+              userAgent: ua,
+            });
+            await context.route('**/*', route => {
+              if (route.request().resourceType() === 'document') return route.continue();
+              return route.abort();
+            });
+            const page = await context.newPage();
+            const res = await page.goto(target, {waitUntil:'domcontentloaded', timeout:15000});
+            const body = await page.content();
+            results.push(summarize('B_static_browser_document_only', res?.status() || 0, await page.title(), body));
+            await context.close();
+          } catch (e) {
+            results.push({method:'B_static_browser_document_only', error:e.message});
+          } finally {
+            if (browser) await browser.close();
+          }
+
+          await sleep(20000);
+
+          try {
+            const res = await fetch(office, {
+              redirect: 'follow',
+              signal: AbortSignal.timeout(15000),
+              headers: {
+                'User-Agent': ua,
+                'Accept': 'text/html,application/xhtml+xml',
+                'Accept-Language': 'ja-JP,ja;q=0.9',
+              },
+            });
+            const body = await res.text();
+            const title = (body.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1] || '';
+            results.push(summarize('C_office_html_fallback', res.status, title, body));
+          } catch (e) {
+            results.push({method:'C_office_html_fallback', error:e.message});
+          }
+
+          console.log('HYOGO_METHOD_RESULTS=' + JSON.stringify(results));
+          require('fs').writeFileSync('/tmp/hyogo-method-results.json', JSON.stringify(results, null, 2));
+          NODE
+
+      - name: 比較結果
+        if: always()
+        run: |
+          {
+            echo "## 兵庫・低負荷アクセス方式比較"
+            echo ""
+            echo "各方式は対象URLへ1回だけ。方式間は20秒空け、Bはdocument以外を遮断。"
+            echo ""
+            cat /tmp/hyogo-method-results.json 2>/dev/null || true
+          } >> "$GITHUB_STEP_SUMMARY"
