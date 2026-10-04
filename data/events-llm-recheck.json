@@ -2,25 +2,20 @@
   "updatedAt": "2026-10-04",
   "limit": 30,
   "summary": {
-    "checked": 325,
-    "flagged": 22,
-    "attempted": 7,
+    "checked": 333,
+    "flagged": 18,
+    "attempted": 8,
     "corrected": 0,
     "unverified": 0,
     "noSource": 5,
     "overBudget": 0,
     "skippedNoSource": 5,
-    "skippedNotEligible": 10,
+    "skippedNotEligible": 5,
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
   "corrections": [],
   "skipped": [
-    {
-      "id": "ob-office-20260930-xetg0",
-      "pref": "obihiro",
-      "reason": "not_eligible"
-    },
     {
       "id": "iw-office-20261101-hx61v",
       "pref": "iwate",
@@ -59,26 +54,6 @@
     {
       "id": "os-office-20261107-l69n5",
       "pref": "osaka",
-      "reason": "not_eligible"
-    },
-    {
-      "id": "hy-office-20261025-svhnx",
-      "pref": "hyogo",
-      "reason": "not_eligible"
-    },
-    {
-      "id": "hy-office-20261027-wbtqt",
-      "pref": "hyogo",
-      "reason": "not_eligible"
-    },
-    {
-      "id": "hy-office-20261001-jm41q",
-      "pref": "hyogo",
-      "reason": "not_eligible"
-    },
-    {
-      "id": "hy-office-20260928-vorim",
-      "pref": "hyogo",
       "reason": "not_eligible"
     },
     {
