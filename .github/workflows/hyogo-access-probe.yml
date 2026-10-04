@@ -13,49 +13,90 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
+      - uses: actions/checkout@v5
+
       - name: Node.js 22
         uses: actions/setup-node@v5
         with:
           node-version: '22'
 
-      - name: 静的HTTPを各1回だけ確認
+      - name: scraper依存をインストール
+        working-directory: scraper
+        run: npm ci
+
+      - name: Chromiumをインストール
+        working-directory: scraper
+        run: npx playwright install chromium --with-deps
+
+      - name: 軽量ブラウザ2方式を各1回だけ確認
+        working-directory: scraper
         run: |
           node <<'NODE'
-          const targets = [
-            ['central', 'https://www.mod.go.jp/pco/hyogo/want/setumeikai.html'],
-            ['office', 'https://www.mod.go.jp/pco/hyogo/jimusyo/nishinomiya.html'],
-          ];
+          const { chromium } = require('playwright');
+          const SUMMARY = 'https://www.mod.go.jp/pco/hyogo/want/setumeikai.html';
+          const TOP = 'https://www.mod.go.jp/pco/hyogo/';
           const sleep = ms => new Promise(r => setTimeout(r, ms));
-          for (let i = 0; i < targets.length; i++) {
-            if (i > 0) await sleep(30000);
-            const [label, url] = targets[i];
+
+          async function makeContext(browser) {
+            const ctx = await browser.newContext({
+              locale: 'ja-JP',
+              timezoneId: 'Asia/Tokyo',
+            });
+            // HTMLとCloudflare判定に必要になり得るJS/XHRだけ許可。
+            // 画像・CSS・フォント・動画は取得しない。
+            await ctx.route('**/*', route => {
+              const t = route.request().resourceType();
+              if (['image', 'stylesheet', 'font', 'media'].includes(t)) return route.abort();
+              return route.continue();
+            });
+            return ctx;
+          }
+
+          async function inspect(page, label, url) {
             const started = Date.now();
-            let res;
             try {
-              res = await fetch(url, {
-                redirect: 'follow',
-                signal: AbortSignal.timeout(15000),
-                headers: {
-                  'User-Agent': 'jsdf-chiiki-events/1.0 (+https://github.com/naoya7928-0813/jsdf-chiiki-events)',
-                  'Accept': 'text/html,application/xhtml+xml',
-                  'Accept-Language': 'ja-JP,ja;q=0.9',
-                },
-              });
-              const body = await res.text();
-              const title = (body.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1] || '';
-              const hasDate = /日\s*時|１０月|10月/.test(body);
+              const res = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 });
+              await page.waitForTimeout(5000);
+              const title = await page.title();
+              const text = await page.locator('body').innerText().catch(() => '');
               console.log(JSON.stringify({
                 label,
-                status: res.status,
-                bytes: Buffer.byteLength(body),
+                status: res?.status() ?? null,
                 ms: Date.now() - started,
-                title: title.trim().slice(0, 80),
-                hasDate,
+                title: title.slice(0, 80),
+                hasDate: /日\s*時|１０月|10月/.test(text),
+                bodyChars: text.length,
               }));
             } catch (e) {
               console.log(JSON.stringify({ label, error: e.message, ms: Date.now() - started }));
             }
+          }
+
+          const browser = await chromium.launch({ headless: true });
+          try {
+            // 方法A: 説明会ページへ直接。1回だけ。
+            {
+              const ctx = await makeContext(browser);
+              const page = await ctx.newPage();
+              await inspect(page, 'direct-light-browser', SUMMARY);
+              await ctx.close();
+            }
+
+            // 相手サイトへの連続アクセスを避ける。
+            await sleep(30000);
+
+            // 方法B: 兵庫トップを1回開いた同一セッションで説明会ページへ遷移。
+            {
+              const ctx = await makeContext(browser);
+              const page = await ctx.newPage();
+              await inspect(page, 'warmup-top', TOP);
+              await page.waitForTimeout(10000);
+              await inspect(page, 'warmup-summary', SUMMARY);
+              await ctx.close();
+            }
+          } finally {
+            await browser.close();
           }
           NODE
