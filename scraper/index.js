@@ -3283,6 +3283,42 @@ async function fetchPagePlaywright(ctx, url) {
 }
 
 /**
+ * 兵庫募集窓口向けの軽量取得。
+ * Stealthコンテキストは維持しつつ、イベント本文に不要な画像/CSS/フォント/動画を
+ * 読み込まない。403/429/challengeは正常ページとして扱わず前回値を保護する。
+ */
+async function fetchPagePlaywrightLight(ctx, url) {
+  let page = null;
+  try {
+    page = await ctx.newPage();
+    await page.route('**/*', route => {
+      const type = route.request().resourceType();
+      if (['image', 'stylesheet', 'font', 'media'].includes(type)) return route.abort();
+      return route.continue();
+    });
+    const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20_000 });
+    await page.waitForTimeout(750);
+    const status = response?.status() || 0;
+    const html = await page.content();
+    const title = (html.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1] || '';
+    if (status === 403 || status === 429 || status >= 500 || isChallengeTitle(title)) {
+      console.warn(`  [fetch-light] アクセス制御: ${url} → status=${status} title=${title.trim().slice(0, 60)}`);
+      return null;
+    }
+    if (status >= 400) {
+      console.warn(`  [fetch-light] HTTP ${status}: ${url}`);
+      return null;
+    }
+    return cheerio.load(html);
+  } catch (err) {
+    console.warn(`  [fetch-light] エラー: ${url} → ${err.message}`);
+    return null;
+  } finally {
+    if (page) await page.close().catch(() => {});
+  }
+}
+
+/**
  * OCR結果またはアセット情報から日付文字列・曜日を解析する。
  * @returns {{ dateStr: string, weekday: string }|null}
  */
@@ -3701,7 +3737,11 @@ async function crawlNationwideOffices(withFreshContext, cutoff) {
     if (index > 1) await sleep(hyogoLowImpact ? Math.max(delayMs, 3000) : delayMs);
     console.log(`[OfficeOCR] ${index}/${targetPages.length} ${meta.pref} ${officeNamesLabel(meta.officeNames)}: ${meta.url}`);
 
-    const $ = await withFreshContext(ctx => fetchPagePlaywright(ctx, meta.url));
+    const $ = await withFreshContext(ctx =>
+      hyogoLowImpact
+        ? fetchPagePlaywrightLight(ctx, meta.url)
+        : fetchPagePlaywright(ctx, meta.url)
+    );
     if (!$) continue;
     markRevisited(meta.url);
 
@@ -3871,6 +3911,15 @@ async function scrapeOfficeAssets(withFreshContext, cutoff) {
       if (o.type === 'hq') hqEntries.push({ pref: o.pref, url: o.url, name: o.name });
     }
   } catch { /* offices.json がなければスキップ */ }
+
+  // 兵庫は専用パーサーがイベントページをHTML＋必要なチラシOCRで処理し、
+  // 募集窓口は別の軽量HTML巡回で補完する。汎用HQ探索は同じURL群を再訪し、
+  // ロゴ/ナビ/PDFまで候補化して負荷とノイズを増やすため対象外にする。
+  const beforeDedicatedSkip = hqEntries.length;
+  hqEntries = hqEntries.filter(h => h.pref !== 'hyogo');
+  if (hqEntries.length !== beforeDedicatedSkip) {
+    console.log('[OfficeOCR] 兵庫HQは専用パーサー＋軽量募集窓口巡回で処理するため汎用HQ探索を省略');
+  }
 
   // ── 既スクレイプURL集合（自動探索の重複除去に使用） ──────────────
   const alreadyScraped = new Set(
