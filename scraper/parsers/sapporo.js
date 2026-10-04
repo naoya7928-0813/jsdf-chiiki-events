@@ -97,7 +97,7 @@ function parseSapporoPage($, categoryHint, prefixId, state, sourceUrl = '') {
 
     const timeMatch = parsed.raw.match(/(\d{1,2}:\d{2}\s*[～〜~\-]\s*\d{1,2}:\d{2})/);
     const time = timeMatch ? timeMatch[1].replace(/\s+/g, '').replace(/[〜~]/g, '～') : '';
-    const cat = guessCategory(toHalfWidth(title)) || categoryHint;
+    const cat = categoryHint === '演奏会' ? '演奏会' : (guessCategory(toHalfWidth(title)) || categoryHint);
 
     events.push({
       id:             `sp-${prefixId}-${parsed.dateStr.replace(/-/g, '')}-${++state.counter}`,
