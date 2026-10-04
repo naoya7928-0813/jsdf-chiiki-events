@@ -50,6 +50,11 @@ on:
         description: 'HQ探索の時間上限（分）。未指定なら25分'
         required: false
         default: ''
+      source_update_mode:
+        description: 'HP更新監視からの起動。データ更新は行うが利用者向け新着通知は送らない'
+        required: false
+        type: boolean
+        default: false
 
 # ── 同時実行防止 ──────────────────────────────────────────────
 # 定期(schedule 3種)と手動(workflow_dispatch)は同じ events.json / 静的HTML /
@@ -475,7 +480,7 @@ jobs:
         run: sleep 60
 
       - name: プッシュ通知を送信
-        if: steps.commit.outputs.changed == 'true'
+        if: steps.commit.outputs.changed == 'true' && github.event.inputs.source_update_mode != 'true'
         env:
           SCRAPE_SCHEDULE: ${{ github.event.schedule }}
         run: |
@@ -652,7 +657,7 @@ jobs:
       # 通知タップ時にまだ旧データが CDN に載っている問題があった（Issue #16 解消）。
       # ペイロードは scraper が push-payload.json に書き出し済み（新着0なら count:0）。
       - name: Web Push を送信（デプロイ反映後）
-        if: steps.commit.outputs.changed == 'true'
+        if: steps.commit.outputs.changed == 'true' && github.event.inputs.source_update_mode != 'true'
         run: |
           if [ ! -f scraper/push-payload.json ]; then
             echo "[WebPush] ペイロードなし。スキップ"; exit 0

@@ -42,3 +42,7 @@ scraper/cutoff-report.json
 
 # 前回値との比較結果（非退行の保護・0件化地本・消失イベント）。実行ごとの一時ファイル。CI のジョブサマリが読む
 scraper/regression-report.json
+
+# 公式HP更新監視（Actions Cacheで前回HTMLハッシュを保持。レポートは実行ごとの一時ファイル）
+scraper/source-update-state.json
+scraper/source-update-report.json

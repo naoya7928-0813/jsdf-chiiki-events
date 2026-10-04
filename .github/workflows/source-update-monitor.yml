@@ -1,0 +1,106 @@
+name: 地本・募集案内所 HP更新監視
+
+on:
+  # GitHub Actions の混雑を避けるため毎時17分に確認。
+  # HTML変化があった場合だけ既存のフルスクレイプ＋OCRを起動する。
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: source-update-monitor
+  cancel-in-progress: true
+
+jobs:
+  monitor:
+    name: 公式HPのHTML差分を確認
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    permissions:
+      contents: read
+      actions: write
+
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v5
+
+      - name: Node.js 22 をセットアップ
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: scraper/package-lock.json
+
+      - name: scraper の依存パッケージをインストール
+        working-directory: scraper
+        run: npm ci
+
+      - name: Playwright Chromium キャッシュを復元
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: source-monitor-playwright-${{ runner.os }}-${{ hashFiles('scraper/package-lock.json') }}
+
+      - name: Chromium をインストール
+        working-directory: scraper
+        run: npx playwright install chromium --with-deps
+
+      - name: HTML監視状態を復元
+        uses: actions/cache@v5
+        with:
+          path: scraper/source-update-state.json
+          key: source-update-state-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            source-update-state-${{ runner.os }}-
+
+      - name: 地本・募集案内所のHTMLを確認
+        id: monitor
+        run: |
+          node scraper/check-source-updates.js
+          CHANGED=$(node -p "require('./scraper/source-update-report.json').changed")
+          FAILED=$(node -p "require('./scraper/source-update-report.json').failed")
+          TOTAL=$(node -p "require('./scraper/source-update-report.json').total")
+          echo "changed=${CHANGED}" >> "$GITHUB_OUTPUT"
+          echo "failed=${FAILED}" >> "$GITHUB_OUTPUT"
+          echo "total=${TOTAL}" >> "$GITHUB_OUTPUT"
+        env:
+          SOURCE_MONITOR_CONCURRENCY: '6'
+          SOURCE_MONITOR_TIMEOUT_MS: '20000'
+          SOURCE_MONITOR_SETTLE_MS: '500'
+
+      - name: 監視結果をサマリへ出力
+        if: always()
+        run: |
+          if [ ! -f scraper/source-update-report.json ]; then
+            echo "## 公式HP更新監視" >> "$GITHUB_STEP_SUMMARY"
+            echo "監視レポートを生成できませんでした。" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          node <<'NODE' >> "$GITHUB_STEP_SUMMARY"
+          const r = require('./scraper/source-update-report.json');
+          console.log('## 公式HP更新監視');
+          console.log('');
+          console.log(`- 対象: ${r.total} URL`);
+          console.log(`- 更新検知: ${r.changed} URL`);
+          console.log(`- 初回基準値: ${r.baseline} URL`);
+          console.log(`- 取得失敗: ${r.failed} URL`);
+          if (r.changes.length) {
+            console.log('');
+            console.log('### 更新されたURL');
+            for (const c of r.changes.slice(0, 30)) {
+              console.log(`- ${c.url}`);
+            }
+          }
+          NODE
+
+      - name: 更新検知時にフルスクレイプ＋OCRを起動
+        if: steps.monitor.outputs.changed != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "[SourceMonitor] ${{ steps.monitor.outputs.changed }} URLの更新を検知。scrape.yml を起動します。"
+          gh workflow run scrape.yml --ref master -f source_update_mode=true
