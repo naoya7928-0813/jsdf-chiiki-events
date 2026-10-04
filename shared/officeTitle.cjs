@@ -91,7 +91,7 @@ function cleanOfficeTitle(raw, opts) {
   if ((t.match(/（/g) || []).length > (t.match(/）/g) || []).length) t = t.replace(/（[^（）]*$/, '').trim();
   if ((t.match(/\(/g) || []).length > (t.match(/\)/g) || []).length) t = t.replace(/\([^()]*$/, '').trim();
   // 先頭・末尾の記号類を除去（括弧 （）() は正規の閉じを壊さないため対象外）
-  t = t.replace(/^[\s／/:：、,．.\-–—~〜～＝=【】\[\]<>!！#＃☞☛➜➤→]+|[\s／/:：、,．.\-–—~〜～＝=【】\[\]<>、☞☛➜➤→]+$/g, '').trim();
+  t = t.replace(/^[\s／/:：、,．.\-–—~〜～＝=【】\[\]<>!！#＃☞☛➜➤→]+|[\s／/:：、,．.\-–—~〜＝=【】\[\]<>、☞☛➜➤→]+$/g, '').trim();
   if (maxLen > 0 && t.length > maxLen) t = t.slice(0, maxLen).trim();
   return t; // 救済不能（空）の場合は空を返す（呼び出し側で除外）
 }
