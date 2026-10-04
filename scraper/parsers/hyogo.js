@@ -171,7 +171,7 @@ function parseDates(rawText) {
   for (let i = 0; i < matches.length; i++) {
     if (i > 0) {
       const between = src.slice(matches[i - 1].end, matches[i].index);
-      if (/[～〜~\-]/.test(between)) continue;
+      if (/^\s*[～〜~\-]\s*$/.test(between)) continue;
     }
     const m = matches[i];
     addDate(dates, seen, m.year, m.month, m.day, m.weekday);
