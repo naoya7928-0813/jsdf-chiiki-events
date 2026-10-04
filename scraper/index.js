@@ -3001,6 +3001,9 @@ async function fetchHyogo(context) {
     eventEvents = await fetchHtmlPref(
       context, '兵庫(イベント)', URLS.hyogoEvent, parseHyogoEvents,
     );
+    // 専用パーサーで正常に読み直したので、同URL由来の旧 office_html は
+    // 後段の「未再取得ソース保護」で持ち越さない。
+    markRevisited(URLS.hyogoEvent);
   } catch (err) {
     sourceErrors.push(`イベント: ${err.message}`);
     console.warn(`[兵庫] イベントページ取得失敗（他経路を継続）: ${err.message}`);
@@ -3014,6 +3017,9 @@ async function fetchHyogo(context) {
       briefingEvents = await fetchHyogoHtmlOnce(
         context, '兵庫(説明会)', URLS.hyogoSetsumeikai, parseHyogoSetsumeikai,
       );
+      // 説明会まとめを正常取得できた回は、このURL由来の旧 office_html を
+      // 前回値として再混入させず、専用HTMLパーサーの結果を正とする。
+      markRevisited(URLS.hyogoSetsumeikai);
     } catch (err) {
       sourceErrors.push(`説明会: ${err.message}`);
       console.warn(`[兵庫] 説明会ページ取得失敗: ${err.message} → 同一runでは再試行しません`);
