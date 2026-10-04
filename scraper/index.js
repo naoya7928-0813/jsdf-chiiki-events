@@ -2879,46 +2879,83 @@ function shouldRefreshHyogoDetailSources() {
 }
 
 /**
- * 説明会ページ専用の低負荷取得。
- * - Playwright 1回だけ（native fetch への即時リトライをしない）
- * - 画像/CSS/フォント/動画を取得しない
- * - 403/429/Cloudflare challenge は尊重して即失敗
- * - challenge 解消待ちを長時間行わない
+ * 兵庫向けの最小負荷HTML取得。
+ *
+ * 実測（GitHub Actions / 2026-10-04）:
+ * - native fetch: 403
+ * - 通常Playwright(JS有効): Cloudflare challenge
+ * - JS無効 + main documentのみ: 200でHTML取得成功
+ *
+ * そのため、WAFを突破しようとせず「HTML documentを1回だけ」取得する。
+ * CSS/JS/画像/フォント/XHR/iframe等は一切要求しない。
  */
-async function fetchHyogoHtmlOnce(context, prefLabel, url, parserFn) {
-  console.log(`[${prefLabel}] 低負荷アクセス（1回のみ）: ${url}`);
-  const page = await context.newPage();
+async function fetchHyogoDocumentOnly(context, prefLabel, url) {
+  console.log(`[${prefLabel}] document-only低負荷アクセス（1回のみ）: ${url}`);
+
+  const browser = context.browser();
+  if (!browser) throw new Error('Playwright browser を取得できません');
+
+  const staticContext = await browser.newContext({
+    javaScriptEnabled: false,
+    locale: 'ja-JP',
+    userAgent: 'Mozilla/5.0 (compatible; jsdf-chiiki-events low-load scraper; +https://github.com/naoya7928-0813/jsdf-chiiki-events)',
+  });
+
+  const page = await staticContext.newPage();
+  let documentRequests = 0;
   try {
     await page.route('**/*', route => {
-      const type = route.request().resourceType();
-      if (['image', 'stylesheet', 'font', 'media'].includes(type)) return route.abort();
-      return route.continue();
+      const request = route.request();
+      // メインHTMLのナビゲーション1回だけ許可する。
+      // iframeを含むその他documentと、全サブリソースは遮断する。
+      if (
+        request.resourceType() === 'document'
+        && request.isNavigationRequest()
+        && request.frame() === page.mainFrame()
+      ) {
+        documentRequests++;
+        return route.continue();
+      }
+      return route.abort();
     });
 
     const response = await page.goto(url, {
       waitUntil: 'domcontentloaded',
       timeout: 15_000,
     });
-    await page.waitForTimeout(2_500);
 
     const status = response?.status() || 0;
     const html = await page.content();
     const title = (html.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1] || '(no title)';
-    console.log(`[${prefLabel}] status=${status} title=${title.trim().substring(0, 70)}`);
+    console.log(`[${prefLabel}] status=${status} documentRequests=${documentRequests} title=${title.trim().substring(0, 70)}`);
 
     if (status === 403 || status === 429 || isChallengeTitle(title)) {
       throw new Error(`アクセス制御 ${status || ''} ${title.trim()}`.trim());
     }
     if (status >= 400) throw new Error(`HTTP ${status}`);
+    if (documentRequests !== 1) {
+      throw new Error(`想定外のdocument要求数: ${documentRequests}`);
+    }
 
-    const $ = cheerio.load(html, { decodeEntities: false });
-    const events = parserFn($);
-    console.log(`[${prefLabel}] ${events.length} 件取得 (single Playwright)`);
-    assertParseHealthy(prefLabel, $, events);
-    return events;
+    return cheerio.load(html, { decodeEntities: false });
   } finally {
-    await page.close().catch(() => {});
+    await staticContext.close().catch(() => {});
   }
+}
+
+/**
+ * 説明会ページ専用の低負荷取得。
+ * - JS無効
+ * - メインHTML document 1回だけ
+ * - native fetchへの即時リトライなし
+ * - 403/429/Cloudflare challenge は尊重して即失敗
+ */
+async function fetchHyogoHtmlOnce(context, prefLabel, url, parserFn) {
+  const $ = await fetchHyogoDocumentOnly(context, prefLabel, url);
+  const events = parserFn($);
+  console.log(`[${prefLabel}] ${events.length} 件取得 (document-only)`);
+  assertParseHealthy(prefLabel, $, events);
+  return events;
 }
 
 /**
@@ -2973,7 +3010,8 @@ async function fetchHyogo(context) {
     console.warn(`[兵庫] イベントページ取得失敗（他経路を継続）: ${err.message}`);
   }
 
-  await sleep(BETWEEN_PAGES_MS);
+  // 同一ホストへの連続アクセスを避ける。説明会ページは特にWAF判定が厳しいため20秒以上空ける。
+  await sleep(Math.max(BETWEEN_PAGES_MS, 20_000));
 
   if (shouldRefreshHyogoDetailSources()) {
     try {
@@ -3701,17 +3739,29 @@ async function crawlNationwideOffices(withFreshContext, cutoff) {
     if (index > 1) await sleep(hyogoLowImpact ? Math.max(delayMs, 3000) : delayMs);
     console.log(`[OfficeOCR] ${index}/${targetPages.length} ${meta.pref} ${officeNamesLabel(meta.officeNames)}: ${meta.url}`);
 
-    const $ = await withFreshContext(ctx => fetchPagePlaywright(ctx, meta.url));
+    let $;
+    if (hyogoLowImpact) {
+      try {
+        $ = await withFreshContext(ctx =>
+          fetchHyogoDocumentOnly(ctx, `兵庫募集窓口:${officeNamesLabel(meta.officeNames)}`, meta.url)
+        );
+      } catch (err) {
+        // 403/429は尊重し、同一runで別方式へ再試行しない。
+        console.warn(`[OfficeOCR] 兵庫 ${officeNamesLabel(meta.officeNames)}: ${err.message} → 再試行せず前回値維持`);
+        continue;
+      }
+    } else {
+      $ = await withFreshContext(ctx => fetchPagePlaywright(ctx, meta.url));
+    }
     if (!$) continue;
     markRevisited(meta.url);
 
     events.push(...extractOfficeHtmlEvents($, meta.url, meta));
 
-    // 兵庫の募集窓口ページは説明会情報がHTML本文に掲載されている。
-    // 専用イベントページ側で既に画像/PDF OCRを行うため、ここではHTMLだけ読み、
-    // 画像/PDFのダウンロードとサブページ巡回をしない（サイト負荷を最小化）。
+    // 兵庫はdocument-onlyでHTML本文だけを1回取得済み。
+    // 画像/PDF OCR・サブページ巡回を行わず、追加リクエストを発生させない。
     if (hyogoLowImpact) {
-      console.log('[OfficeOCR] 兵庫: HTML本文のみ取得（画像/PDF OCR・サブページ巡回なし）');
+      console.log('[OfficeOCR] 兵庫: document-only完了（追加リクエストなし）');
       continue;
     }
 
