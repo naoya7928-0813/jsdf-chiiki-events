@@ -3260,7 +3260,7 @@ const KANTO_PREFS = new Set(Object.keys(KANTO_OFFICE_URLS));
 const OFFICE_EVENT_KW = /イベント|説明会|相談会|見学|体験|公開|フェス|まつり|祭|広報|採用|募集|セミナー|ガイダンス|インターン|オープンキャンパス|フェア|ブース|出張|公務員|自衛官/;
 const OFFICE_ASSET_URL_KW = /event|events|oshirase|news|topics|setsumei|session|recruit|saiyou|bosyu|kouho|chirashi|annai|fair|fes|taiken|kengaku|schedule|calendar/i;
 const OFFICE_SKIP_TEXT_KW = /所在地|住所|電話|TEL|FAX|アクセス|地図|お問い合わせ|メール|受付時間|Copyright|プライバシー|サイトマップ|募集案内所の紹介|地域事務所の紹介|所長|事務所紹介/;
-const OFFICE_SKIP_ASSET_KW = /logo|icon|banner|btn|common|arrow|header|footer|sns|line|instagram|facebook|youtube|map|access|profile|staff|photo|album|gallery|sitemap/i;
+const OFFICE_SKIP_ASSET_KW = /logo|icon|banner|btn|common|arrow|header|footer|sns|line|instagram|facebook|youtube|map|access|profile|staff|photo|album|gallery|sitemap|(?:^|[\/_-])nav\d*(?:[_\.\/-]|$)|webmanual|riyoukiyaku/i;
 
 function compactText(text) {
   return (text || '').replace(/\s+/g, ' ').trim();
