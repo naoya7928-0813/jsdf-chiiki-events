@@ -127,3 +127,18 @@ test('stripTrailingCta: 末尾の誘導文言を除去する', () => {
   // 誘導文言が無いものはそのまま
   assert.equal(stripTrailingCta('護衛艦のしろ一般公開'), '護衛艦のしろ一般公開');
 });
+
+test('officeAnchorDateMismatch: 東京地本 #MMDD と開催日不一致を検出', () => {
+  const { officeAnchorDateMismatch } = require('./officeTitle.cjs');
+  const base = {
+    pref: 'tokyo',
+    source_type: 'office_html',
+    title: '潜水艦艦内見学',
+    url: 'https://www.mod.go.jp/pco/tokyo/koutou/event.html#1120',
+  };
+  assert.equal(officeAnchorDateMismatch({ ...base, date: '2026-11-20' }), false);
+  assert.equal(officeAnchorDateMismatch({ ...base, date: '2026-11-29' }), true);
+  assert.equal(officeAnchorDateMismatch({ ...base, url: 'https://www.mod.go.jp/pco/tokyo/koutou/event.html', date: '2026-11-29' }), false);
+  assert.equal(officeAnchorDateMismatch({ ...base, source_type: 'main', date: '2026-11-29' }), false);
+});
+
