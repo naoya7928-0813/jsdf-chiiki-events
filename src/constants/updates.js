@@ -26,7 +26,31 @@ export const UPDATE_NOTES = [
     date:    '2026-10-04',
     version: '1.38.22',
     type:    'improvement',
-    content: 'イベント取得と3D隊舎の操作性を改善。',
+    content: '兵庫の新しい公式サイトに対応。',
+  },
+  {
+    date:    '2026-10-04',
+    version: '1.38.22',
+    type:    'improvement',
+    content: '北海道のイベント取得を改善。',
+  },
+  {
+    date:    '2026-10-04',
+    version: '1.38.22',
+    type:    'fix',
+    content: '東京・江東出張所のイベント開催日の誤表示を修正。',
+  },
+  {
+    date:    '2026-10-04',
+    version: '1.38.22',
+    type:    'improvement',
+    content: '3D隊舎に「サイトに戻る」ボタンを追加。',
+  },
+  {
+    date:    '2026-10-04',
+    version: '1.38.22',
+    type:    'fix',
+    content: '兵庫の募集窓口情報を更新。',
   },
   {
     date:    '2026-09-25',
