@@ -99,6 +99,7 @@ const { parseEhime }     = require('./parsers/ehime');
 const { parseKagawa }    = require('./parsers/kagawa');
 const { parseKochi }     = require('./parsers/kochi');
 const { parseTokushima } = require('./parsers/tokushima');
+const { isProcurementSource } = require('../shared/procurement.cjs');
 // 中国地本
 const { parseTottori }   = require('./parsers/tottori');
 const { parseShimane }   = require('./parsers/shimane');
@@ -1553,7 +1554,7 @@ const FLYER_OCR_PROMPT = `この自衛隊イベントのチラシ（PDF・画像
  *   画像 → Tesseract → RapidOCR → Groq → OCR.space → Mistral → Gemini
  */
 async function ocrFlyerFull(url) {
-  if (!url) return null;
+  if (!url || isProcurementSource({ url })) return null;
   const isPdf = /\.pdf(\?.*)?$/i.test(url);
 
   const dl = await downloadFile(url);
@@ -3624,12 +3625,14 @@ function extractOfficeHtmlEvents($, pageUrl, meta) {
 }
 
 function extractOfficeCandidateAssets($, pageUrl) {
+  if (isProcurementSource({ url: pageUrl })) return [];
   const seen = new Set();
   const candidates = [];
 
   function add(rawUrl, text = '') {
     const norm = normalizeUrl(rawUrl, pageUrl);
     if (!norm || !isAssetUrl(norm) || seen.has(norm)) return;
+    if (isProcurementSource({ url: norm, text })) return;
     const haystack = decodeForMatch(`${norm} ${text}`);
     if (OFFICE_SKIP_ASSET_KW.test(haystack)) return;
     const hasDate = !!parseOfficeEventDate(haystack);
@@ -3859,6 +3862,7 @@ async function crawlKantoOffices(withFreshContext, cutoff) {
         if (!/\.(pdf|jpe?g|png)/i.test(href) || SKIP_ASSET.test(href)) return;
         let abs; try { abs = new URL(href, url).href; } catch { return; }
         const text = (($(el).attr('alt') || '') + ' ' + ($(el).text() || '')).replace(/\s+/g, ' ').trim();
+        if (isProcurementSource({ url: abs, text })) return;
         const m = abs.match(/(?:^|[\/_])R?(\d{1,2})\.(\d{1,2})\.(\d{1,2})/);
         if (m) {
           const mo = parseInt(m[2], 10), dy = parseInt(m[3], 10);

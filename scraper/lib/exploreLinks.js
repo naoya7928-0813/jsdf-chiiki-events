@@ -1,6 +1,7 @@
 'use strict';
 
 const { normalizeUrl, isPdfUrl, isImageUrl, isAssetUrl } = require('./normalizeUrl');
+const { isProcurementSource } = require('../../shared/procurement.cjs');
 
 // イベント・フライヤー系ページを示すキーワード（URLパス or リンクテキスト）
 const EVENT_URL_KW = /event|oshirase|news|topics|bosyu|chirashi|annai|setsumei|recruit|koho|kiji|post|saiyou|announce|info|schedule|calendar/i;
@@ -20,6 +21,7 @@ const SKIP_URL_KW = /contact|access|jimusyo|about|privacy|sitemap|staff|history|
  * @returns {{ pages: Array<{url,text}>, assets: Array<{url,text,type}> }}
  */
 function findEventLinks($, pageUrl, visited = new Set()) {
+  if (isProcurementSource({ url: pageUrl })) return { pages: [], assets: [] };
   const seenPages  = new Set();
   const seenAssets = new Set();
   const pages  = [];
@@ -30,6 +32,7 @@ function findEventLinks($, pageUrl, visited = new Set()) {
     const text = $(el).text().replace(/\s+/g, ' ').trim();
     const norm = normalizeUrl(href, pageUrl);
     if (!norm) return;
+    if (isProcurementSource({ url: norm, text })) return;
     if (!norm.includes('mod.go.jp/pco')) return;
     if (visited.has(norm)) return;
 
