@@ -1,6 +1,7 @@
 'use strict';
 
 const { normalizeUrl, isPdfUrl, isImageUrl, isAssetUrl } = require('./normalizeUrl');
+const { isProcurementSource } = require('../../shared/procurement.cjs');
 
 /**
  * Cheerio DOM からPDF・画像URLを抽出して返す。
@@ -11,12 +12,14 @@ const { normalizeUrl, isPdfUrl, isImageUrl, isAssetUrl } = require('./normalizeU
  * @returns {Array<{url:string, normalized:string, type:'pdf'|'image', linkText:string, sourcePageUrl:string}>}
  */
 function extractAssets($, pageUrl) {
+  if (isProcurementSource({ url: pageUrl })) return [];
   const seen   = new Set();
   const assets = [];
 
   function add(rawUrl, linkText = '') {
     const norm = normalizeUrl(rawUrl, pageUrl);
     if (!norm) return;
+    if (isProcurementSource({ url: norm, text: linkText })) return;
     if (!isAssetUrl(norm)) return;
     if (seen.has(norm)) return;
     seen.add(norm);

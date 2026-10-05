@@ -1,0 +1,4392 @@
+{
+  "checkedAt": "2026-10-05",
+  "scope": "全国50地本本部の名称・住所・電話・URLと、徳島の5募集窓口の担当区域を含む全項目。全国募集窓口の全項目確定を意味しない。",
+  "baselineCommit": "8ec8cd4d4cb19246366c2f303c984fa7af9435db",
+  "confirmedRecords": [
+    {
+      "id": "hq-sapporo",
+      "pref": "sapporo",
+      "name": "自衛隊札幌地方協力本部",
+      "type": "hq",
+      "address": "北海道札幌市中央区北4条西15丁目1",
+      "tel": "011-631-5472",
+      "url": "https://www.mod.go.jp/pco/sapporo/",
+      "sources": [
+        "https://www.mod.go.jp/pco/sapporo/contact.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-sapporo",
+        "type": "hq",
+        "pref": "sapporo",
+        "name": "自衛隊札幌地方協力本部",
+        "address": "北海道札幌市中央区北3条西7丁目1",
+        "lat": 43.0636,
+        "lng": 141.3469,
+        "tel": "011-631-5472",
+        "url": "https://www.mod.go.jp/pco/sapporo/"
+      },
+      "telephoneNote": "公式窓口一覧の募集課番号",
+      "coordinates": {
+        "query": "北海道札幌市中央区北4条西15丁目1",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 43.063713,
+        "lng": 141.332336,
+        "latApprox": true,
+        "matchedAddress": "北海道札幌市中央区北四条西十五丁目１番地"
+      },
+      "after": {
+        "id": "hq-sapporo",
+        "type": "hq",
+        "pref": "sapporo",
+        "name": "自衛隊札幌地方協力本部",
+        "address": "北海道札幌市中央区北4条西15丁目1",
+        "lat": 43.063713,
+        "lng": 141.332336,
+        "tel": "011-631-5472",
+        "url": "https://www.mod.go.jp/pco/sapporo/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-hakodate",
+      "pref": "hakodate",
+      "name": "自衛隊函館地方協力本部",
+      "type": "hq",
+      "address": "北海道函館市広野町6-25",
+      "tel": "0138-53-6241",
+      "url": "https://www.mod.go.jp/pco/hakodate/",
+      "sources": [
+        "https://www.mod.go.jp/pco/hakodate/about/",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-hakodate",
+        "type": "hq",
+        "pref": "hakodate",
+        "name": "自衛隊函館地方協力本部",
+        "address": "北海道函館市新川町25-18",
+        "lat": 41.7725,
+        "lng": 140.7286,
+        "tel": "0138-53-6241",
+        "url": "https://www.mod.go.jp/pco/hakodate/"
+      },
+      "coordinates": {
+        "query": "北海道函館市広野町6-25",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 41.779579,
+        "lng": 140.764557,
+        "latApprox": true,
+        "matchedAddress": "北海道函館市広野町６番２５号"
+      },
+      "after": {
+        "id": "hq-hakodate",
+        "type": "hq",
+        "pref": "hakodate",
+        "name": "自衛隊函館地方協力本部",
+        "address": "北海道函館市広野町6-25",
+        "lat": 41.779579,
+        "lng": 140.764557,
+        "tel": "0138-53-6241",
+        "url": "https://www.mod.go.jp/pco/hakodate/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-asahikawa",
+      "pref": "asahikawa",
+      "name": "自衛隊旭川地方協力本部",
+      "type": "hq",
+      "address": "北海道旭川市春光町国有無番地",
+      "tel": "0166-51-6060",
+      "url": "https://www.mod.go.jp/pco/asahikawa/",
+      "sources": [
+        "https://www.mod.go.jp/pco/asahikawa/recruit.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-asahikawa",
+        "type": "hq",
+        "pref": "asahikawa",
+        "name": "自衛隊旭川地方協力本部",
+        "address": "北海道旭川市花咲町6丁目",
+        "lat": 43.7709,
+        "lng": 142.3649,
+        "tel": "0166-51-6055",
+        "url": "https://www.mod.go.jp/pco/asahikawa/"
+      },
+      "coordinates": {
+        "query": "北海道旭川市春光町国有無番地",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 43.794292,
+        "lng": 142.365112,
+        "latApprox": true,
+        "matchedAddress": "北海道旭川市春光町"
+      },
+      "after": {
+        "id": "hq-asahikawa",
+        "type": "hq",
+        "pref": "asahikawa",
+        "name": "自衛隊旭川地方協力本部",
+        "address": "北海道旭川市春光町国有無番地",
+        "lat": 43.794292,
+        "lng": 142.365112,
+        "tel": "0166-51-6060",
+        "url": "https://www.mod.go.jp/pco/asahikawa/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-obihiro",
+      "pref": "obihiro",
+      "name": "自衛隊帯広地方協力本部",
+      "type": "hq",
+      "address": "北海道帯広市西14条南14丁目4",
+      "tel": "0155-23-5882",
+      "url": "https://www.mod.go.jp/pco/obihiro/",
+      "sources": [
+        "https://www.mod.go.jp/pco/obihiro/info_contact.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-obihiro",
+        "type": "hq",
+        "pref": "obihiro",
+        "name": "自衛隊帯広地方協力本部",
+        "address": "北海道帯広市西6条南7丁目5",
+        "lat": 42.9175,
+        "lng": 143.1977,
+        "tel": "0155-23-5882",
+        "url": "https://www.mod.go.jp/pco/obihiro/"
+      },
+      "telephoneNote": "公式窓口一覧の募集課番号",
+      "coordinates": {
+        "query": "北海道帯広市西14条南14丁目4",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 42.914654,
+        "lng": 143.181763,
+        "latApprox": true,
+        "matchedAddress": "北海道帯広市西十四条南十四丁目４番地"
+      },
+      "after": {
+        "id": "hq-obihiro",
+        "type": "hq",
+        "pref": "obihiro",
+        "name": "自衛隊帯広地方協力本部",
+        "address": "北海道帯広市西14条南14丁目4",
+        "lat": 42.914654,
+        "lng": 143.181763,
+        "tel": "0155-23-5882",
+        "url": "https://www.mod.go.jp/pco/obihiro/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-aomori",
+      "pref": "aomori",
+      "name": "自衛隊青森地方協力本部",
+      "type": "hq",
+      "address": "青森県青森市長島1丁目3-5 青森第2地方合同庁舎2F",
+      "tel": "017-776-1594",
+      "url": "https://www.mod.go.jp/pco/aomori/",
+      "sources": [
+        "https://www.mod.go.jp/pco/aomori/boshu/office.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-aomori",
+        "type": "hq",
+        "pref": "aomori",
+        "name": "自衛隊青森地方協力本部",
+        "address": "青森県青森市新町1-3-20",
+        "lat": 40.8231,
+        "lng": 140.7466,
+        "tel": "017-776-1594",
+        "url": "https://www.mod.go.jp/pco/aomori/"
+      },
+      "coordinates": {
+        "query": "青森県青森市長島1丁目3-5",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 40.824543,
+        "lng": 140.743729,
+        "latApprox": true,
+        "matchedAddress": "青森県青森市長島一丁目３番５号"
+      },
+      "after": {
+        "id": "hq-aomori",
+        "type": "hq",
+        "pref": "aomori",
+        "name": "自衛隊青森地方協力本部",
+        "address": "青森県青森市長島1丁目3-5 青森第2地方合同庁舎2F",
+        "lat": 40.824543,
+        "lng": 140.743729,
+        "tel": "017-776-1594",
+        "url": "https://www.mod.go.jp/pco/aomori/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-iwate",
+      "pref": "iwate",
+      "name": "自衛隊岩手地方協力本部",
+      "type": "hq",
+      "address": "岩手県盛岡市内丸7-25 盛岡合同庁舎2階",
+      "tel": "019-623-3236",
+      "url": "https://www.mod.go.jp/pco/iwate/",
+      "sources": [
+        "https://www.mod.go.jp/pco/iwate/iwatechihon/",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-iwate",
+        "type": "hq",
+        "pref": "iwate",
+        "name": "自衛隊岩手地方協力本部",
+        "address": "岩手県盛岡市上田4-1-1",
+        "lat": 39.7069,
+        "lng": 141.1378,
+        "tel": "019-623-3236",
+        "url": "https://www.mod.go.jp/pco/iwate/"
+      },
+      "coordinates": {
+        "query": "岩手県盛岡市内丸7-25",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 39.703197,
+        "lng": 141.151611,
+        "latApprox": true,
+        "matchedAddress": "岩手県盛岡市内丸７番２５号"
+      },
+      "after": {
+        "id": "hq-iwate",
+        "type": "hq",
+        "pref": "iwate",
+        "name": "自衛隊岩手地方協力本部",
+        "address": "岩手県盛岡市内丸7-25 盛岡合同庁舎2階",
+        "lat": 39.703197,
+        "lng": 141.151611,
+        "tel": "019-623-3236",
+        "url": "https://www.mod.go.jp/pco/iwate/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-miyagi",
+      "pref": "miyagi",
+      "name": "自衛隊宮城地方協力本部",
+      "type": "hq",
+      "address": "宮城県仙台市宮城野区五輪1丁目3-15 仙台第3合同庁舎1F",
+      "tel": "022-295-2612",
+      "url": "https://www.mod.go.jp/pco/miyagi/",
+      "sources": [
+        "https://www.mod.go.jp/pco/miyagi/miyagitop/office.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-miyagi",
+        "type": "hq",
+        "pref": "miyagi",
+        "name": "自衛隊宮城地方協力本部",
+        "address": "宮城県仙台市宮城野区元寺小路中丁78-17",
+        "lat": 38.2682,
+        "lng": 140.9104,
+        "tel": "022-295-2612",
+        "url": "https://www.mod.go.jp/pco/miyagi/"
+      },
+      "coordinates": {
+        "query": "宮城県仙台市宮城野区五輪1丁目3-15",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 38.26236,
+        "lng": 140.896713,
+        "latApprox": true,
+        "matchedAddress": "宮城県仙台市宮城野区五輪一丁目３番１５号"
+      },
+      "after": {
+        "id": "hq-miyagi",
+        "type": "hq",
+        "pref": "miyagi",
+        "name": "自衛隊宮城地方協力本部",
+        "address": "宮城県仙台市宮城野区五輪1丁目3-15 仙台第3合同庁舎1F",
+        "lat": 38.26236,
+        "lng": 140.896713,
+        "tel": "022-295-2612",
+        "url": "https://www.mod.go.jp/pco/miyagi/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-akita",
+      "pref": "akita",
+      "name": "自衛隊秋田地方協力本部",
+      "type": "hq",
+      "address": "秋田県秋田市山王4丁目3-34",
+      "tel": "018-823-5404",
+      "url": "https://www.mod.go.jp/pco/akita/",
+      "sources": [
+        "https://www.mod.go.jp/pco/akita/asset/about/contact.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-akita",
+        "type": "hq",
+        "pref": "akita",
+        "name": "自衛隊秋田地方協力本部",
+        "address": "秋田県秋田市山王7-1-3",
+        "lat": 39.7186,
+        "lng": 140.1048,
+        "tel": "018-823-5404",
+        "url": "https://www.mod.go.jp/pco/akita/"
+      },
+      "coordinates": {
+        "query": "秋田県秋田市山王4丁目3-34",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 39.716316,
+        "lng": 140.102219,
+        "latApprox": true,
+        "matchedAddress": "秋田県秋田市山王四丁目３番"
+      },
+      "after": {
+        "id": "hq-akita",
+        "type": "hq",
+        "pref": "akita",
+        "name": "自衛隊秋田地方協力本部",
+        "address": "秋田県秋田市山王4丁目3-34",
+        "lat": 39.716316,
+        "lng": 140.102219,
+        "tel": "018-823-5404",
+        "url": "https://www.mod.go.jp/pco/akita/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-yamagata",
+      "pref": "yamagata",
+      "name": "自衛隊山形地方協力本部",
+      "type": "hq",
+      "address": "山形県山形市緑町1-5-48 山形地方合同庁舎",
+      "tel": "023-622-0712",
+      "url": "https://www.mod.go.jp/pco/yamagata/",
+      "sources": [
+        "https://www.mod.go.jp/pco/yamagata/",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-yamagata",
+        "type": "hq",
+        "pref": "yamagata",
+        "name": "自衛隊山形地方協力本部",
+        "address": "山形県山形市小白川町1-8-39",
+        "lat": 38.2512,
+        "lng": 140.3408,
+        "tel": "023-622-0712",
+        "url": "https://www.mod.go.jp/pco/yamagata/"
+      },
+      "coordinates": {
+        "query": "山形県山形市緑町1-5-48",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 38.25655,
+        "lng": 140.347519,
+        "latApprox": true,
+        "matchedAddress": "山形県山形市緑町一丁目５番４８号"
+      },
+      "after": {
+        "id": "hq-yamagata",
+        "type": "hq",
+        "pref": "yamagata",
+        "name": "自衛隊山形地方協力本部",
+        "address": "山形県山形市緑町1-5-48 山形地方合同庁舎",
+        "lat": 38.25655,
+        "lng": 140.347519,
+        "tel": "023-622-0712",
+        "url": "https://www.mod.go.jp/pco/yamagata/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-fukushima",
+      "pref": "fukushima",
+      "name": "自衛隊福島地方協力本部",
+      "type": "hq",
+      "address": "福島県福島市花園町5-46 福島第二地方合同庁舎2階",
+      "tel": "024-531-2351",
+      "url": "https://www.mod.go.jp/pco/fukushima/",
+      "sources": [
+        "https://www.mod.go.jp/pco/fukushima/workcontent/workcontent.html?checkparam=jimusho_inf_content",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-fukushima",
+        "type": "hq",
+        "pref": "fukushima",
+        "name": "自衛隊福島地方協力本部",
+        "address": "福島県福島市栄町6-6",
+        "lat": 37.7607,
+        "lng": 140.4738,
+        "tel": "024-546-1920",
+        "url": "https://www.mod.go.jp/pco/fukushima/"
+      },
+      "coordinates": {
+        "query": "福島県福島市花園町5-46",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 37.761345,
+        "lng": 140.473114,
+        "latApprox": true,
+        "matchedAddress": "福島県福島市花園町５番４６号"
+      },
+      "after": {
+        "id": "hq-fukushima",
+        "type": "hq",
+        "pref": "fukushima",
+        "name": "自衛隊福島地方協力本部",
+        "address": "福島県福島市花園町5-46 福島第二地方合同庁舎2階",
+        "lat": 37.761345,
+        "lng": 140.473114,
+        "tel": "024-531-2351",
+        "url": "https://www.mod.go.jp/pco/fukushima/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-ibaraki",
+      "pref": "ibaraki",
+      "name": "自衛隊茨城地方協力本部",
+      "type": "hq",
+      "address": "茨城県水戸市北見町1-11 水戸地方合同庁舎",
+      "tel": "029-231-3315",
+      "url": "https://www.mod.go.jp/pco/ibaraki/",
+      "sources": [
+        "https://www.mod.go.jp/pco/ibaraki/boshujimusho.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-ibaraki",
+        "type": "hq",
+        "pref": "ibaraki",
+        "name": "自衛隊茨城地方協力本部",
+        "address": "茨城県水戸市南町3-4-57",
+        "lat": 36.366,
+        "lng": 140.4717,
+        "tel": "029-231-3315",
+        "url": "https://www.mod.go.jp/pco/ibaraki/"
+      },
+      "coordinates": {
+        "query": "茨城県水戸市北見町1-11",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 36.377026,
+        "lng": 140.477005,
+        "latApprox": true,
+        "matchedAddress": "茨城県水戸市北見町１番１１号"
+      },
+      "after": {
+        "id": "hq-ibaraki",
+        "type": "hq",
+        "pref": "ibaraki",
+        "name": "自衛隊茨城地方協力本部",
+        "address": "茨城県水戸市北見町1-11 水戸地方合同庁舎",
+        "lat": 36.377026,
+        "lng": 140.477005,
+        "tel": "029-231-3315",
+        "url": "https://www.mod.go.jp/pco/ibaraki/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-tochigi",
+      "pref": "tochigi",
+      "name": "自衛隊栃木地方協力本部",
+      "type": "hq",
+      "address": "栃木県宇都宮市桜5-1-13 宇都宮地方合同庁舎2階",
+      "tel": "028-634-3385",
+      "url": "https://www.mod.go.jp/pco/tochigi/",
+      "sources": [
+        "https://www.mod.go.jp/pco/tochigi/tochigichihon.html",
+        "https://www.mod.go.jp/pco/tochigi/recruit.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-tochigi",
+        "type": "hq",
+        "pref": "tochigi",
+        "name": "自衛隊栃木地方協力本部",
+        "address": "栃木県宇都宮市本町4-12",
+        "lat": 36.5628,
+        "lng": 139.8831,
+        "tel": "028-634-3385",
+        "url": "https://www.mod.go.jp/pco/tochigi/"
+      },
+      "coordinates": {
+        "query": "栃木県宇都宮市桜5-1-13",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 36.565254,
+        "lng": 139.867416,
+        "latApprox": true,
+        "matchedAddress": "栃木県宇都宮市桜五丁目１番１３号"
+      },
+      "after": {
+        "id": "hq-tochigi",
+        "type": "hq",
+        "pref": "tochigi",
+        "name": "自衛隊栃木地方協力本部",
+        "address": "栃木県宇都宮市桜5-1-13 宇都宮地方合同庁舎2階",
+        "lat": 36.565254,
+        "lng": 139.867416,
+        "tel": "028-634-3385",
+        "url": "https://www.mod.go.jp/pco/tochigi/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-gunma",
+      "pref": "gunma",
+      "name": "自衛隊群馬地方協力本部",
+      "type": "hq",
+      "address": "群馬県前橋市南町3丁目64-12",
+      "tel": "027-221-4471",
+      "url": "https://www.mod.go.jp/pco/gunma/",
+      "sources": [
+        "https://www.mod.go.jp/pco/gunma/bosyuannai.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-gunma",
+        "type": "hq",
+        "pref": "gunma",
+        "name": "自衛隊群馬地方協力本部",
+        "address": "群馬県前橋市大手町2-3-1",
+        "lat": 36.3895,
+        "lng": 139.063,
+        "tel": "027-221-4471",
+        "url": "https://www.mod.go.jp/pco/gunma/"
+      },
+      "coordinates": {
+        "query": "群馬県前橋市南町3丁目64-12",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 36.379543,
+        "lng": 139.072021,
+        "latApprox": true,
+        "matchedAddress": "群馬県前橋市南町三丁目６４番"
+      },
+      "after": {
+        "id": "hq-gunma",
+        "type": "hq",
+        "pref": "gunma",
+        "name": "自衛隊群馬地方協力本部",
+        "address": "群馬県前橋市南町3丁目64-12",
+        "lat": 36.379543,
+        "lng": 139.072021,
+        "tel": "027-221-4471",
+        "url": "https://www.mod.go.jp/pco/gunma/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-saitama",
+      "pref": "saitama",
+      "name": "自衛隊埼玉地方協力本部",
+      "type": "hq",
+      "address": "埼玉県さいたま市浦和区常盤4丁目11-15 浦和合同庁舎3F",
+      "tel": "048-831-6043",
+      "url": "https://www.mod.go.jp/pco/saitama/",
+      "sources": [
+        "https://www.mod.go.jp/pco/saitama/office/",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-saitama",
+        "type": "hq",
+        "pref": "saitama",
+        "name": "自衛隊埼玉地方協力本部",
+        "address": "埼玉県さいたま市南区南本町1-6-1",
+        "lat": 35.8588,
+        "lng": 139.6467,
+        "tel": "048-831-6043",
+        "url": "https://www.mod.go.jp/pco/saitama/"
+      },
+      "coordinates": {
+        "query": "埼玉県さいたま市浦和区常盤4丁目11-15",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 35.861134,
+        "lng": 139.646881,
+        "latApprox": true,
+        "matchedAddress": "埼玉県さいたま市浦和区常盤四丁目１１番１５号"
+      },
+      "after": {
+        "id": "hq-saitama",
+        "type": "hq",
+        "pref": "saitama",
+        "name": "自衛隊埼玉地方協力本部",
+        "address": "埼玉県さいたま市浦和区常盤4丁目11-15 浦和合同庁舎3F",
+        "lat": 35.861134,
+        "lng": 139.646881,
+        "tel": "048-831-6043",
+        "url": "https://www.mod.go.jp/pco/saitama/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-chiba",
+      "pref": "chiba",
+      "name": "自衛隊千葉地方協力本部",
+      "type": "hq",
+      "address": "千葉県千葉市稲毛区轟町1丁目1-17",
+      "tel": "043-251-7151",
+      "url": "https://www.mod.go.jp/pco/chiba/",
+      "sources": [
+        "https://www.mod.go.jp/pco/chiba/access.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-chiba",
+        "type": "hq",
+        "pref": "chiba",
+        "name": "自衛隊千葉地方協力本部",
+        "address": "千葉県千葉市中央区千葉港2-1",
+        "lat": 35.6078,
+        "lng": 140.1014,
+        "tel": "043-251-7151",
+        "url": "https://www.mod.go.jp/pco/chiba/"
+      },
+      "coordinates": {
+        "query": "千葉県千葉市稲毛区轟町1丁目1-17",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 35.623592,
+        "lng": 140.107986,
+        "latApprox": true,
+        "matchedAddress": "千葉県千葉市稲毛区轟町一丁目１番１７号"
+      },
+      "after": {
+        "id": "hq-chiba",
+        "type": "hq",
+        "pref": "chiba",
+        "name": "自衛隊千葉地方協力本部",
+        "address": "千葉県千葉市稲毛区轟町1丁目1-17",
+        "lat": 35.623592,
+        "lng": 140.107986,
+        "tel": "043-251-7151",
+        "url": "https://www.mod.go.jp/pco/chiba/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-tokyo",
+      "pref": "tokyo",
+      "name": "自衛隊東京地方協力本部",
+      "type": "hq",
+      "address": "東京都新宿区市谷本村町10番1号",
+      "tel": "03-3269-3513",
+      "url": "https://www.mod.go.jp/pco/tokyo/",
+      "sources": [
+        "https://www.mod.go.jp/pco/tokyo/anamachi/",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-tokyo",
+        "type": "hq",
+        "pref": "tokyo",
+        "name": "自衛隊東京地方協力本部",
+        "address": "東京都新宿区市谷本村町5-1",
+        "lat": 35.6862,
+        "lng": 139.7316,
+        "tel": "03-3269-3513",
+        "url": "https://www.mod.go.jp/pco/tokyo/"
+      },
+      "coordinates": {
+        "query": "東京都新宿区市谷本村町10番1号",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 35.69503,
+        "lng": 139.730789,
+        "latApprox": true,
+        "matchedAddress": "東京都新宿区市谷本村町１０番１号"
+      },
+      "after": {
+        "id": "hq-tokyo",
+        "type": "hq",
+        "pref": "tokyo",
+        "name": "自衛隊東京地方協力本部",
+        "address": "東京都新宿区市谷本村町10番1号",
+        "lat": 35.69503,
+        "lng": 139.730789,
+        "tel": "03-3269-3513",
+        "url": "https://www.mod.go.jp/pco/tokyo/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-kanagawa",
+      "pref": "kanagawa",
+      "name": "自衛隊神奈川地方協力本部",
+      "type": "hq",
+      "address": "神奈川県横浜市中区山下町253-2",
+      "tel": "045-662-9429",
+      "url": "https://www.mod.go.jp/pco/kanagawa/",
+      "sources": [
+        "https://www.mod.go.jp/pco/kanagawa/mado/mado.html",
+        "https://www.mod.go.jp/pco/kanagawa/kouho/chihon/pco.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-kanagawa",
+        "type": "hq",
+        "pref": "kanagawa",
+        "name": "自衛隊神奈川地方協力本部",
+        "address": "神奈川県横浜市中区山下町37",
+        "lat": 35.4427,
+        "lng": 139.6499,
+        "tel": "045-662-9429",
+        "url": "https://www.mod.go.jp/pco/kanagawa/"
+      },
+      "telephoneNote": "募集課番号",
+      "coordinates": {
+        "query": "神奈川県横浜市中区山下町253-2",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 35.440315,
+        "lng": 139.644592,
+        "latApprox": true,
+        "matchedAddress": "神奈川県横浜市中区山下町２５３番地"
+      },
+      "after": {
+        "id": "hq-kanagawa",
+        "type": "hq",
+        "pref": "kanagawa",
+        "name": "自衛隊神奈川地方協力本部",
+        "address": "神奈川県横浜市中区山下町253-2",
+        "lat": 35.440315,
+        "lng": 139.644592,
+        "tel": "045-662-9429",
+        "url": "https://www.mod.go.jp/pco/kanagawa/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-niigata",
+      "pref": "niigata",
+      "name": "自衛隊新潟地方協力本部",
+      "type": "hq",
+      "address": "新潟県新潟市中央区美咲町1-1-1 美咲合同庁舎1号館7階",
+      "tel": "025-285-0515",
+      "url": "https://www.mod.go.jp/pco/niigata/",
+      "sources": [
+        "https://www.mod.go.jp/pco/niigata/HP/access.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-niigata",
+        "type": "hq",
+        "pref": "niigata",
+        "name": "自衛隊新潟地方協力本部",
+        "address": "新潟県新潟市中央区西堀通6番町866",
+        "lat": 37.9161,
+        "lng": 139.0365,
+        "tel": "025-285-0515",
+        "url": "https://www.mod.go.jp/pco/niigata/"
+      },
+      "coordinates": {
+        "query": "新潟県新潟市中央区美咲町1-1-1",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 37.895344,
+        "lng": 139.0177,
+        "latApprox": true,
+        "matchedAddress": "新潟県新潟市中央区美咲町一丁目１番"
+      },
+      "after": {
+        "id": "hq-niigata",
+        "type": "hq",
+        "pref": "niigata",
+        "name": "自衛隊新潟地方協力本部",
+        "address": "新潟県新潟市中央区美咲町1-1-1 美咲合同庁舎1号館7階",
+        "lat": 37.895344,
+        "lng": 139.0177,
+        "tel": "025-285-0515",
+        "url": "https://www.mod.go.jp/pco/niigata/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-yamanashi",
+      "pref": "yamanashi",
+      "name": "自衛隊山梨地方協力本部",
+      "type": "hq",
+      "address": "山梨県甲府市丸の内1-1-18 甲府合同庁舎",
+      "tel": "055-253-1591",
+      "url": "https://www.mod.go.jp/pco/yamanashi/",
+      "sources": [
+        "https://www.mod.go.jp/pco/yamanashi/honbu.html#shozaichi",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-yamanashi",
+        "type": "hq",
+        "pref": "yamanashi",
+        "name": "自衛隊山梨地方協力本部",
+        "address": "山梨県甲府市丸の内1-1-18",
+        "lat": 35.6629,
+        "lng": 138.5689,
+        "tel": "055-253-1591",
+        "url": "https://www.mod.go.jp/pco/yamanashi/"
+      },
+      "coordinates": {
+        "query": "山梨県甲府市丸の内1-1-18",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 35.668755,
+        "lng": 138.567459,
+        "latApprox": true,
+        "matchedAddress": "山梨県甲府市丸の内一丁目１番１８号"
+      },
+      "after": {
+        "id": "hq-yamanashi",
+        "type": "hq",
+        "pref": "yamanashi",
+        "name": "自衛隊山梨地方協力本部",
+        "address": "山梨県甲府市丸の内1-1-18 甲府合同庁舎",
+        "lat": 35.668755,
+        "lng": 138.567459,
+        "tel": "055-253-1591",
+        "url": "https://www.mod.go.jp/pco/yamanashi/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-nagano",
+      "pref": "nagano",
+      "name": "自衛隊長野地方協力本部",
+      "type": "hq",
+      "address": "長野県長野市旭町1108 長野第2合同庁舎1F",
+      "tel": "026-233-2108",
+      "url": "https://www.mod.go.jp/pco/nagano/",
+      "sources": [
+        "https://www.mod.go.jp/pco/nagano/",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-nagano",
+        "type": "hq",
+        "pref": "nagano",
+        "name": "自衛隊長野地方協力本部",
+        "address": "長野県長野市南県町686-1",
+        "lat": 36.6498,
+        "lng": 138.1946,
+        "tel": "026-233-2108",
+        "url": "https://www.mod.go.jp/pco/nagano/"
+      },
+      "coordinates": {
+        "query": "長野県長野市長野旭町1108",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 36.654778,
+        "lng": 138.180771,
+        "latApprox": true,
+        "matchedAddress": "長野県長野市大字長野旭町１１０８番地"
+      },
+      "after": {
+        "id": "hq-nagano",
+        "type": "hq",
+        "pref": "nagano",
+        "name": "自衛隊長野地方協力本部",
+        "address": "長野県長野市旭町1108 長野第2合同庁舎1F",
+        "lat": 36.654778,
+        "lng": 138.180771,
+        "tel": "026-233-2108",
+        "url": "https://www.mod.go.jp/pco/nagano/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-shizuoka",
+      "pref": "shizuoka",
+      "name": "自衛隊静岡地方協力本部",
+      "type": "hq",
+      "address": "静岡県静岡市葵区柚木366",
+      "tel": "054-261-3151",
+      "url": "https://www.mod.go.jp/pco/sizuoka/",
+      "sources": [
+        "https://www.mod.go.jp/pco/sizuoka/office/honbu.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-shizuoka",
+        "type": "hq",
+        "pref": "shizuoka",
+        "name": "自衛隊静岡地方協力本部",
+        "address": "静岡県静岡市葵区追手町9-6",
+        "lat": 34.977,
+        "lng": 138.383,
+        "tel": "054-252-4000",
+        "url": "https://www.mod.go.jp/pco/sizuoka/"
+      },
+      "coordinates": {
+        "query": "静岡県静岡市葵区柚木366",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 34.986118,
+        "lng": 138.40712,
+        "latApprox": true,
+        "matchedAddress": "静岡県静岡市葵区柚木３６６番地"
+      },
+      "after": {
+        "id": "hq-shizuoka",
+        "type": "hq",
+        "pref": "shizuoka",
+        "name": "自衛隊静岡地方協力本部",
+        "address": "静岡県静岡市葵区柚木366",
+        "lat": 34.986118,
+        "lng": 138.40712,
+        "tel": "054-261-3151",
+        "url": "https://www.mod.go.jp/pco/sizuoka/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-toyama",
+      "pref": "toyama",
+      "name": "自衛隊富山地方協力本部",
+      "type": "hq",
+      "address": "富山県富山市牛島新町6-24",
+      "tel": "076-441-3271",
+      "url": "https://www.mod.go.jp/pco/toyama/",
+      "sources": [
+        "https://www.mod.go.jp/pco/toyama/content/07-access/07-access.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-toyama",
+        "type": "hq",
+        "pref": "toyama",
+        "name": "自衛隊富山地方協力本部",
+        "address": "富山県富山市桜橋通り3-1",
+        "lat": 36.6953,
+        "lng": 137.2116,
+        "tel": "076-441-3271",
+        "url": "https://www.mod.go.jp/pco/toyama/"
+      },
+      "coordinates": {
+        "query": "富山県富山市牛島新町6-24",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 36.702351,
+        "lng": 137.216324,
+        "latApprox": true,
+        "matchedAddress": "富山県富山市牛島新町６番２４号"
+      },
+      "after": {
+        "id": "hq-toyama",
+        "type": "hq",
+        "pref": "toyama",
+        "name": "自衛隊富山地方協力本部",
+        "address": "富山県富山市牛島新町6-24",
+        "lat": 36.702351,
+        "lng": 137.216324,
+        "tel": "076-441-3271",
+        "url": "https://www.mod.go.jp/pco/toyama/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-ishikawa",
+      "pref": "ishikawa",
+      "name": "自衛隊石川地方協力本部",
+      "type": "hq",
+      "address": "石川県金沢市新神田4丁目3-10 金沢新神田合同庁舎3F",
+      "tel": "076-291-6214",
+      "url": "https://www.mod.go.jp/pco/ishikawa/",
+      "sources": [
+        "https://www.mod.go.jp/pco/ishikawa/guide/",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-ishikawa",
+        "type": "hq",
+        "pref": "ishikawa",
+        "name": "自衛隊石川地方協力本部",
+        "address": "石川県金沢市西念3-4-1",
+        "lat": 36.5657,
+        "lng": 136.6367,
+        "tel": "076-291-6250",
+        "url": "https://www.mod.go.jp/pco/ishikawa/"
+      },
+      "coordinates": {
+        "query": "石川県金沢市新神田4丁目3-10",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 36.561741,
+        "lng": 136.629562,
+        "latApprox": true,
+        "matchedAddress": "石川県金沢市新神田四丁目３番１０号"
+      },
+      "after": {
+        "id": "hq-ishikawa",
+        "type": "hq",
+        "pref": "ishikawa",
+        "name": "自衛隊石川地方協力本部",
+        "address": "石川県金沢市新神田4丁目3-10 金沢新神田合同庁舎3F",
+        "lat": 36.561741,
+        "lng": 136.629562,
+        "tel": "076-291-6214",
+        "url": "https://www.mod.go.jp/pco/ishikawa/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-fukui",
+      "pref": "fukui",
+      "name": "自衛隊福井地方協力本部",
+      "type": "hq",
+      "address": "福井県福井市春山1丁目1-54 福井春山合同庁舎10F",
+      "tel": "0776-23-1910",
+      "url": "https://www.mod.go.jp/pco/fukui/",
+      "sources": [
+        "https://www.mod.go.jp/pco/fukui/contents/6-aboutus/6-aboutus.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-fukui",
+        "type": "hq",
+        "pref": "fukui",
+        "name": "自衛隊福井地方協力本部",
+        "address": "福井県福井市宝永3-5-34",
+        "lat": 36.0602,
+        "lng": 136.2179,
+        "tel": "0776-23-1910",
+        "url": "https://www.mod.go.jp/pco/fukui/"
+      },
+      "coordinates": {
+        "query": "福井県福井市春山1丁目1-54",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 36.067978,
+        "lng": 136.217728,
+        "latApprox": true,
+        "matchedAddress": "福井県福井市春山一丁目１番５４号"
+      },
+      "after": {
+        "id": "hq-fukui",
+        "type": "hq",
+        "pref": "fukui",
+        "name": "自衛隊福井地方協力本部",
+        "address": "福井県福井市春山1丁目1-54 福井春山合同庁舎10F",
+        "lat": 36.067978,
+        "lng": 136.217728,
+        "tel": "0776-23-1910",
+        "url": "https://www.mod.go.jp/pco/fukui/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-gifu",
+      "pref": "gifu",
+      "name": "自衛隊岐阜地方協力本部",
+      "type": "hq",
+      "address": "岐阜県岐阜市長良福光2675-3",
+      "tel": "058-232-3127",
+      "url": "https://www.mod.go.jp/pco/gifu/",
+      "sources": [
+        "https://www.mod.go.jp/pco/gifu/office/office.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-gifu",
+        "type": "hq",
+        "pref": "gifu",
+        "name": "自衛隊岐阜地方協力本部",
+        "address": "岐阜県岐阜市神田町6-14",
+        "lat": 35.423,
+        "lng": 136.757,
+        "tel": "058-232-3127",
+        "url": "https://www.mod.go.jp/pco/gifu/"
+      },
+      "coordinates": {
+        "query": "岐阜県岐阜市長良福光2675-3",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 35.443569,
+        "lng": 136.763702,
+        "latApprox": true,
+        "matchedAddress": "岐阜県岐阜市長良福光２６７５番地"
+      },
+      "after": {
+        "id": "hq-gifu",
+        "type": "hq",
+        "pref": "gifu",
+        "name": "自衛隊岐阜地方協力本部",
+        "address": "岐阜県岐阜市長良福光2675-3",
+        "lat": 35.443569,
+        "lng": 136.763702,
+        "tel": "058-232-3127",
+        "url": "https://www.mod.go.jp/pco/gifu/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-aichi",
+      "pref": "aichi",
+      "name": "自衛隊愛知地方協力本部",
+      "type": "hq",
+      "address": "愛知県名古屋市中川区松重町3-41",
+      "tel": "052-331-6266",
+      "url": "https://www.mod.go.jp/pco/aichi/",
+      "sources": [
+        "https://www.mod.go.jp/pco/aichi/contact/list.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-aichi",
+        "type": "hq",
+        "pref": "aichi",
+        "name": "自衛隊愛知地方協力本部",
+        "address": "愛知県名古屋市東区泉1-13-3",
+        "lat": 35.1819,
+        "lng": 136.9207,
+        "tel": "052-331-6266",
+        "url": "https://www.mod.go.jp/pco/aichi/"
+      },
+      "coordinates": {
+        "query": "愛知県名古屋市中川区松重町3-41",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 35.155617,
+        "lng": 136.892502,
+        "latApprox": true,
+        "matchedAddress": "愛知県名古屋市中川区松重町３番４１号"
+      },
+      "after": {
+        "id": "hq-aichi",
+        "type": "hq",
+        "pref": "aichi",
+        "name": "自衛隊愛知地方協力本部",
+        "address": "愛知県名古屋市中川区松重町3-41",
+        "lat": 35.155617,
+        "lng": 136.892502,
+        "tel": "052-331-6266",
+        "url": "https://www.mod.go.jp/pco/aichi/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-mie",
+      "pref": "mie",
+      "name": "自衛隊三重地方協力本部",
+      "type": "hq",
+      "address": "三重県津市桜橋1丁目91",
+      "tel": "059-225-0531",
+      "url": "https://www.mod.go.jp/pco/mie/",
+      "sources": [
+        "https://www.mod.go.jp/pco/mie/regional/",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-mie",
+        "type": "hq",
+        "pref": "mie",
+        "name": "自衛隊三重地方協力本部",
+        "address": "三重県津市広明町13",
+        "lat": 34.7303,
+        "lng": 136.5085,
+        "tel": "059-228-4722",
+        "url": "https://www.mod.go.jp/pco/mie/"
+      },
+      "coordinates": {
+        "query": "三重県津市桜橋1丁目91",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 34.728138,
+        "lng": 136.514114,
+        "latApprox": true,
+        "matchedAddress": "三重県津市桜橋一丁目９１番地"
+      },
+      "after": {
+        "id": "hq-mie",
+        "type": "hq",
+        "pref": "mie",
+        "name": "自衛隊三重地方協力本部",
+        "address": "三重県津市桜橋1丁目91",
+        "lat": 34.728138,
+        "lng": 136.514114,
+        "tel": "059-225-0531",
+        "url": "https://www.mod.go.jp/pco/mie/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-shiga",
+      "pref": "shiga",
+      "name": "自衛隊滋賀地方協力本部",
+      "type": "hq",
+      "address": "滋賀県大津市京町3-1-1大津びわ湖合同庁舎5F",
+      "tel": "077-524-6446",
+      "url": "https://www.mod.go.jp/pco/shiga/",
+      "sources": [
+        "https://www.mod.go.jp/pco/shiga/about/#sec3",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-shiga",
+        "type": "hq",
+        "pref": "shiga",
+        "name": "自衛隊滋賀地方協力本部",
+        "address": "滋賀県大津市竜が丘21-10",
+        "lat": 35.0084,
+        "lng": 135.8699,
+        "tel": "077-524-6446",
+        "url": "https://www.mod.go.jp/pco/shiga/"
+      },
+      "coordinates": {
+        "query": "滋賀県大津市京町3-1-1大津びわ湖合同庁舎5F",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 35.004246,
+        "lng": 135.865417,
+        "latApprox": true,
+        "matchedAddress": "滋賀県大津市京町三丁目１番"
+      },
+      "after": {
+        "id": "hq-shiga",
+        "type": "hq",
+        "pref": "shiga",
+        "name": "自衛隊滋賀地方協力本部",
+        "address": "滋賀県大津市京町3-1-1大津びわ湖合同庁舎5F",
+        "lat": 35.004246,
+        "lng": 135.865417,
+        "tel": "077-524-6446",
+        "url": "https://www.mod.go.jp/pco/shiga/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-kyoto",
+      "pref": "kyoto",
+      "name": "自衛隊京都地方協力本部",
+      "type": "hq",
+      "address": "京都府京都市中京区西ノ京笠殿町38",
+      "tel": "075-803-0820",
+      "url": "https://www.mod.go.jp/pco/kyoto/",
+      "sources": [
+        "https://www.mod.go.jp/pco/kyoto/jimusho/jieikan/",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-kyoto",
+        "type": "hq",
+        "pref": "kyoto",
+        "name": "自衛隊京都地方協力本部",
+        "address": "京都府京都市伏見区深草一ノ坪町13",
+        "lat": 34.9403,
+        "lng": 135.7609,
+        "tel": "075-803-0820",
+        "url": "https://www.mod.go.jp/pco/kyoto/"
+      },
+      "coordinates": {
+        "query": "京都府京都市中京区西ノ京笠殿町38",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 35.014999,
+        "lng": 135.733032,
+        "latApprox": true,
+        "matchedAddress": "京都府京都市中京区西ノ京笠殿町３８番地"
+      },
+      "after": {
+        "id": "hq-kyoto",
+        "type": "hq",
+        "pref": "kyoto",
+        "name": "自衛隊京都地方協力本部",
+        "address": "京都府京都市中京区西ノ京笠殿町38",
+        "lat": 35.014999,
+        "lng": 135.733032,
+        "tel": "075-803-0820",
+        "url": "https://www.mod.go.jp/pco/kyoto/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-osaka",
+      "pref": "osaka",
+      "name": "自衛隊大阪地方協力本部",
+      "type": "hq",
+      "address": "大阪府大阪市中央区大手前4-1-67 大阪合同庁舎第2号館3F",
+      "tel": "06-6942-0541",
+      "url": "https://www.mod.go.jp/pco/osaka/",
+      "sources": [
+        "https://www.mod.go.jp/pco/osaka/about/office/madoguti.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-osaka",
+        "type": "hq",
+        "pref": "osaka",
+        "name": "自衛隊大阪地方協力本部",
+        "address": "大阪府大阪市中央区大手前4-1-67",
+        "lat": 34.6867,
+        "lng": 135.5196,
+        "tel": "06-6942-0542",
+        "url": "https://www.mod.go.jp/pco/osaka/"
+      },
+      "coordinates": {
+        "query": "大阪府大阪市中央区大手前4-1-67",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 34.681675,
+        "lng": 135.519241,
+        "latApprox": true,
+        "matchedAddress": "大阪府大阪市中央区大手前四丁目１番６７号"
+      },
+      "after": {
+        "id": "hq-osaka",
+        "type": "hq",
+        "pref": "osaka",
+        "name": "自衛隊大阪地方協力本部",
+        "address": "大阪府大阪市中央区大手前4-1-67 大阪合同庁舎第2号館3F",
+        "lat": 34.681675,
+        "lng": 135.519241,
+        "tel": "06-6942-0541",
+        "url": "https://www.mod.go.jp/pco/osaka/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-hyogo",
+      "pref": "hyogo",
+      "name": "自衛隊兵庫地方協力本部",
+      "type": "hq",
+      "address": "兵庫県神戸市中央区脇浜海岸通1-4-3 神戸防災合同庁舎4F",
+      "tel": "078-261-9777",
+      "url": "https://www.mod.go.jp/pco/hyogo/",
+      "sources": [
+        "https://www.mod.go.jp/pco/hyogo/about/sosiki.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-hyogo",
+        "type": "hq",
+        "pref": "hyogo",
+        "name": "自衛隊兵庫地方協力本部",
+        "address": "兵庫県神戸市中央区下山手通4-4-12",
+        "lat": 34.6921,
+        "lng": 135.1893,
+        "tel": "078-261-8600",
+        "url": "https://www.mod.go.jp/pco/hyogo/"
+      },
+      "coordinates": {
+        "query": "兵庫県神戸市中央区脇浜海岸通1-4-3",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 34.697468,
+        "lng": 135.213013,
+        "latApprox": true,
+        "matchedAddress": "兵庫県神戸市中央区脇浜海岸通一丁目４番"
+      },
+      "after": {
+        "id": "hq-hyogo",
+        "type": "hq",
+        "pref": "hyogo",
+        "name": "自衛隊兵庫地方協力本部",
+        "address": "兵庫県神戸市中央区脇浜海岸通1-4-3 神戸防災合同庁舎4F",
+        "lat": 34.697468,
+        "lng": 135.213013,
+        "tel": "078-261-9777",
+        "url": "https://www.mod.go.jp/pco/hyogo/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-nara",
+      "pref": "nara",
+      "name": "自衛隊奈良地方協力本部",
+      "type": "hq",
+      "address": "奈良県奈良市高畑町552 奈良第2地方合同庁舎1F",
+      "tel": "0742-23-7001",
+      "url": "https://www.mod.go.jp/pco/nara/",
+      "sources": [
+        "https://www.mod.go.jp/pco/nara/guide/about/",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-nara",
+        "type": "hq",
+        "pref": "nara",
+        "name": "自衛隊奈良地方協力本部",
+        "address": "奈良県奈良市四条大路3-4-1",
+        "lat": 34.6826,
+        "lng": 135.828,
+        "tel": "0742-23-7001",
+        "url": "https://www.mod.go.jp/pco/nara/"
+      },
+      "coordinates": {
+        "query": "奈良県奈良市高畑町552",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 34.675339,
+        "lng": 135.840698,
+        "latApprox": true,
+        "matchedAddress": "奈良県奈良市高畑町５５２番地"
+      },
+      "after": {
+        "id": "hq-nara",
+        "type": "hq",
+        "pref": "nara",
+        "name": "自衛隊奈良地方協力本部",
+        "address": "奈良県奈良市高畑町552 奈良第2地方合同庁舎1F",
+        "lat": 34.675339,
+        "lng": 135.840698,
+        "tel": "0742-23-7001",
+        "url": "https://www.mod.go.jp/pco/nara/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-wakayama",
+      "pref": "wakayama",
+      "name": "自衛隊和歌山地方協力本部",
+      "type": "hq",
+      "address": "和歌山県和歌山市築港1丁目14-6",
+      "tel": "073-422-5116",
+      "url": "https://www.mod.go.jp/pco/wakayama/",
+      "sources": [
+        "https://www.mod.go.jp/pco/wakayama/about/",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-wakayama",
+        "type": "hq",
+        "pref": "wakayama",
+        "name": "自衛隊和歌山地方協力本部",
+        "address": "和歌山県和歌山市北出島1-5-21",
+        "lat": 34.2296,
+        "lng": 135.1694,
+        "tel": "073-422-5116",
+        "url": "https://www.mod.go.jp/pco/wakayama/"
+      },
+      "coordinates": {
+        "query": "和歌山県和歌山市築港1丁目14-6",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 34.223576,
+        "lng": 135.157227,
+        "latApprox": true,
+        "matchedAddress": "和歌山県和歌山市築港一丁目１４番地"
+      },
+      "after": {
+        "id": "hq-wakayama",
+        "type": "hq",
+        "pref": "wakayama",
+        "name": "自衛隊和歌山地方協力本部",
+        "address": "和歌山県和歌山市築港1丁目14-6",
+        "lat": 34.223576,
+        "lng": 135.157227,
+        "tel": "073-422-5116",
+        "url": "https://www.mod.go.jp/pco/wakayama/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-tottori",
+      "pref": "tottori",
+      "name": "自衛隊鳥取地方協力本部",
+      "type": "hq",
+      "address": "鳥取県鳥取市富安2-89-4 鳥取第1地方合同庁舎6F",
+      "tel": "0857-23-2251",
+      "url": "https://www.mod.go.jp/pco/tottori/",
+      "sources": [
+        "https://www.mod.go.jp/pco/tottori/",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-tottori",
+        "type": "hq",
+        "pref": "tottori",
+        "name": "自衛隊鳥取地方協力本部",
+        "address": "鳥取県鳥取市上町225",
+        "lat": 35.5044,
+        "lng": 134.2368,
+        "tel": "0857-23-2251",
+        "url": "https://www.mod.go.jp/pco/tottori/"
+      },
+      "coordinates": {
+        "query": "鳥取県鳥取市富安2-89-4",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 35.490543,
+        "lng": 134.228241,
+        "latApprox": true,
+        "matchedAddress": "鳥取県鳥取市富安二丁目８９番地"
+      },
+      "after": {
+        "id": "hq-tottori",
+        "type": "hq",
+        "pref": "tottori",
+        "name": "自衛隊鳥取地方協力本部",
+        "address": "鳥取県鳥取市富安2-89-4 鳥取第1地方合同庁舎6F",
+        "lat": 35.490543,
+        "lng": 134.228241,
+        "tel": "0857-23-2251",
+        "url": "https://www.mod.go.jp/pco/tottori/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-shimane",
+      "pref": "shimane",
+      "name": "自衛隊島根地方協力本部",
+      "type": "hq",
+      "address": "島根県松江市向島町134-10 松江地方合同庁舎4F",
+      "tel": "0852-21-0015",
+      "url": "https://www.mod.go.jp/pco/shimane/",
+      "sources": [
+        "https://www.mod.go.jp/pco/shimane/consultation/branch.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-shimane",
+        "type": "hq",
+        "pref": "shimane",
+        "name": "自衛隊島根地方協力本部",
+        "address": "島根県松江市朝日町478-18",
+        "lat": 35.4721,
+        "lng": 133.0506,
+        "tel": "0852-21-0015",
+        "url": "https://www.mod.go.jp/pco/shimane/"
+      },
+      "coordinates": {
+        "query": "島根県松江市向島町134-10",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 35.468693,
+        "lng": 133.064148,
+        "latApprox": true,
+        "matchedAddress": "島根県松江市向島町１３４番地"
+      },
+      "after": {
+        "id": "hq-shimane",
+        "type": "hq",
+        "pref": "shimane",
+        "name": "自衛隊島根地方協力本部",
+        "address": "島根県松江市向島町134-10 松江地方合同庁舎4F",
+        "lat": 35.468693,
+        "lng": 133.064148,
+        "tel": "0852-21-0015",
+        "url": "https://www.mod.go.jp/pco/shimane/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-okayama",
+      "pref": "okayama",
+      "name": "自衛隊岡山地方協力本部",
+      "type": "hq",
+      "address": "岡山県岡山市北区下石井1-4-1 岡山第2合同庁舎2F",
+      "tel": "086-226-0361",
+      "url": "https://www.mod.go.jp/pco/okayama/",
+      "sources": [
+        "https://www.mod.go.jp/pco/okayama/gide/information.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-okayama",
+        "type": "hq",
+        "pref": "okayama",
+        "name": "自衛隊岡山地方協力本部",
+        "address": "岡山県岡山市北区津島中1-1-1",
+        "lat": 34.6765,
+        "lng": 133.9169,
+        "tel": "086-226-0361",
+        "url": "https://www.mod.go.jp/pco/okayama/"
+      },
+      "coordinates": {
+        "query": "岡山県岡山市北区下石井1-4-1",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 34.662041,
+        "lng": 133.916168,
+        "latApprox": true,
+        "matchedAddress": "岡山県岡山市北区下石井一丁目４番"
+      },
+      "after": {
+        "id": "hq-okayama",
+        "type": "hq",
+        "pref": "okayama",
+        "name": "自衛隊岡山地方協力本部",
+        "address": "岡山県岡山市北区下石井1-4-1 岡山第2合同庁舎2F",
+        "lat": 34.662041,
+        "lng": 133.916168,
+        "tel": "086-226-0361",
+        "url": "https://www.mod.go.jp/pco/okayama/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-hiroshima",
+      "pref": "hiroshima",
+      "name": "自衛隊広島地方協力本部",
+      "type": "hq",
+      "address": "広島県広島市中区上八丁堀6-30 広島合同庁舎4号館6F",
+      "tel": "082-221-2957",
+      "url": "https://www.mod.go.jp/pco/hiroshima/",
+      "sources": [
+        "https://www.mod.go.jp/pco/hiroshima/office/",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-hiroshima",
+        "type": "hq",
+        "pref": "hiroshima",
+        "name": "自衛隊広島地方協力本部",
+        "address": "広島県広島市中区上八丁堀7-44",
+        "lat": 34.3985,
+        "lng": 132.4577,
+        "tel": "082-221-2957",
+        "url": "https://www.mod.go.jp/pco/hiroshima/"
+      },
+      "coordinates": {
+        "query": "広島県広島市中区上八丁堀6-30",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 34.398636,
+        "lng": 132.462082,
+        "latApprox": true,
+        "matchedAddress": "広島県広島市中区上八丁堀６番３０号"
+      },
+      "after": {
+        "id": "hq-hiroshima",
+        "type": "hq",
+        "pref": "hiroshima",
+        "name": "自衛隊広島地方協力本部",
+        "address": "広島県広島市中区上八丁堀6-30 広島合同庁舎4号館6F",
+        "lat": 34.398636,
+        "lng": 132.462082,
+        "tel": "082-221-2957",
+        "url": "https://www.mod.go.jp/pco/hiroshima/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-yamaguchi",
+      "pref": "yamaguchi",
+      "name": "自衛隊山口地方協力本部",
+      "type": "hq",
+      "address": "山口県山口市八幡馬場814",
+      "tel": "083-922-2325",
+      "url": "https://www.mod.go.jp/pco/yamaguchi/",
+      "sources": [
+        "https://www.mod.go.jp/pco/yamaguchi/jimusho.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-yamaguchi",
+        "type": "hq",
+        "pref": "yamaguchi",
+        "name": "自衛隊山口地方協力本部",
+        "address": "山口県山口市旭通り2-9-17",
+        "lat": 34.1861,
+        "lng": 131.4724,
+        "tel": "083-922-2325",
+        "url": "https://www.mod.go.jp/pco/yamaguchi/"
+      },
+      "coordinates": {
+        "query": "山口県山口市八幡馬場814",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 34.187527,
+        "lng": 131.482864,
+        "latApprox": true,
+        "matchedAddress": "山口県山口市八幡馬場８１４番地"
+      },
+      "after": {
+        "id": "hq-yamaguchi",
+        "type": "hq",
+        "pref": "yamaguchi",
+        "name": "自衛隊山口地方協力本部",
+        "address": "山口県山口市八幡馬場814",
+        "lat": 34.187527,
+        "lng": 131.482864,
+        "tel": "083-922-2325",
+        "url": "https://www.mod.go.jp/pco/yamaguchi/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-tokushima",
+      "pref": "tokushima",
+      "name": "自衛隊徳島地方協力本部",
+      "type": "hq",
+      "address": "徳島県徳島市万代町3-5 徳島第2地方合同庁舎5階",
+      "tel": "088-623-2220",
+      "url": "https://www.mod.go.jp/pco/tokushima/",
+      "sources": [
+        "https://www.mod.go.jp/pco/tokushima/",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-tokushima",
+        "type": "hq",
+        "pref": "tokushima",
+        "name": "自衛隊徳島地方協力本部",
+        "address": "徳島県徳島市万代町3-5-1",
+        "lat": 34.0714,
+        "lng": 134.5534,
+        "tel": "088-623-2220",
+        "url": "https://www.mod.go.jp/pco/tokushima/"
+      },
+      "coordinates": {
+        "query": "徳島県徳島市万代町3-5",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 34.065002,
+        "lng": 134.561325,
+        "latApprox": true,
+        "matchedAddress": "徳島県徳島市万代町三丁目５番地"
+      },
+      "after": {
+        "id": "hq-tokushima",
+        "type": "hq",
+        "pref": "tokushima",
+        "name": "自衛隊徳島地方協力本部",
+        "address": "徳島県徳島市万代町3-5 徳島第2地方合同庁舎5階",
+        "lat": 34.065002,
+        "lng": 134.561325,
+        "tel": "088-623-2220",
+        "url": "https://www.mod.go.jp/pco/tokushima/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-kagawa",
+      "pref": "kagawa",
+      "name": "自衛隊香川地方協力本部",
+      "type": "hq",
+      "address": "香川県高松市サンポート3-33 高松サンポート合同庁舎南館2階",
+      "tel": "087-823-9206",
+      "url": "https://www.mod.go.jp/pco/kagawa/",
+      "sources": [
+        "https://www.mod.go.jp/pco/kagawa/pco/access.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-kagawa",
+        "type": "hq",
+        "pref": "kagawa",
+        "name": "自衛隊香川地方協力本部",
+        "address": "香川県高松市サンポート2-1",
+        "lat": 34.3444,
+        "lng": 134.048,
+        "tel": "087-823-9206",
+        "url": "https://www.mod.go.jp/pco/kagawa/"
+      },
+      "coordinates": {
+        "query": "香川県高松市サンポート3-33",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 34.352581,
+        "lng": 134.045914,
+        "latApprox": true,
+        "matchedAddress": "香川県高松市サンポート３番３３号"
+      },
+      "after": {
+        "id": "hq-kagawa",
+        "type": "hq",
+        "pref": "kagawa",
+        "name": "自衛隊香川地方協力本部",
+        "address": "香川県高松市サンポート3-33 高松サンポート合同庁舎南館2階",
+        "lat": 34.352581,
+        "lng": 134.045914,
+        "tel": "087-823-9206",
+        "url": "https://www.mod.go.jp/pco/kagawa/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-ehime",
+      "pref": "ehime",
+      "name": "自衛隊愛媛地方協力本部",
+      "type": "hq",
+      "address": "愛媛県松山市三番町8丁目352-1",
+      "tel": "089-941-8381",
+      "url": "https://www.mod.go.jp/pco/ehime/",
+      "sources": [
+        "https://www.mod.go.jp/pco/ehime/acsess.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-ehime",
+        "type": "hq",
+        "pref": "ehime",
+        "name": "自衛隊愛媛地方協力本部",
+        "address": "愛媛県松山市二番町3-3-10",
+        "lat": 33.8391,
+        "lng": 132.765,
+        "tel": "089-941-8381",
+        "url": "https://www.mod.go.jp/pco/ehime/"
+      },
+      "coordinates": {
+        "query": "愛媛県松山市三番町8丁目352-1",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 33.838017,
+        "lng": 132.751953,
+        "latApprox": true,
+        "matchedAddress": "愛媛県松山市三番町八丁目３５２番地"
+      },
+      "after": {
+        "id": "hq-ehime",
+        "type": "hq",
+        "pref": "ehime",
+        "name": "自衛隊愛媛地方協力本部",
+        "address": "愛媛県松山市三番町8丁目352-1",
+        "lat": 33.838017,
+        "lng": 132.751953,
+        "tel": "089-941-8381",
+        "url": "https://www.mod.go.jp/pco/ehime/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-kochi",
+      "pref": "kochi",
+      "name": "自衛隊高知地方協力本部",
+      "type": "hq",
+      "address": "高知県高知市栄田町2-2-10 高知よさこい咲都合同庁舎8階",
+      "tel": "088-822-6128",
+      "url": "https://www.mod.go.jp/pco/kochi/",
+      "sources": [
+        "https://www.mod.go.jp/pco/kochi/access.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-kochi",
+        "type": "hq",
+        "pref": "kochi",
+        "name": "自衛隊高知地方協力本部",
+        "address": "高知県高知市旭町1-70",
+        "lat": 33.5578,
+        "lng": 133.5413,
+        "tel": "088-822-6128",
+        "url": "https://www.mod.go.jp/pco/kochi/"
+      },
+      "coordinates": {
+        "query": "高知県高知市栄田町2-2-10",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 33.567837,
+        "lng": 133.544968,
+        "latApprox": true,
+        "matchedAddress": "高知県高知市栄田町二丁目２番１０号"
+      },
+      "after": {
+        "id": "hq-kochi",
+        "type": "hq",
+        "pref": "kochi",
+        "name": "自衛隊高知地方協力本部",
+        "address": "高知県高知市栄田町2-2-10 高知よさこい咲都合同庁舎8階",
+        "lat": 33.567837,
+        "lng": 133.544968,
+        "tel": "088-822-6128",
+        "url": "https://www.mod.go.jp/pco/kochi/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-fukuoka",
+      "pref": "fukuoka",
+      "name": "自衛隊福岡地方協力本部",
+      "type": "hq",
+      "address": "福岡県福岡市博多区竹丘町1丁目12番",
+      "tel": "092-584-1881",
+      "url": "https://www.mod.go.jp/pco/fukuoka/",
+      "sources": [
+        "https://www.mod.go.jp/pco/fukuoka/recruit/contact/",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-fukuoka",
+        "type": "hq",
+        "pref": "fukuoka",
+        "name": "自衛隊福岡地方協力本部",
+        "address": "福岡県福岡市中央区天神1-10-1",
+        "lat": 33.5907,
+        "lng": 130.3989,
+        "tel": "092-584-1881",
+        "url": "https://www.mod.go.jp/pco/fukuoka/"
+      },
+      "coordinates": {
+        "query": "福岡県福岡市博多区竹丘町1丁目12番",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 33.542854,
+        "lng": 130.46489,
+        "latApprox": true,
+        "matchedAddress": "福岡県福岡市博多区竹丘町一丁目"
+      },
+      "after": {
+        "id": "hq-fukuoka",
+        "type": "hq",
+        "pref": "fukuoka",
+        "name": "自衛隊福岡地方協力本部",
+        "address": "福岡県福岡市博多区竹丘町1丁目12番",
+        "lat": 33.542854,
+        "lng": 130.46489,
+        "tel": "092-584-1881",
+        "url": "https://www.mod.go.jp/pco/fukuoka/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-saga",
+      "pref": "saga",
+      "name": "自衛隊佐賀地方協力本部",
+      "type": "hq",
+      "address": "佐賀県佐賀市与賀町2-18",
+      "tel": "0952-24-2291",
+      "url": "https://www.mod.go.jp/pco/saga/",
+      "sources": [
+        "https://www.mod.go.jp/pco/saga/about/",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-saga",
+        "type": "hq",
+        "pref": "saga",
+        "name": "自衛隊佐賀地方協力本部",
+        "address": "佐賀県佐賀市駅前中央3-3-20",
+        "lat": 33.2644,
+        "lng": 130.3003,
+        "tel": "0952-24-2291",
+        "url": "https://www.mod.go.jp/pco/saga/"
+      },
+      "coordinates": {
+        "query": "佐賀県佐賀市与賀町2-18",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 33.248577,
+        "lng": 130.295517,
+        "latApprox": true,
+        "matchedAddress": "佐賀県佐賀市与賀町２番１８号"
+      },
+      "after": {
+        "id": "hq-saga",
+        "type": "hq",
+        "pref": "saga",
+        "name": "自衛隊佐賀地方協力本部",
+        "address": "佐賀県佐賀市与賀町2-18",
+        "lat": 33.248577,
+        "lng": 130.295517,
+        "tel": "0952-24-2291",
+        "url": "https://www.mod.go.jp/pco/saga/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-nagasaki",
+      "pref": "nagasaki",
+      "name": "自衛隊長崎地方協力本部",
+      "type": "hq",
+      "address": "長崎県長崎市出島町2-25 防衛省合同庁舎2F",
+      "tel": "095-826-8844",
+      "url": "https://www.mod.go.jp/pco/nagasaki/",
+      "sources": [
+        "https://www.mod.go.jp/pco/nagasaki/madoguchi/",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-nagasaki",
+        "type": "hq",
+        "pref": "nagasaki",
+        "name": "自衛隊長崎地方協力本部",
+        "address": "長崎県長崎市出島町2-25",
+        "lat": 32.7463,
+        "lng": 129.8749,
+        "tel": "095-826-8844",
+        "url": "https://www.mod.go.jp/pco/nagasaki/"
+      },
+      "coordinates": {
+        "query": "長崎県長崎市出島町2-25",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 32.741283,
+        "lng": 129.872208,
+        "latApprox": true,
+        "matchedAddress": "長崎県長崎市出島町２番２５号"
+      },
+      "after": {
+        "id": "hq-nagasaki",
+        "type": "hq",
+        "pref": "nagasaki",
+        "name": "自衛隊長崎地方協力本部",
+        "address": "長崎県長崎市出島町2-25 防衛省合同庁舎2F",
+        "lat": 32.741283,
+        "lng": 129.872208,
+        "tel": "095-826-8844",
+        "url": "https://www.mod.go.jp/pco/nagasaki/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-oita",
+      "pref": "oita",
+      "name": "自衛隊大分地方協力本部",
+      "type": "hq",
+      "address": "大分県大分市新川町2丁目1番36 大分合同庁舎5F",
+      "tel": "097-536-6271",
+      "url": "https://www.mod.go.jp/pco/oita/",
+      "sources": [
+        "https://www.mod.go.jp/pco/oita/06_office.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-oita",
+        "type": "hq",
+        "pref": "oita",
+        "name": "自衛隊大分地方協力本部",
+        "address": "大分県大分市平野912-1",
+        "lat": 33.2401,
+        "lng": 131.6163,
+        "tel": "097-536-6271",
+        "url": "https://www.mod.go.jp/pco/oita/"
+      },
+      "coordinates": {
+        "query": "大分県大分市新川町2丁目1番36",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 33.248814,
+        "lng": 131.607498,
+        "latApprox": true,
+        "matchedAddress": "大分県大分市新川町二丁目１番３６号"
+      },
+      "after": {
+        "id": "hq-oita",
+        "type": "hq",
+        "pref": "oita",
+        "name": "自衛隊大分地方協力本部",
+        "address": "大分県大分市新川町2丁目1番36 大分合同庁舎5F",
+        "lat": 33.248814,
+        "lng": 131.607498,
+        "tel": "097-536-6271",
+        "url": "https://www.mod.go.jp/pco/oita/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-kumamoto",
+      "pref": "kumamoto",
+      "name": "自衛隊熊本地方協力本部",
+      "type": "hq",
+      "address": "熊本県熊本市西区春日2丁目10番1号 熊本地方合同庁舎B棟3F",
+      "tel": "096-297-2050",
+      "url": "https://www.mod.go.jp/pco/kumamoto/",
+      "sources": [
+        "https://www.mod.go.jp/pco/kumamoto/about/access/",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-kumamoto",
+        "type": "hq",
+        "pref": "kumamoto",
+        "name": "自衛隊熊本地方協力本部",
+        "address": "熊本県熊本市南区田迎2-9-56",
+        "lat": 32.7621,
+        "lng": 130.7289,
+        "tel": "096-297-2050",
+        "url": "https://www.mod.go.jp/pco/kumamoto/"
+      },
+      "coordinates": {
+        "query": "熊本県熊本市西区春日2丁目10番1号",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 32.786915,
+        "lng": 130.68927,
+        "latApprox": true,
+        "matchedAddress": "熊本県熊本市西区春日二丁目１０番１号"
+      },
+      "after": {
+        "id": "hq-kumamoto",
+        "type": "hq",
+        "pref": "kumamoto",
+        "name": "自衛隊熊本地方協力本部",
+        "address": "熊本県熊本市西区春日2丁目10番1号 熊本地方合同庁舎B棟3F",
+        "lat": 32.786915,
+        "lng": 130.68927,
+        "tel": "096-297-2050",
+        "url": "https://www.mod.go.jp/pco/kumamoto/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-miyazaki",
+      "pref": "miyazaki",
+      "name": "自衛隊宮崎地方協力本部",
+      "type": "hq",
+      "address": "宮崎県宮崎市東大淀2丁目1-39",
+      "tel": "0985-53-2643",
+      "url": "https://www.mod.go.jp/pco/miyazaki/",
+      "sources": [
+        "https://www.mod.go.jp/pco/miyazaki/office.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-miyazaki",
+        "type": "hq",
+        "pref": "miyazaki",
+        "name": "自衛隊宮崎地方協力本部",
+        "address": "宮崎県宮崎市広島1-3-12",
+        "lat": 31.9117,
+        "lng": 131.4239,
+        "tel": "0985-53-2643",
+        "url": "https://www.mod.go.jp/pco/miyazaki/"
+      },
+      "coordinates": {
+        "query": "宮崎県宮崎市東大淀2丁目1-39",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 31.897667,
+        "lng": 131.423874,
+        "latApprox": true,
+        "matchedAddress": "宮崎県宮崎市東大淀二丁目１番３９号"
+      },
+      "after": {
+        "id": "hq-miyazaki",
+        "type": "hq",
+        "pref": "miyazaki",
+        "name": "自衛隊宮崎地方協力本部",
+        "address": "宮崎県宮崎市東大淀2丁目1-39",
+        "lat": 31.897667,
+        "lng": 131.423874,
+        "tel": "0985-53-2643",
+        "url": "https://www.mod.go.jp/pco/miyazaki/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-kagoshima",
+      "pref": "kagoshima",
+      "name": "自衛隊鹿児島地方協力本部",
+      "type": "hq",
+      "address": "鹿児島県鹿児島市東郡元町4番1号 鹿児島第2地方合同庁舎1F",
+      "tel": "099-253-8920",
+      "url": "https://www.mod.go.jp/pco/kagoshima/",
+      "sources": [
+        "https://www.mod.go.jp/pco/kagoshima/about/access/",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-kagoshima",
+        "type": "hq",
+        "pref": "kagoshima",
+        "name": "自衛隊鹿児島地方協力本部",
+        "address": "鹿児島県鹿児島市東千石町14-35",
+        "lat": 31.5986,
+        "lng": 130.559,
+        "tel": "099-253-8920",
+        "url": "https://www.mod.go.jp/pco/kagoshima/"
+      },
+      "coordinates": {
+        "query": "鹿児島県鹿児島市東郡元町4番1号",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 31.555227,
+        "lng": 130.548248,
+        "latApprox": true,
+        "matchedAddress": "鹿児島県鹿児島市東郡元町４番１号"
+      },
+      "after": {
+        "id": "hq-kagoshima",
+        "type": "hq",
+        "pref": "kagoshima",
+        "name": "自衛隊鹿児島地方協力本部",
+        "address": "鹿児島県鹿児島市東郡元町4番1号 鹿児島第2地方合同庁舎1F",
+        "lat": 31.555227,
+        "lng": 130.548248,
+        "tel": "099-253-8920",
+        "url": "https://www.mod.go.jp/pco/kagoshima/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "hq-okinawa",
+      "pref": "okinawa",
+      "name": "自衛隊沖縄地方協力本部",
+      "type": "hq",
+      "address": "沖縄県那覇市樋川1丁目15番15 那覇第一地方合同庁舎西棟7F・8F",
+      "tel": "098-855-0751",
+      "url": "https://www.mod.go.jp/pco/okinawa/",
+      "sources": [
+        "https://www.mod.go.jp/pco/okinawa/about.html",
+        "https://www.mod.go.jp/gsdf/station/pco/"
+      ],
+      "before": {
+        "id": "hq-okinawa",
+        "type": "hq",
+        "pref": "okinawa",
+        "name": "自衛隊沖縄地方協力本部",
+        "address": "沖縄県那覇市前島3-25-1",
+        "lat": 26.2126,
+        "lng": 127.6821,
+        "tel": "098-866-5457",
+        "url": "https://www.mod.go.jp/pco/okinawa/"
+      },
+      "coordinates": {
+        "query": "沖縄県那覇市樋川1丁目15番15",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 26.207617,
+        "lng": 127.686058,
+        "latApprox": true,
+        "matchedAddress": "沖縄県那覇市樋川一丁目１５番１５号"
+      },
+      "after": {
+        "id": "hq-okinawa",
+        "type": "hq",
+        "pref": "okinawa",
+        "name": "自衛隊沖縄地方協力本部",
+        "address": "沖縄県那覇市樋川1丁目15番15 那覇第一地方合同庁舎西棟7F・8F",
+        "lat": 26.207617,
+        "lng": 127.686058,
+        "tel": "098-855-0751",
+        "url": "https://www.mod.go.jp/pco/okinawa/",
+        "latApprox": true
+      }
+    },
+    {
+      "id": "loc-tokushima-51",
+      "pref": "tokushima",
+      "type": "recruitment",
+      "name": "阿南地域事務所",
+      "address": "徳島県阿南市富岡町内町164-1 内町会館1階",
+      "tel": "0884-22-6981",
+      "area": "小松島市、阿南市、那賀町、勝浦町、上勝町、美波町、牟岐町、海陽町",
+      "url": "https://www.mod.go.jp/pco/tokushima/anan.html",
+      "sources": [
+        "https://www.mod.go.jp/pco/tokushima/anan.html",
+        "https://www.mod.go.jp/pco/tokushima/"
+      ],
+      "before": {
+        "id": "loc-tokushima-51",
+        "type": "recruitment",
+        "pref": "tokushima",
+        "name": "阿南地域事務所",
+        "address": "徳島県徳島市万代町3丁目5 徳島第2地方合同庁舎5階",
+        "lat": 34.065002,
+        "lng": 134.561325,
+        "tel": "088-623-2220~2222",
+        "url": "https://www.mod.go.jp/pco/tokushima/anan.html",
+        "area": ""
+      },
+      "coordinates": {
+        "query": "徳島県阿南市富岡町内町164-1",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 33.922375,
+        "lng": 134.654755,
+        "latApprox": true,
+        "matchedAddress": "徳島県阿南市富岡町内町"
+      },
+      "after": {
+        "id": "loc-tokushima-51",
+        "type": "recruitment",
+        "pref": "tokushima",
+        "name": "阿南地域事務所",
+        "address": "徳島県阿南市富岡町内町164-1 内町会館1階",
+        "lat": 33.922375,
+        "lng": 134.654755,
+        "tel": "0884-22-6981",
+        "url": "https://www.mod.go.jp/pco/tokushima/anan.html",
+        "area": "小松島市、阿南市、那賀町、勝浦町、上勝町、美波町、牟岐町、海陽町",
+        "hasOfficialPage": true,
+        "latApprox": true
+      }
+    },
+    {
+      "id": "loc-tokushima-52",
+      "pref": "tokushima",
+      "type": "recruitment",
+      "name": "吉野川地域事務所",
+      "address": "徳島県吉野川市鴨島町鴨島229-4 まるやビル",
+      "tel": "0883-24-7008",
+      "area": "吉野川市、阿波市、石井町、神山町",
+      "url": "https://www.mod.go.jp/pco/tokushima/kamo.html",
+      "sources": [
+        "https://www.mod.go.jp/pco/tokushima/kamo.html",
+        "https://www.mod.go.jp/pco/tokushima/"
+      ],
+      "before": {
+        "id": "loc-tokushima-52",
+        "type": "recruitment",
+        "pref": "tokushima",
+        "name": "吉野川地域事務所",
+        "address": "徳島県徳島市万代町3丁目5 徳島第2地方合同庁舎5階",
+        "lat": 34.065002,
+        "lng": 134.561325,
+        "tel": "088-623-2220~2222",
+        "url": "https://www.mod.go.jp/pco/tokushima/kamo.html",
+        "area": ""
+      },
+      "coordinates": {
+        "query": "徳島県吉野川市鴨島町鴨島229-4",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 34.068333,
+        "lng": 134.355515,
+        "latApprox": true,
+        "matchedAddress": "徳島県吉野川市鴨島町鴨島２２９番地"
+      },
+      "after": {
+        "id": "loc-tokushima-52",
+        "type": "recruitment",
+        "pref": "tokushima",
+        "name": "吉野川地域事務所",
+        "address": "徳島県吉野川市鴨島町鴨島229-4 まるやビル",
+        "lat": 34.068333,
+        "lng": 134.355515,
+        "tel": "0883-24-7008",
+        "url": "https://www.mod.go.jp/pco/tokushima/kamo.html",
+        "area": "吉野川市、阿波市、石井町、神山町",
+        "hasOfficialPage": true,
+        "latApprox": true
+      }
+    },
+    {
+      "id": "loc-tokushima-53",
+      "pref": "tokushima",
+      "type": "recruitment",
+      "name": "徳島募集案内所",
+      "address": "徳島県徳島市北矢三町1-1-11",
+      "tel": "088-631-9581",
+      "area": "徳島市、佐那河内村",
+      "url": "https://www.mod.go.jp/pco/tokushima/tokushima.html",
+      "sources": [
+        "https://www.mod.go.jp/pco/tokushima/tokushima.html",
+        "https://www.mod.go.jp/pco/tokushima/"
+      ],
+      "before": {
+        "id": "loc-tokushima-53",
+        "type": "recruitment",
+        "pref": "tokushima",
+        "name": "徳島募集案内所",
+        "address": "徳島県徳島市万代町3丁目5 徳島第2",
+        "lat": 34.065002,
+        "lng": 134.561325,
+        "tel": "",
+        "url": "https://www.mod.go.jp/pco/tokushima/",
+        "area": ""
+      },
+      "coordinates": {
+        "query": "徳島県徳島市北矢三町1-1-11",
+        "source": "https://msearch.gsi.go.jp/address-search/AddressSearch",
+        "lat": 34.086231,
+        "lng": 134.528992,
+        "latApprox": true,
+        "matchedAddress": "徳島県徳島市北矢三町一丁目１番１１号"
+      },
+      "after": {
+        "id": "loc-tokushima-53",
+        "type": "recruitment",
+        "pref": "tokushima",
+        "name": "徳島募集案内所",
+        "address": "徳島県徳島市北矢三町1-1-11",
+        "lat": 34.086231,
+        "lng": 134.528992,
+        "tel": "088-631-9581",
+        "url": "https://www.mod.go.jp/pco/tokushima/tokushima.html",
+        "area": "徳島市、佐那河内村",
+        "hasOfficialPage": true,
+        "latApprox": true
+      }
+    },
+    {
+      "id": "loc-tokushima-audit-53a029a429",
+      "pref": "tokushima",
+      "type": "recruitment",
+      "name": "三好出張所",
+      "address": "徳島県三好市池田町マチ2178-20",
+      "tel": "0883-72-0489",
+      "area": "三好市、美馬市、つるぎ町、東みよし町",
+      "url": "https://www.mod.go.jp/pco/tokushima/miyosi.html",
+      "sources": [
+        "https://www.mod.go.jp/pco/tokushima/miyosi.html",
+        "https://www.mod.go.jp/pco/tokushima/"
+      ],
+      "before": null,
+      "coordinates": {
+        "lat": 34.028408,
+        "lng": 133.805374,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "徳島県三好市池田町マチ2178-20",
+        "label": "徳島県三好市池田町マチ２１７８番地",
+        "resultCount": 1
+      },
+      "after": {
+        "id": "loc-tokushima-audit-53a029a429",
+        "type": "recruitment",
+        "pref": "tokushima",
+        "name": "三好出張所",
+        "address": "徳島県三好市池田町マチ2178-20",
+        "tel": "0883-72-0489",
+        "url": "https://www.mod.go.jp/pco/tokushima/miyosi.html",
+        "area": "三好市、美馬市、つるぎ町、東みよし町",
+        "hasOfficialPage": true,
+        "lat": 34.028408,
+        "lng": 133.805374,
+        "latApprox": true
+      }
+    },
+    {
+      "id": "loc-tokushima-audit-dd56d9b5d6",
+      "pref": "tokushima",
+      "type": "recruitment",
+      "name": "鳴門地域事務所",
+      "address": "徳島県鳴門市撫養町立岩字七枚57",
+      "tel": "088-685-5306",
+      "area": "鳴門市、北島町、松茂町、藍住町、板野町、上板町",
+      "url": "https://www.mod.go.jp/pco/tokushima/naruto.html",
+      "sources": [
+        "https://www.mod.go.jp/pco/tokushima/naruto.html",
+        "https://www.mod.go.jp/pco/tokushima/"
+      ],
+      "before": null,
+      "coordinates": {
+        "lat": 34.174606,
+        "lng": 134.613266,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "徳島県鳴門市撫養町立岩字七枚57",
+        "label": "徳島県鳴門市撫養町立岩七枚５７番地",
+        "resultCount": 1
+      },
+      "after": {
+        "id": "loc-tokushima-audit-dd56d9b5d6",
+        "type": "recruitment",
+        "pref": "tokushima",
+        "name": "鳴門地域事務所",
+        "address": "徳島県鳴門市撫養町立岩字七枚57",
+        "tel": "088-685-5306",
+        "url": "https://www.mod.go.jp/pco/tokushima/naruto.html",
+        "area": "鳴門市、北島町、松茂町、藍住町、板野町、上板町",
+        "hasOfficialPage": true,
+        "lat": 34.174606,
+        "lng": 134.613266,
+        "latApprox": true
+      }
+    }
+  ],
+  "changedIds": [
+    "hq-sapporo",
+    "hq-hakodate",
+    "hq-asahikawa",
+    "hq-obihiro",
+    "hq-aomori",
+    "hq-iwate",
+    "hq-miyagi",
+    "hq-akita",
+    "hq-yamagata",
+    "hq-fukushima",
+    "hq-ibaraki",
+    "hq-tochigi",
+    "hq-gunma",
+    "hq-saitama",
+    "hq-chiba",
+    "hq-tokyo",
+    "hq-kanagawa",
+    "hq-niigata",
+    "hq-yamanashi",
+    "hq-nagano",
+    "hq-shizuoka",
+    "hq-toyama",
+    "hq-ishikawa",
+    "hq-fukui",
+    "hq-gifu",
+    "hq-aichi",
+    "hq-mie",
+    "hq-shiga",
+    "hq-kyoto",
+    "hq-osaka",
+    "hq-hyogo",
+    "hq-nara",
+    "hq-wakayama",
+    "hq-tottori",
+    "hq-shimane",
+    "hq-okayama",
+    "hq-hiroshima",
+    "hq-yamaguchi",
+    "hq-tokushima",
+    "hq-kagawa",
+    "hq-ehime",
+    "hq-kochi",
+    "hq-fukuoka",
+    "hq-saga",
+    "hq-nagasaki",
+    "hq-oita",
+    "hq-kumamoto",
+    "hq-miyazaki",
+    "hq-kagoshima",
+    "hq-okinawa",
+    "loc-tokushima-51",
+    "loc-tokushima-52",
+    "loc-tokushima-53",
+    "loc-tokushima-audit-53a029a429",
+    "loc-tokushima-audit-dd56d9b5d6"
+  ],
+  "hqCount": 50,
+  "recruitmentCount": 317,
+  "remainingFieldGaps": [
+    {
+      "id": "loc-fukui-0",
+      "pref": "fukui",
+      "name": "敦賀地域事務所",
+      "missingFields": [
+        "address",
+        "area"
+      ]
+    },
+    {
+      "id": "loc-ishikawa-2",
+      "pref": "ishikawa",
+      "name": "金沢募集案内所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-ishikawa-3",
+      "pref": "ishikawa",
+      "name": "七尾出張所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-ishikawa-4",
+      "pref": "ishikawa",
+      "name": "小松地域事務所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-ishikawa-5",
+      "pref": "ishikawa",
+      "name": "能登地域事務所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-iwate-6",
+      "pref": "iwate",
+      "name": "二戸地域事務所",
+      "missingFields": [
+        "address"
+      ]
+    },
+    {
+      "id": "loc-kochi-13",
+      "pref": "kochi",
+      "name": "香南地域事務所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-kochi-14",
+      "pref": "kochi",
+      "name": "高知募集案内所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-kochi-15",
+      "pref": "kochi",
+      "name": "四万十地域事務所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-kochi-16",
+      "pref": "kochi",
+      "name": "須崎地域事務所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-kumamoto-21",
+      "pref": "kumamoto",
+      "name": "熊本分駐所",
+      "missingFields": [
+        "address"
+      ]
+    },
+    {
+      "id": "loc-kyoto-23",
+      "pref": "kyoto",
+      "name": "宇治地域事務所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-niigata-25",
+      "pref": "niigata",
+      "name": "加茂地域事務所",
+      "missingFields": [
+        "address",
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-niigata-26",
+      "pref": "niigata",
+      "name": "高田地域事務所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-saga-31",
+      "pref": "saga",
+      "name": "佐賀募集案内所",
+      "missingFields": [
+        "tel",
+        "area"
+      ]
+    },
+    {
+      "id": "loc-sapporo-35",
+      "pref": "sapporo",
+      "name": "月寒募集案内所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-sapporo-44",
+      "pref": "sapporo",
+      "name": "南部地区隊",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-sapporo-46",
+      "pref": "sapporo",
+      "name": "北部地区隊",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-shizuoka-47",
+      "pref": "shizuoka",
+      "name": "浜北募集案内所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-tochigi-48",
+      "pref": "tochigi",
+      "name": "小山地域事務所",
+      "missingFields": [
+        "tel",
+        "area"
+      ]
+    },
+    {
+      "id": "loc-tochigi-49",
+      "pref": "tochigi",
+      "name": "真岡募集案内所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-tochigi-50",
+      "pref": "tochigi",
+      "name": "足利地域事務所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-wakayama-54",
+      "pref": "wakayama",
+      "name": "橋本地域事務所",
+      "missingFields": [
+        "address",
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-wakayama-55",
+      "pref": "wakayama",
+      "name": "御坊地域事務所",
+      "missingFields": [
+        "address",
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-wakayama-56",
+      "pref": "wakayama",
+      "name": "新宮地域事務所",
+      "missingFields": [
+        "address",
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-wakayama-57",
+      "pref": "wakayama",
+      "name": "田辺地域事務所",
+      "missingFields": [
+        "address",
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-wakayama-58",
+      "pref": "wakayama",
+      "name": "有田募集案内所",
+      "missingFields": [
+        "address",
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-wakayama-59",
+      "pref": "wakayama",
+      "name": "和歌山募集案内所",
+      "missingFields": [
+        "address",
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-yamanashi-62",
+      "pref": "yamanashi",
+      "name": "巨摩募集案内所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-yamanashi-63",
+      "pref": "yamanashi",
+      "name": "甲府募集案内所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-yamanashi-64",
+      "pref": "yamanashi",
+      "name": "大月地域事務所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-asahikawa-r107",
+      "pref": "asahikawa",
+      "name": "名寄出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-asahikawa-r108",
+      "pref": "asahikawa",
+      "name": "稚内地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-asahikawa-r109",
+      "pref": "asahikawa",
+      "name": "留萌地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-asahikawa-r110",
+      "pref": "asahikawa",
+      "name": "紋別地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-asahikawa-r111",
+      "pref": "asahikawa",
+      "name": "上富良野地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-asahikawa-r112",
+      "pref": "asahikawa",
+      "name": "遠軽地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-asahikawa-r113",
+      "pref": "asahikawa",
+      "name": "枝幸地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-obihiro-r114",
+      "pref": "obihiro",
+      "name": "釧路出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-obihiro-r115",
+      "pref": "obihiro",
+      "name": "根室地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-obihiro-r116",
+      "pref": "obihiro",
+      "name": "網走地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-obihiro-r117",
+      "pref": "obihiro",
+      "name": "北見地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-obihiro-r118",
+      "pref": "obihiro",
+      "name": "中標津地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hakodate-r119",
+      "pref": "hakodate",
+      "name": "今金地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hakodate-r120",
+      "pref": "hakodate",
+      "name": "八雲地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hakodate-r121",
+      "pref": "hakodate",
+      "name": "江差地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hakodate-r122",
+      "pref": "hakodate",
+      "name": "松前地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aomori-r123",
+      "pref": "aomori",
+      "name": "青森募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aomori-r124",
+      "pref": "aomori",
+      "name": "弘前地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aomori-r125",
+      "pref": "aomori",
+      "name": "五所川原地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aomori-r126",
+      "pref": "aomori",
+      "name": "八戸地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aomori-r127",
+      "pref": "aomori",
+      "name": "三沢募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aomori-r128",
+      "pref": "aomori",
+      "name": "むつ地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-akita-r129",
+      "pref": "akita",
+      "name": "秋田募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-akita-r130",
+      "pref": "akita",
+      "name": "能代地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-akita-r131",
+      "pref": "akita",
+      "name": "由利本荘地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-akita-r132",
+      "pref": "akita",
+      "name": "大仙地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-akita-r133",
+      "pref": "akita",
+      "name": "横手地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-akita-r134",
+      "pref": "akita",
+      "name": "大館出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-miyagi-r135",
+      "pref": "miyagi",
+      "name": "仙台募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-miyagi-r136",
+      "pref": "miyagi",
+      "name": "名取地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-miyagi-r137",
+      "pref": "miyagi",
+      "name": "大河原地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-miyagi-r138",
+      "pref": "miyagi",
+      "name": "大崎地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-miyagi-r139",
+      "pref": "miyagi",
+      "name": "石巻地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-miyagi-r140",
+      "pref": "miyagi",
+      "name": "栗原募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-miyagi-r141",
+      "pref": "miyagi",
+      "name": "登米募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukushima-r142",
+      "pref": "fukushima",
+      "name": "福島募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukushima-r143",
+      "pref": "fukushima",
+      "name": "いわき地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukushima-r144",
+      "pref": "fukushima",
+      "name": "郡山地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukushima-r145",
+      "pref": "fukushima",
+      "name": "相双地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukushima-r146",
+      "pref": "fukushima",
+      "name": "白河地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukushima-r147",
+      "pref": "fukushima",
+      "name": "会津若松出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-toyama-r148",
+      "pref": "toyama",
+      "name": "高岡出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-toyama-r149",
+      "pref": "toyama",
+      "name": "魚津地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-toyama-r150",
+      "pref": "toyama",
+      "name": "砺波地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagano-r151",
+      "pref": "nagano",
+      "name": "松本地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagano-r152",
+      "pref": "nagano",
+      "name": "上田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagano-r153",
+      "pref": "nagano",
+      "name": "長野地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagano-r154",
+      "pref": "nagano",
+      "name": "茅野地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagano-r155",
+      "pref": "nagano",
+      "name": "伊那地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagano-r156",
+      "pref": "nagano",
+      "name": "飯田出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-gifu-r157",
+      "pref": "gifu",
+      "name": "大垣出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-gifu-r158",
+      "pref": "gifu",
+      "name": "高山出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-gifu-r159",
+      "pref": "gifu",
+      "name": "多治見地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-gifu-r160",
+      "pref": "gifu",
+      "name": "中津川地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-gifu-r161",
+      "pref": "gifu",
+      "name": "関地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shizuoka-r162",
+      "pref": "shizuoka",
+      "name": "沼津地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shizuoka-r163",
+      "pref": "shizuoka",
+      "name": "富士地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shizuoka-r164",
+      "pref": "shizuoka",
+      "name": "伊東地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shizuoka-r165",
+      "pref": "shizuoka",
+      "name": "藤枝地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shizuoka-r166",
+      "pref": "shizuoka",
+      "name": "袋井地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shizuoka-r167",
+      "pref": "shizuoka",
+      "name": "三島募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shizuoka-r168",
+      "pref": "shizuoka",
+      "name": "清水募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shizuoka-r169",
+      "pref": "shizuoka",
+      "name": "静岡募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shizuoka-r170",
+      "pref": "shizuoka",
+      "name": "浜松出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aichi-r171",
+      "pref": "aichi",
+      "name": "名古屋出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aichi-r172",
+      "pref": "aichi",
+      "name": "守山地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aichi-r173",
+      "pref": "aichi",
+      "name": "金山地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aichi-r174",
+      "pref": "aichi",
+      "name": "半田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aichi-r175",
+      "pref": "aichi",
+      "name": "一宮地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aichi-r176",
+      "pref": "aichi",
+      "name": "小牧地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aichi-r177",
+      "pref": "aichi",
+      "name": "瀬戸地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aichi-r178",
+      "pref": "aichi",
+      "name": "岡崎出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aichi-r179",
+      "pref": "aichi",
+      "name": "豊田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aichi-r180",
+      "pref": "aichi",
+      "name": "安城地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aichi-r181",
+      "pref": "aichi",
+      "name": "豊橋地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aichi-r182",
+      "pref": "aichi",
+      "name": "豊川地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-mie-r183",
+      "pref": "mie",
+      "name": "四日市出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-mie-r184",
+      "pref": "mie",
+      "name": "伊勢地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-mie-r185",
+      "pref": "mie",
+      "name": "松阪地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-mie-r186",
+      "pref": "mie",
+      "name": "熊野地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-mie-r187",
+      "pref": "mie",
+      "name": "津地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shiga-r188",
+      "pref": "shiga",
+      "name": "大津地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shiga-r189",
+      "pref": "shiga",
+      "name": "彦根地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shiga-r190",
+      "pref": "shiga",
+      "name": "長浜地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shiga-r191",
+      "pref": "shiga",
+      "name": "草津地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r192",
+      "pref": "osaka",
+      "name": "枚方出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r193",
+      "pref": "osaka",
+      "name": "茨木地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r194",
+      "pref": "osaka",
+      "name": "東大阪地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r195",
+      "pref": "osaka",
+      "name": "豊中募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r196",
+      "pref": "osaka",
+      "name": "八尾分駐所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r197",
+      "pref": "osaka",
+      "name": "ミナミ募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r198",
+      "pref": "osaka",
+      "name": "梅田募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r199",
+      "pref": "osaka",
+      "name": "十三募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r200",
+      "pref": "osaka",
+      "name": "京橋募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r201",
+      "pref": "osaka",
+      "name": "阿倍野募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r202",
+      "pref": "osaka",
+      "name": "堺出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r203",
+      "pref": "osaka",
+      "name": "岸和田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r204",
+      "pref": "osaka",
+      "name": "富田林地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hyogo-r205",
+      "pref": "hyogo",
+      "name": "西宮地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hyogo-r207",
+      "pref": "hyogo",
+      "name": "柏原地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hyogo-r210",
+      "pref": "hyogo",
+      "name": "西神戸募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hyogo-r211",
+      "pref": "hyogo",
+      "name": "加古川地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hyogo-r212",
+      "pref": "hyogo",
+      "name": "青野原分駐所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hyogo-r213",
+      "pref": "hyogo",
+      "name": "姫路地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hyogo-r214",
+      "pref": "hyogo",
+      "name": "相生地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hyogo-r215",
+      "pref": "hyogo",
+      "name": "豊岡出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hyogo-r216",
+      "pref": "hyogo",
+      "name": "淡路島駐在員事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nara-r217",
+      "pref": "nara",
+      "name": "奈良募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nara-r218",
+      "pref": "nara",
+      "name": "天理募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nara-r219",
+      "pref": "nara",
+      "name": "橿原地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nara-r220",
+      "pref": "nara",
+      "name": "五條地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-tottori-r221",
+      "pref": "tottori",
+      "name": "米子出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-tottori-r222",
+      "pref": "tottori",
+      "name": "倉吉地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shimane-r223",
+      "pref": "shimane",
+      "name": "松江地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shimane-r224",
+      "pref": "shimane",
+      "name": "出雲地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shimane-r225",
+      "pref": "shimane",
+      "name": "浜田出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shimane-r226",
+      "pref": "shimane",
+      "name": "益田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shimane-r227",
+      "pref": "shimane",
+      "name": "大田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shimane-r228",
+      "pref": "shimane",
+      "name": "隠岐駐在員事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hiroshima-r229",
+      "pref": "hiroshima",
+      "name": "尾道出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hiroshima-r230",
+      "pref": "hiroshima",
+      "name": "呉地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hiroshima-r231",
+      "pref": "hiroshima",
+      "name": "三次地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hiroshima-r232",
+      "pref": "hiroshima",
+      "name": "福山地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hiroshima-r233",
+      "pref": "hiroshima",
+      "name": "東広島地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hiroshima-r234",
+      "pref": "hiroshima",
+      "name": "広島地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hiroshima-r235",
+      "pref": "hiroshima",
+      "name": "可部募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-yamaguchi-r236",
+      "pref": "yamaguchi",
+      "name": "下関出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-yamaguchi-r237",
+      "pref": "yamaguchi",
+      "name": "宇部地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-yamaguchi-r238",
+      "pref": "yamaguchi",
+      "name": "防府地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-yamaguchi-r239",
+      "pref": "yamaguchi",
+      "name": "岩国地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-yamaguchi-r240",
+      "pref": "yamaguchi",
+      "name": "萩地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-yamaguchi-r241",
+      "pref": "yamaguchi",
+      "name": "美祢地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-kagawa-r242",
+      "pref": "kagawa",
+      "name": "丸亀出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-kagawa-r243",
+      "pref": "kagawa",
+      "name": "観音寺地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-ehime-r244",
+      "pref": "ehime",
+      "name": "今治出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-ehime-r245",
+      "pref": "ehime",
+      "name": "新居浜地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-ehime-r246",
+      "pref": "ehime",
+      "name": "宇和島地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-ehime-r247",
+      "pref": "ehime",
+      "name": "大洲地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r248",
+      "pref": "fukuoka",
+      "name": "福岡募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r249",
+      "pref": "fukuoka",
+      "name": "福岡西募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r250",
+      "pref": "fukuoka",
+      "name": "福岡地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r251",
+      "pref": "fukuoka",
+      "name": "春日分駐所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r252",
+      "pref": "fukuoka",
+      "name": "北九州出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r253",
+      "pref": "fukuoka",
+      "name": "小倉募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r254",
+      "pref": "fukuoka",
+      "name": "芦屋地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r255",
+      "pref": "fukuoka",
+      "name": "築城地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r256",
+      "pref": "fukuoka",
+      "name": "飯塚地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r257",
+      "pref": "fukuoka",
+      "name": "久留米地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r258",
+      "pref": "fukuoka",
+      "name": "八女地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r259",
+      "pref": "fukuoka",
+      "name": "柳川地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r260",
+      "pref": "fukuoka",
+      "name": "大牟田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagasaki-r261",
+      "pref": "nagasaki",
+      "name": "佐世保出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagasaki-r262",
+      "pref": "nagasaki",
+      "name": "大村地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagasaki-r263",
+      "pref": "nagasaki",
+      "name": "諫早地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagasaki-r264",
+      "pref": "nagasaki",
+      "name": "島原地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagasaki-r265",
+      "pref": "nagasaki",
+      "name": "琴海地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagasaki-r266",
+      "pref": "nagasaki",
+      "name": "長崎募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagasaki-r267",
+      "pref": "nagasaki",
+      "name": "壱岐駐在員事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagasaki-r268",
+      "pref": "nagasaki",
+      "name": "対馬駐在員事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagasaki-r269",
+      "pref": "nagasaki",
+      "name": "上五島駐在員事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagasaki-r270",
+      "pref": "nagasaki",
+      "name": "五島駐在員事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-oita-r271",
+      "pref": "oita",
+      "name": "別府地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-oita-r272",
+      "pref": "oita",
+      "name": "中津出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-oita-r273",
+      "pref": "oita",
+      "name": "佐伯地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-oita-r274",
+      "pref": "oita",
+      "name": "日田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-oita-r275",
+      "pref": "oita",
+      "name": "竹田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-miyazaki-r276",
+      "pref": "miyazaki",
+      "name": "宮崎地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-miyazaki-r277",
+      "pref": "miyazaki",
+      "name": "都城出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-miyazaki-r278",
+      "pref": "miyazaki",
+      "name": "延岡地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-miyazaki-r279",
+      "pref": "miyazaki",
+      "name": "日南地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-okinawa-r280",
+      "pref": "okinawa",
+      "name": "那覇募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-okinawa-r281",
+      "pref": "okinawa",
+      "name": "沖縄地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-okinawa-r282",
+      "pref": "okinawa",
+      "name": "名護地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-okinawa-r283",
+      "pref": "okinawa",
+      "name": "宮古島駐在員事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-okinawa-r284",
+      "pref": "okinawa",
+      "name": "石垣駐在員事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-gunma-r285",
+      "pref": "gunma",
+      "name": "前橋地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-gunma-r286",
+      "pref": "gunma",
+      "name": "高崎出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-gunma-r287",
+      "pref": "gunma",
+      "name": "太田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-gunma-r288",
+      "pref": "gunma",
+      "name": "桐生地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-gunma-r289",
+      "pref": "gunma",
+      "name": "沼田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-iwate-r290",
+      "pref": "iwate",
+      "name": "盛岡地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-iwate-r291",
+      "pref": "iwate",
+      "name": "花巻地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-iwate-r292",
+      "pref": "iwate",
+      "name": "一関出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-iwate-r293",
+      "pref": "iwate",
+      "name": "北上地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-iwate-r294",
+      "pref": "iwate",
+      "name": "宮古地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-iwate-r295",
+      "pref": "iwate",
+      "name": "大船渡地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-iwate-r296",
+      "pref": "iwate",
+      "name": "久慈地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-niigata-r297",
+      "pref": "niigata",
+      "name": "長岡出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-niigata-r298",
+      "pref": "niigata",
+      "name": "上越地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-niigata-r299",
+      "pref": "niigata",
+      "name": "柏崎地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-niigata-r300",
+      "pref": "niigata",
+      "name": "新発田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-niigata-r301",
+      "pref": "niigata",
+      "name": "佐渡駐在員事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-yamagata-r302",
+      "pref": "yamagata",
+      "name": "鶴岡出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-yamagata-r303",
+      "pref": "yamagata",
+      "name": "酒田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-kyoto-r304",
+      "pref": "kyoto",
+      "name": "京都地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-kyoto-r305",
+      "pref": "kyoto",
+      "name": "宮津地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-kyoto-r306",
+      "pref": "kyoto",
+      "name": "舞鶴分駐所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-kyoto-r307",
+      "pref": "kyoto",
+      "name": "福知山地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-kyoto-r308",
+      "pref": "kyoto",
+      "name": "木津地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-saga-r309",
+      "pref": "saga",
+      "name": "武雄地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-saga-r310",
+      "pref": "saga",
+      "name": "唐津出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-saga-r311",
+      "pref": "saga",
+      "name": "鳥栖地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukui-r312",
+      "pref": "fukui",
+      "name": "敦賀出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukui-r313",
+      "pref": "fukui",
+      "name": "越前地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukui-r314",
+      "pref": "fukui",
+      "name": "大野地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    }
+  ],
+  "nameAuditDraftPR": "https://github.com/naoya7928-0813/jsdf-chiiki-events/pull/85"
+}

@@ -5818,5 +5818,1426 @@
       "name": "和歌山募集案内所",
       "reason": "基準データで住所未登録。今回の確定更新対象外のため保留。"
     }
+  ],
+  "syncedMasterCommit": "404398d616a1982b14ec29eb0486ba1c285d63cc",
+  "confirmedContactReview": "docs/office-contact-review-20261005.json",
+  "remainingFieldGaps": [
+    {
+      "id": "loc-ishikawa-3",
+      "pref": "ishikawa",
+      "name": "七尾出張所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-ishikawa-4",
+      "pref": "ishikawa",
+      "name": "小松地域事務所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-ishikawa-5",
+      "pref": "ishikawa",
+      "name": "能登地域事務所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-iwate-6",
+      "pref": "iwate",
+      "name": "二戸地域事務所",
+      "missingFields": [
+        "address"
+      ]
+    },
+    {
+      "id": "loc-kochi-13",
+      "pref": "kochi",
+      "name": "香南地域事務所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-kochi-14",
+      "pref": "kochi",
+      "name": "高知募集案内所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-kochi-15",
+      "pref": "kochi",
+      "name": "四万十地域事務所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-kochi-16",
+      "pref": "kochi",
+      "name": "須崎地域事務所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-kumamoto-21",
+      "pref": "kumamoto",
+      "name": "熊本分駐所",
+      "missingFields": [
+        "address"
+      ]
+    },
+    {
+      "id": "loc-niigata-25",
+      "pref": "niigata",
+      "name": "加茂地域事務所",
+      "missingFields": [
+        "address",
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-saga-31",
+      "pref": "saga",
+      "name": "佐賀募集案内所",
+      "missingFields": [
+        "tel",
+        "area"
+      ]
+    },
+    {
+      "id": "loc-sapporo-35",
+      "pref": "sapporo",
+      "name": "月寒募集案内所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-sapporo-44",
+      "pref": "sapporo",
+      "name": "南部地区隊",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-sapporo-46",
+      "pref": "sapporo",
+      "name": "北部地区隊",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-shizuoka-47",
+      "pref": "shizuoka",
+      "name": "浜北募集案内所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-tochigi-48",
+      "pref": "tochigi",
+      "name": "小山地域事務所",
+      "missingFields": [
+        "tel",
+        "area"
+      ]
+    },
+    {
+      "id": "loc-tochigi-49",
+      "pref": "tochigi",
+      "name": "真岡募集案内所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-tochigi-50",
+      "pref": "tochigi",
+      "name": "足利地域事務所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-wakayama-54",
+      "pref": "wakayama",
+      "name": "橋本地域事務所",
+      "missingFields": [
+        "address",
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-wakayama-55",
+      "pref": "wakayama",
+      "name": "御坊地域事務所",
+      "missingFields": [
+        "address",
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-wakayama-56",
+      "pref": "wakayama",
+      "name": "新宮地域事務所",
+      "missingFields": [
+        "address",
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-wakayama-57",
+      "pref": "wakayama",
+      "name": "田辺地域事務所",
+      "missingFields": [
+        "address",
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-wakayama-58",
+      "pref": "wakayama",
+      "name": "有田募集案内所",
+      "missingFields": [
+        "address",
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-wakayama-59",
+      "pref": "wakayama",
+      "name": "和歌山募集案内所",
+      "missingFields": [
+        "address",
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-yamanashi-62",
+      "pref": "yamanashi",
+      "name": "巨摩募集案内所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-yamanashi-63",
+      "pref": "yamanashi",
+      "name": "甲府募集案内所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-yamanashi-64",
+      "pref": "yamanashi",
+      "name": "大月地域事務所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-asahikawa-r107",
+      "pref": "asahikawa",
+      "name": "名寄出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-asahikawa-r108",
+      "pref": "asahikawa",
+      "name": "稚内地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-asahikawa-r109",
+      "pref": "asahikawa",
+      "name": "留萌地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-asahikawa-r110",
+      "pref": "asahikawa",
+      "name": "紋別地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-asahikawa-r111",
+      "pref": "asahikawa",
+      "name": "上富良野地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-asahikawa-r112",
+      "pref": "asahikawa",
+      "name": "遠軽地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-asahikawa-r113",
+      "pref": "asahikawa",
+      "name": "枝幸地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-obihiro-r114",
+      "pref": "obihiro",
+      "name": "釧路出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-obihiro-r115",
+      "pref": "obihiro",
+      "name": "根室地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-obihiro-r116",
+      "pref": "obihiro",
+      "name": "網走地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-obihiro-r117",
+      "pref": "obihiro",
+      "name": "北見地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-obihiro-r118",
+      "pref": "obihiro",
+      "name": "中標津地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aomori-r123",
+      "pref": "aomori",
+      "name": "青森募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aomori-r124",
+      "pref": "aomori",
+      "name": "弘前地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aomori-r125",
+      "pref": "aomori",
+      "name": "五所川原地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aomori-r126",
+      "pref": "aomori",
+      "name": "八戸地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aomori-r127",
+      "pref": "aomori",
+      "name": "三沢募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aomori-r128",
+      "pref": "aomori",
+      "name": "むつ地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-akita-r129",
+      "pref": "akita",
+      "name": "秋田募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-akita-r130",
+      "pref": "akita",
+      "name": "能代地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-akita-r131",
+      "pref": "akita",
+      "name": "由利本荘地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-akita-r132",
+      "pref": "akita",
+      "name": "大仙地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-akita-r133",
+      "pref": "akita",
+      "name": "横手地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-akita-r134",
+      "pref": "akita",
+      "name": "大館出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-miyagi-r136",
+      "pref": "miyagi",
+      "name": "名取地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-miyagi-r137",
+      "pref": "miyagi",
+      "name": "大河原地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-miyagi-r138",
+      "pref": "miyagi",
+      "name": "大崎地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-miyagi-r139",
+      "pref": "miyagi",
+      "name": "石巻地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukushima-r142",
+      "pref": "fukushima",
+      "name": "福島募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukushima-r143",
+      "pref": "fukushima",
+      "name": "いわき地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukushima-r144",
+      "pref": "fukushima",
+      "name": "郡山地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukushima-r145",
+      "pref": "fukushima",
+      "name": "相双地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukushima-r146",
+      "pref": "fukushima",
+      "name": "白河地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukushima-r147",
+      "pref": "fukushima",
+      "name": "会津若松出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-toyama-r149",
+      "pref": "toyama",
+      "name": "魚津地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagano-r151",
+      "pref": "nagano",
+      "name": "松本地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagano-r152",
+      "pref": "nagano",
+      "name": "上田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagano-r154",
+      "pref": "nagano",
+      "name": "茅野地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagano-r155",
+      "pref": "nagano",
+      "name": "伊那地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagano-r156",
+      "pref": "nagano",
+      "name": "飯田出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-gifu-r158",
+      "pref": "gifu",
+      "name": "高山出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shizuoka-r162",
+      "pref": "shizuoka",
+      "name": "沼津地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shizuoka-r163",
+      "pref": "shizuoka",
+      "name": "富士地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shizuoka-r164",
+      "pref": "shizuoka",
+      "name": "伊東地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shizuoka-r165",
+      "pref": "shizuoka",
+      "name": "藤枝地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shizuoka-r166",
+      "pref": "shizuoka",
+      "name": "袋井地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shizuoka-r167",
+      "pref": "shizuoka",
+      "name": "三島募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shizuoka-r168",
+      "pref": "shizuoka",
+      "name": "清水募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shizuoka-r169",
+      "pref": "shizuoka",
+      "name": "静岡募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shizuoka-r170",
+      "pref": "shizuoka",
+      "name": "浜松出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aichi-r171",
+      "pref": "aichi",
+      "name": "名古屋出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aichi-r174",
+      "pref": "aichi",
+      "name": "半田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aichi-r175",
+      "pref": "aichi",
+      "name": "一宮地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aichi-r177",
+      "pref": "aichi",
+      "name": "瀬戸地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aichi-r178",
+      "pref": "aichi",
+      "name": "岡崎出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aichi-r179",
+      "pref": "aichi",
+      "name": "豊田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aichi-r181",
+      "pref": "aichi",
+      "name": "豊橋地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-aichi-r182",
+      "pref": "aichi",
+      "name": "豊川地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-mie-r184",
+      "pref": "mie",
+      "name": "伊勢地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-mie-r186",
+      "pref": "mie",
+      "name": "熊野地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shiga-r191",
+      "pref": "shiga",
+      "name": "草津地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r193",
+      "pref": "osaka",
+      "name": "茨木地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r194",
+      "pref": "osaka",
+      "name": "東大阪地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r195",
+      "pref": "osaka",
+      "name": "豊中募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r196",
+      "pref": "osaka",
+      "name": "八尾分駐所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r197",
+      "pref": "osaka",
+      "name": "ミナミ募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r198",
+      "pref": "osaka",
+      "name": "梅田募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r199",
+      "pref": "osaka",
+      "name": "十三募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r200",
+      "pref": "osaka",
+      "name": "京橋募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r202",
+      "pref": "osaka",
+      "name": "堺出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r203",
+      "pref": "osaka",
+      "name": "岸和田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-osaka-r204",
+      "pref": "osaka",
+      "name": "富田林地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hyogo-r205",
+      "pref": "hyogo",
+      "name": "西宮地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hyogo-r207",
+      "pref": "hyogo",
+      "name": "柏原地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hyogo-r210",
+      "pref": "hyogo",
+      "name": "西神戸募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hyogo-r211",
+      "pref": "hyogo",
+      "name": "加古川地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hyogo-r212",
+      "pref": "hyogo",
+      "name": "青野原分駐所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hyogo-r213",
+      "pref": "hyogo",
+      "name": "姫路地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hyogo-r214",
+      "pref": "hyogo",
+      "name": "相生地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hyogo-r215",
+      "pref": "hyogo",
+      "name": "豊岡出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hyogo-r216",
+      "pref": "hyogo",
+      "name": "淡路島駐在員事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nara-r217",
+      "pref": "nara",
+      "name": "奈良募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nara-r218",
+      "pref": "nara",
+      "name": "天理募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nara-r219",
+      "pref": "nara",
+      "name": "橿原地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nara-r220",
+      "pref": "nara",
+      "name": "五條地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shimane-r224",
+      "pref": "shimane",
+      "name": "出雲地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shimane-r225",
+      "pref": "shimane",
+      "name": "浜田出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shimane-r226",
+      "pref": "shimane",
+      "name": "益田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-shimane-r227",
+      "pref": "shimane",
+      "name": "大田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hiroshima-r229",
+      "pref": "hiroshima",
+      "name": "尾道出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hiroshima-r230",
+      "pref": "hiroshima",
+      "name": "呉地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hiroshima-r231",
+      "pref": "hiroshima",
+      "name": "三次地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hiroshima-r232",
+      "pref": "hiroshima",
+      "name": "福山地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hiroshima-r233",
+      "pref": "hiroshima",
+      "name": "東広島地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hiroshima-r234",
+      "pref": "hiroshima",
+      "name": "広島地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-hiroshima-r235",
+      "pref": "hiroshima",
+      "name": "可部募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-yamaguchi-r239",
+      "pref": "yamaguchi",
+      "name": "岩国地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-yamaguchi-r240",
+      "pref": "yamaguchi",
+      "name": "萩地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-kagawa-r243",
+      "pref": "kagawa",
+      "name": "観音寺地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-ehime-r246",
+      "pref": "ehime",
+      "name": "宇和島地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-ehime-r247",
+      "pref": "ehime",
+      "name": "大洲地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r248",
+      "pref": "fukuoka",
+      "name": "福岡募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r249",
+      "pref": "fukuoka",
+      "name": "福岡西募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r250",
+      "pref": "fukuoka",
+      "name": "福岡地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r251",
+      "pref": "fukuoka",
+      "name": "春日分駐所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r254",
+      "pref": "fukuoka",
+      "name": "芦屋地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r255",
+      "pref": "fukuoka",
+      "name": "築城地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r256",
+      "pref": "fukuoka",
+      "name": "飯塚地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r257",
+      "pref": "fukuoka",
+      "name": "久留米地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r258",
+      "pref": "fukuoka",
+      "name": "八女地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r259",
+      "pref": "fukuoka",
+      "name": "柳川地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukuoka-r260",
+      "pref": "fukuoka",
+      "name": "大牟田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagasaki-r261",
+      "pref": "nagasaki",
+      "name": "佐世保出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagasaki-r262",
+      "pref": "nagasaki",
+      "name": "大村地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagasaki-r263",
+      "pref": "nagasaki",
+      "name": "諫早地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagasaki-r264",
+      "pref": "nagasaki",
+      "name": "島原地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagasaki-r265",
+      "pref": "nagasaki",
+      "name": "琴海地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagasaki-r266",
+      "pref": "nagasaki",
+      "name": "長崎募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagasaki-r267",
+      "pref": "nagasaki",
+      "name": "壱岐駐在員事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagasaki-r268",
+      "pref": "nagasaki",
+      "name": "対馬駐在員事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagasaki-r269",
+      "pref": "nagasaki",
+      "name": "上五島駐在員事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-nagasaki-r270",
+      "pref": "nagasaki",
+      "name": "五島駐在員事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-oita-r271",
+      "pref": "oita",
+      "name": "別府地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-oita-r273",
+      "pref": "oita",
+      "name": "佐伯地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-oita-r274",
+      "pref": "oita",
+      "name": "日田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-oita-r275",
+      "pref": "oita",
+      "name": "竹田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-miyazaki-r276",
+      "pref": "miyazaki",
+      "name": "宮崎地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-miyazaki-r277",
+      "pref": "miyazaki",
+      "name": "都城出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-miyazaki-r278",
+      "pref": "miyazaki",
+      "name": "延岡地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-miyazaki-r279",
+      "pref": "miyazaki",
+      "name": "日南地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-okinawa-r280",
+      "pref": "okinawa",
+      "name": "那覇募集案内所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-okinawa-r281",
+      "pref": "okinawa",
+      "name": "沖縄地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-okinawa-r282",
+      "pref": "okinawa",
+      "name": "名護地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-okinawa-r283",
+      "pref": "okinawa",
+      "name": "宮古島駐在員事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-okinawa-r284",
+      "pref": "okinawa",
+      "name": "石垣駐在員事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-iwate-r292",
+      "pref": "iwate",
+      "name": "一関出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-iwate-r294",
+      "pref": "iwate",
+      "name": "宮古地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-niigata-r297",
+      "pref": "niigata",
+      "name": "長岡出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-niigata-r299",
+      "pref": "niigata",
+      "name": "柏崎地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-niigata-r300",
+      "pref": "niigata",
+      "name": "新発田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-niigata-r301",
+      "pref": "niigata",
+      "name": "佐渡駐在員事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-yamagata-r302",
+      "pref": "yamagata",
+      "name": "鶴岡出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-yamagata-r303",
+      "pref": "yamagata",
+      "name": "酒田地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-kyoto-r307",
+      "pref": "kyoto",
+      "name": "福知山地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-saga-r309",
+      "pref": "saga",
+      "name": "武雄地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-saga-r310",
+      "pref": "saga",
+      "name": "唐津出張所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-saga-r311",
+      "pref": "saga",
+      "name": "鳥栖地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukui-r313",
+      "pref": "fukui",
+      "name": "越前地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    },
+    {
+      "id": "loc-fukui-r314",
+      "pref": "fukui",
+      "name": "大野地域事務所",
+      "missingFields": [
+        "tel"
+      ]
+    }
   ]
 }

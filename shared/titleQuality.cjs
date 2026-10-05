@@ -1,5 +1,7 @@
 'use strict';
 
+const { isProcurementSource } = require('./procurement.cjs');
+
 /**
  * イベント名の品質管理モジュール（スクレイパー/チェックスクリプト共通）
  *
@@ -454,6 +456,8 @@ const DOC_RESCUE_RE = /説明会|見学|体験|フェス|まつり|祭|公開|�
  */
 function isNonEventDocument(ev) {
   if (!ev) return false;
+  if (isProcurementSource({ url: ev.url, text: [ev.title, ev.place, ev.notes, ev.ageRequirement].filter(Boolean).join(' ') }) ||
+      isProcurementSource({ url: ev.imageUrl })) return true;
   const title = toHalfAlnum(String(ev.title || ''));
   let url = String(ev.url || '');
   try { url = decodeURIComponent(url); } catch { /* keep raw */ }
