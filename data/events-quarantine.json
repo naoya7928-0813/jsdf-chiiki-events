@@ -1,5 +1,30 @@
 {
   "updatedAt": "2026-10-05",
-  "count": 0,
-  "events": []
+  "count": 2,
+  "events": [
+    {
+      "id": "ak-office-20261008-22uwq",
+      "pref": "akita",
+      "date": "2026-10-08",
+      "endDate": "",
+      "title": "海上要員の最終合格発表はです。",
+      "place": "",
+      "url": "https://www.mod.go.jp/pco/akita/file/result/kankouriku1001_1007.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-10-05",
+      "reason": ""
+    },
+    {
+      "id": "ai-office-20280620-ghetd",
+      "pref": "aichi",
+      "date": "2028-06-20",
+      "endDate": "",
+      "title": "陸上自衛隊高等工科学校生徒説明会",
+      "place": "自衛隊愛知地本豊田地域事務所（豊田合同庁舎3）",
+      "url": "https://www.mod.go.jp/pco/aichi/contact/toyota/seminar/toyota_se202606_11.jpg",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-10-05",
+      "reason": "OCR由来の不自然な未来日"
+    }
+  ]
 }
