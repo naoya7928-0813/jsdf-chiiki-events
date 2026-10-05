@@ -1,6 +1,108 @@
 {
-  "updatedAt": "2026-10-05",
+  "updatedAt": "2026-10-06",
   "events": [
+    {
+      "id": "k-20261005-je47v",
+      "pref": "kanagawa",
+      "office": "",
+      "date": "2026-10-05",
+      "endDate": "",
+      "weekday": "月",
+      "title": "制度説明会",
+      "place": "平塚地域事務所",
+      "address": "",
+      "time": "13:00～16:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kanagawa/mado/hiratuka/hiratuka.html",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-09-25",
+      "weatherLocation": {
+        "latitude": 35.335,
+        "longitude": 139.35,
+        "label": "神奈川県平塚市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.920+09:00"
+      },
+      "archivedAt": "2026-10-06"
+    },
+    {
+      "id": "hy-20261005-4hroe",
+      "pref": "hyogo",
+      "office": "",
+      "date": "2026-10-05",
+      "endDate": "",
+      "weekday": "月",
+      "title": "高等工科学校進路相談会",
+      "place": "川西地域事務所",
+      "address": "",
+      "time": "16:00～17:00 / 17:00～18:00 / 18:00～19:00 / 09:00～18:00",
+      "category": "説明会",
+      "tag": "学生向け",
+      "url": "https://www.mod.go.jp/pco/hyogo/want/setumeikai.html",
+      "notes": null,
+      "ageRequirement": "・中学校3年生「男子」 ・中学校勤務教諭",
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "hyogo_html",
+      "firstSeen": "2026-10-05",
+      "weatherLocation": {
+        "latitude": 34.83,
+        "longitude": 135.417,
+        "label": "兵庫県川西市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-05T08:54:38.633+09:00"
+      },
+      "archivedAt": "2026-10-06"
+    },
+    {
+      "id": "ya-off-20261005-7iz09",
+      "pref": "yamaguchi",
+      "office": "",
+      "date": "2026-10-05",
+      "endDate": "",
+      "weekday": "月",
+      "title": "自衛隊採用説明会（10月）",
+      "place": "ハローワーク徳山",
+      "address": "",
+      "time": "14:00～15:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/yamaguchi/setumeikai_syuu081005.pdf",
+      "notes": "服装自由、予約不要",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-09-14",
+      "weatherLocation": {
+        "latitude": 34.186,
+        "longitude": 131.471,
+        "label": "山口県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-09-03T09:01:53.292+09:00"
+      },
+      "archivedAt": "2026-10-06"
+    },
     {
       "id": "ya-20261004-9q6qe",
       "pref": "yamagata",
@@ -543,7 +645,7 @@
         "source": "gsi",
         "geocodedAt": "2026-07-13T07:58:32.830+09:00"
       },
-      "archivedAt": "2026-10-05"
+      "archivedAt": "2026-10-06"
     },
     {
       "id": "os-office-20261004-0kn0u",
@@ -577,7 +679,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:31.252+09:00"
       },
-      "archivedAt": "2026-10-05"
+      "archivedAt": "2026-10-06"
     },
     {
       "id": "hy-20261004-2qtbf",
@@ -985,7 +1087,7 @@
         "source": "gsi",
         "geocodedAt": "2026-09-02T08:42:44.676+09:00"
       },
-      "archivedAt": "2026-10-05"
+      "archivedAt": "2026-10-06"
     },
     {
       "id": "fu-off-20261004-m35pm",
@@ -1019,7 +1121,7 @@
         "source": "gsi",
         "geocodedAt": "2026-09-30T09:54:40.002+09:00"
       },
-      "archivedAt": "2026-10-05"
+      "archivedAt": "2026-10-06"
     },
     {
       "id": "ng-20261004-sq0hm",
@@ -1246,10 +1348,10 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-10-05",
+      "statusUpdatedAt": "2026-10-06",
       "source_type": "office_html",
       "firstSeen": "2026-09-11",
-      "archivedAt": "2026-10-05"
+      "archivedAt": "2026-10-06"
     },
     {
       "id": "to-office-20261003-nx8zc",
@@ -1997,7 +2099,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-10-05"
+      "archivedAt": "2026-10-06"
     },
     {
       "id": "hy-office-20261001-jm41q",
@@ -2190,7 +2292,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-10-05",
+      "statusUpdatedAt": "2026-10-06",
       "source_type": "office_html",
       "firstSeen": "2026-08-06",
       "weatherLocation": {
@@ -2201,7 +2303,7 @@
         "source": "gsi",
         "geocodedAt": "2026-07-02T08:50:36.640+09:00"
       },
-      "archivedAt": "2026-10-05"
+      "archivedAt": "2026-10-06"
     },
     {
       "id": "fs-20260928-ysdga",
