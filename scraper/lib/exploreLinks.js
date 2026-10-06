@@ -32,6 +32,9 @@ function findEventLinks($, pageUrl, visited = new Set()) {
     const text = $(el).text().replace(/\s+/g, ' ').trim();
     const norm = normalizeUrl(href, pageUrl);
     if (!norm) return;
+    // Keep the directory slash for resolving relative links on the fetched page.
+    let absolute;
+    try { const u = new URL(href, pageUrl); u.hash = ''; absolute = u.href; } catch { return; }
     if (isProcurementSource({ url: norm, text })) return;
     if (!norm.includes('mod.go.jp/pco')) return;
     if (visited.has(norm)) return;
@@ -43,7 +46,7 @@ function findEventLinks($, pageUrl, visited = new Set()) {
       if (!EVENT_URL_KW.test(norm) && !EVENT_TXT_KW.test(text)) return;
       seenAssets.add(norm);
       assets.push({
-        url:      norm,
+        url:      absolute,
         text:     text.slice(0, 80),
         type:     isPdfUrl(norm) ? 'pdf' : 'image',
         sourcePageUrl: pageUrl,
@@ -56,7 +59,7 @@ function findEventLinks($, pageUrl, visited = new Set()) {
     if (SKIP_URL_KW.test(norm)) return;
     if (!EVENT_URL_KW.test(norm) && !EVENT_TXT_KW.test(text)) return;
     seenPages.add(norm);
-    pages.push({ url: norm, text: text.slice(0, 80) });
+    pages.push({ url: absolute, normalized: norm, text: text.slice(0, 80) });
   });
 
   return { pages, assets };

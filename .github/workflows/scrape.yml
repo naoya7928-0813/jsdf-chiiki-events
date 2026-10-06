@@ -197,6 +197,19 @@ jobs:
           HQ_EXPLORE_PREFS:       ${{ github.event.inputs.hq_explore_prefs || '' }}
           HQ_EXPLORE_TIMEOUT_MIN: ${{ github.event.inputs.hq_explore_timeout_min || '' }}
 
+      - name: 募集窓口のHTML・OCR取得状況を集計
+        if: always()
+        run: node scripts/office-crawl-summary.cjs
+
+      - name: 募集窓口のHTML・OCR取得状況を保存
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: office-crawl-report-${{ github.run_id }}
+          path: scraper/office-crawl-report.json
+          retention-days: 14
+          if-no-files-found: warn
+
       # ── カットオフ（時間切れ打ち切り）の結果を読む ──────────────
       # 配信スロットに間に合わせるため、間に合わない地本は取得を見送っている。
       # 見送った地本は前回データのままなので公開データは壊れないが、

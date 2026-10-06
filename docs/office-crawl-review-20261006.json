@@ -1,0 +1,1413 @@
+{
+  "checkedAt": "2026-10-06",
+  "sourceRun": 37425699829,
+  "sourceRunUrl": "https://github.com/naoya7928-0813/jsdf-chiiki-events/actions/runs/37425699829",
+  "sourceCode": "v1.38.25以前の巡回方式",
+  "knownFailures": [
+    {
+      "pref": "akita",
+      "officeLabel": "秋田募集案内所・能代地域事務所・由利本荘地域事務所 ほか3拠点",
+      "pageUrl": "https://www.mod.go.jp/pco/akita/asset/about/contact.html",
+      "evidence": "2026-10-06T07:28:48.2663320Z   [fetch] エラー: https://www.mod.go.jp/pco/akita/file/R8bousai.pptx → page.goto: Download is starting"
+    },
+    {
+      "pref": "hakodate",
+      "officeLabel": "今金地域事務所・八雲地域事務所・江差地域事務所 ほか1拠点",
+      "pageUrl": "https://www.mod.go.jp/pco/hakodate/",
+      "evidence": "2026-10-06T07:31:04.4680766Z [DL] 404: https://www.mod.go.jp/pco/hakodate/img/R8.2tourikukaikuusi.pdf"
+    },
+    {
+      "pref": "hakodate",
+      "officeLabel": "今金地域事務所・八雲地域事務所・江差地域事務所 ほか1拠点",
+      "pageUrl": "https://www.mod.go.jp/pco/hakodate/",
+      "evidence": "2026-10-06T07:31:06.1033325Z [DL] 404: https://www.mod.go.jp/pco/hakodate/img/2026kyariaa.jpg"
+    },
+    {
+      "pref": "hakodate",
+      "officeLabel": "今金地域事務所・八雲地域事務所・江差地域事務所 ほか1拠点",
+      "pageUrl": "https://www.mod.go.jp/pco/hakodate/",
+      "evidence": "2026-10-06T07:31:09.0163926Z [DL] 404: https://www.mod.go.jp/pco/hakodate/img/R6.9.23hataraknorimono.pdf"
+    },
+    {
+      "pref": "hakodate",
+      "officeLabel": "今金地域事務所・八雲地域事務所・江差地域事務所 ほか1拠点",
+      "pageUrl": "https://www.mod.go.jp/pco/hakodate/",
+      "evidence": "2026-10-06T07:31:10.6517032Z [DL] 404: https://www.mod.go.jp/pco/hakodate/img/R6.8.3uragakantei.pdf"
+    },
+    {
+      "pref": "miyagi",
+      "officeLabel": "仙台募集案内所・名取地域事務所・大河原地域事務所 ほか4拠点",
+      "pageUrl": "https://www.mod.go.jp/pco/miyagi/",
+      "evidence": "2026-10-06T07:33:30.9060304Z   [fetch] エラー: https://www.mod.go.jp/pco/miyagi/ → page.content: Unable to retrieve content because the page is navigating and changing the content."
+    },
+    {
+      "pref": "nagano",
+      "officeLabel": "茅野地域事務所",
+      "pageUrl": "https://www.mod.go.jp/pco/nagano/naganopco/chino/",
+      "evidence": "2026-10-06T07:33:41.2572332Z [DL] 404: https://www.mod.go.jp/pco/nagano/images/boshuu.png"
+    },
+    {
+      "pref": "oita",
+      "officeLabel": "別府地域事務所・中津出張所・佐伯地域事務所 ほか2拠点",
+      "pageUrl": "https://www.mod.go.jp/pco/oita/",
+      "evidence": "2026-10-06T07:35:48.7398890Z [DL] 404: https://www.mod.go.jp/pco/oita/02_recruit/pdf/2si.pdf"
+    },
+    {
+      "pref": "tokyo",
+      "officeLabel": "国分寺募集案内所",
+      "pageUrl": "https://www.mod.go.jp/pco/tokyo/kokubunji/",
+      "evidence": "2026-10-06T07:39:23.3572099Z [DL] 403: https://www.mod.go.jp/pco/tokyo/kokubunji/img/top_3.JPG"
+    },
+    {
+      "pref": "tokyo",
+      "officeLabel": "国分寺募集案内所",
+      "pageUrl": "https://www.mod.go.jp/pco/tokyo/kokubunji/",
+      "evidence": "2026-10-06T07:39:24.8737609Z [DL] 403: https://www.mod.go.jp/pco/tokyo/kokubunji/img/top_1.JPG"
+    },
+    {
+      "pref": "tokyo",
+      "officeLabel": "江東出張所",
+      "pageUrl": "https://www.mod.go.jp/pco/tokyo/koutou/",
+      "evidence": "2026-10-06T07:39:34.1998302Z [DL] 403: https://www.mod.go.jp/pco/tokyo/koutou/img/setumeikai.JPEG"
+    },
+    {
+      "pref": "tokyo",
+      "officeLabel": "江東出張所",
+      "pageUrl": "https://www.mod.go.jp/pco/tokyo/koutou/",
+      "evidence": "2026-10-06T07:39:35.7152822Z [DL] 403: https://www.mod.go.jp/pco/tokyo/koutou/img/tensyoku.JPG"
+    },
+    {
+      "pref": "yamanashi",
+      "officeLabel": "巨摩募集案内所・甲府募集案内所・大月地域事務所",
+      "pageUrl": "https://www.mod.go.jp/pco/yamanashi/honbu.html#shozaichi",
+      "evidence": "2026-10-06T07:42:03.8253462Z [DL] 403: https://www.mod.go.jp/pco/yamanashi/img/recruitment/re_h1_img-min2.PNG"
+    }
+  ],
+  "newRegistry": {
+    "offices": 59,
+    "uniqueHtmlUrls": 67,
+    "htmlDocumentsFetched": 67,
+    "ocrRunStatus": "新設定による本番OCRは未実施・実績未確認。HTML確認時に資料のOCRは実施していない。"
+  },
+  "newOffices": [
+    {
+      "id": "loc-hakodate-audit-494d73a9a5",
+      "pref": "hakodate",
+      "name": "函館地区隊",
+      "contactUrl": "https://www.mod.go.jp/pco/hakodate/recruitment/",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/hakodate/publicity/",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-712f0c3167"
+        }
+      ]
+    },
+    {
+      "id": "loc-hakodate-audit-b6282499cc",
+      "pref": "hakodate",
+      "name": "函館リクルートセンター（募集案内所）",
+      "contactUrl": "https://www.mod.go.jp/pco/hakodate/recruitment/",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/hakodate/publicity/",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-712f0c3167"
+        }
+      ]
+    },
+    {
+      "id": "loc-iwate-audit-b72f71d565",
+      "pref": "iwate",
+      "name": "釜石地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/iwate/iwatechihon/",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/iwate/event/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-iwate-events"
+        }
+      ]
+    },
+    {
+      "id": "loc-ibaraki-audit-911c5ddbdf",
+      "pref": "ibaraki",
+      "name": "百里分駐所",
+      "contactUrl": "https://www.mod.go.jp/pco/ibaraki/boshujimusho.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/ibaraki/jimusho/hyakuri.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-hyakuri"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/ibaraki/setsumeikai.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-84f36e27af"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/ibaraki/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-36d1e85f24"
+        }
+      ]
+    },
+    {
+      "id": "loc-tochigi-audit-9213b7b159",
+      "pref": "tochigi",
+      "name": "宇都宮募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/tochigi/contact.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/tochigi/recruit.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "tochigi"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/tochigi/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-tochigi-events"
+        }
+      ]
+    },
+    {
+      "id": "loc-tochigi-audit-709ca9a671",
+      "pref": "tochigi",
+      "name": "大田原地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/tochigi/contact.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/tochigi/recruit.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "tochigi"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/tochigi/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-tochigi-events"
+        }
+      ]
+    },
+    {
+      "id": "loc-tokyo-audit-5bfb63f0b2",
+      "pref": "tokyo",
+      "name": "北地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/tokyo/kita/index.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/tokyo/kita/index.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "tokyo-detail-2"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/tokyo/event2/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-b61917b2ba"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/tokyo/setumeikai/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-b99d4c5101"
+        }
+      ]
+    },
+    {
+      "id": "loc-tokyo-audit-5c4bd980b5",
+      "pref": "tokyo",
+      "name": "新小岩募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/tokyo/shinkoiwa/index.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/tokyo/shinkoiwa/index.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "tokyo-detail-3"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/tokyo/event2/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-b61917b2ba"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/tokyo/setumeikai/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-b99d4c5101"
+        }
+      ]
+    },
+    {
+      "id": "loc-tokyo-audit-53193e016c",
+      "pref": "tokyo",
+      "name": "世田谷募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/tokyo/setagaya/index.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/tokyo/setagaya/index.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "tokyo-detail-5"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/tokyo/event2/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-b61917b2ba"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/tokyo/setumeikai/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-b99d4c5101"
+        }
+      ]
+    },
+    {
+      "id": "loc-tokyo-audit-d7312e19bc",
+      "pref": "tokyo",
+      "name": "練馬地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/tokyo/nerima/index.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/tokyo/nerima/index.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "tokyo-detail-6"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/tokyo/event2/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-b61917b2ba"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/tokyo/setumeikai/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-b99d4c5101"
+        }
+      ]
+    },
+    {
+      "id": "loc-tokyo-audit-1db6755f24",
+      "pref": "tokyo",
+      "name": "福生募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/tokyo/fussa/index.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/tokyo/fussa/index.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "tokyo-detail-7"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/tokyo/event2/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-b61917b2ba"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/tokyo/setumeikai/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-b99d4c5101"
+        }
+      ]
+    },
+    {
+      "id": "loc-tokyo-audit-43264909a8",
+      "pref": "tokyo",
+      "name": "府中分駐所",
+      "contactUrl": "https://www.mod.go.jp/pco/tokyo/fuchu/index.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/tokyo/fuchu/index.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "tokyo-detail-8"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/tokyo/event2/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-b61917b2ba"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/tokyo/setumeikai/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-b99d4c5101"
+        }
+      ]
+    },
+    {
+      "id": "loc-tokyo-audit-4ef5694bc5",
+      "pref": "tokyo",
+      "name": "八王子地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/tokyo/hachiouji/index.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/tokyo/hachiouji/index.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "tokyo-detail-9"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/tokyo/event2/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-b61917b2ba"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/tokyo/setumeikai/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-b99d4c5101"
+        }
+      ]
+    },
+    {
+      "id": "loc-kanagawa-audit-bbbbe8be99",
+      "pref": "kanagawa",
+      "name": "川崎出張所",
+      "contactUrl": "https://www.mod.go.jp/pco/kanagawa/mado/kawasaki/kawasaki.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/kanagawa/mado/kawasaki/kawasaki.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "kanagawa-detail-1"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/kanagawa/bosyu/setumei/setumei-top.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-1ddcf2b7be"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/kanagawa/kouho/event/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-21914ce10c"
+        }
+      ]
+    },
+    {
+      "id": "loc-kanagawa-audit-9ff1c50db6",
+      "pref": "kanagawa",
+      "name": "溝の口募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/kanagawa/mado/mizo/mizo.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/kanagawa/mado/mizo/mizo.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "kanagawa-detail-4"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/kanagawa/bosyu/setumei/setumei-top.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-1ddcf2b7be"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/kanagawa/kouho/event/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-21914ce10c"
+        }
+      ]
+    },
+    {
+      "id": "loc-kanagawa-audit-d107df0a74",
+      "pref": "kanagawa",
+      "name": "横浜出張所",
+      "contactUrl": "https://www.mod.go.jp/pco/kanagawa/mado/yokohama/yokohama.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/kanagawa/mado/yokohama/yokohama.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "kanagawa-detail-2"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/kanagawa/bosyu/setumei/setumei-top.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-1ddcf2b7be"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/kanagawa/kouho/event/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-21914ce10c"
+        }
+      ]
+    },
+    {
+      "id": "loc-kanagawa-audit-6a07345a73",
+      "pref": "kanagawa",
+      "name": "上大岡募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/kanagawa/mado/kamiooka/kamiooka.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/kanagawa/mado/kamiooka/kamiooka.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "kanagawa-detail-3"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/kanagawa/bosyu/setumei/setumei-top.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-1ddcf2b7be"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/kanagawa/kouho/event/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-21914ce10c"
+        }
+      ]
+    },
+    {
+      "id": "loc-toyama-audit-40c53717a3",
+      "pref": "toyama",
+      "name": "富山募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/toyama/content/07-access/07-access.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/toyama/content/04-event/04-event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-9fd5010f05"
+        }
+      ]
+    },
+    {
+      "id": "loc-ishikawa-audit-d82a56c336",
+      "pref": "ishikawa",
+      "name": "金沢募集案内所（鳴和）",
+      "contactUrl": "https://www.mod.go.jp/pco/ishikawa/guide/",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/ishikawa/event29/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-5c80b1cb15"
+        }
+      ]
+    },
+    {
+      "id": "loc-fukui-audit-65724b2629",
+      "pref": "fukui",
+      "name": "福井募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/fukui/contents/6-aboutus/6-aboutus.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/fukui/contents/9-event/9-event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-4c3ab9f0a5"
+        }
+      ]
+    },
+    {
+      "id": "loc-mie-audit-3551e75dca",
+      "pref": "mie",
+      "name": "伊賀地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/mie/regional/",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/mie/events-page/",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-78cb4cc350"
+        }
+      ]
+    },
+    {
+      "id": "loc-shiga-audit-66d5ecf2eb",
+      "pref": "shiga",
+      "name": "近江八幡地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/shiga/about/",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/shiga/event-briefing/",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-fc5b63e087"
+        }
+      ]
+    },
+    {
+      "id": "loc-shiga-audit-3ed3837f2a",
+      "pref": "shiga",
+      "name": "高島地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/shiga/about/",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/shiga/event-briefing/",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-fc5b63e087"
+        }
+      ]
+    },
+    {
+      "id": "loc-yamaguchi-audit-d1d00c2fe2",
+      "pref": "yamaguchi",
+      "name": "山口募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/yamaguchi/jimusho.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/yamaguchi/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-yamaguchi-events"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/yamaguchi/setsumeikai_boshu.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-yamaguchi-briefing"
+        }
+      ]
+    },
+    {
+      "id": "loc-yamaguchi-audit-eed38becb0",
+      "pref": "yamaguchi",
+      "name": "周南地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/yamaguchi/jimusho.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/yamaguchi/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-yamaguchi-events"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/yamaguchi/setsumeikai_boshu.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-yamaguchi-briefing"
+        }
+      ]
+    },
+    {
+      "id": "loc-yamaguchi-audit-23d16e50d7",
+      "pref": "yamaguchi",
+      "name": "柳井地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/yamaguchi/jimusho.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/yamaguchi/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-yamaguchi-events"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/yamaguchi/setsumeikai_boshu.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-yamaguchi-briefing"
+        }
+      ]
+    },
+    {
+      "id": "loc-ehime-audit-d4e4ecaa35",
+      "pref": "ehime",
+      "name": "松山募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/ehime/acsess.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/ehime/office/office_matsu.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-ehime-matsu"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/ehime/briefing.skype.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-ehime-briefing"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/ehime/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-ehime-events"
+        }
+      ]
+    },
+    {
+      "id": "loc-kumamoto-audit-5aa20b9fa2",
+      "pref": "kumamoto",
+      "name": "熊本募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/kumamoto/about/access/",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/kumamoto/event/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-f1315c3af7"
+        }
+      ]
+    },
+    {
+      "id": "loc-kumamoto-audit-15d87262d4",
+      "pref": "kumamoto",
+      "name": "山鹿地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/kumamoto/about/access/",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/kumamoto/event/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-f1315c3af7"
+        }
+      ]
+    },
+    {
+      "id": "loc-kumamoto-audit-b152bcd485",
+      "pref": "kumamoto",
+      "name": "八代出張所",
+      "contactUrl": "https://www.mod.go.jp/pco/kumamoto/about/access/",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/kumamoto/event/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-f1315c3af7"
+        }
+      ]
+    },
+    {
+      "id": "loc-kumamoto-audit-8c6dc7322f",
+      "pref": "kumamoto",
+      "name": "人吉地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/kumamoto/about/access/",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/kumamoto/event/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-f1315c3af7"
+        }
+      ]
+    },
+    {
+      "id": "loc-kumamoto-audit-399cf8f22a",
+      "pref": "kumamoto",
+      "name": "天草駐在員事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/kumamoto/about/access/",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/kumamoto/event/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-f1315c3af7"
+        }
+      ]
+    },
+    {
+      "id": "loc-kagoshima-audit-24958f755f",
+      "pref": "kagoshima",
+      "name": "奄美大島駐在員事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/kagoshima/about/access/",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/kagoshima/event/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-kagoshima-events"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/kagoshima/jieikan/briefing-session/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-kagoshima-briefing"
+        }
+      ]
+    },
+    {
+      "id": "loc-kagoshima-audit-a9b1e14741",
+      "pref": "kagoshima",
+      "name": "種子島駐在員事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/kagoshima/about/access/",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/kagoshima/event/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-kagoshima-events"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/kagoshima/jieikan/briefing-session/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-kagoshima-briefing"
+        }
+      ]
+    },
+    {
+      "id": "loc-kagoshima-audit-8be8e3b1b0",
+      "pref": "kagoshima",
+      "name": "徳之島駐在員事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/kagoshima/about/access/",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/kagoshima/event/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-kagoshima-events"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/kagoshima/jieikan/briefing-session/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-kagoshima-briefing"
+        }
+      ]
+    },
+    {
+      "id": "loc-oita-audit-e58a037a7f",
+      "pref": "oita",
+      "name": "大分募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/oita/06_office.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/oita/03_event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-26844a7fe2"
+        }
+      ]
+    },
+    {
+      "id": "loc-oita-audit-5541880c21",
+      "pref": "oita",
+      "name": "宇佐地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/oita/06_office.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/oita/03_event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-26844a7fe2"
+        }
+      ]
+    },
+    {
+      "id": "loc-asahikawa-audit-58929ad1a1",
+      "pref": "asahikawa",
+      "name": "旭川地区隊",
+      "contactUrl": "https://www.mod.go.jp/pco/asahikawa/recruit.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/asahikawa/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-12062a0577"
+        }
+      ]
+    },
+    {
+      "id": "loc-yamagata-audit-1e73312714",
+      "pref": "yamagata",
+      "name": "山形募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/yamagata/yamagatabosyu/yamagatabosyu.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/yamagata/yamagatabosyu/yamagatabosyu.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "yamagata-detail-1"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/yamagata/event/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-6fb2d09875"
+        }
+      ]
+    },
+    {
+      "id": "loc-yamagata-audit-f330b65c70",
+      "pref": "yamagata",
+      "name": "東根地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/yamagata/higashine/higashine.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/yamagata/higashine/higashine.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "yamagata-detail-2"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/yamagata/event/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-6fb2d09875"
+        }
+      ]
+    },
+    {
+      "id": "loc-niigata-audit-a4dcb09f78",
+      "pref": "niigata",
+      "name": "新潟募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/niigata/HP/niigata.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/niigata/HP/niigata.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "niigata-detail-3"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/niigata/HP/event-schedule.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-0f5fad8be3"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/niigata/HP/setumeikai.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-b668f0888f"
+        }
+      ]
+    },
+    {
+      "id": "loc-gifu-audit-0443e7be85",
+      "pref": "gifu",
+      "name": "岐阜募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/gifu/office/gifu/gifu.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/gifu/office/gifu/gifu.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "gifu-detail-1"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/gifu/event/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-d5d4fcdf5f"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/gifu/recruit/guidance.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-ca9ddd4ee5"
+        }
+      ]
+    },
+    {
+      "id": "loc-gifu-audit-5ba59bfa05",
+      "pref": "gifu",
+      "name": "美濃加茂地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/gifu/office/minokamo/minokamo.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/gifu/office/minokamo/minokamo.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "gifu-detail-3"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/gifu/event/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-d5d4fcdf5f"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/gifu/recruit/guidance.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-ca9ddd4ee5"
+        }
+      ]
+    },
+    {
+      "id": "loc-gifu-audit-841fbb533b",
+      "pref": "gifu",
+      "name": "郡上地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/gifu/office/gujyou/gujyou.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/gifu/office/gujyou/gujyou.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "gifu-detail-4"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/gifu/event/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-d5d4fcdf5f"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/gifu/recruit/guidance.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-ca9ddd4ee5"
+        }
+      ]
+    },
+    {
+      "id": "loc-gifu-audit-d0383f828e",
+      "pref": "gifu",
+      "name": "恵那地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/gifu/office/ena/ena.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/gifu/office/ena/ena.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "gifu-detail-5"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/gifu/event/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-d5d4fcdf5f"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/gifu/recruit/guidance.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-ca9ddd4ee5"
+        }
+      ]
+    },
+    {
+      "id": "loc-kyoto-audit-f0eecd6fd1",
+      "pref": "kyoto",
+      "name": "京丹後地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/kyoto/jimusho/jieikan/kyotango.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/kyoto/jimusho/jieikan/kyotango.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "kyoto-detail-2"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/kyoto/kouhoushitsu/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-55d29fc2f3"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-kyoto-briefing"
+        }
+      ]
+    },
+    {
+      "id": "loc-kyoto-audit-12778cea5f",
+      "pref": "kyoto",
+      "name": "亀岡募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/kyoto/jimusho/jieikan/kameoca.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/kyoto/jimusho/jieikan/kameoca.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "kyoto-detail-4"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/kyoto/kouhoushitsu/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-55d29fc2f3"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-kyoto-briefing"
+        }
+      ]
+    },
+    {
+      "id": "loc-kyoto-audit-d0d53ae3c7",
+      "pref": "kyoto",
+      "name": "河原町募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/kyoto/jimusho/jieikan/kawaramachi.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/kyoto/jimusho/jieikan/kawaramachi.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "kyoto-detail-7"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/kyoto/kouhoushitsu/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-55d29fc2f3"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-kyoto-briefing"
+        }
+      ]
+    },
+    {
+      "id": "loc-kyoto-audit-8b75ebc866",
+      "pref": "kyoto",
+      "name": "京都募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/kyoto/jimusho/jieikan/kyoto.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/kyoto/jimusho/jieikan/kyoto.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "kyoto-detail-8"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/kyoto/kouhoushitsu/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-55d29fc2f3"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-kyoto-briefing"
+        }
+      ]
+    },
+    {
+      "id": "loc-osaka-audit-f722276b1b",
+      "pref": "osaka",
+      "name": "天王寺募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/osaka/about/office/tennouji.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/osaka/about/office/tennouji.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "osaka-detail-2"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/osaka/recruit/session/menu.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-63fbf74979"
+        }
+      ]
+    },
+    {
+      "id": "loc-osaka-audit-855cdf64d2",
+      "pref": "osaka",
+      "name": "なんば募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/osaka/about/office/nanba.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/osaka/about/office/nanba.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "osaka-detail-3"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/osaka/recruit/session/menu.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-63fbf74979"
+        }
+      ]
+    },
+    {
+      "id": "loc-osaka-audit-7bbf6cf4c9",
+      "pref": "osaka",
+      "name": "守口出張所",
+      "contactUrl": "https://www.mod.go.jp/pco/osaka/about/office/moriguchi.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/osaka/about/office/moriguchi.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "osaka-detail-5"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/osaka/recruit/session/menu.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-63fbf74979"
+        }
+      ]
+    },
+    {
+      "id": "loc-tokushima-audit-53a029a429",
+      "pref": "tokushima",
+      "name": "三好出張所",
+      "contactUrl": "https://www.mod.go.jp/pco/tokushima/miyosi.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/tokushima/miyosi.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "tokushima-detail-1"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/tokushima/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-e6669028af"
+        }
+      ]
+    },
+    {
+      "id": "loc-tokushima-audit-dd56d9b5d6",
+      "pref": "tokushima",
+      "name": "鳴門地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/tokushima/naruto.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/tokushima/naruto.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "tokushima-detail-2"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/tokushima/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-e6669028af"
+        }
+      ]
+    },
+    {
+      "id": "loc-kagawa-audit-1d4d88a1a0",
+      "pref": "kagawa",
+      "name": "高松募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/kagawa/pco/takamatsu.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/kagawa/pco/takamatsu.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "kagawa-detail-1"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/kagawa/event/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-3118656f58"
+        }
+      ]
+    },
+    {
+      "id": "loc-kagawa-audit-b8647337ab",
+      "pref": "kagawa",
+      "name": "さぬき地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/kagawa/pco/sanuki.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/kagawa/pco/sanuki.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "kagawa-detail-2"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/kagawa/event/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-3118656f58"
+        }
+      ]
+    },
+    {
+      "id": "loc-kagawa-audit-4272d7945c",
+      "pref": "kagawa",
+      "name": "善通寺地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/kagawa/pco/zen.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/kagawa/pco/zen.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "kagawa-detail-4"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/kagawa/event/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-page-3118656f58"
+        }
+      ]
+    },
+    {
+      "id": "loc-chiba-audit-d10ad6ac09",
+      "pref": "chiba",
+      "name": "旭地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/chiba/map/naritaaccess.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/chiba/eventseminar.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-chiba-seminar"
+        }
+      ]
+    },
+    {
+      "id": "loc-chiba-audit-b66bb20a4f",
+      "pref": "chiba",
+      "name": "館山分駐所",
+      "contactUrl": "https://www.mod.go.jp/pco/chiba/map/tateyamaannai.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/chiba/eventseminar.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-06",
+          "fetchedAt": "2026-10-06",
+          "evidenceKey": "event-extra-chiba-seminar"
+        }
+      ]
+    }
+  ]
+}
