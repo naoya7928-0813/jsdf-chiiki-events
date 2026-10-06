@@ -2,10 +2,10 @@
   "updatedAt": "2026-10-06",
   "limit": 30,
   "summary": {
-    "checked": 326,
-    "flagged": 15,
-    "attempted": 7,
-    "corrected": 0,
+    "checked": 384,
+    "flagged": 20,
+    "attempted": 12,
+    "corrected": 2,
     "unverified": 0,
     "noSource": 4,
     "overBudget": 0,
@@ -14,7 +14,93 @@
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
-  "corrections": [],
+  "corrections": [
+    {
+      "id": "ky-office-20261013-n3vja",
+      "pref": "kyoto",
+      "source": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/img/081013_kyoto.jpg",
+      "reasons": [
+        "タイトルが長すぎる（説明文・別イベントの混入）"
+      ],
+      "changes": [
+        {
+          "field": "title",
+          "from": "自衛隊説明会) 京都テルサハローワーク西館3F ！詳しくは上の画像をクリック！申し込みは下記のフォームボタンをクリック",
+          "to": "陸・海・空 自衛隊個別説明会"
+        },
+        {
+          "field": "endDate",
+          "from": null,
+          "to": "2026-10-19"
+        },
+        {
+          "field": "place",
+          "from": null,
+          "to": "京都テルサ西館3F"
+        },
+        {
+          "field": "time",
+          "from": null,
+          "to": "10:00～16:00"
+        },
+        {
+          "field": "tag",
+          "from": "要予約",
+          "to": "個別"
+        },
+        {
+          "field": "ageRequirement",
+          "from": null,
+          "to": "18歳～32歳"
+        },
+        {
+          "field": "notes",
+          "from": "掲載元: 募集案内所・地域事務所",
+          "to": "予約不要"
+        }
+      ]
+    },
+    {
+      "id": "ky-office-20261019-1f1lt",
+      "pref": "kyoto",
+      "source": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/img/081019_kyoto.jpg",
+      "reasons": [
+        "タイトルが長すぎる（説明文・別イベントの混入）"
+      ],
+      "changes": [
+        {
+          "field": "title",
+          "from": "自衛隊説明会) ハローワーク京都七条 ！詳しくは上の画像をクリック！申し込みは下記のフォームボタンをクリックください！",
+          "to": "陸・海・空 自衛隊個別説明会"
+        },
+        {
+          "field": "place",
+          "from": null,
+          "to": "ハローワーク京都七条"
+        },
+        {
+          "field": "time",
+          "from": null,
+          "to": "13:00～17:00"
+        },
+        {
+          "field": "tag",
+          "from": "要予約",
+          "to": "個別"
+        },
+        {
+          "field": "ageRequirement",
+          "from": null,
+          "to": "18歳~32歳"
+        },
+        {
+          "field": "notes",
+          "from": "掲載元: 募集案内所・地域事務所",
+          "to": null
+        }
+      ]
+    }
+  ],
   "skipped": [
     {
       "id": "ya-20261011-oi7jq",
