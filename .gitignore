@@ -46,3 +46,6 @@ scraper/regression-report.json
 # 公式HP更新監視（Actions Cacheで前回HTMLハッシュを保持。レポートは実行ごとの一時ファイル）
 scraper/source-update-state.json
 scraper/source-update-report.json
+
+# 窓口別HTML・OCR巡回実績（Actions artifactに保存）
+scraper/office-crawl-report.json

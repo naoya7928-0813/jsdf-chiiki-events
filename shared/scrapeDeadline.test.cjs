@@ -255,7 +255,10 @@ test('打ち切りは地本ループだけでなく重い処理すべてに効�
   const idx = read('scraper/index.js');
   // 案内所巡回・HQ探索・OCR補完・LLM再検査。どれか1つでも抜けると、
   // そこで時間を使い切って結局スロットに間に合わない。
-  const hits = (idx.match(/cutoff(?:\.reached\(\)| && cutoff\.reached\(\))/g) || []).length;
+  const office = read('scraper/lib/officeCrawl.js');
+  assert.ok(idx.includes('cutoffReached: () => !!cutoff?.reached()'), '窓口巡回に期限が渡されていません');
+  const hits = (idx.match(/cutoff(?:\??\.reached\(\)| && cutoff\.reached\(\))/g) || []).length
+    + (office.match(/cutoffReached\(\)/g) || []).length;
   assert.ok(hits >= 5, `打ち切りの判定箇所が ${hits} か所しかありません`);
   assert.ok(idx.includes('timeCutoff.reached()'), 'LLM再検査に打ち切りが効いていません');
 });

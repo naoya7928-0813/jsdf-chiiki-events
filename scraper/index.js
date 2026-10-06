@@ -31,6 +31,9 @@ const { sortByPriority } = require('./lib/priority');
 const { markDuplicates }  = require('./lib/dedup');
 const { extractAssets }   = require('./lib/extractAssets');
 const { findEventLinks }  = require('./lib/exploreLinks');
+const { buildOfficePages, orderOfficePages, crawlOfficePages } = require('./lib/officeCrawl');
+const officeEventSources = require('./config/office-event-sources.json');
+const { createYearContext, isActivityReport } = require('./lib/officeHtmlContext');
 // OCRテキストからの日付抽出（表記ゆれ吸収。parseTextToEvent / parseOcrDate 共通）
 const { parseDateFromText, toJpDateString } = require('./lib/ocrDate');
 const llmClient = require('./lib/llmClient');
@@ -3322,14 +3325,35 @@ async function fetchToyama(context) {
  * @param {import('playwright').BrowserContext} ctx
  * @param {string} url
  */
+const officePageResponses = new Map();
+const officeCrawlReport = { checkedAt: null, runId: process.env.GITHUB_RUN_ID || null, pages: [] };
+
 async function fetchPagePlaywright(ctx, url) {
+  const normalized = normalizeUrl(url);
+  const cached = officePageResponses.get(normalized);
+  if (cached) return cached.html ? cheerio.load(cached.html) : null;
   let page = null;
   try {
     page = await ctx.newPage();
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+    await page.route('**/*', route => {
+      const request = route.request();
+      if (['image', 'media', 'font', 'stylesheet'].includes(request.resourceType())
+          || (request.isNavigationRequest() && request.frame() !== page.mainFrame())) return route.abort();
+      return route.continue();
+    });
+    const response = await page.goto(url, { waitUntil: 'load', timeout: 30_000 });
+    const status = response?.status() || 0;
     const html = await page.content();
+    const title = (html.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1] || '';
+    if (status < 200 || status >= 400 || isChallengeTitle(title)) {
+      officePageResponses.set(normalized, { status, finalUrl: page.url(), error: `HTTP ${status}: ${title.slice(0, 80)}` });
+      console.warn(`[OfficeHTML] 取得失敗 ${status}: ${url}`);
+      return null;
+    }
+    officePageResponses.set(normalized, { html, status, finalUrl: page.url() });
     return cheerio.load(html);
   } catch (err) {
+    officePageResponses.set(normalized, { error: err.message });
     console.warn(`  [fetch] エラー: ${url} → ${err.message}`);
     return null;
   } finally {
@@ -3414,32 +3438,12 @@ function officeNamesLabel(names) {
   return `${uniq.slice(0, 3).join('・')} ほか${uniq.length - 3}拠点`;
 }
 
-function loadRecruitmentOfficePages({ excludePrefs = new Set() } = {}) {
-  const pages = new Map();
-  try {
-    const officesData = JSON.parse(fs.readFileSync(OFFICES_PATH, 'utf8'));
-    for (const o of officesData.offices || []) {
-      if (!o.url || o.type === 'hq' || excludePrefs.has(o.pref)) continue;
-      const norm = normalizeUrl(o.url);
-      if (!norm) continue;
-      const key = `${o.pref}|${norm}`;
-      if (!pages.has(key)) {
-        pages.set(key, {
-          pref: o.pref,
-          url: o.url,
-          normalized: norm,
-          officeNames: [],
-        });
-      }
-      pages.get(key).officeNames.push(o.name);
-    }
-  } catch (err) {
-    console.warn(`[OfficeOCR] offices.json 読み込み失敗: ${err.message}`);
-  }
-  return [...pages.values()].sort((a, b) => `${a.pref}|${a.normalized}`.localeCompare(`${b.pref}|${b.normalized}`));
+function loadRecruitmentOfficePages() {
+  const officesData = JSON.parse(fs.readFileSync(OFFICES_PATH, 'utf8'));
+  return buildOfficePages(officesData.offices, officeEventSources.offices, new Set(), KANTO_OFFICE_URLS);
 }
 
-function parseOfficeEventDate(text) {
+function parseOfficeEventDate(text, context = null) {
   const t = toHalfWidth(compactText(text));
   const now = new Date(Date.now() + 9 * 3600 * 1000);
 
@@ -3468,7 +3472,13 @@ function parseOfficeEventDate(text) {
   // 年が無い「M月D日（曜）」: 曜日と整合する年を厳格に確定（合わなければ却下）。
   m = t.match(/(?:^|[^\d])(\d{1,2})\s*[月\/.]\s*(\d{1,2})\s*日?(?:[（(]\s*([月火水木金土日祝])\s*[）)])?/);
   if (m) {
-    const yr = resolveYearByWeekday(m[1], m[2], m[3], now.getFullYear());
+    // HTML without a year must not roll an old entry into next year.
+    let yr;
+    if (context?.strict) {
+      yr = context.year || now.getUTCFullYear();
+      if (context.fiscal && Number(m[1]) <= 3) yr++;
+      if (m[3] && m[3] !== '祝' && calcWeekday(`${yr}-${padTwo(Number(m[1]))}-${padTwo(Number(m[2]))}`) !== m[3]) return null;
+    } else yr = resolveYearByWeekday(m[1], m[2], m[3], now.getUTCFullYear());
     if (yr == null) return null; // 曜日が直近の将来と不一致＝古いチラシ/誤読 → 確定しない
     return build(yr, m[1], m[2], m[3]);
   }
@@ -3512,7 +3522,7 @@ function makeOfficeEvent({ meta, parsed, title, place, url, notes, sourceType, t
     date:           parsed.dateStr,
     weekday:        parsed.weekday,
     title:          safeTitle,
-    place:          safeStr(place) || officeNamesLabel(meta.officeNames),
+    place:          safeStr(place) || (sourceType === 'office_html' ? '' : officeNamesLabel(meta.officeNames)),
     address:        '',
     time:           safeStr(time) || '',
     category:       guessCategory(toHalfWidth(safeTitle)),
@@ -3527,7 +3537,7 @@ function makeOfficeEvent({ meta, parsed, title, place, url, notes, sourceType, t
 
 // 表（table）を行・列単位で解析し、日付/名称/場所を列ごとに取得する。
 // 「月日（曜日） イベント名 場 所 …」のように1行へ潰れる不具合を防ぎ、場所も拾える。
-function extractOfficeTableEvents($, table, pageUrl, meta, seen, events) {
+function extractOfficeTableEvents($, table, pageUrl, meta, seen, events, contextFor) {
   const rows = $(table).find('tr');
   if (rows.length < 2) return; // ヘッダ＋データが必要
   // ヘッダ行（見出し語を含む最初の行）と列見出しを推定
@@ -3536,13 +3546,15 @@ function extractOfficeTableEvents($, table, pageUrl, meta, seen, events) {
   rows.each((ri, tr) => {
     if (headerIdx >= 0) return;
     const cells = $(tr).find('th,td').map((_c, c) => compactText($(c).text())).get();
-    if (/月日|日付|日時|開催日|期日|曜日|イベント|行事|名称|内容|場所|会場|時間/.test(cells.join(' '))) {
+    const headers = cells.filter(c => c.length < 25).map(c => c.replace(/\s/g, ''));
+    if (headers.some(c => /月日|日付|日時|開催日|期日|日程/.test(c)) && headers.some(c => /イベント|行事|名称|内容/.test(c))) {
       headerIdx = ri; cols = cells;
     }
   });
+  if (headerIdx < 0) return false;
   // 見出しは「場 所」のように空白入りのことがあるため、空白を除去して照合する
   const colOf = (re, fb) => { const i = cols.findIndex(c => re.test(c.replace(/\s/g, ''))); return i >= 0 ? i : fb; };
-  const dateCol  = colOf(/月日|日付|日時|開催日|期日/, 0);
+  const dateCol  = colOf(/月日|日付|日時|開催日|期日|日程/, 0);
   const titleCol = colOf(/イベント|行事|名称|内容|催/, 1);
   const placeCol = colOf(/場所|会場|開催地/, -1);
 
@@ -3551,12 +3563,12 @@ function extractOfficeTableEvents($, table, pageUrl, meta, seen, events) {
     const cells = $(tr).find('td,th').map((_c, c) => compactText($(c).text())).get();
     if (cells.length < 2) return;
     const joined = cells.join(' ');
-    if (!OFFICE_EVENT_KW.test(joined) || isOfficeJunkText(joined)) return;
-    const parsed = parseOfficeEventDate(cells[dateCol] || '') || parseOfficeEventDate(joined);
+    if (!OFFICE_EVENT_KW.test(joined) || isOfficeJunkText(joined) || isActivityReport(joined)) return;
+    const parsed = parseOfficeEventDate(cells[dateCol] || '', contextFor(tr));
     if (!parsed) return;
     const rawTitle = cells[titleCol] || cells.find((c, i) => i !== dateCol && c) || '';
     const title = cleanOfficeTitle(rawTitle) || cleanOfficeTitle(joined);
-    if (!title || title.replace(/[\s　]/g, '').length < 4) return;
+    if (!title || title === '募集案内所イベント' || title.replace(/[\s　]/g, '').length < 4) return;
     if (officeIsJunk(title)) return; // 整形後タイトルが非イベント（フォーム項目等）なら除外
     const place = placeCol >= 0 ? cleanOfficePlace(cells[placeCol] || '') : '';
     const key = `${parsed.dateStr}|${title.slice(0, 40)}`;
@@ -3564,28 +3576,30 @@ function extractOfficeTableEvents($, table, pageUrl, meta, seen, events) {
     seen.add(key);
     events.push(makeOfficeEvent({
       meta, parsed, title,
-      place: place || officeNamesLabel(meta.officeNames),
+      place,
       url: pageUrl, notes: null, sourceType: 'office_html',
     }));
   });
+  return true;
 }
 
 function extractOfficeHtmlEvents($, pageUrl, meta) {
   const events = [];
   const seen = new Set();
-  // 1) 表は行・列単位で解析（日付/名称/場所を分離）。イベントを抽出できた表だけ「処理済み」とする。
+  const contextFor = createYearContext($);
+  // 過去日付で0件となったデータ表も処理済みとし、表全体を別のイベントとして再解釈しない。
   const handledTables = new Set();
   $('table').each((_t, table) => {
-    const before = events.length;
-    extractOfficeTableEvents($, table, pageUrl, meta, seen, events);
-    if (events.length > before) handledTables.add(table); // データ表（レイアウト表は対象外）
+    if (extractOfficeTableEvents($, table, pageUrl, meta, seen, events, contextFor)) handledTables.add(table);
   });
   // 2) 表の外＋レイアウト表の中の要素を従来どおり解析（データ表は上で処理済みなので除外）
   const selector = 'a[href], li, tr, article, section, div[class*="event"], div[class*="news"], div[class*="topic"], div[class*="post"]';
   $(selector).each((_i, el) => {
     const tbl = $(el).closest('table').get(0);
     if (tbl && handledTables.has(tbl)) return; // データ表として整形済み。レイアウト表は通す
+    if ($(el).find('table').toArray().some(table => handledTables.has(table))) return;
     const text = compactText($(el).text());
+    if (isActivityReport(text)) return;
     if (text.length < 8 || text.length > 220) return;
     if (!OFFICE_EVENT_KW.test(text)) return;
     if (OFFICE_SKIP_TEXT_KW.test(text)) return;
@@ -3594,7 +3608,7 @@ function extractOfficeHtmlEvents($, pageUrl, meta) {
     // ナビメニュー/カテゴリ一覧の塊（「イベント情報」等の見出し語が複数回出る）は除外
     const navHits = (text.match(/イベント情報|採用試験情報|入札情報|重要なお知らせ|トピックス|お知らせ一覧|すべて/g) || []).length;
     if (navHits >= 2) return;
-    const parsed = parseOfficeEventDate(text);
+    const parsed = parseOfficeEventDate(text, contextFor(el));
     if (!parsed) return;
 
     const href = $(el).attr('href') || $(el).find('a[href]').first().attr('href') || '';
@@ -3615,13 +3629,13 @@ function extractOfficeHtmlEvents($, pageUrl, meta) {
       meta,
       parsed,
       title,
-      place: officeNamesLabel(meta.officeNames),
+      place: '',
       url,
       notes: null,
       sourceType: 'office_html',
     }));
   });
-  return events;
+  return events.filter(e => e.title !== '募集案内所イベント' && !isJunkOrStubTitle(e.title));
 }
 
 function extractOfficeCandidateAssets($, pageUrl) {
@@ -3673,11 +3687,15 @@ function wasRevisited(url) {
   return !!n && revisitedSources.has(n);
 }
 
-async function ocrOfficeAssets(assets, meta, maxAssets = 2) {
+async function ocrOfficeAssets(assets, meta, maxAssets = 2, outcomes = null, cutoffReached = () => false) {
   const events = [];
-  const sorted = sortByPriority(assets).filter(a => a.priority !== 'low').slice(0, maxAssets);
+  const sorted = sortByPriority(assets).filter(a => a.forceOcr || a.priority !== 'low').slice(0, maxAssets);
   for (const asset of sorted) {
-    const ocr = await ocrFlyerFull(asset.url);
+    if (cutoffReached()) break;
+    let ocr = null;
+    try { ocr = await ocrFlyerFull(asset.url); }
+    catch (err) { console.warn(`[OfficeOCR] 資料取得・OCR失敗: ${asset.url} → ${err.message}`); }
+    if (outcomes) outcomes.push({ url: asset.url, status: ocr ? 'read' : 'no_result' });
     await sleep(1500);
     if (ocr) markRevisited(asset.url); // 読めた＝今回の結果が正（読めなかったら前回を維持）
     const parsed = ocr ? parseOcrDate(ocr.date) : null;
@@ -3707,116 +3725,50 @@ async function ocrOfficeAssets(assets, meta, maxAssets = 2) {
  */
 async function crawlNationwideOffices(withFreshContext, cutoff) {
   if (!withFreshContext) return [];
-  let pages = loadRecruitmentOfficePages({ excludePrefs: KANTO_PREFS });
-
-  // 診断・補完実行では対象都道府県だけに限定できる。
-  // 通常実行は未指定なので従来どおり全国を巡回する。
-  const officeOnlyPrefs = (process.env.OFFICE_CRAWL_PREFS || '')
-    .split(',').map(v => v.trim()).filter(Boolean);
-  if (officeOnlyPrefs.length) {
-    pages = pages.filter(p => officeOnlyPrefs.includes(p.pref));
-    console.log(`[OfficeOCR] OFFICE_CRAWL_PREFS 指定により ${pages.length} URLに限定: ${officeOnlyPrefs.join(',')}`);
-  }
-
-  // 既定で全国全件巡回（OFFICE_CRAWL_MAX_PAGES 未指定なら全URLを対象にする）。
-  // 環境変数で上限を指定した場合のみその件数に絞る。
-  const maxPagesEnv = Number.parseInt(process.env.OFFICE_CRAWL_MAX_PAGES || '', 10);
-  const maxPages = Number.isFinite(maxPagesEnv) ? maxPagesEnv : pages.length;
-  const maxSubPages = Number.parseInt(process.env.OFFICE_CRAWL_MAX_SUBPAGES || '2', 10);
-  const maxAssets = Number.parseInt(process.env.OFFICE_CRAWL_MAX_ASSETS || '2', 10);
-  const delayMs = Number.parseInt(process.env.OFFICE_CRAWL_DELAY_MS || '1800', 10);
+  let pages = loadRecruitmentOfficePages();
+  const only = (process.env.OFFICE_CRAWL_PREFS || process.env.SCRAPE_ONLY_PREFS || '').split(',').map(v => v.trim()).filter(Boolean);
+  if (only.length) pages = pages.filter(p => only.includes(p.pref));
+  pages = orderOfficePages(pages, rotationOffset(pages.length, { runNumber: process.env.GITHUB_RUN_NUMBER }));
+  const positiveInt = (value, fallback) => { const n = Number.parseInt(value, 10); return Number.isFinite(n) && n >= 0 ? n : fallback; };
+  const maxPages = positiveInt(process.env.OFFICE_CRAWL_MAX_PAGES, pages.length);
+  const maxAssets = positiveInt(process.env.OFFICE_CRAWL_MAX_ASSETS, 2);
   const ocrReady = await hasAnyOcrEngine();
-  const events = [];
-  // 地本の専用パーサーが読むページ（URLS）もここで読む。専用パーサーが一部しか取れないページがあるため
-  // （2026-09-23 石川: 本文に今後の日付10件・パーサー1件。巡回が補っていた6件を読まないようにした結果、
-  //  品質ゲートで停止した）。パーサーと同じイベントの重複は mergeOfficeEvents の同日タイトル照合で除く。
-  const seenPages = new Set();
-  const targetPages = pages.slice(0, maxPages);
-
-  console.log(`[OfficeOCR] 全国募集案内所 ${targetPages.length}/${pages.length} URLを巡回開始`);
-  let index = 0;
-  for (const meta of targetPages) {
-    // 配信スロットに間に合わせるための打ち切り。ここまでに拾えた案内所の分は
-    // そのまま使う（1拠点ごとに独立しているので途中で止めても壊れない）。
-    if (cutoff && cutoff.reached()) {
-      console.warn(`[OfficeOCR] 時間切れのため巡回を ${index}/${targetPages.length} で打ち切ります`);
-      break;
-    }
-    index++;
-    if (seenPages.has(meta.normalized)) continue;
-
-    // 兵庫は専用パーサー＋イベントページOCRを持つため、募集窓口の汎用巡回は
-    // 1日1回（第1便）だけにする。第2・第3便では前回officeイベントを維持し、
-    // 同じ公式ページへ何度もアクセスしない。
-    const hyogoLowImpact = meta.pref === 'hyogo';
-    if (hyogoLowImpact && !shouldRefreshHyogoDetailSources()) {
-      console.log(`[OfficeOCR] 兵庫 ${officeNamesLabel(meta.officeNames)}: 第2・第3便は前回値維持（アクセス省略）`);
-      continue;
-    }
-
-    seenPages.add(meta.normalized);
-    if (index > 1) await sleep(hyogoLowImpact ? Math.max(delayMs, 3000) : delayMs);
-    console.log(`[OfficeOCR] ${index}/${targetPages.length} ${meta.pref} ${officeNamesLabel(meta.officeNames)}: ${meta.url}`);
-
-    let $;
-    if (hyogoLowImpact) {
-      try {
-        $ = await withFreshContext(ctx =>
-          fetchStaticDocumentOnce(ctx, `兵庫募集窓口:${officeNamesLabel(meta.officeNames)}`, meta.url)
-        );
-      } catch (err) {
-        // 403/429は尊重し、同一runで別方式へ再試行しない。
-        console.warn(`[OfficeOCR] 兵庫 ${officeNamesLabel(meta.officeNames)}: ${err.message} → 再試行せず前回値維持`);
-        continue;
+  console.log(`[OfficeOCR] 全国・関東募集窓口 ${Math.min(maxPages, pages.length)}/${pages.length} URLをHTML巡回開始`);
+  const result = await crawlOfficePages({
+    pages: pages.slice(0, maxPages), ocrReady,
+    cutoffReached: () => !!cutoff?.reached(), sleep,
+    delayMs: positiveInt(process.env.OFFICE_CRAWL_DELAY_MS, 1800),
+    maxSubPages: positiveInt(process.env.OFFICE_CRAWL_MAX_SUBPAGES, 2), maxAssets,
+    skipReason: meta => meta.pref === 'hyogo' && !shouldRefreshHyogoDetailSources() ? 'hyogo_daily_limit' : '',
+    markRevisited, log: console.log, onRows: rows => { officeCrawlReport.pages = rows; },
+    fetchPage: async meta => {
+      if (meta.pref === 'hyogo') {
+        const document = await withFreshContext(ctx => fetchStaticDocumentOnce(ctx, `兵庫募集窓口:${officeNamesLabel(meta.officeNames)}`, meta.url));
+        return { document, status: 200, finalUrl: meta.url };
       }
-    } else {
-      $ = await withFreshContext(ctx => fetchPagePlaywright(ctx, meta.url));
-    }
-    if (!$) continue;
-    markRevisited(meta.url);
-
-    events.push(...extractOfficeHtmlEvents($, meta.url, meta));
-
-    // 兵庫はdocument-onlyでHTML本文だけを1回取得済み。
-    // 画像/PDF OCR・サブページ巡回を行わず、追加リクエストを発生させない。
-    if (hyogoLowImpact) {
-      console.log('[OfficeOCR] 兵庫: document-only完了（追加リクエストなし）');
-      continue;
-    }
-
-    if (ocrReady) {
-      const directAssets = extractOfficeCandidateAssets($, meta.url);
-      if (directAssets.length > 0) {
-        events.push(...await ocrOfficeAssets(directAssets, meta, maxAssets));
-      }
-    }
-
-    const skip = new Set([meta.normalized]);
-    const { pages: subPages, assets: linkedAssets } = findEventLinks($, meta.url, skip);
-    if (ocrReady && linkedAssets.length > 0) {
-      events.push(...await ocrOfficeAssets(linkedAssets, meta, maxAssets));
-    }
-
-    let subCount = 0;
-    for (const sub of subPages.slice(0, Number.isFinite(maxSubPages) ? maxSubPages : 2)) {
-      const norm = normalizeUrl(sub.url);
-      if (!norm || seenPages.has(norm)) continue;
-      seenPages.add(norm);
-      subCount++;
-      await sleep(Math.max(800, Math.floor(delayMs / 2)));
-      const $sub = await withFreshContext(ctx => fetchPagePlaywright(ctx, sub.url));
-      if (!$sub) continue;
-      markRevisited(sub.url);
-      events.push(...extractOfficeHtmlEvents($sub, sub.url, meta));
-      if (ocrReady) {
-        events.push(...await ocrOfficeAssets(extractOfficeCandidateAssets($sub, sub.url), meta, maxAssets));
-      }
-      if (subCount >= maxSubPages) break;
-    }
-  }
-
-  const deduped = markDuplicates(events).filter(e => !e.duplicate_candidate);
-  console.log(`[OfficeOCR] 全国募集案内所巡回完了: ${deduped.length}件`);
+      const document = await withFreshContext(ctx => fetchPagePlaywright(ctx, meta.url));
+      const response = officePageResponses.get(meta.normalized) || {};
+      return { document, status: response.status, finalUrl: response.finalUrl, error: response.error };
+    },
+    extractHtml: extractOfficeHtmlEvents,
+    collectAssets: ($, url) => {
+      const pref = pages.find(p => p.normalized === normalizeUrl(url))?.pref;
+      const assets = [...extractOfficeCandidateAssets($, url), ...findEventLinks($, url).assets,
+        ...(KANTO_PREFS.has(pref) ? extractKantoOfficeCandidateAssets($, url) : [])];
+      // Legacy date-based candidates take precedence over generic metadata.
+      return [...new Map(assets.map(a => [normalizeUrl(a.url), { ...a, normalized: normalizeUrl(a.url), linkText: a.linkText || a.text || '', sourcePageUrl: url }])).values()];
+    },
+    findSubPages: ($, url) => findEventLinks($, url, new Set([normalizeUrl(url)])).pages,
+    processAssets: async (assets, meta, limit, cutoffReached) => {
+      const results = [];
+      const events = await ocrOfficeAssets(assets, meta, KANTO_PREFS.has(meta.pref) ? Math.max(3, limit) : limit, results, cutoffReached);
+      return { events, results, deferred: Math.max(0, assets.length - results.length) };
+    },
+  });
+  officeCrawlReport.pages = result.pages;
+  for (const p of pages.slice(maxPages)) officeCrawlReport.pages.push({ ...p, status: 'not_visited', reason: 'configured_limit', ocr: { status: 'not_attempted', results: [] } });
+  const deduped = markDuplicates(result.events).filter(e => !e.duplicate_candidate);
+  console.log(`[OfficeOCR] 全国・関東巡回完了: HTML取得 ${result.pages.filter(p => p.status === 'fetched').length} / 失敗 ${result.pages.filter(p => p.status === 'fetch_failed').length} / 未巡回 ${result.pages.filter(p => p.status === 'not_visited').length} / イベント ${deduped.length}件`);
   return deduped;
 }
 
@@ -3826,37 +3778,10 @@ async function crawlNationwideOffices(withFreshContext, cutoff) {
  * 同一チラシは assetCache によりOCRが一度きりになるため、繰り返し巡回しても安価。
  * 戻り値: events[]（pref / source_type:'office_crawl' 付き）
  */
-async function crawlKantoOffices(withFreshContext, cutoff) {
-  if (!await hasAnyOcrEngine()) {
-    console.log('[KantoOffice] 利用可能なOCRエンジンがないためスキップ');
-    return [];
-  }
-  if (!withFreshContext) return [];
-
+function extractKantoOfficeCandidateAssets($, url) {
   const EVENT_KW = /イベント|説明会|見学|体験|公開|フェス|まつり|祭|相談会|ブース|出張|広報/;
   const SKIP_ASSET = /logo|icon|banner|btn|common|arrow|header|footer|sns|^tw$|^fb$|insta|youtube|map_|sitemap/i;
-  const events = [];
-  const all = Object.entries(KANTO_OFFICE_URLS);
-  const total = all.reduce((n, [, u]) => n + u.length, 0);
-  let visited = 0;
-  console.log(`[KantoOffice] 関東 ${total} 事務所ページを巡回開始`);
-
-  const CRAWL_DELAY_MS = 3000; // 連続アクセスによる Cloudflare チャレンジ誘発を避ける
-  for (const [pref, urls] of all) {
-    // 配信スロットの期限。ここまでに拾えた事務所の分はそのまま使う
-    if (cutoff && cutoff.reached()) {
-      console.warn('[KantoOffice] 時間切れのため巡回を打ち切ります');
-      break;
-    }
-    const prefCode = pref.slice(0, 2);
-    for (const url of urls) {
-      visited++;
-      if (visited > 1) await sleep(CRAWL_DELAY_MS);
-      const $ = await withFreshContext(ctx => fetchPagePlaywright(ctx, url));
-      if (!$) continue;
-
-      // 候補チラシ: 将来日付入りファイル名 or イベント系リンク/altテキスト
-      const candidates = [];
+  const candidates = [];
       $('a[href], img[src]').each((_i, el) => {
         const href = $(el).attr('href') || $(el).attr('src') || '';
         if (!/\.(pdf|jpe?g|png)/i.test(href) || SKIP_ASSET.test(href)) return;
@@ -3868,48 +3793,18 @@ async function crawlKantoOffices(withFreshContext, cutoff) {
           const mo = parseInt(m[2], 10), dy = parseInt(m[3], 10);
           if (mo >= 1 && mo <= 12 && dy >= 1 && dy <= 31) {
             const ds = `${reiwaToAD(parseInt(m[1], 10))}-${padTwo(mo)}-${padTwo(dy)}`;
-            if (!isPast(ds)) candidates.push({ url: abs, text });   // 将来日付チラシ
+            if (!isPast(ds)) candidates.push({ url: abs, text, forceOcr: true });   // 将来日付チラシ
             return;                                                  // 過去日付チラシはOCRしない
           }
         }
         // 日付なしでもイベント系の PDF はチラシの可能性が高いので対象にする。
         // 画像（PNG/JPG）はカレンダー見出し等のUI装飾が多く誤検出するため除外。
-        if (/\.pdf/i.test(abs) && EVENT_KW.test(text)) candidates.push({ url: abs, text });
+        if (/\.pdf/i.test(abs) && EVENT_KW.test(text)) candidates.push({ url: abs, text, forceOcr: true });
       });
 
-      if (candidates.length === 0) continue; // ← 高速スキップ
 
-      const uniq = [...new Map(candidates.map(c => [c.url, c])).values()].slice(0, 3);
-      for (const c of uniq) {
-        const ocr    = await ocrFlyerFull(c.url);
-        if (ocr) markRevisited(c.url);
-        const parsed = ocr ? parseOcrDate(ocr.date) : null;
-        if (!parsed || isPast(parsed.dateStr)) continue;
-        const title = (ocr.title && fixOcrTitle(safeStr(ocr.title))) || c.text || '(タイトル不明)';
-        events.push({
-          id:             `${prefCode}-off-${parsed.dateStr.replace(/-/g, '')}-${titleHash(parsed.dateStr, title)}`,
-          pref,
-          date:           parsed.dateStr,
-          weekday:        parsed.weekday,
-          title,
-          place:          safeStr(ocr.place) || '',
-          address:        '',
-          time:           safeStr(ocr.time) || '',
-          category:       guessCategory(toHalfWidth(title)),
-          tag:            guessTag(title),
-          url:            c.url,
-          notes:          ocr.notes || null,
-          ageRequirement: safeStr(ocr.ageRequirement) || null,
-          deadline:       safeStr(ocr.deadline) || null,
-          imageUrl:       c.url,
-          source_type:    'office_crawl',
-        });
-        console.log(`[KantoOffice] ✓ ${pref} ${parsed.dateStr} ${title.slice(0, 26)}`);
-      }
-    }
-  }
-  console.log(`[KantoOffice] 巡回完了: ${visited}事務所 / 抽出 ${events.length}件`);
-  return events;
+  return candidates.map(a => ({ ...a, normalized: normalizeUrl(a.url), linkText: a.text,
+    type: isPdfUrl(a.url) ? 'pdf' : 'image', sourcePageUrl: url }));
 }
 
 /**
@@ -4355,33 +4250,18 @@ async function main() {
 
     // ── 募集案内所ページから PDF/画像 OCR でイベントを収集 ────────
     // browser.close() の前に呼ぶ必要あり（Playwright が必要なため）
-    console.log('[wait] 募集案内所探索を開始します...');
+    // Verified office/event URLs precede broad HQ discovery so the latter cannot
+    // consume the entire office budget. Every office still obeys the deadline.
+    console.log('[wait] 確認済みイベントHTML・募集窓口の巡回を開始します...');
+    try { officeEvents = await crawlNationwideOffices(withFreshContext, cutoff); }
+    catch (err) { console.warn(`[OfficeOCR] 全国募集窓口巡回失敗: ${err.message}`); officeCrawlReport.error = err.message; }
     const officeScrape = await scrapeOfficeAssets(withFreshContext, cutoff);
-    officeEvents    = officeScrape.events;
+    officeEvents.push(...officeScrape.events);
     hqExploredPrefs = officeScrape.exploredHqPrefs;
-    try {
-      officeEvents = [
-        ...officeEvents,
-        ...await crawlNationwideOffices(withFreshContext, cutoff),
-      ];
-    } catch (err) {
-      console.warn(`[OfficeOCR] 全国募集案内所巡回失敗: ${err.message}`);
-    }
-
-    // ── 関東 各事務所ページの先回り巡回（中央未掲載イベントの収集）──
-    const needsKantoOfficeCrawl = !onlyPrefSet.size
-      || [...onlyPrefSet].some(pref => KANTO_PREFS.has(pref));
-    if (needsKantoOfficeCrawl) {
-      try {
-        kantoOfficeEvents = await crawlKantoOffices(withFreshContext, cutoff);
-      } catch (err) {
-        console.warn(`[KantoOffice] 巡回失敗: ${err.message}`);
-      }
-    } else {
-      console.log('[KantoOffice] 限定実行の対象外のためスキップ');
-    }
   } finally {
     await browser.close();
+    officeCrawlReport.checkedAt = nowJST();
+    fs.writeFileSync(path.join(__dirname, 'office-crawl-report.json'), JSON.stringify(officeCrawlReport, null, 2));
   }
 
   // 全地本エラーの場合のみ終了
@@ -5265,7 +5145,11 @@ async function notifyNewEvents(prevData, newData) {
 
 
 // ── エントリーポイント ────────────────────────────────────────
-main().catch(err => {
-  console.error('[致命的エラー]', err);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch(err => {
+    console.error('[致命的エラー]', err);
+    process.exit(1);
+  });
+}
+
+module.exports = { extractOfficeHtmlEvents, extractOfficeCandidateAssets, extractKantoOfficeCandidateAssets, loadRecruitmentOfficePages, fetchPagePlaywright };
