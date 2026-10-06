@@ -11,6 +11,12 @@
  */
 export const UPDATE_NOTES = [
   {
+    date:    '2026-10-06',
+    version: '1.38.25',
+    type:    'fix',
+    content: '確認済みの募集窓口79件の連絡先・所在地を修正。',
+  },
+  {
     date:    '2026-10-05',
     version: '1.38.24',
     type:    'fix',

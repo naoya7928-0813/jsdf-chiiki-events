@@ -1,0 +1,2688 @@
+{
+  "checkedAt": "2026-10-06",
+  "scope": "既存79窓口の確認済み連絡先を先行反映。全国監査は継続中。未確定の追加・削除・名称変更は含まない。",
+  "baselineCommit": "e3f30d4a",
+  "recruitmentCount": 317,
+  "headquartersCount": 50,
+  "countsByPref": {
+    "aichi": 12,
+    "akita": 6,
+    "aomori": 6,
+    "asahikawa": 7,
+    "chiba": 8,
+    "ehime": 4,
+    "fukui": 4,
+    "fukuoka": 13,
+    "fukushima": 6,
+    "gifu": 5,
+    "gunma": 6,
+    "hakodate": 4,
+    "hiroshima": 7,
+    "hyogo": 13,
+    "ibaraki": 6,
+    "ishikawa": 4,
+    "iwate": 8,
+    "kagawa": 2,
+    "kagoshima": 6,
+    "kanagawa": 8,
+    "kochi": 4,
+    "kumamoto": 6,
+    "kyoto": 6,
+    "mie": 5,
+    "miyagi": 7,
+    "miyazaki": 4,
+    "nagano": 6,
+    "nagasaki": 10,
+    "nara": 4,
+    "niigata": 7,
+    "obihiro": 5,
+    "oita": 5,
+    "okayama": 4,
+    "okinawa": 5,
+    "osaka": 13,
+    "saga": 4,
+    "saitama": 8,
+    "sapporo": 15,
+    "shiga": 4,
+    "shimane": 6,
+    "shizuoka": 10,
+    "tochigi": 3,
+    "tokushima": 5,
+    "tokyo": 12,
+    "tottori": 2,
+    "toyama": 3,
+    "wakayama": 6,
+    "yamagata": 4,
+    "yamaguchi": 6,
+    "yamanashi": 3
+  },
+  "records": [
+    {
+      "pref": "ehime",
+      "name": "大洲地域事務所",
+      "address": "愛媛県大洲市大洲678-1 旧市立図書館2階",
+      "tel": "0893-24-4123",
+      "area": "大洲市、八幡浜市、西予市、内子町、伊方町",
+      "url": "https://www.mod.go.jp/pco/ehime/acsess.html",
+      "sourceKeys": [
+        "ehime"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/ehime/acsess.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-ehime-r247",
+      "coordinates": {
+        "lat": 33.506477,
+        "lng": 132.542953,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "愛媛県大洲市大洲678-1",
+        "label": "愛媛県大洲市大洲６７８番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "ehime",
+      "name": "宇和島地域事務所",
+      "address": "愛媛県宇和島市天神町4-40 宇和島地方合同庁舎1階",
+      "tel": "0895-23-5431",
+      "area": "宇和島市、松野町、鬼北町、愛南町",
+      "url": "https://www.mod.go.jp/pco/ehime/acsess.html",
+      "sourceKeys": [
+        "ehime"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/ehime/acsess.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-ehime-r246",
+      "coordinates": {
+        "lat": 33.225723,
+        "lng": 132.569077,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "愛媛県宇和島市天神町4-40",
+        "label": "愛媛県宇和島市天神町４番",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "fukui",
+      "name": "大野地域事務所",
+      "address": "福井県大野市城町8-5 ハローワーク大野2F",
+      "tel": "0779-65-6325",
+      "area": "大野市、勝山市",
+      "url": "https://www.mod.go.jp/pco/fukui/contents/6-aboutus/6-aboutus.html",
+      "sourceKeys": [
+        "fukui"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/fukui/contents/6-aboutus/6-aboutus.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-fukui-r314",
+      "coordinates": {
+        "lat": 35.986412,
+        "lng": 136.486801,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "福井県大野市城町8-5",
+        "label": "福井県大野市城町８番５号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "fukui",
+      "name": "越前地域事務所",
+      "address": "福井県越前市新町8-1-12 土田ビル3F",
+      "tel": "0778-22-6139",
+      "area": "鯖江市、越前市、越前町、南越前町、池田町",
+      "url": "https://www.mod.go.jp/pco/fukui/contents/6-aboutus/6-aboutus.html",
+      "sourceKeys": [
+        "fukui"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/fukui/contents/6-aboutus/6-aboutus.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-fukui-r313",
+      "coordinates": {
+        "lat": 35.902405,
+        "lng": 136.151489,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "福井県越前市新町8-1-12",
+        "label": "福井県越前市新町８番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "hiroshima",
+      "name": "尾道出張所",
+      "address": "広島県尾道市東御所町9-1 尾道ウォーターフロントビル3F",
+      "tel": "0848-22-6942",
+      "area": "尾道市、三原市、竹原市、大崎上島",
+      "url": "https://www.mod.go.jp/pco/hiroshima/office/",
+      "sourceKeys": [
+        "hiroshima"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/hiroshima/office/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-hiroshima-r229",
+      "coordinates": {
+        "lat": 34.403675,
+        "lng": 133.193344,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "広島県尾道市東御所町9-1",
+        "label": "広島県尾道市東御所町９番１号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "hiroshima",
+      "name": "呉地域事務所",
+      "address": "広島県呉市幸町6-15",
+      "tel": "0823-23-1226",
+      "area": "呉市、江田島市、坂町",
+      "url": "https://www.mod.go.jp/pco/hiroshima/office/",
+      "sourceKeys": [
+        "hiroshima"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/hiroshima/office/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-hiroshima-r230",
+      "coordinates": {
+        "lat": 34.238762,
+        "lng": 132.560547,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "広島県呉市幸町6-15",
+        "label": "広島県呉市幸町６番１５号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "hiroshima",
+      "name": "三次地域事務所",
+      "address": "広島県三次市十日市東4-3-5 クリーンハイムビル1F",
+      "tel": "0824-62-0350",
+      "area": "三次市、庄原市、世羅町",
+      "url": "https://www.mod.go.jp/pco/hiroshima/office/",
+      "sourceKeys": [
+        "hiroshima"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/hiroshima/office/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-hiroshima-r231",
+      "coordinates": {
+        "lat": 34.804363,
+        "lng": 132.862396,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "広島県三次市十日市東4-3-5",
+        "label": "広島県三次市十日市東四丁目３番５号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "hiroshima",
+      "name": "福山地域事務所",
+      "address": "広島県福山市元町15-16 和田ビル2F",
+      "tel": "084-923-4743",
+      "area": "福山市、府中市、神石高原町",
+      "url": "https://www.mod.go.jp/pco/hiroshima/office/",
+      "sourceKeys": [
+        "hiroshima"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/hiroshima/office/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-hiroshima-r232",
+      "coordinates": {
+        "lat": 34.487911,
+        "lng": 133.366333,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "広島県福山市元町15-16",
+        "label": "広島県福山市元町１５番１６号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "hiroshima",
+      "name": "東広島地域事務所",
+      "address": "広島県東広島市西条昭和町5-1 ジブラルタ生命ビル3F",
+      "tel": "082-422-4252",
+      "area": "東広島市、安芸区、府中町、海田町、熊野町",
+      "url": "https://www.mod.go.jp/pco/hiroshima/office/",
+      "sourceKeys": [
+        "hiroshima"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/hiroshima/office/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-hiroshima-r233",
+      "coordinates": {
+        "lat": 34.42551,
+        "lng": 132.740311,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "広島県東広島市西条昭和町5-1",
+        "label": "広島県東広島市西条昭和町５番１号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "hiroshima",
+      "name": "広島地域事務所",
+      "address": "広島県広島市南区京橋町1-3 WAKO広島駅前ビル2F",
+      "tel": "082-261-1070",
+      "area": "広島市中区、南区、西区、東区、佐伯区、大竹市、廿日市市",
+      "url": "https://www.mod.go.jp/pco/hiroshima/office/",
+      "sourceKeys": [
+        "hiroshima"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/hiroshima/office/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-hiroshima-r234",
+      "coordinates": {
+        "lat": 34.394817,
+        "lng": 132.47319,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "広島県広島市南区京橋町1-3",
+        "label": "広島県広島市南区京橋町１番３号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "hiroshima",
+      "name": "可部募集案内所",
+      "address": "広島県広島市安佐北区可部3-37-40 大下新館ビル1F",
+      "tel": "082-815-3980",
+      "area": "広島市安佐南区、安佐北区、安芸高田市、北広島町、安芸太田町",
+      "url": "https://www.mod.go.jp/pco/hiroshima/office/",
+      "sourceKeys": [
+        "hiroshima"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/hiroshima/office/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-hiroshima-r235",
+      "coordinates": {
+        "lat": 34.519173,
+        "lng": 132.511429,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "広島県広島市安佐北区可部3-37-40",
+        "label": "広島県広島市安佐北区可部三丁目３７番４０号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "mie",
+      "name": "伊勢地域事務所",
+      "address": "三重県伊勢市神久2-1-58 角屋ビル2F",
+      "tel": "0596-23-3880",
+      "area": "伊勢市、鳥羽市、志摩市、明和町、大台町、玉城町、度会町、大紀町、南伊勢町",
+      "url": "https://www.mod.go.jp/pco/mie/regional/",
+      "sourceKeys": [
+        "mie"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/mie/regional/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-mie-r184",
+      "coordinates": {
+        "lat": 34.488678,
+        "lng": 136.719559,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "三重県伊勢市神久2-1-58",
+        "label": "三重県伊勢市神久二丁目１番５８号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "mie",
+      "name": "熊野地域事務所",
+      "address": "三重県熊野市井戸町802-13",
+      "tel": "0597-85-2214",
+      "area": "尾鷲市、熊野市、紀北町、御浜町、紀宝町",
+      "url": "https://www.mod.go.jp/pco/mie/regional/",
+      "sourceKeys": [
+        "mie"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/mie/regional/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-mie-r186",
+      "coordinates": {
+        "lat": 33.888401,
+        "lng": 136.100677,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "三重県熊野市井戸町802-13",
+        "label": "三重県熊野市井戸町８０２番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "nara",
+      "name": "奈良募集案内所",
+      "address": "奈良県奈良市高天市町11-1 高天飯田ビル1F",
+      "tel": "0742-27-5701",
+      "area": "奈良市、大和郡山市、生駒市、平群町、三郷町、斑鳩町、安堵町",
+      "url": "https://www.mod.go.jp/pco/nara/guide/about/nara/",
+      "sourceKeys": [
+        "nara-review-nara"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/nara/guide/about/nara/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-nara-r217",
+      "coordinates": {
+        "lat": 34.685005,
+        "lng": 135.8255,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "奈良県奈良市高天市町11-1",
+        "label": "奈良県奈良市高天市町１１番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "nara",
+      "name": "五條地域事務所",
+      "address": "奈良県五條市今井5丁目1-12 サンタウン2F",
+      "tel": "0747-22-3789",
+      "area": "五條市、御所市、大淀町、吉野町、下市町、東吉野村、黒滝村、川上村、天川村、十津川村、野迫川村、上北山村、下北山村",
+      "url": "https://www.mod.go.jp/pco/nara/guide/about/gojou/",
+      "sourceKeys": [
+        "nara-review-gojou"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/nara/guide/about/gojou/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-nara-r220",
+      "coordinates": {
+        "lat": 34.35936,
+        "lng": 135.711487,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "奈良県五條市今井5丁目1-12",
+        "label": "奈良県五條市今井五丁目１番１２号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "nara",
+      "name": "天理募集案内所",
+      "address": "奈良県天理市川原城町796 海老山ビル4F",
+      "tel": "0743-63-2540",
+      "area": "天理市、桜井市、宇陀市、曽爾村、御杖村、山添村",
+      "url": "https://www.mod.go.jp/pco/nara/guide/about/tenri/",
+      "sourceKeys": [
+        "nara-review-tenri"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/nara/guide/about/tenri/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-nara-r218",
+      "coordinates": {
+        "lat": 34.599442,
+        "lng": 135.83139,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "奈良県天理市川原城町796",
+        "label": "奈良県天理市川原城町７９６番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "nara",
+      "name": "橿原地域事務所",
+      "address": "奈良県橿原市内膳町5-2-34 第弐ナカタニビル3F",
+      "tel": "0744-29-9060",
+      "area": "橿原市、大和高田市、香芝市、葛城市、王寺町、河合町、上牧町、広陵町、川西町、三宅町、田原本町、高取町、明日香村",
+      "url": "https://www.mod.go.jp/pco/nara/guide/about/kashihara/",
+      "sourceKeys": [
+        "nara-review-kashihara"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/nara/guide/about/kashihara/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-nara-r219",
+      "coordinates": {
+        "lat": 34.513645,
+        "lng": 135.792511,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "奈良県橿原市内膳町5-2-34",
+        "label": "奈良県橿原市内膳町五丁目２番３４号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "yamagata",
+      "name": "鶴岡出張所",
+      "address": "山形県鶴岡市大塚町17-27 鶴岡合同庁舎3F",
+      "tel": "0235-22-0466",
+      "area": "鶴岡市・三川町・庄内町",
+      "url": "https://www.mod.go.jp/pco/yamagata/turuoka/turuoka.html",
+      "sourceKeys": [
+        "yamagata-review-turuoka"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/yamagata/turuoka/turuoka.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-yamagata-r302",
+      "coordinates": {
+        "lat": 38.737068,
+        "lng": 139.806946,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "山形県鶴岡市大塚町17-27",
+        "label": "山形県鶴岡市大塚町１７番２７号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "yamagata",
+      "name": "酒田地域事務所",
+      "address": "山形県酒田市上安町一丁目6-18",
+      "tel": "0234-27-3532",
+      "area": "酒田市・遊佐町",
+      "url": "https://www.mod.go.jp/pco/yamagata/sakata/sakata.html",
+      "sourceKeys": [
+        "yamagata-review-sakata"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/yamagata/sakata/sakata.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-yamagata-r303",
+      "coordinates": {
+        "lat": 38.92791,
+        "lng": 139.861069,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "山形県酒田市上安町一丁目6-18",
+        "label": "山形県酒田市上安町一丁目６番",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "akita",
+      "name": "大館出張所",
+      "address": "秋田県大館市字中町5 旧正札竹村ビル3F",
+      "tel": "0186-42-1398",
+      "area": "大館市、鹿角市、北秋田市、小坂町、上小阿仁村",
+      "url": "https://www.mod.go.jp/pco/akita/asset/about/contact.html",
+      "sourceKeys": [
+        "akita-area",
+        "akita"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/akita/asset/publicity/adranger.html",
+        "https://www.mod.go.jp/pco/akita/asset/about/contact.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-akita-r134",
+      "coordinates": {
+        "lat": 40.270061,
+        "lng": 140.559784,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "秋田県大館市字中町5",
+        "label": "秋田県大館市中町５番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "akita",
+      "name": "秋田募集案内所",
+      "address": "秋田県秋田市中通5-9-16 東北森林管理局庁舎2F",
+      "tel": "018-834-5000",
+      "area": "秋田市、男鹿市、潟上市、五城目町、八郎潟町、井川町、大潟村",
+      "url": "https://www.mod.go.jp/pco/akita/asset/about/contact.html",
+      "sourceKeys": [
+        "akita-area",
+        "akita"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/akita/asset/publicity/adranger.html",
+        "https://www.mod.go.jp/pco/akita/asset/about/contact.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-akita-r129",
+      "coordinates": {
+        "lat": 39.712872,
+        "lng": 140.120987,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "秋田県秋田市中通5-9-16",
+        "label": "秋田県秋田市中通五丁目９番",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "akita",
+      "name": "能代地域事務所",
+      "address": "秋田県能代市末広町4-20 能代合同庁舎1F",
+      "tel": "0185-52-0768",
+      "area": "能代市、八峰町、藤里町、三種町",
+      "url": "https://www.mod.go.jp/pco/akita/asset/about/contact.html",
+      "sourceKeys": [
+        "akita-area",
+        "akita"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/akita/asset/publicity/adranger.html",
+        "https://www.mod.go.jp/pco/akita/asset/about/contact.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-akita-r130",
+      "coordinates": {
+        "lat": 40.208134,
+        "lng": 140.01738,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "秋田県能代市末広町4-20",
+        "label": "秋田県能代市末広町４番２０号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "akita",
+      "name": "由利本荘地域事務所",
+      "address": "秋田県由利本荘市給人町17 本荘合同庁舎4F",
+      "tel": "0184-22-3479",
+      "area": "由利本荘市、にかほ市",
+      "url": "https://www.mod.go.jp/pco/akita/asset/about/contact.html",
+      "sourceKeys": [
+        "akita-area",
+        "akita"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/akita/asset/publicity/adranger.html",
+        "https://www.mod.go.jp/pco/akita/asset/about/contact.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-akita-r131",
+      "coordinates": {
+        "lat": 39.388256,
+        "lng": 140.043854,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "秋田県由利本荘市給人町17",
+        "label": "秋田県由利本荘市給人町１７番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "akita",
+      "name": "大仙地域事務所",
+      "address": "秋田県大仙市大曲住吉町1-45 大曲合同庁舎1F",
+      "tel": "0187-63-1313",
+      "area": "大仙市、仙北市、美郷町",
+      "url": "https://www.mod.go.jp/pco/akita/asset/about/contact.html",
+      "sourceKeys": [
+        "akita-area",
+        "akita"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/akita/asset/publicity/adranger.html",
+        "https://www.mod.go.jp/pco/akita/asset/about/contact.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-akita-r132",
+      "coordinates": {
+        "lat": 39.447437,
+        "lng": 140.484161,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "秋田県大仙市大曲住吉町1-45",
+        "label": "秋田県大仙市大曲住吉町１番４５号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "akita",
+      "name": "横手地域事務所",
+      "address": "秋田県横手市本町2-9 横手法務合同庁舎1F",
+      "tel": "0182-32-3920",
+      "area": "横手市、湯沢市、羽後町、東成瀬村",
+      "url": "https://www.mod.go.jp/pco/akita/asset/about/contact.html",
+      "sourceKeys": [
+        "akita-area",
+        "akita"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/akita/asset/publicity/adranger.html",
+        "https://www.mod.go.jp/pco/akita/asset/about/contact.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-akita-r133",
+      "coordinates": {
+        "lat": 39.319527,
+        "lng": 140.566345,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "秋田県横手市本町2-9",
+        "label": "秋田県横手市本町２番９号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "wakayama",
+      "name": "有田募集案内所",
+      "address": "和歌山県有田市宮崎町106-2",
+      "tel": "0737-82-6631",
+      "area": "海南市・有田市・紀美野町・有田川町・湯浅町・広川町",
+      "url": "https://www.mod.go.jp/pco/wakayama/about/location/arida/",
+      "sourceKeys": [
+        "wakayama-review-arida"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/wakayama/about/location/arida/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-wakayama-58",
+      "coordinates": {
+        "lat": 34.079998,
+        "lng": 135.116257,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "和歌山県有田市宮崎町106-2",
+        "label": "和歌山県有田市宮崎町１０６番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "wakayama",
+      "name": "御坊地域事務所",
+      "address": "和歌山県御坊市湯川町小松原410-1丸仁第1ビル1F",
+      "tel": "0738-23-0020",
+      "area": "御坊市・日高川町・由良町・日高町・美浜町・印南町・みなべ町",
+      "url": "https://www.mod.go.jp/pco/wakayama/about/location/gobo/",
+      "sourceKeys": [
+        "wakayama-review-gobo"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/wakayama/about/location/gobo/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-wakayama-55",
+      "coordinates": {
+        "lat": 33.907375,
+        "lng": 135.159027,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "和歌山県御坊市湯川町小松原410-1丸仁第1ビル1F",
+        "label": "和歌山県御坊市湯川町小松原４１０番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "wakayama",
+      "name": "橋本地域事務所",
+      "address": "和歌山県橋本市東家5丁目2-2橋本地方合同庁舎3F",
+      "tel": "0736-32-0744",
+      "area": "橋本市・紀の川市・かつらぎ町・九度山町・高野町",
+      "url": "https://www.mod.go.jp/pco/wakayama/about/location/hashimoto/",
+      "sourceKeys": [
+        "wakayama-review-hashimoto"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/wakayama/about/location/hashimoto/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-wakayama-54",
+      "coordinates": {
+        "lat": 34.314468,
+        "lng": 135.608398,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "和歌山県橋本市東家5丁目2-2橋本地方合同庁舎3F",
+        "label": "和歌山県橋本市東家五丁目２番２号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "wakayama",
+      "name": "新宮地域事務所",
+      "address": "和歌山県新宮市五新1-24",
+      "tel": "0735-21-3449",
+      "area": "新宮市・那智勝浦町・古座川町・串本町・太地町・北山村",
+      "url": "https://www.mod.go.jp/pco/wakayama/about/location/singu/",
+      "sourceKeys": [
+        "wakayama-review-singu"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/wakayama/about/location/singu/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-wakayama-56",
+      "coordinates": {
+        "lat": 33.718948,
+        "lng": 135.985382,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "和歌山県新宮市五新1-24",
+        "label": "和歌山県新宮市五新１番２４号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "wakayama",
+      "name": "田辺地域事務所",
+      "address": "和歌山県田辺市下万呂564-2 宮本ビル",
+      "tel": "0739-24-6219",
+      "area": "田辺市・上富田町・白浜町・すさみ町",
+      "url": "https://www.mod.go.jp/pco/wakayama/about/location/tanabe/",
+      "sourceKeys": [
+        "wakayama-review-tanabe"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/wakayama/about/location/tanabe/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-wakayama-57",
+      "coordinates": {
+        "lat": 33.740162,
+        "lng": 135.391251,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "和歌山県田辺市下万呂564-2",
+        "label": "和歌山県田辺市下万呂５６４番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "wakayama",
+      "name": "和歌山募集案内所",
+      "address": "和歌山県和歌山市美園町5丁目1番2号 新橘ビル2F",
+      "tel": "073-432-4479",
+      "area": "和歌山市・岩出市",
+      "url": "https://www.mod.go.jp/pco/wakayama/about/location/wakayama/",
+      "sourceKeys": [
+        "wakayama-review-wakayama"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/wakayama/about/location/wakayama/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-wakayama-59",
+      "coordinates": {
+        "lat": 34.231747,
+        "lng": 135.18985,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "和歌山県和歌山市美園町5丁目1番2号",
+        "label": "和歌山県和歌山市美園町五丁目１番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "nagasaki",
+      "name": "五島駐在員事務所",
+      "address": "長崎県五島市栄町9-5",
+      "tel": "0959-72-2665",
+      "area": "五島市",
+      "url": "https://www.mod.go.jp/pco/nagasaki/madoguchi/goto.html",
+      "sourceKeys": [
+        "nagasaki-review-goto"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/nagasaki/madoguchi/goto.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-nagasaki-r270",
+      "coordinates": {
+        "lat": 32.696682,
+        "lng": 128.845688,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "長崎県五島市栄町9-5",
+        "label": "長崎県五島市栄町９番",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "nagasaki",
+      "name": "壱岐駐在員事務所",
+      "address": "長崎県壱岐市郷ノ浦町本村触620-4 合同庁舎3階",
+      "tel": "0920-47-1499",
+      "area": "壱岐市",
+      "url": "https://www.mod.go.jp/pco/nagasaki/madoguchi/iki.html",
+      "sourceKeys": [
+        "nagasaki-review-iki"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/nagasaki/madoguchi/iki.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-nagasaki-r267",
+      "coordinates": {
+        "lat": 33.748852,
+        "lng": 129.692322,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "長崎県壱岐市郷ノ浦町本村触620-4",
+        "label": "長崎県壱岐市郷ノ浦町本村触６２０番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "nagasaki",
+      "name": "諫早地域事務所",
+      "address": "長崎県諫早市東小路町5-17",
+      "tel": "0957-22-4455",
+      "area": "諫早市",
+      "url": "https://www.mod.go.jp/pco/nagasaki/madoguchi/isahaya.html",
+      "sourceKeys": [
+        "nagasaki-review-isahaya"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/nagasaki/madoguchi/isahaya.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-nagasaki-r263",
+      "coordinates": {
+        "lat": 32.842014,
+        "lng": 130.053497,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "長崎県諫早市東小路町5-17",
+        "label": "長崎県諫早市東小路町５番１７号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "nagasaki",
+      "name": "上五島駐在員事務所",
+      "address": "長崎県南松浦郡新上五島町有川郷2314-9",
+      "tel": "0959-42-2969",
+      "area": "新上五島町、小値賀町",
+      "url": "https://www.mod.go.jp/pco/nagasaki/madoguchi/kamigoto.html",
+      "sourceKeys": [
+        "nagasaki-review-kamigoto"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/nagasaki/madoguchi/kamigoto.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-nagasaki-r269",
+      "coordinates": {
+        "lat": 32.981464,
+        "lng": 129.113815,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "長崎県南松浦郡新上五島町有川郷2314-9",
+        "label": "長崎県新上五島町有川郷２３１４番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "nagasaki",
+      "name": "琴海地域事務所",
+      "address": "長崎県長崎市琴海村松町704-14",
+      "tel": "095-884-2809",
+      "area": "西海市、時津町、長与町",
+      "url": "https://www.mod.go.jp/pco/nagasaki/madoguchi/kinkai.html",
+      "sourceKeys": [
+        "nagasaki-review-kinkai"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/nagasaki/madoguchi/kinkai.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-nagasaki-r265",
+      "coordinates": {
+        "lat": 32.86401,
+        "lng": 129.787033,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "長崎県長崎市琴海村松町704-14",
+        "label": "長崎県長崎市琴海村松町７０４番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "nagasaki",
+      "name": "長崎募集案内所",
+      "address": "長崎県長崎市岩川町16-16 長崎地方合同庁舎1階",
+      "tel": "095-849-6278または6279",
+      "area": "長崎市",
+      "url": "https://www.mod.go.jp/pco/nagasaki/madoguchi/nagasaki.html",
+      "sourceKeys": [
+        "nagasaki-review-nagasaki"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/nagasaki/madoguchi/nagasaki.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-nagasaki-r266",
+      "coordinates": {
+        "lat": 32.765362,
+        "lng": 129.866516,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "長崎県長崎市岩川町16-16",
+        "label": "長崎県長崎市岩川町１６番１６号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "nagasaki",
+      "name": "大村地域事務所",
+      "address": "長崎県大村市東本町534 大村法務総合庁舎1階",
+      "tel": "0957-52-6217",
+      "area": "大村市、東彼杵町、波佐見町、川棚町",
+      "url": "https://www.mod.go.jp/pco/nagasaki/madoguchi/oomura.html",
+      "sourceKeys": [
+        "nagasaki-review-oomura"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/nagasaki/madoguchi/oomura.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-nagasaki-r262",
+      "coordinates": {
+        "lat": 32.907455,
+        "lng": 129.961197,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "長崎県大村市東本町534",
+        "label": "長崎県大村市東本町５３４番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "nagasaki",
+      "name": "佐世保出張所",
+      "address": "長崎県佐世保市木場田町2-19 佐世保合同庁舎2階",
+      "tel": "0956-23-1231",
+      "area": "佐世保市、佐々町、平戸市、松浦市",
+      "url": "https://www.mod.go.jp/pco/nagasaki/madoguchi/sasebo.html",
+      "sourceKeys": [
+        "nagasaki-review-sasebo"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/nagasaki/madoguchi/sasebo.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-nagasaki-r261",
+      "coordinates": {
+        "lat": 33.17939,
+        "lng": 129.714478,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "長崎県佐世保市木場田町2-19",
+        "label": "長崎県佐世保市木場田町２番１９号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "nagasaki",
+      "name": "島原地域事務所",
+      "address": "長崎県島原市今川町1855-5",
+      "tel": "0957-62-3759",
+      "area": "島原市、南島原市、雲仙市",
+      "url": "https://www.mod.go.jp/pco/nagasaki/madoguchi/shimabara.html",
+      "sourceKeys": [
+        "nagasaki-review-shimabara"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/nagasaki/madoguchi/shimabara.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-nagasaki-r264",
+      "coordinates": {
+        "lat": 32.787575,
+        "lng": 130.367569,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "長崎県島原市今川町1855-5",
+        "label": "長崎県島原市今川町１８５５番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "nagasaki",
+      "name": "対馬駐在員事務所",
+      "address": "長崎県対馬市厳原町東里341-42",
+      "tel": "0920-52-0908",
+      "area": "対馬市",
+      "url": "https://www.mod.go.jp/pco/nagasaki/madoguchi/tsushima.html",
+      "sourceKeys": [
+        "nagasaki-review-tsushima"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/nagasaki/madoguchi/tsushima.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-nagasaki-r268",
+      "coordinates": {
+        "lat": 34.198013,
+        "lng": 129.291458,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "長崎県対馬市厳原町東里341-42",
+        "label": "長崎県対馬市厳原町東里３４１番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "kochi",
+      "name": "高知募集案内所",
+      "address": "高知県高知市栄田町2-2-10 高知よさこい咲都合同庁舎8F",
+      "tel": "088-823-2006",
+      "area": "高知市、南国市、大豊町、本山町、土佐町、大川村、いの町、仁淀川町",
+      "url": "https://www.mod.go.jp/pco/kochi/access.html",
+      "sourceKeys": [
+        "kochi"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/kochi/access.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-kochi-14",
+      "coordinates": {
+        "lat": 33.567837,
+        "lng": 133.544968,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "高知県高知市栄田町2-2-10",
+        "label": "高知県高知市栄田町二丁目２番１０号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "kochi",
+      "name": "四万十地域事務所",
+      "address": "高知県四万十市右山五月町3-12 中村地方合同庁舎4F",
+      "tel": "0880-35-3096",
+      "area": "四万十市、土佐清水市、黒潮町、宿毛市、大月町、三原村",
+      "url": "https://www.mod.go.jp/pco/kochi/access.html",
+      "sourceKeys": [
+        "kochi"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/kochi/access.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-kochi-15",
+      "coordinates": {
+        "lat": 32.987972,
+        "lng": 132.939316,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "高知県四万十市右山五月町3-12",
+        "label": "高知県四万十市右山五月町３番１２号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "kochi",
+      "name": "須崎地域事務所",
+      "address": "高知県須崎市西崎町325-2",
+      "tel": "0889-42-7186",
+      "area": "須崎市、津野町、檮原町、越知町、土佐市、佐川町、日高村、四万十町、中土佐町",
+      "url": "https://www.mod.go.jp/pco/kochi/access.html",
+      "sourceKeys": [
+        "kochi"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/kochi/access.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-kochi-16",
+      "coordinates": {
+        "lat": 33.411991,
+        "lng": 133.292389,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "高知県須崎市西崎町325-2",
+        "label": "高知県須崎市西崎町",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "kochi",
+      "name": "香南地域事務所",
+      "address": "高知県香南市野市町西野2217-3",
+      "tel": "0887-57-8182",
+      "area": "安芸市、香南市、芸西村、安田町、馬路村、室戸市、東洋町、田野町、奈半利町、北川村、香美市",
+      "url": "https://www.mod.go.jp/pco/kochi/access.html",
+      "sourceKeys": [
+        "kochi"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/kochi/access.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-kochi-13",
+      "coordinates": {
+        "lat": 33.55674,
+        "lng": 133.696854,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "高知県香南市野市町西野2217-3",
+        "label": "高知県香南市野市町西野２２１７番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "ishikawa",
+      "name": "七尾出張所",
+      "address": "石川県七尾市小島町西部2 七尾地方合同庁舎3階",
+      "tel": "0767-53-1691",
+      "area": "七尾市、羽咋市、志賀町、中能登町、宝達志水町",
+      "url": "https://www.mod.go.jp/pco/ishikawa/guide/",
+      "sourceKeys": [
+        "ishikawa"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/ishikawa/guide/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-ishikawa-3",
+      "coordinates": {
+        "lat": 37.044052,
+        "lng": 136.952438,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "石川県七尾市小島町西部2",
+        "label": "石川県七尾市小島町西部２番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "ishikawa",
+      "name": "小松地域事務所",
+      "address": "石川県小松市園町ニ-1 小松商工会議所内",
+      "tel": "0761-24-5180",
+      "area": "小松市、加賀市、能美市、川北町",
+      "url": "https://www.mod.go.jp/pco/ishikawa/guide/",
+      "sourceKeys": [
+        "ishikawa"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/ishikawa/guide/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-ishikawa-4",
+      "coordinates": {
+        "lat": 36.404739,
+        "lng": 136.46312,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "石川県小松市園町ニ-1",
+        "label": "石川県小松市園町ニ１番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "ishikawa",
+      "name": "能登地域事務所",
+      "address": "石川県鳳珠郡穴水町川島キ84 穴水地方合同庁舎3階",
+      "tel": "0768-52-4175",
+      "area": "珠洲市、輪島市、能登町、穴水町",
+      "url": "https://www.mod.go.jp/pco/ishikawa/guide/",
+      "sourceKeys": [
+        "ishikawa"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/ishikawa/guide/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-ishikawa-5",
+      "coordinates": {
+        "lat": 37.229645,
+        "lng": 136.911652,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "石川県鳳珠郡穴水町川島キ84",
+        "label": "石川県穴水町字川島キ８４番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "yamanashi",
+      "name": "甲府募集案内所",
+      "address": "山梨県甲府市酒折2-2-7",
+      "tel": "055-228-6427",
+      "area": "甲府市、笛吹市、山梨市、甲州市",
+      "url": "https://www.mod.go.jp/pco/yamanashi/honbu.html#shozaichi",
+      "sourceKeys": [
+        "yamanashi"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/yamanashi/honbu.html#shozaichi"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-yamanashi-63",
+      "coordinates": {
+        "lat": 35.657719,
+        "lng": 138.602631,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "山梨県甲府市酒折2-2-7",
+        "label": "山梨県甲府市酒折二丁目２番７号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "yamanashi",
+      "name": "巨摩募集案内所",
+      "address": "山梨県南アルプス市桃園611-2",
+      "tel": "055-228-5150",
+      "area": "中央市、甲斐市、韮崎市、北杜市、南アルプス市、昭和町、市川三郷町、富士川町、身延町、早川町、南部町",
+      "url": "https://www.mod.go.jp/pco/yamanashi/honbu.html#shozaichi",
+      "sourceKeys": [
+        "yamanashi"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/yamanashi/honbu.html#shozaichi"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-yamanashi-62",
+      "coordinates": {
+        "lat": 35.625401,
+        "lng": 138.463943,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "山梨県南アルプス市桃園611-2",
+        "label": "山梨県南アルプス市桃園６１１番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "yamanashi",
+      "name": "大月地域事務所",
+      "address": "山梨県大月市御太刀2-8-10 大月合同庁舎内",
+      "tel": "0554-22-1298",
+      "area": "富士吉田市、大月市、都留市、上野原市、富士河口湖町、西桂町、忍野村、鳴沢村、小菅村、丹波山村、道志村、山中湖村",
+      "url": "https://www.mod.go.jp/pco/yamanashi/honbu.html#shozaichi",
+      "sourceKeys": [
+        "yamanashi"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/yamanashi/honbu.html#shozaichi"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-yamanashi-64",
+      "coordinates": {
+        "lat": 35.616329,
+        "lng": 138.94725,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "山梨県大月市御太刀2-8-10",
+        "label": "山梨県大月市御太刀二丁目８番１０号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "tochigi",
+      "name": "真岡募集案内所",
+      "address": "栃木県真岡市西郷2585-252 栄光ビル2階",
+      "tel": "0285-83-7818",
+      "area": "真岡市、芳賀町、益子町、茂木町、市貝町",
+      "url": "https://www.mod.go.jp/pco/tochigi/contact.html",
+      "sourceKeys": [
+        "tochigi",
+        "tochigi-contact"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/tochigi/recruit.html",
+        "https://www.mod.go.jp/pco/tochigi/contact.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-tochigi-49",
+      "coordinates": {
+        "lat": 36.457966,
+        "lng": 139.996552,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "栃木県真岡市西郷2585-252",
+        "label": "栃木県真岡市西郷２５８５番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "tochigi",
+      "name": "足利地域事務所",
+      "address": "栃木県足利市南町4254-1 ニューミヤコホテル1階",
+      "tel": "0284-73-0230",
+      "area": "足利市、佐野市",
+      "url": "https://www.mod.go.jp/pco/tochigi/contact.html",
+      "sourceKeys": [
+        "tochigi",
+        "tochigi-contact"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/tochigi/recruit.html",
+        "https://www.mod.go.jp/pco/tochigi/contact.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-tochigi-50",
+      "coordinates": {
+        "lat": 36.330002,
+        "lng": 139.448166,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "栃木県足利市南町4254-1",
+        "label": "栃木県足利市南町４２５４番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "tochigi",
+      "name": "小山地域事務所",
+      "address": "栃木県小山市駅東通り1-25-20",
+      "tel": "0285-25-4763",
+      "area": "小山市、栃木市、下野市、壬生町、野木町",
+      "url": "https://www.mod.go.jp/pco/tochigi/contact.html",
+      "sourceKeys": [
+        "tochigi",
+        "tochigi-contact"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/tochigi/recruit.html",
+        "https://www.mod.go.jp/pco/tochigi/contact.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-tochigi-48",
+      "coordinates": {
+        "lat": 36.308548,
+        "lng": 139.810074,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "栃木県小山市駅東通り1-25-20",
+        "label": "栃木県小山市駅東通り一丁目２５番２０号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "asahikawa",
+      "name": "名寄出張所",
+      "address": "北海道名寄市西1条南9丁目45",
+      "tel": "01654-2-3921",
+      "area": "名寄市、士別市、和寒町、剣淵町、下川町、美深町、音威子府村、中川町",
+      "url": "https://www.mod.go.jp/pco/asahikawa/recruit.html",
+      "sourceKeys": [
+        "asahikawa",
+        "asahikawa-nayoro"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/asahikawa/recruit.html",
+        "https://www.mod.go.jp/pco/asahikawa/01_recruit/nayoro.jpg"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-asahikawa-r107",
+      "coordinates": {
+        "lat": 44.347012,
+        "lng": 142.461685,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "北海道名寄市西1条南9丁目45",
+        "label": "北海道名寄市西一条南九丁目４５番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "asahikawa",
+      "name": "稚内地域事務所",
+      "address": "北海道稚内市末広5丁目6-1 合同庁舎5F",
+      "tel": "0162-33-1227",
+      "area": "稚内市、豊富町、猿払村、利尻町、利尻富士町、礼文町、天塩町、幌延町、遠別町",
+      "url": "https://www.mod.go.jp/pco/asahikawa/recruit.html",
+      "sourceKeys": [
+        "asahikawa",
+        "asahikawa-wakkanai"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/asahikawa/recruit.html",
+        "https://www.mod.go.jp/pco/asahikawa/01_recruit/wakkanai.jpg"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-asahikawa-r108",
+      "coordinates": {
+        "lat": 45.399273,
+        "lng": 141.701614,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "北海道稚内市末広5丁目6-1",
+        "label": "北海道稚内市末広五丁目６番１号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "asahikawa",
+      "name": "留萌地域事務所",
+      "address": "北海道留萌市大町2丁目 合同庁舎2F",
+      "tel": "0164-42-4650",
+      "area": "留萌市、増毛町、小平町、苫前町、羽幌町、初山別村",
+      "url": "https://www.mod.go.jp/pco/asahikawa/recruit.html",
+      "sourceKeys": [
+        "asahikawa",
+        "asahikawa-rumoi"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/asahikawa/recruit.html",
+        "https://www.mod.go.jp/pco/asahikawa/01_recruit/rumoi.jpg"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-asahikawa-r109",
+      "coordinates": {
+        "lat": 43.94664,
+        "lng": 141.631836,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "北海道留萌市大町2丁目",
+        "label": "北海道留萌市大町二丁目",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "asahikawa",
+      "name": "紋別地域事務所",
+      "address": "北海道紋別市潮見町1丁目2-8",
+      "tel": "0158-23-2696",
+      "area": "紋別市、興部町、雄武町、滝上町、西興部村",
+      "url": "https://www.mod.go.jp/pco/asahikawa/recruit.html",
+      "sourceKeys": [
+        "asahikawa",
+        "asahikawa-monbetu"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/asahikawa/recruit.html",
+        "https://www.mod.go.jp/pco/asahikawa/01_recruit/monbetu.jpg"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-asahikawa-r110",
+      "coordinates": {
+        "lat": 44.357643,
+        "lng": 143.352921,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "北海道紋別市潮見町1丁目2-8",
+        "label": "北海道紋別市潮見町一丁目２番８号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "asahikawa",
+      "name": "上富良野地域事務所",
+      "address": "北海道空知郡上富良野町栄町2丁目1-47",
+      "tel": "0167-45-3412",
+      "area": "富良野市、美瑛町、上富良野町、中富良野町、南富良野町、占冠村",
+      "url": "https://www.mod.go.jp/pco/asahikawa/recruit.html",
+      "sourceKeys": [
+        "asahikawa",
+        "asahikawa-kamifurano"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/asahikawa/recruit.html",
+        "https://www.mod.go.jp/pco/asahikawa/01_recruit/kamifurano.jpg"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-asahikawa-r111",
+      "coordinates": {
+        "lat": 43.463856,
+        "lng": 142.466644,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "北海道空知郡上富良野町栄町2丁目1-47",
+        "label": "北海道上富良野町栄町二丁目１番４７号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "asahikawa",
+      "name": "遠軽地域事務所",
+      "address": "北海道紋別郡遠軽町岩見通南3丁目",
+      "tel": "0158-42-6616",
+      "area": "遠軽町、湧別町、佐呂間町",
+      "url": "https://www.mod.go.jp/pco/asahikawa/recruit.html",
+      "sourceKeys": [
+        "asahikawa",
+        "asahikawa-engaru"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/asahikawa/recruit.html",
+        "https://www.mod.go.jp/pco/asahikawa/01_recruit/engaru.jpg"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-asahikawa-r112",
+      "coordinates": {
+        "lat": 44.055893,
+        "lng": 143.519302,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "北海道紋別郡遠軽町岩見通南3丁目",
+        "label": "北海道遠軽町岩見通南三丁目",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "asahikawa",
+      "name": "枝幸地域事務所",
+      "address": "北海道枝幸郡枝幸町新栄町812番地",
+      "tel": "0163-62-1593",
+      "area": "枝幸町、浜頓別町、中頓別町",
+      "url": "https://www.mod.go.jp/pco/asahikawa/recruit.html",
+      "sourceKeys": [
+        "asahikawa",
+        "asahikawa-esasi"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/asahikawa/recruit.html",
+        "https://www.mod.go.jp/pco/asahikawa/01_recruit/esasi.jpg"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-asahikawa-r113",
+      "coordinates": {
+        "lat": 44.941875,
+        "lng": 142.580963,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "北海道枝幸郡枝幸町新栄町812番地",
+        "label": "北海道枝幸町新栄町８１２番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "shimane",
+      "name": "出雲地域事務所",
+      "address": "島根県出雲市塩冶善行町13-3 出雲地方合同庁舎",
+      "tel": "0853-21-0831",
+      "area": "出雲市、雲南市、飯石郡飯南町",
+      "url": "https://www.mod.go.jp/pco/shimane/consultation/branch.html",
+      "sourceKeys": [
+        "shimane"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/shimane/consultation/branch.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-shimane-r224",
+      "coordinates": {
+        "lat": 35.358269,
+        "lng": 132.7547,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "島根県出雲市塩冶善行町13-3",
+        "label": "島根県出雲市塩冶善行町１３番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "shimane",
+      "name": "大田地域事務所",
+      "address": "島根県大田市大田町大田イ307-4",
+      "tel": "0854-82-1437",
+      "area": "大田市、江津市、邑智郡川本町、邑智郡美郷町、邑智郡邑南町",
+      "url": "https://www.mod.go.jp/pco/shimane/consultation/branch.html",
+      "sourceKeys": [
+        "shimane"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/shimane/consultation/branch.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-shimane-r227",
+      "coordinates": {
+        "lat": 35.197296,
+        "lng": 132.50351,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "島根県大田市大田町大田イ307-4",
+        "label": "島根県大田市大田町大田イ３０７番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "shimane",
+      "name": "浜田出張所",
+      "address": "島根県浜田市殿町83-191",
+      "tel": "0855-22-1334",
+      "area": "浜田市",
+      "url": "https://www.mod.go.jp/pco/shimane/consultation/branch.html",
+      "sourceKeys": [
+        "shimane"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/shimane/consultation/branch.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-shimane-r225",
+      "coordinates": {
+        "lat": 34.89957,
+        "lng": 132.076645,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "島根県浜田市殿町83-191",
+        "label": "島根県浜田市殿町８３番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "shimane",
+      "name": "益田地域事務所",
+      "address": "島根県益田市高津5丁目34-13 レジーナビル1F102号",
+      "tel": "0856-22-8223",
+      "area": "益田市、鹿足郡津和野町、鹿足郡吉賀町",
+      "url": "https://www.mod.go.jp/pco/shimane/consultation/branch.html",
+      "sourceKeys": [
+        "shimane"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/shimane/consultation/branch.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-shimane-r226",
+      "coordinates": {
+        "lat": 34.689579,
+        "lng": 131.816605,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "島根県益田市高津5丁目34-13",
+        "label": "島根県益田市高津五丁目３４番１３号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "toyama",
+      "name": "魚津地域事務所",
+      "address": "富山県魚津市新金屋1-12-31",
+      "tel": "0765-24-1036",
+      "area": "魚津市、滑川市、黒部市、舟橋村、上市町、立山町、入善町、朝日町",
+      "url": "https://www.mod.go.jp/pco/toyama/content/07-access/07-access.html",
+      "sourceKeys": [
+        "toyama"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/toyama/content/07-access/07-access.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-toyama-r149",
+      "coordinates": {
+        "lat": 36.820755,
+        "lng": 137.406693,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "富山県魚津市新金屋1-12-31",
+        "label": "富山県魚津市新金屋一丁目１２番３１号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "saga",
+      "name": "唐津出張所",
+      "address": "佐賀県唐津市和多田本村1-7",
+      "tel": "0955-72-8697",
+      "area": "唐津市、玄海町",
+      "url": "https://www.mod.go.jp/pco/saga/about/",
+      "sourceKeys": [
+        "saga"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/saga/about/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-saga-r310",
+      "coordinates": {
+        "lat": 33.4366,
+        "lng": 129.976013,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "佐賀県唐津市和多田本村1-7",
+        "label": "佐賀県唐津市和多田本村１番７号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "saga",
+      "name": "鳥栖地域事務所",
+      "address": "佐賀県鳥栖市本町1丁目962-1",
+      "tel": "0942-83-4077",
+      "area": "鳥栖市、神埼市、吉野ヶ里町、上峰町、みやき町、基山町",
+      "url": "https://www.mod.go.jp/pco/saga/about/",
+      "sourceKeys": [
+        "saga"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/saga/about/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-saga-r311",
+      "coordinates": {
+        "lat": 33.373955,
+        "lng": 130.513351,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "佐賀県鳥栖市本町1丁目962-1",
+        "label": "佐賀県鳥栖市本町一丁目９６２番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "saga",
+      "name": "佐賀募集案内所",
+      "address": "佐賀県佐賀市栄町3-51",
+      "tel": "0952-25-6700",
+      "area": "佐賀市、小城市、多久市",
+      "url": "https://www.mod.go.jp/pco/saga/about/",
+      "sourceKeys": [
+        "saga"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/saga/about/"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-05",
+      "id": "loc-saga-31",
+      "coordinates": {
+        "lat": 33.264198,
+        "lng": 130.301987,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "佐賀県佐賀市栄町3-51",
+        "label": "佐賀県佐賀市栄町３番５１号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "shizuoka",
+      "name": "沼津地域事務所",
+      "address": "静岡県沼津市杉崎町6-20 法務局内1F",
+      "tel": "055-916-0605",
+      "area": "沼津市、御殿場市、小山町、清水町",
+      "url": "https://www.mod.go.jp/pco/sizuoka/office/numazu.html",
+      "sourceKeys": [
+        "shizuoka",
+        "shizuoka-review-numazu"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/sizuoka/office/",
+        "https://www.mod.go.jp/pco/sizuoka/office/numazu.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-06",
+      "id": "loc-shizuoka-r162",
+      "coordinates": {
+        "lat": 35.108662,
+        "lng": 138.86499,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "静岡県沼津市杉崎町6-20",
+        "label": "静岡県沼津市杉崎町６番２０号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "shizuoka",
+      "name": "富士地域事務所",
+      "address": "静岡県富士市御幸町13-5 長谷川ビル3F",
+      "tel": "0545-51-1719",
+      "area": "富士市、富士宮市",
+      "url": "https://www.mod.go.jp/pco/sizuoka/office/fuji.html",
+      "sourceKeys": [
+        "shizuoka",
+        "shizuoka-review-fuji"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/sizuoka/office/",
+        "https://www.mod.go.jp/pco/sizuoka/office/fuji.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-06",
+      "id": "loc-shizuoka-r163",
+      "coordinates": {
+        "lat": 35.160118,
+        "lng": 138.685501,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "静岡県富士市御幸町13-5",
+        "label": "静岡県富士市御幸町１３番５号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "shizuoka",
+      "name": "伊東地域事務所",
+      "address": "静岡県伊東市東松原町12-5 三浜ビル2F",
+      "tel": "055-737-9632",
+      "area": "熱海市、伊東市、下田市、東伊豆町、西伊豆町、南伊豆町、河津町、松崎町",
+      "url": "https://www.mod.go.jp/pco/sizuoka/office/ito.html",
+      "sourceKeys": [
+        "shizuoka",
+        "shizuoka-review-ito"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/sizuoka/office/",
+        "https://www.mod.go.jp/pco/sizuoka/office/ito.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-06",
+      "id": "loc-shizuoka-r164",
+      "coordinates": {
+        "lat": 34.971695,
+        "lng": 139.096603,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "静岡県伊東市東松原町12-5",
+        "label": "静岡県伊東市東松原町１２番５号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "shizuoka",
+      "name": "三島募集案内所",
+      "address": "静岡県三島市文教町1-9-10 ミシマ北口ビル4階4D",
+      "tel": "055-989-9111",
+      "area": "裾野市、三島市、伊豆の国市、伊豆市、長泉町、函南町",
+      "url": "https://www.mod.go.jp/pco/sizuoka/office/mishima.html",
+      "sourceKeys": [
+        "shizuoka",
+        "shizuoka-review-mishima"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/sizuoka/office/",
+        "https://www.mod.go.jp/pco/sizuoka/office/mishima.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-06",
+      "id": "loc-shizuoka-r167",
+      "coordinates": {
+        "lat": 35.128048,
+        "lng": 138.912003,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "静岡県三島市文教町1-9-10",
+        "label": "静岡県三島市文教町一丁目９番１０号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "shizuoka",
+      "name": "静岡募集案内所",
+      "address": "静岡県静岡市駿河区南安倍3-6-45 相川ビル1F",
+      "tel": "054-284-3936",
+      "area": "静岡市葵区、静岡市駿河区",
+      "url": "https://www.mod.go.jp/pco/sizuoka/office/shizuoka.html",
+      "sourceKeys": [
+        "shizuoka",
+        "shizuoka-review-shizuoka"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/sizuoka/office/",
+        "https://www.mod.go.jp/pco/sizuoka/office/shizuoka.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-06",
+      "id": "loc-shizuoka-r169",
+      "coordinates": {
+        "lat": 34.96117,
+        "lng": 138.376175,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "静岡県静岡市駿河区南安倍3-6-45",
+        "label": "静岡県静岡市駿河区南安倍三丁目６番４５号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "shizuoka",
+      "name": "藤枝地域事務所",
+      "address": "静岡県藤枝市駅前3-11-21",
+      "tel": "054-643-6391",
+      "area": "藤枝市、焼津市、島田市、牧之原市、川根本町、吉田町",
+      "url": "https://www.mod.go.jp/pco/sizuoka/office/fujieda.html",
+      "sourceKeys": [
+        "shizuoka",
+        "shizuoka-review-fujieda"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/sizuoka/office/",
+        "https://www.mod.go.jp/pco/sizuoka/office/fujieda.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-06",
+      "id": "loc-shizuoka-r165",
+      "coordinates": {
+        "lat": 34.84819,
+        "lng": 138.248062,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "静岡県藤枝市駅前3-11-21",
+        "label": "静岡県藤枝市駅前三丁目１１番２１号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "shizuoka",
+      "name": "清水募集案内所",
+      "address": "静岡県静岡市清水区松原町2-15 清水合同庁舎3F",
+      "tel": "054-352-9100",
+      "area": "静岡市清水区",
+      "url": "https://www.mod.go.jp/pco/sizuoka/office/shimizu.html",
+      "sourceKeys": [
+        "shizuoka",
+        "shizuoka-review-shimizu"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/sizuoka/office/",
+        "https://www.mod.go.jp/pco/sizuoka/office/shimizu.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-06",
+      "id": "loc-shizuoka-r168",
+      "coordinates": {
+        "lat": 35.01228,
+        "lng": 138.490311,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "静岡県静岡市清水区松原町2-15",
+        "label": "静岡県静岡市清水区松原町２番１５号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "shizuoka",
+      "name": "浜松出張所",
+      "address": "静岡県浜松市中央区中央1-12-4 浜松合同庁舎8F",
+      "tel": "053-454-4605",
+      "area": "浜松市中央区、湖西市",
+      "url": "https://www.mod.go.jp/pco/sizuoka/office/hamamatu.html",
+      "sourceKeys": [
+        "shizuoka",
+        "shizuoka-review-hamamatu"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/sizuoka/office/",
+        "https://www.mod.go.jp/pco/sizuoka/office/hamamatu.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-06",
+      "id": "loc-shizuoka-r170",
+      "coordinates": {
+        "lat": 34.711269,
+        "lng": 137.734711,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "静岡県浜松市中央区中央1-12-4",
+        "label": "静岡県浜松市中央区中央一丁目１２番４号",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "shizuoka",
+      "name": "袋井地域事務所",
+      "address": "静岡県袋井市永楽町143 朝日生命ビル3F",
+      "tel": "0538-43-3717",
+      "area": "袋井市、磐田市、掛川市、菊川市、御前崎市、森町",
+      "url": "https://www.mod.go.jp/pco/sizuoka/office/fukuroi.html",
+      "sourceKeys": [
+        "shizuoka",
+        "shizuoka-review-fukuroi"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/sizuoka/office/",
+        "https://www.mod.go.jp/pco/sizuoka/office/fukuroi.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-06",
+      "id": "loc-shizuoka-r166",
+      "coordinates": {
+        "lat": 34.749504,
+        "lng": 137.92131,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "静岡県袋井市永楽町143",
+        "label": "静岡県袋井市永楽町１４３番地",
+        "resultCount": 1
+      }
+    },
+    {
+      "pref": "shizuoka",
+      "name": "浜北募集案内所",
+      "address": "静岡県浜松市浜名区新原3908",
+      "tel": "053-585-1719",
+      "area": "浜松市浜名区、浜松市天竜区",
+      "url": "https://www.mod.go.jp/pco/sizuoka/office/hamakita.html",
+      "sourceKeys": [
+        "shizuoka",
+        "shizuoka-review-hamakita"
+      ],
+      "sources": [
+        "https://www.mod.go.jp/pco/sizuoka/office/",
+        "https://www.mod.go.jp/pco/sizuoka/office/hamakita.html"
+      ],
+      "status": "confirmed",
+      "pendingReason": "",
+      "checkedAt": "2026-10-06",
+      "id": "loc-shizuoka-47",
+      "coordinates": {
+        "lat": 34.809986,
+        "lng": 137.774658,
+        "latApprox": true,
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "静岡県浜松市浜名区新原3908",
+        "label": "静岡県浜松市浜名区新原３９０８番地",
+        "resultCount": 1
+      }
+    }
+  ],
+  "sources": [
+    {
+      "key": "akita",
+      "url": "https://www.mod.go.jp/pco/akita/asset/about/contact.html",
+      "finalUrl": "https://www.mod.go.jp/pco/akita/asset/about/contact.html",
+      "status": 200,
+      "lastModified": "Thu, 30 Jul 2026 02:39:48 GMT",
+      "checkedAt": "2026-10-04"
+    },
+    {
+      "key": "akita-area",
+      "url": "https://www.mod.go.jp/pco/akita/asset/publicity/adranger.html",
+      "finalUrl": "https://www.mod.go.jp/pco/akita/asset/publicity/adranger.html",
+      "status": 200,
+      "lastModified": "Thu, 30 Jul 2026 02:39:48 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "asahikawa",
+      "url": "https://www.mod.go.jp/pco/asahikawa/recruit.html",
+      "finalUrl": "https://www.mod.go.jp/pco/asahikawa/recruit.html",
+      "status": 200,
+      "lastModified": "Mon, 07 Sep 2026 03:04:20 GMT",
+      "checkedAt": "2026-10-04"
+    },
+    {
+      "key": "asahikawa-engaru",
+      "url": "https://www.mod.go.jp/pco/asahikawa/01_recruit/engaru.jpg",
+      "finalUrl": "https://www.mod.go.jp/pco/asahikawa/01_recruit/engaru.jpg",
+      "status": 200,
+      "checkedAt": "2026-10-05",
+      "note": "公式窓口一覧に掲載された連絡先画像を目視確認"
+    },
+    {
+      "key": "asahikawa-esasi",
+      "url": "https://www.mod.go.jp/pco/asahikawa/01_recruit/esasi.jpg",
+      "finalUrl": "https://www.mod.go.jp/pco/asahikawa/01_recruit/esasi.jpg",
+      "status": 200,
+      "checkedAt": "2026-10-05",
+      "note": "公式窓口一覧に掲載された連絡先画像を目視確認"
+    },
+    {
+      "key": "asahikawa-kamifurano",
+      "url": "https://www.mod.go.jp/pco/asahikawa/01_recruit/kamifurano.jpg",
+      "finalUrl": "https://www.mod.go.jp/pco/asahikawa/01_recruit/kamifurano.jpg",
+      "status": 200,
+      "checkedAt": "2026-10-05",
+      "note": "公式窓口一覧に掲載された連絡先画像を目視確認"
+    },
+    {
+      "key": "asahikawa-monbetu",
+      "url": "https://www.mod.go.jp/pco/asahikawa/01_recruit/monbetu.jpg",
+      "finalUrl": "https://www.mod.go.jp/pco/asahikawa/01_recruit/monbetu.jpg",
+      "status": 200,
+      "checkedAt": "2026-10-05",
+      "note": "公式窓口一覧に掲載された連絡先画像を目視確認"
+    },
+    {
+      "key": "asahikawa-nayoro",
+      "url": "https://www.mod.go.jp/pco/asahikawa/01_recruit/nayoro.jpg",
+      "finalUrl": "https://www.mod.go.jp/pco/asahikawa/01_recruit/nayoro.jpg",
+      "status": 200,
+      "checkedAt": "2026-10-05",
+      "note": "公式窓口一覧に掲載された連絡先画像を目視確認"
+    },
+    {
+      "key": "asahikawa-rumoi",
+      "url": "https://www.mod.go.jp/pco/asahikawa/01_recruit/rumoi.jpg",
+      "finalUrl": "https://www.mod.go.jp/pco/asahikawa/01_recruit/rumoi.jpg",
+      "status": 200,
+      "checkedAt": "2026-10-05",
+      "note": "公式窓口一覧に掲載された連絡先画像を目視確認"
+    },
+    {
+      "key": "asahikawa-wakkanai",
+      "url": "https://www.mod.go.jp/pco/asahikawa/01_recruit/wakkanai.jpg",
+      "finalUrl": "https://www.mod.go.jp/pco/asahikawa/01_recruit/wakkanai.jpg",
+      "status": 200,
+      "checkedAt": "2026-10-05",
+      "note": "公式窓口一覧に掲載された連絡先画像を目視確認"
+    },
+    {
+      "key": "ehime",
+      "url": "https://www.mod.go.jp/pco/ehime/acsess.html",
+      "finalUrl": "https://www.mod.go.jp/pco/ehime/acsess.html",
+      "status": 200,
+      "lastModified": "Thu, 07 May 2026 07:32:27 GMT",
+      "checkedAt": "2026-10-04"
+    },
+    {
+      "key": "fukui",
+      "url": "https://www.mod.go.jp/pco/fukui/contents/6-aboutus/6-aboutus.html",
+      "finalUrl": "https://www.mod.go.jp/pco/fukui/contents/6-aboutus/6-aboutus.html",
+      "status": 200,
+      "lastModified": "Fri, 02 Oct 2026 04:32:47 GMT",
+      "checkedAt": "2026-10-04"
+    },
+    {
+      "key": "hiroshima",
+      "url": "https://www.mod.go.jp/pco/hiroshima/office/",
+      "finalUrl": "https://www.mod.go.jp/pco/hiroshima/office/",
+      "status": 200,
+      "lastModified": "Tue, 18 Aug 2026 00:00:07 GMT",
+      "checkedAt": "2026-10-04"
+    },
+    {
+      "key": "ishikawa",
+      "url": "https://www.mod.go.jp/pco/ishikawa/guide/",
+      "finalUrl": "https://www.mod.go.jp/pco/ishikawa/guide/",
+      "status": 200,
+      "lastModified": "Wed, 19 Aug 2026 23:30:11 GMT",
+      "checkedAt": "2026-10-04"
+    },
+    {
+      "key": "kochi",
+      "url": "https://www.mod.go.jp/pco/kochi/access.html",
+      "finalUrl": "https://www.mod.go.jp/pco/kochi/access.html",
+      "status": 200,
+      "lastModified": "Wed, 28 May 2025 08:53:03 GMT",
+      "checkedAt": "2026-10-04"
+    },
+    {
+      "key": "mie",
+      "url": "https://www.mod.go.jp/pco/mie/regional/",
+      "finalUrl": "https://www.mod.go.jp/pco/mie/regional/",
+      "status": 200,
+      "lastModified": "Fri, 02 Oct 2026 00:53:09 GMT",
+      "checkedAt": "2026-10-04"
+    },
+    {
+      "key": "nagasaki-review-goto",
+      "url": "https://www.mod.go.jp/pco/nagasaki/madoguchi/goto.html",
+      "finalUrl": "https://www.mod.go.jp/pco/nagasaki/madoguchi/goto.html",
+      "status": 200,
+      "lastModified": "Wed, 23 Jul 2025 06:10:16 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "nagasaki-review-iki",
+      "url": "https://www.mod.go.jp/pco/nagasaki/madoguchi/iki.html",
+      "finalUrl": "https://www.mod.go.jp/pco/nagasaki/madoguchi/iki.html",
+      "status": 200,
+      "lastModified": "Wed, 23 Jul 2025 06:10:16 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "nagasaki-review-isahaya",
+      "url": "https://www.mod.go.jp/pco/nagasaki/madoguchi/isahaya.html",
+      "finalUrl": "https://www.mod.go.jp/pco/nagasaki/madoguchi/isahaya.html",
+      "status": 200,
+      "lastModified": "Thu, 02 Apr 2026 06:01:32 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "nagasaki-review-kamigoto",
+      "url": "https://www.mod.go.jp/pco/nagasaki/madoguchi/kamigoto.html",
+      "finalUrl": "https://www.mod.go.jp/pco/nagasaki/madoguchi/kamigoto.html",
+      "status": 200,
+      "lastModified": "Wed, 23 Jul 2025 06:10:16 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "nagasaki-review-kinkai",
+      "url": "https://www.mod.go.jp/pco/nagasaki/madoguchi/kinkai.html",
+      "finalUrl": "https://www.mod.go.jp/pco/nagasaki/madoguchi/kinkai.html",
+      "status": 200,
+      "lastModified": "Thu, 02 Apr 2026 06:01:32 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "nagasaki-review-nagasaki",
+      "url": "https://www.mod.go.jp/pco/nagasaki/madoguchi/nagasaki.html",
+      "finalUrl": "https://www.mod.go.jp/pco/nagasaki/madoguchi/nagasaki.html",
+      "status": 200,
+      "lastModified": "Fri, 18 Sep 2026 07:25:12 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "nagasaki-review-oomura",
+      "url": "https://www.mod.go.jp/pco/nagasaki/madoguchi/oomura.html",
+      "finalUrl": "https://www.mod.go.jp/pco/nagasaki/madoguchi/oomura.html",
+      "status": 200,
+      "lastModified": "Thu, 02 Apr 2026 06:01:32 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "nagasaki-review-sasebo",
+      "url": "https://www.mod.go.jp/pco/nagasaki/madoguchi/sasebo.html",
+      "finalUrl": "https://www.mod.go.jp/pco/nagasaki/madoguchi/sasebo.html",
+      "status": 200,
+      "lastModified": "Fri, 18 Sep 2026 07:25:12 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "nagasaki-review-shimabara",
+      "url": "https://www.mod.go.jp/pco/nagasaki/madoguchi/shimabara.html",
+      "finalUrl": "https://www.mod.go.jp/pco/nagasaki/madoguchi/shimabara.html",
+      "status": 200,
+      "lastModified": "Fri, 18 Sep 2026 07:25:12 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "nagasaki-review-tsushima",
+      "url": "https://www.mod.go.jp/pco/nagasaki/madoguchi/tsushima.html",
+      "finalUrl": "https://www.mod.go.jp/pco/nagasaki/madoguchi/tsushima.html",
+      "status": 200,
+      "lastModified": "Fri, 18 Sep 2026 07:25:12 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "nara-review-gojou",
+      "url": "https://www.mod.go.jp/pco/nara/guide/about/gojou/",
+      "finalUrl": "https://www.mod.go.jp/pco/nara/guide/about/gojou/",
+      "status": 200,
+      "lastModified": "Mon, 28 Sep 2026 03:23:24 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "nara-review-kashihara",
+      "url": "https://www.mod.go.jp/pco/nara/guide/about/kashihara/",
+      "finalUrl": "https://www.mod.go.jp/pco/nara/guide/about/kashihara/",
+      "status": 200,
+      "lastModified": "Thu, 01 Oct 2026 05:54:06 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "nara-review-nara",
+      "url": "https://www.mod.go.jp/pco/nara/guide/about/nara/",
+      "finalUrl": "https://www.mod.go.jp/pco/nara/guide/about/nara/",
+      "status": 200,
+      "lastModified": "Mon, 28 Sep 2026 03:23:23 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "nara-review-tenri",
+      "url": "https://www.mod.go.jp/pco/nara/guide/about/tenri/",
+      "finalUrl": "https://www.mod.go.jp/pco/nara/guide/about/tenri/",
+      "status": 200,
+      "lastModified": "Mon, 28 Sep 2026 03:23:23 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "saga",
+      "url": "https://www.mod.go.jp/pco/saga/about/",
+      "finalUrl": "https://www.mod.go.jp/pco/saga/about/",
+      "status": 200,
+      "lastModified": "Thu, 01 Oct 2026 05:36:59 GMT",
+      "checkedAt": "2026-10-04"
+    },
+    {
+      "key": "shimane",
+      "url": "https://www.mod.go.jp/pco/shimane/consultation/branch.html",
+      "finalUrl": "https://www.mod.go.jp/pco/shimane/consultation/branch.html",
+      "status": 200,
+      "lastModified": "Tue, 22 Oct 2024 00:39:45 GMT",
+      "checkedAt": "2026-10-04"
+    },
+    {
+      "key": "shizuoka",
+      "url": "https://www.mod.go.jp/pco/sizuoka/office/",
+      "finalUrl": "https://www.mod.go.jp/pco/sizuoka/office/",
+      "status": 200,
+      "lastModified": "Thu, 03 Sep 2026 23:26:23 GMT",
+      "checkedAt": "2026-10-04"
+    },
+    {
+      "key": "shizuoka-review-fuji",
+      "url": "https://www.mod.go.jp/pco/sizuoka/office/fuji.html",
+      "finalUrl": "https://www.mod.go.jp/pco/sizuoka/office/fuji.html",
+      "status": 200,
+      "lastModified": "Tue, 15 Sep 2026 23:02:27 GMT",
+      "checkedAt": "2026-10-06"
+    },
+    {
+      "key": "shizuoka-review-fujieda",
+      "url": "https://www.mod.go.jp/pco/sizuoka/office/fujieda.html",
+      "finalUrl": "https://www.mod.go.jp/pco/sizuoka/office/fujieda.html",
+      "status": 200,
+      "lastModified": "Wed, 16 Sep 2026 23:32:44 GMT",
+      "checkedAt": "2026-10-06"
+    },
+    {
+      "key": "shizuoka-review-fukuroi",
+      "url": "https://www.mod.go.jp/pco/sizuoka/office/fukuroi.html",
+      "finalUrl": "https://www.mod.go.jp/pco/sizuoka/office/fukuroi.html",
+      "status": 200,
+      "lastModified": "Thu, 03 Sep 2026 23:26:24 GMT",
+      "checkedAt": "2026-10-06"
+    },
+    {
+      "key": "shizuoka-review-hamakita",
+      "url": "https://www.mod.go.jp/pco/sizuoka/office/hamakita.html",
+      "finalUrl": "https://www.mod.go.jp/pco/sizuoka/office/hamakita.html",
+      "status": 200,
+      "lastModified": "Thu, 03 Sep 2026 23:26:23 GMT",
+      "checkedAt": "2026-10-06"
+    },
+    {
+      "key": "shizuoka-review-hamamatu",
+      "url": "https://www.mod.go.jp/pco/sizuoka/office/hamamatu.html",
+      "finalUrl": "https://www.mod.go.jp/pco/sizuoka/office/hamamatu.html",
+      "status": 200,
+      "lastModified": "Thu, 10 Sep 2026 04:15:39 GMT",
+      "checkedAt": "2026-10-06"
+    },
+    {
+      "key": "shizuoka-review-ito",
+      "url": "https://www.mod.go.jp/pco/sizuoka/office/ito.html",
+      "finalUrl": "https://www.mod.go.jp/pco/sizuoka/office/ito.html",
+      "status": 200,
+      "lastModified": "Thu, 03 Sep 2026 23:26:23 GMT",
+      "checkedAt": "2026-10-06"
+    },
+    {
+      "key": "shizuoka-review-mishima",
+      "url": "https://www.mod.go.jp/pco/sizuoka/office/mishima.html",
+      "finalUrl": "https://www.mod.go.jp/pco/sizuoka/office/mishima.html",
+      "status": 200,
+      "lastModified": "Thu, 03 Sep 2026 23:26:23 GMT",
+      "checkedAt": "2026-10-06"
+    },
+    {
+      "key": "shizuoka-review-numazu",
+      "url": "https://www.mod.go.jp/pco/sizuoka/office/numazu.html",
+      "finalUrl": "https://www.mod.go.jp/pco/sizuoka/office/numazu.html",
+      "status": 200,
+      "lastModified": "Wed, 09 Sep 2026 00:07:44 GMT",
+      "checkedAt": "2026-10-06"
+    },
+    {
+      "key": "shizuoka-review-shimizu",
+      "url": "https://www.mod.go.jp/pco/sizuoka/office/shimizu.html",
+      "finalUrl": "https://www.mod.go.jp/pco/sizuoka/office/shimizu.html",
+      "status": 200,
+      "lastModified": "Wed, 09 Sep 2026 01:03:07 GMT",
+      "checkedAt": "2026-10-06"
+    },
+    {
+      "key": "shizuoka-review-shizuoka",
+      "url": "https://www.mod.go.jp/pco/sizuoka/office/shizuoka.html",
+      "finalUrl": "https://www.mod.go.jp/pco/sizuoka/office/shizuoka.html",
+      "status": 200,
+      "lastModified": "Mon, 28 Sep 2026 23:02:35 GMT",
+      "checkedAt": "2026-10-06"
+    },
+    {
+      "key": "tochigi",
+      "url": "https://www.mod.go.jp/pco/tochigi/recruit.html",
+      "finalUrl": "https://www.mod.go.jp/pco/tochigi/recruit.html",
+      "status": 200,
+      "lastModified": "Wed, 30 Sep 2026 23:30:55 GMT",
+      "checkedAt": "2026-10-04"
+    },
+    {
+      "key": "tochigi-contact",
+      "url": "https://www.mod.go.jp/pco/tochigi/contact.html",
+      "finalUrl": "https://www.mod.go.jp/pco/tochigi/contact.html",
+      "status": 200,
+      "lastModified": "Fri, 25 Sep 2026 00:36:06 GMT",
+      "checkedAt": "2026-10-04"
+    },
+    {
+      "key": "toyama",
+      "url": "https://www.mod.go.jp/pco/toyama/content/07-access/07-access.html",
+      "finalUrl": "https://www.mod.go.jp/pco/toyama/content/07-access/07-access.html",
+      "status": 200,
+      "lastModified": "Fri, 28 Aug 2026 02:53:35 GMT",
+      "checkedAt": "2026-10-04"
+    },
+    {
+      "key": "wakayama-review-arida",
+      "url": "https://www.mod.go.jp/pco/wakayama/about/location/arida/",
+      "finalUrl": "https://www.mod.go.jp/pco/wakayama/about/location/arida/",
+      "status": 200,
+      "lastModified": "Thu, 01 Oct 2026 06:44:39 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "wakayama-review-gobo",
+      "url": "https://www.mod.go.jp/pco/wakayama/about/location/gobo/",
+      "finalUrl": "https://www.mod.go.jp/pco/wakayama/about/location/gobo/",
+      "status": 200,
+      "lastModified": "Thu, 01 Oct 2026 06:44:39 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "wakayama-review-hashimoto",
+      "url": "https://www.mod.go.jp/pco/wakayama/about/location/hashimoto/",
+      "finalUrl": "https://www.mod.go.jp/pco/wakayama/about/location/hashimoto/",
+      "status": 200,
+      "lastModified": "Thu, 01 Oct 2026 06:44:39 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "wakayama-review-singu",
+      "url": "https://www.mod.go.jp/pco/wakayama/about/location/singu/",
+      "finalUrl": "https://www.mod.go.jp/pco/wakayama/about/location/singu/",
+      "status": 200,
+      "lastModified": "Thu, 01 Oct 2026 06:44:39 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "wakayama-review-tanabe",
+      "url": "https://www.mod.go.jp/pco/wakayama/about/location/tanabe/",
+      "finalUrl": "https://www.mod.go.jp/pco/wakayama/about/location/tanabe/",
+      "status": 200,
+      "lastModified": "Thu, 01 Oct 2026 06:44:39 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "wakayama-review-wakayama",
+      "url": "https://www.mod.go.jp/pco/wakayama/about/location/wakayama/",
+      "finalUrl": "https://www.mod.go.jp/pco/wakayama/about/location/wakayama/",
+      "status": 200,
+      "lastModified": "Thu, 01 Oct 2026 06:44:39 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "yamagata-review-sakata",
+      "url": "https://www.mod.go.jp/pco/yamagata/sakata/sakata.html",
+      "finalUrl": "https://www.mod.go.jp/pco/yamagata/sakata/sakata.html",
+      "status": 200,
+      "lastModified": "Fri, 21 Aug 2026 01:49:22 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "yamagata-review-turuoka",
+      "url": "https://www.mod.go.jp/pco/yamagata/turuoka/turuoka.html",
+      "finalUrl": "https://www.mod.go.jp/pco/yamagata/turuoka/turuoka.html",
+      "status": 200,
+      "lastModified": "Wed, 30 Sep 2026 01:41:52 GMT",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "key": "yamanashi",
+      "url": "https://www.mod.go.jp/pco/yamanashi/honbu.html#shozaichi",
+      "finalUrl": "https://www.mod.go.jp/pco/yamanashi/honbu.html#shozaichi",
+      "status": 200,
+      "lastModified": "Thu, 19 Mar 2026 02:04:27 GMT",
+      "checkedAt": "2026-10-04"
+    }
+  ]
+}
