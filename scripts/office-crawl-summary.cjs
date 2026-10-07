@@ -2,7 +2,9 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const file = path.join(__dirname, '../scraper/office-crawl-report.json');
-const lines = ['## 募集窓口のHTML・OCR巡回', ''];
+const audit = JSON.parse(fs.readFileSync(path.join(__dirname, '../docs/office-audit-20261004.json'), 'utf8'));
+const lines = ['## 募集窓口のHTML・OCR巡回', '',
+  `全国窓口情報の照合: 未確定候補 ${audit.pending.length}件、既存の不足 ${audit.remainingFieldGaps.length}件（重複あり）。監査記録 ${audit.checkedAt}。巡回成功は項目照合の完了を意味しません。`, ''];
 if (!fs.existsSync(file)) lines.push('巡回レポート未生成。取得済み・イベントなしとは判断できません。');
 else {
   const report = JSON.parse(fs.readFileSync(file, 'utf8'));

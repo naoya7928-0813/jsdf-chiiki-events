@@ -1,0 +1,40 @@
+{
+  "checkedAt": "2026-10-07",
+  "sourceRun": 37549392641,
+  "note": "最新巡回で取得に失敗した探索リンクを、公式掲載・HTTP200を再確認した現行URLへ置換。担当区域や窓口の廃止を推測する設定ではない。",
+  "aliases": {
+    "https://www.mod.go.jp/pco/osaka/recruit/list.html": {
+      "url": "https://www.mod.go.jp/pco/osaka/recruit/session/menu.html",
+      "scope": "shared"
+    },
+    "https://www.mod.go.jp/pco/osaka/recruit/session/index.html": {
+      "url": "https://www.mod.go.jp/pco/osaka/recruit/session/menu.html",
+      "scope": "shared"
+    },
+    "https://www.mod.go.jp/pco/osaka/news/index.html": {
+      "url": "https://www.mod.go.jp/pco/osaka/recruit/session/menu.html",
+      "scope": "shared"
+    },
+    "https://www.mod.go.jp/pco/ishikawa/01ongakuensoukai/": {
+      "url": "https://www.mod.go.jp/pco/ishikawa/event29/index.html",
+      "scope": "shared"
+    },
+    "https://www.mod.go.jp/pco/nagasaki/madoguchi/jieitai-naritai.html": {
+      "url": "https://www.mod.go.jp/pco/nagasaki/jieitai-naritai.html",
+      "scope": "shared"
+    },
+    "https://www.mod.go.jp/pco/nagasaki/madoguchi/recruit/index.html": {
+      "url": "https://www.mod.go.jp/pco/nagasaki/recruit/index.html",
+      "scope": "shared"
+    },
+    "https://www.mod.go.jp/pco/nagasaki/madoguchi/recruit/setsumeikai.html": {
+      "url": "https://www.mod.go.jp/pco/nagasaki/recruit/setsumeikai.html",
+      "scope": "shared"
+    },
+    "https://www.mod.go.jp/pco/tokyo/koutou/event.html": {
+      "url": "https://www.mod.go.jp/pco/tokyo/event2/index.html",
+      "scope": "shared",
+      "reason": "個別イベントページの403が残るため、現行の公式共通カレンダーへ巡回先を切替。原ページの復旧・個別時刻の取得成功を意味しない。"
+    }
+  }
+}
