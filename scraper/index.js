@@ -28,6 +28,8 @@ const cheerio   = require('cheerio');
 const assetCache  = require('./lib/assetCache');
 const { normalizeUrl, isAssetUrl, isPdfUrl } = require('./lib/normalizeUrl');
 const { sortByPriority } = require('./lib/priority');
+const { planOfficeAssets } = require('./lib/officeAssetQueue');
+const { readOfficeSnapshot } = require('./lib/officePageSnapshot');
 const { markDuplicates }  = require('./lib/dedup');
 const { extractAssets }   = require('./lib/extractAssets');
 const { findEventLinks }  = require('./lib/exploreLinks');
@@ -3326,6 +3328,7 @@ async function fetchToyama(context) {
  * @param {string} url
  */
 const officePageResponses = new Map();
+const officeAssetResults = new Map();
 const officeCrawlReport = { checkedAt: null, runId: process.env.GITHUB_RUN_ID || null, pages: [] };
 
 async function fetchPagePlaywright(ctx, url) {
@@ -3341,16 +3344,14 @@ async function fetchPagePlaywright(ctx, url) {
           || (request.isNavigationRequest() && request.frame() !== page.mainFrame())) return route.abort();
       return route.continue();
     });
-    const response = await page.goto(url, { waitUntil: 'load', timeout: 30_000 });
-    const status = response?.status() || 0;
-    const html = await page.content();
+    const { html, status, finalUrl } = await readOfficeSnapshot(page, url);
     const title = (html.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1] || '';
     if (status < 200 || status >= 400 || isChallengeTitle(title)) {
-      officePageResponses.set(normalized, { status, finalUrl: page.url(), error: `HTTP ${status}: ${title.slice(0, 80)}` });
+      officePageResponses.set(normalized, { status, finalUrl, error: `HTTP ${status}: ${title.slice(0, 80)}` });
       console.warn(`[OfficeHTML] 取得失敗 ${status}: ${url}`);
       return null;
     }
-    officePageResponses.set(normalized, { html, status, finalUrl: page.url() });
+    officePageResponses.set(normalized, { html, status, finalUrl });
     return cheerio.load(html);
   } catch (err) {
     officePageResponses.set(normalized, { error: err.message });
@@ -3391,9 +3392,9 @@ const KANTO_OFFICE_URLS = {
     'https://www.mod.go.jp/pco/gunma/bosyuannai/numata_sho/numata.html',
   ],
   tochigi: [
-    'https://www.mod.go.jp/pco/tochigi/jimusyo_mohka.html',
-    'https://www.mod.go.jp/pco/tochigi/jimusyo_oyama.html',
-    'https://www.mod.go.jp/pco/tochigi/jimusyo_ashikaga.html',
+    'https://www.mod.go.jp/pco/tochigi/contact.html',
+    'https://www.mod.go.jp/pco/tochigi/recruit.html',
+    'https://www.mod.go.jp/pco/tochigi/event.html',
   ],
   chiba: [
     'https://www.mod.go.jp/pco/chiba/map/itikawatop.html',
@@ -3689,14 +3690,17 @@ function wasRevisited(url) {
 
 async function ocrOfficeAssets(assets, meta, maxAssets = 2, outcomes = null, cutoffReached = () => false) {
   const events = [];
-  const sorted = sortByPriority(assets).filter(a => a.forceOcr || a.priority !== 'low').slice(0, maxAssets);
-  for (const asset of sorted) {
+  const plan = planOfficeAssets(assets, maxAssets, process.env.GITHUB_RUN_NUMBER);
+  for (const asset of plan.selected) {
     if (cutoffReached()) break;
-    let ocr = null;
-    try { ocr = await ocrFlyerFull(asset.url); }
+    const normalized = normalizeUrl(asset.url);
+    const reused = officeAssetResults.has(normalized);
+    let ocr = reused ? officeAssetResults.get(normalized) : null;
+    try { if (!reused) ocr = await ocrFlyerFull(asset.url); }
     catch (err) { console.warn(`[OfficeOCR] 資料取得・OCR失敗: ${asset.url} → ${err.message}`); }
-    if (outcomes) outcomes.push({ url: asset.url, status: ocr ? 'read' : 'no_result' });
-    await sleep(1500);
+    if (!reused) officeAssetResults.set(normalized, ocr);
+    if (outcomes) outcomes.push({ url: asset.url, status: ocr ? 'read' : 'no_result', reused });
+    if (!reused) await sleep(1500);
     if (ocr) markRevisited(asset.url); // 読めた＝今回の結果が正（読めなかったら前回を維持）
     const parsed = ocr ? parseOcrDate(ocr.date) : null;
     if (!parsed || isPast(parsed.dateStr)) continue;
@@ -3714,6 +3718,7 @@ async function ocrOfficeAssets(assets, meta, maxAssets = 2, outcomes = null, cut
       deadline: safeStr(ocr.deadline) || null,
     }));
   }
+  if (outcomes) { outcomes.eligible = plan.eligible; outcomes.ignored = plan.ignored; }
   return events;
 }
 
@@ -3762,7 +3767,7 @@ async function crawlNationwideOffices(withFreshContext, cutoff) {
     processAssets: async (assets, meta, limit, cutoffReached) => {
       const results = [];
       const events = await ocrOfficeAssets(assets, meta, KANTO_PREFS.has(meta.pref) ? Math.max(3, limit) : limit, results, cutoffReached);
-      return { events, results, deferred: Math.max(0, assets.length - results.length) };
+      return { events, results, deferred: Math.max(0, (results.eligible || 0) - results.length), ignored: results.ignored || 0 };
     },
   });
   officeCrawlReport.pages = result.pages;
@@ -5152,4 +5157,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { extractOfficeHtmlEvents, extractOfficeCandidateAssets, extractKantoOfficeCandidateAssets, loadRecruitmentOfficePages, fetchPagePlaywright };
+module.exports = { extractOfficeHtmlEvents, extractOfficeCandidateAssets, extractKantoOfficeCandidateAssets, loadRecruitmentOfficePages, fetchPagePlaywright, createStealthContext, ocrFlyerFull, hasAnyOcrEngine, getOfficePageResponse: url => officePageResponses.get(normalizeUrl(url)) };

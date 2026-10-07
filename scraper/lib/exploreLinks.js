@@ -2,6 +2,7 @@
 
 const { normalizeUrl, isPdfUrl, isImageUrl, isAssetUrl } = require('./normalizeUrl');
 const { isProcurementSource } = require('../../shared/procurement.cjs');
+const sourceRecovery = require('../config/office-source-recovery.json');
 
 // イベント・フライヤー系ページを示すキーワード（URLパス or リンクテキスト）
 const EVENT_URL_KW = /event|oshirase|news|topics|bosyu|chirashi|annai|setsumei|recruit|koho|kiji|post|saiyou|announce|info|schedule|calendar/i;
@@ -26,17 +27,25 @@ function findEventLinks($, pageUrl, visited = new Set()) {
   const seenAssets = new Set();
   const pages  = [];
   const assets = [];
+  let baseUrl = pageUrl;
+  try { baseUrl = new URL($('base[href]').first().attr('href') || pageUrl, pageUrl).href; } catch {}
 
   $('a[href]').each((_, el) => {
-    const href = $(el).attr('href') || '';
+    let href = $(el).attr('href') || '';
+    // Official pages sometimes omit the scheme on an absolute domain link.
+    if (/^www\.mod\.go\.jp\//i.test(href)) href = 'https://' + href;
     const text = $(el).text().replace(/\s+/g, ' ').trim();
-    const norm = normalizeUrl(href, pageUrl);
+    let norm = normalizeUrl(href, baseUrl);
     if (!norm) return;
     // Keep the directory slash for resolving relative links on the fetched page.
     let absolute;
-    try { const u = new URL(href, pageUrl); u.hash = ''; absolute = u.href; } catch { return; }
+    try { const u = new URL(href, baseUrl); u.hash = ''; absolute = u.href; } catch { return; }
+    const originalUrl = absolute;
+    const replacement = Object.entries(sourceRecovery.aliases).find(([url]) => normalizeUrl(url) === norm)?.[1];
+    if (replacement) { absolute = replacement.url; norm = normalizeUrl(absolute); }
     if (isProcurementSource({ url: norm, text })) return;
-    if (!norm.includes('mod.go.jp/pco')) return;
+    const target = new URL(absolute);
+    if (target.protocol !== 'https:' || target.hostname !== 'www.mod.go.jp' || !target.pathname.startsWith('/pco/')) return;
     if (visited.has(norm)) return;
 
     // PDF/画像リンク → assets として直接OCR対象にする
@@ -59,7 +68,8 @@ function findEventLinks($, pageUrl, visited = new Set()) {
     if (SKIP_URL_KW.test(norm)) return;
     if (!EVENT_URL_KW.test(norm) && !EVENT_TXT_KW.test(text)) return;
     seenPages.add(norm);
-    pages.push({ url: absolute, normalized: norm, text: text.slice(0, 80) });
+    pages.push({ url: absolute, normalized: norm, text: text.slice(0, 80),
+      ...(replacement ? { remappedFrom: originalUrl, scope: replacement.scope } : {}) });
   });
 
   return { pages, assets };

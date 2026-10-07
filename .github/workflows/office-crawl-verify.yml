@@ -1,0 +1,56 @@
+name: 募集窓口の取得修正を再確認
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'scraper/config/office-source-recovery.json'
+      - 'scripts/verify-office-crawl.cjs'
+      - '.github/workflows/office-crawl-verify.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: office-crawl-verification
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: npm ci
+        working-directory: scraper
+      - run: python -m pip install -r scraper/requirements-ocr.txt
+      - uses: actions/cache/restore@v5
+        with:
+          path: scraper/ocr-cache.json
+          key: office-verify-${{ github.run_id }}
+          restore-keys: |
+            ocr-cache-${{ runner.os }}-
+      - run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-jpn poppler-utils
+      - run: npx playwright install chromium --with-deps
+        working-directory: scraper
+      - name: HTML・OCRの限定再確認（イベント保存・通知なし）
+        run: node scripts/verify-office-crawl.cjs
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          OCR_SPACE_API_KEY: ${{ secrets.OCR_SPACE_API_KEY }}
+      - uses: actions/cache/save@v5
+        if: always()
+        with:
+          path: scraper/ocr-cache.json
+          key: ocr-cache-${{ runner.os }}-${{ github.run_id }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: office-crawl-verification-${{ github.run_id }}
+          path: scraper/office-crawl-verification.json
+          retention-days: 14

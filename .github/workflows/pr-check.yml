@@ -42,7 +42,7 @@ jobs:
         run: node --check scraper/index.js
 
       - name: 実HTMLパーサー回帰テスト
-        run: node --test shared/yamanashiParser.test.cjs shared/hyogoParser.test.cjs shared/hokkaidoHyogoRegression.test.cjs shared/tokyoCalendar.test.cjs shared/procurement.test.cjs shared/officeCrawl.test.cjs shared/officeCrawlHtml.test.cjs
+        run: node --test shared/yamanashiParser.test.cjs shared/hyogoParser.test.cjs shared/hokkaidoHyogoRegression.test.cjs shared/tokyoCalendar.test.cjs shared/procurement.test.cjs shared/officeCrawl.test.cjs shared/officeCrawlHtml.test.cjs shared/officeCrawlRecovery.test.cjs
 
       - name: ビルド
         run: npm run build

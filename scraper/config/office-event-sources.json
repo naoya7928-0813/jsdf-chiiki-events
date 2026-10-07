@@ -1,6 +1,6 @@
 {
-  "checkedAt": "2026-10-06",
-  "note": "追加窓口59件（徳島の先行反映2件を含む）のイベントHTML巡回先。sharedは地本共通掲載ページで、窓口独自のイベント掲載を意味しない。全URLは公式HTMLを取得して確認。",
+  "checkedAt": "2026-10-07",
+  "note": "公式イベントHTML巡回先（追加窓口と既存窓口を含む）。sharedは地本共通掲載ページで、窓口独自のイベント掲載を意味しない。担当区域の監査完了を意味しない。",
   "offices": [
     {
       "id": "loc-hakodate-audit-494d73a9a5",
@@ -1318,6 +1318,177 @@
           "verifiedAt": "2026-10-06",
           "fetchedAt": "2026-10-06",
           "evidenceKey": "event-extra-chiba-seminar"
+        }
+      ]
+    },
+    {
+      "id": "loc-tochigi-48",
+      "pref": "tochigi",
+      "name": "小山地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/tochigi/contact.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/tochigi/recruit.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-07",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "tochigi"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/tochigi/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-07",
+          "fetchedAt": "2026-10-07",
+          "evidenceKey": "recheck-20261007-tochigi-events"
+        }
+      ]
+    },
+    {
+      "id": "loc-tochigi-49",
+      "pref": "tochigi",
+      "name": "真岡募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/tochigi/contact.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/tochigi/recruit.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-07",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "tochigi"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/tochigi/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-07",
+          "fetchedAt": "2026-10-07",
+          "evidenceKey": "recheck-20261007-tochigi-events"
+        }
+      ]
+    },
+    {
+      "id": "loc-tochigi-50",
+      "pref": "tochigi",
+      "name": "足利地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/tochigi/contact.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/tochigi/recruit.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-07",
+          "fetchedAt": "2026-10-04",
+          "evidenceKey": "tochigi"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/tochigi/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-07",
+          "fetchedAt": "2026-10-07",
+          "evidenceKey": "recheck-20261007-tochigi-events"
+        }
+      ]
+    },
+    {
+      "id": "loc-miyagi-r135",
+      "pref": "miyagi",
+      "name": "仙台募集案内所",
+      "contactUrl": "https://www.mod.go.jp/pco/miyagi/miyagitop/office.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/miyagi/miyagitop/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-07",
+          "fetchedAt": "2026-10-07",
+          "evidenceKey": "recheck-20261007-miyagi-events"
+        }
+      ]
+    },
+    {
+      "id": "loc-miyagi-r136",
+      "pref": "miyagi",
+      "name": "名取地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/miyagi/",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/miyagi/miyagitop/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-07",
+          "fetchedAt": "2026-10-07",
+          "evidenceKey": "recheck-20261007-miyagi-events"
+        }
+      ]
+    },
+    {
+      "id": "loc-miyagi-r137",
+      "pref": "miyagi",
+      "name": "大河原地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/miyagi/",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/miyagi/miyagitop/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-07",
+          "fetchedAt": "2026-10-07",
+          "evidenceKey": "recheck-20261007-miyagi-events"
+        }
+      ]
+    },
+    {
+      "id": "loc-miyagi-r138",
+      "pref": "miyagi",
+      "name": "大崎地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/miyagi/",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/miyagi/miyagitop/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-07",
+          "fetchedAt": "2026-10-07",
+          "evidenceKey": "recheck-20261007-miyagi-events"
+        }
+      ]
+    },
+    {
+      "id": "loc-miyagi-r139",
+      "pref": "miyagi",
+      "name": "石巻地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/miyagi/",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/miyagi/miyagitop/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-07",
+          "fetchedAt": "2026-10-07",
+          "evidenceKey": "recheck-20261007-miyagi-events"
+        }
+      ]
+    },
+    {
+      "id": "loc-miyagi-r140",
+      "pref": "miyagi",
+      "name": "栗原地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/miyagi/miyagitop/office.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/miyagi/miyagitop/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-07",
+          "fetchedAt": "2026-10-07",
+          "evidenceKey": "recheck-20261007-miyagi-events"
+        }
+      ]
+    },
+    {
+      "id": "loc-miyagi-r141",
+      "pref": "miyagi",
+      "name": "登米地域事務所",
+      "contactUrl": "https://www.mod.go.jp/pco/miyagi/miyagitop/office.html",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/miyagi/miyagitop/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-07",
+          "fetchedAt": "2026-10-07",
+          "evidenceKey": "recheck-20261007-miyagi-events"
         }
       ]
     }

@@ -63,7 +63,7 @@ async function crawlOfficePages({ pages, fetchPage, extractHtml, collectAssets, 
     const key = `${meta.pref}|${meta.normalized}`;
     if (seen.has(key)) return seen.get(key);
     const row = { pref: meta.pref, url: meta.url, officeIds: meta.officeIds || [], officeNames: meta.officeNames || [],
-      scope: meta.scope, parentUrl, status: 'not_visited', reason: '', htmlEvents: 0,
+      scope: meta.scope, parentUrl, remappedFrom: meta.remappedFrom || null, status: 'not_visited', reason: '', htmlEvents: 0,
       ocr: { status: 'not_attempted', candidates: 0, results: [] } };
     rows.push(row); seen.set(key, row); onRows(rows);
     if (cutoffReached()) { row.reason = 'cutoff'; return row; }
@@ -80,11 +80,12 @@ async function crawlOfficePages({ pages, fetchPage, extractHtml, collectAssets, 
     if (!result?.document) { row.status = 'fetch_failed'; row.reason = result?.error || 'empty_response'; return row; }
     row.status = 'fetched'; documents.set(key, result.document); markRevisited(meta.url);
     // A prefecture-wide listing must not invent all its offices as the venue.
+    const sourceUrl = isOfficialHtml(row.finalUrl) ? row.finalUrl : meta.url;
     const eventMeta = meta.scope === 'shared' ? { ...meta, officeNames: [] } : meta;
-    const extracted = extractHtml(result.document, meta.url, eventMeta);
+    const extracted = extractHtml(result.document, sourceUrl, eventMeta);
     row.htmlEvents = extracted.length; events.push(...extracted);
     if (meta.pref === 'hyogo') { row.ocr.status = 'not_attempted'; row.ocr.reason = 'document_only'; return row; }
-    const assets = collectAssets(result.document, meta.url);
+    const assets = collectAssets(result.document, sourceUrl);
     row.ocr.candidates = assets.length;
     if (!ocrReady) row.ocr.status = 'engine_unavailable';
     else if (!assets.length) row.ocr.status = 'no_candidates';
@@ -92,8 +93,8 @@ async function crawlOfficePages({ pages, fetchPage, extractHtml, collectAssets, 
     else {
       row.ocr.status = 'processed';
       const output = await processAssets(assets, eventMeta, maxAssets, cutoffReached);
-      row.ocr.results = output.results; row.ocr.deferred = output.deferred || 0;
-      if (!output.results.length) row.ocr.status = 'not_attempted';
+      row.ocr.results = output.results; row.ocr.deferred = output.deferred || 0; row.ocr.ignored = output.ignored || 0;
+      if (!output.results.length) row.ocr.status = output.ignored === assets.length ? 'no_candidates' : 'not_attempted';
       events.push(...output.events);
     }
     return row;
@@ -101,14 +102,15 @@ async function crawlOfficePages({ pages, fetchPage, extractHtml, collectAssets, 
   for (const meta of pages) {
     const row = await visit(meta);
     if (row.status !== 'fetched' || meta.pref === 'hyogo' || cutoffReached()) continue;
-    const subs = findSubPages(documents.get(`${meta.pref}|${meta.normalized}`), meta.url);
+    const subs = findSubPages(documents.get(`${meta.pref}|${meta.normalized}`), isOfficialHtml(row.finalUrl) ? row.finalUrl : meta.url);
     let n = 0;
     for (const sub of subs) {
       if (!isOfficialHtml(sub.url)) continue;
       const normalized = normalizeUrl(sub.url); const key = `${meta.pref}|${normalized}`;
       if (seen.has(key) || scheduled.has(key)) continue;
       if (n++ >= maxSubPages) break;
-      await visit({ ...meta, url: sub.url, normalized }, meta.url);
+      await visit({ ...meta, url: sub.url, normalized, scope: sub.scope || meta.scope,
+        remappedFrom: sub.remappedFrom || null }, meta.url);
     }
   }
   return { events, pages: rows };
