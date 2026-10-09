@@ -1,55 +1,7 @@
 {
   "updatedAt": "2026-10-09",
-  "count": 5,
+  "count": 4,
   "events": [
-    {
-      "id": "fu-off-20261009-l4lhz",
-      "pref": "fukushima",
-      "date": "2026-10-09",
-      "endDate": "",
-      "title": "自衛隊福島地方協力本部",
-      "place": "",
-      "url": "https://www.mod.go.jp/pco/fukushima/d_result/081009.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-09",
-      "reason": ""
-    },
-    {
-      "id": "fu-off-20261009-l4lhz",
-      "pref": "fukushima",
-      "date": "2026-10-09",
-      "endDate": "",
-      "title": "自衛隊福島地方協力本部",
-      "place": "",
-      "url": "https://www.mod.go.jp/pco/fukushima/d_result/081009.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-09",
-      "reason": ""
-    },
-    {
-      "id": "fu-off-20261009-l4lhz",
-      "pref": "fukushima",
-      "date": "2026-10-09",
-      "endDate": "",
-      "title": "自衛隊福島地方協力本部",
-      "place": "",
-      "url": "https://www.mod.go.jp/pco/fukushima/d_result/081009.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-09",
-      "reason": ""
-    },
-    {
-      "id": "ni-off-20270101-19282",
-      "pref": "niigata",
-      "date": "2027-01-01",
-      "endDate": "",
-      "title": "陸海空自衛官",
-      "place": "調機の充足完了及び空調が整備されていない駐屯地",
-      "url": "https://www.mod.go.jp/pco/niigata/files/top/fukurikousei-kaizen.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-09",
-      "reason": "非イベント文書の疑い"
-    },
     {
       "id": "ai-office-20280620-ghetd",
       "pref": "aichi",
@@ -61,6 +13,42 @@
       "source_type": "office_ocr",
       "quarantinedAt": "2026-10-09",
       "reason": "OCR由来の不自然な未来日"
+    },
+    {
+      "id": "fu-office-20261009-hw1m6",
+      "pref": "fukuoka",
+      "date": "2026-10-09",
+      "endDate": "",
+      "title": "自衛隧福网地方協力本部",
+      "place": "",
+      "url": "https://www.mod.go.jp/pco/fukuoka/recruit/results/images/2024/8.10.9kougakuM.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-10-09",
+      "reason": ""
+    },
+    {
+      "id": "fu-off-20261009-qaivx",
+      "pref": "fukuoka",
+      "date": "2026-10-09",
+      "endDate": "",
+      "title": "自衛隧福网地方協力本部",
+      "place": "",
+      "url": "https://www.mod.go.jp/pco/fukuoka/recruit/results/images/2024/8.10.9kougakuM.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-10-09",
+      "reason": ""
+    },
+    {
+      "id": "fu-off-20261009-qaivx",
+      "pref": "fukuoka",
+      "date": "2026-10-09",
+      "endDate": "",
+      "title": "自衛隧福网地方協力本部",
+      "place": "",
+      "url": "https://www.mod.go.jp/pco/fukuoka/recruit/results/images/2024/8.10.9kougakuA.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-10-09",
+      "reason": ""
     }
   ]
 }
