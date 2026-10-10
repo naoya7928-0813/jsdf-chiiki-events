@@ -11,6 +11,12 @@
  */
 export const UPDATE_NOTES = [
   {
+    date:    '2026-10-10',
+    version: '1.40.26',
+    type:    'feature',
+    content: '募集窓口を追加し、住所・連絡先と公式サイトの巡回を更新。',
+  },
+  {
     date:    '2026-10-07',
     version: '1.39.26',
     type:    'fix',

@@ -50,6 +50,20 @@ for (const pref of expectedPrefs) {
   if (actual.join('\n') !== expected.join('\n')) errors.push(`${pref}: inventory differs from reviewed snapshot`);
 }
 const byId = new Map(offices.map(o => [o.id, o]));
+const contactReview = JSON.parse(fs.readFileSync(path.join(root, 'docs/office-contact-review-20261010.json'), 'utf8'));
+const registry = JSON.parse(fs.readFileSync(path.join(root, 'scraper/config/office-event-sources.json'), 'utf8'));
+for (const record of contactReview.updates) {
+  const office = byId.get(record.id);
+  if (!office) { errors.push(`Missing reviewed office: ${record.id}`); continue; }
+  for (const field of record.verifiedFields) {
+    if (!record.values[field] || office[field] !== record.values[field]) errors.push(`${record.id}: differs from reviewed ${field}`);
+  }
+  for (const field of ['lat', 'lng']) {
+    if (office[field] !== Math.round(record.coordinates[field] * 1e6) / 1e6) errors.push(`${record.id}: differs from reviewed ${field}`);
+  }
+  if (!/^https:\/\/www\.mod\.go\.jp\/pco\//.test(record.sourceUrl)) errors.push(`${record.id}: missing official source`);
+  if (record.added && !registry.offices.some(o => o.id === record.id && o.pages.length)) errors.push(`${record.id}: added office is not configured for crawling`);
+}
 const byName = new Map(offices.filter(o => o.type === 'recruitment').map(o => [`${o.pref}|${o.name}`, o]));
 for (const record of audit.confirmedUpdates) {
   const office = byName.get(`${record.pref}|${record.name}`);
@@ -73,6 +87,6 @@ if (errors.length) {
   process.exitCode = 1;
 } else {
   console.log(`Office inventory OK: ${count} recruitment offices, ${headquarters.size} PCOs; ${audit.confirmedUpdates.length} confirmed records checked.`);
-  console.log(`Official audit remains incomplete: ${audit.pending.length} records pending; only confirmed changes are included in this partial release.`);
+  console.log(`Contact review: ${contactReview.updates.length} records checked; ${audit.pending.length} published contacts still need area/other field review.`);
   console.log(`Pre-existing missing addresses retained: ${offices.filter(o => o.type === "recruitment" && !o.address?.trim()).length}.`);
 }

@@ -37,6 +37,7 @@ function findEventLinks($, pageUrl, visited = new Set()) {
     const text = $(el).text().replace(/\s+/g, ' ').trim();
     let norm = normalizeUrl(href, baseUrl);
     if (!norm) return;
+    if ((sourceRecovery.excludedUrls || []).some(entry => normalizeUrl(entry.url) === norm)) return;
     // Keep the directory slash for resolving relative links on the fetched page.
     let absolute;
     try { const u = new URL(href, baseUrl); u.hash = ''; absolute = u.href; } catch { return; }

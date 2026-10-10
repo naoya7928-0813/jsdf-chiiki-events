@@ -3,6 +3,14 @@ const test = require('node:test'); const assert = require('node:assert/strict');
 const { planOfficeAssets } = require('../scraper/lib/officeAssetQueue');
 let cheerio; try { cheerio=require('../scraper/node_modules/cheerio'); } catch {}
 const { readOfficeSnapshot, decodeHtml } = require('../scraper/lib/officePageSnapshot');
+test('廃止された先輩紹介リンクを除外し、十三の説明会は現行共通一覧を巡回する', { skip: !cheerio }, () => {
+  const { findEventLinks } = require('../scraper/lib/exploreLinks');
+  const $ = cheerio.load('<a href="https://www.mod.go.jp/pco/shimane/recruit/senior.html">先輩自衛官</a><a href="https://www.mod.go.jp/pco/osaka/recruit/session/jyuso.html">十三説明会</a>');
+  const { pages } = findEventLinks($, 'https://www.mod.go.jp/pco/osaka/');
+  assert.equal(pages.length, 1);
+  assert.equal(pages[0].url, 'https://www.mod.go.jp/pco/osaka/recruit/session/menu.html');
+  assert.equal(pages[0].scope, 'shared');
+});
 test('限られたOCR枠でも後続資料を巡回し、低優先の除外資料を未処理候補へ数えない', () => {
   const assets = Array.from({length: 7}, (_,i) => ({url:`https://www.mod.go.jp/pco/test/event${i}.pdf`, normalized:'event',type:'pdf',linkText:'説明会',sourcePageUrl:'event'}));
   assets.push({url:'https://www.mod.go.jp/pco/test/past.pdf',normalized:'past',type:'pdf',linkText:'過去のイベント',sourcePageUrl:'event'});

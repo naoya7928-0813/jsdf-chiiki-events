@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-07",
+  "checkedAt": "2026-10-10",
   "note": "公式イベントHTML巡回先（追加窓口と既存窓口を含む）。sharedは地本共通掲載ページで、窓口独自のイベント掲載を意味しない。担当区域の監査完了を意味しない。",
   "offices": [
     {
@@ -1406,7 +1406,7 @@
       "id": "loc-miyagi-r136",
       "pref": "miyagi",
       "name": "名取地域事務所",
-      "contactUrl": "https://www.mod.go.jp/pco/miyagi/",
+      "contactUrl": "https://www.mod.go.jp/pco/miyagi/miyagitop/office.html",
       "pages": [
         {
           "url": "https://www.mod.go.jp/pco/miyagi/miyagitop/event.html",
@@ -1421,7 +1421,7 @@
       "id": "loc-miyagi-r137",
       "pref": "miyagi",
       "name": "大河原地域事務所",
-      "contactUrl": "https://www.mod.go.jp/pco/miyagi/",
+      "contactUrl": "https://www.mod.go.jp/pco/miyagi/miyagitop/office.html",
       "pages": [
         {
           "url": "https://www.mod.go.jp/pco/miyagi/miyagitop/event.html",
@@ -1436,7 +1436,7 @@
       "id": "loc-miyagi-r138",
       "pref": "miyagi",
       "name": "大崎地域事務所",
-      "contactUrl": "https://www.mod.go.jp/pco/miyagi/",
+      "contactUrl": "https://www.mod.go.jp/pco/miyagi/miyagitop/office.html",
       "pages": [
         {
           "url": "https://www.mod.go.jp/pco/miyagi/miyagitop/event.html",
@@ -1451,7 +1451,7 @@
       "id": "loc-miyagi-r139",
       "pref": "miyagi",
       "name": "石巻地域事務所",
-      "contactUrl": "https://www.mod.go.jp/pco/miyagi/",
+      "contactUrl": "https://www.mod.go.jp/pco/miyagi/miyagitop/office.html",
       "pages": [
         {
           "url": "https://www.mod.go.jp/pco/miyagi/miyagitop/event.html",
@@ -1491,6 +1491,512 @@
           "evidenceKey": "recheck-20261007-miyagi-events"
         }
       ]
+    },
+    {
+      "id": "loc-obihiro-audit-892d3a350d",
+      "pref": "obihiro",
+      "name": "帯広募集案内所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/obihiro/info_contact.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-4647b7947a"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/obihiro/topics_event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-5b8fc0bb1d"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/obihiro/info_contact.html"
+    },
+    {
+      "id": "loc-iwate-6",
+      "pref": "iwate",
+      "name": "二戸地域事務所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/iwate/iwatechihon/",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-b1a03343bf"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/iwate/event/index.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-3cbf959e05"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/iwate/iwatechihon/"
+    },
+    {
+      "id": "loc-miyagi-audit-6bb04c813f",
+      "pref": "miyagi",
+      "name": "仙台駅東口募集案内所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/miyagi/miyagitop/office.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-f73bad4537"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/miyagi/miyagitop/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-03a491bfdc"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/miyagi/miyagitop/office.html"
+    },
+    {
+      "id": "loc-miyazaki-r276",
+      "pref": "miyazaki",
+      "name": "宮崎募集案内所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/miyazaki/office.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-fd13d8acaf"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/miyazaki/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-28a6026df3"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/miyazaki/office.html"
+    },
+    {
+      "id": "loc-miyazaki-r277",
+      "pref": "miyazaki",
+      "name": "都城地域事務所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/miyazaki/office.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-fd13d8acaf"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/miyazaki/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-28a6026df3"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/miyazaki/office.html"
+    },
+    {
+      "id": "loc-miyazaki-r278",
+      "pref": "miyazaki",
+      "name": "延岡出張所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/miyazaki/office.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-fd13d8acaf"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/miyazaki/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-28a6026df3"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/miyazaki/office.html"
+    },
+    {
+      "id": "loc-miyazaki-audit-fa260b307c",
+      "pref": "miyazaki",
+      "name": "日向地域事務所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/miyazaki/office.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-fd13d8acaf"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/miyazaki/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-28a6026df3"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/miyazaki/office.html"
+    },
+    {
+      "id": "loc-miyazaki-audit-b797b60214",
+      "pref": "miyazaki",
+      "name": "新田原分駐所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/miyazaki/office.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-fd13d8acaf"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/miyazaki/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-28a6026df3"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/miyazaki/office.html"
+    },
+    {
+      "id": "loc-miyazaki-audit-966a771415",
+      "pref": "miyazaki",
+      "name": "小林地域事務所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/miyazaki/office.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-fd13d8acaf"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/miyazaki/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-28a6026df3"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/miyazaki/office.html"
+    },
+    {
+      "id": "loc-miyazaki-audit-1ab5297e89",
+      "pref": "miyazaki",
+      "name": "高千穂連絡所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/miyazaki/office.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-fd13d8acaf"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/miyazaki/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-28a6026df3"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/miyazaki/office.html"
+    },
+    {
+      "id": "loc-osaka-r193",
+      "pref": "osaka",
+      "name": "高槻地域事務所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/osaka/about/office/takatsuki.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-e9cac038bc"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/osaka/recruit/session/menu.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-63fbf74979"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/osaka/about/office/takatsuki.html"
+    },
+    {
+      "id": "loc-saitama-audit-59b9b1a151",
+      "pref": "saitama",
+      "name": "秩父地域事務所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/saitama/office/chichibu-office.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-737d7b882e"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/saitama/event/",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-e66c86afb7"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/saitama/office/chichibu-office.html"
+    },
+    {
+      "id": "loc-saitama-audit-a1c6bf2ef4",
+      "pref": "saitama",
+      "name": "大宮分駐所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/saitama/office/saitama-office.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-824fe8198d"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/saitama/event/",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-e66c86afb7"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/saitama/office/saitama-office.html"
+    },
+    {
+      "id": "loc-saitama-audit-d5a422cb05",
+      "pref": "saitama",
+      "name": "入間分駐所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/saitama/office/iruma-office.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-630589b28f"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/saitama/event/",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-e66c86afb7"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/saitama/office/iruma-office.html"
+    },
+    {
+      "id": "loc-saitama-audit-e0eb594e85",
+      "pref": "saitama",
+      "name": "熊谷分駐所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/saitama/office/kumagaya-office.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-df531b2c95"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/saitama/event/",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-e66c86afb7"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/saitama/office/kumagaya-office.html"
+    },
+    {
+      "id": "loc-tottori-audit-2f44285cd3",
+      "pref": "tottori",
+      "name": "鳥取募集案内所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/tottori/content/jimusyo/toubusyo.html",
+          "scope": "office",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-2caca6479d"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/tottori/content/02-event/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-8d5e4fce52"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/tottori/content/jimusyo/toubusyo.html"
+    },
+    {
+      "id": "loc-okinawa-r281",
+      "pref": "okinawa",
+      "name": "沖縄募集案内所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/okinawa/about.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-f367b68794"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/okinawa/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-aa085f8fcf"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/okinawa/about.html"
+    },
+    {
+      "id": "loc-okinawa-audit-53ac1fdb2e",
+      "pref": "okinawa",
+      "name": "島尻募集案内所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/okinawa/about.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-f367b68794"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/okinawa/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-aa085f8fcf"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/okinawa/about.html"
+    },
+    {
+      "id": "loc-okinawa-r283",
+      "pref": "okinawa",
+      "name": "宮古島出張所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/okinawa/about.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-f367b68794"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/okinawa/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-aa085f8fcf"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/okinawa/about.html"
+    },
+    {
+      "id": "loc-okinawa-r284",
+      "pref": "okinawa",
+      "name": "石垣出張所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/okinawa/about.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-f367b68794"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/okinawa/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-aa085f8fcf"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/okinawa/about.html"
+    },
+    {
+      "id": "loc-okinawa-r282",
+      "pref": "okinawa",
+      "name": "名護地域事務所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/okinawa/about.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-f367b68794"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/okinawa/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-aa085f8fcf"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/okinawa/about.html"
+    },
+    {
+      "id": "loc-okinawa-r280",
+      "pref": "okinawa",
+      "name": "那覇募集案内所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/okinawa/about.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-f367b68794"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/okinawa/event.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-aa085f8fcf"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/okinawa/about.html"
+    },
+    {
+      "id": "loc-aichi-audit-68bc0cd25d",
+      "pref": "aichi",
+      "name": "名古屋南募集案内所",
+      "pages": [
+        {
+          "url": "https://www.mod.go.jp/pco/aichi/contact/kanayama/sho-kanayama.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-6f5370cc42"
+        },
+        {
+          "url": "https://www.mod.go.jp/pco/aichi/calendar.html",
+          "scope": "shared",
+          "verifiedAt": "2026-10-10",
+          "fetchedAt": "2026-10-10",
+          "evidenceKey": "contact-review-20261010-ebe35656dd"
+        }
+      ],
+      "contactUrl": "https://www.mod.go.jp/pco/aichi/contact/kanayama/sho-kanayama.html"
     }
   ]
 }

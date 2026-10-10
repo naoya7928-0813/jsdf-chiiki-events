@@ -7,9 +7,13 @@ const { fetchPagePlaywright, createStealthContext, extractOfficeCandidateAssets,
   ocrFlyerFull, hasAnyOcrEngine, getOfficePageResponse } = require('../scraper/index');
 const { planOfficeAssets } = require('../scraper/lib/officeAssetQueue');
 const policy = require('../scraper/config/office-source-recovery.json');
+const contactReview = require('../docs/office-contact-review-20261010.json');
+const registry = require('../scraper/config/office-event-sources.json');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function main() {
   const urls = [...new Set([...Object.values(policy.aliases).map(x => x.url),
+    ...registry.offices.filter(o => contactReview.updates.some(r => r.id === o.id && r.added))
+      .flatMap(o => o.pages.map(p => p.url)),
     'https://www.mod.go.jp/pco/tochigi/contact.html',
     'https://www.mod.go.jp/pco/tochigi/recruit.html',
     'https://www.mod.go.jp/pco/tochigi/event.html',
@@ -52,7 +56,7 @@ async function main() {
     require('../scraper/lib/assetCache').save();
     const audit = JSON.parse(fs.readFileSync(path.join(root,'docs/office-audit-20261004.json'),'utf8'));
     const text = `HTML取得 ${fetched}/${urls.length} URL、OCR読取結果あり ${report.ocr.filter(p=>p.status==='read').length}/${report.ocr.length} 資料（上限2）。\n`+
-      `全国の項目照合は未完了: 未確定候補 ${audit.pending.length}件、既存不足 ${audit.remainingFieldGaps.length}件。\n`+
+      `全国の項目照合は未完了: 担当区域等の確認保留 ${audit.pending.length}件、項目不足 ${audit.remainingFieldGaps.length}件。\n`+
       `取得失敗: ${report.pages.filter(p=>p.status==='fetch_failed').map(p=>p.url).join('、') || 'なし'}\n`;
     console.log(text);
     if(process.env.GITHUB_STEP_SUMMARY)fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,text);
