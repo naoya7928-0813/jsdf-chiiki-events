@@ -1,6 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import officeCrawl from '../scraper/lib/officeCrawl.js';
+import sourceMonitor from '../scraper/check-source-updates.js';
 
 // Offline inventory validation: never contacts PCO websites.
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -52,6 +54,7 @@ for (const pref of expectedPrefs) {
 const byId = new Map(offices.map(o => [o.id, o]));
 const followup = JSON.parse(fs.readFileSync(path.join(root, 'docs/office-field-followup-20261010.json'), 'utf8'));
 const reviewedIds = new Set();
+const unresolved = (office, field) => !office[field]?.trim() || (field === 'area' && office[field] === '要確認');
 for (const record of followup.records) {
   const office = byId.get(record.id);
   if (!office || reviewedIds.has(record.id)) { errors.push(`Invalid follow-up office: ${record.id}`); continue; }
@@ -60,14 +63,34 @@ for (const record of followup.records) {
   for (const [field, value] of Object.entries(record.values)) {
     if (office[field] !== value) errors.push(`${record.id}: differs from follow-up ${field}`);
   }
-  const missing = ['address', 'tel', 'area'].filter(field => !office[field]?.trim());
+  for (const [field, value] of Object.entries(record.displayValues || {})) {
+    if (office[field] !== value) errors.push(`${record.id}: differs from follow-up display ${field}`);
+  }
+  const missing = ['address', 'tel', 'area'].filter(field => unresolved(office, field));
   if (missing.join() !== record.remainingFields.join()) errors.push(`${record.id}: stale follow-up remaining fields`);
 }
-const remaining = offices.filter(o => o.type === 'recruitment' && ['address', 'tel', 'area'].some(field => !o[field]?.trim()));
+const remaining = offices.filter(o => o.type === 'recruitment' && ['address', 'tel', 'area'].some(field => unresolved(o, field)));
 if (followup.records.length !== followup.beforeCount || remaining.length !== followup.remainingCount ||
     followup.records.filter(r => r.status === 'confirmed').length !== followup.confirmedCount) errors.push('Follow-up counts are inconsistent');
 const contactReview = JSON.parse(fs.readFileSync(path.join(root, 'docs/office-contact-review-20261010.json'), 'utf8'));
 const registry = JSON.parse(fs.readFileSync(path.join(root, 'scraper/config/office-event-sources.json'), 'utf8'));
+const crawlPlan = officeCrawl.buildOfficePages(offices, registry.offices);
+const monitoredUrls = new Set(sourceMonitor.loadSources().map(source => source.normalizedUrl));
+const partialRecords = followup.additionalPartialReview || [];
+for (const record of partialRecords) {
+  if (byId.get(record.id)?.[record.field] !== record.displayValue) errors.push(`${record.id}: partial confirmation display differs`);
+}
+for (const office of [...remaining, ...partialRecords.map(record => byId.get(record.id)).filter(Boolean)]) {
+  const pages = crawlPlan.filter(page => page.officeIds.includes(office.id));
+  if (!pages.length) errors.push(`${office.id}: unresolved office missing from crawl plan`);
+  for (const page of pages) {
+    const url = new URL(page.url); url.hash = '';
+    if (!monitoredUrls.has(url.href)) errors.push(`${office.id}: crawl source missing from weekly monitor: ${url.href}`);
+  }
+  if (office.area === '要確認' && !registry.offices.some(entry => entry.id === office.id && entry.pages.length)) {
+    errors.push(`${office.id}: unresolved area office missing explicit crawl sources`);
+  }
+}
 for (const record of contactReview.updates) {
   const office = byId.get(record.id);
   if (!office) { errors.push(`Missing reviewed office: ${record.id}`); continue; }
@@ -104,6 +127,7 @@ if (errors.length) {
 } else {
   console.log(`Office inventory OK: ${count} recruitment offices, ${headquarters.size} PCOs; ${audit.confirmedUpdates.length} confirmed records checked.`);
   console.log(`Contact review: ${contactReview.updates.length} records checked; ${audit.pending.length} published contacts still need area/other field review.`);
-  console.log(`Field follow-up: ${followup.beforeCount} reviewed, ${followup.confirmedCount} resolved, ${followup.remainingCount} with remaining blank fields; partial area evidence is tracked separately.`);
+  console.log(`Field follow-up: ${followup.beforeCount} reviewed, ${followup.confirmedCount} resolved, ${followup.remainingCount} with unresolved fields; partial area evidence is tracked separately.`);
+  console.log(`Unresolved offices: ${remaining.length} plus ${partialRecords.length} partial area record included in crawl plan and weekly monitoring.`);
   console.log(`Pre-existing missing addresses retained: ${offices.filter(o => o.type === "recruitment" && !o.address?.trim()).length}.`);
 }

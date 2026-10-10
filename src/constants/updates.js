@@ -12,6 +12,12 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-10-10',
+    version: '1.40.28',
+    type:    'improvement',
+    content: '募集窓口情報の表示を調整。',
+  },
+  {
+    date:    '2026-10-10',
     version: '1.40.27',
     type:    'fix',
     content: '募集窓口情報の修正。',

@@ -115,10 +115,11 @@ function officeSection(prefKey, prefLabel) {
   const rec = list.filter(o => o.type !== 'hq')
     .sort((a, b) => String(a.name).localeCompare(String(b.name), 'ja'));
   const row = (o) => {
-    const tel = o.tel ? `　TEL: <a href="tel:${esc(String(o.tel).replace(/[^\d+-]/g, ''))}">${esc(o.tel)}</a>` : '';
+    const tel = o.tel ? `　TEL: <a href="tel:${esc(String(o.tel).replace(/[^\d+-]/g, ''))}">${esc(o.tel)}</a>` : '　TEL: 不明';
+    const areaNote = o.area?.includes('要確認') ? `<br />担当範囲: ${esc(o.area)}` : '';
     const link = o.url && /^https?:\/\//.test(o.url) && o.hasOfficialPage !== false
       ? `　<a href="${esc(o.url)}" target="_blank" rel="noopener noreferrer">公式ページ</a>` : '';
-    return `    <li><strong>${esc(o.name)}</strong>${o.address ? `<br />${esc(o.address)}` : ''}${tel}${link}</li>`;
+    return `    <li><strong>${esc(o.name)}</strong>${o.address ? `<br />${esc(o.address)}` : ''}${tel}${link}${areaNote}</li>`;
   };
   return `  <h2>${esc(prefLabel)}の自衛隊 募集案内所・地域事務所</h2>
   <p class="meta">イベントの申込方法の確認や自衛官採用の相談は、最寄りの募集案内所・地域事務所でも受け付けています（受付時間等は各所へお問い合わせください）。</p>

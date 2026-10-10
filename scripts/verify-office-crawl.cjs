@@ -9,9 +9,17 @@ const { planOfficeAssets } = require('../scraper/lib/officeAssetQueue');
 const policy = require('../scraper/config/office-source-recovery.json');
 const contactReview = require('../docs/office-contact-review-20261010.json');
 const registry = require('../scraper/config/office-event-sources.json');
+const followup = require('../docs/office-field-followup-20261010.json');
+const { buildOfficePages } = require('../scraper/lib/officeCrawl');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function main() {
+  const unresolvedIds = new Set([
+    ...followup.records.filter(record => record.remainingFields.length).map(record => record.id),
+    ...(followup.additionalPartialReview || []).map(record => record.id),
+  ]);
+  const officePages = buildOfficePages(require('../public/data/offices.json').offices, registry.offices);
   const urls = [...new Set([...Object.values(policy.aliases).map(x => x.url),
+    ...officePages.filter(page => page.officeIds.some(id => unresolvedIds.has(id))).map(page => page.url),
     ...registry.offices.filter(o => contactReview.updates.some(r => r.id === o.id && r.added))
       .flatMap(o => o.pages.map(p => p.url)),
     'https://www.mod.go.jp/pco/tochigi/contact.html',
@@ -56,7 +64,7 @@ async function main() {
     require('../scraper/lib/assetCache').save();
     const audit = JSON.parse(fs.readFileSync(path.join(root,'docs/office-audit-20261004.json'),'utf8'));
     const text = `HTML取得 ${fetched}/${urls.length} URL、OCR読取結果あり ${report.ocr.filter(p=>p.status==='read').length}/${report.ocr.length} 資料（上限2）。\n`+
-      `全国の項目照合は未完了: 担当区域等の確認保留 ${audit.pending.length}件、項目不足 ${audit.remainingFieldGaps.length}件。\n`+
+      `担当区域等の確認保留 ${audit.pending.length}件、未確定項目あり ${audit.remainingFieldGaps.length}件。担当範囲は「要確認」と表示し、未確定の窓口も巡回対象に含む。\n`+
       `取得失敗: ${report.pages.filter(p=>p.status==='fetch_failed').map(p=>p.url).join('、') || 'なし'}\n`;
     console.log(text);
     if(process.env.GITHUB_STEP_SUMMARY)fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,text);
