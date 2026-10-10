@@ -732,11 +732,15 @@ function OfficeCard({ office, rank, primary }) {
           style={btnStyle(`${primary}14`, `${primary}33`, primary)}>
           {ICO.map('var(--brand-fg)', 12)} 地図で開く
         </a>
-        {office.tel && (
+        {office.tel ? (
           <a href={`tel:${office.tel.replace(/[^\d+]/g, '')}`}
             style={btnStyle('#16a34a14', '#16a34a33', '#16a34a')}>
             {ICO.phone('#16a34a', 12)} 電話する
           </a>
+        ) : (
+          <span style={{ ...btnStyle('var(--bg)', 'var(--border)', 'var(--text-muted)'), cursor: 'default' }}>
+            電話番号: 不明
+          </span>
         )}
         {office.url && (
           <a href={office.url} target="_blank" rel="noopener noreferrer"
