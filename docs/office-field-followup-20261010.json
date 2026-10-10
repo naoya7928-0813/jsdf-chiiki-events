@@ -1,0 +1,661 @@
+{
+  "checkedAt": "2026-10-10T17:18:25+09:00",
+  "scope": "2026-10-10初回照合で空欄が残った26窓口の追加照合。公開ページでの確認であり電話・メール照会は行っていない。",
+  "beforeCount": 26,
+  "confirmedCount": 4,
+  "remainingCount": 22,
+  "records": [
+    {
+      "id": "loc-sapporo-35",
+      "pref": "sapporo",
+      "name": "月寒募集案内所",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/sapporo/contact.html",
+        "https://www.mod.go.jp/pco/sapporo/contact_nanbu.html"
+      ],
+      "status": "confirmed",
+      "before": {
+        "area": ""
+      },
+      "values": {
+        "area": "札幌市白石区・厚別区・豊平区・清田区・南区"
+      },
+      "remainingFields": [],
+      "reason": "公式各担当窓口一覧に窓口名と担当地区の対応を明記。地区隊は個別紹介ページでも照合。"
+    },
+    {
+      "id": "loc-sapporo-44",
+      "pref": "sapporo",
+      "name": "南部地区隊",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/sapporo/contact.html",
+        "https://www.mod.go.jp/pco/sapporo/contact_nanbu.html"
+      ],
+      "status": "confirmed",
+      "before": {
+        "area": ""
+      },
+      "values": {
+        "area": "札幌市白石区・厚別区・豊平区・清田区・南区"
+      },
+      "remainingFields": [],
+      "reason": "公式各担当窓口一覧に窓口名と担当地区の対応を明記。地区隊は個別紹介ページでも照合。"
+    },
+    {
+      "id": "loc-sapporo-46",
+      "pref": "sapporo",
+      "name": "北部地区隊",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/sapporo/contact.html",
+        "https://www.mod.go.jp/pco/sapporo/contact_hokubu.html"
+      ],
+      "status": "confirmed",
+      "before": {
+        "area": ""
+      },
+      "values": {
+        "area": "札幌市中央区・北区・東区・西区・手稲区"
+      },
+      "remainingFields": [],
+      "reason": "公式各担当窓口一覧に窓口名と担当地区の対応を明記。地区隊は個別紹介ページでも照合。"
+    },
+    {
+      "id": "loc-osaka-r193",
+      "pref": "osaka",
+      "name": "高槻地域事務所",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/osaka/about/office/takatsuki.html",
+        "https://www.mod.go.jp/pco/osaka/about/office/access.html",
+        "https://www.mod.go.jp/pco/osaka/recruit/session/menu.html"
+      ],
+      "status": "not-confirmed-from-reviewed-public-sources",
+      "reason": "現行高槻ページで住所・電話、北東地区隊への所属を確認。説明会の開催地は確認できるが、正式な担当市町村一覧を確認できない。",
+      "remainingFields": [
+        "area"
+      ],
+      "values": {},
+      "confirmationContact": {
+        "name": "高槻地域事務所",
+        "tel": "072-604-6360",
+        "sourceUrl": "https://www.mod.go.jp/pco/osaka/about/office/takatsuki.html"
+      }
+    },
+    {
+      "id": "loc-miyazaki-r276",
+      "pref": "miyazaki",
+      "name": "宮崎募集案内所",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/miyazaki/office.html"
+      ],
+      "status": "not-confirmed-from-reviewed-public-sources",
+      "reason": "出張所等問い合わせ先の現行本文で名称・連絡先を確認したが、市町村単位の担当区域は確認できない。百科事典の区域記載を一次資料で裏付けできず、推測で補完しない。",
+      "remainingFields": [
+        "area"
+      ],
+      "values": {},
+      "confirmationContact": {
+        "name": "宮崎募集案内所",
+        "tel": "0985-61-7663",
+        "sourceUrl": "https://www.mod.go.jp/pco/miyazaki/office.html"
+      }
+    },
+    {
+      "id": "loc-miyazaki-r277",
+      "pref": "miyazaki",
+      "name": "都城地域事務所",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/miyazaki/office.html"
+      ],
+      "status": "not-confirmed-from-reviewed-public-sources",
+      "reason": "出張所等問い合わせ先の現行本文で名称・連絡先を確認したが、市町村単位の担当区域は確認できない。百科事典の区域記載を一次資料で裏付けできず、推測で補完しない。",
+      "remainingFields": [
+        "area"
+      ],
+      "values": {},
+      "confirmationContact": {
+        "name": "都城地域事務所",
+        "tel": "0986-23-3944 内線373",
+        "sourceUrl": "https://www.mod.go.jp/pco/miyazaki/office.html"
+      }
+    },
+    {
+      "id": "loc-miyazaki-r278",
+      "pref": "miyazaki",
+      "name": "延岡出張所",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/miyazaki/office.html"
+      ],
+      "status": "not-confirmed-from-reviewed-public-sources",
+      "reason": "出張所等問い合わせ先の現行本文で名称・連絡先を確認したが、市町村単位の担当区域は確認できない。百科事典の区域記載を一次資料で裏付けできず、推測で補完しない。",
+      "remainingFields": [
+        "area"
+      ],
+      "values": {},
+      "confirmationContact": {
+        "name": "延岡出張所",
+        "tel": "0982-21-2387",
+        "sourceUrl": "https://www.mod.go.jp/pco/miyazaki/office.html"
+      }
+    },
+    {
+      "id": "loc-okinawa-r280",
+      "pref": "okinawa",
+      "name": "那覇募集案内所",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/okinawa/about.html"
+      ],
+      "status": "not-confirmed-from-reviewed-public-sources",
+      "reason": "現行公式紹介ページで6窓口の名称・電話を確認したが、窓口別の担当市町村は本文に記載を確認できない。所在地と担当区域を同一視しない。",
+      "remainingFields": [
+        "area"
+      ],
+      "values": {},
+      "confirmationContact": {
+        "name": "那覇募集案内所",
+        "tel": "098-863-5280",
+        "sourceUrl": "https://www.mod.go.jp/pco/okinawa/about.html"
+      }
+    },
+    {
+      "id": "loc-okinawa-r281",
+      "pref": "okinawa",
+      "name": "沖縄募集案内所",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/okinawa/about.html"
+      ],
+      "status": "not-confirmed-from-reviewed-public-sources",
+      "reason": "現行公式紹介ページで6窓口の名称・電話を確認したが、窓口別の担当市町村は本文に記載を確認できない。所在地と担当区域を同一視しない。",
+      "remainingFields": [
+        "area"
+      ],
+      "values": {},
+      "confirmationContact": {
+        "name": "沖縄募集案内所",
+        "tel": "098-937-1608",
+        "sourceUrl": "https://www.mod.go.jp/pco/okinawa/about.html"
+      }
+    },
+    {
+      "id": "loc-okinawa-r282",
+      "pref": "okinawa",
+      "name": "名護地域事務所",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/okinawa/about.html"
+      ],
+      "status": "not-confirmed-from-reviewed-public-sources",
+      "reason": "現行公式紹介ページで6窓口の名称・電話を確認したが、窓口別の担当市町村は本文に記載を確認できない。所在地と担当区域を同一視しない。",
+      "remainingFields": [
+        "area"
+      ],
+      "values": {},
+      "confirmationContact": {
+        "name": "名護地域事務所",
+        "tel": "0980-52-4064",
+        "sourceUrl": "https://www.mod.go.jp/pco/okinawa/about.html"
+      }
+    },
+    {
+      "id": "loc-okinawa-r283",
+      "pref": "okinawa",
+      "name": "宮古島出張所",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/okinawa/about.html"
+      ],
+      "status": "not-confirmed-from-reviewed-public-sources",
+      "reason": "現行公式紹介ページで6窓口の名称・電話を確認したが、窓口別の担当市町村は本文に記載を確認できない。所在地と担当区域を同一視しない。",
+      "remainingFields": [
+        "area"
+      ],
+      "values": {},
+      "confirmationContact": {
+        "name": "宮古島出張所",
+        "tel": "0980-72-4742",
+        "sourceUrl": "https://www.mod.go.jp/pco/okinawa/about.html"
+      }
+    },
+    {
+      "id": "loc-okinawa-r284",
+      "pref": "okinawa",
+      "name": "石垣出張所",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/okinawa/about.html"
+      ],
+      "status": "not-confirmed-from-reviewed-public-sources",
+      "reason": "現行公式紹介ページで6窓口の名称・電話を確認したが、窓口別の担当市町村は本文に記載を確認できない。所在地と担当区域を同一視しない。",
+      "remainingFields": [
+        "area"
+      ],
+      "values": {},
+      "confirmationContact": {
+        "name": "石垣出張所",
+        "tel": "0980-82-4942",
+        "sourceUrl": "https://www.mod.go.jp/pco/okinawa/about.html"
+      }
+    },
+    {
+      "id": "loc-saga-r309",
+      "pref": "saga",
+      "name": "武雄地域事務所",
+      "missingFields": [
+        "tel"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/saga/about/index.html",
+        "https://www.mod.go.jp/pco/saga/",
+        "https://www.town.omachi.lg.jp/kiji0031061/index.html"
+      ],
+      "status": "confirmed",
+      "before": {
+        "address": "佐賀県武雄市武雄町大字武雄",
+        "tel": "",
+        "url": "https://www.mod.go.jp/pco/saga/",
+        "area": "武雄市・嬉野市・鹿島市",
+        "lat": 33.186131,
+        "lng": 130.008301,
+        "latApprox": null
+      },
+      "values": {
+        "address": "佐賀県武雄市武雄町大字昭和43-15",
+        "tel": "0954-23-8304",
+        "url": "https://www.mod.go.jp/pco/saga/about/index.html",
+        "area": "伊万里市・武雄市・嬉野市・鹿島市・有田町・大町町・江北町・白石町・太良町",
+        "lat": 33.196327,
+        "lng": 130.02887,
+        "latApprox": true
+      },
+      "remainingFields": [],
+      "reason": "地本の武雄紹介欄で電話、地本トップで担当9市町、令和8年度の大町町募集案内で大字・番地と同じ電話を確認。",
+      "coordinates": {
+        "source": "国土地理院住所検索（住所代表点）",
+        "query": "佐賀県武雄市武雄町昭和43-15",
+        "sourceUrl": "https://msearch.gsi.go.jp/address-search/AddressSearch?q=%E4%BD%90%E8%B3%80%E7%9C%8C%E6%AD%A6%E9%9B%84%E5%B8%82%E6%AD%A6%E9%9B%84%E7%94%BA%E6%98%AD%E5%92%8C43-15",
+        "label": "佐賀県武雄市武雄町昭和４３番地",
+        "resultCount": 1,
+        "lat": 33.196327,
+        "lng": 130.02887,
+        "latApprox": true
+      }
+    },
+    {
+      "id": "loc-obihiro-audit-892d3a350d",
+      "pref": "obihiro",
+      "name": "帯広募集案内所",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/obihiro/info_contact.html",
+        "https://www.mod.go.jp/pco/obihiro/recruit_session.html",
+        "https://www.mod.go.jp/pco/obihiro/recruit.html"
+      ],
+      "status": "not-confirmed-from-reviewed-public-sources",
+      "reason": "現行公式窓口一覧・説明会案内に住所・電話を確認。地本全体の42市町村を案内所単独の担当区域としては採用しない。",
+      "remainingFields": [
+        "area"
+      ],
+      "values": {},
+      "confirmationContact": {
+        "name": "帯広募集案内所",
+        "tel": "0155-23-8718",
+        "sourceUrl": "https://www.mod.go.jp/pco/obihiro/info_contact.html"
+      }
+    },
+    {
+      "id": "loc-miyagi-audit-6bb04c813f",
+      "pref": "miyagi",
+      "name": "仙台駅東口募集案内所",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/miyagi/miyagitop/office.html",
+        "https://sites.google.com/view/sendai-page?usp=sharing",
+        "https://sites.google.com/view/miyagi-recruit/"
+      ],
+      "status": "not-confirmed-from-reviewed-public-sources",
+      "reason": "防衛省ページからリンクされた現行紹介ページと募集窓口一覧を確認。仙台募集案内所の3区は明記されるが、駅東口募集案内所の区域は別途明記されていないため転記しない。",
+      "remainingFields": [
+        "area"
+      ],
+      "values": {},
+      "confirmationContact": {
+        "name": "仙台駅東口募集案内所",
+        "tel": "022-293-5559",
+        "sourceUrl": "https://www.mod.go.jp/pco/miyagi/miyagitop/office.html"
+      }
+    },
+    {
+      "id": "loc-miyazaki-audit-fa260b307c",
+      "pref": "miyazaki",
+      "name": "日向地域事務所",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/miyazaki/office.html"
+      ],
+      "status": "not-confirmed-from-reviewed-public-sources",
+      "reason": "出張所等問い合わせ先の現行本文で名称・連絡先を確認したが、市町村単位の担当区域は確認できない。百科事典の区域記載を一次資料で裏付けできず、推測で補完しない。",
+      "remainingFields": [
+        "area"
+      ],
+      "values": {},
+      "confirmationContact": {
+        "name": "日向地域事務所",
+        "tel": "0982-52-6914",
+        "sourceUrl": "https://www.mod.go.jp/pco/miyazaki/office.html"
+      }
+    },
+    {
+      "id": "loc-miyazaki-audit-b797b60214",
+      "pref": "miyazaki",
+      "name": "新田原分駐所",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/miyazaki/office.html"
+      ],
+      "status": "not-confirmed-from-reviewed-public-sources",
+      "reason": "出張所等問い合わせ先の現行本文で名称・連絡先を確認したが、市町村単位の担当区域は確認できない。百科事典の区域記載を一次資料で裏付けできず、推測で補完しない。",
+      "remainingFields": [
+        "area"
+      ],
+      "values": {},
+      "confirmationContact": {
+        "name": "新田原分駐所",
+        "tel": "0983-35-1121 内線5207",
+        "sourceUrl": "https://www.mod.go.jp/pco/miyazaki/office.html"
+      }
+    },
+    {
+      "id": "loc-miyazaki-audit-966a771415",
+      "pref": "miyazaki",
+      "name": "小林地域事務所",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/miyazaki/office.html"
+      ],
+      "status": "not-confirmed-from-reviewed-public-sources",
+      "reason": "出張所等問い合わせ先の現行本文で名称・連絡先を確認したが、市町村単位の担当区域は確認できない。百科事典の区域記載を一次資料で裏付けできず、推測で補完しない。",
+      "remainingFields": [
+        "area"
+      ],
+      "values": {},
+      "confirmationContact": {
+        "name": "小林地域事務所",
+        "tel": "0984-22-5254",
+        "sourceUrl": "https://www.mod.go.jp/pco/miyazaki/office.html"
+      }
+    },
+    {
+      "id": "loc-miyazaki-audit-1ab5297e89",
+      "pref": "miyazaki",
+      "name": "高千穂連絡所",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/miyazaki/office.html"
+      ],
+      "status": "not-confirmed-from-reviewed-public-sources",
+      "reason": "出張所等問い合わせ先の現行本文で名称・連絡先を確認したが、市町村単位の担当区域は確認できない。百科事典の区域記載を一次資料で裏付けできず、推測で補完しない。",
+      "remainingFields": [
+        "area"
+      ],
+      "values": {},
+      "confirmationContact": {
+        "name": "高千穂連絡所",
+        "tel": "0982-72-7061",
+        "sourceUrl": "https://www.mod.go.jp/pco/miyazaki/office.html"
+      }
+    },
+    {
+      "id": "loc-saitama-audit-59b9b1a151",
+      "pref": "saitama",
+      "name": "秩父地域事務所",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/saitama/office/chichibu-office.html",
+        "https://www.mod.go.jp/pco/saitama/index.html",
+        "https://www.mod.go.jp/pco/saitama/office/"
+      ],
+      "status": "not-confirmed-from-reviewed-public-sources",
+      "reason": "公式トップではどの窓口でも相談対応可能と案内。個別ページは住所・電話を掲載しているが、当該窓口の担当市町村は確認できない。上位事務所の区域を分駐所に流用しない。",
+      "remainingFields": [
+        "area"
+      ],
+      "values": {},
+      "confirmationContact": {
+        "name": "秩父地域事務所",
+        "tel": "0494-22-6157",
+        "sourceUrl": "https://www.mod.go.jp/pco/saitama/office/chichibu-office.html"
+      }
+    },
+    {
+      "id": "loc-saitama-audit-a1c6bf2ef4",
+      "pref": "saitama",
+      "name": "大宮分駐所",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/saitama/office/saitama-office.html",
+        "https://www.mod.go.jp/pco/saitama/index.html",
+        "https://www.mod.go.jp/pco/saitama/office/"
+      ],
+      "status": "not-confirmed-from-reviewed-public-sources",
+      "reason": "公式トップではどの窓口でも相談対応可能と案内。個別ページは住所・電話を掲載しているが、当該窓口の担当市町村は確認できない。上位事務所の区域を分駐所に流用しない。",
+      "remainingFields": [
+        "area"
+      ],
+      "values": {},
+      "confirmationContact": {
+        "name": "大宮分駐所",
+        "tel": "048-663-4241",
+        "sourceUrl": "https://www.mod.go.jp/pco/saitama/office/saitama-office.html"
+      }
+    },
+    {
+      "id": "loc-saitama-audit-d5a422cb05",
+      "pref": "saitama",
+      "name": "入間分駐所",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/saitama/office/iruma-office.html",
+        "https://www.mod.go.jp/pco/saitama/index.html",
+        "https://www.mod.go.jp/pco/saitama/office/"
+      ],
+      "status": "not-confirmed-from-reviewed-public-sources",
+      "reason": "公式トップではどの窓口でも相談対応可能と案内。個別ページは住所・電話を掲載しているが、当該窓口の担当市町村は確認できない。上位事務所の区域を分駐所に流用しない。",
+      "remainingFields": [
+        "area"
+      ],
+      "values": {},
+      "confirmationContact": {
+        "name": "入間分駐所",
+        "tel": "04-2953-4851",
+        "sourceUrl": "https://www.mod.go.jp/pco/saitama/office/iruma-office.html"
+      }
+    },
+    {
+      "id": "loc-saitama-audit-e0eb594e85",
+      "pref": "saitama",
+      "name": "熊谷分駐所",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/saitama/office/kumagaya-office.html",
+        "https://www.mod.go.jp/pco/saitama/index.html",
+        "https://www.mod.go.jp/pco/saitama/office/"
+      ],
+      "status": "not-confirmed-from-reviewed-public-sources",
+      "reason": "公式トップではどの窓口でも相談対応可能と案内。個別ページは住所・電話を掲載しているが、当該窓口の担当市町村は確認できない。上位事務所の区域を分駐所に流用しない。",
+      "remainingFields": [
+        "area"
+      ],
+      "values": {},
+      "confirmationContact": {
+        "name": "熊谷分駐所",
+        "tel": "048-532-3554",
+        "sourceUrl": "https://www.mod.go.jp/pco/saitama/office/kumagaya-office.html"
+      }
+    },
+    {
+      "id": "loc-tottori-audit-2f44285cd3",
+      "pref": "tottori",
+      "name": "鳥取募集案内所",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/tottori/content/jimusyo/toubusyo.html",
+        "https://www.mod.go.jp/pco/tottori/content/hijoukin/hijoukin.html"
+      ],
+      "status": "not-confirmed-from-reviewed-public-sources",
+      "reason": "現行事務所紹介・令和8年度職員募集案内で住所・電話を確認。窓口別の担当区域は本文に確認できず、説明会開催地から区域を推定しない。",
+      "remainingFields": [
+        "area"
+      ],
+      "values": {},
+      "confirmationContact": {
+        "name": "鳥取募集案内所",
+        "tel": "0857-26-4019",
+        "sourceUrl": "https://www.mod.go.jp/pco/tottori/content/jimusyo/toubusyo.html"
+      }
+    },
+    {
+      "id": "loc-okinawa-audit-53ac1fdb2e",
+      "pref": "okinawa",
+      "name": "島尻募集案内所",
+      "missingFields": [
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/okinawa/about.html"
+      ],
+      "status": "not-confirmed-from-reviewed-public-sources",
+      "reason": "現行公式紹介ページで6窓口の名称・電話を確認したが、窓口別の担当市町村は本文に記載を確認できない。所在地と担当区域を同一視しない。",
+      "remainingFields": [
+        "area"
+      ],
+      "values": {},
+      "confirmationContact": {
+        "name": "島尻募集案内所",
+        "tel": "098-992-4141",
+        "sourceUrl": "https://www.mod.go.jp/pco/okinawa/about.html"
+      }
+    },
+    {
+      "id": "loc-aichi-audit-68bc0cd25d",
+      "pref": "aichi",
+      "name": "名古屋南募集案内所",
+      "missingFields": [
+        "tel",
+        "area"
+      ],
+      "checkedAt": "2026-10-10",
+      "sourceUrls": [
+        "https://www.mod.go.jp/pco/aichi/contact/kanayama/sho-kanayama.html",
+        "https://www.pref.aichi.jp/soshiki/shichoson/0000008586.html"
+      ],
+      "status": "not-confirmed-from-reviewed-public-sources",
+      "reason": "現行公式ページの名古屋南欄は住所のみ。金山の電話・担当区域を流用しない。愛知県の2023-11-27更新一覧には同住所の旧名称「野並案内所」と052-892-6280があるが、現行性を確認できないため参考記録に留める。",
+      "remainingFields": [
+        "tel",
+        "area"
+      ],
+      "values": {},
+      "historicalOnly": {
+        "name": "野並案内所",
+        "tel": "052-892-6280",
+        "publishedAt": "2023-11-27",
+        "sourceUrl": "https://www.pref.aichi.jp/soshiki/shichoson/0000008586.html"
+      },
+      "confirmationContact": {
+        "name": "金山募集案内所",
+        "tel": "052-331-4866",
+        "sourceUrl": "https://www.mod.go.jp/pco/aichi/contact/kanayama/sho-kanayama.html",
+        "note": "名古屋南の直通電話としては登録しない。"
+      }
+    }
+  ],
+  "additionalPartialReview": [
+    {
+      "id": "loc-iwate-6",
+      "name": "二戸地域事務所",
+      "field": "area",
+      "status": "partial-confirmation-retained",
+      "sourceUrl": "https://www.mod.go.jp/pco/iwate/iwatechihon/",
+      "reason": "現行所員紹介に準備中が1名分残る。公開済みの6市町村を限定付きで保持し、担当全域の確定とは扱わない。"
+    }
+  ]
+}

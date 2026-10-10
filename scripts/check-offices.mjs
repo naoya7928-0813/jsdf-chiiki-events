@@ -50,6 +50,22 @@ for (const pref of expectedPrefs) {
   if (actual.join('\n') !== expected.join('\n')) errors.push(`${pref}: inventory differs from reviewed snapshot`);
 }
 const byId = new Map(offices.map(o => [o.id, o]));
+const followup = JSON.parse(fs.readFileSync(path.join(root, 'docs/office-field-followup-20261010.json'), 'utf8'));
+const reviewedIds = new Set();
+for (const record of followup.records) {
+  const office = byId.get(record.id);
+  if (!office || reviewedIds.has(record.id)) { errors.push(`Invalid follow-up office: ${record.id}`); continue; }
+  reviewedIds.add(record.id);
+  if (!record.reason || !record.sourceUrls?.length) errors.push(`${record.id}: missing follow-up evidence`);
+  for (const [field, value] of Object.entries(record.values)) {
+    if (office[field] !== value) errors.push(`${record.id}: differs from follow-up ${field}`);
+  }
+  const missing = ['address', 'tel', 'area'].filter(field => !office[field]?.trim());
+  if (missing.join() !== record.remainingFields.join()) errors.push(`${record.id}: stale follow-up remaining fields`);
+}
+const remaining = offices.filter(o => o.type === 'recruitment' && ['address', 'tel', 'area'].some(field => !o[field]?.trim()));
+if (followup.records.length !== followup.beforeCount || remaining.length !== followup.remainingCount ||
+    followup.records.filter(r => r.status === 'confirmed').length !== followup.confirmedCount) errors.push('Follow-up counts are inconsistent');
 const contactReview = JSON.parse(fs.readFileSync(path.join(root, 'docs/office-contact-review-20261010.json'), 'utf8'));
 const registry = JSON.parse(fs.readFileSync(path.join(root, 'scraper/config/office-event-sources.json'), 'utf8'));
 for (const record of contactReview.updates) {
@@ -88,5 +104,6 @@ if (errors.length) {
 } else {
   console.log(`Office inventory OK: ${count} recruitment offices, ${headquarters.size} PCOs; ${audit.confirmedUpdates.length} confirmed records checked.`);
   console.log(`Contact review: ${contactReview.updates.length} records checked; ${audit.pending.length} published contacts still need area/other field review.`);
+  console.log(`Field follow-up: ${followup.beforeCount} reviewed, ${followup.confirmedCount} resolved, ${followup.remainingCount} with remaining blank fields; partial area evidence is tracked separately.`);
   console.log(`Pre-existing missing addresses retained: ${offices.filter(o => o.type === "recruitment" && !o.address?.trim()).length}.`);
 }
