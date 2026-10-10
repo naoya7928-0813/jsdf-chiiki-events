@@ -4515,30 +4515,6 @@
   ],
   "remainingFieldGaps": [
     {
-      "id": "loc-sapporo-35",
-      "pref": "sapporo",
-      "name": "月寒募集案内所",
-      "missingFields": [
-        "area"
-      ]
-    },
-    {
-      "id": "loc-sapporo-44",
-      "pref": "sapporo",
-      "name": "南部地区隊",
-      "missingFields": [
-        "area"
-      ]
-    },
-    {
-      "id": "loc-sapporo-46",
-      "pref": "sapporo",
-      "name": "北部地区隊",
-      "missingFields": [
-        "area"
-      ]
-    },
-    {
       "id": "loc-osaka-r193",
       "pref": "osaka",
       "name": "高槻地域事務所",
@@ -4608,14 +4584,6 @@
       "name": "石垣出張所",
       "missingFields": [
         "area"
-      ]
-    },
-    {
-      "id": "loc-saga-r309",
-      "pref": "saga",
-      "name": "武雄地域事務所",
-      "missingFields": [
-        "tel"
       ]
     },
     {
@@ -4725,10 +4693,10 @@
     }
   ],
   "limitations": [
-    "武雄地域事務所: 現行公式一覧で存在・担当区域のみ確認。過去広報紙の住所・電話を最新と断定せず、連絡先再確認を保留。",
     "名古屋南募集案内所: 現行公式連絡先本文に電話番号の掲載なし。",
     "沖縄6窓口: 名称・電話は現行本文で確認。住所は2026-10-04の公式埋込地図照合記録を継承。",
     "担当区域は不明項目を推測で補完しない。",
     "座標は国土地理院住所代表点または既存公式監査座標。建物入口の精度を保証しない。"
-  ]
+  ],
+  "fieldFollowup": "docs/office-field-followup-20261010.json"
 }

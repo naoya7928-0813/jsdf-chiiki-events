@@ -7965,30 +7965,6 @@
   "confirmedContactReview": "docs/office-contact-review-20261005.json",
   "remainingFieldGaps": [
     {
-      "id": "loc-sapporo-35",
-      "pref": "sapporo",
-      "name": "月寒募集案内所",
-      "missingFields": [
-        "area"
-      ]
-    },
-    {
-      "id": "loc-sapporo-44",
-      "pref": "sapporo",
-      "name": "南部地区隊",
-      "missingFields": [
-        "area"
-      ]
-    },
-    {
-      "id": "loc-sapporo-46",
-      "pref": "sapporo",
-      "name": "北部地区隊",
-      "missingFields": [
-        "area"
-      ]
-    },
-    {
       "id": "loc-osaka-r193",
       "pref": "osaka",
       "name": "高槻地域事務所",
@@ -8058,14 +8034,6 @@
       "name": "石垣出張所",
       "missingFields": [
         "area"
-      ]
-    },
-    {
-      "id": "loc-saga-r309",
-      "pref": "saga",
-      "name": "武雄地域事務所",
-      "missingFields": [
-        "tel"
       ]
     },
     {
@@ -8174,5 +8142,6 @@
       ]
     }
   ],
-  "releaseNote": "2026-10-10: 公式連絡先を確認した保留候補23件を公開。担当区域の確認とは分離し、13件を新規登録。最新の項目別根拠はoffice-contact-review-20261010.json。"
+  "releaseNote": "2026-10-10: 公式連絡先を確認した保留候補23件を公開。担当区域の確認とは分離し、13件を新規登録。最新の項目別根拠はoffice-contact-review-20261010.json。",
+  "fieldFollowup": "docs/office-field-followup-20261010.json"
 }
