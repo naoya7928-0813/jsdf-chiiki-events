@@ -2122,7 +2122,10 @@ async function enrichTokyoFromOfficePages(events, context) {
   const pagesToTry = [];
   for (const [linkPage, list] of byPage) {
     const sibling = linkPage.replace(/[^/]*$/, 'event.html');
-    for (const page of [...new Set([linkPage, sibling])]) pagesToTry.push([page, list]);
+    // 共通カレンダー event2/index.html に event.html は存在しない。
+    const candidates = new URL(linkPage).pathname === '/pco/tokyo/event2/index.html'
+      ? [linkPage] : [linkPage, sibling];
+    for (const page of [...new Set(candidates)]) pagesToTry.push([page, list]);
   }
   for (const [page, all] of pagesToTry.slice(0, 30)) {
     const list = all.filter(ev => !ev.time);

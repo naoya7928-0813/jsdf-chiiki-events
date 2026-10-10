@@ -1,326 +1,333 @@
 {
-  "checkedAt": "2026-10-06",
+  "checkedAt": "2026-10-10",
   "status": "partial-release",
   "baselineCommit": "8ec8cd4d4cb19246366c2f303c984fa7af9435db",
   "baselineRecruitmentCount": 315,
-  "draftRecruitmentCount": 352,
+  "draftRecruitmentCount": 365,
   "candidateRecruitmentCount": 365,
   "expectedDraftNames": {
     "fukui": [
-      "大野地域事務所",
       "敦賀地域事務所",
-      "福井募集案内所",
-      "越前地域事務所"
+      "越前地域事務所",
+      "大野地域事務所",
+      "福井募集案内所"
     ],
     "gunma": [
-      "前橋募集案内所",
       "太田出張所",
-      "沼田地域事務所",
-      "高崎地域事務所"
+      "前橋募集案内所",
+      "高崎地域事務所",
+      "沼田地域事務所"
     ],
     "ishikawa": [
+      "金沢募集案内所（新神田）",
       "七尾出張所",
       "小松地域事務所",
       "能登地域事務所",
-      "金沢募集案内所（新神田）",
       "金沢募集案内所（鳴和）"
     ],
     "iwate": [
-      "一関出張所",
       "二戸地域事務所",
+      "盛岡募集案内所",
+      "一関出張所",
       "北上地域事務所",
       "宮古地域事務所",
-      "盛岡募集案内所",
       "釜石地域事務所"
     ],
     "kagoshima": [
       "国分地域事務所",
-      "大隅地域事務所",
-      "奄美大島駐在員事務所",
-      "徳之島駐在員事務所",
-      "知覧募集案内所",
-      "種子島駐在員事務所",
       "薩摩川内出張所",
+      "鹿屋地域事務所",
       "鹿児島募集案内所",
-      "鹿屋地域事務所"
+      "大隅地域事務所",
+      "知覧募集案内所",
+      "奄美大島駐在員事務所",
+      "種子島駐在員事務所",
+      "徳之島駐在員事務所"
     ],
     "kochi": [
-      "四万十地域事務所",
-      "須崎地域事務所",
       "香南地域事務所",
-      "高知募集案内所"
+      "高知募集案内所",
+      "四万十地域事務所",
+      "須崎地域事務所"
     ],
     "kumamoto": [
-      "人吉地域事務所",
-      "八代出張所",
-      "天草駐在員事務所",
+      "阿蘇地域事務所",
       "宇城募集案内所",
-      "山鹿地域事務所",
-      "水俣地域事務所",
-      "熊本分駐所",
-      "熊本募集案内所",
-      "玉名地域事務所",
       "菊池分駐所",
-      "阿蘇地域事務所"
+      "玉名地域事務所",
+      "熊本分駐所",
+      "水俣地域事務所",
+      "熊本募集案内所",
+      "山鹿地域事務所",
+      "八代出張所",
+      "人吉地域事務所",
+      "天草駐在員事務所"
     ],
     "kyoto": [
-      "亀岡募集案内所",
-      "京丹後地域事務所",
-      "京都募集案内所",
       "宇治地域事務所",
-      "河原町募集案内所",
+      "舞鶴地域事務所",
       "福知山地域事務所",
-      "舞鶴地域事務所"
+      "京丹後地域事務所",
+      "亀岡募集案内所",
+      "河原町募集案内所",
+      "京都募集案内所"
     ],
     "niigata": [
-      "佐渡駐在員事務所",
       "加茂地域事務所",
-      "新潟募集案内所",
-      "新発田地域事務所",
-      "柏崎地域事務所",
+      "高田地域事務所",
       "長岡出張所",
-      "高田地域事務所"
+      "柏崎地域事務所",
+      "新発田地域事務所",
+      "佐渡駐在員事務所",
+      "新潟募集案内所"
     ],
     "okayama": [
-      "倉敷地域事務所",
       "岡山募集案内所",
-      "津山出張所",
-      "高梁地域事務所"
+      "高梁地域事務所",
+      "倉敷地域事務所",
+      "津山出張所"
     ],
     "saga": [
       "佐賀募集案内所",
-      "唐津出張所",
       "武雄地域事務所",
+      "唐津出張所",
       "鳥栖地域事務所"
     ],
     "sapporo": [
-      "倶知安地域事務所",
-      "北部地区隊",
-      "千歳地域事務所",
-      "南部地区隊",
-      "室蘭地域事務所",
-      "小樽地域事務所",
       "岩見沢地域事務所",
+      "倶知安地域事務所",
       "恵庭地域事務所",
       "月寒募集案内所",
-      "札幌（大通）募集案内所",
       "江別地域事務所",
+      "札幌（大通）募集案内所",
+      "室蘭地域事務所",
+      "小樽地域事務所",
+      "静内分駐所",
+      "千歳地域事務所",
       "滝川地域事務所",
-      "白石募集案内所",
       "苫小牧出張所",
-      "静内分駐所"
+      "南部地区隊",
+      "白石募集案内所",
+      "北部地区隊"
     ],
     "shizuoka": [
-      "三島募集案内所",
-      "伊東地域事務所",
-      "富士地域事務所",
-      "沼津地域事務所",
       "浜北募集案内所",
-      "浜松出張所",
-      "清水募集案内所",
+      "沼津地域事務所",
+      "富士地域事務所",
+      "伊東地域事務所",
       "藤枝地域事務所",
       "袋井地域事務所",
-      "静岡募集案内所"
+      "三島募集案内所",
+      "清水募集案内所",
+      "静岡募集案内所",
+      "浜松出張所"
     ],
     "tochigi": [
-      "大田原地域事務所",
-      "宇都宮募集案内所",
       "小山地域事務所",
       "真岡募集案内所",
-      "足利地域事務所"
+      "足利地域事務所",
+      "宇都宮募集案内所",
+      "大田原地域事務所"
     ],
     "tokushima": [
-      "三好出張所",
+      "阿南地域事務所",
       "吉野川地域事務所",
       "徳島募集案内所",
-      "阿南地域事務所",
+      "三好出張所",
       "鳴門地域事務所"
     ],
     "wakayama": [
-      "和歌山募集案内所",
+      "橋本地域事務所",
       "御坊地域事務所",
       "新宮地域事務所",
+      "田辺地域事務所",
       "有田募集案内所",
-      "橋本地域事務所",
-      "田辺地域事務所"
+      "和歌山募集案内所"
     ],
     "yamagata": [
-      "山形募集案内所",
       "新庄地域事務所",
-      "東根地域事務所",
       "米沢地域事務所",
+      "鶴岡出張所",
       "酒田地域事務所",
-      "鶴岡出張所"
+      "山形募集案内所",
+      "東根地域事務所"
     ],
     "yamanashi": [
-      "大月地域事務所",
       "巨摩募集案内所",
-      "甲府募集案内所"
+      "甲府募集案内所",
+      "大月地域事務所"
     ],
     "kanagawa": [
-      "上大岡募集案内所",
-      "厚木募集案内所",
-      "小田原地域事務所",
-      "川崎出張所",
-      "市ヶ尾募集案内所",
-      "平塚地域事務所",
       "横浜中央募集案内所",
-      "横浜出張所",
+      "市ヶ尾募集案内所",
+      "藤沢募集案内所",
+      "厚木募集案内所",
       "横須賀地域事務所",
-      "溝の口募集案内所",
+      "平塚地域事務所",
+      "小田原地域事務所",
       "相模原地域事務所",
-      "藤沢募集案内所"
+      "川崎出張所",
+      "溝の口募集案内所",
+      "横浜出張所",
+      "上大岡募集案内所"
     ],
     "tokyo": [
-      "世田谷募集案内所",
-      "八王子地域事務所",
-      "北地域事務所",
-      "国分寺募集案内所",
-      "大田出張所",
-      "府中分駐所",
-      "文京出張所",
-      "新小岩募集案内所",
-      "江東出張所",
-      "渋谷募集案内所",
       "港出張所",
-      "町田募集案内所",
-      "福生募集案内所",
-      "立川出張所",
-      "練馬地域事務所",
-      "西東京地域事務所",
       "豊島出張所",
+      "大田出張所",
+      "江東出張所",
+      "文京出張所",
+      "立川出張所",
       "足立地域事務所",
-      "高円寺募集案内所"
+      "西東京地域事務所",
+      "高円寺募集案内所",
+      "渋谷募集案内所",
+      "国分寺募集案内所",
+      "町田募集案内所",
+      "北地域事務所",
+      "新小岩募集案内所",
+      "世田谷募集案内所",
+      "練馬地域事務所",
+      "福生募集案内所",
+      "府中分駐所",
+      "八王子地域事務所"
     ],
     "saitama": [
       "さいたま地域事務所",
       "入間地域事務所",
-      "加須募集案内所",
-      "川口募集案内所",
-      "川越募集案内所",
-      "春日部募集案内所",
       "朝霞地域事務所",
-      "熊谷地域事務所"
+      "熊谷地域事務所",
+      "川口募集案内所",
+      "春日部募集案内所",
+      "川越募集案内所",
+      "加須募集案内所",
+      "秩父地域事務所",
+      "大宮分駐所",
+      "入間分駐所",
+      "熊谷分駐所"
     ],
     "chiba": [
       "千葉募集案内所",
-      "市川募集案内所",
-      "成田地域事務所",
-      "旭地域事務所",
-      "木更津地域事務所",
       "柏募集案内所",
+      "市川募集案内所",
       "船橋出張所",
+      "成田地域事務所",
+      "木更津地域事務所",
       "茂原地域事務所",
+      "旭地域事務所",
       "館山分駐所"
     ],
     "ibaraki": [
-      "土浦地域事務所",
-      "日立出張所",
       "水戸募集案内所",
-      "百里分駐所",
+      "日立出張所",
+      "土浦地域事務所",
+      "龍ヶ崎地域事務所",
       "筑西地域事務所",
-      "龍ヶ崎地域事務所"
+      "百里分駐所"
     ],
     "asahikawa": [
-      "上富良野地域事務所",
       "名寄出張所",
-      "旭川地区隊",
-      "枝幸地域事務所",
-      "留萌地域事務所",
       "稚内地域事務所",
+      "留萌地域事務所",
       "紋別地域事務所",
-      "遠軽地域事務所"
+      "上富良野地域事務所",
+      "遠軽地域事務所",
+      "枝幸地域事務所",
+      "旭川地区隊"
     ],
     "obihiro": [
-      "中標津地域事務所",
-      "北見地域事務所",
+      "釧路出張所",
       "根室地域事務所",
       "網走地域事務所",
-      "釧路出張所"
+      "北見地域事務所",
+      "中標津地域事務所",
+      "帯広募集案内所"
     ],
     "hakodate": [
       "今金地域事務所",
       "八雲地域事務所",
-      "函館リクルートセンター（募集案内所）",
-      "函館地区隊",
+      "江差地域事務所",
       "松前地域事務所",
-      "江差地域事務所"
+      "函館地区隊",
+      "函館リクルートセンター（募集案内所）"
     ],
     "aomori": [
-      "むつ地域事務所",
-      "三沢募集案内所",
+      "青森募集案内所",
+      "弘前地域事務所",
       "五所川原地域事務所",
       "八戸地域事務所",
-      "弘前地域事務所",
-      "青森募集案内所"
+      "三沢募集案内所",
+      "むつ地域事務所"
     ],
     "akita": [
-      "大仙地域事務所",
-      "大館出張所",
-      "横手地域事務所",
-      "由利本荘地域事務所",
       "秋田募集案内所",
-      "能代地域事務所"
+      "能代地域事務所",
+      "由利本荘地域事務所",
+      "大仙地域事務所",
+      "横手地域事務所",
+      "大館出張所"
     ],
     "miyagi": [
       "仙台募集案内所",
       "名取地域事務所",
-      "大崎地域事務所",
       "大河原地域事務所",
+      "大崎地域事務所",
+      "石巻地域事務所",
       "栗原地域事務所",
       "登米地域事務所",
-      "石巻地域事務所"
+      "仙台駅東口募集案内所"
     ],
     "fukushima": [
-      "いわき地域事務所",
-      "会津若松出張所",
-      "白河地域事務所",
-      "相双地域事務所",
       "福島募集案内所",
-      "郡山地域事務所"
+      "いわき地域事務所",
+      "郡山地域事務所",
+      "相双地域事務所",
+      "白河地域事務所",
+      "会津若松出張所"
     ],
     "toyama": [
-      "富山募集案内所",
-      "砺波募集案内所",
       "高岡地域事務所",
-      "魚津地域事務所"
+      "魚津地域事務所",
+      "砺波募集案内所",
+      "富山募集案内所"
     ],
     "nagano": [
-      "上田地域事務所",
-      "伊那地域事務所",
       "松本地域事務所",
-      "茅野地域事務所",
+      "上田地域事務所",
       "長野募集案内所",
+      "茅野地域事務所",
+      "伊那地域事務所",
       "飯田出張所"
     ],
     "gifu": [
       "大垣地域事務所",
+      "高山出張所",
       "岐阜募集案内所",
-      "恵那地域事務所",
       "美濃加茂地域事務所",
       "郡上地域事務所",
-      "高山出張所"
+      "恵那地域事務所"
     ],
     "aichi": [
-      "一宮地域事務所",
-      "半田地域事務所",
       "名古屋出張所",
       "守山分駐所",
-      "安城募集案内所",
+      "金山募集案内所",
+      "半田地域事務所",
+      "一宮地域事務所",
       "小牧分駐所",
-      "岡崎出張所",
       "瀬戸地域事務所",
-      "豊川地域事務所",
-      "豊橋地域事務所",
+      "岡崎出張所",
       "豊田地域事務所",
-      "金山募集案内所"
+      "安城募集案内所",
+      "豊橋地域事務所",
+      "豊川地域事務所",
+      "名古屋南募集案内所"
     ],
     "mie": [
-      "伊勢地域事務所",
-      "伊賀地域事務所",
       "四日市地域事務所",
+      "伊勢地域事務所",
+      "熊野地域事務所",
       "津募集案内所",
-      "熊野地域事務所"
+      "伊賀地域事務所"
     ],
     "shiga": [
       "大津募集案内所",
@@ -330,133 +337,139 @@
       "高島地域事務所"
     ],
     "osaka": [
-      "なんば募集案内所",
-      "ミナミ募集案内所",
-      "京橋募集案内所",
-      "八尾分駐所",
-      "十三募集案内所",
-      "堺出張所",
-      "天王寺募集案内所",
-      "守口出張所",
-      "富田林地域事務所",
-      "岸和田地域事務所",
+      "高槻地域事務所",
       "東大阪地域事務所",
-      "梅田募集案内所",
-      "茨木地域事務所",
       "豊中募集案内所",
-      "阿倍野出張所"
+      "八尾分駐所",
+      "ミナミ募集案内所",
+      "梅田募集案内所",
+      "十三募集案内所",
+      "京橋募集案内所",
+      "阿倍野出張所",
+      "堺出張所",
+      "岸和田地域事務所",
+      "富田林地域事務所",
+      "天王寺募集案内所",
+      "なんば募集案内所",
+      "守口出張所"
     ],
     "hyogo": [
-      "加古川地域事務所",
-      "姫路地域事務所",
+      "西宮地域事務所",
       "川西地域事務所",
       "柏原地域事務所",
-      "淡路島駐在員事務所",
-      "相生地域事務所",
       "神戸出張所本部",
       "神戸募集案内所",
-      "西宮地域事務所",
-      "西神戸募集案内所",
-      "豊岡出張所",
       "長田募集案内所",
-      "青野原分駐所"
+      "西神戸募集案内所",
+      "加古川地域事務所",
+      "青野原分駐所",
+      "姫路地域事務所",
+      "相生地域事務所",
+      "豊岡出張所",
+      "淡路島駐在員事務所"
     ],
     "nara": [
-      "五條地域事務所",
-      "天理募集案内所",
       "奈良募集案内所",
-      "橿原地域事務所"
+      "天理募集案内所",
+      "橿原地域事務所",
+      "五條地域事務所"
     ],
     "tottori": [
+      "米子地域事務所",
       "倉吉地域事務所",
-      "米子地域事務所"
+      "鳥取募集案内所"
     ],
     "shimane": [
-      "出雲地域事務所",
-      "大田地域事務所",
       "松江募集案内所",
+      "出雲地域事務所",
       "浜田出張所",
       "益田地域事務所",
+      "大田地域事務所",
       "隠岐の島駐在員事務所"
     ],
     "hiroshima": [
-      "三次地域事務所",
-      "可部募集案内所",
-      "呉地域事務所",
       "尾道出張所",
-      "広島地域事務所",
+      "呉地域事務所",
+      "三次地域事務所",
+      "福山地域事務所",
       "東広島地域事務所",
-      "福山地域事務所"
+      "広島地域事務所",
+      "可部募集案内所"
     ],
     "yamaguchi": [
       "下関出張所",
-      "周南地域事務所",
       "宇部地域事務所",
-      "山口募集案内所",
       "岩国地域事務所",
-      "柳井地域事務所",
-      "萩地域事務所"
+      "萩地域事務所",
+      "山口募集案内所",
+      "周南地域事務所",
+      "柳井地域事務所"
     ],
     "kagawa": [
-      "さぬき地域事務所",
       "丸亀地域事務所",
-      "善通寺地域事務所",
       "観音寺地域事務所",
-      "高松募集案内所"
+      "高松募集案内所",
+      "さぬき地域事務所",
+      "善通寺地域事務所"
     ],
     "ehime": [
       "今治地域事務所",
-      "大洲地域事務所",
-      "宇和島地域事務所",
       "新居浜出張所",
+      "宇和島地域事務所",
+      "大洲地域事務所",
       "松山募集案内所"
     ],
     "fukuoka": [
+      "福岡募集案内所",
+      "福岡西募集案内所",
+      "福岡地域事務所",
+      "春日分駐所",
+      "北九州出張所",
+      "芦屋地域事務所",
+      "築城地域事務所",
+      "飯塚地域事務所",
       "久留米地域事務所",
       "八女地域事務所",
-      "北九州出張所",
-      "大牟田地域事務所",
-      "春日分駐所",
       "柳川地域事務所",
-      "福岡募集案内所",
-      "福岡地域事務所",
-      "福岡西募集案内所",
-      "築城地域事務所",
-      "芦屋地域事務所",
-      "飯塚地域事務所"
+      "大牟田地域事務所"
     ],
     "nagasaki": [
-      "上五島駐在員事務所",
-      "五島駐在員事務所",
       "佐世保出張所",
-      "壱岐駐在員事務所",
       "大村地域事務所",
-      "対馬駐在員事務所",
+      "諫早地域事務所",
       "島原地域事務所",
       "琴海地域事務所",
-      "諫早地域事務所",
-      "長崎募集案内所"
+      "長崎募集案内所",
+      "壱岐駐在員事務所",
+      "対馬駐在員事務所",
+      "上五島駐在員事務所",
+      "五島駐在員事務所"
     ],
     "oita": [
-      "佐伯地域事務所",
       "別府地域事務所",
-      "大分募集案内所",
-      "宇佐地域事務所",
+      "佐伯地域事務所",
       "日田地域事務所",
-      "竹田地域事務所"
+      "竹田地域事務所",
+      "大分募集案内所",
+      "宇佐地域事務所"
     ],
     "miyazaki": [
-      "宮崎地域事務所",
-      "延岡地域事務所",
+      "宮崎募集案内所",
+      "都城地域事務所",
+      "延岡出張所",
       "日南地域事務所",
-      "都城出張所"
+      "日向地域事務所",
+      "新田原分駐所",
+      "小林地域事務所",
+      "高千穂連絡所"
     ],
     "okinawa": [
+      "那覇募集案内所",
+      "沖縄募集案内所",
       "名護地域事務所",
-      "宮古島駐在員事務所",
-      "沖縄地域事務所",
-      "石垣駐在員事務所",
-      "那覇募集案内所"
+      "宮古島出張所",
+      "石垣出張所",
+      "島尻募集案内所"
     ]
   },
   "regions": [
@@ -850,7 +863,7 @@
       "pref": "saitama",
       "label": "埼玉",
       "beforeCount": 8,
-      "draftCount": 8,
+      "draftCount": 12,
       "candidateCount": 12,
       "candidateNames": [
         "さいたま地域事務所",
@@ -943,7 +956,7 @@
       "pref": "obihiro",
       "label": "帯広",
       "beforeCount": 5,
-      "draftCount": 5,
+      "draftCount": 6,
       "candidateCount": 6,
       "candidateNames": [
         "帯広募集案内所",
@@ -1016,7 +1029,7 @@
       "pref": "miyagi",
       "label": "宮城",
       "beforeCount": 7,
-      "draftCount": 7,
+      "draftCount": 8,
       "candidateCount": 8,
       "candidateNames": [
         "仙台募集案内所",
@@ -1106,7 +1119,7 @@
       "pref": "aichi",
       "label": "愛知",
       "beforeCount": 12,
-      "draftCount": 12,
+      "draftCount": 13,
       "candidateCount": 13,
       "candidateNames": [
         "名古屋出張所",
@@ -1233,7 +1246,7 @@
       "pref": "tottori",
       "label": "鳥取",
       "beforeCount": 2,
-      "draftCount": 2,
+      "draftCount": 3,
       "candidateCount": 3,
       "candidateNames": [
         "鳥取募集案内所",
@@ -1402,7 +1415,7 @@
       "pref": "miyazaki",
       "label": "宮崎",
       "beforeCount": 4,
-      "draftCount": 4,
+      "draftCount": 8,
       "candidateCount": 8,
       "candidateNames": [
         "宮崎募集案内所",
@@ -1422,7 +1435,7 @@
       "pref": "okinawa",
       "label": "沖縄",
       "beforeCount": 5,
-      "draftCount": 5,
+      "draftCount": 6,
       "candidateCount": 6,
       "candidateNames": [
         "那覇募集案内所",
@@ -6538,8 +6551,9 @@
         "label": "北海道帯広市西五条南十四丁目１３番地",
         "resultCount": 1
       },
-      "status": "pending",
-      "pendingReason": "担当区域を現在の公式公開資料で確定できない"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "担当区域を現在の公式公開資料で確定できない",
+      "publishedId": "loc-obihiro-audit-892d3a350d"
     },
     {
       "pref": "iwate",
@@ -6565,8 +6579,9 @@
         "label": "岩手県二戸市石切所荷渡６番地",
         "resultCount": 1
       },
-      "status": "pending",
-      "pendingReason": "所員紹介の一部が準備中で担当区域が網羅されていない"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "所員紹介の一部が準備中で担当区域が網羅されていない",
+      "publishedId": "loc-iwate-6"
     },
     {
       "pref": "miyagi",
@@ -6594,8 +6609,9 @@
         "label": "宮城県仙台市宮城野区榴岡一丁目２番４８号",
         "resultCount": 1
       },
-      "status": "pending",
-      "pendingReason": "担当区域を現在の公式公開資料で確定できない"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "担当区域を現在の公式公開資料で確定できない",
+      "publishedId": "loc-miyagi-audit-6bb04c813f"
     },
     {
       "pref": "miyazaki",
@@ -6621,8 +6637,9 @@
         "label": "宮崎県宮崎市橘通東三丁目１番２２号",
         "resultCount": 1
       },
-      "status": "pending",
-      "pendingReason": "担当区域を現在の公式公開資料で確定できない"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "担当区域を現在の公式公開資料で確定できない",
+      "publishedId": "loc-miyazaki-r276"
     },
     {
       "pref": "miyazaki",
@@ -6648,8 +6665,9 @@
         "label": "宮崎県都城市久保原町１番",
         "resultCount": 1
       },
-      "status": "pending",
-      "pendingReason": "担当区域を現在の公式公開資料で確定できない"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "担当区域を現在の公式公開資料で確定できない",
+      "publishedId": "loc-miyazaki-r277"
     },
     {
       "pref": "miyazaki",
@@ -6675,8 +6693,9 @@
         "label": "宮崎県延岡市大貫町一丁目２９１５番地",
         "resultCount": 1
       },
-      "status": "pending",
-      "pendingReason": "担当区域を現在の公式公開資料で確定できない"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "担当区域を現在の公式公開資料で確定できない",
+      "publishedId": "loc-miyazaki-r278"
     },
     {
       "pref": "miyazaki",
@@ -6702,8 +6721,9 @@
         "label": "宮崎県日向市鶴町二丁目",
         "resultCount": 1
       },
-      "status": "pending",
-      "pendingReason": "担当区域を現在の公式公開資料で確定できない"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "担当区域を現在の公式公開資料で確定できない",
+      "publishedId": "loc-miyazaki-audit-fa260b307c"
     },
     {
       "pref": "miyazaki",
@@ -6729,8 +6749,9 @@
         "label": "宮崎県新富町新田",
         "resultCount": 1
       },
-      "status": "pending",
-      "pendingReason": "担当区域を現在の公式公開資料で確定できない"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "担当区域を現在の公式公開資料で確定できない",
+      "publishedId": "loc-miyazaki-audit-b797b60214"
     },
     {
       "pref": "miyazaki",
@@ -6756,8 +6777,9 @@
         "label": "宮崎県小林市細野２６６番地",
         "resultCount": 1
       },
-      "status": "pending",
-      "pendingReason": "担当区域を現在の公式公開資料で確定できない"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "担当区域を現在の公式公開資料で確定できない",
+      "publishedId": "loc-miyazaki-audit-966a771415"
     },
     {
       "pref": "miyazaki",
@@ -6783,8 +6805,9 @@
         "label": "宮崎県高千穂町三田井",
         "resultCount": 1
       },
-      "status": "pending",
-      "pendingReason": "担当区域を現在の公式公開資料で確定できない"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "担当区域を現在の公式公開資料で確定できない",
+      "publishedId": "loc-miyazaki-audit-1ab5297e89"
     },
     {
       "pref": "osaka",
@@ -6810,8 +6833,9 @@
         "label": "大阪府高槻市紺屋町８番２６号",
         "resultCount": 1
       },
-      "status": "pending",
-      "pendingReason": "担当区域を現在の公式公開資料で確定できない"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "担当区域を現在の公式公開資料で確定できない",
+      "publishedId": "loc-osaka-r193"
     },
     {
       "pref": "saitama",
@@ -6837,8 +6861,9 @@
         "label": "埼玉県秩父市大野原４９１番地",
         "resultCount": 1
       },
-      "status": "pending",
-      "pendingReason": "担当区域を現在の公式公開資料で確定できない"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "担当区域を現在の公式公開資料で確定できない",
+      "publishedId": "loc-saitama-audit-59b9b1a151"
     },
     {
       "pref": "saitama",
@@ -6867,8 +6892,9 @@
         "label": "埼玉県さいたま市北区日進町一丁目４０番地",
         "resultCount": 1
       },
-      "status": "pending",
-      "pendingReason": "担当区域を現在の公式公開資料で確定できない"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "担当区域を現在の公式公開資料で確定できない",
+      "publishedId": "loc-saitama-audit-a1c6bf2ef4"
     },
     {
       "pref": "saitama",
@@ -6897,8 +6923,9 @@
         "label": "埼玉県狭山市稲荷山二丁目",
         "resultCount": 1
       },
-      "status": "pending",
-      "pendingReason": "担当区域を現在の公式公開資料で確定できない"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "担当区域を現在の公式公開資料で確定できない",
+      "publishedId": "loc-saitama-audit-d5a422cb05"
     },
     {
       "pref": "saitama",
@@ -6927,8 +6954,9 @@
         "label": "埼玉県熊谷市拾六間",
         "resultCount": 1
       },
-      "status": "pending",
-      "pendingReason": "担当区域を現在の公式公開資料で確定できない"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "担当区域を現在の公式公開資料で確定できない",
+      "publishedId": "loc-saitama-audit-e0eb594e85"
     },
     {
       "pref": "tottori",
@@ -6954,8 +6982,9 @@
         "label": "鳥取県鳥取市東町二丁目３０２番地",
         "resultCount": 1
       },
-      "status": "pending",
-      "pendingReason": "担当区域を現在の公式公開資料で確定できない"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "担当区域を現在の公式公開資料で確定できない",
+      "publishedId": "loc-tottori-audit-2f44285cd3"
     },
     {
       "pref": "okinawa",
@@ -6981,8 +7010,9 @@
         "https://www.mod.go.jp/pco/okinawa/about.html",
         "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3575.5814969790267!2d127.81303531539622!3d26.340047790847517!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x34e50dfbc64c4e9f%3A0xbc7b9d755ab50eeb!2z6Ieq6KGb6ZqK5rKW57iE5Zyw5pa55Y2U5Yqb5pys6YOo5Yuf6ZuG5qGI5YaF5omA!5e0!3m2!1sja!2sjp!4v1638333149527!5m2!1sja!2sjp"
       ],
-      "status": "pending",
-      "pendingReason": "担当区域を現在の公式公開資料で確定できない"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "担当区域を現在の公式公開資料で確定できない",
+      "publishedId": "loc-okinawa-r281"
     },
     {
       "pref": "okinawa",
@@ -7008,8 +7038,9 @@
         "https://www.mod.go.jp/pco/okinawa/about.html",
         "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3581.412964089823!2d127.67095631539355!3d26.150676998772166!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x34e568785fa6ad45%3A0x1ca4a33d0c31cd5a!2z6Ieq6KGb6ZqK5rKW57iE5Zyw5pa55Y2U5Yqb5pys6YOo6YKj6KaH5YiG6aeQ5omA5bO25bC75YiG5a6k!5e0!3m2!1sja!2sjp!4v1638332650103!5m2!1sja!2sjp"
       ],
-      "status": "pending",
-      "pendingReason": "担当区域を現在の公式公開資料で確定できない"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "担当区域を現在の公式公開資料で確定できない",
+      "publishedId": "loc-okinawa-audit-53ac1fdb2e"
     },
     {
       "pref": "okinawa",
@@ -7035,8 +7066,9 @@
         "https://www.mod.go.jp/pco/okinawa/about.html",
         "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d57959.301774503605!2d125.27646244862142!3d24.779822106468977!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x34f4547481927ed9%3A0x7def637da4161a03!2z6Ieq6KGb6ZqK5rKW57iE5Zyw5pa55Y2U5Yqb5pys6YOoIOWuruWPpOWztuWHuuW8teaJgA!5e0!3m2!1sja!2sjp!4v1638333348396!5m2!1sja!2sjp"
       ],
-      "status": "pending",
-      "pendingReason": "担当区域を現在の公式公開資料で確定できない"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "担当区域を現在の公式公開資料で確定できない",
+      "publishedId": "loc-okinawa-r283"
     },
     {
       "pref": "okinawa",
@@ -7062,8 +7094,9 @@
         "https://www.mod.go.jp/pco/okinawa/about.html",
         "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d116329.74078268194!2d124.09104705820309!3d24.33588700000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x34600ab1c9b724c3%3A0xcef299aef8f32636!2z6Ieq6KGb6ZqK5rKW57iE5Zyw5pa55Y2U5Yqb5pys6YOoIOefs-Weo-WHuuW8teaJgA!5e0!3m2!1sja!2sjp!4v1638333406674!5m2!1sja!2sjp"
       ],
-      "status": "pending",
-      "pendingReason": "担当区域を現在の公式公開資料で確定できない"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "担当区域を現在の公式公開資料で確定できない",
+      "publishedId": "loc-okinawa-r284"
     },
     {
       "pref": "okinawa",
@@ -7089,8 +7122,9 @@
         "https://www.mod.go.jp/pco/okinawa/about.html",
         "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3567.6967800851253!2d127.9639283153997!3d26.59410378013446!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x34e4558a8a996e67%3A0x7f4d73ef36d19859!2z6Ieq6KGb6ZqK5rKW57iE5Zyw5pa55Y2U5Yqb5pys6YOo5ZCN6K235Zyw5Z-f5LqL5YuZ5omA!5e0!3m2!1sja!2sjp!4v1638333278798!5m2!1sja!2sjp"
       ],
-      "status": "pending",
-      "pendingReason": "担当区域を現在の公式公開資料で確定できない"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "担当区域を現在の公式公開資料で確定できない",
+      "publishedId": "loc-okinawa-r282"
     },
     {
       "pref": "okinawa",
@@ -7116,8 +7150,9 @@
         "https://www.mod.go.jp/pco/okinawa/about.html",
         "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d447.4413374220081!2d127.67559483491817!3d26.2119405!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x34e5699932ab8caf%3A0xbf3f065c47b8a45a!2z77yI5qCq77yJ5Y-k5rOi6JS157WE!5e0!3m2!1sja!2sjp!4v1762851449938!5m2!1sja!2sjp"
       ],
-      "status": "pending",
-      "pendingReason": "担当区域を現在の公式公開資料で確定できない"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "担当区域を現在の公式公開資料で確定できない",
+      "publishedId": "loc-okinawa-r280"
     },
     {
       "pref": "aichi",
@@ -7144,8 +7179,9 @@
         "https://www.mod.go.jp/pco/aichi/contact/kanayama/sho-kanayama.html",
         "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d1632.0482554349192!2d136.9490234!3d35.1043009!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60037b0d160d0ec7%3A0xc07207a3fb86d44a!2z6Ieq6KGb6ZqK5oSb55-l5Zyw5pa55Y2U5Yqb5pys6YOoIOmHjuS4puWLn-mbhuahiOWGheaJgA!5e0!3m2!1sja!2sjp!4v1774445024226!5m2!1sja!2sjp"
       ],
-      "status": "pending",
-      "pendingReason": "金山個別ページに掲載されるが一覧12事務所には無く、地図は野並の名称。運用形態・担当区域を要確認"
+      "status": "contact-published-area-review-pending",
+      "pendingReason": "金山個別ページに掲載されるが一覧12事務所には無く、地図は野並の名称。運用形態・担当区域を要確認",
+      "publishedId": "loc-aichi-audit-68bc0cd25d"
     }
   ],
   "added": [
@@ -7929,31 +7965,6 @@
   "confirmedContactReview": "docs/office-contact-review-20261005.json",
   "remainingFieldGaps": [
     {
-      "id": "loc-iwate-6",
-      "pref": "iwate",
-      "name": "二戸地域事務所",
-      "missingFields": [
-        "address"
-      ]
-    },
-    {
-      "id": "loc-kumamoto-21",
-      "pref": "kumamoto",
-      "name": "熊本分駐所",
-      "missingFields": [
-        "address"
-      ]
-    },
-    {
-      "id": "loc-niigata-25",
-      "pref": "niigata",
-      "name": "加茂地域事務所",
-      "missingFields": [
-        "address",
-        "tel"
-      ]
-    },
-    {
       "id": "loc-sapporo-35",
       "pref": "sapporo",
       "name": "月寒募集案内所",
@@ -7978,627 +7989,35 @@
       ]
     },
     {
-      "id": "loc-obihiro-r114",
-      "pref": "obihiro",
-      "name": "釧路出張所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-obihiro-r115",
-      "pref": "obihiro",
-      "name": "根室地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-obihiro-r116",
-      "pref": "obihiro",
-      "name": "網走地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-obihiro-r117",
-      "pref": "obihiro",
-      "name": "北見地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-obihiro-r118",
-      "pref": "obihiro",
-      "name": "中標津地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-aomori-r123",
-      "pref": "aomori",
-      "name": "青森募集案内所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-aomori-r124",
-      "pref": "aomori",
-      "name": "弘前地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-aomori-r125",
-      "pref": "aomori",
-      "name": "五所川原地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-aomori-r126",
-      "pref": "aomori",
-      "name": "八戸地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-aomori-r127",
-      "pref": "aomori",
-      "name": "三沢募集案内所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-aomori-r128",
-      "pref": "aomori",
-      "name": "むつ地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-miyagi-r136",
-      "pref": "miyagi",
-      "name": "名取地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-miyagi-r137",
-      "pref": "miyagi",
-      "name": "大河原地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-miyagi-r138",
-      "pref": "miyagi",
-      "name": "大崎地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-miyagi-r139",
-      "pref": "miyagi",
-      "name": "石巻地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-fukushima-r142",
-      "pref": "fukushima",
-      "name": "福島募集案内所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-fukushima-r143",
-      "pref": "fukushima",
-      "name": "いわき地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-fukushima-r144",
-      "pref": "fukushima",
-      "name": "郡山地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-fukushima-r145",
-      "pref": "fukushima",
-      "name": "相双地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-fukushima-r146",
-      "pref": "fukushima",
-      "name": "白河地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-fukushima-r147",
-      "pref": "fukushima",
-      "name": "会津若松出張所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-nagano-r151",
-      "pref": "nagano",
-      "name": "松本地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-nagano-r152",
-      "pref": "nagano",
-      "name": "上田地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-nagano-r154",
-      "pref": "nagano",
-      "name": "茅野地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-nagano-r155",
-      "pref": "nagano",
-      "name": "伊那地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-nagano-r156",
-      "pref": "nagano",
-      "name": "飯田出張所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-gifu-r158",
-      "pref": "gifu",
-      "name": "高山出張所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-aichi-r171",
-      "pref": "aichi",
-      "name": "名古屋出張所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-aichi-r174",
-      "pref": "aichi",
-      "name": "半田地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-aichi-r175",
-      "pref": "aichi",
-      "name": "一宮地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-aichi-r177",
-      "pref": "aichi",
-      "name": "瀬戸地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-aichi-r178",
-      "pref": "aichi",
-      "name": "岡崎出張所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-aichi-r179",
-      "pref": "aichi",
-      "name": "豊田地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-aichi-r181",
-      "pref": "aichi",
-      "name": "豊橋地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-aichi-r182",
-      "pref": "aichi",
-      "name": "豊川地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-shiga-r191",
-      "pref": "shiga",
-      "name": "草津地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
       "id": "loc-osaka-r193",
       "pref": "osaka",
-      "name": "茨木地域事務所",
+      "name": "高槻地域事務所",
       "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-osaka-r194",
-      "pref": "osaka",
-      "name": "東大阪地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-osaka-r195",
-      "pref": "osaka",
-      "name": "豊中募集案内所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-osaka-r196",
-      "pref": "osaka",
-      "name": "八尾分駐所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-osaka-r197",
-      "pref": "osaka",
-      "name": "ミナミ募集案内所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-osaka-r198",
-      "pref": "osaka",
-      "name": "梅田募集案内所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-osaka-r199",
-      "pref": "osaka",
-      "name": "十三募集案内所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-osaka-r200",
-      "pref": "osaka",
-      "name": "京橋募集案内所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-osaka-r202",
-      "pref": "osaka",
-      "name": "堺出張所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-osaka-r203",
-      "pref": "osaka",
-      "name": "岸和田地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-osaka-r204",
-      "pref": "osaka",
-      "name": "富田林地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-hyogo-r205",
-      "pref": "hyogo",
-      "name": "西宮地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-hyogo-r207",
-      "pref": "hyogo",
-      "name": "柏原地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-hyogo-r210",
-      "pref": "hyogo",
-      "name": "西神戸募集案内所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-hyogo-r211",
-      "pref": "hyogo",
-      "name": "加古川地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-hyogo-r212",
-      "pref": "hyogo",
-      "name": "青野原分駐所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-hyogo-r213",
-      "pref": "hyogo",
-      "name": "姫路地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-hyogo-r214",
-      "pref": "hyogo",
-      "name": "相生地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-hyogo-r215",
-      "pref": "hyogo",
-      "name": "豊岡出張所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-hyogo-r216",
-      "pref": "hyogo",
-      "name": "淡路島駐在員事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-yamaguchi-r239",
-      "pref": "yamaguchi",
-      "name": "岩国地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-yamaguchi-r240",
-      "pref": "yamaguchi",
-      "name": "萩地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-kagawa-r243",
-      "pref": "kagawa",
-      "name": "観音寺地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-fukuoka-r248",
-      "pref": "fukuoka",
-      "name": "福岡募集案内所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-fukuoka-r249",
-      "pref": "fukuoka",
-      "name": "福岡西募集案内所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-fukuoka-r250",
-      "pref": "fukuoka",
-      "name": "福岡地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-fukuoka-r251",
-      "pref": "fukuoka",
-      "name": "春日分駐所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-fukuoka-r254",
-      "pref": "fukuoka",
-      "name": "芦屋地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-fukuoka-r255",
-      "pref": "fukuoka",
-      "name": "築城地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-fukuoka-r256",
-      "pref": "fukuoka",
-      "name": "飯塚地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-fukuoka-r257",
-      "pref": "fukuoka",
-      "name": "久留米地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-fukuoka-r258",
-      "pref": "fukuoka",
-      "name": "八女地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-fukuoka-r259",
-      "pref": "fukuoka",
-      "name": "柳川地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-fukuoka-r260",
-      "pref": "fukuoka",
-      "name": "大牟田地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-oita-r271",
-      "pref": "oita",
-      "name": "別府地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-oita-r273",
-      "pref": "oita",
-      "name": "佐伯地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-oita-r274",
-      "pref": "oita",
-      "name": "日田地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-oita-r275",
-      "pref": "oita",
-      "name": "竹田地域事務所",
-      "missingFields": [
-        "tel"
+        "area"
       ]
     },
     {
       "id": "loc-miyazaki-r276",
       "pref": "miyazaki",
-      "name": "宮崎地域事務所",
+      "name": "宮崎募集案内所",
       "missingFields": [
-        "tel"
+        "area"
       ]
     },
     {
       "id": "loc-miyazaki-r277",
       "pref": "miyazaki",
-      "name": "都城出張所",
+      "name": "都城地域事務所",
       "missingFields": [
-        "tel"
+        "area"
       ]
     },
     {
       "id": "loc-miyazaki-r278",
       "pref": "miyazaki",
-      "name": "延岡地域事務所",
+      "name": "延岡出張所",
       "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-miyazaki-r279",
-      "pref": "miyazaki",
-      "name": "日南地域事務所",
-      "missingFields": [
-        "tel"
+        "area"
       ]
     },
     {
@@ -8606,15 +8025,15 @@
       "pref": "okinawa",
       "name": "那覇募集案内所",
       "missingFields": [
-        "tel"
+        "area"
       ]
     },
     {
       "id": "loc-okinawa-r281",
       "pref": "okinawa",
-      "name": "沖縄地域事務所",
+      "name": "沖縄募集案内所",
       "missingFields": [
-        "tel"
+        "area"
       ]
     },
     {
@@ -8622,79 +8041,23 @@
       "pref": "okinawa",
       "name": "名護地域事務所",
       "missingFields": [
-        "tel"
+        "area"
       ]
     },
     {
       "id": "loc-okinawa-r283",
       "pref": "okinawa",
-      "name": "宮古島駐在員事務所",
+      "name": "宮古島出張所",
       "missingFields": [
-        "tel"
+        "area"
       ]
     },
     {
       "id": "loc-okinawa-r284",
       "pref": "okinawa",
-      "name": "石垣駐在員事務所",
+      "name": "石垣出張所",
       "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-iwate-r292",
-      "pref": "iwate",
-      "name": "一関出張所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-iwate-r294",
-      "pref": "iwate",
-      "name": "宮古地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-niigata-r297",
-      "pref": "niigata",
-      "name": "長岡出張所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-niigata-r299",
-      "pref": "niigata",
-      "name": "柏崎地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-niigata-r300",
-      "pref": "niigata",
-      "name": "新発田地域事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-niigata-r301",
-      "pref": "niigata",
-      "name": "佐渡駐在員事務所",
-      "missingFields": [
-        "tel"
-      ]
-    },
-    {
-      "id": "loc-kyoto-r307",
-      "pref": "kyoto",
-      "name": "福知山地域事務所",
-      "missingFields": [
-        "tel"
+        "area"
       ]
     },
     {
@@ -8704,7 +8067,112 @@
       "missingFields": [
         "tel"
       ]
+    },
+    {
+      "id": "loc-obihiro-audit-892d3a350d",
+      "pref": "obihiro",
+      "name": "帯広募集案内所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-miyagi-audit-6bb04c813f",
+      "pref": "miyagi",
+      "name": "仙台駅東口募集案内所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-miyazaki-audit-fa260b307c",
+      "pref": "miyazaki",
+      "name": "日向地域事務所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-miyazaki-audit-b797b60214",
+      "pref": "miyazaki",
+      "name": "新田原分駐所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-miyazaki-audit-966a771415",
+      "pref": "miyazaki",
+      "name": "小林地域事務所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-miyazaki-audit-1ab5297e89",
+      "pref": "miyazaki",
+      "name": "高千穂連絡所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-saitama-audit-59b9b1a151",
+      "pref": "saitama",
+      "name": "秩父地域事務所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-saitama-audit-a1c6bf2ef4",
+      "pref": "saitama",
+      "name": "大宮分駐所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-saitama-audit-d5a422cb05",
+      "pref": "saitama",
+      "name": "入間分駐所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-saitama-audit-e0eb594e85",
+      "pref": "saitama",
+      "name": "熊谷分駐所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-tottori-audit-2f44285cd3",
+      "pref": "tottori",
+      "name": "鳥取募集案内所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-okinawa-audit-53ac1fdb2e",
+      "pref": "okinawa",
+      "name": "島尻募集案内所",
+      "missingFields": [
+        "area"
+      ]
+    },
+    {
+      "id": "loc-aichi-audit-68bc0cd25d",
+      "pref": "aichi",
+      "name": "名古屋南募集案内所",
+      "missingFields": [
+        "tel",
+        "area"
+      ]
     }
   ],
-  "releaseNote": "確定分のみ先行反映。未確定23候補と既存の不足97件の確認を継続。"
+  "releaseNote": "2026-10-10: 公式連絡先を確認した保留候補23件を公開。担当区域の確認とは分離し、13件を新規登録。最新の項目別根拠はoffice-contact-review-20261010.json。"
 }

@@ -3,8 +3,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const { chromium } = require('playwright');
 const { hashHtml, classifyChange } = require('./lib/sourceMonitor');
+const { decodeHtml } = require('./lib/officePageSnapshot');
 
 const ROOT = path.join(__dirname, '..');
 const OFFICES_PATH = path.join(ROOT, 'public/data/offices.json');
@@ -114,6 +114,14 @@ function loadSources() {
     });
   }
 
+  // 全国窓口巡回と同じ設定を読む。連絡先URLだけでは専用イベントページを網羅できない。
+  const configured = require('./config/office-event-sources.json');
+  for (const office of configured.offices || []) {
+    for (const url of [office.contactUrl, ...(office.pages || []).map(page => page.url)]) {
+      addSource(map, url, { pref: office.pref, name: office.name, kind: 'office-event-source' });
+    }
+  }
+
   // 地本トップだけでなく、既存スクレイパーが直接読むイベント専用ページも監視する。
   // index.js の URLS から抽出するため、今後URLが追加されても監視側の二重管理を避けられる。
   for (const url of urlsFromScraperIndex()) {
@@ -166,14 +174,20 @@ async function takeSnapshot(context, source) {
     }
     if (status >= 500) throw new Error(`HTTP ${status}`);
 
-    const html = await page.content();
+    const headers = response ? await response.allHeaders() : {};
+    let html;
+    try { html = await page.content(); }
+    catch (error) {
+      if (!response?.body) throw error;
+      // ナビゲーション競合時は受信済みHTMLを利用し、再リクエストしない。
+      html = decodeHtml(await response.body(), headers);
+    }
     if (!html || html.length < 40) throw new Error('HTMLが空です');
 
-    const headers = response ? await response.allHeaders() : {};
     return {
       hash: hashHtml(html),
       status,
-      finalUrl: page.url(),
+      finalUrl: response?.url?.() || page.url(),
       etag: headers.etag || null,
       lastModified: headers['last-modified'] || null,
       contentLength: html.length,
@@ -184,6 +198,7 @@ async function takeSnapshot(context, source) {
 }
 
 async function main() {
+  const { chromium } = require('playwright');
   const sources = loadSources();
   if (!sources.length) throw new Error('監視対象URLが0件です');
 
@@ -325,7 +340,9 @@ async function main() {
   }
 }
 
-main().catch((err) => {
+module.exports = { loadSources, takeSnapshot };
+
+if (require.main === module) main().catch((err) => {
   console.error('[SourceMonitor] fatal:', err);
   process.exitCode = 1;
 });

@@ -99,10 +99,24 @@ jobs:
               console.log(`- ${c.url}`);
             }
           }
+          if (r.failures.length) {
+            console.log('');
+            console.log('### 取得失敗・保護停止');
+            for (const f of r.failures) console.log(`- ${f.url}: ${f.error}`);
+          }
           NODE
 
+      - name: 監視レポートを保存
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-update-report
+          path: scraper/source-update-report.json
+          if-no-files-found: warn
+          retention-days: 30
+
       - name: 更新検知時にフルスクレイプ＋OCRを起動
-        if: steps.monitor.outputs.changed != '0'
+        if: steps.monitor.outcome == 'success' && fromJSON(steps.monitor.outputs.changed || '0') > 0
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

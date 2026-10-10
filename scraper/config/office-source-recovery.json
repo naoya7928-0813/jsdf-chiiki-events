@@ -1,6 +1,6 @@
 {
-  "checkedAt": "2026-10-07",
-  "sourceRun": 37549392641,
+  "checkedAt": "2026-10-10",
+  "sourceRun": 37937955680,
   "note": "最新巡回で取得に失敗した探索リンクを、公式掲載・HTTP200を再確認した現行URLへ置換。担当区域や窓口の廃止を推測する設定ではない。",
   "aliases": {
     "https://www.mod.go.jp/pco/osaka/recruit/list.html": {
@@ -35,6 +35,18 @@
       "url": "https://www.mod.go.jp/pco/tokyo/event2/index.html",
       "scope": "shared",
       "reason": "個別イベントページの403が残るため、現行の公式共通カレンダーへ巡回先を切替。原ページの復旧・個別時刻の取得成功を意味しない。"
+    },
+    "https://www.mod.go.jp/pco/osaka/recruit/session/jyuso.html": {
+      "url": "https://www.mod.go.jp/pco/osaka/recruit/session/menu.html",
+      "scope": "shared",
+      "reason": "旧URLは最新実行で404。現行一覧本文に十三募集案内所の説明会を確認。"
     }
-  }
+  },
+  "excludedUrls": [
+    {
+      "url": "https://www.mod.go.jp/pco/shimane/recruit/senior.html",
+      "reason": "最新実行で404。先輩自衛官の紹介ページでありイベント掲載先ではない。現行イベント一覧は既存巡回を継続。",
+      "checkedAt": "2026-10-10"
+    }
+  ]
 }
