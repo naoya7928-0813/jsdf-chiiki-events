@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-10-09",
-  "count": 4,
+  "updatedAt": "2026-10-10",
+  "count": 3,
   "events": [
     {
       "id": "ai-office-20280620-ghetd",
@@ -11,44 +11,32 @@
       "place": "自衛隊愛知地本豊田地域事務所（豊田合同庁舎3）",
       "url": "https://www.mod.go.jp/pco/aichi/contact/toyota/seminar/toyota_se202606_11.jpg",
       "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-09",
+      "quarantinedAt": "2026-10-10",
       "reason": "OCR由来の不自然な未来日"
     },
     {
-      "id": "fu-office-20261009-hw1m6",
-      "pref": "fukuoka",
-      "date": "2026-10-09",
+      "id": "hy-office-20261017-q3dja",
+      "pref": "hyogo",
+      "date": "2026-10-17",
       "endDate": "",
-      "title": "自衛隧福网地方協力本部",
+      "title": "第19回：放送「自衛官の生活環境や待遇について💡💡」",
       "place": "",
-      "url": "https://www.mod.go.jp/pco/fukuoka/recruit/results/images/2024/8.10.9kougakuM.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-09",
-      "reason": ""
+      "url": "https://www.mod.go.jp/pco/hyogo/jimusyo/radio/20251017FMmikkixi.wav",
+      "source_type": "office_html",
+      "quarantinedAt": "2026-10-10",
+      "reason": "非イベント文書の疑い"
     },
     {
-      "id": "fu-off-20261009-qaivx",
-      "pref": "fukuoka",
-      "date": "2026-10-09",
+      "id": "hy-office-20261011-hnkej",
+      "pref": "hyogo",
+      "date": "2026-10-11",
       "endDate": "",
-      "title": "自衛隧福网地方協力本部",
+      "title": "第7回：放送「自衛官って休みあるん？あります！！」",
       "place": "",
-      "url": "https://www.mod.go.jp/pco/fukuoka/recruit/results/images/2024/8.10.9kougakuM.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-09",
-      "reason": ""
-    },
-    {
-      "id": "fu-off-20261009-qaivx",
-      "pref": "fukuoka",
-      "date": "2026-10-09",
-      "endDate": "",
-      "title": "自衛隧福网地方協力本部",
-      "place": "",
-      "url": "https://www.mod.go.jp/pco/fukuoka/recruit/results/images/2024/8.10.9kougakuA.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-09",
-      "reason": ""
+      "url": "https://www.mod.go.jp/pco/hyogo/jimusyo/radio/20241011FMmikkixi.wav",
+      "source_type": "office_html",
+      "quarantinedAt": "2026-10-10",
+      "reason": "非イベント文書の疑い"
     }
   ]
 }
