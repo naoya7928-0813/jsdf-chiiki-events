@@ -1,16 +1,16 @@
 {
-  "updatedAt": "2026-10-11",
+  "updatedAt": "2026-10-12",
   "limit": 30,
   "summary": {
-    "checked": 402,
-    "flagged": 21,
+    "checked": 379,
+    "flagged": 19,
     "attempted": 13,
     "corrected": 2,
     "unverified": 0,
-    "noSource": 4,
+    "noSource": 3,
     "overBudget": 0,
-    "skippedNoSource": 4,
-    "skippedNotEligible": 4,
+    "skippedNoSource": 3,
+    "skippedNotEligible": 3,
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
@@ -103,11 +103,6 @@
   ],
   "skipped": [
     {
-      "id": "ya-20261011-oi7jq",
-      "pref": "yamagata",
-      "reason": "no_source"
-    },
-    {
       "id": "ya-20261024-waz1q",
       "pref": "yamagata",
       "reason": "no_source"
@@ -135,11 +130,6 @@
     {
       "id": "ok-20261115-b75qj",
       "pref": "okayama",
-      "reason": "not_eligible"
-    },
-    {
-      "id": "hi-20261011-qcxpz",
-      "pref": "hiroshima",
       "reason": "not_eligible"
     }
   ]
