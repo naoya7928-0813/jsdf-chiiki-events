@@ -12,6 +12,8 @@ import { normalizeTags } from '../../shared/tags.cjs';
 import { sanitizePublicChanges } from '../../shared/eventChanges.cjs';
 // 運営が公開した FAQ・参加準備ガイド
 import { sanitizePublicFaq, sanitizePublicGuide } from '../../shared/eventGuide.cjs';
+// 運営が設定した交通アクセス（入場口・推奨駅など）
+import { sanitizeAccess } from '../../shared/transit.cjs';
 import { jstTodayStr } from '../utils/date';
 
 const EMPTY = { updatedAt: null };
@@ -65,6 +67,7 @@ function normalizeEvent(ev) {
     changes: ev.changes === undefined ? undefined : sanitizePublicChanges(ev.changes),
     faq:     ev.faq === undefined ? undefined : sanitizePublicFaq(ev.faq),
     guide:   ev.guide === undefined ? undefined : sanitizePublicGuide(ev.guide),
+    access:  ev.access === undefined ? undefined : (sanitizeAccess(ev.access) || undefined),
   };
 }
 

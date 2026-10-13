@@ -303,7 +303,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         };
         delete payload.multiDay; delete payload.timeStart; delete payload.timeEnd;
         delete payload.lat; delete payload.lon;
-        const r = await adminFetch('/api/admin/events', { method: 'POST', body: JSON.stringify({ event: { ...payload, status, faq: guideValue.faq, guide: guideValue.guide } }) });
+        const r = await adminFetch('/api/admin/events', { method: 'POST', body: JSON.stringify({ event: { ...payload, status, faq: guideValue.faq, guide: guideValue.guide, access: guideValue.access } }) });
         const j = await r.json().catch(() => ({}));
         if (r.ok) {
           setMsg({ type: 'ok', text: status === 'published' ? '公開しました（全利用者に表示）。' : '下書き保存しました。' });
@@ -654,7 +654,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         )}
 
         {/* よくある質問・参加準備ガイド。新規はイベントと一緒に、既存は個別に保存する */}
-        <SectionLabel>よくある質問・参加準備ガイド</SectionLabel>
+        <SectionLabel>よくある質問・参加準備ガイド・交通アクセス</SectionLabel>
         {editingId
           ? <EventGuidePanel key={`guide-${editingId}`} eventId={editingId} adminFetch={adminFetch} primary={primary} styles={{ input, label, hint }} />
           : <EventGuideEditor value={guideValue} onChange={setGuideValue} styles={{ input, label, hint }} primary={primary} />}

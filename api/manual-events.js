@@ -5,6 +5,7 @@ import { redis } from './_security.js';
 import { PUBLIC_STATUS_VALUES } from '../shared/eventStatus.cjs';
 import { publicChanges } from '../shared/eventChanges.cjs';
 import { toPublicRecord } from '../shared/eventGuide.cjs';
+import { sanitizeAccess } from '../shared/transit.cjs';
 
 const KEY = 'manual:events';
 const OKEY = 'manual:overrides';
@@ -23,7 +24,13 @@ function withPublicChanges(o) {
 }
 
 /** 公開用に整える: 変更のお知らせ・FAQ・参加準備ガイドを公開してよい分だけにする */
-const toPublic = (o) => toPublicRecord(withPublicChanges(o));
+const toPublic = (o) => {
+  const r = toPublicRecord(withPublicChanges(o));
+  if (!r || r.access === undefined) return r;
+  const { access, ...rest } = r;
+  const a = sanitizeAccess(access);
+  return a ? { ...rest, access: a } : rest;
+};
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });

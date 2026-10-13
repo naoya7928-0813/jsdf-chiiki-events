@@ -4,7 +4,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import { GUIDE_ITEMS, GUIDE_STATES, LIMITS } from '../../shared/eventGuide.cjs';
 
-export const EMPTY_GUIDE_VALUE = { faq: [], guide: {} };
+export const EMPTY_GUIDE_VALUE = { faq: [], guide: {}, access: {} };
+
+/** 保存済みの交通アクセス（{entrance:{lat,lon,label}, …}）→ 入力欄の形 */
+function accessToInput(a) {
+  if (!a || typeof a !== 'object') return {};
+  return {
+    entranceLabel: a.entrance ? a.entrance.label : (a.entranceLabel || ''),
+    entranceLat: a.entrance ? String(a.entrance.lat) : '', entranceLon: a.entrance ? String(a.entrance.lon) : '',
+    station: a.station || '', busStop: a.busStop || '', notes: a.notes || '', url: a.url || '',
+  };
+}
 
 const STATE_COLOR = { unknown: '#888', na: '#64748b', confirmed: '#16a34a' };
 
@@ -12,7 +22,9 @@ export function EventGuideEditor({ value, onChange, styles, primary }) {
   const { input, label, hint } = styles;
   const faq = Array.isArray(value?.faq) ? value.faq : [];
   const guide = value?.guide && typeof value.guide === 'object' ? value.guide : {};
+  const access = value?.access && typeof value.access === 'object' ? value.access : {};
   const setFaq = (next) => onChange({ ...value, faq: next });
+  const setAccess = (k, v) => onChange({ ...value, access: { ...access, [k]: v } });
   const setItem = (id, patch) => onChange({ ...value, guide: { ...guide, [id]: { state: 'unknown', text: '', ...(guide[id] || {}), ...patch } } });
   const move = (i, d) => {
     const j = i + d;
@@ -71,6 +83,25 @@ export function EventGuideEditor({ value, onChange, styles, primary }) {
         );
       })}
       <div style={hint}>「確認済み」の項目は内容を、「該当なし」は「該当なし」とだけ公開します。「未確認」は公開しません（推測で埋めないでください）。</div>
+
+      <div style={{ ...label, marginTop: 14 }}>交通アクセス（公共交通機関での案内に使います）</div>
+      {[
+        ['entranceLabel', '来場者用入口の名称（例: 正門・北門）', 40],
+        ['station', '推奨最寄り駅（例: JR宇都宮駅）', 40],
+        ['busStop', '推奨バス停（例: 関東バス「駐屯地前」）', 60],
+        ['url', '公式のアクセス案内URL（https://…）', 500],
+      ].map(([k, ph, max]) => (
+        <input key={k} value={access[k] || ''} maxLength={max} onChange={e => setAccess(k, e.target.value)} placeholder={ph} aria-label={ph} style={input} />
+      ))}
+      <div style={{ display: 'flex', gap: 10 }}>
+        <input value={access.entranceLat || ''} onChange={e => setAccess('entranceLat', e.target.value)} placeholder="入口の緯度（例: 36.559）" aria-label="入口の緯度" inputMode="decimal" style={{ ...input, flex: 1, minWidth: 0 }} />
+        <input value={access.entranceLon || ''} onChange={e => setAccess('entranceLon', e.target.value)} placeholder="入口の経度（例: 139.898）" aria-label="入口の経度" inputMode="decimal" style={{ ...input, flex: 1, minWidth: 0 }} />
+      </div>
+      <textarea value={access.notes || ''} maxLength={300} rows={2} onChange={e => setAccess('notes', e.target.value)} placeholder="交通の注意事項（例: 当日は臨時バスあり。駐車場はありません）" aria-label="交通の注意事項" style={{ ...input, resize: 'vertical' }} />
+      <div style={hint}>
+        駐屯地・基地は施設の中心と来場者の入口が離れていることがあります。入口の座標を入れると、経路の目的地が入口になります
+        （空なら会場の住所・会場名を使います）。駐車場は上の「駐車場」項目で設定してください。
+      </div>
     </div>
   );
 }
@@ -85,7 +116,7 @@ export default function EventGuidePanel({ eventId, adminFetch, primary, styles }
     try {
       const r = await adminFetch(`/api/admin/event-guides?id=${encodeURIComponent(eventId)}`);
       const j = await r.json().catch(() => ({}));
-      if (r.ok) { const v = { faq: j.faq || [], guide: j.guide || {} }; setValue(v); setSaved(JSON.stringify(v)); }
+      if (r.ok) { const v = { faq: j.faq || [], guide: j.guide || {}, access: accessToInput(j.access) }; setValue(v); setSaved(JSON.stringify(v)); }
       else setMsg({ type: 'err', text: j.error || '読み込めませんでした。' });
     } catch { setMsg({ type: 'err', text: '通信に失敗しました。' }); }
   }, [adminFetch, eventId]);
@@ -97,9 +128,9 @@ export default function EventGuidePanel({ eventId, adminFetch, primary, styles }
       const r = await adminFetch('/api/admin/event-guides', { method: 'PUT', body: JSON.stringify({ id: eventId, ...value }) });
       const j = await r.json().catch(() => ({}));
       if (r.ok) {
-        const v = { faq: j.faq || [], guide: j.guide || {} };
+        const v = { faq: j.faq || [], guide: j.guide || {}, access: accessToInput(j.access) };
         setValue(v); setSaved(JSON.stringify(v));
-        setMsg({ type: 'ok', text: 'FAQ・参加準備ガイドを保存しました（公開画面に反映されます）。' });
+        setMsg({ type: 'ok', text: 'FAQ・参加準備ガイド・交通アクセスを保存しました（公開画面に反映されます）。' });
       } else setMsg({ type: 'err', text: j.error || '保存に失敗しました。' });
     } catch { setMsg({ type: 'err', text: '通信に失敗しました。' }); }
     finally { setBusy(false); }
@@ -113,7 +144,7 @@ export default function EventGuidePanel({ eventId, adminFetch, primary, styles }
       {msg && <div style={{ padding: '8px 11px', borderRadius: 8, margin: '0 0 10px', fontSize: 12, lineHeight: 1.6, background: msg.type === 'ok' ? '#16a34a14' : '#ef444412', color: msg.type === 'ok' ? '#15803d' : '#ef4444' }}>{msg.text}</div>}
       <button type="button" onClick={save} disabled={busy || !dirty}
         style={{ width: '100%', padding: 12, borderRadius: 10, marginBottom: 12, border: 'none', fontSize: 13.5, fontWeight: 700, color: '#fff', background: (busy || !dirty) ? 'var(--border)' : primary, cursor: (busy || !dirty) ? 'default' : 'pointer' }}>
-        {busy ? '保存中…' : dirty ? 'FAQ・参加準備ガイドを保存' : '保存済み'}
+        {busy ? '保存中…' : dirty ? 'FAQ・参加準備ガイド・交通アクセスを保存' : '保存済み'}
       </button>
     </div>
   );

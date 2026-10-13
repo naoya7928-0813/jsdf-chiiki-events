@@ -77,3 +77,18 @@ test('入力検証と権限: 片方だけの行・確認済みの空本文は 40
   assert.equal((await guides('PUT', null, { id, faq: [] })).statusCode, 401);
   assert.equal((await guides('PUT', 'tokyo', { id: '../../x', faq: [] })).statusCode, 400);
 });
+
+test('交通アクセス: 入場口・推奨駅を保存し、公開APIは検証済みの形だけを返す。不正な座標・URLは 400', async () => {
+  const id = 'tk-20991020-bbbb';
+  const bad = await guides('PUT', 'tokyo', { id, access: { entranceLat: '91', entranceLon: '139' } });
+  assert.equal(bad.statusCode, 400);
+  assert.equal((await guides('PUT', 'tokyo', { id, access: { url: 'javascript:alert(1)' } })).statusCode, 400);
+  const ok = await guides('PUT', 'tokyo', { id, faq: [], guide: {}, access: { entranceLabel: '正門', entranceLat: '36.574', entranceLon: '139.876', station: 'JR宇都宮駅', url: 'https://www.mod.go.jp/' } });
+  assert.equal(ok.statusCode, 200, JSON.stringify(ok.body));
+  const o = (await pub()).body.overrides[id];
+  assert.deepEqual(o.access.entrance, { lat: 36.574, lon: 139.876, label: '正門' });
+  assert.equal(o.access.station, 'JR宇都宮駅');
+  // 内容の上書き保存でも残る
+  await call('../api/admin/overrides.js', 'POST', 'tokyo', { id, patch: { title: '自衛隊説明会' } });
+  assert.equal((await guides('GET', 'tokyo', null, { id })).body.access.station, 'JR宇都宮駅');
+});

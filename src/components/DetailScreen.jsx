@@ -6,6 +6,7 @@ import WeatherCard from './WeatherCard';
 import { EventChangeNotice } from './EventChanges';
 import { EventGuideSection, EventFaqSection } from './EventGuide';
 import { recordView } from '../utils/viewTracker';
+import AccessGuide from './AccessGuide';
 import { useElementWidth, isTouchPhone, useIsShortViewport } from '../hooks/useBreakpoint';
 import { googleCalendarUrl, downloadIcs } from '../utils/calendar';
 import { useOnline } from '../hooks/useOnline';
@@ -643,6 +644,9 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
           </div>
         </div>
         {/* ここまでが 天気 / 開催場所 の横並びブロック */}
+
+        {/* 公共交通機関でのアクセス（押したときだけ駅データ・位置情報を使う） */}
+        <AccessGuide ev={ev} online={online} />
 
         {/* 参加資格・締切 */}
         {(ev.ageRequirement || ev.deadline) && (

@@ -80,6 +80,15 @@ registerRoute(
   })
 );
 
+// 全国の鉄道駅（交通アクセス案内）。年1回程度しか変わらない。開いた人だけが取得し、以後はオフラインでも使う
+registerRoute(
+  ({ url }) => url.pathname === '/data/stations.json',
+  new StaleWhileRevalidate({
+    cacheName: 'stations-data',
+    plugins: [new ExpirationPlugin({ maxEntries: 2, maxAgeSeconds: 60 * 60 * 24 * 90, purgeOnQuotaError: true })],
+  })
+);
+
 // 天気予報（詳細画面の遅延取得）。主キャッシュはサーバー側（Redis + CDN）。
 // SW は補助的に「短期間」だけ保持し、再描画のちらつき抑制とネットワーク障害時の
 // フォールバックに限定する（長期間古い予報を返さない）。

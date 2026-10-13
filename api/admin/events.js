@@ -11,6 +11,7 @@ import W from '../../shared/weather.cjs';
 import { normalizeBranches } from '../../shared/branch.cjs';
 import { normalizeTags } from '../../shared/tags.cjs';
 import G from '../../shared/eventGuide.cjs';
+import T from '../../shared/transit.cjs';
 
 const KEY = 'manual:events';
 const MAX_EVENTS = 500;
@@ -86,9 +87,12 @@ function buildEvent(input, account) {
   if (faqIn.error) return { error: faqIn.error };
   const guideIn = G.normalizeGuideInput(e.guide);
   if (guideIn.error) return { error: guideIn.error };
+  const accessIn = T.normalizeAccessInput(e.access);
+  if (accessIn.error) return { error: accessIn.error };
   const guideFields = {
     ...(faqIn.faq.length ? { faq: faqIn.faq } : {}),
     ...(Object.keys(guideIn.guide).length ? { guide: guideIn.guide } : {}),
+    ...(Object.keys(accessIn.access).length ? { access: accessIn.access } : {}),
   };
   if (Object.keys(guideFields).length) guideFields.guideUpdatedAt = new Date().toISOString();
   const manualLoc = parseManualCoords(e.weatherLocation);

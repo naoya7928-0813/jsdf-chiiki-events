@@ -466,6 +466,22 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
   統計を書き換える API は無い（計測API以外から変更不可）
 - イベントIDが変わらない限り、スクレイプ・再デプロイで履歴は消えない（Redis に保存）
 
+## 交通・アクセス案内（2026-10-13 導入）
+
+調査結果は **`docs/TRANSIT_API_2026-10.md`**（Google の経路APIは日本の公共交通に非対応・国内の経路APIは有料）。
+純粋ロジックは **`shared/transit.cjs`**、画面は `src/components/AccessGuide.jsx`、経路APIの差し替え口は `api/transit.js`。
+
+- 駅データ: `public/data/stations.json`（国土数値情報 鉄道データ N02・CC BY 4.0。**出典表示が必要**）。
+  `scripts/build-stations.mjs` で年1回程度作り直す（スクレイプ毎には実行しない）。開いた人だけが取得（precache しない・SW で90日保持）
+- 最寄り駅は**直線距離の近い順の候補**を出して利用者に選ばせる（断定しない）。距離は「直線」と明記
+- 目的地は 入場口の座標（運営設定 `access.entrance`）> 天気用座標（accuracy が address/venue/manual のときだけ）> 住所・会場名
+- 経路は Google マップの経路検索ページ（Maps URLs・APIキー不要）へ案内。⚠️ **運賃・所要時間・乗換は経路APIの応答だけを表示し、推測で作らない**
+- `/api/transit` は既定で `not_configured`。有料APIの接続は**承認後**に `PROVIDERS` へアダプタを足し、
+  `TRANSIT_PROVIDER`・`TRANSIT_MONTHLY_LIMIT`（既定0=呼ばない）・各社キーを Vercel に設定する。キーはブラウザに出さない
+- 運営の設定: `access`（入口の名称・緯度経度・推奨最寄り駅・推奨バス停・注意事項・公式アクセスURL）。駐車場はガイドの `parking`。
+  `/api/admin/event-guides` で FAQ・ガイドと一緒に保存（`MANAGED_KEYS` に含めて上書き保存・取り消しでも残す）
+- 位置情報は「現在地から探す」を押したときだけ取得し、保存しない（`vercel.json` の Permissions-Policy は `geolocation=(self)`）
+
 ## フロントエンド仕様
 
 - **地域マップ**: 8地域（北海道・東北・関東・中部・近畿・中国・四国・九州）
@@ -617,6 +633,7 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 | 変更・中止の種別・連動する開催状況・公開形 | `shared/eventChanges.cjs` | `/api/admin/event-changes`／`/api/manual-events`／詳細・一覧・お気に入り・運営画面 |
 | FAQ・参加準備ガイドの項目・状態・公開形 | `shared/eventGuide.cjs` | `/api/admin/event-guides`／`/api/admin/events`／`/api/manual-events`／詳細・運営画面 |
 | 閲覧数の集計・重複判定・並べ替え | `shared/viewStats.cjs` | `/api/view`／`/api/admin/view-stats`／`src/utils/viewTracker.js`／運営画面 |
+| 駅候補・目的地の決め方・経路URL・経路応答の正規化 | `shared/transit.cjs` | `AccessGuide.jsx`／`/api/transit`／`/api/admin/event-guides` |
 | 管理APIの対象イベントの所属解決 | `api/_eventScope.js` | `/api/admin/overrides`／`/api/admin/event-changes` ほか |
 | 公開URL・許可オリジン | `shared/siteUrl.cjs` | 全体（上記「セキュリティ構成」参照）／`shared/domainNotice.cjs` |
 | ドメイン移行のお知らせを出すか | `shared/domainNotice.cjs` | `src/App.jsx`（`src/components/DomainNotice.jsx` を出す判断） |
