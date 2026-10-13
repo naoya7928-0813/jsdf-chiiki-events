@@ -212,6 +212,9 @@ jobs:
           GEMINI_API_KEY:   ${{ secrets.GEMINI_API_KEY }}
           MISTRAL_API_KEY:  ${{ secrets.MISTRAL_API_KEY }}
           OCR_SPACE_API_KEY: ${{ secrets.OCR_SPACE_API_KEY }}
+          # OCR.space のエンジン番号（未設定なら 1）。日本語対応と明記されているのは 1 だが廃止予定のため、
+          # 実行サマリの「OCR稼働状況」で OCR.space の失敗が続くようならリポジトリ変数で 3 に切り替える
+          OCR_SPACE_ENGINE: ${{ vars.OCR_SPACE_ENGINE }}
           SITE_URL:         ${{ secrets.SITE_URL }}
           NOTIFY_SECRET:    ${{ secrets.NOTIFY_SECRET }}
           HQ_EXPLORE_PREFS:       ${{ github.event.inputs.hq_explore_prefs || '' }}
