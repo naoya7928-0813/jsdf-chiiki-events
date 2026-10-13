@@ -450,6 +450,22 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - 削除・終了: 手動イベントは削除時に一緒に消える。自動収集イベントは公開データから外れると表示されなくなり、
   上書きレコードは運営が取り消すまで残る（同じIDで再掲載された場合に備える）
 
+## イベント別閲覧数（2026-10-13 導入）
+
+純粋ロジックは **`shared/viewStats.cjs`**。計測は `POST /api/view`（公開）、閲覧は `GET /api/admin/view-stats`（運営）。
+数えるのは「イベント詳細が開かれた回数」（**ユニーク人数ではない**）。日付の区切りは JST。
+
+- Redis: `views:total`（hash・累計・失効なし）/ `views:d:<YYYY-MM-DD>`（hash・日別・40日で失効）/
+  `views:seen:<hash>`（重複防止・30分）。1回の計測は SET NX＋HINCRBY×2＋EXPIRE（＋レート制限）
+- 重複防止: 画面はイベントIDが変わったときだけ送る（再描画・状態更新・自動更新で送らない）＋同じタブで30分以内は送らない
+  （sessionStorage `jsdf-viewed`）。サーバーは同じ通信元×UA×イベントを30分に1回（IP は保存せずハッシュのみ。
+  ソルトは `VIEW_HASH_SALT`、未設定なら KV トークン）
+- 数えないもの: ボットの UA・`navigator.webdriver`・運営者ログイン中・Origin なし／`Sec-Fetch-Site` が same-origin 以外・
+  存在しないイベントID・下書き・画面側の重複回避接尾辞（`~2`）付きID。拒否は 202 で黙って捨てる（監査ログを汚さない）
+- 運営側は担当範囲（`canManageScope`）のイベントだけを返す。権限は `event:update`／`event:override`／`audit:read`。
+  統計を書き換える API は無い（計測API以外から変更不可）
+- イベントIDが変わらない限り、スクレイプ・再デプロイで履歴は消えない（Redis に保存）
+
 ## フロントエンド仕様
 
 - **地域マップ**: 8地域（北海道・東北・関東・中部・近畿・中国・四国・九州）
@@ -600,6 +616,7 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 | 配信スロット・打ち切り期限・開始位置のずらし | `shared/scrapeDeadline.cjs` | `scraper/index.js`（締切・ローテーション・前回データ引き継ぎ）／`.github/workflows/scrape.yml`（通知の待機時刻） |
 | 変更・中止の種別・連動する開催状況・公開形 | `shared/eventChanges.cjs` | `/api/admin/event-changes`／`/api/manual-events`／詳細・一覧・お気に入り・運営画面 |
 | FAQ・参加準備ガイドの項目・状態・公開形 | `shared/eventGuide.cjs` | `/api/admin/event-guides`／`/api/admin/events`／`/api/manual-events`／詳細・運営画面 |
+| 閲覧数の集計・重複判定・並べ替え | `shared/viewStats.cjs` | `/api/view`／`/api/admin/view-stats`／`src/utils/viewTracker.js`／運営画面 |
 | 管理APIの対象イベントの所属解決 | `api/_eventScope.js` | `/api/admin/overrides`／`/api/admin/event-changes` ほか |
 | 公開URL・許可オリジン | `shared/siteUrl.cjs` | 全体（上記「セキュリティ構成」参照）／`shared/domainNotice.cjs` |
 | ドメイン移行のお知らせを出すか | `shared/domainNotice.cjs` | `src/App.jsx`（`src/components/DomainNotice.jsx` を出す判断） |

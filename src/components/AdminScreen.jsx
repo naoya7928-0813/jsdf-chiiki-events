@@ -11,6 +11,7 @@ import PresencePanel from './PresencePanel';
 import ReportsPanel from './ReportsPanel';
 import EventChangesPanel from './EventChangesPanel';
 import EventGuidePanel, { EventGuideEditor, EMPTY_GUIDE_VALUE } from './EventGuidePanel';
+import ViewStatsPanel, { EventViewStats } from './ViewStatsPanel';
 import { useIsDesktop } from '../hooks/useBreakpoint';
 
 // 広い画面での本文の最大幅（公開ページと同じ判定・設定でレイアウトを切り替える）。
@@ -144,6 +145,8 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const canAddDelete = perms.has('event:delete');
   const canSeePresence = perms.has('account:read'); // 在席状況（所長・担当官のみ）
   const canSeeReports = perms.has('report:read'); // 利用者からの報告（所長・担当官のみ）
+  // 閲覧数（担当範囲のイベントのみ。サーバー側でも同じ権限で判定する）
+  const canSeeViews = perms.has('event:update') || perms.has('event:override') || perms.has('audit:read');
   const org = account?.organization ?? account?.pref ?? '*';
   // 画面幅の区分は公開ページと共通（useBreakpoint・表示の向き設定を含む）
   const isDesktop = useIsDesktop();
@@ -395,20 +398,22 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const isPastView = filter === 'past';
   const isPresenceView = filter === 'presence';
   const isReportsView = filter === 'reports';
+  const isViewsView = filter === 'views';
   // タブ定義（在席状況・報告は権限を持つロールのみ）
   const TABS = [['all', '公開中'], ['draft', '下書き'], ['past', '終了済み']];
+  if (canSeeViews) TABS.push(['views', '閲覧数']);
   if (canSeeReports) TABS.push(['reports', '報告']);
   if (canSeePresence) TABS.push(['presence', '在席状況']);
   // 下書き確認ページでは登録フォームを出さない（編集時のみ表示）。追加修正ページは常時表示。
   const showForm = (filter === 'all') || !!editingId; // 'draft'・'past' ではフォームを出さない（編集時を除く）
   // 2列にするのは「フォーム」と「一覧」を同時に出す画面だけ（過去・在席・報告の各パネルは1列で広く使う）
-  const twoCol = isDesktop && scrollWidth >= TWO_COL_MIN && showForm && !isPastView && !isPresenceView && !isReportsView;
+  const twoCol = isDesktop && scrollWidth >= TWO_COL_MIN && showForm && !isPastView && !isPresenceView && !isReportsView && !isViewsView;
   // 本文の枠: 2列・各パネルは CONTENT_MAX まで。フォームを1列で出すときは設定画面と同じ 720px に抑える
   const contentBox = !isDesktop ? undefined
     : { ...centered, maxWidth: (showForm && !twoCol) ? 720 : CONTENT_MAX };
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)', fontFamily: F.sans }}>
-      <ScreenHeader primary={primary} title={editingId ? '編集' : (filter === 'draft' ? '下書き確認' : filter === 'past' ? '過去イベント' : filter === 'presence' ? '在席状況' : filter === 'reports' ? '利用者からの報告' : 'イベント追加・修正')} subtitle="ADMIN"
+      <ScreenHeader primary={primary} title={editingId ? '編集' : (filter === 'draft' ? '下書き確認' : filter === 'past' ? '過去イベント' : filter === 'presence' ? '在席状況' : filter === 'reports' ? '利用者からの報告' : filter === 'views' ? '閲覧数' : 'イベント追加・修正')} subtitle="ADMIN"
         onBack={(editingId && !fromDetail) ? cancelEdit : onBack}
         trailing={<button onClick={logout} style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', borderRadius: 8, fontSize: 12, padding: '6px 10px', cursor: 'pointer' }}>ログアウト</button>} />
       {/* タブ（追加・修正／下書き／過去／在席状況）。1ページで全機能にアクセス */}
@@ -640,6 +645,14 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         <div style={hint}>詳細画面に表示されます。ここに書いた語はタグの自動判定にも使われます（例:「抽選」「オンライン」）。</div>
         {editingId && editingDeadline && <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginBottom: 12 }}>現在の締切: {editingDeadline}（締切欄を空のままなら保持されます）</div>}
 
+        {/* 閲覧統計（既存イベントのみ） */}
+        {editingId && canSeeViews && (
+          <>
+            <SectionLabel>閲覧統計</SectionLabel>
+            <EventViewStats key={`views-${editingId}`} eventId={editingId} adminFetch={adminFetch} primary={primary} />
+          </>
+        )}
+
         {/* よくある質問・参加準備ガイド。新規はイベントと一緒に、既存は個別に保存する */}
         <SectionLabel>よくある質問・参加準備ガイド</SectionLabel>
         {editingId
@@ -705,10 +718,13 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         {isPresenceView && <PresencePanel adminFetch={adminFetch} primary={primary} />}
 
         {/* 利用者からの報告（report:read を持つロールのみ・別画面） */}
+        {/* イベント別の閲覧数（担当範囲のみ・閲覧専用） */}
+        {isViewsView && <ViewStatsPanel adminFetch={adminFetch} primary={primary} />}
+
         {isReportsView && <ReportsPanel adminFetch={adminFetch} primary={primary} account={account} onUnreadChange={loadReportUnread} canManage={perms.has('report:manage')} />}
 
         {/* 一覧 + 出力 + 履歴（現在・今後／下書き） */}
-        {!isPastView && !isPresenceView && !isReportsView && (<>
+        {!isPastView && !isPresenceView && !isReportsView && !isViewsView && (<>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', flex: 1 }}>{filter === 'draft' ? '下書き一覧' : '公開中のイベント'}（{shown.length}）</div>
           <button onClick={exportCSV} disabled={!list.length} style={miniOut(primary)}>CSV</button>

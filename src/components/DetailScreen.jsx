@@ -5,6 +5,7 @@ import { REGION_HQ, REGION_SOURCE } from '../config';
 import WeatherCard from './WeatherCard';
 import { EventChangeNotice } from './EventChanges';
 import { EventGuideSection, EventFaqSection } from './EventGuide';
+import { recordView } from '../utils/viewTracker';
 import { useElementWidth, isTouchPhone, useIsShortViewport } from '../hooks/useBreakpoint';
 import { googleCalendarUrl, downloadIcs } from '../utils/calendar';
 import { useOnline } from '../hooks/useOnline';
@@ -29,6 +30,11 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
   // ⚠ 早期 return（ev が無い場合）より前で呼ぶこと。後ろに置くとフックの数が
   //    レンダーごとに変わり、React が「Rendered fewer hooks than expected」で落ちる。
   const online = useOnline();
+
+  // 閲覧数の計測。イベントIDが変わったときだけ（同じ画面内の再描画・状態更新・自動更新では送らない）。
+  // 重複・運営者の閲覧の除外は recordView 側
+  const viewedId = event?.id;
+  useEffect(() => { recordView(viewedId, { admin: !!adminAuthed }); }, [viewedId, adminAuthed]);
 
   // 本文の実寸で「天気」と「開催場所+地図」を横並びにするか決める。
   //
