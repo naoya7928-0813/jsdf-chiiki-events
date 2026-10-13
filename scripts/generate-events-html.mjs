@@ -281,7 +281,10 @@ function toEventSchema(ev, prefLabel) {
     '@context': 'https://schema.org',
     '@type': 'Event',
     name: ev.title,
-    eventStatus: 'https://schema.org/EventScheduled',
+    // 中止・延期は検索結果に正しく出す（Google は EventCancelled / EventPostponed を表示に使う）
+    eventStatus: ev.status === 'cancelled' ? 'https://schema.org/EventCancelled'
+      : ev.status === 'postponed' ? 'https://schema.org/EventPostponed'
+      : 'https://schema.org/EventScheduled',
     eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
     organizer: {
       '@type': 'Organization',

@@ -3,6 +3,7 @@ import { ICO } from './Icons';
 import { Emblem, F, splitDate, SectionTitle, iconBtnStyle, StatusBadge } from './Shared';
 import { REGION_HQ, REGION_SOURCE } from '../config';
 import WeatherCard from './WeatherCard';
+import { EventChangeNotice } from './EventChanges';
 import { useElementWidth, isTouchPhone, useIsShortViewport } from '../hooks/useBreakpoint';
 import { googleCalendarUrl, downloadIcs } from '../utils/calendar';
 import { useOnline } from '../hooks/useOnline';
@@ -496,6 +497,9 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
       <div ref={bodyRef} style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '16px 0' }}>
         {shortVp && heroHeader}
         <div style={{ maxWidth: sideBySide ? 1200 : 860, margin: '0 auto', width: '100%' }}>
+
+        {/* 中止・延期・日時/会場変更のお知らせ（運営が公開したもの）。誤って会場へ向かわないよう最上部に出す */}
+        <EventChangeNotice ev={ev} />
 
         {/* 横長のときは 天気 と 開催場所+地図 を横並びにする。
             縦に積むと地図まで必ずスクロールが要るため、広い画面では並べて

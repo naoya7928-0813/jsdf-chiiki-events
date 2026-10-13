@@ -3,6 +3,7 @@ import { ICO } from './Icons';
 import { BottomTabBar, F } from './Shared';
 import { COLOR_SCHEMES, REGION_SOURCE, REGION_HQ } from '../config';
 import { usePushNotification } from '../hooks/usePushNotification';
+import { useWatchPref } from '../hooks/useFavoriteWatch';
 import { fetchOfficesData } from '../hooks/useOffices';
 import { UPDATE_NOTES, TYPE_LABEL } from '../constants/updates';
 
@@ -25,6 +26,7 @@ export default function SettingsScreen({
 
   // ── Web Push ─────────────────────────────────────────────────
   const push = usePushNotification();
+  const [watchFav, setWatchFav] = useWatchPref();
 
   // ── 折込（アコーディオン） ────────────────────────────────────
   // 設定項目を縦に並べると全体像が掴めないため、既定では見出しだけを表示し、
@@ -163,6 +165,7 @@ export default function SettingsScreen({
               loading={push.loading}
               onChange={() => push.subscribed ? push.unsubscribe() : push.subscribe()}
               primary={primary}
+              last={!push.subscribed}
             />
           ) : (
             <div style={{ padding: '14px', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>
@@ -178,6 +181,18 @@ export default function SettingsScreen({
               <span style={{ display: 'flex', marginTop: 1, flexShrink: 0 }}>{ICO.warn('#e05252', 13)}</span>
               <span>{push.error}</span>
             </div>
+          )}
+          {push.supported && push.subscribed && (
+            <ToggleRow
+              label="お気に入りの変更・中止を通知"
+              sub={watchFav
+                ? 'お気に入りのイベントが中止・延期・日時/会場変更になったときにお知らせします'
+                : 'オンにすると、お気に入りのイベントID（最大100件）を通知の宛先とともにサーバーへ送ります'}
+              on={watchFav}
+              onChange={() => setWatchFav(!watchFav)}
+              primary={primary}
+              last
+            />
           )}
         </Card>
         <div style={{

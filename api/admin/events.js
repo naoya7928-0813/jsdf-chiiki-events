@@ -21,7 +21,8 @@ const PREFS = new Set([
   'hyogo','nara','wakayama','tottori','shimane','okayama','hiroshima','yamaguchi','tokushima','kagawa',
   'ehime','kochi','fukuoka','saga','nagasaki','kumamoto','oita','miyazaki','kagoshima','okinawa',
 ]);
-const STATUSES = new Set(['draft', 'published', 'closed', 'cancelled']);
+// postponed（延期）は通常 /api/admin/event-changes で理由とともに登録するが、状態の切替でも受け付ける
+const STATUSES = new Set(['draft', 'published', 'closed', 'cancelled', 'postponed']);
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const WD = ['日', '月', '火', '水', '木', '金', '土'];
 const weekdayOf = d => { const t = new Date(d + 'T00:00:00Z'); return Number.isNaN(t.getTime()) ? '' : WD[t.getUTCDay()]; };
@@ -238,7 +239,7 @@ export default async function handler(req, res) {
       ev.updatedBy = account.displayId;  // 編集した操作者（仮名・公開には出さない）
       await redis.hset(KEY, { [id]: JSON.stringify(ev) });
       const note = patch.status !== undefined
-        ? `状態→${({ draft: '下書き', published: '公開', closed: '締切', cancelled: '中止' })[ev.status] || ev.status}`
+        ? `状態→${({ draft: '下書き', published: '公開', closed: '締切', cancelled: '中止', postponed: '延期' })[ev.status] || ev.status}`
         : '内容を編集';
       await writeAudit(account, { action: 'event.update', result: 'success', targetId: id, organization: ev.pref, office: ev.office, title: ev.title, before, after: ev, note });
       return res.status(200).json({ ok: true, event: ev });

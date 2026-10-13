@@ -408,6 +408,34 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - 誤検疫を最小化するため判定は保守的（イベント語があれば検疫しない）。検知漏れは従来どおり
   isJunkOrStubTitle へのルール追加で対応し、テストを `titleQuality.test.cjs` に足す
 
+## イベントの変更・中止管理（2026-10-13 導入）
+
+運営が「中止・延期・受付終了・日時変更・会場変更・内容変更・重要なお知らせ」を登録し、利用者へ表示・通知する。
+**純粋ロジックは `shared/eventChanges.cjs`**（管理API・公開API・画面で共有。`shared/eventChanges.test.cjs`）。
+
+- **開催状況（`status`）と変更履歴（`changes`）を分ける**。
+  - `status`: `published`（開催予定）/ `closed`（受付終了）/ `cancelled`（中止）/ `postponed`（延期）/ `draft`（手動のみ）
+  - `changes[]`: `{id, type, reason, before, after, public, notify, evidence, confirmed, at, by, notifiedAt?}`（新しい順・最大30件）
+  - 「日時変更」は開催状況ではない（新しい日時で開催予定のまま）。種別ごとに連動する status は `CHANGE_TYPES` が唯一の出どころ
+- ⚠️ **`postponed` は運営の登録でのみ付く**。自動判定（`deriveStatus`）は延期を出さない（「延期の場合あり」等で延期扱いにしない）。
+  中止も確定語だけで判定し、根拠（`statusEvidence`＝本文の抜き出し）と確信度（`statusConfidence`）を events.json に残す。
+  運営画面で根拠を確認し、誤りなら「開催予定に戻す」を登録する
+- 保存先: 手動イベントは本体（`manual:events`）、**自動収集イベントは上書き（`manual:overrides`）**。上書きは表示時に適用されるので
+  **スクレイプでは消えない**。⚠️ `/api/admin/overrides` の内容保存・取り消しは `status`/`changes`/FAQ 等（`MANAGED_KEYS`）を**引き継ぐ**こと
+  （落とすと表示を直しただけで中止設定が消える）
+- API: `/api/admin/event-changes`（GET/POST/PATCH/DELETE）。権限は手動=`event:update`・自動収集=`event:override`、
+  「開催予定に戻す」は公開権限も必要。所属は `api/_eventScope.js` がサーバー側で解決（IDOR対策）。全操作を `writeAudit`
+- 公開: `/api/manual-events` は `public:true` の記録だけを `publicChanges()` の形（根拠・操作者なし）で返す
+- 通知: **公開する・通知対象の種別・一次情報の根拠＋確認済み**がそろったときだけ。同じイベント・同じ文面は24時間に1回まで
+  （`push:change-sent:*`）。宛先は「お気に入りの変更・中止を通知」をオンにした端末だけ（下記）
+- **見守り（watch）**: お気に入りは端末内にしか無いため、利用者が設定でオンにしたとき（既定オフ）だけ `/api/watch` に
+  push の endpoint とお気に入りのイベントID（最大100件）を送る（`src/hooks/useFavoriteWatch.js`）。
+  Redis: `push:watch:<eventId>`（endpoint の集合）/ `push:watching:<sha256(endpoint)>`（差し替え用）。180日で失効、購読解除で削除。
+  プライバシーポリシーに記載済み（`LEGAL_VERSION` 2026-10-13）
+- 構造化データ: 中止は `EventCancelled`、延期は `EventPostponed`（`scripts/generate-events-html.mjs`）
+- 既知の制約: 自動収集イベントの ID はタイトル・日付から作るため、地本サイト側で名称・日付が変わると ID が変わり、
+  旧 ID の上書き（中止設定等）は表示されなくなる（運営画面で新しいイベントに登録し直す）
+
 ## フロントエンド仕様
 
 - **地域マップ**: 8地域（北海道・東北・関東・中部・近畿・中国・四国・九州）
@@ -556,6 +584,8 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 | ブランド色の文字用 | `shared/brandColors.cjs` ＋ CSS 変数 `--brand-fg`/`--accent-fg` | 全画面（上記「テーマ」参照） |
 | PWA の色・アイコン・ショートカット | `shared/pwaTheme.cjs` | `vite.config.js`（既定 manifest）／`scripts/generate-manifests.mjs`（配色別）／`scripts/generate-icons.mjs`／`shared/bootTheme.cjs`／`src/App.jsx` |
 | 配信スロット・打ち切り期限・開始位置のずらし | `shared/scrapeDeadline.cjs` | `scraper/index.js`（締切・ローテーション・前回データ引き継ぎ）／`.github/workflows/scrape.yml`（通知の待機時刻） |
+| 変更・中止の種別・連動する開催状況・公開形 | `shared/eventChanges.cjs` | `/api/admin/event-changes`／`/api/manual-events`／詳細・一覧・お気に入り・運営画面 |
+| 管理APIの対象イベントの所属解決 | `api/_eventScope.js` | `/api/admin/overrides`／`/api/admin/event-changes` ほか |
 | 公開URL・許可オリジン | `shared/siteUrl.cjs` | 全体（上記「セキュリティ構成」参照）／`shared/domainNotice.cjs` |
 | ドメイン移行のお知らせを出すか | `shared/domainNotice.cjs` | `src/App.jsx`（`src/components/DomainNotice.jsx` を出す判断） |
 

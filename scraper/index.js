@@ -4850,6 +4850,7 @@ async function writeOutput(data, timeCutoff = null) {
   // published（通常）は状態フィールドを付けない＝後方互換＆データ量を抑える。
   // 前回 events.json の status を読み、cancelled/closed の粘着性を維持（文言消失で復活させない）。
   const prevStatusById = new Map();
+  const prevStatusMetaById = new Map();   // 自動判定の根拠・確信度（前回状態を維持したときに引き継ぐ）
   // 初回掲載日（firstSeen）。構造化データ（JSON-LD）の offers.validFrom に使うため、
   // 一度付いた日付は前回 events.json から引き継いで変化させない。
   const prevFirstSeenById = new Map();
@@ -4858,6 +4859,7 @@ async function writeOutput(data, timeCutoff = null) {
     for (const e of prevData[k]) {
       if (!e || !e.id) continue;
       if (e.status) prevStatusById.set(e.id, e.status);
+      if (e.statusEvidence || e.statusConfidence) prevStatusMetaById.set(e.id, { evidence: e.statusEvidence, confidence: e.statusConfidence });
       if (/^\d{4}-\d{2}-\d{2}$/.test(String(e.firstSeen ?? ''))) prevFirstSeenById.set(e.id, e.firstSeen);
     }
   }
@@ -4889,6 +4891,11 @@ async function writeOutput(data, timeCutoff = null) {
         ev.statusReason = merged.statusReason || derived.statusReason || '';
         ev.statusSource = merged.sticky ? (prevStatusById.get(ev.id) ? 'previous' : statusSourceOf(ev)) : statusSourceOf(ev);
         ev.statusUpdatedAt = today;
+        // 自動判定の確信度と根拠（本文の抜き出し）。運営画面で「なぜ中止扱いか」を確認し、
+        // 誤りなら上書き（開催予定に戻す）で直せるようにする。前回状態の維持（sticky）は前回の根拠を残す
+        const meta = merged.sticky ? (prevStatusMetaById.get(ev.id) || {}) : { evidence: derived.evidence, confidence: derived.confidence };
+        if (meta.confidence) ev.statusConfidence = meta.confidence;
+        if (meta.evidence) ev.statusEvidence = meta.evidence;
         if (merged.status === 'closed') closedCount++; else cancelledCount++;
         if (derived.confidence === 'low') lowConfCount++;
       }

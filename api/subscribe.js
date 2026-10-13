@@ -8,6 +8,7 @@
 // - IPごとのレートリミット（購読の大量登録・総当たり解除の抑止）
 import { Redis } from '@upstash/redis';
 import { checkOrigin, isValidPushEndpoint, rateLimit } from './_security.js';
+import { clearWatchList } from './_push.js';
 
 const redis = new Redis({
   url:   process.env.KV_REST_API_URL,
@@ -70,6 +71,8 @@ export default async function handler(req, res) {
     }
     try {
       await redis.hdel(KEY, endpoint);
+      // お気に入りの見守り（/api/watch）も一緒に外す。通知を止めた端末の情報を残さない
+      await clearWatchList(endpoint).catch(() => {});
       return res.status(200).json({ ok: true });
     } catch (err) {
       console.error('[subscribe] DELETE error', err);

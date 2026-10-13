@@ -103,15 +103,22 @@ self.addEventListener('push', event => {
   let payload;
   try { payload = event.data.json(); } catch { payload = { title: '自衛隊地本イベント', body: event.data.text() }; }
 
-  const { title = '自衛隊地本イベント', body = '新しいイベントが追加されました', url = '/', badge, icon } = payload;
+  const { title = '自衛隊地本イベント', body = '新しいイベントが追加されました', url = '/', badge, icon, tag } = payload;
+  // 変更・中止のお知らせは変更ごとの tag を持つ（新着通知と上書きし合わない）。URL は自サイト内だけ
+  let safeUrl = '/';
+  try {
+    const u = new URL(String(url || '/'), self.location.origin);
+    if (u.origin === self.location.origin) safeUrl = u.pathname + u.search + u.hash;
+  } catch { /* 不正な URL はトップへ */ }
+  const safeTag = typeof tag === 'string' && /^[\w-]{1,64}$/.test(tag) ? tag : 'jsdf-event';
 
   event.waitUntil(Promise.all([
     self.registration.showNotification(title, {
       body,
       icon:  icon  || '/icons/icon-192.png',
       badge: badge || '/icons/icon-192.png',
-      data:  { url },
-      tag:   'jsdf-event',
+      data:  { url: safeUrl },
+      tag:   safeTag,
       renotify: true,
       vibrate: [100, 50, 100],
     }),

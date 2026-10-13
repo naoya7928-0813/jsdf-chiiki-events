@@ -2,6 +2,7 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { ICO } from './Icons';
 import { useIsShortViewport } from '../hooks/useBreakpoint';
 import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle, StatusBadge } from './Shared';
+import { ChangeFlags } from './EventChanges';
 import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, weekendRange, matchesTag, matchesBranch, APPLIED_TAG_ID, ENDED_TAG_ID } from './FilterBar';
 import CalendarView from './CalendarView';
 import { daysUntil, deadlineDaysUntil, daysLabel, daysColor, daysFgColor, jstTodayStr } from '../utils/date';
@@ -676,6 +677,8 @@ export default function ListScreen({
                           <div style={{ display: 'flex', gap: 6, marginBottom: 5, flexWrap: 'wrap', alignItems: 'center' }}>
                             {/* 中止/受付終了は終了済みより優先して目立たせる */}
                             <StatusBadge status={ev.status} size="sm" />
+                            {/* 日時変更・会場変更・重要なお知らせ（運営が公開した変更） */}
+                            <ChangeFlags ev={ev} />
                             {ev.ended && (
                               <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3, background: '#6b7280', color: '#fff', letterSpacing: 0.5, flexShrink: 0 }}>終了済み</span>
                             )}

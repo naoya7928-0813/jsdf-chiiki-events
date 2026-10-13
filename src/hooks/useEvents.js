@@ -8,6 +8,8 @@ import { cleanTimeText, cleanDeadlineText, cleanPlaceText, splitPlaceAddress, sa
 import { ENDED_KEEP_DAYS } from '../../shared/eventStatus.cjs';
 // 運営が付けた属性タグ。既知のID以外は捨てる（配信データ・キャッシュ由来の混入対策）
 import { normalizeTags } from '../../shared/tags.cjs';
+// 運営が公開した変更のお知らせ（中止・延期・日時/会場変更）。壊れた値は捨てる
+import { sanitizePublicChanges } from '../../shared/eventChanges.cjs';
 import { jstTodayStr } from '../utils/date';
 
 const EMPTY = { updatedAt: null };
@@ -58,6 +60,7 @@ function normalizeEvent(ev) {
     // endDate は形式不正・開始日より前なら無かったことにする（期間表示の崩れ防止）
     endDate:    (typeof ev.endDate === 'string' && DATE_RE.test(ev.endDate) && ev.endDate >= ev.date) ? ev.endDate : undefined,
     endWeekday: (typeof ev.endDate === 'string' && DATE_RE.test(ev.endDate) && ev.endDate >= ev.date) ? str(ev.endWeekday) : undefined,
+    changes: ev.changes === undefined ? undefined : sanitizePublicChanges(ev.changes),
   };
 }
 

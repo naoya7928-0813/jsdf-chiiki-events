@@ -183,8 +183,12 @@ test('mergeStatus: published → closed は素直に反映', () => {
   assert.equal(S.mergeStatus('published', { status: 'closed', statusReason: '受付終了告知' }).status, 'closed');
 });
 
-test('STATUS_VALUES は published/closed/cancelled/draft のみ', () => {
-  assert.deepEqual([...S.STATUS_VALUES].sort(), ['cancelled', 'closed', 'draft', 'published']);
+test('STATUS_VALUES は published/closed/cancelled/postponed/draft のみ（postponed は運営登録専用）', () => {
+  assert.deepEqual([...S.STATUS_VALUES].sort(), ['cancelled', 'closed', 'draft', 'postponed', 'published']);
+  // 公開してよいのは draft 以外
+  assert.deepEqual([...S.PUBLIC_STATUS_VALUES].sort(), ['cancelled', 'closed', 'postponed', 'published']);
+  // 自動判定は延期を出さない（曖昧な文言で延期扱いにしない）
+  assert.notEqual(S.deriveStatus({ text: '雨天の場合は延期となる場合があります', eventDate: '2099-01-01', today: '2098-12-01' }).status, 'postponed');
 });
 
 

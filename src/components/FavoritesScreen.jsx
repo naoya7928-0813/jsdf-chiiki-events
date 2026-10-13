@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { ICO } from './Icons';
-import { BottomTabBar, F, splitDate } from './Shared';
+import { BottomTabBar, F, splitDate, StatusBadge } from './Shared';
+import { ChangeFlags } from './EventChanges';
 import { SUPPORTED_PREFECTURES, PREFECTURE_INFO } from '../data/regionMap';
 import { useIsDesktop } from '../hooks/useBreakpoint';
 import { deadlineDaysUntil, daysUntil, daysLabel, daysColor, daysFgColor, jstTodayStr } from '../utils/date';
@@ -147,6 +148,9 @@ function FavCard({ ev, primary, accent, applied, onTap, inGrid = false }) {
         {/* テキスト */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', gap: 6, marginBottom: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+            {/* 中止・延期・受付終了と変更のお知らせ。お気に入りは「行く予定」のものなので特に見落とさせない */}
+            <StatusBadge status={ev.status} size="sm" />
+            <ChangeFlags ev={ev} />
             {ev.ended && (
               <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 7px', borderRadius: 3, background: '#6b7280', color: '#fff', letterSpacing: 0.5 }}>終了済み</span>
             )}

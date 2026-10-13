@@ -9,6 +9,7 @@ import { TAG_DEFS, normalizeTags } from '../../shared/tags.cjs';
 import PastEventsPanel from './PastEventsPanel';
 import PresencePanel from './PresencePanel';
 import ReportsPanel from './ReportsPanel';
+import EventChangesPanel from './EventChangesPanel';
 import { useIsDesktop } from '../hooks/useBreakpoint';
 
 // 広い画面での本文の最大幅（公開ページと同じ判定・設定でレイアウトを切り替える）。
@@ -30,13 +31,14 @@ const CATEGORIES = ['説明会', '採用イベント', '一般公開', '艦艇�
 const APPLY_OPTS = ['', '要予約', '予約不要', '事前申込制', '入場無料', '要問合せ'];
 // closed は「受付終了」（申込・受付が終了。イベント自体は開催予定/済み）。公開側 StatusBadge・
 // 状態モデル(CLAUDE.md)と表記を統一する。※ 申込締切の「日付」欄(申込締切)とは別概念。
-const STATUS_LABEL = { draft: '下書き', published: '公開中', closed: '受付終了', cancelled: '中止' };
-const STATUS_COLOR = { draft: '#888', published: '#16a34a', closed: '#b45309', cancelled: '#ef4444' };
+const STATUS_LABEL = { draft: '下書き', published: '公開中', closed: '受付終了', cancelled: '中止', postponed: '延期' };
+const STATUS_COLOR = { draft: '#888', published: '#16a34a', closed: '#b45309', cancelled: '#ef4444', postponed: '#7c3aed' };
 const ACTION_LABEL = {
   add: '登録', update: '編集', status: '状態変更', delete: '削除', override: '上書き修正', 'override-clear': '上書き取消',
   'event.create': '登録', 'event.update': '編集', 'event.delete': '削除',
   'override.save': '上書き修正', 'override.clear': '上書き取消',
   'auth.login': 'ログイン', 'auth.logout': 'ログアウト', 'audit.read': '監査閲覧',
+  'event.change': '変更・中止の登録', 'event.change.notify': '変更の通知', 'event.change.visibility': '変更の公開切替', 'event.change.delete': '変更の取消',
 };
 const PREF_ENTRIES = Object.entries(PREFECTURE_INFO);
 // 認証はサーバー側セッション(HttpOnly Cookie)。localStorage には非機密のアカウント情報のみ保持し、
@@ -634,6 +636,23 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         <textarea value={form.notes} onChange={e => set('notes', e.target.value)} rows={2} placeholder="補足事項（持ち物・雨天時の扱いなど）" style={{ ...input, resize: 'vertical' }} />
         <div style={hint}>詳細画面に表示されます。ここに書いた語はタグの自動判定にも使われます（例:「抽選」「オンライン」）。</div>
         {editingId && editingDeadline && <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginBottom: 12 }}>現在の締切: {editingDeadline}（締切欄を空のままなら保持されます）</div>}
+
+        {/* 開催状況（中止・延期・受付終了）と変更のお知らせ。既存イベントの編集時のみ。
+            内容の「変更を更新する」とは別に、その場で登録・公開される（変更履歴として残る） */}
+        {editingId && (
+          <>
+            <SectionLabel>開催状況・変更のお知らせ</SectionLabel>
+            <EventChangesPanel
+              key={editingId}
+              eventId={editingId}
+              adminFetch={adminFetch}
+              primary={primary}
+              canPublish={perms.has('event:publish')}
+              onChanged={loadList}
+              styles={{ input, label, hint }}
+            />
+          </>
+        )}
 
         <button onClick={() => setPreview(p => !p)} style={{ width: '100%', padding: 12, borderRadius: 10, marginBottom: 12, cursor: 'pointer', background: 'transparent', border: '1px solid var(--border)', color: 'var(--text)', fontSize: 13, fontWeight: 600 }}>{preview ? 'プレビューを隠す' : 'プレビュー（カード表示イメージ）'}</button>
         {preview && <PreviewCard form={form} primary={primary} prefLabel={isScoped ? prefLabel : (PREFECTURE_INFO[form.pref]?.label || form.pref)} />}
