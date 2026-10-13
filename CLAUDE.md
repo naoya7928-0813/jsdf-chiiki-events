@@ -746,6 +746,7 @@ PC幅では従来どおり折り返し表示。
   PDF（印刷用ページ→ブラウザの「PDFに保存」）にする。⚠️ 印刷用ページにスクリプトを書かない（CSP `script-src 'self'` で動かない。印刷は開いた側から呼ぶ）。
   閲覧数は Upstash の1リクエスト上限に収まるよう ID を400件ずつ読む
 - **地本別の運営画面**: `/admin/<地本>`（vercel.json で `/admin.html` へ振り替え。`shared/adminPref.cjs`）。URL で権限は広がらない。
+  ログイン画面はどの地本でも共通で、地本名の案内・タブ名はログイン後にだけ出す（担当違いなら警告と担当地本へのリンク）。
   アカウントは `scripts/admin-accounts.mjs`（init/add/passwd/disable/list/check/encode）で作る。手順は `docs/ADMIN_ACCOUNT_SETUP.md`。
   `*.local.json`/`*.local.csv`（パスワード・ハッシュ）は .gitignore 済み
 - **タグの排他**: 「入場無料」⇔「要予約」、「家族向け」⇔「学生向け」は同時に選べない（申込要否の選択も含む）。`shared/tags.cjs` の

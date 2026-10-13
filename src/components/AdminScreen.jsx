@@ -222,9 +222,10 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
 
   // 全国担当は、地本別の画面ならその地本を初期選択にする
   function applyScope(pref) { const p = pref && pref !== '*' ? pref : PAGE_PREF; if (p) setForm(f => ({ ...f, pref: p })); }
+  // 地本別の画面であることはログイン後にだけ示す（ログイン画面はどの地本でも同じ）
   useEffect(() => {
-    if (PAGE_PREF) document.title = `${PREFECTURE_INFO[PAGE_PREF].label}地本 運営画面`;
-  }, []);
+    if (PAGE_PREF && account) document.title = `${PREFECTURE_INFO[PAGE_PREF].label}地本 運営画面`;
+  }, [account]);
 
   // 詳細画面から渡された編集対象を、ログイン確認後に一度だけフォームへ読み込む
   const [editConsumed, setEditConsumed] = useState(false);
@@ -406,7 +407,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   if (!account) {
     return (
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)', fontFamily: F.sans }}>
-        <ScreenHeader primary={primary} title={PAGE_PREF ? `${PREFECTURE_INFO[PAGE_PREF].label}地本 運営者ログイン` : '運営者ログイン'} subtitle="ADMIN" onBack={onBack} />
+        <ScreenHeader primary={primary} title="運営者ログイン" subtitle="ADMIN" onBack={onBack} />
         <div style={{ flex: 1, overflowY: 'auto', padding: isDesktop ? '48px 18px' : '24px 18px' }}>
           <div style={{ maxWidth: 420, margin: '0 auto' }}>
           <div style={label}>ユーザー名</div>
@@ -416,7 +417,6 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
           {authErr && <div style={{ color: '#ef4444', fontSize: 12.5, marginBottom: 12 }}>{authErr}</div>}
           <button onClick={handleLogin} disabled={busy || !uInput || !pInput} style={{ width: '100%', padding: 13, borderRadius: 12, border: 'none', fontFamily: F.sans, fontSize: 15, fontWeight: 700, color: '#fff', background: (busy || !uInput || !pInput) ? 'var(--border)' : primary, cursor: (busy || !uInput || !pInput) ? 'default' : 'pointer' }}>{busy ? '確認中…' : 'ログイン'}</button>
           <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 14, lineHeight: 1.7 }}>ログイン後は通常の画面に戻ります。管理メニューは「設定」内に表示されます。</div>
-          {PAGE_PREF && <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 6, lineHeight: 1.7 }}>この画面は{PREFECTURE_INFO[PAGE_PREF].label}地本の担当者用です。操作できる範囲はアカウントの担当範囲で決まります。</div>}
           </div>
         </div>
       </div>
@@ -499,6 +499,11 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
       <div data-admin-scroll ref={setScrollEl} onTouchStart={onSwipeStart} onTouchEnd={onSwipeEnd} onTouchCancel={() => { swipeStart.current = null; }} style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '16px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 28px)' }}>
         <div style={contentBox}>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10 }}>ログイン中: <strong style={{ color: 'var(--text)' }}>{account.label}</strong>（担当: {prefLabel}）</div>
+        {['match', 'national'].includes(adminPageRelation(PAGE_PREF, org)) && (
+          <div style={{ marginBottom: 12, padding: '10px 12px', borderRadius: 10, background: `${primary}10`, border: `1px solid ${primary}33`, fontSize: 12.5, lineHeight: 1.7, color: 'var(--text)' }}>
+            この画面は<strong>{PREFECTURE_INFO[PAGE_PREF].label}地本</strong>の運営画面です。操作できる範囲はアカウントの担当範囲で決まります。
+          </div>
+        )}
         {adminPageRelation(PAGE_PREF, org) === 'mismatch' && (
           <div role="alert" style={{ marginBottom: 12, padding: '10px 12px', borderRadius: 10, background: '#f59e0b14', border: '1px solid #f59e0b55', fontSize: 12.5, lineHeight: 1.7, color: 'var(--text)' }}>
             この画面は{PREFECTURE_INFO[PAGE_PREF].label}地本用ですが、ログイン中のアカウントの担当は{prefLabel}地本です（操作できるのは{prefLabel}地本のイベントだけです）。
