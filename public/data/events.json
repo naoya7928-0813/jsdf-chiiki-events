@@ -51,34 +51,7 @@
       }
     }
   ],
-  "asahikawa": [
-    {
-      "id": "as-off-20270128-xp1ck",
-      "pref": "asahikawa",
-      "date": "2027-01-28",
-      "weekday": "木",
-      "title": "自衛官募集ホームページ <自衛官募集X",
-      "place": "防衛大学",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/asahikawa/01_recruit/r8_nitteihyou.pdf",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-10-12",
-      "weatherLocation": {
-        "latitude": 43.771,
-        "longitude": 142.365,
-        "label": "北海道旭川市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-31T16:01:31.345+09:00"
-      }
-    }
-  ],
+  "asahikawa": [],
   "obihiro": [
     {
       "id": "ob-office-20261025-kuv21",
@@ -218,22 +191,22 @@
   "aomori": [],
   "iwate": [
     {
-      "id": "iw-office-20261115-09nli",
+      "id": "iw-office-20261115-gc8tf",
       "pref": "iwate",
       "date": "2026-11-15",
       "weekday": "日",
-      "title": "公務員合同説明会",
+      "title": "公務員仕事説明会",
       "place": "中妻公民館",
       "address": "",
       "time": "12:10～16:10",
       "category": "説明会",
       "tag": "",
-      "url": "https://www.mod.go.jp/pco/iwate/assets/img/event/until20261115/kamaishi.jpg",
-      "notes": "掲載元: 募集案内所・地域事務所\n受付期間：令和8年10月15日（水）～11月13日（金）",
+      "url": "https://www.mod.go.jp/pco/iwate/assets/img/event/until20261115/kamaishi.pdf",
+      "notes": "掲載元: 募集案内所・地域事務所\n災害など諸事情により中止の場合はご連絡いたします。",
       "ageRequirement": null,
       "deadline": "11月13日（金）",
       "source_type": "office_ocr",
-      "firstSeen": "2026-10-10",
+      "firstSeen": "2026-10-09",
       "deadlineDate": "2026-11-13",
       "weatherLocation": {
         "latitude": 39.704,
@@ -272,22 +245,22 @@
       }
     },
     {
-      "id": "iw-office-20261115-gc8tf",
+      "id": "iw-office-20261115-09nli",
       "pref": "iwate",
       "date": "2026-11-15",
       "weekday": "日",
-      "title": "公務員仕事説明会",
+      "title": "公務員合同説明会",
       "place": "中妻公民館",
       "address": "",
       "time": "12:10～16:10",
       "category": "説明会",
       "tag": "",
-      "url": "https://www.mod.go.jp/pco/iwate/assets/img/event/until20261115/kamaishi.pdf",
-      "notes": "掲載元: 募集案内所・地域事務所\n災害など諸事情により中止の場合はご連絡いたします。",
+      "url": "https://www.mod.go.jp/pco/iwate/assets/img/event/until20261115/kamaishi.jpg",
+      "notes": "掲載元: 募集案内所・地域事務所\n受付期間：令和8年10月15日（水）～11月13日（金）",
       "ageRequirement": null,
       "deadline": "11月13日（金）",
       "source_type": "office_ocr",
-      "firstSeen": "2026-10-09",
+      "firstSeen": "2026-10-10",
       "deadlineDate": "2026-11-13",
       "weatherLocation": {
         "latitude": 39.704,
@@ -593,32 +566,6 @@
         "source": "gsi",
         "geocodedAt": "2026-09-30T22:53:30.739+09:00"
       }
-    },
-    {
-      "id": "ya-off-20270128-xp1ck",
-      "pref": "yamagata",
-      "date": "2027-01-28",
-      "weekday": "木",
-      "title": "自衛官募集ホームページ <自衛官募集X",
-      "place": "防衛大学",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/yamagata/bosyu/r8_nitteihyou.pdf",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-10-13",
-      "weatherLocation": {
-        "latitude": 38.24,
-        "longitude": 140.364,
-        "label": "山形県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-31T16:01:32.400+09:00"
-      }
     }
   ],
   "fukushima": [
@@ -649,6 +596,156 @@
     }
   ],
   "akita": [
+    {
+      "id": "ak-20261017-nm0cb",
+      "pref": "akita",
+      "date": "2026-10-17",
+      "weekday": "土",
+      "title": "［イベント］「あきたNEXTモーターショー(秋田市)」に自衛隊ブース出展します",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 39.719,
+        "longitude": 140.102,
+        "label": "秋田県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
+      }
+    },
+    {
+      "id": "ak-20261017-sdo7q",
+      "pref": "akita",
+      "date": "2026-10-17",
+      "weekday": "土",
+      "title": "［イベント］「上小阿仁村産業文化祭(上小阿仁村)」に自衛隊ブース出展します",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 39.719,
+        "longitude": 140.102,
+        "label": "秋田県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
+      }
+    },
+    {
+      "id": "ak-20261018-r86yn",
+      "pref": "akita",
+      "date": "2026-10-18",
+      "weekday": "日",
+      "title": "［イベント］「第24回かづの畜産まつり(鹿角市)」に自衛隊ブース出展します",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 39.719,
+        "longitude": 140.102,
+        "label": "秋田県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
+      }
+    },
+    {
+      "id": "ak-20261018-112r7",
+      "pref": "akita",
+      "date": "2026-10-18",
+      "weekday": "日",
+      "title": "［イベント］「史跡の里の秋まつり(大仙市)」に自衛隊ブース出展します",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 39.719,
+        "longitude": 140.102,
+        "label": "秋田県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
+      }
+    },
+    {
+      "id": "ak-20261018-xqwaa",
+      "pref": "akita",
+      "date": "2026-10-18",
+      "weekday": "日",
+      "title": "［イベント］「第19回北秋田市産業祭(北秋田市)」に自衛隊ブース出展します",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 39.719,
+        "longitude": 140.102,
+        "label": "秋田県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
+      }
+    },
+    {
+      "id": "ak-20261024-32312",
+      "pref": "akita",
+      "date": "2026-10-24",
+      "weekday": "土",
+      "title": "［イベント］「美郷町フェスタ2026(美郷町)」に自衛隊ブース出展します",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 39.719,
+        "longitude": 140.102,
+        "label": "秋田県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:16.656+09:00"
+      }
+    },
     {
       "id": "ak-off-20270128-xp1ck",
       "pref": "akita",
@@ -1749,6 +1846,58 @@
       }
     },
     {
+      "id": "t-20261107-wcel2",
+      "pref": "tokyo",
+      "date": "2026-11-07",
+      "weekday": "土",
+      "title": "サテライトブース",
+      "place": "募集課",
+      "time": "10:00～18:00",
+      "category": "採用イベント",
+      "tag": "抽選",
+      "ageRequirement": "どなたでも参加可能",
+      "deadline": null,
+      "url": "https://www.mod.go.jp/pco/tokyo/event2/1107-08_taiken.html",
+      "notes": "・ガラポン抽選会\n・VR体験\n・キャリア相談コーナー\n応募締切: 当日参加可能\n参加無料",
+      "source_type": "office_html",
+      "address": "",
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 35.69,
+        "longitude": 139.692,
+        "label": "東京都",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-29T16:31:20.349+09:00"
+      }
+    },
+    {
+      "id": "t-20261108-ibv4p",
+      "pref": "tokyo",
+      "date": "2026-11-08",
+      "weekday": "日",
+      "title": "サテライトブース",
+      "place": "募集課",
+      "time": "10:00～18:00",
+      "category": "採用イベント",
+      "tag": "抽選",
+      "ageRequirement": "どなたでも参加可能",
+      "deadline": null,
+      "url": "https://www.mod.go.jp/pco/tokyo/event2/1107-08_taiken.html",
+      "notes": "・ガラポン抽選会\n・VR体験\n・キャリア相談コーナー\n応募締切: 当日参加可能\n参加無料",
+      "source_type": "office_html",
+      "address": "",
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 35.69,
+        "longitude": 139.692,
+        "label": "東京都",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-29T16:31:20.349+09:00"
+      }
+    },
+    {
       "id": "t-20261120-1gpy4",
       "pref": "tokyo",
       "date": "2026-11-20",
@@ -1773,6 +1922,268 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-07-02T08:50:36.640+09:00"
+      }
+    },
+    {
+      "id": "t-20261214-hwdgu",
+      "pref": "tokyo",
+      "date": "2026-12-14",
+      "weekday": "月",
+      "title": "百里基地見学",
+      "place": "新小岩募集案内所",
+      "time": "",
+      "category": "体験",
+      "tag": "",
+      "ageRequirement": "15歳以上33歳未満",
+      "deadline": "11月9日（月）",
+      "url": "https://www.mod.go.jp/pco/tokyo/shinkoiwa/index.html#1214",
+      "notes": "・概要説明\n・航空機見学\n・体験喫食\n応募者多数の場合、抽選。当選者へ連絡。",
+      "source_type": "office_html",
+      "address": "",
+      "firstSeen": "2026-10-13",
+      "deadlineDate": "2026-11-09",
+      "weatherLocation": {
+        "latitude": 35.694,
+        "longitude": 139.704,
+        "label": "東京都新宿区",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-29T16:31:20.866+09:00"
+      }
+    },
+    {
+      "id": "to-office-20261122-nalt9",
+      "pref": "tokyo",
+      "date": "2026-11-22",
+      "weekday": "日",
+      "title": "合同説明会",
+      "place": "多摩中央警察署",
+      "address": "",
+      "time": "13:00～17:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tokyo/fuchu/img/1122_goudou.jpg",
+      "notes": "掲載元: 府中分駐所\n当日参加可能、服装自由、途中退室可能、保護者の参加可",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 35.637,
+        "longitude": 139.446,
+        "label": "東京都多摩市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-13T17:05:50.974+09:00"
+      }
+    },
+    {
+      "id": "to-office-20261015-rpr8k",
+      "pref": "tokyo",
+      "date": "2026-10-15",
+      "weekday": "木",
+      "title": "説明会",
+      "place": "希望の方事務所",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tokyo/nerima/img/10_setumeikai.png",
+      "notes": "掲載元: 練馬地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-06",
+      "weatherLocation": {
+        "latitude": 35.69,
+        "longitude": 139.692,
+        "label": "東京都",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-06T23:55:35.521+09:00"
+      }
+    },
+    {
+      "id": "to-office-20261019-jd8mq",
+      "pref": "tokyo",
+      "date": "2026-10-19",
+      "weekday": "月",
+      "title": "防衛省自行隧説明",
+      "place": "西東京地域事務所",
+      "address": "",
+      "time": "17:00～21:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tokyo/nishitokyo/img/1019-1023_night.png",
+      "notes": "掲載元: 募集案内所・地域事務所\n各日3日前まで要予約",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-06",
+      "weatherLocation": {
+        "latitude": 35.726,
+        "longitude": 139.538,
+        "label": "東京都西東京市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-02T08:50:37.016+09:00"
+      }
+    },
+    {
+      "id": "to-office-20261013-gondi",
+      "pref": "tokyo",
+      "date": "2026-10-13",
+      "weekday": "火",
+      "title": "女性自衛官のための自衛隊職業説明会",
+      "place": "立川地方合同庁舎2 立川出張所",
+      "address": "",
+      "time": "16:30",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tokyo/tachikawa/img/1013-1028_josei.png",
+      "notes": "掲載元: 募集案内所・地域事務所\n事前予約制",
+      "ageRequirement": "高校生以上",
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 35.714,
+        "longitude": 139.408,
+        "label": "東京都立川市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-06T01:03:28.355+09:00"
+      }
+    },
+    {
+      "id": "to-office-20261031-3g5th",
+      "pref": "tokyo",
+      "date": "2026-10-31",
+      "weekday": "土",
+      "title": "自衛官転職相談会",
+      "place": "自衛隊東京地方協力本部江東出張所",
+      "address": "",
+      "time": "10:00～15:30",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tokyo/koutou/img/1031-1101_tensyoku.png",
+      "notes": "掲載元: 江東出張所\n事前予約制、入退場自由、個別相談有",
+      "ageRequirement": "18~32歳未満の方",
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-12",
+      "weatherLocation": {
+        "latitude": 35.69,
+        "longitude": 139.692,
+        "label": "東京都",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-07T23:55:51.805+09:00"
+      }
+    },
+    {
+      "id": "to-office-20261031-iremt",
+      "pref": "tokyo",
+      "date": "2026-10-31",
+      "weekday": "土",
+      "title": "転職者向けの一歩",
+      "place": "東京地方協力本部西東京地域事務所",
+      "address": "",
+      "time": "09:00～16:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tokyo/nishitokyo/img/1031_getumatu.jpg",
+      "notes": "掲載元: 西東京地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 35.758,
+        "longitude": 139.53,
+        "label": "東京都東久留米市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-13T12:14:33.473+09:00"
+      }
+    },
+    {
+      "id": "to-office-20261213-4lc67",
+      "pref": "tokyo",
+      "date": "2026-12-13",
+      "weekday": "日",
+      "title": "合同職業",
+      "place": "自衛隊東京地方協力本部渋谷募集案内所",
+      "address": "",
+      "time": "09:00～12:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tokyo/shibuya/img/1213_goudou.jpg",
+      "notes": "掲載元: 渋谷募集案内所\n応募者多数の場合抽選",
+      "ageRequirement": "高校生以上33歳未満",
+      "deadline": "12月3日（木）",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-13",
+      "deadlineDate": "2026-12-03",
+      "weatherLocation": {
+        "latitude": 35.69,
+        "longitude": 139.692,
+        "label": "東京都",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-13T17:05:51.894+09:00"
+      }
+    },
+    {
+      "id": "to-office-20261024-uopt4",
+      "pref": "tokyo",
+      "date": "2026-10-24",
+      "weekday": "土",
+      "title": "令和9年度入校第54期防衛医科大学校医学科学生採用第1次試験",
+      "place": "ビジョンセンター新宿マインズタワー",
+      "address": "",
+      "time": "09:00～18:00",
+      "category": "採用イベント",
+      "tag": "学生向け",
+      "url": "https://www.mod.go.jp/pco/tokyo/event2/img/shinjuku.pdf",
+      "notes": "掲載元: 豊島出張所\n受付時間07:30～08:20。遅刻時は遅延証明書提示要。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 35.69,
+        "longitude": 139.692,
+        "label": "東京都",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-13T17:05:52.237+09:00"
+      }
+    },
+    {
+      "id": "to-office-20261024-adqaa",
+      "pref": "tokyo",
+      "date": "2026-10-24",
+      "weekday": "土",
+      "title": "令和9年度入校第54期防衛医科大学校医学科学生採用第1次試験",
+      "place": "自衛隊目黒基地",
+      "address": "",
+      "time": "09:00～18:00",
+      "category": "採用イベント",
+      "tag": "学生向け",
+      "url": "https://www.mod.go.jp/pco/tokyo/event2/img/meguro.pdf",
+      "notes": "掲載元: 豊島出張所\n受付時間07:30～08:20。遅刻時は遅延証明書提示要。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 35.69,
+        "longitude": 139.692,
+        "label": "東京都",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-13T17:05:52.710+09:00"
       }
     },
     {
@@ -1825,59 +2236,6 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-10-07T23:55:50.984+09:00"
-      }
-    },
-    {
-      "id": "to-office-20261015-rpr8k",
-      "pref": "tokyo",
-      "date": "2026-10-15",
-      "weekday": "木",
-      "title": "説明会",
-      "place": "希望の方事務所",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/tokyo/nerima/img/10_setumeikai.png",
-      "notes": "掲載元: 練馬地域事務所",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-10-06",
-      "weatherLocation": {
-        "latitude": 35.69,
-        "longitude": 139.692,
-        "label": "東京都",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-10-06T23:55:35.521+09:00"
-      }
-    },
-    {
-      "id": "to-office-20261214-q8qvy",
-      "pref": "tokyo",
-      "date": "2026-12-14",
-      "weekday": "月",
-      "title": "空自基地見学",
-      "place": "新小岩募集案内所",
-      "address": "",
-      "time": "",
-      "category": "体験",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/tokyo/shinkoiwa/img/1214_hyakuri.png",
-      "notes": "掲載元: 新小岩募集案内所\n応募者多数の場合、抽選。当選者へ連絡。",
-      "ageRequirement": "15歳以上33歳未満",
-      "deadline": "11月9日（月）",
-      "source_type": "office_ocr",
-      "firstSeen": "2026-10-13",
-      "deadlineDate": "2026-11-09",
-      "weatherLocation": {
-        "latitude": 35.694,
-        "longitude": 139.704,
-        "label": "東京都新宿区",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-06-29T16:31:20.866+09:00"
       }
     },
     {
@@ -1960,110 +2318,6 @@
       }
     },
     {
-      "id": "to-office-20261031-iremt",
-      "pref": "tokyo",
-      "date": "2026-10-31",
-      "weekday": "土",
-      "title": "転職者向けの一歩",
-      "place": "東京地方協力本部西東京地域事務所",
-      "address": "",
-      "time": "09:00～16:00",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/tokyo/nishitokyo/img/1031_getumatu.jpg",
-      "notes": "掲載元: 西東京地域事務所",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-10-13",
-      "weatherLocation": {
-        "latitude": 35.758,
-        "longitude": 139.53,
-        "label": "東京都東久留米市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-10-13T12:14:33.473+09:00"
-      }
-    },
-    {
-      "id": "to-office-20261019-jd8mq",
-      "pref": "tokyo",
-      "date": "2026-10-19",
-      "weekday": "月",
-      "title": "防衛省自行隧説明",
-      "place": "西東京地域事務所",
-      "address": "",
-      "time": "17:00～21:00",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/tokyo/nishitokyo/img/1019-1023_night.png",
-      "notes": "掲載元: 西東京地域事務所\n各日3日前まで要予約",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-10-06",
-      "weatherLocation": {
-        "latitude": 35.726,
-        "longitude": 139.538,
-        "label": "東京都西東京市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-02T08:50:37.016+09:00"
-      }
-    },
-    {
-      "id": "to-office-20261013-gondi",
-      "pref": "tokyo",
-      "date": "2026-10-13",
-      "weekday": "火",
-      "title": "女性自衛官のための自衛隊職業説明会",
-      "place": "立川地方合同庁舎2 立川出張所",
-      "address": "",
-      "time": "16:30",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/tokyo/tachikawa/img/1013-1028_josei.png",
-      "notes": "掲載元: 立川出張所\n事前予約制",
-      "ageRequirement": "高校生以上",
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-10-13",
-      "weatherLocation": {
-        "latitude": 35.714,
-        "longitude": 139.408,
-        "label": "東京都立川市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-10-06T01:03:28.355+09:00"
-      }
-    },
-    {
-      "id": "to-off-20270128-xp1ck",
-      "pref": "tokyo",
-      "date": "2027-01-28",
-      "weekday": "木",
-      "title": "自衛官募集ホームページ <自衛官募集X",
-      "place": "防衛大学",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/tokyo/saiyou/saiyouanai2026.pdf",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-10-10",
-      "weatherLocation": {
-        "latitude": 35.69,
-        "longitude": 139.692,
-        "label": "東京都",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-31T16:01:33.302+09:00"
-      }
-    },
-    {
       "id": "to-office-20261018-7lzzm",
       "pref": "tokyo",
       "date": "2026-10-18",
@@ -2114,32 +2368,6 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-10-06T23:55:34.803+09:00"
-      }
-    },
-    {
-      "id": "to-office-20261031-3g5th",
-      "pref": "tokyo",
-      "date": "2026-10-31",
-      "weekday": "土",
-      "title": "自衛官転職相談会",
-      "place": "自衛隊東京地方協力本部江東出張所",
-      "address": "",
-      "time": "10:00～15:30",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/tokyo/koutou/img/1031-1101_tensyoku.png",
-      "notes": "掲載元: 江東出張所\n事前予約制、入退場自由、個別相談有",
-      "ageRequirement": "18~32歳未満の方",
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-10-12",
-      "weatherLocation": {
-        "latitude": 35.69,
-        "longitude": 139.692,
-        "label": "東京都",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-10-07T23:55:51.805+09:00"
       }
     }
   ],
@@ -2253,6 +2481,32 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-28T15:46:14.123+09:00"
+      }
+    },
+    {
+      "id": "sa-office-20261013-mdfav",
+      "pref": "saitama",
+      "date": "2026-10-13",
+      "weekday": "火",
+      "title": "退職自衛官の声 更新",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/saitama/",
+      "notes": "掲載元: 募集案内所・地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_html",
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 35.857,
+        "longitude": 139.649,
+        "label": "埼玉県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:19.230+09:00"
       }
     }
   ],
@@ -3123,32 +3377,6 @@
       }
     },
     {
-      "id": "gu-office-20261011-v4yea",
-      "pref": "gunma",
-      "date": "2026-10-11",
-      "weekday": "日",
-      "title": "ISESARI DREAM FESTIVAL 2026",
-      "place": "Sludium",
-      "address": "",
-      "time": "10:00～16:00",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/gunma/sozai/event/20261011-1.jpg",
-      "notes": "掲載元: 前橋募集案内所",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-10-06",
-      "weatherLocation": {
-        "latitude": 36.391,
-        "longitude": 139.06,
-        "label": "群馬県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-10-06T23:55:35.844+09:00"
-      }
-    },
-    {
       "id": "gu-office-20261017-3lo0j",
       "pref": "gunma",
       "date": "2026-10-17",
@@ -3359,37 +3587,10 @@
       }
     }
   ],
-  "chiba": [
-    {
-      "id": "ch-off-20270128-xp1ck",
-      "pref": "chiba",
-      "date": "2027-01-28",
-      "weekday": "木",
-      "title": "自衛官募集ホームページ <自衛官募集X",
-      "place": "防衛大学",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/chiba/pdf/2026annai.pdf",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-10-13",
-      "weatherLocation": {
-        "latitude": 35.605,
-        "longitude": 140.123,
-        "label": "千葉県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-31T16:01:33.659+09:00"
-      }
-    }
-  ],
+  "chiba": [],
   "tochigi": [
     {
-      "id": "to-off-20261107-pks0r",
+      "id": "to-office-20261107-zb0gb",
       "pref": "tochigi",
       "date": "2026-11-07",
       "weekday": "土",
@@ -3400,11 +3601,11 @@
       "category": "記念行事",
       "tag": "学生向け",
       "url": "https://www.mod.go.jp/pco/tochigi/doc/recruit/boudai_kaikoukinensai.pdf",
-      "notes": "希望者多数の場合は抽選となります。事前エントリー制。",
+      "notes": "掲載元: 募集案内所・地域事務所\n希望者多数の場合は抽選となります。事前エントリー制。",
       "ageRequirement": "高校生、受験資格がある方等",
       "deadline": "10月23日（金）",
       "source_type": "office_ocr",
-      "firstSeen": "2026-10-11",
+      "firstSeen": "2026-10-13",
       "deadlineDate": "2026-10-23",
       "weatherLocation": {
         "latitude": 36.566,
@@ -3425,7 +3626,7 @@
       "title": "新潟産業大学学園祭（紅葉祭）",
       "place": "新潟産業大学",
       "address": "",
-      "time": "",
+      "time": "10:00～17:00",
       "category": "採用イベント",
       "tag": "",
       "url": "",
@@ -3443,6 +3644,56 @@
       }
     },
     {
+      "id": "ni-20261017-7yvu5",
+      "pref": "niigata",
+      "date": "2026-10-17",
+      "weekday": "土",
+      "title": "大農業祭",
+      "place": "響きの森公園・魚沼響きの森文化会館",
+      "address": "",
+      "time": "09:00～14:30",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 37.902,
+        "longitude": 139.023,
+        "label": "新潟県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-13T17:05:53.069+09:00"
+      }
+    },
+    {
+      "id": "ni-20261017-jyfpv",
+      "pref": "niigata",
+      "date": "2026-10-17",
+      "weekday": "土",
+      "title": "ミニ防災フェア",
+      "place": "小千谷スポーツコミュニティ「ソコラテ。」",
+      "address": "",
+      "time": "09:00～12:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 37.314,
+        "longitude": 138.795,
+        "label": "新潟県小千谷市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-13T17:05:53.407+09:00"
+      }
+    },
+    {
       "id": "ni-20261018-gtvyw",
       "pref": "niigata",
       "date": "2026-10-18",
@@ -3450,7 +3701,7 @@
       "title": "柏崎市比角コミュニティ祭",
       "place": "比角コミセン・東部公園",
       "address": "",
-      "time": "",
+      "time": "10:00～14:30",
       "category": "広報活動",
       "tag": "",
       "url": "",
@@ -3465,6 +3716,56 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-09-29T00:18:47.844+09:00"
+      }
+    },
+    {
+      "id": "ni-20261018-lepu8",
+      "pref": "niigata",
+      "date": "2026-10-18",
+      "weekday": "日",
+      "title": "にしかん産業祭",
+      "place": "まき鯛車商店街",
+      "address": "",
+      "time": "10:00～15:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 37.902,
+        "longitude": 139.023,
+        "label": "新潟県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-13T17:05:53.755+09:00"
+      }
+    },
+    {
+      "id": "ni-20261024-mm2gl",
+      "pref": "niigata",
+      "date": "2026-10-24",
+      "weekday": "土",
+      "title": "柏崎工業高校文化祭「睦友祭」",
+      "place": "柏崎工業高校",
+      "address": "",
+      "time": "10:00～14:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 37.365,
+        "longitude": 138.558,
+        "label": "新潟県柏崎市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-06T23:55:38.221+09:00"
       }
     },
     {
@@ -3546,6 +3847,32 @@
       }
     },
     {
+      "id": "ni-office-20261104-0661w",
+      "pref": "niigata",
+      "date": "2026-11-04",
+      "weekday": "水",
+      "title": "自衛隊職業説明会",
+      "place": "パルムート新発田",
+      "address": "",
+      "time": "10:00～12:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/niigata/images/honbu/r8.11.4shibatahwsetumeikai.jpg",
+      "notes": "掲載元: 募集案内所・地域事務所\n予約不要、当日参加可能",
+      "ageRequirement": "18歳以上33歳未満",
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 37.902,
+        "longitude": 139.023,
+        "label": "新潟県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-09-10T21:41:47.937+09:00"
+      }
+    },
+    {
       "id": "ni-office-20261024-orsbx",
       "pref": "niigata",
       "date": "2026-10-24",
@@ -3624,32 +3951,6 @@
       }
     },
     {
-      "id": "ni-off-20261104-cj4te",
-      "pref": "niigata",
-      "date": "2026-11-04",
-      "weekday": "水",
-      "title": "自衛隊職業説明会",
-      "place": "パルムート新発田",
-      "address": "",
-      "time": "10:00～12:00",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/niigata/images/honbu/r8.11.4shibatahwsetumeikai.jpg",
-      "notes": "予約不要、当日参加可能",
-      "ageRequirement": "18歳以上33歳未満",
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-10-12",
-      "weatherLocation": {
-        "latitude": 37.902,
-        "longitude": 139.023,
-        "label": "新潟県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-09-10T21:41:47.937+09:00"
-      }
-    },
-    {
       "id": "ni-office-20261018-rq3i4",
       "pref": "niigata",
       "date": "2026-10-18",
@@ -3676,32 +3977,6 @@
       }
     },
     {
-      "id": "ni-office-20261024-dxmp5",
-      "pref": "niigata",
-      "date": "2026-10-24",
-      "weekday": "土",
-      "title": "睦友祭 自衛隊展示＆体験ブース",
-      "place": "柏崎工業高校",
-      "address": "",
-      "time": "10:00～14:30",
-      "category": "体験",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/niigata/files/event/r8.10.24kashiwazaki.pdf",
-      "notes": "掲載元: 柏崎地域事務所",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-10-07",
-      "weatherLocation": {
-        "latitude": 37.365,
-        "longitude": 138.558,
-        "label": "新潟県柏崎市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-10-06T23:55:38.221+09:00"
-      }
-    },
-    {
       "id": "ni-office-20261011-tpnv2",
       "pref": "niigata",
       "date": "2026-10-11",
@@ -3725,32 +4000,6 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-10-06T23:55:37.899+09:00"
-      }
-    },
-    {
-      "id": "ni-office-20261024-ispro",
-      "pref": "niigata",
-      "date": "2026-10-24",
-      "weekday": "土",
-      "title": "睦友祭 自衛隊展示&体験",
-      "place": "柏崎工業高校",
-      "address": "",
-      "time": "10:00～14:30",
-      "category": "体験",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/niigata/images/event/r8.10.24kashiwazaki.jpg",
-      "notes": "掲載元: 柏崎地域事務所",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-10-06",
-      "weatherLocation": {
-        "latitude": 37.365,
-        "longitude": 138.558,
-        "label": "新潟県柏崎市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-10-06T23:55:38.221+09:00"
       }
     },
     {
@@ -3808,29 +4057,29 @@
   ],
   "toyama": [
     {
-      "id": "to-office-20261213-jb3bq",
+      "id": "to-office-20261118-cvj5d",
       "pref": "toyama",
-      "date": "2026-12-13",
-      "weekday": "日",
-      "title": "富山自衛隊演奏会",
-      "place": "",
+      "date": "2026-11-18",
+      "weekday": "水",
+      "title": "富山自衛隧演奏会",
+      "place": "南砺福野高校",
       "address": "",
-      "time": "13:00",
+      "time": "",
       "category": "演奏会",
       "tag": "",
-      "url": "https://www.mod.go.jp/pco/toyama/content/04-event/images/MFivento.jpg",
+      "url": "https://www.mod.go.jp/pco/toyama/content/04-event/images/2026ivento.pdf",
       "notes": "掲載元: 募集案内所・地域事務所",
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_ocr",
       "firstSeen": "2026-10-09",
       "weatherLocation": {
-        "latitude": 36.695,
-        "longitude": 137.211,
-        "label": "富山県",
-        "accuracy": "prefecture",
+        "latitude": 36.557,
+        "longitude": 136.875,
+        "label": "富山県南砺市",
+        "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-07-02T08:50:40.109+09:00"
+        "geocodedAt": "2026-10-09T16:46:34.876+09:00"
       }
     },
     {
@@ -3860,29 +4109,29 @@
       }
     },
     {
-      "id": "to-office-20261118-cvj5d",
+      "id": "to-office-20261213-jb3bq",
       "pref": "toyama",
-      "date": "2026-11-18",
-      "weekday": "水",
-      "title": "富山自衛隧演奏会",
-      "place": "南砺福野高校",
+      "date": "2026-12-13",
+      "weekday": "日",
+      "title": "富山自衛隊演奏会",
+      "place": "",
       "address": "",
-      "time": "",
+      "time": "13:00",
       "category": "演奏会",
       "tag": "",
-      "url": "https://www.mod.go.jp/pco/toyama/content/04-event/images/2026ivento.pdf",
+      "url": "https://www.mod.go.jp/pco/toyama/content/04-event/images/MFivento.jpg",
       "notes": "掲載元: 募集案内所・地域事務所",
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_ocr",
       "firstSeen": "2026-10-09",
       "weatherLocation": {
-        "latitude": 36.557,
-        "longitude": 136.875,
-        "label": "富山県南砺市",
-        "accuracy": "venue",
+        "latitude": 36.695,
+        "longitude": 137.211,
+        "label": "富山県",
+        "accuracy": "prefecture",
         "source": "gsi",
-        "geocodedAt": "2026-10-09T16:46:34.876+09:00"
+        "geocodedAt": "2026-07-02T08:50:40.109+09:00"
       }
     }
   ],
@@ -4129,6 +4378,31 @@
   "yamanashi": [],
   "nagano": [
     {
+      "id": "na-20261017-c5eer",
+      "pref": "nagano",
+      "date": "2026-10-17",
+      "weekday": "土",
+      "title": "【小布施町】六斎市",
+      "place": "",
+      "address": "小布施町",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-25",
+      "weatherLocation": {
+        "latitude": 36.697,
+        "longitude": 138.312,
+        "label": "長野県小布施町",
+        "accuracy": "municipality",
+        "source": "gsi",
+        "geocodedAt": "2026-08-25T12:35:42.861+09:00"
+      }
+    },
+    {
       "id": "na-20261017-4mxbx",
       "pref": "nagano",
       "date": "2026-10-17",
@@ -4204,13 +4478,13 @@
       }
     },
     {
-      "id": "na-20261017-c5eer",
+      "id": "na-20261024-vu6k6",
       "pref": "nagano",
-      "date": "2026-10-17",
+      "date": "2026-10-24",
       "weekday": "土",
-      "title": "【小布施町】六斎市",
-      "place": "",
-      "address": "小布施町",
+      "title": "【川上村】防災イベント",
+      "place": "川上村民体育館",
+      "address": "",
       "time": "",
       "category": "広報活動",
       "tag": "",
@@ -4218,14 +4492,39 @@
       "notes": null,
       "ageRequirement": null,
       "deadline": null,
-      "firstSeen": "2026-08-25",
+      "firstSeen": "2026-08-26",
       "weatherLocation": {
-        "latitude": 36.697,
-        "longitude": 138.312,
-        "label": "長野県小布施町",
-        "accuracy": "municipality",
+        "latitude": 35.975,
+        "longitude": 138.578,
+        "label": "長野県川上村",
+        "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-08-25T12:35:42.861+09:00"
+        "geocodedAt": "2026-08-26T18:08:23.037+09:00"
+      }
+    },
+    {
+      "id": "na-20261024-debx2",
+      "pref": "nagano",
+      "date": "2026-10-24",
+      "weekday": "土",
+      "title": "【松本市】松本市総合防災訓練",
+      "place": "松本城大手門枡形跡広場",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "場所：枡形広場 時間：１０：００～１４：３０ 松本市総合防災訓練に参加いたします。 台風１９号災害の写真パネル展示と災害時に役立つロープワークの基本的な結び方の体験を実施いたします。 体験された方には自衛隊グッズを差し上げます。 楽しみながら学べる機会ですので是非お越しください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 36.238,
+        "longitude": 137.972,
+        "label": "長野県松本市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-13T17:05:54.090+09:00"
       }
     },
     {
@@ -4254,56 +4553,6 @@
       }
     },
     {
-      "id": "na-20261024-e58tt",
-      "pref": "nagano",
-      "date": "2026-10-24",
-      "weekday": "土",
-      "title": "【松本市】松本市防災訓練",
-      "place": "",
-      "address": "松本市",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 36.238,
-        "longitude": 137.972,
-        "label": "長野県松本市",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:37.753+09:00"
-      }
-    },
-    {
-      "id": "na-20261024-vu6k6",
-      "pref": "nagano",
-      "date": "2026-10-24",
-      "weekday": "土",
-      "title": "【川上村】防災イベント",
-      "place": "川上村民体育館",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-26",
-      "weatherLocation": {
-        "latitude": 35.975,
-        "longitude": 138.578,
-        "label": "長野県川上村",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-26T18:08:23.037+09:00"
-      }
-    },
-    {
       "id": "na-20261025-3il78",
       "pref": "nagano",
       "date": "2026-10-25",
@@ -4326,56 +4575,6 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-08-25T12:35:43.575+09:00"
-      }
-    },
-    {
-      "id": "na-20261025-5plfp",
-      "pref": "nagano",
-      "date": "2026-10-25",
-      "weekday": "日",
-      "title": "【伊那市】防災イベント（仮称）",
-      "place": "かんてんぱぱ くぬぎの杜",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "細部、調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 36.651,
-        "longitude": 138.181,
-        "label": "長野県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-06T19:57:02.477+09:00"
-      }
-    },
-    {
-      "id": "na-20261025-rv0ey",
-      "pref": "nagano",
-      "date": "2026-10-25",
-      "weekday": "日",
-      "title": "【大町市】県統合防災訓練",
-      "place": "",
-      "address": "大町市",
-      "time": "",
-      "category": "広報活動",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-08-06",
-      "weatherLocation": {
-        "latitude": 36.503,
-        "longitude": 137.851,
-        "label": "長野県大町",
-        "accuracy": "municipality",
-        "source": "gsi",
-        "geocodedAt": "2026-07-29T14:30:38.512+09:00"
       }
     },
     {
@@ -4404,6 +4603,56 @@
       }
     },
     {
+      "id": "na-20261025-5plfp",
+      "pref": "nagano",
+      "date": "2026-10-25",
+      "weekday": "日",
+      "title": "【伊那市】防災イベント（仮称）",
+      "place": "かんてんぱぱ くぬぎの杜",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "細部、調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-08-06",
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-06T19:57:02.477+09:00"
+      }
+    },
+    {
+      "id": "na-20261025-vj2cd",
+      "pref": "nagano",
+      "date": "2026-10-25",
+      "weekday": "日",
+      "title": "【大町市】長野県総合防災訓練",
+      "place": "大町運動公園",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "場所：大町運動公園 ローラースケート場 時間：９：００～１２：３０ 長野県総合防災訓練に参加いたします。 松本駐屯地１３連隊の隊員が炊事車でカレーを作ります。 限定２００食（予定）試食できます☆彡 握力測定チャレンジ ギュッと握って景品ゲット！年齢平均に挑め！ ガチャガチャ 何が出るかな？お楽しみ!(^^)! 楽しみながら防災を学べます。 自衛隊ブースに是非遊びに来てください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 36.503,
+        "longitude": 137.851,
+        "label": "長野県大町",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-13T17:05:54.441+09:00"
+      }
+    },
+    {
       "id": "na-20261031-p8gme",
       "pref": "nagano",
       "date": "2026-10-31",
@@ -4426,6 +4675,31 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-08-25T12:35:39.581+09:00"
+      }
+    },
+    {
+      "id": "na-20261101-4vah4",
+      "pref": "nagano",
+      "date": "2026-11-01",
+      "weekday": "日",
+      "title": "【大町市】消防フェスタ2026",
+      "place": "大町市文化会館［エコーホール］",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "",
+      "notes": "調整中",
+      "ageRequirement": null,
+      "deadline": null,
+      "firstSeen": "2026-10-06",
+      "weatherLocation": {
+        "latitude": 36.503,
+        "longitude": 137.851,
+        "label": "長野県大町",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-06T01:03:29.394+09:00"
       }
     },
     {
@@ -4476,31 +4750,6 @@
         "accuracy": "municipality",
         "source": "gsi",
         "geocodedAt": "2026-10-09T23:49:09.896+09:00"
-      }
-    },
-    {
-      "id": "na-20261101-4vah4",
-      "pref": "nagano",
-      "date": "2026-11-01",
-      "weekday": "日",
-      "title": "【大町市】消防フェスタ2026",
-      "place": "大町市文化会館［エコーホール］",
-      "address": "",
-      "time": "",
-      "category": "地域参加",
-      "tag": "",
-      "url": "",
-      "notes": "調整中",
-      "ageRequirement": null,
-      "deadline": null,
-      "firstSeen": "2026-10-06",
-      "weatherLocation": {
-        "latitude": 36.503,
-        "longitude": 137.851,
-        "label": "長野県大町",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-10-06T01:03:29.394+09:00"
       }
     },
     {
@@ -4615,7 +4864,7 @@
       "category": "広報活動",
       "tag": "",
       "url": "",
-      "notes": "場所：イオン南松本 時間： 内容： 「自衛隊って何してるの？」その疑問を解決！仕事内容、生活、ワークライフバランス、待遇など「自衛隊って結構いいじゃん！」って思える説明をいたします。是非、お越しいただき現役の自衛官とお話してみませんか。なお、ご来場いただいた方には自衛隊オリジナルグッズをプレゼントいたします。松本市深志にある自衛隊広報センター信濃の隊員が出向します。(^^)/笑顔でお待ちしています！",
+      "notes": "場所：イオン南松本 東側入口 時間：１６：００～１９：００ 内容： 「自衛隊って何してるの？」その疑問を解決！仕事内容、生活、ワークライフバランス、待遇など「自衛隊って結構いいじゃん！」って思える説明をいたします。是非、お越しいただき現役の自衛官とお話してみませんか。なお、ご来場いただいた方には自衛隊オリジナルグッズをプレゼントいたします。松本市深志にある自衛隊広報センター信濃の隊員が出向します。(^^)/笑顔でお待ちしています！",
       "ageRequirement": null,
       "deadline": null,
       "firstSeen": "2026-10-06",
@@ -4665,7 +4914,7 @@
       "category": "説明会",
       "tag": "",
       "url": "",
-      "notes": "場所：イオンモール松本 風庭２F イオンホール 時間：１１：００～１６：００ (１５：４０受付終了) 内容：「公務員ってなにしてるの？」その疑問を解決！ 公務員の仕事内容、生活、ワークライフバランス、待遇等わかりやすく説明させていただきます。 【参加団体】 陸上自衛隊、海上自衛隊、航空自衛隊、長野県警、松本少年刑務所、北アルプス消防、木曽広域消防、松本市役所、安曇野市役所、大町市役所、防衛省事務官",
+      "notes": "場所：イオンモール松本 風庭２F イオンホール 時間：１１：００～１６：００ (１５：４０受付終了) 内容：「公務員ってなにしてるの？」その疑問を解決！ 公務員の仕事内容、生活、ワークライフバランス、待遇等わかりやすく説明させていただきます。 当日は現役女性海上自衛官も来ますので詳しい説明が聞ける貴重な機会です。 少しでも興味がある、話を聞いてみたい方、ぜひお気軽にご参加ください。 【参加団体】 陸上自衛隊、海上自衛隊、航空自衛隊、長野県警、松本少年刑務所、北アルプス消防、木曽広域消防、松本市役所、安曇野市役所、大町市役所、防衛省事務官",
       "ageRequirement": null,
       "deadline": null,
       "firstSeen": "2026-10-06",
@@ -5384,32 +5633,6 @@
       }
     },
     {
-      "id": "ai-off-20270128-xp1ck",
-      "pref": "aichi",
-      "date": "2027-01-28",
-      "weekday": "木",
-      "title": "自衛官募集ホームページ <自衛官募集X",
-      "place": "防衛大学",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/aichi/event/r8saiyouannai.pdf",
-      "notes": null,
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-10-13",
-      "weatherLocation": {
-        "latitude": 35.18,
-        "longitude": 136.907,
-        "label": "愛知県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-08-31T08:58:59.575+09:00"
-      }
-    },
-    {
       "id": "ai-office-20270121-rlpv2",
       "pref": "aichi",
       "date": "2027-01-21",
@@ -5433,6 +5656,32 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-10-04T08:54:42.848+09:00"
+      }
+    },
+    {
+      "id": "ai-off-20270128-xp1ck",
+      "pref": "aichi",
+      "date": "2027-01-28",
+      "weekday": "木",
+      "title": "自衛官募集ホームページ <自衛官募集X",
+      "place": "防衛大学",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/aichi/event/r8saiyouannai.pdf",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 35.18,
+        "longitude": 136.907,
+        "label": "愛知県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-08-31T08:58:59.575+09:00"
       }
     },
     {
@@ -5739,7 +5988,7 @@
       "source_type": "office_html",
       "endDate": "2026-10-19",
       "verifiedBy": "llm-recheck",
-      "verifiedAt": "2026-10-13T03:14:33.155Z",
+      "verifiedAt": "2026-10-13T08:05:50.732Z",
       "endWeekday": "月",
       "firstSeen": "2026-10-06",
       "weatherLocation": {
@@ -5768,7 +6017,7 @@
       "deadline": null,
       "source_type": "office_html",
       "verifiedBy": "llm-recheck",
-      "verifiedAt": "2026-10-13T03:14:33.185Z",
+      "verifiedAt": "2026-10-13T08:05:50.760Z",
       "firstSeen": "2026-10-06",
       "weatherLocation": {
         "latitude": 35.021,
@@ -5777,58 +6026,6 @@
         "accuracy": "venue",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:30.769+09:00"
-      }
-    },
-    {
-      "id": "ky-office-20270128-yf7cd",
-      "pref": "kyoto",
-      "date": "2027-01-28",
-      "weekday": "木",
-      "title": "自衛官募集ホームページ <自衛官募集X",
-      "place": "防衛大学",
-      "address": "",
-      "time": "",
-      "category": "説明会",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/kyoto/img/common/2026jieikannbosyuu.pdf",
-      "notes": "掲載元: 募集案内所・地域事務所",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-10-13",
-      "weatherLocation": {
-        "latitude": 35.021,
-        "longitude": 135.756,
-        "label": "京都府",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-10-08T10:36:14.101+09:00"
-      }
-    },
-    {
-      "id": "ky-office-20261018-gshjb",
-      "pref": "kyoto",
-      "date": "2026-10-18",
-      "weekday": "日",
-      "title": "桂駐屯地創設72周年記念行事",
-      "place": "桂駐屯地",
-      "address": "",
-      "time": "",
-      "category": "記念行事",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/kyoto/kouhoushitsu/img/080915.pdf",
-      "notes": "掲載元: 募集案内所・地域事務所\n一般開放",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-09-15",
-      "weatherLocation": {
-        "latitude": 35.021,
-        "longitude": 135.756,
-        "label": "京都府",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-09-15T15:13:47.689+09:00"
       }
     },
     {
@@ -5882,6 +6079,58 @@
         "accuracy": "prefecture",
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:31.003+09:00"
+      }
+    },
+    {
+      "id": "ky-office-20270128-yf7cd",
+      "pref": "kyoto",
+      "date": "2027-01-28",
+      "weekday": "木",
+      "title": "自衛官募集ホームページ <自衛官募集X",
+      "place": "防衛大学",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kyoto/img/common/2026jieikannbosyuu.pdf",
+      "notes": "掲載元: 募集案内所・地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 35.021,
+        "longitude": 135.756,
+        "label": "京都府",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-08T10:36:14.101+09:00"
+      }
+    },
+    {
+      "id": "ky-office-20261018-gshjb",
+      "pref": "kyoto",
+      "date": "2026-10-18",
+      "weekday": "日",
+      "title": "桂駐屯地創設72周年記念行事",
+      "place": "桂駐屯地",
+      "address": "",
+      "time": "",
+      "category": "記念行事",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kyoto/kouhoushitsu/img/080915.pdf",
+      "notes": "掲載元: 募集案内所・地域事務所\n一般開放",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-09-15",
+      "weatherLocation": {
+        "latitude": 35.021,
+        "longitude": 135.756,
+        "label": "京都府",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-09-15T15:13:47.689+09:00"
       }
     }
   ],
@@ -7014,84 +7263,6 @@
       }
     },
     {
-      "id": "eh-office-20261123-rum18",
-      "pref": "ehime",
-      "date": "2026-11-23",
-      "weekday": "月・祝",
-      "title": "陸上自衛隊松山駐屯地創立71周年記念行事",
-      "place": "陸上自衛隊松山駐屯地",
-      "address": "",
-      "time": "08:30～15:00",
-      "category": "記念行事",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/ehime/event/2026/chutontikinengyoji.jpg",
-      "notes": "掲載元: 募集案内所・地域事務所\n危険物（刃物類、火気類）の持込は禁止。駐屯地内は立入禁止場所あり。",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-10-06",
-      "weatherLocation": {
-        "latitude": 33.842,
-        "longitude": 132.766,
-        "label": "愛媛県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-07-14T19:08:36.311+09:00"
-      }
-    },
-    {
-      "id": "eh-office-20270109-y4y0f",
-      "pref": "ehime",
-      "date": "2027-01-09",
-      "weekday": "土",
-      "title": "高等工科学校生徒",
-      "place": "",
-      "address": "",
-      "time": "",
-      "category": "広報活動",
-      "tag": "学生向け",
-      "url": "https://www.mod.go.jp/pco/ehime/event/2026/kotokoka1.jpg",
-      "notes": "掲載元: 募集案内所・地域事務所",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-10-08",
-      "weatherLocation": {
-        "latitude": 33.842,
-        "longitude": 132.766,
-        "label": "愛媛県",
-        "accuracy": "prefecture",
-        "source": "gsi",
-        "geocodedAt": "2026-10-08T10:36:15.062+09:00"
-      }
-    },
-    {
-      "id": "eh-office-20261012-hj5zl",
-      "pref": "ehime",
-      "date": "2026-10-12",
-      "weekday": "月・祝",
-      "title": "大洲の来Z!知o!",
-      "place": "大洲市東大洲1702-1",
-      "address": "",
-      "time": "09:00～15:00",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/ehime/event/2026/oozu/oozusangyomaturi.jpg",
-      "notes": "掲載元: 募集案内所・地域事務所\n雨天決行、定員500名",
-      "ageRequirement": "小学生未就学の対象子樣某子",
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-10-06",
-      "weatherLocation": {
-        "latitude": 33.528,
-        "longitude": 132.571,
-        "label": "愛媛県大洲市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-10-06T23:55:39.556+09:00"
-      }
-    },
-    {
       "id": "eh-off-20261018-hib7d",
       "pref": "ehime",
       "date": "2026-10-18",
@@ -7194,6 +7365,84 @@
         "source": "gsi",
         "geocodedAt": "2026-09-14T15:21:39.739+09:00"
       }
+    },
+    {
+      "id": "eh-office-20261123-rum18",
+      "pref": "ehime",
+      "date": "2026-11-23",
+      "weekday": "月・祝",
+      "title": "陸上自衛隊松山駐屯地創立71周年記念行事",
+      "place": "陸上自衛隊松山駐屯地",
+      "address": "",
+      "time": "08:30～15:00",
+      "category": "記念行事",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/ehime/event/2026/chutontikinengyoji.jpg",
+      "notes": "掲載元: 募集案内所・地域事務所\n危険物（刃物類、火気類）の持込は禁止。駐屯地内は立入禁止場所あり。",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-06",
+      "weatherLocation": {
+        "latitude": 33.842,
+        "longitude": 132.766,
+        "label": "愛媛県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-14T19:08:36.311+09:00"
+      }
+    },
+    {
+      "id": "eh-office-20270109-y4y0f",
+      "pref": "ehime",
+      "date": "2027-01-09",
+      "weekday": "土",
+      "title": "高等工科学校生徒",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "学生向け",
+      "url": "https://www.mod.go.jp/pco/ehime/event/2026/kotokoka1.jpg",
+      "notes": "掲載元: 募集案内所・地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-08",
+      "weatherLocation": {
+        "latitude": 33.842,
+        "longitude": 132.766,
+        "label": "愛媛県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-10-08T10:36:15.062+09:00"
+      }
+    },
+    {
+      "id": "eh-office-20261012-hj5zl",
+      "pref": "ehime",
+      "date": "2026-10-12",
+      "weekday": "月・祝",
+      "title": "大洲の来Z!知o!",
+      "place": "大洲市東大洲1702-1",
+      "address": "",
+      "time": "09:00～15:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/ehime/event/2026/oozu/oozusangyomaturi.jpg",
+      "notes": "掲載元: 募集案内所・地域事務所\n雨天決行、定員500名",
+      "ageRequirement": "小学生未就学の対象子樣某子",
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-06",
+      "weatherLocation": {
+        "latitude": 33.528,
+        "longitude": 132.571,
+        "label": "愛媛県大洲市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-06T23:55:39.556+09:00"
+      }
     }
   ],
   "kagawa": [
@@ -7261,7 +7510,7 @@
       "category": "体験",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/kagawa/img/8.12.5taikentoujyo.png",
-      "notes": "応募条件：香川県内在住、健康状態良好、自衛隊に興味のある方",
+      "notes": "悪天候等で実施が困難な場合、翌日6日（日）に実施。",
       "ageRequirement": "16歳以上33歳未満",
       "deadline": "11月5日（木）",
       "source_type": "office_ocr",
@@ -7278,7 +7527,34 @@
     }
   ],
   "kochi": [],
-  "tokushima": [],
+  "tokushima": [
+    {
+      "id": "to-off-20270128-xp1ck",
+      "pref": "tokushima",
+      "date": "2027-01-28",
+      "weekday": "木",
+      "title": "自衛官募集ホームページ <自衛官募集X",
+      "place": "防衛大学",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tokushima/images/recurit/recruit_2026.pdf",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-10",
+      "weatherLocation": {
+        "latitude": 34.066,
+        "longitude": 134.559,
+        "label": "徳島県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-09-30T09:54:39.518+09:00"
+      }
+    }
+  ],
   "tottori": [],
   "shimane": [],
   "okayama": [
@@ -7866,7 +8142,7 @@
       }
     },
     {
-      "id": "ok-office-20261025-lqs02",
+      "id": "ok-off-20261025-712iq",
       "pref": "okayama",
       "date": "2026-10-25",
       "weekday": "日",
@@ -7877,7 +8153,7 @@
       "category": "体験",
       "tag": "学生向け",
       "url": "https://www.mod.go.jp/pco/okayama/img/koutou_op.pdf",
-      "notes": "掲載元: 募集案内所・地域事務所\n事前予約制となります。女子向けの懇談も実施予定です。",
+      "notes": "事前予約制となります。女子向けの懇談も実施予定です。",
       "ageRequirement": null,
       "deadline": "10月14日（水）",
       "source_type": "office_ocr",
@@ -8575,34 +8851,7 @@
       }
     }
   ],
-  "yamaguchi": [
-    {
-      "id": "ya-office-20261011-j6qwe",
-      "pref": "yamaguchi",
-      "date": "2026-10-11",
-      "weekday": "日",
-      "title": "清流線老来祭",
-      "place": "世本通9商店街",
-      "address": "",
-      "time": "09:00～16:00",
-      "category": "広報活動",
-      "tag": "",
-      "url": "https://www.mod.go.jp/pco/yamaguchi/event_20261011.pdf",
-      "notes": "掲載元: 募集案内所・地域事務所\n雨天決行・荒天中止",
-      "ageRequirement": null,
-      "deadline": null,
-      "source_type": "office_ocr",
-      "firstSeen": "2026-10-06",
-      "weatherLocation": {
-        "latitude": 34.186,
-        "longitude": 131.471,
-        "label": "山口県",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-10-06T23:55:40.567+09:00"
-      }
-    }
-  ],
+  "yamaguchi": [],
   "fukuoka": [
     {
       "id": "fu-off-20270109-btq4u",
@@ -8975,29 +9224,29 @@
   ],
   "oita": [
     {
-      "id": "oi-office-20261103-13mwn",
+      "id": "oi-office-20261103-26972",
       "pref": "oita",
       "date": "2026-11-03",
       "weekday": "火・祝",
-      "title": "DDH-181 HYUGA 一般公開",
-      "place": "別府国際光港第4小頭",
+      "title": "護衛艦公開",
+      "place": "別府国際光港第4ふ頭",
       "address": "",
       "time": "09:00～15:30",
-      "category": "一般公開",
+      "category": "艦艇公開",
       "tag": "",
       "url": "https://www.mod.go.jp/pco/oita/03_event/images/2026_1103_hyuga.jpg",
-      "notes": "掲載元: 募集案内所・地域事務所\n公共交通機関等利用。付近駐車場は混雑・苦情の恐れあり。",
+      "notes": "掲載元: 募集案内所・地域事務所\n公共交通機関の利用を推奨。付近の駐車場入場待ち発生、付近の店舗等への苦情の場合、一般公開中止の可能性あり。",
       "ageRequirement": null,
       "deadline": null,
       "source_type": "office_ocr",
-      "firstSeen": "2026-10-04",
+      "firstSeen": "2026-10-13",
       "weatherLocation": {
         "latitude": 33.285,
         "longitude": 131.491,
         "label": "大分県別府市",
         "accuracy": "venue",
         "source": "gsi",
-        "geocodedAt": "2026-10-04T19:05:29.071+09:00"
+        "geocodedAt": "2026-10-13T17:05:54.799+09:00"
       }
     },
     {
@@ -9135,5 +9384,5 @@
       }
     }
   ],
-  "updatedAt": "2026/10/13 12:14"
+  "updatedAt": "2026/10/13 17:05"
 }
