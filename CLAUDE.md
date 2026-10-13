@@ -481,8 +481,12 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 
 - 理由: 地本サイトは政府標準利用規約2.0／公共データ利用規約1.0（出典を書けば転載・加工可）だが、**シンボルマーク・ロゴ・キャラクターは対象外**、
   写真の人物（肖像権）・タレント等の**第三者の権利は利用者が許諾を取る必要がある**。チラシにはこれらがほぼ必ず入るため、自動収集した画像は出さない
-- 表示するときは `EVENT_IMAGES_ENABLED` を `true` にし、イベントに `images: [{url, alt, credit, edited, rightsConfirmed:true, public:true}]` を持たせる
-  （運営画面・API は未実装）。**権利確認済み・公開許可・出典あり・許可ホスト（自サイト／mod.go.jp）の https 画像だけ**が出る。個別に隠すときは `imagesHidden: true`
+- **運営画面では画像を登録できる**（2026-10-13）: `/api/admin/images`（`api/admin/_images.js`）＋ `src/components/EventImagesPanel.jsx`。
+  ブラウザで縮小・JPEG 再圧縮（最大1600px・600KB。位置情報等のメタデータも消える）→ 先頭バイトで形式を検査 → Redis `img:<id>` に保存、
+  一覧はイベント本体／上書きの `images`（`MANAGED_KEYS` で上書き保存・取り消しでも残す）。1イベント6枚まで・出典必須・権利確認／公開許可のチェック。
+  権限・所属・監査は FAQ と同じ（手動=`event:update`・自動収集=`event:override`）。イベント削除時は画像データも消す
+- ⚠️ **公開APIは `images`/`imagesHidden` を返さない**（`api/manual-events.js`）。表示を始めるときは `EVENT_IMAGES_ENABLED` を `true` にし、
+  公開用の画像配信API（`/api/image?id=`）を足す（関数数の上限に注意）。**権利確認済み・公開許可・出典ありの画像だけ**が出る（`normalizeImages`）
 - ⚠️ スクレイパーの `imageUrl`（チラシ実物）は使わない。出典は「出典：自衛隊○○地方協力本部ホームページ（URL）」、加工したら「（加工して作成）」を必ず添える
 
 ## 交通・アクセス案内（2026-10-13 導入）
@@ -716,6 +720,22 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 スマホ（1列表示）では、タブ（公開中・下書き・終了済み・閲覧数・報告・在席状況）を**1行の横スクロール**にし、本文の**左右スワイプ**でも切り替える
 （6タブが2段に折り返して窮屈だったため。2026-10-13）。判定は `shared/swipe.cjs`。入力欄・横スクロールする部品（並べ替えバー等）の上で始まった操作は切り替えない。
 PC幅では従来どおり折り返し表示。
+
+### 運営画面の編集記録・統計出力・地本別URL（2026-10-13）
+- **編集記録**: 誰がいつ何をしたかを、イベント本体（手動）／上書き（自動収集）の `_log` に残す（`shared/editLog.cjs`。新しい順・最大50件。
+  追加・修正・状態変更・上書き・変更登録・FAQ・画像のすべての保存経路で `withLog`）。`_` で始まるキーは公開APIが必ず除去する。
+  運営画面は `GET /api/admin/history?targetId=<ID>`（編集できる人なら閲覧可。監査権限があれば監査ログの該当分も返す）を `EditLogPanel` で表示
+- **統計の出力**: 「閲覧数」タブの出力（`ReportExport.jsx`）。`GET /api/admin/view-stats?report=1` が担当範囲の掲載中・運営登録・
+  過去（アーカイブ）全件と閲覧数を返し、`shared/reportExport.cjs` が Excel（無圧縮ZIPの .xlsx・依存なし）／CSV（BOM付き・数式無害化）／
+  PDF（印刷用ページ→ブラウザの「PDFに保存」）にする。⚠️ 印刷用ページにスクリプトを書かない（CSP `script-src 'self'` で動かない。印刷は開いた側から呼ぶ）。
+  閲覧数は Upstash の1リクエスト上限に収まるよう ID を400件ずつ読む
+- **地本別の運営画面**: `/admin/<地本>`（vercel.json で `/admin.html` へ振り替え。`shared/adminPref.cjs`）。URL で権限は広がらない。
+  アカウントは `scripts/admin-accounts.mjs`（init/add/passwd/disable/list/check/encode）で作る。手順は `docs/ADMIN_ACCOUNT_SETUP.md`。
+  `*.local.json`/`*.local.csv`（パスワード・ハッシュ）は .gitignore 済み
+- **タグの排他**: 「入場無料」⇔「要予約」、「家族向け」⇔「学生向け」は同時に選べない（申込要否の選択も含む）。`shared/tags.cjs` の
+  `EXCLUSIVE_TAG_GROUPS`/`tagConflict`。画面は押せなくし、API（events・overrides）は 400。タグを触らない保存は既存データで止めない
+- **会場の選択肢**: 案内所・事務所は `public/data/offices.json`（最新の窓口データ）をそのまま使う。駐屯地・基地は `src/data/jsdfFacilities.js`
+  （手作業の一覧）。地本と住所の都道府県の一致を `shared/facilities.test.cjs` が検査（2026-10-13 に守山＝岐阜・築城＝大分等の誤りを修正）
 
 ### 運営画面（/admin.html）の入力欄
 イベントの追加・修正フォームは **基本 → 開催日時 → 分類 → 会場 → 詳細・リンク** の順にセクション分けする。

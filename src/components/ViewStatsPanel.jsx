@@ -6,6 +6,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { F } from './Shared';
 import { PREFECTURE_INFO } from '../data/regionMap';
 import { sortRows } from '../../shared/viewStats.cjs';
+import ReportExport from './ReportExport';
 
 const COLS = [
   ['title', 'イベント名'], ['pref', '開催地域'], ['date', '開催日'],
@@ -13,7 +14,7 @@ const COLS = [
 ];
 const NUM = new Set(['total', 'today', 'd7', 'd30']);
 
-export default function ViewStatsPanel({ adminFetch, primary }) {
+export default function ViewStatsPanel({ adminFetch, primary, scopeLabel }) {
   const [data, setData] = useState(null);
   const [sortKey, setSortKey] = useState('d7');
   const [dir, setDir] = useState('desc');
@@ -60,6 +61,7 @@ export default function ViewStatsPanel({ adminFetch, primary }) {
   );
   return (
     <div>
+      <ReportExport adminFetch={adminFetch} primary={primary} scopeLabel={scopeLabel} />
       <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 6 }}>イベント別の閲覧数（{rows.length}件）</div>
       <div style={{ fontSize: 11.5, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 10 }}>
         イベント詳細が開かれた回数です（同じ人が開き直した回数も含むため、人数ではありません）。

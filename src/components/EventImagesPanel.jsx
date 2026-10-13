@@ -36,6 +36,7 @@ export default function EventImagesPanel({ eventId, adminFetch, primary, styles 
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState(null);
   const [rev, setRev] = useState(0);
+  const [fileKey, setFileKey] = useState(0); // 追加後にファイル選択欄を空に戻す
 
   const load = useCallback(async () => {
     try {
@@ -67,7 +68,7 @@ export default function EventImagesPanel({ eventId, adminFetch, primary, styles 
     try { c = await compressImage(file, data?.maxBytes || 600 * 1024); }
     catch { setBusy(false); return setMsg({ type: 'err', text: '画像を読み込めないか、大きすぎます' }); }
     setBusy(false);
-    if (await send('POST', { ...form, ...c }, '画像を追加しました')) { setForm(EMPTY); setFile(null); }
+    if (await send('POST', { ...form, ...c }, '画像を追加しました')) { setForm(EMPTY); setFile(null); setFileKey(k => k + 1); }
   }
 
   const chk = (key, text, f = form, onChange = (v) => setForm(p => ({ ...p, [key]: v }))) => (
@@ -108,7 +109,7 @@ export default function EventImagesPanel({ eventId, adminFetch, primary, styles 
       {data.images.length < data.maxImages ? (
         <div style={{ padding: 10, border: `1px dashed ${primary}`, borderRadius: 10, marginBottom: 8 }}>
           <div style={label}>画像を追加（JPEG・PNG・WebP。自動で縮小します）</div>
-          <input type="file" accept="image/jpeg,image/png,image/webp" onChange={e => setFile(e.target.files?.[0] || null)} style={{ ...input, padding: 8 }} />
+          <input key={fileKey} type="file" accept="image/jpeg,image/png,image/webp" onChange={e => setFile(e.target.files?.[0] || null)} style={{ ...input, padding: 8 }} />
           <input value={form.credit} maxLength={200} onChange={e => setForm(p => ({ ...p, credit: e.target.value }))} placeholder="出典（例: 自衛隊東京地方協力本部ホームページ（URL））*" style={input} />
           <input value={form.alt} maxLength={120} onChange={e => setForm(p => ({ ...p, alt: e.target.value }))} placeholder="画像の説明（読み上げ用。例: 会場の様子）" style={input} />
           {chk('edited', 'トリミング・加工した（「加工して作成」と表示）')}
