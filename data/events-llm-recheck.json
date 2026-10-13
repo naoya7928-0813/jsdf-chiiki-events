@@ -1,11 +1,11 @@
 {
-  "updatedAt": "2026-10-13",
+  "updatedAt": "2026-10-14",
   "limit": 30,
   "summary": {
-    "checked": 371,
-    "flagged": 19,
-    "attempted": 14,
-    "corrected": 2,
+    "checked": 374,
+    "flagged": 18,
+    "attempted": 13,
+    "corrected": 4,
     "unverified": 0,
     "noSource": 2,
     "overBudget": 0,
@@ -15,6 +15,81 @@
     "skippedCutoff": 0
   },
   "corrections": [
+    {
+      "id": "to-office-20261015-rpr8k",
+      "pref": "tokyo",
+      "source": "https://www.mod.go.jp/pco/tokyo/nerima/img/10_setumeikai.png",
+      "reasons": [
+        "タイトルが短すぎる"
+      ],
+      "changes": [
+        {
+          "field": "title",
+          "from": "説明会",
+          "to": "10月説明会"
+        },
+        {
+          "field": "date",
+          "from": "2026-10-15",
+          "to": "2026-10-01"
+        },
+        {
+          "field": "endDate",
+          "from": null,
+          "to": "2026-10-31"
+        },
+        {
+          "field": "place",
+          "from": "ご希望の方は事務所",
+          "to": null
+        },
+        {
+          "field": "tag",
+          "from": null,
+          "to": "オンライン"
+        },
+        {
+          "field": "notes",
+          "from": "掲載元: 練馬地域事務所",
+          "to": "来所が難しい方→オンラインでも対応可能"
+        }
+      ]
+    },
+    {
+      "id": "to-office-20261024-uopt4",
+      "pref": "tokyo",
+      "source": "https://www.mod.go.jp/pco/tokyo/event2/img/shinjuku.pdf",
+      "reasons": [
+        "日付がタイトルになっている"
+      ],
+      "changes": [
+        {
+          "field": "title",
+          "from": "令和9年度入校第54期防衛医科大学校医学科学生採用第1次試験",
+          "to": "令和9年度入校第54期防衛医科大学校学生採用第1次試験"
+        },
+        {
+          "field": "place",
+          "from": "ビジョンセンター新宿マインズタワー",
+          "to": "ビジョンセンター新宿メインスタワー"
+        },
+        {
+          "field": "address",
+          "from": null,
+          "to": "東京都渋谷区代々木2-1-1"
+        },
+        {
+          "field": "time",
+          "from": "09:00～18:00",
+          "to": "07:30～18:00"
+        },
+        {
+          "field": "notes",
+          "from": "掲載元: 豊島出張所\n受付時間07:30～08:20。遅刻時は遅延証明書提示要。",
+          "to": "受験票（顔写真付き）必携。公共交通機関の利用を推奨。"
+        }
+      ]
+    },
     {
       "id": "ky-office-20261013-n3vja",
       "pref": "kyoto",

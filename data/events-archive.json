@@ -1,6 +1,228 @@
 {
-  "updatedAt": "2026-10-13",
+  "updatedAt": "2026-10-14",
   "events": [
+    {
+      "id": "ya-20261013-xwjbd",
+      "pref": "yamagata",
+      "office": "",
+      "date": "2026-10-13",
+      "endDate": "",
+      "weekday": "火",
+      "title": "ハローワーク村山出張所説明会",
+      "place": "ハローワーク村山（10:00～15:00）",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-10-07",
+      "archivedAt": "2026-10-14"
+    },
+    {
+      "id": "ka-office-20261013-666oc",
+      "pref": "kanagawa",
+      "office": "",
+      "date": "2026-10-13",
+      "endDate": "",
+      "weekday": "火",
+      "title": "座間市ひまわりフェスタ",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "地域参加",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kanagawa/mado/sagami/sagami.html",
+      "notes": "掲載元: 相模原地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_html",
+      "firstSeen": "2026-10-06",
+      "weatherLocation": {
+        "latitude": 35.448,
+        "longitude": 139.643,
+        "label": "神奈川県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-07-02T08:50:35.831+09:00"
+      },
+      "archivedAt": "2026-10-14"
+    },
+    {
+      "id": "to-office-20261013-gondi",
+      "pref": "tokyo",
+      "office": "",
+      "date": "2026-10-13",
+      "endDate": "",
+      "weekday": "火",
+      "title": "女性自衛官のための自衛隊職業説明会",
+      "place": "立川地方合同庁舎2 立川出張所",
+      "address": "",
+      "time": "16:30",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tokyo/tachikawa/img/1013-1028_josei.png",
+      "notes": "掲載元: 募集案内所・地域事務所\n事前予約制",
+      "ageRequirement": "高校生以上",
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 35.714,
+        "longitude": 139.408,
+        "label": "東京都立川市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-06T01:03:28.355+09:00"
+      },
+      "archivedAt": "2026-10-14"
+    },
+    {
+      "id": "to-office-20261013-zuuk7",
+      "pref": "tokyo",
+      "office": "",
+      "date": "2026-10-13",
+      "endDate": "",
+      "weekday": "火",
+      "title": "就職相談会",
+      "place": "東京地方協力本部府中分所",
+      "address": "",
+      "time": "09:00～12:00",
+      "category": "採用イベント",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tokyo/fuchu/img/1013_soudan.png",
+      "notes": "掲載元: 府中分駐所\n予約不要・直接越下",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-07",
+      "weatherLocation": {
+        "latitude": 35.758,
+        "longitude": 139.53,
+        "label": "東京都東久留米市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-07T23:55:50.984+09:00"
+      },
+      "archivedAt": "2026-10-14"
+    },
+    {
+      "id": "sa-office-20261013-mdfav",
+      "pref": "saitama",
+      "office": "",
+      "date": "2026-10-13",
+      "endDate": "",
+      "weekday": "火",
+      "title": "退職自衛官の声 更新",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/saitama/",
+      "notes": "掲載元: 募集案内所・地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_html",
+      "firstSeen": "2026-10-13",
+      "weatherLocation": {
+        "latitude": 35.857,
+        "longitude": 139.649,
+        "label": "埼玉県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:19.230+09:00"
+      },
+      "archivedAt": "2026-10-14"
+    },
+    {
+      "id": "ib-office-20261013-b1jod",
+      "pref": "ibaraki",
+      "office": "",
+      "date": "2026-10-13",
+      "endDate": "",
+      "weekday": "火",
+      "title": "土浦地域事務所が参加するイベント等のご案内 元気いばらき就職フェアinつくば 日程",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "採用イベント",
+      "tag": "",
+      "url": "https://www.pref.ibaraki.jp/shokorodo/rosei/rodo/genki_ibaraki_mensetsu/r8_genki_tsukuba.html",
+      "notes": "掲載元: 土浦地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_html",
+      "firstSeen": "2026-10-06",
+      "weatherLocation": {
+        "latitude": 36.342,
+        "longitude": 140.447,
+        "label": "茨城県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-10-06T23:55:36.928+09:00"
+      },
+      "archivedAt": "2026-10-14"
+    },
+    {
+      "id": "ky-set-20261013-x5krs",
+      "pref": "kyoto",
+      "office": "",
+      "date": "2026-10-13",
+      "endDate": "",
+      "weekday": "火",
+      "title": "自衛官 就職・進学説明会",
+      "place": "京都テルサハローワーク西館3Ｆ",
+      "address": "",
+      "time": "10:00～16:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
+      "notes": "担当: 京都募集案内所",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-10-04",
+      "archivedAt": "2026-10-14"
+    },
     {
       "id": "ak-20261012-az8iw",
       "pref": "akita",
@@ -169,7 +391,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-08T10:36:12.606+09:00"
       },
-      "archivedAt": "2026-10-13"
+      "archivedAt": "2026-10-14"
     },
     {
       "id": "ib-office-20261012-1qp0t",
@@ -203,7 +425,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-06T23:55:36.597+09:00"
       },
-      "archivedAt": "2026-10-13"
+      "archivedAt": "2026-10-14"
     },
     {
       "id": "ni-office-20261012-2fki3",
@@ -373,7 +595,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-06T23:55:39.556+09:00"
       },
-      "archivedAt": "2026-10-13"
+      "archivedAt": "2026-10-14"
     },
     {
       "id": "to-office-20261012-5dois",
@@ -498,7 +720,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-10-13",
+      "statusUpdatedAt": "2026-10-14",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-08",
       "weatherLocation": {
@@ -509,7 +731,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:38.485+09:00"
       },
-      "archivedAt": "2026-10-13"
+      "archivedAt": "2026-10-14"
     },
     {
       "id": "ka-office-20261012-5tfj3",
@@ -849,7 +1071,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-08T16:51:07.494+09:00"
       },
-      "archivedAt": "2026-10-13"
+      "archivedAt": "2026-10-14"
     },
     {
       "id": "to-office-20261011-7kvp7",
@@ -1053,7 +1275,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-06T23:55:37.899+09:00"
       },
-      "archivedAt": "2026-10-13"
+      "archivedAt": "2026-10-14"
     },
     {
       "id": "ni-office-20261011-p1tdr",
@@ -2957,7 +3179,7 @@
         "source": "gsi",
         "geocodedAt": "2026-09-30T09:54:40.700+09:00"
       },
-      "archivedAt": "2026-10-13"
+      "archivedAt": "2026-10-14"
     },
     {
       "id": "ng-20261010-sul3l",
@@ -3229,7 +3451,7 @@
         "source": "gsi",
         "geocodedAt": "2026-07-13T07:58:32.830+09:00"
       },
-      "archivedAt": "2026-10-13"
+      "archivedAt": "2026-10-14"
     },
     {
       "id": "ok-office-20261009-r87pa",
@@ -3263,7 +3485,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-10-13"
+      "archivedAt": "2026-10-14"
     },
     {
       "id": "ok-office-20261009-25ir2",
@@ -3297,7 +3519,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-10-13"
+      "archivedAt": "2026-10-14"
     },
     {
       "id": "ok-office-20261009-sd49h",
@@ -3331,7 +3553,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:39.717+09:00"
       },
-      "archivedAt": "2026-10-13"
+      "archivedAt": "2026-10-14"
     },
     {
       "id": "ka-office-20261008-i27ow",
@@ -3587,7 +3809,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-10-13"
+      "archivedAt": "2026-10-14"
     },
     {
       "id": "iw-office-20261008-pnj1p",
@@ -3613,7 +3835,7 @@
       "statusUpdatedAt": "",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-09",
-      "archivedAt": "2026-10-13"
+      "archivedAt": "2026-10-14"
     },
     {
       "id": "sh-office-20261008-dio2j",
@@ -3775,7 +3997,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-06T23:55:37.899+09:00"
       },
-      "archivedAt": "2026-10-13"
+      "archivedAt": "2026-10-14"
     },
     {
       "id": "ni-off-20261007-9otej",
@@ -3979,7 +4201,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-10-13"
+      "archivedAt": "2026-10-14"
     },
     {
       "id": "k-20261005-je47v",
