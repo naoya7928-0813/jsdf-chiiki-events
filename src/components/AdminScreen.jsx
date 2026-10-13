@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { ScreenHeader, F } from './Shared';
 import { PREFECTURE_INFO } from '../data/regionMap';
 import { fetchOfficesData } from '../hooks/useOffices';
@@ -13,6 +13,7 @@ import EventChangesPanel from './EventChangesPanel';
 import EventGuidePanel, { EventGuideEditor, EMPTY_GUIDE_VALUE } from './EventGuidePanel';
 import ViewStatsPanel, { EventViewStats } from './ViewStatsPanel';
 import { useIsDesktop } from '../hooks/useBreakpoint';
+import { swipeDirection, neighborTab } from '../../shared/swipe.cjs';
 
 // 広い画面での本文の最大幅（公開ページと同じ判定・設定でレイアウトを切り替える）。
 // デスクトップでは「入力フォーム（左）＋一覧（右）」の2列、それ以外は従来どおり1列。
@@ -115,6 +116,18 @@ function toDeadlineStr(d) {
 const miniOut = (c) => ({ fontSize: 11.5, fontWeight: 600, cursor: 'pointer', borderRadius: 7, padding: '5px 10px', color: c, background: 'transparent', border: `1px solid ${c}55` });
 function fmtTime(iso) { try { return new Date(iso).toLocaleString('ja-JP', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Tokyo' }); } catch { return iso || ''; } }
 
+// 入力欄・横スクロールする部品（並べ替え・表など）の上で始まった操作はタブ切り替えにしない
+function startsInNoSwipeArea(target, root) {
+  for (let el = target; el && el !== root; el = el.parentElement) {
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable || el.hasAttribute?.('data-no-swipe')) return true;
+    if (el.scrollWidth > el.clientWidth + 1) {
+      const ox = getComputedStyle(el).overflowX;
+      if (ox === 'auto' || ox === 'scroll') return true;
+    }
+  }
+  return false;
+}
+
 export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn, onAuthChange, initialFilter = 'all', initialEditEvent = null, showTabs = false }) {
   const { primary } = theme;
   const [account, setAccount] = useState(() => { try { return JSON.parse(localStorage.getItem(ACCT_KEY)) || null; } catch { return null; } });
@@ -153,6 +166,14 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const centered = isDesktop ? { maxWidth: CONTENT_MAX, width: '100%', margin: '0 auto', boxSizing: 'border-box' } : null;
   // 本文（スクロール領域）の実幅。管理画面の本体はログイン確認の後に現れるため、要素を state で受けて計測する
   const [scrollEl, setScrollEl] = useState(null);
+  // スマホ: タブは1行の横スクロール＋本文の左右スワイプで切り替える（6タブが2段に折り返して窮屈だった）
+  const tabBarRef = useRef(null);
+  const swipeStart = useRef(null);
+  useEffect(() => {
+    // 選んだタブが横スクロールの外に隠れないよう、見える位置へ寄せる
+    const el = tabBarRef.current?.querySelector('[aria-selected="true"]');
+    try { el?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' }); } catch { /* noop */ }
+  }, [filter]);
   const [scrollWidth, setScrollWidth] = useState(0);
   useEffect(() => {
     if (!scrollEl || typeof ResizeObserver === 'undefined') return;
@@ -404,6 +425,24 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   if (canSeeViews) TABS.push(['views', '閲覧数']);
   if (canSeeReports) TABS.push(['reports', '報告']);
   if (canSeePresence) TABS.push(['presence', '在席状況']);
+  // スマホ（1列表示）のときだけ、タブを横スクロール＋本文スワイプで切り替える
+  const swipeTabs = showTabs && !editingId && !isDesktop;
+  function onSwipeStart(e) {
+    swipeStart.current = null;
+    if (!swipeTabs || e.touches.length !== 1 || startsInNoSwipeArea(e.target, e.currentTarget)) return;
+    const t = e.touches[0];
+    swipeStart.current = { x: t.clientX, y: t.clientY, t: Date.now() };
+  }
+  function onSwipeEnd(e) {
+    const s = swipeStart.current;
+    swipeStart.current = null;
+    if (!s || !e.changedTouches?.length) return;
+    const t = e.changedTouches[0];
+    const next = neighborTab(TABS.map(([v]) => v), filter, swipeDirection({ dx: t.clientX - s.x, dy: t.clientY - s.y, dt: Date.now() - s.t }));
+    if (!next) return;
+    setFilter(next);
+    try { scrollEl?.scrollTo({ top: 0 }); } catch { /* noop */ }
+  }
   // 下書き確認ページでは登録フォームを出さない（編集時のみ表示）。追加修正ページは常時表示。
   const showForm = (filter === 'all') || !!editingId; // 'draft'・'past' ではフォームを出さない（編集時を除く）
   // 2列にするのは「フォーム」と「一覧」を同時に出す画面だけ（過去・在席・報告の各パネルは1列で広く使う）
@@ -418,12 +457,18 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         trailing={<button onClick={logout} style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', borderRadius: 8, fontSize: 12, padding: '6px 10px', cursor: 'pointer' }}>ログアウト</button>} />
       {/* タブ（追加・修正／下書き／過去／在席状況）。1ページで全機能にアクセス */}
       {showTabs && !editingId && (
-        <div style={{ display: 'flex', gap: 8, padding: '10px 16px 0', flexShrink: 0, flexWrap: 'wrap', ...(contentBox ? { ...contentBox, maxWidth: contentBox.maxWidth + 32 } : {}) }}>
+        <div ref={tabBarRef} role="tablist" aria-label="運営メニュー" data-no-swipe
+          style={{ display: 'flex', gap: 8, padding: '10px 16px 0', flexShrink: 0,
+            ...(swipeTabs
+              ? { flexWrap: 'nowrap', overflowX: 'auto', scrollSnapType: 'x proximity', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', paddingBottom: 2 }
+              : { flexWrap: 'wrap' }),
+            ...(contentBox ? { ...contentBox, maxWidth: contentBox.maxWidth + 32 } : {}) }}>
           {TABS.map(([v, jp]) => {
             const on = filter === v;
             return (
-              <button key={v} onClick={() => setFilter(v)} style={{
-                flex: 1, padding: '9px 0', borderRadius: 9, fontFamily: F.sans, fontSize: 13, fontWeight: 700,
+              <button key={v} role="tab" aria-selected={on} onClick={() => setFilter(v)} style={{
+                ...(swipeTabs ? { flex: '0 0 auto', padding: '9px 16px', scrollSnapAlign: 'center', whiteSpace: 'nowrap' } : { flex: 1, padding: '9px 0' }),
+                borderRadius: 9, fontFamily: F.sans, fontSize: 13, fontWeight: 700,
                 cursor: 'pointer', border: `1px solid ${on ? primary : 'var(--border)'}`,
                 background: on ? primary : 'var(--card)', color: on ? '#fff' : 'var(--text-sub)',
               }}>{jp}{v === 'draft' && list.filter(e => e.status === 'draft').length > 0 ? `（${list.filter(e => e.status === 'draft').length}）` : ''}{v === 'reports' && reportUnread > 0 ? `（${reportUnread}）` : ''}</button>
@@ -431,10 +476,16 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
           })}
         </div>
       )}
+      {swipeTabs && (
+        <div aria-hidden="true" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 5, padding: '6px 16px 0', flexShrink: 0 }}>
+          {TABS.map(([v]) => <span key={v} style={{ width: filter === v ? 14 : 5, height: 5, borderRadius: 3, background: filter === v ? primary : 'var(--border)', transition: 'width .2s' }} />)}
+          <span style={{ fontSize: 10.5, color: 'var(--text-muted)', marginLeft: 6 }}>左右にスワイプで切り替え</span>
+        </div>
+      )}
       {/* overflowX:hidden = 横方向のドラッグ/遊びを抑止（overflowY:auto のみだと
           CSS仕様で overflow-x が auto になり、はみ出し時に横スクロールが生じる）。
           フォーム内の要素は各自 width:100%/minWidth:0 で縮むため内容は欠けない。 */}
-      <div data-admin-scroll ref={setScrollEl} style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '16px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 28px)' }}>
+      <div data-admin-scroll ref={setScrollEl} onTouchStart={onSwipeStart} onTouchEnd={onSwipeEnd} onTouchCancel={() => { swipeStart.current = null; }} style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '16px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 28px)' }}>
         <div style={contentBox}>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10 }}>ログイン中: <strong style={{ color: 'var(--text)' }}>{account.label}</strong>（担当: {prefLabel}）</div>
 

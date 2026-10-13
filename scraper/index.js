@@ -106,6 +106,9 @@ const { parseKagawa }    = require('./parsers/kagawa');
 const { parseKochi }     = require('./parsers/kochi');
 const { parseTokushima } = require('./parsers/tokushima');
 const { isProcurementSource } = require('../shared/procurement.cjs');
+const { isExamResultSource, isExamResultEvent } = require('../shared/examResult.cjs');
+// 調達資料・合格者発表はイベントではない。リンク探索・チラシ取得の前に除外して OCR を使わない
+const isExcludedSource = (src) => isProcurementSource(src) || isExamResultSource(src);
 // 中国地本
 const { parseTottori }   = require('./parsers/tottori');
 const { parseShimane }   = require('./parsers/shimane');
@@ -1683,7 +1686,7 @@ const FLYER_OCR_PROMPT = `この自衛隊イベントのチラシ（PDF・画像
  *   画像 → Tesseract → RapidOCR → Groq → OCR.space → Mistral → Gemini
  */
 async function ocrFlyerFull(url) {
-  if (!url || isProcurementSource({ url })) return null;
+  if (!url || isExcludedSource({ url })) return null;
   const isPdf = /\.pdf(\?.*)?$/i.test(url);
 
   const dl = await downloadFile(url);
@@ -3724,14 +3727,14 @@ function extractOfficeHtmlEvents($, pageUrl, meta) {
 }
 
 function extractOfficeCandidateAssets($, pageUrl) {
-  if (isProcurementSource({ url: pageUrl })) return [];
+  if (isExcludedSource({ url: pageUrl })) return [];
   const seen = new Set();
   const candidates = [];
 
   function add(rawUrl, text = '') {
     const norm = normalizeUrl(rawUrl, pageUrl);
     if (!norm || !isAssetUrl(norm) || seen.has(norm)) return;
-    if (isProcurementSource({ url: norm, text })) return;
+    if (isExcludedSource({ url: norm, text })) return;
     const haystack = decodeForMatch(`${norm} ${text}`);
     if (OFFICE_SKIP_ASSET_KW.test(haystack)) return;
     const hasDate = !!parseOfficeEventDate(haystack);
@@ -3876,7 +3879,7 @@ function extractKantoOfficeCandidateAssets($, url) {
         if (!/\.(pdf|jpe?g|png)/i.test(href) || SKIP_ASSET.test(href)) return;
         let abs; try { abs = new URL(href, url).href; } catch { return; }
         const text = (($(el).attr('alt') || '') + ' ' + ($(el).text() || '')).replace(/\s+/g, ' ').trim();
-        if (isProcurementSource({ url: abs, text })) return;
+        if (isExcludedSource({ url: abs, text })) return;
         const m = abs.match(/(?:^|[\/_])R?(\d{1,2})\.(\d{1,2})\.(\d{1,2})/);
         if (m) {
           const mo = parseInt(m[2], 10), dy = parseInt(m[3], 10);
@@ -4740,6 +4743,8 @@ async function writeOutput(data, timeCutoff = null) {
       if (isStaleDatedEvent(ev)) return false;
       // 段3で一次ソースの裏付けが取れなかったものは公開しない
       if (ev.__llmUnverified) { quarantined.push(ev); return false; }
+      // 合格者発表・試験結果はイベントではない（既知の種類なので検疫せず落とす）
+      if (isExamResultEvent(ev)) return false;
       // 非イベント文書（福利厚生・待遇資料、規約、放送音声 等）は公開せず検疫へ
       if (isNonEventDocument(ev)) { quarantined.push({ ...ev, __quarantineReason: '非イベント文書の疑い' }); return false; }
       // OCR 由来で2年以上先の日付（開催年の裏付けなし）は日付の誤読の疑いが強いので検疫へ
@@ -5168,7 +5173,8 @@ function archivePastEvents(candidates, today) {
     archivedAt: today,
   });
 
-  const byId = new Map(archive.events.map(e => [e.id, e]));
+  // 以前に退避してしまった合格者発表・試験結果は過去ログからも外す（2026-10 に混入していた）
+  const byId = new Map(archive.events.filter(e => !isExamResultEvent(e)).map(e => [e.id, e]));
   let added = 0;
   for (const e of candidates) {
     // 品質防御は shared/titleQuality の isArchivableEvent に一本化

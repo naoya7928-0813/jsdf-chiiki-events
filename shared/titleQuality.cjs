@@ -1,6 +1,7 @@
 'use strict';
 
 const { isProcurementSource } = require('./procurement.cjs');
+const { isExamResultEvent } = require('./examResult.cjs');
 
 /**
  * イベント名の品質管理モジュール（スクレイパー/チェックスクリプト共通）
@@ -470,6 +471,8 @@ function isNonEventDocument(ev) {
   let url = String(ev.url || '');
   try { url = decodeURIComponent(url); } catch { /* keep raw */ }
   if (MEDIA_URL_RE.test(url)) return true;
+  // 採用試験の合格者発表・試験結果（shared/examResult.cjs）
+  if (isExamResultEvent(ev)) return true;
   if (DOC_RESCUE_RE.test(title)) return false;
   if (NON_EVENT_DOC_RE.test(title) || NON_EVENT_DOC_RE.test(String(ev.place || ''))) return true;
   if (NON_EVENT_URL_RE.test(url.split(/[?#]/)[0].split('/').pop() || '')) return true;

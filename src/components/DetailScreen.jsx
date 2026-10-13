@@ -5,6 +5,7 @@ import { REGION_HQ, REGION_SOURCE } from '../config';
 import WeatherCard from './WeatherCard';
 import { EventChangeNotice } from './EventChanges';
 import { EventGuideSection, EventFaqSection } from './EventGuide';
+import EventImages from './EventImages';
 import { recordView } from '../utils/viewTracker';
 import AccessGuide from './AccessGuide';
 import { useElementWidth, isTouchPhone, useIsShortViewport } from '../hooks/useBreakpoint';
@@ -696,6 +697,9 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
             </div>
           </div>
         )}
+
+        {/* 画像（チラシ・会場写真）。権利確認の仕組みが整うまで「（現在用意中）」だけを表示 */}
+        <EventImages ev={ev} />
 
         {/* 参加準備ガイド・よくある質問（運営が確認して公開したものだけ） */}
         <EventGuideSection ev={ev} />
