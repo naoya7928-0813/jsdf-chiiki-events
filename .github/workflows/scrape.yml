@@ -119,8 +119,28 @@ jobs:
         run: npm ci
 
       - name: RapidOCR をインストール
+        id: rapidocr
         continue-on-error: true
-        run: python -m pip install -r scraper/requirements-ocr.txt
+        run: |
+          python -m pip install -r scraper/requirements-ocr.txt
+          echo "models=$(python -c 'import os, rapidocr; print(os.path.join(os.path.dirname(rapidocr.__file__), "models"))')" >> "$GITHUB_OUTPUT"
+
+      # 日本語認識モデル（約31MB）は初回推論時に modelscope.cn から取得される。
+      # 毎回取りに行くと外部障害で RapidOCR が丸ごと使えなくなるためキャッシュする。
+      - name: RapidOCR モデルを復元
+        if: steps.rapidocr.outputs.models != ''
+        continue-on-error: true
+        uses: actions/cache@v5
+        with:
+          path: ${{ steps.rapidocr.outputs.models }}
+          key: rapidocr-models-${{ runner.os }}-${{ hashFiles('scraper/requirements-ocr.txt') }}
+
+      # スクレイパー側の利用可否チェックは 15 秒で打ち切るため、ダウンロードはここで済ませる
+      - name: RapidOCR モデルを準備（日本語）
+        if: steps.rapidocr.outputs.models != ''
+        continue-on-error: true
+        timeout-minutes: 5
+        run: python scraper/lib/rapidocr_cli.py --check
 
       # ── OCRキャッシュを復元（git管理外・大容量対応） ────────────
       - name: OCRキャッシュを復元
@@ -214,6 +234,12 @@ jobs:
       # 配信スロットに間に合わせるため、間に合わない地本は取得を見送っている。
       # 見送った地本は前回データのままなので公開データは壊れないが、
       # 「毎回どこかを切っている」状態は取り逃しなので気づけるようにする。
+      # OCR の不調は総イベント数に現れない（キャッシュが穴を埋める）。経路ごとの成否を出す
+      - name: OCR稼働状況を確認
+        if: always()
+        continue-on-error: true
+        run: node scripts/check-ocr-health.mjs
+
       - name: カットオフの結果を確認
         run: |
           echo "STAGE=cutoff_check" >> "$GITHUB_ENV"
@@ -736,6 +762,7 @@ jobs:
             echo "| スクレイピング | ${TOTAL_EVENTS:+成功（${TOTAL_EVENTS} 件取得）}${TOTAL_EVENTS:-未到達 or 失敗} |"
             echo "| イベント総数 | ${TOTAL_EVENTS:-N/A} 件（前回 ${PREV_EVENTS:-N/A} 件） |"
             echo "| カットオフ | ${CUTOFF_RESULT:-未実行} |"
+            echo "| OCR稼働 | ${OCR_HEALTH:-未確認} |"
             echo "| データ健全性 | ${HEALTH_ALERT:-異常なし} |"
             echo "| 品質警告数（イベント名） | ${TITLE_WARNINGS:-0} 件 |"
             echo "| 検疫（公開保留） | ${QUARANTINED:-0} 件 |"

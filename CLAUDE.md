@@ -129,7 +129,20 @@ cd scraper && node index.js
 
 **すでに取得済みの PDF/画像は再取得・再 OCR しないこと。** OCR は Gemini API のクォータを消費するため、同一アセットの重複処理は厳禁。実装は `scraper/lib/assetCache.js` と `downloadFile()` に集約されており、新規パーサーや探索ロジックを追加する際もこのキャッシュ経路を必ず通すこと。
 
-OCRの優先順は、無料ローカルOCR（Tesseract → RapidOCR）を先に試し、次に無料枠の大きいAPI（Groq → OCR.space）、最後に Mistral / Gemini へフォールバックする。RapidOCR は `scraper/requirements-ocr.txt` と `scraper/lib/rapidocr_cli.py` で GitHub Actions に導入済み。OCR.space は `OCR_SPACE_API_KEY` がある場合のみ使う。
+OCRの優先順は、無料ローカルOCR（**RapidOCR 日本語モデル → Tesseract**）を先に試し、次に無料枠の大きいAPI（Groq → OCR.space）、最後に Mistral / Gemini へフォールバックする（共通経路は `localOcrStructured`）。RapidOCR は `scraper/requirements-ocr.txt`（`rapidocr==3.10.0`）と `scraper/lib/rapidocr_cli.py` で GitHub Actions に導入済み。OCR.space は `OCR_SPACE_API_KEY` がある場合のみ使う。
+
+**OCR 稼働確認（2026-10-13）で直したこと**（再発させないこと）:
+- ⚠️ **RapidOCR は日本語モデル（PP-OCRv6 small / `lang=japan`）で動かす**。旧 `rapidocr-onnxruntime` は既定が中国語モデルで、
+  かなを落として簡体字に化ける（「駐屯地」→「鞋屯地」、「保健センター」→「保健七一」）。本番の文字化けタイトルの主因だった。
+  モデル（約31MB）は modelscope.cn から取得し、scrape.yml が Actions cache に保持する
+- ⚠️ Tesseract の起動チェックは**言語一覧（`tesseract --list-langs` に jpn）で判定**する。以前は埋め込みの PNG が CRC 破損しており、
+  導入済みなのに毎回「利用不可」だった。実チラシ比較で RapidOCR(日本語) が全件で上回ったため、Tesseract は予備（2番手）
+- 旧パイプラインの結果のうち**誤読の痕跡（簡体字・不正タイトル）があるものだけ**、ローカルOCRで1回だけ読み直す
+  （`scraper/lib/ocrRefresh.js`。1実行 `OCR_REFRESH_LIMIT`=20 件まで。API の画像OCRは呼ばない＝取得済みアセットの再OCR禁止を守る）
+- LLM（段1〜3）は**プロバイダが答えなかったとき（429・障害）の null をキャッシュしない**。以前は 90 日固定され、その資料は読み直されなかった
+- 段3再検査は、条件付きGETで 304 だった資料でも LLM キャッシュに無ければ本体を取り直して読む（以前は無言で何もしていなかった）
+- OCR の経路ごとの成否は `scraper/ocr-stats.json` → `scripts/check-ocr-health.mjs`（`shared/ocrHealth.cjs`）が実行サマリへ出し、
+  止まっている経路を `::warning::` にする（ジョブは落とさない）
 
 - **キャッシュ実体**: `scraper/ocr-cache.json`（`.gitignore` 対象。self-hosted runner 上 + GitHub Actions cache で永続化）。キーはファイル実体の **SHA-256（`content_sha256`）**。
 - **ダウンロード段階の重複回避**: `downloadFile(url)` は正規化 URL でキャッシュを引き、OCR 成功済みエントリがあれば `If-None-Match`(ETag) / `If-Modified-Since`(Last-Modified) で**条件付き GET** を発行。`304 Not Modified` ならファイル本体をダウンロードしない。

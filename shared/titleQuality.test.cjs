@@ -812,3 +812,35 @@ test('isSuspiciousTitle: 句点で終わるタイトルは本文の断片とし�
     assert.equal(Q.isSameEventTitle('小松市どんどん祭り', '徳田まつり'), false);
   });
 }
+
+// ── 2026-10-13: OCR 稼働確認で見つかった本番の誤データ ──────────────
+test('isJunkOrStubTitle: 番号付き一覧・様式の番号付き項目行を除外する', () => {
+  // 新潟: 会場図の出店一覧が平坦化してタイトル化
+  assert.equal(isJunkOrStubTitle('1 比角ラーメン・かけうどん（比角子ども育成応援団） 8 金魚すくい（（愛）TAMATATSU） 15 占い'), true);
+  assert.equal(isJunkOrStubTitle('1 海上自衛隊 2 航空自衛隊'), true);
+  // 東京: 受験案内PDFの「2 受付時間 07:30～08:20」
+  assert.equal(isJunkOrStubTitle('2 受付時間 07:30～08:20'), true);
+  // 番号で始まっても一覧でない正規タイトルは残す
+  assert.equal(isJunkOrStubTitle('第48回比角コミュニティ祭 比角ストリートフェスティバル'), false);
+  assert.equal(isJunkOrStubTitle('10月 自衛隊説明会'), false);
+  assert.equal(isJunkOrStubTitle('3 自衛隊合同説明会'), false);
+});
+
+test('applyVerifiedOverrides: 新潟・柏崎（比角ストリートフェスティバル）をチラシ照合済みの値へ', () => {
+  const ev = applyVerifiedOverrides({
+    pref: 'niigata', date: '2026-10-18',
+    title: '1 比角ラーメン・かけうどん（比角子ども育成応援団） 8 金魚すくい', place: '（9:00～15:30車両通行止め）歩行者優先',
+    url: 'https://www.mod.go.jp/pco/niigata/files/event/r8.10.18kasiwazakimaturi2.pdf',
+  });
+  assert.equal(ev.title, '第48回比角コミュニティ祭 比角ストリートフェスティバル');
+  assert.equal(ev.place, '比角ストリートフェスティバル会場');
+  assert.equal(ev.time, '10:00～14:30');
+  assert.equal(ev.category, '地域参加');
+});
+
+test('toJapaneseKanji: 中国語モデルの誤読に出ていた字を日本語へ直す', () => {
+  assert.equal(toJapaneseKanji('役場北驻車場'), '役場北駐車場');
+  assert.equal(toJapaneseKanji('宇都宫駐屯地'), '宇都宮駐屯地');
+  assert.equal(toJapaneseKanji('小雨决行'), '小雨決行');
+  assert.equal(toJapaneseKanji('活动・业务・宣传'), '活動・業務・宣伝');
+});
