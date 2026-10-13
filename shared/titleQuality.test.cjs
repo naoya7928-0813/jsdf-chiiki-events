@@ -865,4 +865,13 @@ test('照合: 確定修正（チラシ実物で照合した値）が拡張子の
   assert.deepEqual([g.date, g.endDate, g.title], ['2026-10-17', '2026-10-18', '第28回百貨市（太田市立太田高等学校）']);
   assert.equal(r('https://www.mod.go.jp/pco/nagasaki/pdf/event/2026_takematu.pdf', '2027-03-29').date, '2026-03-29');
   assert.equal(r('https://www.mod.go.jp/pco/tokyo/nishitokyo/img/1019-1023_night.png', '2026-10-19').endDate, '2026-10-23');
+  assert.equal(r('https://www.mod.go.jp/pco/toyama/content/04-event/images/2026ivento.pdf', '2026-11-18').date, '2026-12-13');
+  // 前日祭（maturi.jpg）と本祭（maturi2.pdf）を取り違えない
+  assert.equal(r('https://www.mod.go.jp/pco/niigata/images/event/r8.10.18kasiwazakimaturi.jpg', '2026-10-17').title, '第48回比角コミュニティ祭 前日祭');
+  assert.equal(r('https://www.mod.go.jp/pco/niigata/images/event/r8.10.18kasiwazakimaturi2.jpg', '2026-10-18').title, '第48回比角コミュニティ祭 比角ストリートフェスティバル');
+});
+
+test('照合: サイト内リンクの文言（「自衛官募集ホームページ <自衛官募集X」）はイベントにしない', () => {
+  assert.equal(isJunk14('自衛官募集ホームページ <自衛官募集X'), true);
+  assert.equal(isJunk14('自衛隊ホームページ紹介イベント'), false);
 });

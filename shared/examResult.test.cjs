@@ -45,3 +45,10 @@ test('一般のイベントを巻き込まない（「格」「結果」を含�
     assert.equal(isExamResultEvent({ title, url: 'https://www.mod.go.jp/pco/tokyo/event/a.html' }), false, title);
   }
 });
+
+test('採用試験の日程そのものもイベントにしない（説明会・対策講座は残す）', () => {
+  for (const t of ['令和9年度入校第54期防衛医科大学校学生採用第1次試験', '令和8年度第2回一般曹候補生採用第2次試験', '第14期防衛医科大学校看護学科学生（自衛官候補看護学生）採用第1次試験']) {
+    assert.equal(isExamResultEvent({ title: t }), true, t);
+  }
+  for (const t of ['採用試験説明会', '採用試験対策講座', '自衛官採用試験の概要説明会', '模擬試験体験会']) assert.equal(isExamResultEvent({ title: t }), false, t);
+});

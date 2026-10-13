@@ -427,6 +427,13 @@ jobs:
           # 失敗原因を区別し、恒久的な拒否（ブランチ保護/権限）は再試行せず即終了、
           # 一時的な通信障害・非fast-forward（他 push との競合）のみ再試行する。
           echo "STAGE=push" >> "$GITHUB_ENV"
+          # 自動生成ファイルは「このスクレイプが作った内容」を丸ごと正とする。
+          # rebase -X theirs は競合した部分だけを本コミット側にし、競合しない部分は相手側の変更を行単位で
+          # 取り込むため、他のスクレイプが先に push していると events.json に同じイベントが二重に入っていた
+          # （2026-10-13 に重複ID 6件。手動実行と定期実行が重なった回）。rebase 後に本コミットの内容へ戻す。
+          # ※ 検疫の履歴（追記専用 JSONL）は両方の追記を残したいので対象外
+          OURS=$(git rev-parse HEAD)
+          GENERATED="public/data/events.json data/events-quarantine.json data/events-llm-recheck.json data/events-archive.json data/field-carry-state.json public/events.html public/events public/sitemap.xml scraper/geocode-cache.json"
           PUSHED=0
           ATTEMPTS=3
           for i in $(seq 1 "$ATTEMPTS"); do
@@ -441,6 +448,26 @@ jobs:
               echo "::warning::rebase に失敗（試行 ${i}/${ATTEMPTS}）。中断してやり直します。"
               git rebase --abort 2>/dev/null || true
               sleep $((5 * i)); continue
+            fi
+
+            # 自動生成ファイルを本コミットの内容に戻す（行単位で混ざった結果を残さない）
+            EXISTING=""
+            for f in $GENERATED; do if git cat-file -e "$OURS:$f" 2>/dev/null || git ls-files --error-unmatch "$f" >/dev/null 2>&1; then EXISTING="$EXISTING $f"; fi; done
+            git restore --source="$OURS" --staged --worktree -- $EXISTING
+            if ! git diff --cached --quiet; then
+              echo "rebase で混ざった自動生成ファイルを、このスクレイプの内容に戻しました"
+              git commit --amend --no-edit
+            fi
+            # 公開データが JSON として読め、ID が重複していないこと（混ざり事故の最終確認）
+            if ! node -e "
+              const d = JSON.parse(require('fs').readFileSync('public/data/events.json', 'utf8'));
+              const seen = new Set(); const dup = [];
+              for (const e of Object.values(d).filter(Array.isArray).flat()) { if (seen.has(e.id)) dup.push(e.id); seen.add(e.id); }
+              if (dup.length) { console.error('重複ID: ' + dup.join(', ')); process.exit(1); }
+            "; then
+              echo "::error::push 直前の events.json に重複IDがあります。push を中止します"
+              echo "PUSH_RESULT=中止（重複ID）" >> "$GITHUB_ENV"
+              exit 1
             fi
 
             # push: 標準エラーを捕捉して原因を判別（認証情報は出力されない）
