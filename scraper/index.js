@@ -35,7 +35,7 @@ const { extractAssets }   = require('./lib/extractAssets');
 const { findEventLinks }  = require('./lib/exploreLinks');
 const { buildOfficePages, orderOfficePages, crawlOfficePages } = require('./lib/officeCrawl');
 const officeEventSources = require('./config/office-event-sources.json');
-const { createYearContext, isActivityReport } = require('./lib/officeHtmlContext');
+const { createYearContext, isActivityReport, isReportBlock, followingText, weekdayConflict } = require('./lib/officeHtmlContext');
 // OCRテキストからの日付抽出（表記ゆれ吸収。parseTextToEvent / parseOcrDate 共通）
 const { parseDateFromText, toJpDateString } = require('./lib/ocrDate');
 const llmClient = require('./lib/llmClient');
@@ -3654,6 +3654,7 @@ function extractOfficeTableEvents($, table, pageUrl, meta, seen, events, context
     if (!OFFICE_EVENT_KW.test(joined) || isOfficeJunkText(joined) || isActivityReport(joined)) return;
     const parsed = parseOfficeEventDate(cells[dateCol] || '', contextFor(tr));
     if (!parsed) return;
+    if (weekdayConflict(joined, parsed.dateStr)) return; // 曜日が合わない＝年の取り違え
     const rawTitle = cells[titleCol] || cells.find((c, i) => i !== dateCol && c) || '';
     const title = cleanOfficeTitle(rawTitle) || cleanOfficeTitle(joined);
     if (!title || title === '募集案内所イベント' || title.replace(/[\s　]/g, '').length < 4) return;
@@ -3698,6 +3699,10 @@ function extractOfficeHtmlEvents($, pageUrl, meta) {
     if (navHits >= 2) return;
     const parsed = parseOfficeEventDate(text, contextFor(el));
     if (!parsed) return;
+    // 見出しの直後の本文が活動報告（「…を実施しました」）なら過去の記事。
+    // 本文の「M月D日（曜）」と決めた日付の曜日が食い違う場合も、年を取り違えた過去の記事として除外する
+    if (isReportBlock($, el, text)) return;
+    if (weekdayConflict(`${text} ${followingText($, el)}`, parsed.dateStr)) return;
 
     const href = $(el).attr('href') || $(el).find('a[href]').first().attr('href') || '';
     const norm = href ? normalizeUrl(href, pageUrl) : null;

@@ -844,3 +844,25 @@ test('toJapaneseKanji: 中国語モデルの誤読に出ていた字を日本語
   assert.equal(toJapaneseKanji('小雨决行'), '小雨決行');
   assert.equal(toJapaneseKanji('活动・业务・宣传'), '活動・業務・宣伝');
 });
+
+// ── 2026-10-14 掲載中イベントの一次ソース照合で見つかった誤りの再発防止 ──
+const { isNonEventDocument: isNonEventDocument14, isJunkOrStubTitle: isJunk14, applyVerifiedOverrides: applyOverrides14 } = require('./titleQuality.cjs');
+test('照合: 予備自衛官補の招集教育訓練日程・隊員の募集告知はイベントにしない', () => {
+  assert.equal(isNonEventDocument14({ title: '合和8年度予偏自衛官補招集教育訓日程' }), true);
+  assert.equal(isNonEventDocument14({ title: '令和8年度予備自衛官補招集教育訓練日程' }), true);
+  assert.equal(isJunk14('2等陸・海・空士（任期制自衛官）】募集'), true);
+  assert.equal(isJunk14('一般曹候補生募集'), true);
+  // 参加者募集のイベント・説明会は残す
+  assert.equal(isJunk14('UH-1J体験搭乗 参加者募集'), false);
+  assert.equal(isJunk14('自衛官候補生説明会'), false);
+  assert.equal(isJunk14('航空学生 説明会'), false);
+});
+
+test('照合: 確定修正（チラシ実物で照合した値）が拡張子の変化・日付の誤りに関係なく当たる', () => {
+  const r = (url, date, title = 'x') => applyOverrides14({ url, date, title });
+  assert.equal(r('https://www.mod.go.jp/pco/niigata/images/event/r8.10.18kasiwazakimaturi2.jpg', '2026-10-18').title, '第48回比角コミュニティ祭 比角ストリートフェスティバル');
+  const g = r('https://www.mod.go.jp/pco/gunma/sozai/event/20261017-18-2.jpg', '2026-10-31');
+  assert.deepEqual([g.date, g.endDate, g.title], ['2026-10-17', '2026-10-18', '第28回百貨市（太田市立太田高等学校）']);
+  assert.equal(r('https://www.mod.go.jp/pco/nagasaki/pdf/event/2026_takematu.pdf', '2027-03-29').date, '2026-03-29');
+  assert.equal(r('https://www.mod.go.jp/pco/tokyo/nishitokyo/img/1019-1023_night.png', '2026-10-19').endDate, '2026-10-23');
+});
