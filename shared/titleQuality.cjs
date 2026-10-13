@@ -718,6 +718,9 @@ const VERIFIED_OVERRIDES = [
   // 新潟: 誤読「比角二祭」。チラシ: 第48回比角コミュニティ祭 前日祭 10/17(土) 10:00～15:00 比角コミセン・東部公園
   { urlIncludes: 'niigata/images/event/r8.10.18kasiwazakimaturi.', date: '2026-10-17',
     set: { title: '第48回比角コミュニティ祭 前日祭', place: '比角コミセン・東部公園', time: '10:00～15:00', category: '地域参加' } },
+  // 新潟: 会場の誤り（パルムート新発田）。チラシ: ハローワーク新発田 職業説明会 令和8年11月4日(水) 10:00～12:00 ハローワーク新発田4階（新発田市日渡96）
+  { urlIncludes: 'niigata/images/honbu/r8.11.4shibatahwsetumeikai', date: '2026-11-04',
+    set: { title: 'ハローワーク新発田 自衛隊職業説明会', place: 'ハローワーク新発田4階', address: '新潟県新発田市日渡96', time: '10:00～12:00', category: '説明会' } },
   // 福島: 掲載ページ: 実施日時 令和8年12月20日(日)～12月22日(火)（終了日が欠落していた）
   { pref: 'fukushima', titleIncludes: '横須賀基地 インターンシップ', date: '2026-12-20',
     set: { endDate: '2026-12-22', endWeekday: '火' } },
