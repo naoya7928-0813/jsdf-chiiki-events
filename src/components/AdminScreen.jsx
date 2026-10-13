@@ -10,6 +10,7 @@ import PastEventsPanel from './PastEventsPanel';
 import PresencePanel from './PresencePanel';
 import ReportsPanel from './ReportsPanel';
 import EventChangesPanel from './EventChangesPanel';
+import EventGuidePanel, { EventGuideEditor, EMPTY_GUIDE_VALUE } from './EventGuidePanel';
 import { useIsDesktop } from '../hooks/useBreakpoint';
 
 // 広い画面での本文の最大幅（公開ページと同じ判定・設定でレイアウトを切り替える）。
@@ -38,7 +39,7 @@ const ACTION_LABEL = {
   'event.create': '登録', 'event.update': '編集', 'event.delete': '削除',
   'override.save': '上書き修正', 'override.clear': '上書き取消',
   'auth.login': 'ログイン', 'auth.logout': 'ログアウト', 'audit.read': '監査閲覧',
-  'event.change': '変更・中止の登録', 'event.change.notify': '変更の通知', 'event.change.visibility': '変更の公開切替', 'event.change.delete': '変更の取消',
+  'event.guide': 'FAQ・ガイド更新', 'event.change': '変更・中止の登録', 'event.change.notify': '変更の通知', 'event.change.visibility': '変更の公開切替', 'event.change.delete': '変更の取消',
 };
 const PREF_ENTRIES = Object.entries(PREFECTURE_INFO);
 // 認証はサーバー側セッション(HttpOnly Cookie)。localStorage には非機密のアカウント情報のみ保持し、
@@ -122,6 +123,8 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const [pInput, setPInput] = useState('');
   const [authErr, setAuthErr] = useState('');
   const [form, setForm] = useState(EMPTY);
+  // 新規登録時の FAQ・参加準備ガイド（イベントと一緒に送る。既存イベントは EventGuidePanel が個別に保存）
+  const [guideValue, setGuideValue] = useState(EMPTY_GUIDE_VALUE);
   const [list, setList] = useState([]);
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
@@ -297,11 +300,11 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         };
         delete payload.multiDay; delete payload.timeStart; delete payload.timeEnd;
         delete payload.lat; delete payload.lon;
-        const r = await adminFetch('/api/admin/events', { method: 'POST', body: JSON.stringify({ event: { ...payload, status } }) });
+        const r = await adminFetch('/api/admin/events', { method: 'POST', body: JSON.stringify({ event: { ...payload, status, faq: guideValue.faq, guide: guideValue.guide } }) });
         const j = await r.json().catch(() => ({}));
         if (r.ok) {
           setMsg({ type: 'ok', text: status === 'published' ? '公開しました（全利用者に表示）。' : '下書き保存しました。' });
-          setForm(f => ({ ...EMPTY, pref: f.pref, category: f.category })); setPreview(false); loadList();
+          setForm(f => ({ ...EMPTY, pref: f.pref, category: f.category })); setGuideValue(EMPTY_GUIDE_VALUE); setPreview(false); loadList();
         } else setMsg({ type: 'err', text: j.error || '保存に失敗しました。' });
       }
     } catch { setMsg({ type: 'err', text: '通信に失敗しました。' }); }
@@ -636,6 +639,12 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         <textarea value={form.notes} onChange={e => set('notes', e.target.value)} rows={2} placeholder="補足事項（持ち物・雨天時の扱いなど）" style={{ ...input, resize: 'vertical' }} />
         <div style={hint}>詳細画面に表示されます。ここに書いた語はタグの自動判定にも使われます（例:「抽選」「オンライン」）。</div>
         {editingId && editingDeadline && <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginBottom: 12 }}>現在の締切: {editingDeadline}（締切欄を空のままなら保持されます）</div>}
+
+        {/* よくある質問・参加準備ガイド。新規はイベントと一緒に、既存は個別に保存する */}
+        <SectionLabel>よくある質問・参加準備ガイド</SectionLabel>
+        {editingId
+          ? <EventGuidePanel key={`guide-${editingId}`} eventId={editingId} adminFetch={adminFetch} primary={primary} styles={{ input, label, hint }} />
+          : <EventGuideEditor value={guideValue} onChange={setGuideValue} styles={{ input, label, hint }} primary={primary} />}
 
         {/* 開催状況（中止・延期・受付終了）と変更のお知らせ。既存イベントの編集時のみ。
             内容の「変更を更新する」とは別に、その場で登録・公開される（変更履歴として残る） */}

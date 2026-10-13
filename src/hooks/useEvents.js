@@ -10,6 +10,8 @@ import { ENDED_KEEP_DAYS } from '../../shared/eventStatus.cjs';
 import { normalizeTags } from '../../shared/tags.cjs';
 // 運営が公開した変更のお知らせ（中止・延期・日時/会場変更）。壊れた値は捨てる
 import { sanitizePublicChanges } from '../../shared/eventChanges.cjs';
+// 運営が公開した FAQ・参加準備ガイド
+import { sanitizePublicFaq, sanitizePublicGuide } from '../../shared/eventGuide.cjs';
 import { jstTodayStr } from '../utils/date';
 
 const EMPTY = { updatedAt: null };
@@ -61,6 +63,8 @@ function normalizeEvent(ev) {
     endDate:    (typeof ev.endDate === 'string' && DATE_RE.test(ev.endDate) && ev.endDate >= ev.date) ? ev.endDate : undefined,
     endWeekday: (typeof ev.endDate === 'string' && DATE_RE.test(ev.endDate) && ev.endDate >= ev.date) ? str(ev.endWeekday) : undefined,
     changes: ev.changes === undefined ? undefined : sanitizePublicChanges(ev.changes),
+    faq:     ev.faq === undefined ? undefined : sanitizePublicFaq(ev.faq),
+    guide:   ev.guide === undefined ? undefined : sanitizePublicGuide(ev.guide),
   };
 }
 

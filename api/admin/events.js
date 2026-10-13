@@ -10,6 +10,7 @@ import { checkOrigin, noStore, requireSameOrigin, rateLimit, requireAuth, hasPer
 import W from '../../shared/weather.cjs';
 import { normalizeBranches } from '../../shared/branch.cjs';
 import { normalizeTags } from '../../shared/tags.cjs';
+import G from '../../shared/eventGuide.cjs';
 
 const KEY = 'manual:events';
 const MAX_EVENTS = 500;
@@ -80,6 +81,16 @@ function buildEvent(input, account) {
   // 属性タグ（オンライン・家族向け・抽選 等）。公開側の絞り込みチップと同じ定義を使う。
   // 申込要否(tag)とは別物なので混ぜない（tag は「要予約/予約不要/…」の単一値）。
   const tags = normalizeTags(e.tags);
+  // FAQ・参加準備ガイド（任意。登録後は /api/admin/event-guides で編集する）
+  const faqIn = G.normalizeFaqInput(e.faq);
+  if (faqIn.error) return { error: faqIn.error };
+  const guideIn = G.normalizeGuideInput(e.guide);
+  if (guideIn.error) return { error: guideIn.error };
+  const guideFields = {
+    ...(faqIn.faq.length ? { faq: faqIn.faq } : {}),
+    ...(Object.keys(guideIn.guide).length ? { guide: guideIn.guide } : {}),
+  };
+  if (Object.keys(guideFields).length) guideFields.guideUpdatedAt = new Date().toISOString();
   const manualLoc = parseManualCoords(e.weatherLocation);
   const weather = manualLoc
     ? { weatherLocation: manualLoc }
@@ -105,6 +116,7 @@ function buildEvent(input, account) {
       deadline: cleanText(e.deadline, 40) || null,              // 締切（例: 7月20日（金））
       url,
       notes:   cleanText(e.notes, 300) || null,
+      ...guideFields,
       ...weather,
       status,
       source_type: 'manual',

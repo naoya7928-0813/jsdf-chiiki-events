@@ -4,6 +4,7 @@ import { Emblem, F, splitDate, SectionTitle, iconBtnStyle, StatusBadge } from '.
 import { REGION_HQ, REGION_SOURCE } from '../config';
 import WeatherCard from './WeatherCard';
 import { EventChangeNotice } from './EventChanges';
+import { EventGuideSection, EventFaqSection } from './EventGuide';
 import { useElementWidth, isTouchPhone, useIsShortViewport } from '../hooks/useBreakpoint';
 import { googleCalendarUrl, downloadIcs } from '../utils/calendar';
 import { useOnline } from '../hooks/useOnline';
@@ -685,6 +686,10 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
             </div>
           </div>
         )}
+
+        {/* 参加準備ガイド・よくある質問（運営が確認して公開したものだけ） */}
+        <EventGuideSection ev={ev} />
+        <EventFaqSection ev={ev} />
 
         {/* 主催・お問い合わせ */}
         <div style={{ padding: '6px 16px 20px' }}>

@@ -436,6 +436,20 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - 既知の制約: 自動収集イベントの ID はタイトル・日付から作るため、地本サイト側で名称・日付が変わると ID が変わり、
   旧 ID の上書き（中止設定等）は表示されなくなる（運営画面で新しいイベントに登録し直す）
 
+## イベント別 FAQ・参加準備ガイド（2026-10-13 導入）
+
+純粋ロジックは **`shared/eventGuide.cjs`**（`shared/eventGuide.test.cjs`）。API は `/api/admin/event-guides`（GET/PUT）。
+保存先・権限・監査は「変更・中止管理」と同じ（手動=本体 / 自動収集=上書き。`MANAGED_KEYS` で上書き保存・取り消し時も残す）。
+
+- FAQ: `faq: [{id, q, a, public}]`（最大20件・並びは配列順・質問120字／回答600字）。非公開は運営画面だけに残る
+- ガイド: `guide: {<項目ID>: {state, text}}`。項目は `GUIDE_ITEMS`（事前申込・参加費・年齢制限・持ち物・推奨服装・駐車場・
+  雨天時・写真撮影・身分証明書・その他）。状態は `unknown`（未確認＝公開しない・既定）/ `na`（該当なし）/ `confirmed`（本文を公開）
+- ⚠️ **未確認・未入力を推測で埋めない**。公開画面は確認済み・該当なしの項目だけを出し、「記載のない項目は公式ページで確認」と添える
+- 公開API（`/api/manual-events`）は `toPublicRecord()` で公開分だけの配列形（`faq:[{id,q,a}]`・`guide:[{id,label,state,text}]`）にして返す
+- 新規登録時はイベントと一緒に `/api/admin/events` POST へ送る。既存イベントは編集画面の「FAQ・参加準備ガイドを保存」で個別保存
+- 削除・終了: 手動イベントは削除時に一緒に消える。自動収集イベントは公開データから外れると表示されなくなり、
+  上書きレコードは運営が取り消すまで残る（同じIDで再掲載された場合に備える）
+
 ## フロントエンド仕様
 
 - **地域マップ**: 8地域（北海道・東北・関東・中部・近畿・中国・四国・九州）
@@ -585,6 +599,7 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 | PWA の色・アイコン・ショートカット | `shared/pwaTheme.cjs` | `vite.config.js`（既定 manifest）／`scripts/generate-manifests.mjs`（配色別）／`scripts/generate-icons.mjs`／`shared/bootTheme.cjs`／`src/App.jsx` |
 | 配信スロット・打ち切り期限・開始位置のずらし | `shared/scrapeDeadline.cjs` | `scraper/index.js`（締切・ローテーション・前回データ引き継ぎ）／`.github/workflows/scrape.yml`（通知の待機時刻） |
 | 変更・中止の種別・連動する開催状況・公開形 | `shared/eventChanges.cjs` | `/api/admin/event-changes`／`/api/manual-events`／詳細・一覧・お気に入り・運営画面 |
+| FAQ・参加準備ガイドの項目・状態・公開形 | `shared/eventGuide.cjs` | `/api/admin/event-guides`／`/api/admin/events`／`/api/manual-events`／詳細・運営画面 |
 | 管理APIの対象イベントの所属解決 | `api/_eventScope.js` | `/api/admin/overrides`／`/api/admin/event-changes` ほか |
 | 公開URL・許可オリジン | `shared/siteUrl.cjs` | 全体（上記「セキュリティ構成」参照）／`shared/domainNotice.cjs` |
 | ドメイン移行のお知らせを出すか | `shared/domainNotice.cjs` | `src/App.jsx`（`src/components/DomainNotice.jsx` を出す判断） |

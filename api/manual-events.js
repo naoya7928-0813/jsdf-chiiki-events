@@ -4,6 +4,7 @@
 import { redis } from './_security.js';
 import { PUBLIC_STATUS_VALUES } from '../shared/eventStatus.cjs';
 import { publicChanges } from '../shared/eventChanges.cjs';
+import { toPublicRecord } from '../shared/eventGuide.cjs';
 
 const KEY = 'manual:events';
 const OKEY = 'manual:overrides';
@@ -21,6 +22,9 @@ function withPublicChanges(o) {
   return pub.length ? { ...rest, changes: pub } : rest;
 }
 
+/** 公開用に整える: 変更のお知らせ・FAQ・参加準備ガイドを公開してよい分だけにする */
+const toPublic = (o) => toPublicRecord(withPublicChanges(o));
+
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
   // events.json と同様に短時間キャッシュ（CDN/ブラウザ）
@@ -37,7 +41,7 @@ export default async function handler(req, res) {
       // 権限判定用の事務所 office を除去。公開画面は office を使わない）。
       // status は残す: 公開画面は受付終了/中止のバッジを ev.status で表示するため
       // （以前は除去しており、中止にした手動イベントが通常表示されていた）。
-      .map(({ createdBy, updatedBy, createdAt, updatedAt, weatherLocationNeedsUpdate, office, ...pub }) => withPublicChanges(pub));
+      .map(({ createdBy, updatedBy, createdAt, updatedAt, weatherLocationNeedsUpdate, office, ...pub }) => toPublic(pub));
 
     // 既存イベントの上書き（スクレイプイベント等）。表示フィールドのみ公開する。
     // 「_」で始まる管理用メタ（_by/_at/_pref/_office 等）はすべて除去（今後増えても漏れない）
@@ -50,7 +54,7 @@ export default async function handler(req, res) {
           const pub = Object.fromEntries(Object.entries(o || {}).filter(([k]) => !k.startsWith('_')));
           // 上書きの status も公開可能な値だけ（不正値・draft で一覧から消えたりしないように）
           if (pub.status !== undefined && !PUBLIC_STATUSES.has(pub.status)) delete pub.status;
-          overrides[id] = withPublicChanges(pub);
+          overrides[id] = toPublic(pub);
         }
       }
     } catch { /* 取得失敗は無視 */ }
