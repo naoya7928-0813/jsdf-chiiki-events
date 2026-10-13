@@ -28,7 +28,7 @@ function mockRes() {
 }
 
 async function call(name, method) {
-  const handler = (await import('../api/admin/' + name + '.js')).default;
+  const handler = (await import('../api/admin/_' + name + '.js')).default;
   const req = { method, headers: {}, query: {}, body: {} };
   const res = mockRes();
   await handler(req, res);
@@ -56,7 +56,7 @@ for (const [name, method] of CASES) {
 
 // ── CSRF（#4）統合: login ハンドラ経由 ──────────────────────────
 async function loginWith(headers) {
-  const handler = (await import('../api/admin/login.js')).default;
+  const handler = (await import('../api/admin/_login.js')).default;
   const req = { method: 'POST', headers, query: {}, body: { user: 'x', pass: 'y' } };
   const res = mockRes();
   await handler(req, res);
@@ -81,7 +81,7 @@ test('CSRF: Origin欠落のブラウザ書込みは403', async () => {
   assert.equal(res.statusCode, 403);
 });
 test('CSRF: GET（状態変更でない）は403にならない（405）', async () => {
-  const handler = (await import('../api/admin/login.js')).default;
+  const handler = (await import('../api/admin/_login.js')).default;
   const res = mockRes();
   await handler({ method: 'GET', headers: {}, query: {}, body: {} }, res);
   assert.equal(res.statusCode, 405);

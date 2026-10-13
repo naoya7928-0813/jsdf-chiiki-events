@@ -22,11 +22,11 @@ async function call(path, method, user, body, query = {}) {
   await handler({ method, headers: { ...(user ? { 'x-admin-user': user, 'x-admin-pass': 'pw' } : {}), origin: ORIGIN, 'sec-fetch-site': 'same-origin', host: 'jsdf-chiiki-events.jp' }, query, body }, res);
   return res;
 }
-const guides = (m, u, b, q) => call('../api/admin/event-guides.js', m, u, b, q);
+const guides = (m, u, b, q) => call('../api/admin/_event-guides.js', m, u, b, q);
 const pub = () => call('../api/manual-events.js', 'GET', null, null);
 
 test('手動イベント: 新規登録時に FAQ・ガイドを一緒に保存し、公開分だけが公開APIに出る', async () => {
-  const r = await call('../api/admin/events.js', 'POST', 'tokyo', { event: {
+  const r = await call('../api/admin/_events.js', 'POST', 'tokyo', { event: {
     pref: 'tokyo', date: '2099-11-01', title: '説明会', status: 'published',
     faq: [{ q: '予約は必要？', a: '必要です' }, { q: '内部用', a: 'メモ', public: false }],
     guide: { fee: { state: 'confirmed', text: '無料' }, parking: { state: 'unknown', text: '' } },
@@ -61,8 +61,8 @@ test('自動収集イベント: 上書きに保存され、並べ替え・公開
 test('FAQ はスクレイプ後も残る: 表示内容の上書き保存・取り消しで消えない', async () => {
   const id = 'tk-20991020-bbbb';
   await guides('PUT', 'tokyo', { id, faq: [{ q: '駐車場は？', a: 'ありません' }], guide: {} });
-  await call('../api/admin/overrides.js', 'POST', 'tokyo', { id, patch: { title: '自衛隊説明会（修正）' } });
-  await call('../api/admin/overrides.js', 'DELETE', 'tokyo', { id });
+  await call('../api/admin/_overrides.js', 'POST', 'tokyo', { id, patch: { title: '自衛隊説明会（修正）' } });
+  await call('../api/admin/_overrides.js', 'DELETE', 'tokyo', { id });
   const g = await guides('GET', 'tokyo', null, { id });
   assert.deepEqual(g.body.faq.map(f => f.q), ['駐車場は？']);
 });
@@ -89,6 +89,6 @@ test('交通アクセス: 入場口・推奨駅を保存し、公開APIは検証
   assert.deepEqual(o.access.entrance, { lat: 36.574, lon: 139.876, label: '正門' });
   assert.equal(o.access.station, 'JR宇都宮駅');
   // 内容の上書き保存でも残る
-  await call('../api/admin/overrides.js', 'POST', 'tokyo', { id, patch: { title: '自衛隊説明会' } });
+  await call('../api/admin/_overrides.js', 'POST', 'tokyo', { id, patch: { title: '自衛隊説明会' } });
   assert.equal((await guides('GET', 'tokyo', null, { id })).body.access.station, 'JR宇都宮駅');
 });

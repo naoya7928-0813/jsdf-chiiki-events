@@ -50,12 +50,12 @@ async function call(path, method, user, body, query = {}) {
   await handler({ method, headers: hdr(user), query, body }, res);
   return res;
 }
-const changes = (m, u, b, q) => call('../api/admin/event-changes.js', m, u, b, q);
+const changes = (m, u, b, q) => call('../api/admin/_event-changes.js', m, u, b, q);
 const SCRAPED_ID = 'tk-20991019-aaaa';
 let manualId;
 
 before(async () => {
-  const r = await call('../api/admin/events.js', 'POST', 'nat', { event: { pref: 'tokyo', date: '2099-11-01', title: '手動の説明会', place: '渋谷', status: 'published' } });
+  const r = await call('../api/admin/_events.js', 'POST', 'nat', { event: { pref: 'tokyo', date: '2099-11-01', title: '手動の説明会', place: '渋谷', status: 'published' } });
   assert.equal(r.statusCode, 200);
   manualId = r.body.event.id;
 });
@@ -91,13 +91,13 @@ test('自動収集イベント: 自動判定の根拠を確認でき、上書き
 });
 
 test('運営設定はスクレイプ後も残る: 表示内容の上書き保存・取り消しで status/changes を消さない', async () => {
-  const save = await call('../api/admin/overrides.js', 'POST', 'tokyo', { id: SCRAPED_ID, patch: { title: '宇都宮駐屯地見学（修正）' } });
+  const save = await call('../api/admin/_overrides.js', 'POST', 'tokyo', { id: SCRAPED_ID, patch: { title: '宇都宮駐屯地見学（修正）' } });
   assert.equal(save.statusCode, 200);
   let rec = JSON.parse(fake.store.get('manual:overrides').get(SCRAPED_ID));
   assert.equal(rec.title, '宇都宮駐屯地見学（修正）');
   assert.equal(rec.changes.length, 2, '内容の上書き保存で変更記録が消えた');
   assert.equal(rec.status, 'published');
-  const clear = await call('../api/admin/overrides.js', 'DELETE', 'tokyo', { id: SCRAPED_ID });
+  const clear = await call('../api/admin/_overrides.js', 'DELETE', 'tokyo', { id: SCRAPED_ID });
   assert.equal(clear.statusCode, 200);
   rec = JSON.parse(fake.store.get('manual:overrides').get(SCRAPED_ID));
   assert.equal(rec.title, undefined, '表示内容の上書きは取り消される');
@@ -175,7 +175,7 @@ test('通知: 見守り登録した端末にだけ送る。根拠なしは拒否
 });
 
 test('下書きの手動イベントは通知できず、延期を登録しても公開にならない', async () => {
-  const r = await call('../api/admin/events.js', 'POST', 'nat', { event: { pref: 'tokyo', date: '2099-12-01', title: '下書き', status: 'draft' } });
+  const r = await call('../api/admin/_events.js', 'POST', 'nat', { event: { pref: 'tokyo', date: '2099-12-01', title: '下書き', status: 'draft' } });
   const id = r.body.event.id;
   const n = await changes('POST', 'tokyo', { id, change: { type: 'postponed', reason: '調整中', public: true, notify: true, evidence: 'x', confirmed: true } });
   assert.equal(n.statusCode, 400);
@@ -187,7 +187,7 @@ test('下書きの手動イベントは通知できず、延期を登録して�
 });
 
 test('延期（postponed）は公開APIを通る', async () => {
-  const r = await call('../api/admin/events.js', 'POST', 'nat', { event: { pref: 'tokyo', date: '2099-12-02', title: '延期される催し', status: 'published' } });
+  const r = await call('../api/admin/_events.js', 'POST', 'nat', { event: { pref: 'tokyo', date: '2099-12-02', title: '延期される催し', status: 'published' } });
   const id = r.body.event.id;
   await changes('POST', 'tokyo', { id, change: { type: 'postponed', reason: '会場都合', after: '新しい日程は決まり次第お知らせします', public: true } });
   const pub = await call('../api/manual-events.js', 'GET', null, null);

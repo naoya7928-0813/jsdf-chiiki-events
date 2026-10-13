@@ -5,7 +5,7 @@
 //   - 削除済みイベント（Redisから削除済）は対象外（本体が無いため表示しない）。
 //   - 将来/開催中イベントは対象外。
 //
-// I/O（Redis/fetch）は呼び出し側（api/admin/past-events.js）が集め、ここは集約・フィルタ・
+// I/O（Redis/fetch）は呼び出し側（api/admin/_past-events.js）が集め、ここは集約・フィルタ・
 // ページングのみ行う。権限判定（canManageScope）は注入する（authz と同一の deny-by-default）。
 'use strict';
 

@@ -28,7 +28,7 @@ async function view(id, { ip = '203.0.113.1', ua = UA, origin = ORIGIN, site = '
   return res;
 }
 async function stats(user, query = {}) {
-  const handler = (await import('../api/admin/view-stats.js')).default;
+  const handler = (await import('../api/admin/_view-stats.js')).default;
   const res = fake.mockRes();
   await handler({ method: 'GET', headers: { 'x-admin-user': user, 'x-admin-pass': 'pw', origin: ORIGIN, 'sec-fetch-site': 'same-origin', host: 'jsdf-chiiki-events.jp' }, query }, res);
   return res;
@@ -82,7 +82,7 @@ test('運営: 担当範囲のイベントだけの閲覧数を返し、担当外
 test('統計は計測API以外から変更できず、累計キーは失効しない（再デプロイ・スクレイプで消えない）', async () => {
   assert.equal(fake.ttl.has(V.TOTAL_KEY), false);
   assert.ok(fake.ttl.has(V.dayKey(V.jstDay())), '日別は40日で失効させる');
-  const handler = (await import('../api/admin/view-stats.js')).default;
+  const handler = (await import('../api/admin/_view-stats.js')).default;
   const res = fake.mockRes();
   await handler({ method: 'POST', headers: { 'x-admin-user': 'nat', 'x-admin-pass': 'pw', origin: ORIGIN, 'sec-fetch-site': 'same-origin' }, query: {}, body: {} }, res);
   assert.equal(res.statusCode, 405);

@@ -61,7 +61,7 @@ function mockRes() {
 const ORIGIN = require('./siteUrl.cjs').DEFAULT_SITE_URL;
 const as = (user) => ({ 'x-admin-user': user, 'x-admin-pass': 'pw', origin: ORIGIN, 'sec-fetch-site': 'same-origin' });
 async function admin(method, user, body) {
-  const handler = (await import('../api/admin/events.js')).default;
+  const handler = (await import('../api/admin/_events.js')).default;
   const res = mockRes();
   await handler({ method, headers: as(user), query: {}, body }, res);
   return res;

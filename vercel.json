@@ -96,7 +96,7 @@
     }
   ],
   "functions": {
-    "api/admin/past-events.js": {
+    "api/admin/[action].js": {
       "includeFiles": "data/**"
     }
   }

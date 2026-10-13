@@ -71,6 +71,10 @@ cd scraper && node index.js
 - **deploy.yml**: `src/`, `public/`, `scripts/`, `index.html`, `vite.config.js`, `vercel.json`, `package.json` の変更時に自動デプロイ
 - 手動デプロイ: `gh workflow run deploy.yml`
 - 必要シークレット: `GROQ_API_KEY`, `GEMINI_API_KEY`, `MISTRAL_API_KEY`, `OCR_SPACE_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `NTFY_ADMIN_TOPIC`（管理者向け監視通知）, `NTFY_TOPIC`（旧・地域別の ntfy 配信。scrape.yml が使用）
+- ⚠️ **Vercel は Hobby プランのため、サーバー関数は1デプロイ12個まで**（Edge の `api/og.js` は数えない）。
+  超えるとビルドは通ってもデプロイが「No more than 12 Serverless Functions」で失敗する（2026-10-13 に運営API追加で18個になり発生）。
+  **運営API（`/api/admin/*`）は `api/admin/[action].js` が振り分ける**。処理本体は `api/admin/_<名前>.js`（先頭 `_` は関数にならない）に置き、
+  `[action].js` の `HANDLERS` に足すこと。公開APIを増やすときも数に注意（`shared/vercelFunctions.test.cjs` が上限超過・登録漏れで CI を落とす）
 - **deploy.yml のトリガーには `shared/**` と `middleware.js` も含める**。フロントは `shared/*.cjs` を直接 import しているため、ここが漏れると shared だけの修正がサイトに反映されない（2026-08-29 に漏れていたのを修正）
 
 ## スクレイパー仕様
@@ -749,6 +753,7 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - **IDOR対策**: イベント/オーバーライドの所属地本は**サーバー側で実データから解決**（手動イベントは Redis、スクレイプは events.json）して判定。存在しない対象は拒否。`/api/admin/overrides` の GET/POST/DELETE もスコープ強制。
 - **監査ログ（追記専用）**: `writeAudit`（`manual:history`）。操作・ログイン成功/失敗・権限拒否を requestId/操作者(displayId)/地本/事務所/対象/result/変更前後付きで記録。**削除APIは廃止**（history DELETE は405）。
 - **新APIを足すときは必ず `requireAuth` → `hasPermission`/`canManageScope` → `writeAudit` の順を通すこと。**
+- 運営APIの処理は `api/admin/_<名前>.js` に書き、`api/admin/[action].js` の `HANDLERS` に登録する（関数数の上限対策。上記「デプロイ」参照）。
 
 ### 過去イベント閲覧（管理・閲覧専用）
 - `GET /api/admin/past-events`（`shared/pastEvents.cjs` に純粋ロジック集約）。**過去イベント＝`effectiveDate(endDate||date) < 今日(Asia/Tokyo)`**。
@@ -762,7 +767,7 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
     明示的に設定したときだけ日数で打ち切る（既定 0 = 無期限）。件数上限 `ARCHIVE_MAX`（既定 200000）は暴走防止の安全弁。
   - **アーカイブは `public/` の外に置く**。`public/data/` に置くと静的配信されて誰でも全履歴を
     取得でき、この保存方針が成立しない。運営APIは HTTP ではなく**ファイルシステム**から読む
-    （`vercel.json` の `functions["api/admin/past-events.js"].includeFiles: "data/**"` で関数バンドルへ同梱。
+    （`vercel.json` の `functions["api/admin/[action].js"].includeFiles: "data/**"` で関数バンドルへ同梱。
     `EVENTS_ARCHIVE_PATH` で配置を差し替え可能）。
   - `data/**` を変更したらデプロイが必要（関数バンドルに載るため）。scrape.yml / deploy.yml のトリガーに追加済み。
   - 手動イベント（Redis）は削除まで残る。
