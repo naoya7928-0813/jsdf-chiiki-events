@@ -5,8 +5,9 @@
 //   確定中止(cancelled)にしない。「定員に達し次第締切」「締切延長」を closed にしない。
 // - 締切日は、原文(deadline)を保持しつつ、機械判定可能な ISO 日付(deadlineDate)へ
 //   変換できる場合のみ変換する。年が無い締切は開催日から年を解決（年跨ぎ考慮）。
-// - status は published / closed / cancelled のみを確定させる（draft は手動専用、
-//   postponed は現状データに存在しないため導入しない＝別課題）。
+// - 自動判定（deriveStatus）が確定させる status は published / closed / cancelled のみ。
+//   draft は手動専用。postponed（延期）は運営の登録（shared/eventChanges.cjs）でのみ付く
+//   （「延期の可能性」等の曖昧な文言で機械的に延期扱いにしない）。
 // - 信頼度(confidence)と根拠(reason)を返し、呼び出し側（スクレイパー/データ品質）が
 //   信頼度に応じて採否・警告を判断できるようにする。
 'use strict';
@@ -25,10 +26,14 @@ const STATUS = Object.freeze({
   PUBLISHED: 'published',
   CLOSED: 'closed',
   CANCELLED: 'cancelled',
+  POSTPONED: 'postponed',
   DRAFT: 'draft',
 });
-// 永続化を許可する status の集合（postponed は未導入。導入時は別課題で全経路更新）。
-const STATUS_VALUES = new Set(['published', 'closed', 'cancelled', 'draft']);
+// 永続化を許可する status の集合。postponed は 2026-10 に運営登録専用として追加
+// （公開API・画面バッジ・構造化データ・管理画面を同時に対応済み）。
+const STATUS_VALUES = new Set(['published', 'closed', 'cancelled', 'postponed', 'draft']);
+// 利用者に公開してよい status（draft 以外）。公開APIの許可リストに使う。
+const PUBLIC_STATUS_VALUES = new Set(['published', 'closed', 'cancelled', 'postponed']);
 
 /** 全角英数を半角へ、空白・改行を圧縮して比較しやすくする。 */
 function normalizeText(input) {
@@ -67,9 +72,18 @@ const CANCEL_CONFIRMED = [
   /[【\[［(（]\s*(?:開催)?中\s*止\s*[】\]］)）]/,
 ];
 
+/** 一致箇所の前後を切り出した根拠テキスト（運営が自動判定を確認するため。最大 80 字） */
+function evidenceAround(text, re) {
+  const m = re.exec(text);
+  if (!m) return '';
+  const from = Math.max(0, m.index - 25);
+  const to = Math.min(text.length, m.index + m[0].length + 25);
+  return `${from > 0 ? '…' : ''}${text.slice(from, to)}${to < text.length ? '…' : ''}`.slice(0, 80);
+}
+
 /**
  * 中止判定。条件付き注意書きを除去してから確定中止語を照合する。
- * @returns {{cancelled:boolean, reason:string, conditionalOnly:boolean}}
+ * @returns {{cancelled:boolean, reason:string, conditionalOnly:boolean, evidence:string}}
  */
 function detectCancelled(text) {
   const t = normalizeText(text);
@@ -80,9 +94,9 @@ function detectCancelled(text) {
   for (const re of CANCEL_CONDITIONAL) stripped = stripped.replace(new RegExp(re, 'g'), '〔条件付〕');
   const confirmed = CANCEL_CONFIRMED.find((re) => re.test(stripped));
   if (confirmed) {
-    return { cancelled: true, reason: '中止告知', conditionalOnly: false };
+    return { cancelled: true, reason: '中止告知', conditionalOnly: false, evidence: evidenceAround(stripped, confirmed) };
   }
-  return { cancelled: false, reason: '', conditionalOnly: hasConditional };
+  return { cancelled: false, reason: '', conditionalOnly: hasConditional, evidence: '' };
 }
 
 // ── 受付終了/募集終了(closed)判定（テキスト由来） ─────────────────────
@@ -121,10 +135,11 @@ function detectClosedText(text) {
   // 否定（延長・次第締切・締切予定）を伏字化してから確定語を判定
   let stripped = t;
   for (const re of CLOSED_NEGATIVE) stripped = stripped.replace(new RegExp(re, 'g'), '〔継続〕');
-  if (CLOSED_CONFIRMED.some((re) => re.test(stripped))) {
-    return { closed: true, reason: '受付終了告知' };
+  const hit = CLOSED_CONFIRMED.find((re) => re.test(stripped));
+  if (hit) {
+    return { closed: true, reason: '受付終了告知', evidence: evidenceAround(stripped, hit) };
   }
-  return { closed: false, reason: '' };
+  return { closed: false, reason: '', evidence: '' };
 }
 
 // ── 締切日(deadlineDate)の解決 ───────────────────────────────────
@@ -216,7 +231,8 @@ function resolveDeadlineDate(deadlineText, eventDate) {
  *   eventDate   開催日 "YYYY-MM-DD"
  *   endDate     連日開催の終了日（任意）
  *   today       今日 "YYYY-MM-DD"
- * @returns {{status:string, statusReason:string, deadlineDate:string|null, confidence:'high'|'medium'|'low'}}
+ * @returns {{status:string, statusReason:string, deadlineDate:string|null, confidence:'high'|'medium'|'low', evidence:string}}
+ *   evidence … 判定の根拠になった本文の抜き出し（運営画面で確認するため）
  */
 function deriveStatus({ text = '', deadline = '', eventDate = '', endDate = '', today = '' } = {}) {
   const dl = resolveDeadlineDate(deadline, eventDate);
@@ -225,13 +241,13 @@ function deriveStatus({ text = '', deadline = '', eventDate = '', endDate = '', 
   // 1) 明示中止（最優先）
   const cancel = detectCancelled(text);
   if (cancel.cancelled) {
-    return { status: STATUS.CANCELLED, statusReason: cancel.reason, deadlineDate, confidence: 'high' };
+    return { status: STATUS.CANCELLED, statusReason: cancel.reason, deadlineDate, confidence: 'high', evidence: cancel.evidence };
   }
 
   // 2) 明示受付終了
   const closedText = detectClosedText(text);
   if (closedText.closed) {
-    return { status: STATUS.CLOSED, statusReason: closedText.reason, deadlineDate, confidence: 'high' };
+    return { status: STATUS.CLOSED, statusReason: closedText.reason, deadlineDate, confidence: 'high', evidence: closedText.evidence };
   }
 
   // 3) 締切日経過による自動 closed（信頼できる締切日が今日より前）
@@ -241,11 +257,11 @@ function deriveStatus({ text = '', deadline = '', eventDate = '', endDate = '', 
     const eff = isRealDate(endDate) ? endDate : eventDate;
     const notAbsurd = !isRealDate(eff) || (deadlineDate <= eff && deadlineDate >= yearBefore(eff));
     if (notAbsurd) {
-      return { status: STATUS.CLOSED, statusReason: '締切日経過', deadlineDate, confidence: 'medium' };
+      return { status: STATUS.CLOSED, statusReason: '締切日経過', deadlineDate, confidence: 'medium', evidence: `申込締切 ${deadlineDate}` };
     }
   }
 
-  return { status: STATUS.PUBLISHED, statusReason: '', deadlineDate, confidence: 'high' };
+  return { status: STATUS.PUBLISHED, statusReason: '', deadlineDate, confidence: 'high', evidence: '' };
 }
 
 /** dateStr の1年前（"YYYY-MM-DD"）。 */
@@ -276,7 +292,7 @@ function mergeStatus(prevStatus, derived) {
 }
 
 module.exports = {
-  STATUS, STATUS_VALUES, ENDED_KEEP_DAYS,
+  STATUS, STATUS_VALUES, PUBLIC_STATUS_VALUES, ENDED_KEEP_DAYS,
   normalizeText, detectCancelled, detectClosedText,
   resolveDeadlineDate, weekdayChar, deriveStatus, mergeStatus,
 };

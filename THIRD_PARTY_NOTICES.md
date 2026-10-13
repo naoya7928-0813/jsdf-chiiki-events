@@ -25,11 +25,13 @@
 | cheerio | HTML 解析 | MIT |
 | iconv-lite | 文字コード変換 | MIT |
 | pdf-parse | PDF テキスト/画像抽出 | MIT |
-| （OCR 各種・onnxruntime 等） | OCR | 各提供元のライセンス |
+| （OCR 各種・rapidocr・onnxruntime 等） | OCR（rapidocr: Apache-2.0 / onnxruntime: MIT） | 各提供元のライセンス |
 
 ## 外部サービス / データ
 - Open-Meteo（気象データ、CC BY 4.0）
 - 国土地理院 住所検索API（座標データ）
+- 国土数値情報（鉄道データ N02 2025年度版、国土交通省、CC BY 4.0）… 「『国土数値情報（鉄道データ）』（国土交通省）を加工して作成」（public/data/stations.json・交通アクセス案内）
+- Google マップ Maps URLs（経路検索ページへのリンク。API キー不要）
 - Google Fonts（Noto Sans JP / Noto Serif JP / IBM Plex Mono、SIL Open Font License 1.1）
 - ntfy.sh（通知配信）
 

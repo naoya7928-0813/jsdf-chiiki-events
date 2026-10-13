@@ -3,6 +3,10 @@ import { ICO } from './Icons';
 import { Emblem, F, splitDate, SectionTitle, iconBtnStyle, StatusBadge } from './Shared';
 import { REGION_HQ, REGION_SOURCE } from '../config';
 import WeatherCard from './WeatherCard';
+import { EventChangeNotice } from './EventChanges';
+import { EventGuideSection, EventFaqSection } from './EventGuide';
+import { recordView } from '../utils/viewTracker';
+import AccessGuide from './AccessGuide';
 import { useElementWidth, isTouchPhone, useIsShortViewport } from '../hooks/useBreakpoint';
 import { googleCalendarUrl, downloadIcs } from '../utils/calendar';
 import { useOnline } from '../hooks/useOnline';
@@ -27,6 +31,11 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
   // ⚠ 早期 return（ev が無い場合）より前で呼ぶこと。後ろに置くとフックの数が
   //    レンダーごとに変わり、React が「Rendered fewer hooks than expected」で落ちる。
   const online = useOnline();
+
+  // 閲覧数の計測。イベントIDが変わったときだけ（同じ画面内の再描画・状態更新・自動更新では送らない）。
+  // 重複・運営者の閲覧の除外は recordView 側
+  const viewedId = event?.id;
+  useEffect(() => { recordView(viewedId, { admin: !!adminAuthed }); }, [viewedId, adminAuthed]);
 
   // 本文の実寸で「天気」と「開催場所+地図」を横並びにするか決める。
   //
@@ -497,6 +506,9 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
         {shortVp && heroHeader}
         <div style={{ maxWidth: sideBySide ? 1200 : 860, margin: '0 auto', width: '100%' }}>
 
+        {/* 中止・延期・日時/会場変更のお知らせ（運営が公開したもの）。誤って会場へ向かわないよう最上部に出す */}
+        <EventChangeNotice ev={ev} />
+
         {/* 横長のときは 天気 と 開催場所+地図 を横並びにする。
             縦に積むと地図まで必ずスクロールが要るため、広い画面では並べて
             両方を一度に見せる。狭いペインでは従来どおり縦積み。 */}
@@ -633,6 +645,9 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
         </div>
         {/* ここまでが 天気 / 開催場所 の横並びブロック */}
 
+        {/* 公共交通機関でのアクセス（押したときだけ駅データ・位置情報を使う） */}
+        <AccessGuide ev={ev} online={online} />
+
         {/* 参加資格・締切 */}
         {(ev.ageRequirement || ev.deadline) && (
           <div style={{ padding: '6px 16px 14px' }}>
@@ -681,6 +696,10 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
             </div>
           </div>
         )}
+
+        {/* 参加準備ガイド・よくある質問（運営が確認して公開したものだけ） */}
+        <EventGuideSection ev={ev} />
+        <EventFaqSection ev={ev} />
 
         {/* 主催・お問い合わせ */}
         <div style={{ padding: '6px 16px 20px' }}>

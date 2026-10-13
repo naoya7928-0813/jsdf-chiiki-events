@@ -40,6 +40,7 @@ const { createYearContext, isActivityReport } = require('./lib/officeHtmlContext
 const { parseDateFromText, toJpDateString } = require('./lib/ocrDate');
 const llmClient = require('./lib/llmClient');
 const llmCache  = require('./lib/llmCache');
+const { OCR_PIPELINE_VERSION, needsLocalReocr, looksMisread } = require('./lib/ocrRefresh');
 const {
   decideRecheck, mergeRecheck, isPublishable, titleIssues,
 } = require('../shared/llmExtract.cjs');
@@ -340,7 +341,7 @@ function hashBuffer(buf) {
  *
  * @returns {{ buf: Buffer|null, hash: string, mime: string, notModified: boolean }|null}
  */
-async function downloadFile(url) {
+async function downloadFile(url, { conditional = true } = {}) {
   const normUrl  = normalizeUrl(url);
   const existing = normUrl ? assetCache.getByUrl(normUrl) : null;
 
@@ -348,9 +349,12 @@ async function downloadFile(url) {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
     'Referer':    'https://www.mod.go.jp/',
   };
-  // OCR成功済みエントリのみ条件付きGET（未OCRなら必ず再ダウンロード）
-  if (existing?.result && existing?.etag)               headers['If-None-Match']     = existing.etag;
-  else if (existing?.result && existing?.last_modified) headers['If-Modified-Since'] = existing.last_modified;
+  // OCR成功済みエントリのみ条件付きGET（未OCRなら必ず再ダウンロード）。
+  // 例外: 旧ローカルOCRの誤読をこの実行で読み直す予定のもの（本体が要る）と、
+  //       呼び出し側が本体を必要とする場合（conditional:false。段3再検査のキャッシュ未ヒット時）
+  const useConditional = conditional && existing?.result && !willRefreshLegacyOcr(existing);
+  if (useConditional && existing?.etag)               headers['If-None-Match']     = existing.etag;
+  else if (useConditional && existing?.last_modified) headers['If-Modified-Since'] = existing.last_modified;
 
   try {
     // ダウンロードもタイムアウト必須（ハングしても必ず戻る）。
@@ -534,9 +538,13 @@ async function checkTesseractAvailable() {
     return false;
   }
   try {
-    // 1x1ピクセルの白PNG（最小限のテスト）
-    const tiny = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI6QAAAABJRU5ErkJggg==', 'base64');
-    await lib.recognize(tiny, { lang: 'jpn', oem: 1, psm: 6 });
+    // 本体と日本語データ（jpn）が入っているかを言語一覧で確かめる。
+    // 以前は埋め込みの 1x1 PNG で試し読みしていたが、その PNG が CRC 破損しており
+    // （libpng error: IDAT: CRC error）、apt で導入済みでも毎回「利用不可」と判定されていた。
+    // 2026-10-13 に本番ログで発覚。画像を使わない判定にして同じ壊れ方を起こさない。
+    const { stdout, stderr } = await execFileAsync('tesseract', ['--list-langs'], { timeout: 10_000 });
+    const langs = `${stdout}\n${stderr}`.split(/\r?\n/).map(s => s.trim());
+    if (!langs.includes('jpn')) throw new Error('日本語データ(jpn)がありません（tesseract-ocr-jpn 未導入）');
     tesseractAvailable = true;
     console.log('[OCRエンジン] Tesseract: 利用可能');
   } catch (err) {
@@ -572,6 +580,7 @@ async function tryTesseractOcr(buf) {
 const RAPID_OCR_SCRIPT = path.join(__dirname, 'lib', 'rapidocr_cli.py');
 let rapidOcrAvailable = null;
 let rapidOcrPython = null;
+let rapidOcrEngineName = '';   // rapidocr_cli.py --check が返したエンジン名（日本語/中国語モデルの判別用）
 
 async function checkRapidOcrAvailable() {
   if (process.env.RAPIDOCR_DISABLED === '1') return false;
@@ -585,10 +594,20 @@ async function checkRapidOcrAvailable() {
 
   for (const cmd of candidates) {
     try {
-      await execFileAsync(cmd, [RAPID_OCR_SCRIPT, '--check'], { timeout: 15_000, maxBuffer: 1024 * 1024 });
+      // 1回だけの確認。モデル読み込みは通常 3〜7 秒だが、Chromium と並走する負荷下では 15 秒を超え、
+      // 全候補が時間切れになるとこの実行中ずっと RapidOCR が「利用不可」になる（2026-10-13 に手元で再現）
+      const { stdout } = await execFileAsync(cmd, [RAPID_OCR_SCRIPT, '--check'], { timeout: 60_000, maxBuffer: 1024 * 1024 });
+      let engine = '';
+      try { engine = JSON.parse(stdout).engine || ''; } catch { /* 旧CLIは engine を返さない */ }
       rapidOcrPython = cmd;
       rapidOcrAvailable = true;
-      console.log(`[OCRエンジン] RapidOCR: 利用可能（${cmd}）`);
+      rapidOcrEngineName = engine;
+      console.log(`[OCRエンジン] RapidOCR: 利用可能（${cmd}${engine ? ` / ${engine}` : ''}）`);
+      // 中国語モデルはかなを落として簡体字に化ける。動きはするが品質が大きく落ちるので知らせる
+      if (/\(ch\)/.test(engine)) {
+        console.warn('[OCRエンジン] RapidOCR: 中国語モデルで動作中です。日本語モデルを使うには'
+          + ' scraper/requirements-ocr.txt（rapidocr）を導入してください');
+      }
       return true;
     } catch { /* try next python command */ }
   }
@@ -779,6 +798,9 @@ const ocrStats = {
   structured: 0,  // 構造化イベントとして成立した数（これが 0 なら OCR は死んでいる）
   engine:     { pdftext: 0, tesseract: 0, rapidocr: 0, groq: 0, ocrspace: 0, mistral: 0, gemini: 0 },
   errors:     { groq: 0, ocrspace: 0, mistral: 0, gemini: 0 },
+  // API は応答したが JSON として読めなかった件数（errors とは別。以前は数えておらず無言で消えていた）
+  parseFailures: { groq: 0, gemini: 0 },
+  refreshed:  0,   // 旧ローカルOCR（中国語モデル）の誤読をキャッシュから読み直して置き換えた数
   models:     {},  // 実際に使ったモデルID（廃止追従の記録）
 };
 
@@ -858,6 +880,93 @@ async function structureOcrText(text, mode, engine, opts = {}) {
   return fallback;
 }
 
+// ── ローカルOCR（無料）の共通経路 ─────────────────────────────
+/**
+ * ローカルOCRで読み、構造化まで行う。RapidOCR（日本語モデル）→ Tesseract の順。
+ *
+ * 2026-10-13 に実チラシ5枚で比較し、RapidOCR（日本語 PP-OCRv6）が全件で Tesseract を
+ * 上回った（Tesseract は写真・装飾文字の上ではほぼ読めない）。以前は Tesseract が先だったが、
+ * Tesseract は起動チェックの不具合で一度も動いておらず、実際の順序は RapidOCR が先頭だった。
+ * その実態に合わせ、Tesseract は RapidOCR が使えない／読めないときの予備にする。
+ */
+async function localOcrStructured(buf, mode, label) {
+  const rapidText = await tryRapidOcr(buf, label);
+  if (rapidText) {
+    const r = await structureOcrText(rapidText, mode, 'rapidocr');
+    if (r) { console.log(`[${label}] RapidOCR 構造化成功`); return r; }
+  }
+  const tessText = await tryTesseractOcr(buf);
+  if (tessText) {
+    const r = await structureOcrText(tessText, mode, 'tesseract');
+    if (r) { console.log(`[${label}] Tesseract 構造化成功`); return r; }
+  }
+  return null;
+}
+
+/** PDF を画像化し、ページ順にローカルOCRで読む（先頭2ページまで） */
+async function localOcrPdfPages(pdfBuf, mode, label, pages = null) {
+  const imgs = pages || await pdfToImages(pdfBuf, 2);
+  for (const img of imgs) {
+    const r = await localOcrStructured(img, mode, label);
+    if (r) return r;
+  }
+  return null;
+}
+
+/** OCR 成功結果を保存する（新パイプラインの印を付ける。旧結果の読み直し判定に使う） */
+function storeOcrResult(hash, url, result, extra = {}) {
+  assetCache.set(hash, {
+    ocr_status: 'success', last_ocr_at: new Date().toISOString(), url, result,
+    ocr_pipeline: OCR_PIPELINE_VERSION, ...extra,
+  });
+}
+
+// 旧ローカルOCR（中国語モデル）の誤読を読み直す上限（1実行あたり）。
+// ローカルOCR＋LLM整形だけで行い、API の画像OCRは呼ばない（取得済みアセットの再OCR禁止の方針）。
+const OCR_REFRESH_LIMIT = (() => {
+  const n = Number.parseInt(process.env.OCR_REFRESH_LIMIT || '', 10);
+  return Number.isFinite(n) && n >= 0 ? n : 20;
+})();
+let ocrRefreshUsed = 0;
+
+/** このキャッシュエントリをこの実行で読み直すか（上限内かつ誤読の疑いあり） */
+function willRefreshLegacyOcr(entry) {
+  return ocrRefreshUsed < OCR_REFRESH_LIMIT && needsLocalReocr(entry);
+}
+
+/**
+ * OCR キャッシュを引く。旧パイプラインの誤読が疑われる結果は、ローカルOCRで1回だけ読み直す。
+ * 読み直しで誤読の無い結果が得られた場合だけ置き換え、そうでなければ旧結果を使い続ける
+ * （今より悪くしない）。
+ * @returns {Promise<{hit: boolean, result?: Object}>}
+ */
+async function lookupOcrCache(dl, { url, label, mode, isPdf }) {
+  const cached = assetCache.getByHash(dl.hash);
+  if (!cached || !cached.result) return { hit: false };
+  const name = String(url || '').split('/').pop();
+  if (dl.buf && willRefreshLegacyOcr(cached)) {
+    ocrRefreshUsed++;
+    let fresh = null;
+    if (isPdf) {
+      fresh = await localOcrPdfPages(dl.buf, mode, label);
+    } else {
+      const prep = await prepareImageForOcr(dl.buf, dl.mime, label);
+      if (prep.ok) fresh = await localOcrStructured(prep.buf, mode, label);
+    }
+    if (fresh && !looksMisread(fresh) && (mode !== 'full' || fresh.date)) {
+      storeOcrResult(dl.hash, url, fresh, { refreshed_from_legacy: true });
+      ocrStats.refreshed = (ocrStats.refreshed || 0) + 1;
+      console.log(`[${label}] 旧OCRの誤読を読み直し: ${name} 「${cached.result.title || ''}」→「${fresh.title || ''}」`);
+      return { hit: true, result: fresh };
+    }
+    assetCache.set(dl.hash, { refreshed_for: OCR_PIPELINE_VERSION });
+    console.log(`[${label}] 旧OCRの読み直しで改善せず（以後は再試行しない）: ${name}`);
+  }
+  ocrStats.cacheHits++;
+  console.log(`[${label}] キャッシュヒット: ${name}`);
+  return { hit: true, result: cached.result };
+}
+
 const OCR_STATS_PATH = path.join(__dirname, 'ocr-stats.json');
 // カットオフ（時間切れ打ち切り）の結果。ワークフローが実行サマリと管理者通知に使う
 const CUTOFF_REPORT_PATH = path.join(__dirname, 'cutoff-report.json');
@@ -884,6 +993,29 @@ function writeCutoffReport(cutoff, skippedTasks) {
   }
 }
 
+/**
+ * ローカルOCRの利用可否と API キーの有無を統計に載せる（キーの値は載せない）。
+ * 利用可否の判定は初回呼び出し時にキャッシュされるため、この実行で使ったものと同じ結果になる。
+ */
+async function probeOcrEngines() {
+  ocrStats.local = {
+    tesseract: await checkTesseractAvailable(),
+    rapidocr:  await checkRapidOcrAvailable(),
+    rapidocrEngine: rapidOcrEngineName || null,
+    pdftoppm:  await checkPdftoppm(),
+  };
+  ocrStats.keys = {
+    groq:     Boolean(process.env.GROQ_API_KEY),
+    gemini:   Boolean(process.env.GEMINI_API_KEY),
+    mistral:  Boolean(process.env.MISTRAL_API_KEY),
+    ocrspace: Boolean(process.env.OCR_SPACE_API_KEY),
+  };
+  ocrStats.quotaExhausted = {
+    groq: groqQuotaExhausted, gemini: geminiQuotaExhausted,
+    mistral: mistralQuotaExhausted, ocrspace: ocrSpaceQuotaExhausted,
+  };
+}
+
 /** OCR 稼働統計を scraper/ocr-stats.json に書き出し、サマリを標準出力にも出す */
 function writeOcrStats() {
   const cloudErrors = Object.values(ocrStats.errors).reduce((a, b) => a + b, 0);
@@ -900,7 +1032,9 @@ function writeOcrStats() {
   console.log('[OCR統計]'
     + ` 試行 ${ocrStats.attempted} 件 / キャッシュ再利用 ${ocrStats.cacheHits} 件`
     + ` / ローカル生テキスト ${ocrStats.localText} 件 / 構造化成功 ${ocrStats.structured} 件`
-    + ` / クラウド失敗 ${cloudErrors} 件`);
+    + ` / クラウド失敗 ${cloudErrors} 件`
+    + ` / JSON読取失敗 ${Object.values(ocrStats.parseFailures).reduce((a, b) => a + b, 0)} 件`
+    + ` / 旧OCR読み直し ${ocrStats.refreshed} 件`);
   console.log(`  エンジン別成功: ${Object.entries(ocrStats.engine).map(([k, v]) => `${k}=${v}`).join(' ')}`);
   console.log(`  使用モデル: ${Object.entries(ocrStats.models).map(([k, v]) => `${k}=${v}`).join(' ') || '(未使用)'}`);
 }
@@ -918,9 +1052,10 @@ function writeOcrStats() {
 // ここが陳腐化しただけで OCR が止まることはない。
 const GROQ_VISION_MODEL_CANDIDATES = [
   process.env.GROQ_OCR_MODEL,
-  // console.groq.com/docs/vision が挙げる唯一の画像入力モデル
-  // （20MB/枚・5枚まで・JSONモード対応）
-  'qwen/qwen3.6-27b',
+  // console.groq.com/docs/vision が挙げる唯一の画像入力モデル（2026-10-13 確認。
+  // 20MB/リクエスト・3枚まで・JSONモード対応。Preview 扱い）。
+  // 旧候補 qwen/qwen3.6-27b は廃止済みで、本番では discover が毎回これを自動選択していた
+  'qwen/qwen3.8-27b',
 ].filter(Boolean);
 
 const GEMINI_MODEL_CANDIDATES = [
@@ -1068,6 +1203,7 @@ async function callGroqOcr(base64, mimeType, prompt, label = 'OCR') {
     const text      = apiJson.choices?.[0]?.message?.content ?? '';
     const jsonMatch = text.match(/(\[[\s\S]*\]|\{[\s\S]*\})/);
     if (!jsonMatch) {
+      ocrStats.parseFailures.groq++;
       console.warn(`[${label}] Groq JSON パース失敗: ${text.slice(0, 100)}`);
       return null;
     }
@@ -1075,7 +1211,11 @@ async function callGroqOcr(base64, mimeType, prompt, label = 'OCR') {
       const parsed = JSON.parse(jsonMatch[0]);
       if (parsed) noteOcrSuccess('groq');
       return parsed;
-    } catch { return null; }
+    } catch {
+      ocrStats.parseFailures.groq++;
+      console.warn(`[${label}] Groq 応答の JSON が壊れています: ${text.slice(0, 100)}`);
+      return null;
+    }
   }
   return null;
 }
@@ -1181,8 +1321,10 @@ async function callMistralOcr(base64, mimeType, label = 'Mistral-OCR') {
     const json = await res.json();
     const text = (json.pages || []).map(p => p.markdown || '').filter(Boolean).join('\n\n');
     if (!text.trim()) return null;
-    const result = parseTextToEvent(text, 'full');
-    if (result) { noteOcrSuccess('mistral'); console.log(`[${label}] Mistral OCR 成功`); }
+    // 他のOCR経路と同じく段1（LLM整形）→ 正規表現の順で構造化する。
+    // 以前は正規表現だけで、Mistral が読めても会場・タイトルを取りこぼしていた。
+    const result = await structureOcrText(text, 'full', 'mistral');
+    if (result) console.log(`[${label}] Mistral OCR 成功`);
     return result;
   } catch (err) {
     ocrStats.errors.mistral++;
@@ -1237,6 +1379,8 @@ async function callGeminiOcr(parts, label = 'PDF-OCR') {
   for (let attempt = 0; attempt <= retryDelays.length; attempt++) {
     let apiRes;
     try {
+      // PDF/画像を丸ごと送るため既定の 45 秒では足りないことがある（本番で timeout 5 件/回を確認）。
+      // 他のPDF対応API（Mistral・OCR.space）と同じ 90 秒にそろえる
       apiRes = await fetchWithTimeout(
         `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`,
         {
@@ -1246,7 +1390,8 @@ async function callGeminiOcr(parts, label = 'PDF-OCR') {
             contents: [{ parts }],
             generationConfig: { maxOutputTokens: 512, temperature: 0 },
           }),
-        }
+        },
+        90_000
       );
     } catch (err) {
       ocrStats.errors.gemini++;
@@ -1279,12 +1424,23 @@ async function callGeminiOcr(parts, label = 'PDF-OCR') {
     const apiJson   = await apiRes.json();
     const text      = apiJson.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
     const jsonMatch = text.match(/(\[[\s\S]*\]|\{[\s\S]*\})/);
-    if (!jsonMatch) return null;
+    // 応答はあったが JSON にならなかった（出力上限での途中切れ等）。以前は無言で null を返し、
+    // 失敗件数にも数えていなかったため「エラーなし・成功0件」に見えていた
+    const finish = apiJson.candidates?.[0]?.finishReason || '';
+    if (!jsonMatch) {
+      ocrStats.parseFailures.gemini++;
+      console.warn(`[${label}] Gemini 応答を JSON として読めません（finishReason=${finish || '不明'}）: ${text.slice(0, 80)}`);
+      return null;
+    }
     try {
       const parsed = JSON.parse(jsonMatch[0]);
       if (parsed) noteOcrSuccess('gemini');
       return parsed;
-    } catch { return null; }
+    } catch {
+      ocrStats.parseFailures.gemini++;
+      console.warn(`[${label}] Gemini 応答の JSON が壊れています（finishReason=${finish || '不明'}）`);
+      return null;
+    }
   }
   return null;
 }
@@ -1323,32 +1479,16 @@ async function ocrImage(imageUrl) {
   if (!dl) return null;
 
   // ハッシュベースキャッシュ確認
-  if (assetCache.getByHash(dl.hash) && assetCache.getByHash(dl.hash).result) {
-    ocrStats.cacheHits++;
-    console.log(`[OCR] キャッシュヒット: ${imageUrl.split('/').pop()}`);
-    return assetCache.getByHash(dl.hash).result;
-  }
+  const hit = await lookupOcrCache(dl, { url: imageUrl, label: 'OCR', mode: 'full', isPdf: false });
+  if (hit.hit) return hit.result;
+  if (!dl.buf) return null;   // 304 なのにキャッシュが無い（通常起きない）→ 判断材料なし
 
   const prep = await prepareImageForOcr(dl.buf, dl.mime, 'OCR');
   const base64 = prep.buf.toString('base64');
   ocrStats.attempted++;   // キャッシュミス → 実際にOCRを走らせる
-  let result = null;
 
-  // 1. ローカル Tesseract
-  const tessText = await tryTesseractOcr(prep.buf);
-  if (tessText) {
-    result = await structureOcrText(tessText, 'full', 'tesseract');
-    if (result) console.log(`[OCR] Tesseract 成功: ${imageUrl.split('/').pop()}`);
-  }
-
-  // 2. RapidOCR
-  if (!result) {
-    const rapidText = await tryRapidOcr(prep.buf, 'OCR');
-    if (rapidText) {
-      result = await structureOcrText(rapidText, 'full', 'rapidocr');
-      if (result) console.log(`[OCR] RapidOCR 構造化成功: ${imageUrl.split('/').pop()}`);
-    }
-  }
+  // 1-2. ローカルOCR（RapidOCR 日本語 → Tesseract）
+  let result = await localOcrStructured(prep.buf, 'full', 'OCR');
 
   // 3. Groq Vision
   if (!result && prep.ok && process.env.GROQ_API_KEY) {
@@ -1366,7 +1506,7 @@ async function ocrImage(imageUrl) {
       { text: OCR_PROMPT },
     ], 'OCR');
   }
-  if (result) assetCache.set(dl.hash, { ocr_status: "success", last_ocr_at: new Date().toISOString(), url: imageUrl, result });
+  if (result) storeOcrResult(dl.hash, imageUrl, result);
   return result;
 }
 
@@ -1419,11 +1559,8 @@ async function ocrPdf(pdfUrl) {
   if (!dl) return null;
 
   // ハッシュベースキャッシュ確認
-  if (assetCache.getByHash(dl.hash) && assetCache.getByHash(dl.hash).result) {
-    ocrStats.cacheHits++;
-    console.log(`[PDF-OCR] キャッシュヒット: ${pdfUrl.split('/').pop()}`);
-    return assetCache.getByHash(dl.hash).result;
-  }
+  const hit = await lookupOcrCache(dl, { url: pdfUrl, label: 'PDF-OCR', mode: 'pdf', isPdf: true });
+  if (hit.hit) return hit.result;
 
   if (dl.notModified) return null;
 
@@ -1438,29 +1575,16 @@ async function ocrPdf(pdfUrl) {
     if (result) console.log(`[PDF-OCR] テキスト抽出成功（API不要）: ${pdfUrl.split('/').pop()}`);
   }
 
-  // 2. PDF→画像 → Tesseract
+  // 2-3. PDF→画像 → ローカルOCR（RapidOCR 日本語 → Tesseract）
+  let pages = null;
   if (!result) {
-    const imgs = await pdfToImages(dl.buf, 2);
-    for (const imgBuf of imgs) {
-      const tessText = await tryTesseractOcr(imgBuf);
-      if (tessText) { result = await structureOcrText(tessText, 'full', 'tesseract'); }
-      if (result) { console.log(`[PDF-OCR] Tesseract 成功: ${pdfUrl.split('/').pop()}`); break; }
-    }
-  }
-
-  // 3. PDF→画像 → RapidOCR
-  if (!result) {
-    const imgs = await pdfToImages(dl.buf, 2);
-    for (const imgBuf of imgs) {
-      const rapidText = await tryRapidOcr(imgBuf, 'PDF-OCR');
-      if (rapidText) result = await structureOcrText(rapidText, 'pdf', 'rapidocr');
-      if (result) { console.log(`[PDF-OCR] RapidOCR 成功: ${pdfUrl.split('/').pop()}`); break; }
-    }
+    pages = await pdfToImages(dl.buf, 2);
+    result = await localOcrPdfPages(dl.buf, 'pdf', 'PDF-OCR', pages);
   }
 
   // 4. PDF→画像 → Groq Vision
   if (!result && process.env.GROQ_API_KEY) {
-    const imgs = await pdfToImages(dl.buf, 2);
+    const imgs = pages || await pdfToImages(dl.buf, 2);
     for (const imgBuf of imgs) {
       const imgBase64 = imgBuf.toString('base64');
       result = await callGroqOcr(imgBase64, 'image/jpeg', PDF_OCR_PROMPT, 'PDF-OCR(Groq)');
@@ -1487,7 +1611,7 @@ async function ocrPdf(pdfUrl) {
     ], 'PDF-OCR(Gemini)');
   }
 
-  if (result) assetCache.set(dl.hash, { ocr_status: 'success', last_ocr_at: new Date().toISOString(), url: pdfUrl, result });
+  if (result) storeOcrResult(dl.hash, pdfUrl, result);
   return result;
 }
 
@@ -1566,11 +1690,8 @@ async function ocrFlyerFull(url) {
   if (!dl) return null;
 
   // ハッシュベースキャッシュ確認
-  if (assetCache.getByHash(dl.hash) && assetCache.getByHash(dl.hash).result) {
-    ocrStats.cacheHits++;
-    console.log(`[チラシOCR] キャッシュヒット: ${url.split('/').pop()}`);
-    return assetCache.getByHash(dl.hash).result;
-  }
+  const hit = await lookupOcrCache(dl, { url, label: 'チラシOCR', mode: 'full', isPdf });
+  if (hit.hit) return hit.result;
 
   if (dl.notModified) return null;
 
@@ -1585,27 +1706,15 @@ async function ocrFlyerFull(url) {
       result = await structureOcrText(pdfText, 'full', 'pdftext');
       if (result) console.log(`[チラシOCR] PDFテキスト抽出成功（API不要）: ${url.split('/').pop()}`);
     }
-    // 2. PDF→画像 → Tesseract
+    // 2-3. PDF→画像 → ローカルOCR（RapidOCR 日本語 → Tesseract）
+    let pages = null;
     if (!result) {
-      const imgs = await pdfToImages(dl.buf, 2);
-      for (const imgBuf of imgs) {
-        const t = await tryTesseractOcr(imgBuf);
-        if (t) { result = await structureOcrText(t, 'full', 'tesseract'); }
-        if (result) { console.log(`[チラシOCR] PDF+Tesseract 成功`); break; }
-      }
-    }
-    // 3. PDF→画像 → RapidOCR
-    if (!result) {
-      const imgs = await pdfToImages(dl.buf, 2);
-      for (const imgBuf of imgs) {
-        const rapidText = await tryRapidOcr(imgBuf, 'チラシOCR-PDF');
-        if (rapidText) result = await structureOcrText(rapidText, 'full', 'rapidocr');
-        if (result) { console.log(`[チラシOCR] PDF+RapidOCR 成功`); break; }
-      }
+      pages = await pdfToImages(dl.buf, 2);
+      result = await localOcrPdfPages(dl.buf, 'full', 'チラシOCR-PDF', pages);
     }
     // 4. PDF→画像 → Groq Vision
     if (!result && process.env.GROQ_API_KEY) {
-      const imgs = await pdfToImages(dl.buf, 2);
+      const imgs = pages || await pdfToImages(dl.buf, 2);
       for (const imgBuf of imgs) {
         result = await callGroqOcr(imgBuf.toString('base64'), 'image/jpeg', FLYER_OCR_PROMPT, 'チラシOCR-PDF(Groq)');
         if (result) { console.log(`[チラシOCR] PDF+Groq 成功`); break; }
@@ -1628,20 +1737,8 @@ async function ocrFlyerFull(url) {
   } else {
     const prep = await prepareImageForOcr(dl.buf, dl.mime, 'チラシOCR');
     const imgBase64 = prep.buf.toString('base64');
-    // 2a. ローカル Tesseract
-    const tessText = await tryTesseractOcr(prep.buf);
-    if (tessText) {
-      result = await structureOcrText(tessText, 'full', 'tesseract');
-      if (result) console.log(`[チラシOCR] Tesseract 成功: ${url.split('/').pop()}`);
-    }
-    // 2b. RapidOCR
-    if (!result) {
-      const rapidText = await tryRapidOcr(prep.buf, 'チラシOCR');
-      if (rapidText) {
-        result = await structureOcrText(rapidText, 'full', 'rapidocr');
-        if (result) console.log(`[チラシOCR] RapidOCR 成功: ${url.split('/').pop()}`);
-      }
-    }
+    // 2a-2b. ローカルOCR（RapidOCR 日本語 → Tesseract）
+    result = await localOcrStructured(prep.buf, 'full', 'チラシOCR');
     // 2c. Groq Vision
     if (!result && prep.ok && process.env.GROQ_API_KEY) {
       result = await callGroqOcr(imgBase64, prep.mime, FLYER_OCR_PROMPT, 'チラシOCR(Groq)');
@@ -1664,7 +1761,7 @@ async function ocrFlyerFull(url) {
     }
   }
 
-  if (result) assetCache.set(dl.hash, { ocr_status: "success", last_ocr_at: new Date().toISOString(), url, result });
+  if (result) storeOcrResult(dl.hash, url, result);
   return result;
 }
 
@@ -1750,32 +1847,16 @@ async function ocrImageFull(imageUrl) {
   if (!dl) return null;
 
   // ハッシュベースキャッシュ確認
-  if (assetCache.getByHash(dl.hash) && assetCache.getByHash(dl.hash).result) {
-    ocrStats.cacheHits++;
-    console.log(`[OCR-FULL] キャッシュヒット: ${imageUrl.split('/').pop()}`);
-    return assetCache.getByHash(dl.hash).result;
-  }
+  const hit = await lookupOcrCache(dl, { url: imageUrl, label: 'OCR-FULL', mode: 'full', isPdf: false });
+  if (hit.hit) return hit.result;
+  if (!dl.buf) return null;   // 304 なのにキャッシュが無い（通常起きない）→ 判断材料なし
 
   const prep = await prepareImageForOcr(dl.buf, dl.mime, 'OCR-FULL');
   const base64 = prep.buf.toString('base64');
   ocrStats.attempted++;   // キャッシュミス → 実際にOCRを走らせる
-  let result = null;
 
-  // 1. ローカル Tesseract
-  const tessText = await tryTesseractOcr(prep.buf);
-  if (tessText) {
-    result = await structureOcrText(tessText, 'full', 'tesseract');
-    if (result) console.log(`[OCR-FULL] Tesseract 成功: ${imageUrl.split('/').pop()}`);
-  }
-
-  // 2. RapidOCR
-  if (!result) {
-    const rapidText = await tryRapidOcr(prep.buf, 'OCR-FULL');
-    if (rapidText) {
-      result = await structureOcrText(rapidText, 'full', 'rapidocr');
-      if (result) console.log(`[OCR-FULL] RapidOCR 成功: ${imageUrl.split('/').pop()}`);
-    }
-  }
+  // 1-2. ローカルOCR（RapidOCR 日本語 → Tesseract）
+  let result = await localOcrStructured(prep.buf, 'full', 'OCR-FULL');
 
   // 3. Groq Vision
   if (!result && prep.ok && process.env.GROQ_API_KEY) {
@@ -1794,7 +1875,7 @@ async function ocrImageFull(imageUrl) {
     ], 'OCR-FULL');
   }
 
-  if (result) assetCache.set(dl.hash, { ocr_status: "success", last_ocr_at: new Date().toISOString(), url: imageUrl, result });
+  if (result) storeOcrResult(dl.hash, imageUrl, result);
   return result;
 }
 
@@ -4420,7 +4501,8 @@ async function main() {
   };
   // OCRキャッシュを保存（スキャン済みURLを記録 → 次回以降の再スキャンを防ぐ）
   assetCache.save();
-  // OCR層の稼働状況を書き出す（ワークフローの健全性チェックが読む）
+  // OCR層の稼働状況を書き出す（scrape.yml の「OCR稼働状況を確認」が読む）
+  await probeOcrEngines();
   writeOcrStats();
   // カットオフの結果を残す（ワークフローが実行サマリと管理者通知に使う）
   writeCutoffReport(cutoff, prefSkipped);
@@ -4475,11 +4557,15 @@ async function recheckFromPrimarySource(ev, prefLabel, today) {
   try { dl = await downloadFile(src); } catch { return null; }
   if (!dl) return null;
 
-  // 304（中身が変わっていない）はハッシュだけでキャッシュを引ける
+  // 304（中身が変わっていない）はハッシュだけでキャッシュを引ける。
+  // ただし段3でまだ読んだことの無い資料は、OCR 済み（＝条件付きGETの対象）でも本体が無い。
+  // 以前はそのまま null を返しており、本番では再検査14件中11件が何もせず終わっていた
+  // （2026-10-13 のログ: 再検査14件・画像の LLM 呼び出し0件）。本体を取り直して読む。
   if (!dl.buf) {
-    return llmClient.extractEventFromImage('', dl.mime || 'image/jpeg', {
-      cacheKey: dl.hash, prefLabel, today, label: 'LLM再検査',
-    });
+    const peek = llmClient.peekImageCache({ cacheKey: dl.hash, prefLabel });
+    if (peek.hit) return peek.result;
+    try { dl = await downloadFile(src, { conditional: false }); } catch { return null; }
+    if (!dl || !dl.buf) return null;
   }
 
   let base64, mime;
@@ -4766,6 +4852,7 @@ async function writeOutput(data, timeCutoff = null) {
   // published（通常）は状態フィールドを付けない＝後方互換＆データ量を抑える。
   // 前回 events.json の status を読み、cancelled/closed の粘着性を維持（文言消失で復活させない）。
   const prevStatusById = new Map();
+  const prevStatusMetaById = new Map();   // 自動判定の根拠・確信度（前回状態を維持したときに引き継ぐ）
   // 初回掲載日（firstSeen）。構造化データ（JSON-LD）の offers.validFrom に使うため、
   // 一度付いた日付は前回 events.json から引き継いで変化させない。
   const prevFirstSeenById = new Map();
@@ -4774,6 +4861,7 @@ async function writeOutput(data, timeCutoff = null) {
     for (const e of prevData[k]) {
       if (!e || !e.id) continue;
       if (e.status) prevStatusById.set(e.id, e.status);
+      if (e.statusEvidence || e.statusConfidence) prevStatusMetaById.set(e.id, { evidence: e.statusEvidence, confidence: e.statusConfidence });
       if (/^\d{4}-\d{2}-\d{2}$/.test(String(e.firstSeen ?? ''))) prevFirstSeenById.set(e.id, e.firstSeen);
     }
   }
@@ -4805,6 +4893,11 @@ async function writeOutput(data, timeCutoff = null) {
         ev.statusReason = merged.statusReason || derived.statusReason || '';
         ev.statusSource = merged.sticky ? (prevStatusById.get(ev.id) ? 'previous' : statusSourceOf(ev)) : statusSourceOf(ev);
         ev.statusUpdatedAt = today;
+        // 自動判定の確信度と根拠（本文の抜き出し）。運営画面で「なぜ中止扱いか」を確認し、
+        // 誤りなら上書き（開催予定に戻す）で直せるようにする。前回状態の維持（sticky）は前回の根拠を残す
+        const meta = merged.sticky ? (prevStatusMetaById.get(ev.id) || {}) : { evidence: derived.evidence, confidence: derived.confidence };
+        if (meta.confidence) ev.statusConfidence = meta.confidence;
+        if (meta.evidence) ev.statusEvidence = meta.evidence;
         if (merged.status === 'closed') closedCount++; else cancelledCount++;
         if (derived.confidence === 'low') lowConfCount++;
       }

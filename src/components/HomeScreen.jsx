@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { ICO } from './Icons';
-import { BottomTabBar, F, Spinner, ErrorBanner, splitDate } from './Shared';
+import { BottomTabBar, F, Spinner, ErrorBanner, splitDate, StatusBadge } from './Shared';
 import JapanMap from './JapanMap';
 import { useIsDesktop } from '../hooks/useBreakpoint';
 import NearbyOfficesModal from './NearbyOfficesModal';
@@ -397,6 +397,10 @@ function RegionPanelDetail({ prefs, events, primary, onOpenList, onOpenDetail })
                   </span>
                   {/* 本文 */}
                   <span style={{ minWidth: 0, flex: 1 }}>
+                    {/* 中止・延期・受付終了は見落とすと会場へ行ってしまうので、直近一覧でも示す */}
+                    {ev.status && ev.status !== 'published' && (
+                      <span style={{ display: 'block', marginBottom: 3 }}><StatusBadge status={ev.status} size="sm" /></span>
+                    )}
                     <span style={{
                       display: 'block', fontSize: 13, color: 'var(--text)', fontWeight: 600,
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',

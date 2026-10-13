@@ -129,7 +129,20 @@ cd scraper && node index.js
 
 **すでに取得済みの PDF/画像は再取得・再 OCR しないこと。** OCR は Gemini API のクォータを消費するため、同一アセットの重複処理は厳禁。実装は `scraper/lib/assetCache.js` と `downloadFile()` に集約されており、新規パーサーや探索ロジックを追加する際もこのキャッシュ経路を必ず通すこと。
 
-OCRの優先順は、無料ローカルOCR（Tesseract → RapidOCR）を先に試し、次に無料枠の大きいAPI（Groq → OCR.space）、最後に Mistral / Gemini へフォールバックする。RapidOCR は `scraper/requirements-ocr.txt` と `scraper/lib/rapidocr_cli.py` で GitHub Actions に導入済み。OCR.space は `OCR_SPACE_API_KEY` がある場合のみ使う。
+OCRの優先順は、無料ローカルOCR（**RapidOCR 日本語モデル → Tesseract**）を先に試し、次に無料枠の大きいAPI（Groq → OCR.space）、最後に Mistral / Gemini へフォールバックする（共通経路は `localOcrStructured`）。RapidOCR は `scraper/requirements-ocr.txt`（`rapidocr==3.10.0`）と `scraper/lib/rapidocr_cli.py` で GitHub Actions に導入済み。OCR.space は `OCR_SPACE_API_KEY` がある場合のみ使う。
+
+**OCR 稼働確認（2026-10-13）で直したこと**（再発させないこと）:
+- ⚠️ **RapidOCR は日本語モデル（PP-OCRv6 small / `lang=japan`）で動かす**。旧 `rapidocr-onnxruntime` は既定が中国語モデルで、
+  かなを落として簡体字に化ける（「駐屯地」→「鞋屯地」、「保健センター」→「保健七一」）。本番の文字化けタイトルの主因だった。
+  モデル（約31MB）は modelscope.cn から取得し、scrape.yml が Actions cache に保持する
+- ⚠️ Tesseract の起動チェックは**言語一覧（`tesseract --list-langs` に jpn）で判定**する。以前は埋め込みの PNG が CRC 破損しており、
+  導入済みなのに毎回「利用不可」だった。実チラシ比較で RapidOCR(日本語) が全件で上回ったため、Tesseract は予備（2番手）
+- 旧パイプラインの結果のうち**誤読の痕跡（簡体字・不正タイトル）があるものだけ**、ローカルOCRで1回だけ読み直す
+  （`scraper/lib/ocrRefresh.js`。1実行 `OCR_REFRESH_LIMIT`=20 件まで。API の画像OCRは呼ばない＝取得済みアセットの再OCR禁止を守る）
+- LLM（段1〜3）は**プロバイダが答えなかったとき（429・障害）の null をキャッシュしない**。以前は 90 日固定され、その資料は読み直されなかった
+- 段3再検査は、条件付きGETで 304 だった資料でも LLM キャッシュに無ければ本体を取り直して読む（以前は無言で何もしていなかった）
+- OCR の経路ごとの成否は `scraper/ocr-stats.json` → `scripts/check-ocr-health.mjs`（`shared/ocrHealth.cjs`）が実行サマリへ出し、
+  止まっている経路を `::warning::` にする（ジョブは落とさない）
 
 - **キャッシュ実体**: `scraper/ocr-cache.json`（`.gitignore` 対象。self-hosted runner 上 + GitHub Actions cache で永続化）。キーはファイル実体の **SHA-256（`content_sha256`）**。
 - **ダウンロード段階の重複回避**: `downloadFile(url)` は正規化 URL でキャッシュを引き、OCR 成功済みエントリがあれば `If-None-Match`(ETag) / `If-Modified-Since`(Last-Modified) で**条件付き GET** を発行。`304 Not Modified` ならファイル本体をダウンロードしない。
@@ -395,6 +408,80 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - 誤検疫を最小化するため判定は保守的（イベント語があれば検疫しない）。検知漏れは従来どおり
   isJunkOrStubTitle へのルール追加で対応し、テストを `titleQuality.test.cjs` に足す
 
+## イベントの変更・中止管理（2026-10-13 導入）
+
+運営が「中止・延期・受付終了・日時変更・会場変更・内容変更・重要なお知らせ」を登録し、利用者へ表示・通知する。
+**純粋ロジックは `shared/eventChanges.cjs`**（管理API・公開API・画面で共有。`shared/eventChanges.test.cjs`）。
+
+- **開催状況（`status`）と変更履歴（`changes`）を分ける**。
+  - `status`: `published`（開催予定）/ `closed`（受付終了）/ `cancelled`（中止）/ `postponed`（延期）/ `draft`（手動のみ）
+  - `changes[]`: `{id, type, reason, before, after, public, notify, evidence, confirmed, at, by, notifiedAt?}`（新しい順・最大30件）
+  - 「日時変更」は開催状況ではない（新しい日時で開催予定のまま）。種別ごとに連動する status は `CHANGE_TYPES` が唯一の出どころ
+- ⚠️ **`postponed` は運営の登録でのみ付く**。自動判定（`deriveStatus`）は延期を出さない（「延期の場合あり」等で延期扱いにしない）。
+  中止も確定語だけで判定し、根拠（`statusEvidence`＝本文の抜き出し）と確信度（`statusConfidence`）を events.json に残す。
+  運営画面で根拠を確認し、誤りなら「開催予定に戻す」を登録する
+- 保存先: 手動イベントは本体（`manual:events`）、**自動収集イベントは上書き（`manual:overrides`）**。上書きは表示時に適用されるので
+  **スクレイプでは消えない**。⚠️ `/api/admin/overrides` の内容保存・取り消しは `status`/`changes`/FAQ 等（`MANAGED_KEYS`）を**引き継ぐ**こと
+  （落とすと表示を直しただけで中止設定が消える）
+- API: `/api/admin/event-changes`（GET/POST/PATCH/DELETE）。権限は手動=`event:update`・自動収集=`event:override`、
+  「開催予定に戻す」は公開権限も必要。所属は `api/_eventScope.js` がサーバー側で解決（IDOR対策）。全操作を `writeAudit`
+- 公開: `/api/manual-events` は `public:true` の記録だけを `publicChanges()` の形（根拠・操作者なし）で返す
+- 通知: **公開する・通知対象の種別・一次情報の根拠＋確認済み**がそろったときだけ。同じイベント・同じ文面は24時間に1回まで
+  （`push:change-sent:*`）。宛先は「お気に入りの変更・中止を通知」をオンにした端末だけ（下記）
+- **見守り（watch）**: お気に入りは端末内にしか無いため、利用者が設定でオンにしたとき（既定オフ）だけ `/api/watch` に
+  push の endpoint とお気に入りのイベントID（最大100件）を送る（`src/hooks/useFavoriteWatch.js`）。
+  Redis: `push:watch:<eventId>`（endpoint の集合）/ `push:watching:<sha256(endpoint)>`（差し替え用）。180日で失効、購読解除で削除。
+  プライバシーポリシーに記載済み（`LEGAL_VERSION` 2026-10-13）
+- 構造化データ: 中止は `EventCancelled`、延期は `EventPostponed`（`scripts/generate-events-html.mjs`）
+- 既知の制約: 自動収集イベントの ID はタイトル・日付から作るため、地本サイト側で名称・日付が変わると ID が変わり、
+  旧 ID の上書き（中止設定等）は表示されなくなる（運営画面で新しいイベントに登録し直す）
+
+## イベント別 FAQ・参加準備ガイド（2026-10-13 導入）
+
+純粋ロジックは **`shared/eventGuide.cjs`**（`shared/eventGuide.test.cjs`）。API は `/api/admin/event-guides`（GET/PUT）。
+保存先・権限・監査は「変更・中止管理」と同じ（手動=本体 / 自動収集=上書き。`MANAGED_KEYS` で上書き保存・取り消し時も残す）。
+
+- FAQ: `faq: [{id, q, a, public}]`（最大20件・並びは配列順・質問120字／回答600字）。非公開は運営画面だけに残る
+- ガイド: `guide: {<項目ID>: {state, text}}`。項目は `GUIDE_ITEMS`（事前申込・参加費・年齢制限・持ち物・推奨服装・駐車場・
+  雨天時・写真撮影・身分証明書・その他）。状態は `unknown`（未確認＝公開しない・既定）/ `na`（該当なし）/ `confirmed`（本文を公開）
+- ⚠️ **未確認・未入力を推測で埋めない**。公開画面は確認済み・該当なしの項目だけを出し、「記載のない項目は公式ページで確認」と添える
+- 公開API（`/api/manual-events`）は `toPublicRecord()` で公開分だけの配列形（`faq:[{id,q,a}]`・`guide:[{id,label,state,text}]`）にして返す
+- 新規登録時はイベントと一緒に `/api/admin/events` POST へ送る。既存イベントは編集画面の「FAQ・参加準備ガイドを保存」で個別保存
+- 削除・終了: 手動イベントは削除時に一緒に消える。自動収集イベントは公開データから外れると表示されなくなり、
+  上書きレコードは運営が取り消すまで残る（同じIDで再掲載された場合に備える）
+
+## イベント別閲覧数（2026-10-13 導入）
+
+純粋ロジックは **`shared/viewStats.cjs`**。計測は `POST /api/view`（公開）、閲覧は `GET /api/admin/view-stats`（運営）。
+数えるのは「イベント詳細が開かれた回数」（**ユニーク人数ではない**）。日付の区切りは JST。
+
+- Redis: `views:total`（hash・累計・失効なし）/ `views:d:<YYYY-MM-DD>`（hash・日別・40日で失効）/
+  `views:seen:<hash>`（重複防止・30分）。1回の計測は SET NX＋HINCRBY×2＋EXPIRE（＋レート制限）
+- 重複防止: 画面はイベントIDが変わったときだけ送る（再描画・状態更新・自動更新で送らない）＋同じタブで30分以内は送らない
+  （sessionStorage `jsdf-viewed`）。サーバーは同じ通信元×UA×イベントを30分に1回（IP は保存せずハッシュのみ。
+  ソルトは `VIEW_HASH_SALT`、未設定なら KV トークン）
+- 数えないもの: ボットの UA・`navigator.webdriver`・運営者ログイン中・Origin なし／`Sec-Fetch-Site` が same-origin 以外・
+  存在しないイベントID・下書き・画面側の重複回避接尾辞（`~2`）付きID。拒否は 202 で黙って捨てる（監査ログを汚さない）
+- 運営側は担当範囲（`canManageScope`）のイベントだけを返す。権限は `event:update`／`event:override`／`audit:read`。
+  統計を書き換える API は無い（計測API以外から変更不可）
+- イベントIDが変わらない限り、スクレイプ・再デプロイで履歴は消えない（Redis に保存）
+
+## 交通・アクセス案内（2026-10-13 導入）
+
+調査結果は **`docs/TRANSIT_API_2026-10.md`**（Google の経路APIは日本の公共交通に非対応・国内の経路APIは有料）。
+純粋ロジックは **`shared/transit.cjs`**、画面は `src/components/AccessGuide.jsx`、経路APIの差し替え口は `api/transit.js`。
+
+- 駅データ: `public/data/stations.json`（国土数値情報 鉄道データ N02・CC BY 4.0。**出典表示が必要**）。
+  `scripts/build-stations.mjs` で年1回程度作り直す（スクレイプ毎には実行しない）。開いた人だけが取得（precache しない・SW で90日保持）
+- 最寄り駅は**直線距離の近い順の候補**を出して利用者に選ばせる（断定しない）。距離は「直線」と明記
+- 目的地は 入場口の座標（運営設定 `access.entrance`）> 天気用座標（accuracy が address/venue/manual のときだけ）> 住所・会場名
+- 経路は Google マップの経路検索ページ（Maps URLs・APIキー不要）へ案内。⚠️ **運賃・所要時間・乗換は経路APIの応答だけを表示し、推測で作らない**
+- `/api/transit` は既定で `not_configured`。有料APIの接続は**承認後**に `PROVIDERS` へアダプタを足し、
+  `TRANSIT_PROVIDER`・`TRANSIT_MONTHLY_LIMIT`（既定0=呼ばない）・各社キーを Vercel に設定する。キーはブラウザに出さない
+- 運営の設定: `access`（入口の名称・緯度経度・推奨最寄り駅・推奨バス停・注意事項・公式アクセスURL）。駐車場はガイドの `parking`。
+  `/api/admin/event-guides` で FAQ・ガイドと一緒に保存（`MANAGED_KEYS` に含めて上書き保存・取り消しでも残す）
+- 位置情報は「現在地から探す」を押したときだけ取得し、保存しない（`vercel.json` の Permissions-Policy は `geolocation=(self)`）
+
 ## フロントエンド仕様
 
 - **地域マップ**: 8地域（北海道・東北・関東・中部・近畿・中国・四国・九州）
@@ -543,6 +630,11 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 | ブランド色の文字用 | `shared/brandColors.cjs` ＋ CSS 変数 `--brand-fg`/`--accent-fg` | 全画面（上記「テーマ」参照） |
 | PWA の色・アイコン・ショートカット | `shared/pwaTheme.cjs` | `vite.config.js`（既定 manifest）／`scripts/generate-manifests.mjs`（配色別）／`scripts/generate-icons.mjs`／`shared/bootTheme.cjs`／`src/App.jsx` |
 | 配信スロット・打ち切り期限・開始位置のずらし | `shared/scrapeDeadline.cjs` | `scraper/index.js`（締切・ローテーション・前回データ引き継ぎ）／`.github/workflows/scrape.yml`（通知の待機時刻） |
+| 変更・中止の種別・連動する開催状況・公開形 | `shared/eventChanges.cjs` | `/api/admin/event-changes`／`/api/manual-events`／詳細・一覧・お気に入り・運営画面 |
+| FAQ・参加準備ガイドの項目・状態・公開形 | `shared/eventGuide.cjs` | `/api/admin/event-guides`／`/api/admin/events`／`/api/manual-events`／詳細・運営画面 |
+| 閲覧数の集計・重複判定・並べ替え | `shared/viewStats.cjs` | `/api/view`／`/api/admin/view-stats`／`src/utils/viewTracker.js`／運営画面 |
+| 駅候補・目的地の決め方・経路URL・経路応答の正規化 | `shared/transit.cjs` | `AccessGuide.jsx`／`/api/transit`／`/api/admin/event-guides` |
+| 管理APIの対象イベントの所属解決 | `api/_eventScope.js` | `/api/admin/overrides`／`/api/admin/event-changes` ほか |
 | 公開URL・許可オリジン | `shared/siteUrl.cjs` | 全体（上記「セキュリティ構成」参照）／`shared/domainNotice.cjs` |
 | ドメイン移行のお知らせを出すか | `shared/domainNotice.cjs` | `src/App.jsx`（`src/components/DomainNotice.jsx` を出す判断） |
 

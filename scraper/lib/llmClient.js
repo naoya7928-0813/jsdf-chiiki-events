@@ -43,6 +43,8 @@ const stats = {
   structured:  0,
   provider:    { groq: 0, gemini: 0 },
   errors:      { groq: 0, gemini: 0 },
+  parseFailures: { groq: 0, gemini: 0 },  // 応答はあったが JSON として読めなかった
+  unanswered:  0,                          // どのプロバイダも答えなかった（キャッシュしていない）
 };
 
 function fetchWithTimeout(url, options = {}, timeoutMs = TIMEOUT_MS) {
@@ -85,7 +87,10 @@ const GROQ_TEXT_PREFER = [/llama-?3\.[3-9]/, /llama-?[4-9]/, /qwen/, /gemma/, /^
 
 const groqTextResolver = new OcrModelResolver({
   provider:   'groq(text)',
-  candidates: [process.env.GROQ_LLM_MODEL, 'llama-3.3-70b-versatile'],
+  // llama-3.3-70b-versatile は公式一覧（console.groq.com/docs/models）では Production だが、
+  // 2026-10 の本番の models API には現れず、discover が qwen/qwen3.8-27b を選んでいた。
+  // 実際に使われているものを明示しておく（discover の警告を毎回出さないため）
+  candidates: [process.env.GROQ_LLM_MODEL, 'llama-3.3-70b-versatile', 'qwen/qwen3.8-27b'],
   listModels: listGroqModels,
   discover:   available => pickByPattern(available, { deny: GROQ_TEXT_DENY, prefer: GROQ_TEXT_PREFER }),
 });
@@ -96,7 +101,8 @@ const GROQ_VISION_PREFER = [/qwen.*\d/, /(vision|-vl-|vl$)/, /(scout|maverick)/,
 
 const groqVisionResolver = new OcrModelResolver({
   provider:   'groq(vision)',
-  candidates: [process.env.GROQ_OCR_MODEL, 'qwen/qwen3.6-27b'],
+  // console.groq.com/docs/vision の唯一の画像入力モデル（2026-10-13 確認。旧 qwen3.6-27b は廃止）
+  candidates: [process.env.GROQ_OCR_MODEL, 'qwen/qwen3.8-27b'],
   listModels: listGroqModels,
   discover:   available => pickByPattern(available, { deny: GROQ_VISION_DENY, prefer: GROQ_VISION_PREFER }),
 });
@@ -163,10 +169,16 @@ async function callGroq({ model, messages, label }) {
   return { ok: true, text: json.choices?.[0]?.message?.content ?? '' };
 }
 
+// 戻り値: { responded: boolean, data: Object|null }
+//   responded=false … 通信エラー・429・モデル無し等で「答えが得られなかった」
+//   responded=true  … API は答えた（data が null なら資料から取り出せなかった）
+// この区別が無いと、一時的な障害の null まで 90 日キャッシュされ、その資料は二度と読み直されない。
+const NO_RESPONSE = Object.freeze({ responded: false, data: null });
+
 async function groqStructured({ resolver, messages, label }) {
-  if (!process.env.GROQ_API_KEY || groqExhausted) return null;
+  if (!process.env.GROQ_API_KEY || groqExhausted) return NO_RESPONSE;
   let model = await resolver.resolve();
-  if (!model) return null;
+  if (!model) return NO_RESPONSE;
 
   for (let attempt = 0; attempt < 2; attempt++) {
     let out;
@@ -175,19 +187,21 @@ async function groqStructured({ resolver, messages, label }) {
     } catch (err) {
       stats.errors.groq++;
       console.warn(`[${label}] Groq 通信エラー: ${err.message}`);
-      return null;
+      return NO_RESPONSE;
     }
     if (out.ok) {
       const parsed = parseJsonLoose(out.text);
       if (parsed) stats.provider.groq++;
-      return parsed;
+      else { stats.parseFailures.groq++; console.warn(`[${label}] Groq 応答を JSON として読めません: ${String(out.text).slice(0, 80)}`); }
+      // JSON として読めない応答は「答えた」とはみなさない（次のプロバイダへ回し、キャッシュもしない）
+      return parsed ? { responded: true, data: parsed } : NO_RESPONSE;
     }
     if (out.status === 429) {
       // 1回だけ待って再試行し、それでも駄目ならこの実行では Groq を使わない
       if (attempt === 0) { console.warn(`[${label}] Groq 429 → 20秒待機`); await sleep(20000); continue; }
       console.warn(`[${label}] Groq 429 継続 → この実行では Groq をスキップ`);
       groqExhausted = true;
-      return null;
+      return NO_RESPONSE;
     }
     stats.errors.groq++;
     console.warn(`[${label}] Groq エラー (${out.status}): ${String(out.body).slice(0, 120)}`);
@@ -196,16 +210,16 @@ async function groqStructured({ resolver, messages, label }) {
       const next = await resolver.resolve();
       if (next && next !== model) { model = next; continue; }
     }
-    return null;
+    return NO_RESPONSE;
   }
-  return null;
+  return NO_RESPONSE;
 }
 
 // ── Gemini ─────────────────────────────────────────────────────
 async function geminiStructured({ parts, label }) {
-  if (!process.env.GEMINI_API_KEY || geminiExhausted) return null;
+  if (!process.env.GEMINI_API_KEY || geminiExhausted) return NO_RESPONSE;
   let model = await geminiResolver.resolve();
-  if (!model) return null;
+  if (!model) return NO_RESPONSE;
 
   for (let attempt = 0; attempt < 2; attempt++) {
     let res;
@@ -228,20 +242,24 @@ async function geminiStructured({ parts, label }) {
     } catch (err) {
       stats.errors.gemini++;
       console.warn(`[${label}] Gemini 通信エラー: ${err.message}`);
-      return null;
+      return NO_RESPONSE;
     }
     if (res.ok) {
       const json   = await res.json();
       const text   = json.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
       const parsed = parseJsonLoose(text);
       if (parsed) stats.provider.gemini++;
-      return parsed;
+      else {
+        stats.parseFailures.gemini++;
+        console.warn(`[${label}] Gemini 応答を JSON として読めません（finishReason=${json.candidates?.[0]?.finishReason || '不明'}）`);
+      }
+      return parsed ? { responded: true, data: parsed } : NO_RESPONSE;
     }
     if (res.status === 429) {
       if (attempt === 0) { console.warn(`[${label}] Gemini 429 → 30秒待機`); await sleep(30000); continue; }
       console.warn(`[${label}] Gemini 429 継続 → この実行では Gemini をスキップ`);
       geminiExhausted = true;
-      return null;
+      return NO_RESPONSE;
     }
     const body = await res.text();
     stats.errors.gemini++;
@@ -251,9 +269,18 @@ async function geminiStructured({ parts, label }) {
       const next = await geminiResolver.resolve();
       if (next && next !== model) { model = next; continue; }
     }
-    return null;
+    return NO_RESPONSE;
   }
-  return null;
+  return NO_RESPONSE;
+}
+
+/** Groq → Gemini の順に試し、最初に答えたものを返す */
+async function firstResponse(tries) {
+  for (const t of tries) {
+    const out = await t();
+    if (out.responded) return out;
+  }
+  return NO_RESPONSE;
 }
 
 // ── 段1: テキストから構造化 ────────────────────────────────────
@@ -284,16 +311,16 @@ async function extractEventFromText(text, opts = {}) {
   ].join('\n');
 
   stats.textCalls++;
-  let raw = await groqStructured({
-    resolver: groqTextResolver,
-    messages: [{ role: 'user', content: prompt }],
-    label,
-  });
-  if (!raw) raw = await geminiStructured({ parts: [{ text: prompt }], label });
+  const out = await firstResponse([
+    () => groqStructured({ resolver: groqTextResolver, messages: [{ role: 'user', content: prompt }], label }),
+    () => geminiStructured({ parts: [{ text: prompt }], label }),
+  ]);
 
-  const result = raw ? normalizeLlmEvent(raw) : null;
+  const result = out.data ? normalizeLlmEvent(out.data) : null;
   if (result) stats.structured++;
-  llmCache.set(key, result, { task: 'text', pref: prefLabel });
+  // どのプロバイダも答えなかった（障害・429）ときはキャッシュしない。次回また試す
+  if (out.responded) llmCache.set(key, result, { task: 'text', pref: prefLabel });
+  else stats.unanswered++;
   return result;
 }
 
@@ -325,31 +352,42 @@ async function extractEventFromImage(base64, mimeType, opts = {}) {
   const prompt = [buildRecheckPrompt({ prefLabel, today }), '', SCHEMA_BLOCK].join('\n');
 
   stats.visionCalls++;
-  let raw = await groqStructured({
-    resolver: groqVisionResolver,
-    messages: [{
-      role: 'user',
-      content: [
-        { type: 'image_url', image_url: { url: `data:${mimeType};base64,${base64}` } },
-        { type: 'text',      text: prompt },
-      ],
-    }],
-    label,
-  });
-  if (!raw) {
-    raw = await geminiStructured({
+  const out = await firstResponse([
+    () => groqStructured({
+      resolver: groqVisionResolver,
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'image_url', image_url: { url: `data:${mimeType};base64,${base64}` } },
+          { type: 'text',      text: prompt },
+        ],
+      }],
+      label,
+    }),
+    () => geminiStructured({
       parts: [
         { inline_data: { mime_type: mimeType, data: base64 } },
         { text: prompt },
       ],
       label,
-    });
-  }
+    }),
+  ]);
 
-  const result = raw ? normalizeLlmEvent(raw) : null;
+  const result = out.data ? normalizeLlmEvent(out.data) : null;
   if (result) stats.structured++;
-  llmCache.set(key, result, { task: 'vision', pref: prefLabel });
+  if (out.responded) llmCache.set(key, result, { task: 'vision', pref: prefLabel });
+  else stats.unanswered++;
   return result;
+}
+
+/**
+ * 段3の画像再抽出がキャッシュ済みかを、API を呼ばずに確かめる。
+ * 条件付きGETで 304 だった資料は本体を持たないため、キャッシュに無ければ本体を取り直す必要がある。
+ * @returns {{hit: boolean, result: Object|null}}
+ */
+function peekImageCache({ cacheKey = '', prefLabel = '' } = {}) {
+  if (!cacheKey) return { hit: false, result: null };
+  return llmCache.get(llmCache.keyFor('vision', `${PROMPT_VERSION}|${prefLabel}`, cacheKey));
 }
 
 function getStats() { return { ...stats, cacheSize: llmCache.size() }; }
@@ -359,13 +397,16 @@ function logStats() {
     + ` テキスト ${stats.textCalls} 件 / 画像 ${stats.visionCalls} 件`
     + ` / キャッシュ再利用 ${stats.cacheHits} 件 / 構造化成功 ${stats.structured} 件`);
   console.log(`  プロバイダ別: ${Object.entries(stats.provider).map(([k, v]) => `${k}=${v}`).join(' ')}`
-    + ` / エラー: ${Object.entries(stats.errors).map(([k, v]) => `${k}=${v}`).join(' ')}`);
+    + ` / エラー: ${Object.entries(stats.errors).map(([k, v]) => `${k}=${v}`).join(' ')}`
+    + ` / JSON読取失敗: ${Object.entries(stats.parseFailures).map(([k, v]) => `${k}=${v}`).join(' ')}`
+    + ` / 無応答(未キャッシュ) ${stats.unanswered} 件`);
 }
 
 module.exports = {
   hasLlm,
   extractEventFromText,
   extractEventFromImage,
+  peekImageCache,
   getStats,
   logStats,
   PROMPT_VERSION,

@@ -80,6 +80,15 @@ registerRoute(
   })
 );
 
+// 全国の鉄道駅（交通アクセス案内）。年1回程度しか変わらない。開いた人だけが取得し、以後はオフラインでも使う
+registerRoute(
+  ({ url }) => url.pathname === '/data/stations.json',
+  new StaleWhileRevalidate({
+    cacheName: 'stations-data',
+    plugins: [new ExpirationPlugin({ maxEntries: 2, maxAgeSeconds: 60 * 60 * 24 * 90, purgeOnQuotaError: true })],
+  })
+);
+
 // 天気予報（詳細画面の遅延取得）。主キャッシュはサーバー側（Redis + CDN）。
 // SW は補助的に「短期間」だけ保持し、再描画のちらつき抑制とネットワーク障害時の
 // フォールバックに限定する（長期間古い予報を返さない）。
@@ -103,15 +112,22 @@ self.addEventListener('push', event => {
   let payload;
   try { payload = event.data.json(); } catch { payload = { title: '自衛隊地本イベント', body: event.data.text() }; }
 
-  const { title = '自衛隊地本イベント', body = '新しいイベントが追加されました', url = '/', badge, icon } = payload;
+  const { title = '自衛隊地本イベント', body = '新しいイベントが追加されました', url = '/', badge, icon, tag } = payload;
+  // 変更・中止のお知らせは変更ごとの tag を持つ（新着通知と上書きし合わない）。URL は自サイト内だけ
+  let safeUrl = '/';
+  try {
+    const u = new URL(String(url || '/'), self.location.origin);
+    if (u.origin === self.location.origin) safeUrl = u.pathname + u.search + u.hash;
+  } catch { /* 不正な URL はトップへ */ }
+  const safeTag = typeof tag === 'string' && /^[\w-]{1,64}$/.test(tag) ? tag : 'jsdf-event';
 
   event.waitUntil(Promise.all([
     self.registration.showNotification(title, {
       body,
       icon:  icon  || '/icons/icon-192.png',
       badge: badge || '/icons/icon-192.png',
-      data:  { url },
-      tag:   'jsdf-event',
+      data:  { url: safeUrl },
+      tag:   safeTag,
       renotify: true,
       vibrate: [100, 50, 100],
     }),

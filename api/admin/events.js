@@ -10,6 +10,8 @@ import { checkOrigin, noStore, requireSameOrigin, rateLimit, requireAuth, hasPer
 import W from '../../shared/weather.cjs';
 import { normalizeBranches } from '../../shared/branch.cjs';
 import { normalizeTags } from '../../shared/tags.cjs';
+import G from '../../shared/eventGuide.cjs';
+import T from '../../shared/transit.cjs';
 
 const KEY = 'manual:events';
 const MAX_EVENTS = 500;
@@ -21,7 +23,8 @@ const PREFS = new Set([
   'hyogo','nara','wakayama','tottori','shimane','okayama','hiroshima','yamaguchi','tokushima','kagawa',
   'ehime','kochi','fukuoka','saga','nagasaki','kumamoto','oita','miyazaki','kagoshima','okinawa',
 ]);
-const STATUSES = new Set(['draft', 'published', 'closed', 'cancelled']);
+// postponed（延期）は通常 /api/admin/event-changes で理由とともに登録するが、状態の切替でも受け付ける
+const STATUSES = new Set(['draft', 'published', 'closed', 'cancelled', 'postponed']);
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const WD = ['日', '月', '火', '水', '木', '金', '土'];
 const weekdayOf = d => { const t = new Date(d + 'T00:00:00Z'); return Number.isNaN(t.getTime()) ? '' : WD[t.getUTCDay()]; };
@@ -79,6 +82,19 @@ function buildEvent(input, account) {
   // 属性タグ（オンライン・家族向け・抽選 等）。公開側の絞り込みチップと同じ定義を使う。
   // 申込要否(tag)とは別物なので混ぜない（tag は「要予約/予約不要/…」の単一値）。
   const tags = normalizeTags(e.tags);
+  // FAQ・参加準備ガイド（任意。登録後は /api/admin/event-guides で編集する）
+  const faqIn = G.normalizeFaqInput(e.faq);
+  if (faqIn.error) return { error: faqIn.error };
+  const guideIn = G.normalizeGuideInput(e.guide);
+  if (guideIn.error) return { error: guideIn.error };
+  const accessIn = T.normalizeAccessInput(e.access);
+  if (accessIn.error) return { error: accessIn.error };
+  const guideFields = {
+    ...(faqIn.faq.length ? { faq: faqIn.faq } : {}),
+    ...(Object.keys(guideIn.guide).length ? { guide: guideIn.guide } : {}),
+    ...(Object.keys(accessIn.access).length ? { access: accessIn.access } : {}),
+  };
+  if (Object.keys(guideFields).length) guideFields.guideUpdatedAt = new Date().toISOString();
   const manualLoc = parseManualCoords(e.weatherLocation);
   const weather = manualLoc
     ? { weatherLocation: manualLoc }
@@ -104,6 +120,7 @@ function buildEvent(input, account) {
       deadline: cleanText(e.deadline, 40) || null,              // 締切（例: 7月20日（金））
       url,
       notes:   cleanText(e.notes, 300) || null,
+      ...guideFields,
       ...weather,
       status,
       source_type: 'manual',
@@ -238,7 +255,7 @@ export default async function handler(req, res) {
       ev.updatedBy = account.displayId;  // 編集した操作者（仮名・公開には出さない）
       await redis.hset(KEY, { [id]: JSON.stringify(ev) });
       const note = patch.status !== undefined
-        ? `状態→${({ draft: '下書き', published: '公開', closed: '締切', cancelled: '中止' })[ev.status] || ev.status}`
+        ? `状態→${({ draft: '下書き', published: '公開', closed: '締切', cancelled: '中止', postponed: '延期' })[ev.status] || ev.status}`
         : '内容を編集';
       await writeAudit(account, { action: 'event.update', result: 'success', targetId: id, organization: ev.pref, office: ev.office, title: ev.title, before, after: ev, note });
       return res.status(200).json({ ok: true, event: ev });

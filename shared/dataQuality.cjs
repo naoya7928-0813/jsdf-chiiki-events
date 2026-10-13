@@ -131,7 +131,7 @@ function validateEventsData(data, opts = {}) {
       // status（受付終了/中止）— 許可値・根拠・整合
       if (ev.status != null && ev.status !== '') {
         if (!STATUS_VALUES.has(ev.status)) {
-          errors.push(`${loc} status が不正: "${ev.status}"（許可: published/closed/cancelled/draft）`);
+          errors.push(`${loc} status が不正: "${ev.status}"（許可: published/closed/cancelled/postponed/draft）`);
         }
         if (ev.status === 'cancelled' && !(ev.statusReason && String(ev.statusReason).trim())) {
           warnings.push(`${loc} cancelled なのに statusReason が空です`);

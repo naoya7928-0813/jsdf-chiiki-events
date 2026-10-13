@@ -9,52 +9,18 @@
 import { checkOrigin, noStore, requireSameOrigin, rateLimit, requireAuth, hasPermission, canManageScope, redis, cleanText, writeAudit } from '../_security.js';
 import { normalizeBranches } from '../../shared/branch.cjs';
 import { normalizeTags } from '../../shared/tags.cjs';
-import { normalizeOrigin, DEFAULT_SITE_URL } from '../../shared/siteUrl.cjs';
+import { resolveEventScope, OVERRIDE_KEY } from '../_eventScope.js';
 
-const OKEY = 'manual:overrides';
-const MKEY = 'manual:events';
+const OKEY = OVERRIDE_KEY;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const WD = ['日', '月', '火', '水', '木', '金', '土'];
 const weekdayOf = d => { const t = new Date(d + 'T00:00:00Z'); return Number.isNaN(t.getTime()) ? '' : WD[t.getUTCDay()]; };
 
-// events.json の id→pref マップ（短期キャッシュ）。スクレイプイベントの所属解決用。
-let eventsMap = { at: 0, map: null };
-async function loadEventsMap(req) {
-  const now = Date.now();
-  if (eventsMap.map && now - eventsMap.at < 60000) return eventsMap.map;
-  // SITE_URL が設定されていればそれを優先（従来どおり）。未設定なら自分のホスト、
-  // それも無ければ既定の公開URL。値の妥当性は normalizeOrigin で検証する
-  const base = normalizeOrigin(process.env.SITE_URL)
-    || (req.headers.host ? `https://${req.headers.host}` : DEFAULT_SITE_URL);
-  const map = new Map();
-  try {
-    const r = await fetch(`${base}/data/events.json`, { signal: AbortSignal.timeout(5000) });
-    if (r.ok) {
-      const data = await r.json();
-      for (const k of Object.keys(data)) {
-        if (!Array.isArray(data[k])) continue;
-        for (const ev of data[k]) if (ev && ev.id) map.set(ev.id, { pref: ev.pref || k, office: ev.office || '' });
-      }
-    }
-  } catch { /* 取得失敗時は空マップ（手動イベントのみ解決可） */ }
-  eventsMap = { at: now, map };
-  return map;
-}
-
-/**
- * 対象イベントの所属（地本・事務所）をサーバー側で解決（手動イベント→events.json の順）。
- * 未知は null。スクレイプイベントは office を持たないことが多く、その場合 office='' を返す
- * （= office ロールは canManageScope の deny-by-default で 403、pco_admin 以上のみ操作可能）。
- * @returns {{pref:string, office:string}|null}
- */
-async function resolveEventScope(req, id) {
-  try {
-    const raw = await redis.hget(MKEY, id);
-    if (raw) { const ev = typeof raw === 'string' ? JSON.parse(raw) : raw; return { pref: ev.pref || '', office: ev.office || '' }; }
-  } catch { /* noop */ }
-  const map = await loadEventsMap(req);
-  return map.get(id) || null;
-}
+// 変更・中止の管理（/api/admin/event-changes）と FAQ・参加準備ガイド（/api/admin/event-guides）が
+// 同じ上書きレコードに書く項目。内容の上書き保存・取り消しでは消さずに引き継ぐ
+// （ここを落とすと、表示内容を直しただけで「中止」の設定やFAQが消える）。
+const MANAGED_KEYS = ['status', 'changes', 'changesUpdatedAt', 'faq', 'guide', 'access', 'guideUpdatedAt'];
+const pickManaged = (rec) => Object.fromEntries(MANAGED_KEYS.filter(k => rec && rec[k] !== undefined).map(k => [k, rec[k]]));
 
 function buildPatch(input) {
   const e = input || {};
@@ -135,7 +101,7 @@ export default async function handler(req, res) {
     try {
       const prevRaw = await redis.hget(OKEY, id);
       const before = prevRaw ? (typeof prevRaw === 'string' ? JSON.parse(prevRaw) : prevRaw) : null;
-      const record = { ...built.patch, _pref: scope.pref, _office: scope.office, _by: account.displayId, _at: new Date().toISOString() };
+      const record = { ...pickManaged(before), ...built.patch, _pref: scope.pref, _office: scope.office, _by: account.displayId, _at: new Date().toISOString() };
       await redis.hset(OKEY, { [id]: JSON.stringify(record) });
       await writeAudit(account, { action: 'override.save', result: 'success', targetId: id, organization: scope.pref, office: scope.office, title: built.patch.title || '', before, after: record, note: '一覧イベントを上書き修正' });
       return res.status(200).json({ ok: true });
@@ -158,8 +124,14 @@ export default async function handler(req, res) {
         await writeAudit(account, { action: 'override.clear', result: 'denied', targetId: id, organization: scope.pref, office: scope.office, note: '担当外イベント（office不一致/未割当を含む）' });
         return res.status(403).json({ error: '担当範囲のイベントのみ操作できます' });
       }
-      await redis.hdel(OKEY, id);
-      await writeAudit(account, { action: 'override.clear', result: 'success', targetId: id, organization: scope.pref, office: scope.office, before, note: '上書きを取り消し' });
+      // 表示内容の上書きだけを取り消す。開催状況・変更のお知らせ・FAQ 等は残す（別画面で個別に取り消す）
+      const kept = pickManaged(before);
+      if (Object.keys(kept).length) {
+        await redis.hset(OKEY, { [id]: JSON.stringify({ ...kept, _pref: scope.pref, _office: scope.office, _by: account.displayId, _at: new Date().toISOString() }) });
+      } else {
+        await redis.hdel(OKEY, id);
+      }
+      await writeAudit(account, { action: 'override.clear', result: 'success', targetId: id, organization: scope.pref, office: scope.office, before, note: Object.keys(kept).length ? '上書きを取り消し（開催状況・お知らせ・FAQ等は維持）' : '上書きを取り消し' });
       return res.status(200).json({ ok: true });
     } catch (err) { console.error('[overrides] DELETE', err); return res.status(500).json({ error: 'failed to delete' }); }
   }

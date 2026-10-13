@@ -227,13 +227,16 @@ export function ErrorBanner({ message }) {
   );
 }
 
-// ─── 状態バッジ（中止 / 受付終了） ───────────────────────────
+// ─── 状態バッジ（中止 / 延期 / 受付終了） ─────────────────────
 // スクレイパー/運営が付与した status を利用者に明確に表示する。
 //   cancelled → 「中止」（赤・目立つ）
+//   postponed → 「延期」（紫。運営の登録でのみ付く）
 //   closed    → 「受付終了」（オレンジ）
 // published / 未設定は何も表示しない（通常イベント）。size='sm' は一覧カード用。
 const STATUS_BADGE = {
   cancelled: { label: '中止', bg: '#dc2626' },
+  // 延期は「中止ではないが、その日には開催しない」。中止の赤・受付終了の橙と見分けられる紫
+  postponed: { label: '延期', bg: '#7c3aed' },
   closed:    { label: '受付終了', bg: '#b45309' },
 };
 export function StatusBadge({ status, size = 'sm' }) {

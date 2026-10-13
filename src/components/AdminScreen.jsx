@@ -9,6 +9,9 @@ import { TAG_DEFS, normalizeTags } from '../../shared/tags.cjs';
 import PastEventsPanel from './PastEventsPanel';
 import PresencePanel from './PresencePanel';
 import ReportsPanel from './ReportsPanel';
+import EventChangesPanel from './EventChangesPanel';
+import EventGuidePanel, { EventGuideEditor, EMPTY_GUIDE_VALUE } from './EventGuidePanel';
+import ViewStatsPanel, { EventViewStats } from './ViewStatsPanel';
 import { useIsDesktop } from '../hooks/useBreakpoint';
 
 // 広い画面での本文の最大幅（公開ページと同じ判定・設定でレイアウトを切り替える）。
@@ -30,13 +33,14 @@ const CATEGORIES = ['説明会', '採用イベント', '一般公開', '艦艇�
 const APPLY_OPTS = ['', '要予約', '予約不要', '事前申込制', '入場無料', '要問合せ'];
 // closed は「受付終了」（申込・受付が終了。イベント自体は開催予定/済み）。公開側 StatusBadge・
 // 状態モデル(CLAUDE.md)と表記を統一する。※ 申込締切の「日付」欄(申込締切)とは別概念。
-const STATUS_LABEL = { draft: '下書き', published: '公開中', closed: '受付終了', cancelled: '中止' };
-const STATUS_COLOR = { draft: '#888', published: '#16a34a', closed: '#b45309', cancelled: '#ef4444' };
+const STATUS_LABEL = { draft: '下書き', published: '公開中', closed: '受付終了', cancelled: '中止', postponed: '延期' };
+const STATUS_COLOR = { draft: '#888', published: '#16a34a', closed: '#b45309', cancelled: '#ef4444', postponed: '#7c3aed' };
 const ACTION_LABEL = {
   add: '登録', update: '編集', status: '状態変更', delete: '削除', override: '上書き修正', 'override-clear': '上書き取消',
   'event.create': '登録', 'event.update': '編集', 'event.delete': '削除',
   'override.save': '上書き修正', 'override.clear': '上書き取消',
   'auth.login': 'ログイン', 'auth.logout': 'ログアウト', 'audit.read': '監査閲覧',
+  'event.guide': 'FAQ・ガイド更新', 'event.change': '変更・中止の登録', 'event.change.notify': '変更の通知', 'event.change.visibility': '変更の公開切替', 'event.change.delete': '変更の取消',
 };
 const PREF_ENTRIES = Object.entries(PREFECTURE_INFO);
 // 認証はサーバー側セッション(HttpOnly Cookie)。localStorage には非機密のアカウント情報のみ保持し、
@@ -120,6 +124,8 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const [pInput, setPInput] = useState('');
   const [authErr, setAuthErr] = useState('');
   const [form, setForm] = useState(EMPTY);
+  // 新規登録時の FAQ・参加準備ガイド（イベントと一緒に送る。既存イベントは EventGuidePanel が個別に保存）
+  const [guideValue, setGuideValue] = useState(EMPTY_GUIDE_VALUE);
   const [list, setList] = useState([]);
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
@@ -139,6 +145,8 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const canAddDelete = perms.has('event:delete');
   const canSeePresence = perms.has('account:read'); // 在席状況（所長・担当官のみ）
   const canSeeReports = perms.has('report:read'); // 利用者からの報告（所長・担当官のみ）
+  // 閲覧数（担当範囲のイベントのみ。サーバー側でも同じ権限で判定する）
+  const canSeeViews = perms.has('event:update') || perms.has('event:override') || perms.has('audit:read');
   const org = account?.organization ?? account?.pref ?? '*';
   // 画面幅の区分は公開ページと共通（useBreakpoint・表示の向き設定を含む）
   const isDesktop = useIsDesktop();
@@ -295,11 +303,11 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         };
         delete payload.multiDay; delete payload.timeStart; delete payload.timeEnd;
         delete payload.lat; delete payload.lon;
-        const r = await adminFetch('/api/admin/events', { method: 'POST', body: JSON.stringify({ event: { ...payload, status } }) });
+        const r = await adminFetch('/api/admin/events', { method: 'POST', body: JSON.stringify({ event: { ...payload, status, faq: guideValue.faq, guide: guideValue.guide, access: guideValue.access } }) });
         const j = await r.json().catch(() => ({}));
         if (r.ok) {
           setMsg({ type: 'ok', text: status === 'published' ? '公開しました（全利用者に表示）。' : '下書き保存しました。' });
-          setForm(f => ({ ...EMPTY, pref: f.pref, category: f.category })); setPreview(false); loadList();
+          setForm(f => ({ ...EMPTY, pref: f.pref, category: f.category })); setGuideValue(EMPTY_GUIDE_VALUE); setPreview(false); loadList();
         } else setMsg({ type: 'err', text: j.error || '保存に失敗しました。' });
       }
     } catch { setMsg({ type: 'err', text: '通信に失敗しました。' }); }
@@ -390,20 +398,22 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const isPastView = filter === 'past';
   const isPresenceView = filter === 'presence';
   const isReportsView = filter === 'reports';
+  const isViewsView = filter === 'views';
   // タブ定義（在席状況・報告は権限を持つロールのみ）
   const TABS = [['all', '公開中'], ['draft', '下書き'], ['past', '終了済み']];
+  if (canSeeViews) TABS.push(['views', '閲覧数']);
   if (canSeeReports) TABS.push(['reports', '報告']);
   if (canSeePresence) TABS.push(['presence', '在席状況']);
   // 下書き確認ページでは登録フォームを出さない（編集時のみ表示）。追加修正ページは常時表示。
   const showForm = (filter === 'all') || !!editingId; // 'draft'・'past' ではフォームを出さない（編集時を除く）
   // 2列にするのは「フォーム」と「一覧」を同時に出す画面だけ（過去・在席・報告の各パネルは1列で広く使う）
-  const twoCol = isDesktop && scrollWidth >= TWO_COL_MIN && showForm && !isPastView && !isPresenceView && !isReportsView;
+  const twoCol = isDesktop && scrollWidth >= TWO_COL_MIN && showForm && !isPastView && !isPresenceView && !isReportsView && !isViewsView;
   // 本文の枠: 2列・各パネルは CONTENT_MAX まで。フォームを1列で出すときは設定画面と同じ 720px に抑える
   const contentBox = !isDesktop ? undefined
     : { ...centered, maxWidth: (showForm && !twoCol) ? 720 : CONTENT_MAX };
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)', fontFamily: F.sans }}>
-      <ScreenHeader primary={primary} title={editingId ? '編集' : (filter === 'draft' ? '下書き確認' : filter === 'past' ? '過去イベント' : filter === 'presence' ? '在席状況' : filter === 'reports' ? '利用者からの報告' : 'イベント追加・修正')} subtitle="ADMIN"
+      <ScreenHeader primary={primary} title={editingId ? '編集' : (filter === 'draft' ? '下書き確認' : filter === 'past' ? '過去イベント' : filter === 'presence' ? '在席状況' : filter === 'reports' ? '利用者からの報告' : filter === 'views' ? '閲覧数' : 'イベント追加・修正')} subtitle="ADMIN"
         onBack={(editingId && !fromDetail) ? cancelEdit : onBack}
         trailing={<button onClick={logout} style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', borderRadius: 8, fontSize: 12, padding: '6px 10px', cursor: 'pointer' }}>ログアウト</button>} />
       {/* タブ（追加・修正／下書き／過去／在席状況）。1ページで全機能にアクセス */}
@@ -635,6 +645,37 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         <div style={hint}>詳細画面に表示されます。ここに書いた語はタグの自動判定にも使われます（例:「抽選」「オンライン」）。</div>
         {editingId && editingDeadline && <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginBottom: 12 }}>現在の締切: {editingDeadline}（締切欄を空のままなら保持されます）</div>}
 
+        {/* 閲覧統計（既存イベントのみ） */}
+        {editingId && canSeeViews && (
+          <>
+            <SectionLabel>閲覧統計</SectionLabel>
+            <EventViewStats key={`views-${editingId}`} eventId={editingId} adminFetch={adminFetch} primary={primary} />
+          </>
+        )}
+
+        {/* よくある質問・参加準備ガイド。新規はイベントと一緒に、既存は個別に保存する */}
+        <SectionLabel>よくある質問・参加準備ガイド・交通アクセス</SectionLabel>
+        {editingId
+          ? <EventGuidePanel key={`guide-${editingId}`} eventId={editingId} adminFetch={adminFetch} primary={primary} styles={{ input, label, hint }} />
+          : <EventGuideEditor value={guideValue} onChange={setGuideValue} styles={{ input, label, hint }} primary={primary} />}
+
+        {/* 開催状況（中止・延期・受付終了）と変更のお知らせ。既存イベントの編集時のみ。
+            内容の「変更を更新する」とは別に、その場で登録・公開される（変更履歴として残る） */}
+        {editingId && (
+          <>
+            <SectionLabel>開催状況・変更のお知らせ</SectionLabel>
+            <EventChangesPanel
+              key={editingId}
+              eventId={editingId}
+              adminFetch={adminFetch}
+              primary={primary}
+              canPublish={perms.has('event:publish')}
+              onChanged={loadList}
+              styles={{ input, label, hint }}
+            />
+          </>
+        )}
+
         <button onClick={() => setPreview(p => !p)} style={{ width: '100%', padding: 12, borderRadius: 10, marginBottom: 12, cursor: 'pointer', background: 'transparent', border: '1px solid var(--border)', color: 'var(--text)', fontSize: 13, fontWeight: 600 }}>{preview ? 'プレビューを隠す' : 'プレビュー（カード表示イメージ）'}</button>
         {preview && <PreviewCard form={form} primary={primary} prefLabel={isScoped ? prefLabel : (PREFECTURE_INFO[form.pref]?.label || form.pref)} />}
 
@@ -677,10 +718,13 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         {isPresenceView && <PresencePanel adminFetch={adminFetch} primary={primary} />}
 
         {/* 利用者からの報告（report:read を持つロールのみ・別画面） */}
+        {/* イベント別の閲覧数（担当範囲のみ・閲覧専用） */}
+        {isViewsView && <ViewStatsPanel adminFetch={adminFetch} primary={primary} />}
+
         {isReportsView && <ReportsPanel adminFetch={adminFetch} primary={primary} account={account} onUnreadChange={loadReportUnread} canManage={perms.has('report:manage')} />}
 
         {/* 一覧 + 出力 + 履歴（現在・今後／下書き） */}
-        {!isPastView && !isPresenceView && !isReportsView && (<>
+        {!isPastView && !isPresenceView && !isReportsView && !isViewsView && (<>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', flex: 1 }}>{filter === 'draft' ? '下書き一覧' : '公開中のイベント'}（{shown.length}）</div>
           <button onClick={exportCSV} disabled={!list.length} style={miniOut(primary)}>CSV</button>

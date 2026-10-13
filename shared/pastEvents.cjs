@@ -11,7 +11,7 @@
 
 const { isRealDate } = require('./weather.cjs');
 
-const STATUSES = new Set(['published', 'draft', 'closed', 'cancelled']);
+const STATUSES = new Set(['published', 'draft', 'closed', 'cancelled', 'postponed']);
 
 /** 終了判定に使う実効日（連日開催は終了日、無ければ開催日）。 */
 function effectiveDate(ev) {

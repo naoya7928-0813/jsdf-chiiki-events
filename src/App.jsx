@@ -14,6 +14,7 @@ import { themeColorFor, manifestPathFor, appleTouchIconFor } from '../shared/pwa
 import { decideDomainNotice, isLegacyHost, NOTICE_KEY, NOTICE_VERSION } from '../shared/domainNotice.cjs';
 import { jstTodayStr } from './utils/date';
 import { usePushSubscribed } from './hooks/usePushSubscribed';
+import { useFavoriteWatch } from './hooks/useFavoriteWatch';
 import { setBadgeCount } from './utils/appBadge';
 import SideNav from './components/SideNav';
 import ConsentGate from './components/ConsentGate';
@@ -523,6 +524,8 @@ export default function App({ operator = false }) {
   // アプリを閉じている間は Service Worker が push のたびに +1 しており、
   // ここで実際の未読件数に入れ直す（既読にすれば消える）。
   const pushSubscribed = usePushSubscribed();
+  // 「お気に入りの変更・中止を通知」がオンなら、お気に入りのイベントIDを通知の宛先と結び付ける
+  useFavoriteWatch(favorites);
   useEffect(() => {
     if (operator) return;
     // null = 購読しているか判定中。ここで消すと、閉じている間に Service Worker が
