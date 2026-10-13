@@ -1,6 +1,6 @@
 // 在席状況（プレゼンス）の純粋ロジック（I/O 無し）。
 // 「最終アクティビティ時刻」から在席状態を判定し、閲覧者のスコープ内メンバー一覧を組み立てる。
-// I/O（Redis からの最終アクセス取得・アカウント解決）は api/_security.js / api/admin/presence.js が担当する。
+// I/O（Redis からの最終アクセス取得・アカウント解決）は api/_security.js / api/admin/_presence.js が担当する。
 'use strict';
 
 // 状態のしきい値（秒）。online ≤ onlineSec ＜ away ≤ awaySec ＜ offline。

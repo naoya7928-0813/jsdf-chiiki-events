@@ -51,7 +51,7 @@ function mockRes() {
   return r;
 }
 async function call(method, headers = {}, query = {}) {
-  const handler = (await import('../api/admin/past-events.js')).default;
+  const handler = (await import('../api/admin/_past-events.js')).default;
   const res = mockRes();
   await handler({ method, headers, query }, res);
   return res;

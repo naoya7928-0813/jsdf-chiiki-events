@@ -73,7 +73,7 @@ test('allowedOrigins: SITE_ORIGINS の不正値は捨てる（全許可にしな
 test('公開URLをコードに直書きしていない（shared/siteUrl.cjs 以外）', () => {
   const files = [
     'scripts/generate-events-html.mjs', 'scripts/indexnow.mjs',
-    'api/og.js', 'api/_security.js', 'api/admin/overrides.js', 'api/admin/past-events.js',
+    'api/og.js', 'api/_security.js', 'api/admin/_overrides.js', 'api/admin/_past-events.js',
     'src/utils/calendar.js', 'vite.config.js',
   ];
   for (const f of files) {
