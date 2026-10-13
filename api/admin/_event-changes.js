@@ -16,6 +16,7 @@ import { checkOrigin, noStore, requireSameOrigin, rateLimit, requireAuth, hasPer
 import { findEvent, MANUAL_KEY, OVERRIDE_KEY, EVENT_ID_RE } from '../_eventScope.js';
 import { sendToWatchers } from '../_push.js';
 import C from '../../shared/eventChanges.cjs';
+import { withLog } from '../../shared/editLog.cjs';
 
 const WD = ['日', '月', '火', '水', '木', '金', '土'];
 const weekdayOf = d => { const t = new Date(d + 'T00:00:00Z'); return Number.isNaN(t.getTime()) ? '' : WD[t.getUTCDay()]; };
@@ -113,6 +114,7 @@ export default async function handler(req, res) {
       } else {
         next = { ...next, _pref: found.pref, _office: found.office, _by: account.displayId, _at: entry.at };
       }
+      next = withLog(next, { by: account.displayId, action: 'change', note: def.label, at: entry.at });
       await redis.hset(key, { [id]: JSON.stringify(next) });
       await writeAudit(account, {
         action: 'event.change', result: 'success', targetId: id, organization: found.pref, office: found.office,
@@ -162,7 +164,7 @@ export default async function handler(req, res) {
       const next = C.setChangeVisibility(record, changeId, req.body?.public === true);
       if (!next) return res.status(404).json({ error: '変更記録が見つかりません' });
       const stamp = found.kind === 'manual' ? { updatedBy: account.displayId } : { _pref: found.pref, _office: found.office, _by: account.displayId, _at: new Date().toISOString() };
-      await redis.hset(key, { [id]: JSON.stringify({ ...next, ...stamp }) });
+      await redis.hset(key, { [id]: JSON.stringify(withLog({ ...next, ...stamp }, { by: account.displayId, action: 'change-edit', note: req.body?.public === true ? '公開に切り替え' : '非公開に切り替え' })) });
       await writeAudit(account, { action: 'event.change.visibility', result: 'success', targetId: id, organization: found.pref, office: found.office, title: current.title || '', note: `${changeId} を${req.body?.public === true ? '公開' : '非公開'}に` });
       return res.status(200).json({ ok: true });
     }
@@ -173,7 +175,7 @@ export default async function handler(req, res) {
       const out = C.removeChange(record, changeId);
       if (!out) return res.status(404).json({ error: '変更記録が見つかりません' });
       const stamp = found.kind === 'manual' ? { updatedBy: account.displayId } : { _pref: found.pref, _office: found.office, _by: account.displayId, _at: new Date().toISOString() };
-      await redis.hset(key, { [id]: JSON.stringify({ ...out.next, ...stamp }) });
+      await redis.hset(key, { [id]: JSON.stringify(withLog({ ...out.next, ...stamp }, { by: account.displayId, action: 'change-edit', note: '記録を取り消し' })) });
       await writeAudit(account, { action: 'event.change.delete', result: 'success', targetId: id, organization: found.pref, office: found.office, title: current.title || '', before: out.removed, note: `変更記録「${C.CHANGE_TYPES[out.removed.type].label}」を取り消し（開催状況は変更しない）` });
       return res.status(200).json({ ok: true });
     }

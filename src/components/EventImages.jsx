@@ -1,5 +1,5 @@
 // イベント詳細の画像枠。表示の可否は shared/eventImages.cjs の decideImageDisplay が決める。
-// 現在は全体スイッチ（EVENT_IMAGES_ENABLED）が false のため「（現在用意中）」だけを表示する。
+// 現在は全体スイッチ（EVENT_IMAGES_ENABLED）が false のため「（現在準備中）」だけを表示する。
 import { SectionTitle } from './Shared';
 import { decideImageDisplay } from '../../shared/eventImages.cjs';
 
@@ -11,7 +11,7 @@ export default function EventImages({ ev, enabled }) {
       <SectionTitle>画像</SectionTitle>
       {d.state === 'preparing' ? (
         <div style={{ background: 'var(--card)', borderRadius: 12, border: '1px solid var(--border)', padding: '14px 16px', fontSize: 13.5, color: 'var(--text-muted)' }}>
-          （現在用意中）
+          （現在準備中）
         </div>
       ) : (
         <div style={{ display: 'grid', gap: 10 }}>

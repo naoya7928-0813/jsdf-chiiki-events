@@ -8,8 +8,9 @@
 // サーバー側で実データ（Redis 手動イベント / events.json）から解決して権限判定する。
 import { checkOrigin, noStore, requireSameOrigin, rateLimit, requireAuth, hasPermission, canManageScope, redis, cleanText, writeAudit } from '../_security.js';
 import { normalizeBranches } from '../../shared/branch.cjs';
-import { normalizeTags } from '../../shared/tags.cjs';
+import { normalizeTags, tagConflict } from '../../shared/tags.cjs';
 import { resolveEventScope, OVERRIDE_KEY } from '../_eventScope.js';
+import { withLog } from '../../shared/editLog.cjs';
 
 const OKEY = OVERRIDE_KEY;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -19,7 +20,8 @@ const weekdayOf = d => { const t = new Date(d + 'T00:00:00Z'); return Number.isN
 // 変更・中止の管理（/api/admin/event-changes）と FAQ・参加準備ガイド（/api/admin/event-guides）が
 // 同じ上書きレコードに書く項目。内容の上書き保存・取り消しでは消さずに引き継ぐ
 // （ここを落とすと、表示内容を直しただけで「中止」の設定やFAQが消える）。
-const MANAGED_KEYS = ['status', 'changes', 'changesUpdatedAt', 'faq', 'guide', 'access', 'guideUpdatedAt'];
+// _log（編集記録）・images（画像）も残す。落とすと誰が修正したかの記録・登録した画像が消える
+const MANAGED_KEYS = ['status', 'changes', 'changesUpdatedAt', 'faq', 'guide', 'access', 'guideUpdatedAt', 'images', 'imagesHidden', '_log'];
 const pickManaged = (rec) => Object.fromEntries(MANAGED_KEYS.filter(k => rec && rec[k] !== undefined).map(k => [k, rec[k]]));
 
 function buildPatch(input) {
@@ -49,6 +51,11 @@ function buildPatch(input) {
   if (e.tags !== undefined) {
     const t = normalizeTags(e.tags);
     o.tags = t.length ? t : null;
+  }
+  // 同時に選べないタグ（入場無料⇔要予約・家族向け⇔学生向け。申込要否も含む）
+  if (e.tags !== undefined || e.tag !== undefined) {
+    const conflict = tagConflict(o.tags || [], o.tag !== undefined ? o.tag : e.tag);
+    if (conflict) return { error: conflict };
   }
   if (o.title !== undefined && !o.title) return { error: 'タイトルは必須です' };
   return { patch: o };
@@ -101,7 +108,8 @@ export default async function handler(req, res) {
     try {
       const prevRaw = await redis.hget(OKEY, id);
       const before = prevRaw ? (typeof prevRaw === 'string' ? JSON.parse(prevRaw) : prevRaw) : null;
-      const record = { ...pickManaged(before), ...built.patch, _pref: scope.pref, _office: scope.office, _by: account.displayId, _at: new Date().toISOString() };
+      const record = withLog({ ...pickManaged(before), ...built.patch, _pref: scope.pref, _office: scope.office, _by: account.displayId, _at: new Date().toISOString() },
+        { by: account.displayId, action: 'override', before: before || {} });
       await redis.hset(OKEY, { [id]: JSON.stringify(record) });
       await writeAudit(account, { action: 'override.save', result: 'success', targetId: id, organization: scope.pref, office: scope.office, title: built.patch.title || '', before, after: record, note: '一覧イベントを上書き修正' });
       return res.status(200).json({ ok: true });
@@ -127,7 +135,7 @@ export default async function handler(req, res) {
       // 表示内容の上書きだけを取り消す。開催状況・変更のお知らせ・FAQ 等は残す（別画面で個別に取り消す）
       const kept = pickManaged(before);
       if (Object.keys(kept).length) {
-        await redis.hset(OKEY, { [id]: JSON.stringify({ ...kept, _pref: scope.pref, _office: scope.office, _by: account.displayId, _at: new Date().toISOString() }) });
+        await redis.hset(OKEY, { [id]: JSON.stringify(withLog({ ...kept, _pref: scope.pref, _office: scope.office, _by: account.displayId, _at: new Date().toISOString() }, { by: account.displayId, action: 'override-clear' })) });
       } else {
         await redis.hdel(OKEY, id);
       }

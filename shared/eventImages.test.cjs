@@ -7,7 +7,7 @@ const { EVENT_IMAGES_ENABLED, decideImageDisplay, normalizeImages, safeImageUrl,
 
 const OK_IMG = { url: 'https://www.mod.go.jp/pco/tokyo/img/a.jpg', alt: '会場の様子', credit: '自衛隊東京地方協力本部ホームページ（https://www.mod.go.jp/pco/tokyo/）', rightsConfirmed: true, public: true };
 
-test('現在は全体スイッチが off で、どのイベントも「（現在用意中）」', () => {
+test('現在は全体スイッチが off で、どのイベントも「（現在準備中）」', () => {
   assert.equal(EVENT_IMAGES_ENABLED, false);
   assert.deepEqual(decideImageDisplay({ images: [OK_IMG] }), { state: 'preparing' });
   assert.deepEqual(decideImageDisplay({}), { state: 'preparing' });

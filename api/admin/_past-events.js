@@ -65,7 +65,7 @@ function archiveCandidates() {
   ];
 }
 
-async function loadArchive() {
+export async function loadArchive() {
   const now = Date.now();
   if (archiveCache.events && now - archiveCache.at < 60000) return archiveCache.events;
   let events = [];

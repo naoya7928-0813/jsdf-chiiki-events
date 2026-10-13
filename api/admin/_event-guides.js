@@ -15,6 +15,7 @@ import { checkOrigin, noStore, requireSameOrigin, rateLimit, requireAuth, hasPer
 import { findEvent, MANUAL_KEY, OVERRIDE_KEY, EVENT_ID_RE } from '../_eventScope.js';
 import G from '../../shared/eventGuide.cjs';
 import T from '../../shared/transit.cjs';
+import { withLog } from '../../shared/editLog.cjs';
 
 const parse = (raw) => (typeof raw === 'string' ? JSON.parse(raw) : raw);
 const MAX_BODY_CHARS = 40000;   // FAQ 20件×600字 + ガイドで十分。巨大な送信を受け付けない
@@ -73,7 +74,7 @@ export default async function handler(req, res) {
     if (found.kind === 'manual') { next.updatedAt = now; next.updatedBy = account.displayId; }
     else Object.assign(next, { _pref: found.pref, _office: found.office, _by: account.displayId, _at: now });
 
-    await redis.hset(key, { [id]: JSON.stringify(next) });
+    await redis.hset(key, { [id]: JSON.stringify(withLog(next, { by: account.displayId, action: 'guide', before: record })) });
     await writeAudit(account, {
       action: 'event.guide', result: 'success', targetId: id, organization: found.pref, office: found.office,
       title: found.event.title || '', before: { ...stored, access: T.sanitizeAccess(record.access) }, after: { faq: f.faq, guide: g.guide, access: ac.access },

@@ -80,4 +80,35 @@ function matchesTag(ev, tagId) {
   return def.rx.test(haystack);
 }
 
-module.exports = { TAG_DEFS, TAG_VALUES, guessTags, guessTag, matchesTag, normalizeTags, eventTags };
+/**
+ * 同時に選べないタグの組（運営の手動入力）。2026-10-13 運営の要望で導入。
+ * 申込要否（tag の単一値）の「入場無料」「要予約」も同じ組として扱う。
+ */
+const EXCLUSIVE_TAG_GROUPS = Object.freeze([
+  Object.freeze(['入場無料', '要予約']),
+  Object.freeze(['家族向け', '学生向け']),
+]);
+
+/** そのタグと同時に選べないタグ（無ければ空配列）。 */
+function conflictingTags(id) {
+  const g = EXCLUSIVE_TAG_GROUPS.find(grp => grp.includes(id));
+  return g ? g.filter(t => t !== id) : [];
+}
+
+/**
+ * タグの組み合わせが規則に反していればその説明を返す（問題なければ null）。
+ * @param {string[]|string} tags 属性タグ
+ * @param {string} [applyTag] 申込要否（tag）
+ */
+function tagConflict(tags, applyTag = '') {
+  const set = new Set(normalizeTags(tags));
+  const apply = String(applyTag || '').trim();
+  if (apply) set.add(apply);
+  for (const grp of EXCLUSIVE_TAG_GROUPS) {
+    const hit = grp.filter(t => set.has(t));
+    if (hit.length > 1) return `「${hit.join('」と「')}」は同時に選べません`;
+  }
+  return null;
+}
+
+module.exports = { TAG_DEFS, TAG_VALUES, guessTags, guessTag, matchesTag, normalizeTags, eventTags, EXCLUSIVE_TAG_GROUPS, conflictingTags, tagConflict };

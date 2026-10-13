@@ -132,3 +132,18 @@ test('公開 API: 中止・受付終了は status 付きで公開、下書き・
   assert.ok(!byId[draft], '下書きが公開されている');
   assert.ok(!byId[unknown], '未知の状態が公開されている');
 });
+
+test('タグ: 同時に選べない組（入場無料⇔要予約・家族向け⇔学生向け）は保存できない', async () => {
+  const r1 = await admin('POST', 'nat', { event: { ...base, title: 'タグ矛盾', tags: ['入場無料', '要予約'] } });
+  assert.equal(r1.statusCode, 400);
+  assert.match(r1.body.error, /同時に選べません/);
+  const r2 = await admin('POST', 'nat', { event: { ...base, title: 'タグ矛盾2', tag: '要予約', tags: ['入場無料'] } });
+  assert.equal(r2.statusCode, 400);
+  const ok = await admin('POST', 'nat', { event: { ...base, title: 'タグ正常', tag: '要予約', tags: ['家族向け'] } });
+  assert.equal(ok.statusCode, 200);
+  const id = ok.body.event.id;
+  assert.equal((await admin('PATCH', 'nat', { id, patch: { tags: ['家族向け', '学生向け'] } })).statusCode, 400);
+  assert.equal((await admin('PATCH', 'nat', { id, patch: { tags: ['入場無料'] } })).statusCode, 400, '申込要否「要予約」と入場無料');
+  // タグを触らない保存（状態変更など）は止めない
+  assert.equal((await admin('PATCH', 'nat', { id, patch: { status: 'draft' } })).statusCode, 200);
+});

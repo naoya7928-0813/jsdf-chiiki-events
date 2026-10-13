@@ -14,7 +14,7 @@ export const UPDATE_NOTES = [
     date:    '2026-10-13',
     version: '1.43.30',
     type:    'improvement',
-    content: 'イベント詳細に画像欄を追加（現在用意中）。',
+    content: 'イベント詳細に画像欄を追加（現在準備中）。',
   },
   {
     date:    '2026-10-13',

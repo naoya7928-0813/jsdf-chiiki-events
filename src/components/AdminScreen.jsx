@@ -5,13 +5,15 @@ import { fetchOfficesData } from '../hooks/useOffices';
 import { facilitiesForPref, AGE_OPTIONS } from '../data/jsdfFacilities';
 import { BRANCH_DEFS, normalizeBranches } from '../../shared/branch.cjs';
 // 属性タグは公開サイトの絞り込みチップと同じ定義を使う（shared/tags.cjs が唯一の出どころ）
-import { TAG_DEFS, normalizeTags } from '../../shared/tags.cjs';
+import { TAG_DEFS, normalizeTags, conflictingTags } from '../../shared/tags.cjs';
 import PastEventsPanel from './PastEventsPanel';
 import PresencePanel from './PresencePanel';
 import ReportsPanel from './ReportsPanel';
 import EventChangesPanel from './EventChangesPanel';
 import EventGuidePanel, { EventGuideEditor, EMPTY_GUIDE_VALUE } from './EventGuidePanel';
 import ViewStatsPanel, { EventViewStats } from './ViewStatsPanel';
+import EditLogPanel from './EditLogPanel';
+import EventImagesPanel from './EventImagesPanel';
 import { useIsDesktop } from '../hooks/useBreakpoint';
 import { swipeDirection, neighborTab } from '../../shared/swipe.cjs';
 
@@ -554,7 +556,11 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         <div style={{ display: 'flex', gap: 10 }}>
           {/* minWidth:0 で選択肢の長い select が縮む（無いと横はみ出しの原因になる） */}
           <div style={{ flex: 1, minWidth: 0 }}><div style={label}>イベント種別</div><select value={form.category} onChange={e => set('category', e.target.value)} style={input}>{CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
-          <div style={{ flex: 1, minWidth: 0 }}><div style={label}>申込要否</div><select value={form.tag} onChange={e => set('tag', e.target.value)} style={input}>{APPLY_OPTS.map(o => <option key={o} value={o}>{o || '—'}</option>)}</select></div>
+          <div style={{ flex: 1, minWidth: 0 }}><div style={label}>申込要否</div><select value={form.tag} onChange={e => set('tag', e.target.value)} style={input}>{APPLY_OPTS.map(o => {
+            // 同時に選べないタグ（例: タグで「入場無料」を選んでいると「要予約」は選べない）
+            const blocked = o && o !== form.tag && conflictingTags(o).some(t => normalizeTags(form.tags).includes(t));
+            return <option key={o} value={o} disabled={blocked}>{o || '—'}{blocked ? '（タグと同時に選べません）' : ''}</option>;
+          })}</select></div>
         </div>
         <div style={hint}>
           イベント種別はカードのバッジと「種別」の絞り込みに使われます（9種から1つ）。
@@ -566,11 +572,15 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
           {TAG_DEFS.map(({ id, label: tl }) => {
             const isOn = normalizeTags(form.tags).includes(id);
+            // 同時に選べない組（入場無料⇔要予約・家族向け⇔学生向け）。申込要否の選択も含めて判定する
+            const blockedBy = isOn ? null : conflictingTags(id).find(t => normalizeTags(form.tags).includes(t) || form.tag === t);
             return (
               <button
                 key={id}
                 type="button"
                 aria-pressed={isOn}
+                disabled={!!blockedBy}
+                title={blockedBy ? `「${blockedBy}」と同時に選べません` : undefined}
                 onClick={() => setForm(prev => {
                   const cur = normalizeTags(prev.tags);
                   return { ...prev, tags: cur.includes(id) ? cur.filter(t => t !== id) : [...cur, id] };
@@ -582,6 +592,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
                   background: isOn ? `${primary}18` : 'var(--card)',
                   color: isOn ? 'var(--brand-fg)' : 'var(--text-sub)',
                   fontSize: 12.5, fontWeight: isOn ? 700 : 500, fontFamily: F.sans,
+                  ...(blockedBy ? { opacity: 0.4, cursor: 'not-allowed', textDecoration: 'line-through' } : {}),
                 }}
               >
                 {isOn ? '✓ ' : ''}{tl}
@@ -592,6 +603,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         <div style={hint}>
           公開サイトの絞り込みチップと同じ項目です。未選択でもイベント名・備考に該当する語があれば
           自動で絞り込みに出ますが、確実に出したいときはここで選んでください。
+          「入場無料」と「要予約」、「家族向け」と「学生向け」は同時に選べません（申込要否の選択も含みます）。
         </div>
 
         {/* 自衛隊の種別（陸/海/空）。合同開催は複数選択可。未選択なら文面から自動推定 */}
@@ -726,6 +738,15 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
             />
           </>
         )}
+
+        {/* 画像（チラシ・会場写真）。公開画面は当面「（現在準備中）」のみで、登録した画像は運営画面でだけ見える */}
+        <SectionLabel>画像</SectionLabel>
+        {editingId
+          ? <EventImagesPanel key={`images-${editingId}`} eventId={editingId} adminFetch={adminFetch} primary={primary} styles={{ input, label, hint }} />
+          : <div style={hint}>画像はイベントを登録した後、編集画面から追加できます。</div>}
+
+        {/* 編集記録（誰が追加・修正したか）。既存イベントの編集時のみ */}
+        {editingId && <EditLogPanel key={`log-${editingId}`} eventId={editingId} adminFetch={adminFetch} styles={{ label }} />}
 
         <button onClick={() => setPreview(p => !p)} style={{ width: '100%', padding: 12, borderRadius: 10, marginBottom: 12, cursor: 'pointer', background: 'transparent', border: '1px solid var(--border)', color: 'var(--text)', fontSize: 13, fontWeight: 600 }}>{preview ? 'プレビューを隠す' : 'プレビュー（カード表示イメージ）'}</button>
         {preview && <PreviewCard form={form} primary={primary} prefLabel={isScoped ? prefLabel : (PREFECTURE_INFO[form.pref]?.label || form.pref)} />}

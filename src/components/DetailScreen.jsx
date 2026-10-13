@@ -698,7 +698,7 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
           </div>
         )}
 
-        {/* 画像（チラシ・会場写真）。権利確認の仕組みが整うまで「（現在用意中）」だけを表示 */}
+        {/* 画像（チラシ・会場写真）。権利確認の仕組みが整うまで「（現在準備中）」だけを表示 */}
         <EventImages ev={ev} />
 
         {/* 参加準備ガイド・よくある質問（運営が確認して公開したものだけ） */}
