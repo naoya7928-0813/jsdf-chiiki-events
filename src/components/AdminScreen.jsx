@@ -1,18 +1,25 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { ScreenHeader, F } from './Shared';
 import { PREFECTURE_INFO } from '../data/regionMap';
 import { fetchOfficesData } from '../hooks/useOffices';
 import { facilitiesForPref, AGE_OPTIONS } from '../data/jsdfFacilities';
 import { BRANCH_DEFS, normalizeBranches } from '../../shared/branch.cjs';
 // 属性タグは公開サイトの絞り込みチップと同じ定義を使う（shared/tags.cjs が唯一の出どころ）
-import { TAG_DEFS, normalizeTags } from '../../shared/tags.cjs';
+import { TAG_DEFS, normalizeTags, conflictingTags } from '../../shared/tags.cjs';
 import PastEventsPanel from './PastEventsPanel';
 import PresencePanel from './PresencePanel';
 import ReportsPanel from './ReportsPanel';
 import EventChangesPanel from './EventChangesPanel';
 import EventGuidePanel, { EventGuideEditor, EMPTY_GUIDE_VALUE } from './EventGuidePanel';
 import ViewStatsPanel, { EventViewStats } from './ViewStatsPanel';
+import EditLogPanel from './EditLogPanel';
+import EventImagesPanel from './EventImagesPanel';
 import { useIsDesktop } from '../hooks/useBreakpoint';
+import { swipeDirection, neighborTab } from '../../shared/swipe.cjs';
+import { prefFromAdminPath, adminPathFor, adminPageRelation } from '../../shared/adminPref.cjs';
+
+// 地本別の運営画面（/admin/<地本>）。URL で権限は広がらない（担当範囲はサーバーがアカウントから決める）
+const PAGE_PREF = typeof window !== 'undefined' ? prefFromAdminPath(window.location.pathname, PREFECTURE_INFO) : null;
 
 // 広い画面での本文の最大幅（公開ページと同じ判定・設定でレイアウトを切り替える）。
 // デスクトップでは「入力フォーム（左）＋一覧（右）」の2列、それ以外は従来どおり1列。
@@ -115,6 +122,18 @@ function toDeadlineStr(d) {
 const miniOut = (c) => ({ fontSize: 11.5, fontWeight: 600, cursor: 'pointer', borderRadius: 7, padding: '5px 10px', color: c, background: 'transparent', border: `1px solid ${c}55` });
 function fmtTime(iso) { try { return new Date(iso).toLocaleString('ja-JP', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Tokyo' }); } catch { return iso || ''; } }
 
+// 入力欄・横スクロールする部品（並べ替え・表など）の上で始まった操作はタブ切り替えにしない
+function startsInNoSwipeArea(target, root) {
+  for (let el = target; el && el !== root; el = el.parentElement) {
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable || el.hasAttribute?.('data-no-swipe')) return true;
+    if (el.scrollWidth > el.clientWidth + 1) {
+      const ox = getComputedStyle(el).overflowX;
+      if (ox === 'auto' || ox === 'scroll') return true;
+    }
+  }
+  return false;
+}
+
 export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn, onAuthChange, initialFilter = 'all', initialEditEvent = null, showTabs = false }) {
   const { primary } = theme;
   const [account, setAccount] = useState(() => { try { return JSON.parse(localStorage.getItem(ACCT_KEY)) || null; } catch { return null; } });
@@ -153,6 +172,14 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   const centered = isDesktop ? { maxWidth: CONTENT_MAX, width: '100%', margin: '0 auto', boxSizing: 'border-box' } : null;
   // 本文（スクロール領域）の実幅。管理画面の本体はログイン確認の後に現れるため、要素を state で受けて計測する
   const [scrollEl, setScrollEl] = useState(null);
+  // スマホ: タブは1行の横スクロール＋本文の左右スワイプで切り替える（6タブが2段に折り返して窮屈だった）
+  const tabBarRef = useRef(null);
+  const swipeStart = useRef(null);
+  useEffect(() => {
+    // 選んだタブが横スクロールの外に隠れないよう、見える位置へ寄せる
+    const el = tabBarRef.current?.querySelector('[aria-selected="true"]');
+    try { el?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' }); } catch { /* noop */ }
+  }, [filter]);
   const [scrollWidth, setScrollWidth] = useState(0);
   useEffect(() => {
     if (!scrollEl || typeof ResizeObserver === 'undefined') return;
@@ -193,7 +220,12 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function applyScope(pref) { if (pref && pref !== '*') setForm(f => ({ ...f, pref })); }
+  // 全国担当は、地本別の画面ならその地本を初期選択にする
+  function applyScope(pref) { const p = pref && pref !== '*' ? pref : PAGE_PREF; if (p) setForm(f => ({ ...f, pref: p })); }
+  // 地本別の画面であることはログイン後にだけ示す（ログイン画面はどの地本でも同じ）
+  useEffect(() => {
+    if (PAGE_PREF && account) document.title = `${PREFECTURE_INFO[PAGE_PREF].label}地本 運営画面`;
+  }, [account]);
 
   // 詳細画面から渡された編集対象を、ログイン確認後に一度だけフォームへ読み込む
   const [editConsumed, setEditConsumed] = useState(false);
@@ -404,6 +436,24 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
   if (canSeeViews) TABS.push(['views', '閲覧数']);
   if (canSeeReports) TABS.push(['reports', '報告']);
   if (canSeePresence) TABS.push(['presence', '在席状況']);
+  // スマホ（1列表示）のときだけ、タブを横スクロール＋本文スワイプで切り替える
+  const swipeTabs = showTabs && !editingId && !isDesktop;
+  function onSwipeStart(e) {
+    swipeStart.current = null;
+    if (!swipeTabs || e.touches.length !== 1 || startsInNoSwipeArea(e.target, e.currentTarget)) return;
+    const t = e.touches[0];
+    swipeStart.current = { x: t.clientX, y: t.clientY, t: Date.now() };
+  }
+  function onSwipeEnd(e) {
+    const s = swipeStart.current;
+    swipeStart.current = null;
+    if (!s || !e.changedTouches?.length) return;
+    const t = e.changedTouches[0];
+    const next = neighborTab(TABS.map(([v]) => v), filter, swipeDirection({ dx: t.clientX - s.x, dy: t.clientY - s.y, dt: Date.now() - s.t }));
+    if (!next) return;
+    setFilter(next);
+    try { scrollEl?.scrollTo({ top: 0 }); } catch { /* noop */ }
+  }
   // 下書き確認ページでは登録フォームを出さない（編集時のみ表示）。追加修正ページは常時表示。
   const showForm = (filter === 'all') || !!editingId; // 'draft'・'past' ではフォームを出さない（編集時を除く）
   // 2列にするのは「フォーム」と「一覧」を同時に出す画面だけ（過去・在席・報告の各パネルは1列で広く使う）
@@ -418,12 +468,18 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         trailing={<button onClick={logout} style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', borderRadius: 8, fontSize: 12, padding: '6px 10px', cursor: 'pointer' }}>ログアウト</button>} />
       {/* タブ（追加・修正／下書き／過去／在席状況）。1ページで全機能にアクセス */}
       {showTabs && !editingId && (
-        <div style={{ display: 'flex', gap: 8, padding: '10px 16px 0', flexShrink: 0, flexWrap: 'wrap', ...(contentBox ? { ...contentBox, maxWidth: contentBox.maxWidth + 32 } : {}) }}>
+        <div ref={tabBarRef} role="tablist" aria-label="運営メニュー" data-no-swipe
+          style={{ display: 'flex', gap: 8, padding: '10px 16px 0', flexShrink: 0,
+            ...(swipeTabs
+              ? { flexWrap: 'nowrap', overflowX: 'auto', scrollSnapType: 'x proximity', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', paddingBottom: 2 }
+              : { flexWrap: 'wrap' }),
+            ...(contentBox ? { ...contentBox, maxWidth: contentBox.maxWidth + 32 } : {}) }}>
           {TABS.map(([v, jp]) => {
             const on = filter === v;
             return (
-              <button key={v} onClick={() => setFilter(v)} style={{
-                flex: 1, padding: '9px 0', borderRadius: 9, fontFamily: F.sans, fontSize: 13, fontWeight: 700,
+              <button key={v} role="tab" aria-selected={on} onClick={() => setFilter(v)} style={{
+                ...(swipeTabs ? { flex: '0 0 auto', padding: '9px 16px', scrollSnapAlign: 'center', whiteSpace: 'nowrap' } : { flex: 1, padding: '9px 0' }),
+                borderRadius: 9, fontFamily: F.sans, fontSize: 13, fontWeight: 700,
                 cursor: 'pointer', border: `1px solid ${on ? primary : 'var(--border)'}`,
                 background: on ? primary : 'var(--card)', color: on ? '#fff' : 'var(--text-sub)',
               }}>{jp}{v === 'draft' && list.filter(e => e.status === 'draft').length > 0 ? `（${list.filter(e => e.status === 'draft').length}）` : ''}{v === 'reports' && reportUnread > 0 ? `（${reportUnread}）` : ''}</button>
@@ -431,12 +487,29 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
           })}
         </div>
       )}
+      {swipeTabs && (
+        <div aria-hidden="true" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 5, padding: '6px 16px 0', flexShrink: 0 }}>
+          {TABS.map(([v]) => <span key={v} style={{ width: filter === v ? 14 : 5, height: 5, borderRadius: 3, background: filter === v ? primary : 'var(--border)', transition: 'width .2s' }} />)}
+          <span style={{ fontSize: 10.5, color: 'var(--text-muted)', marginLeft: 6 }}>左右にスワイプで切り替え</span>
+        </div>
+      )}
       {/* overflowX:hidden = 横方向のドラッグ/遊びを抑止（overflowY:auto のみだと
           CSS仕様で overflow-x が auto になり、はみ出し時に横スクロールが生じる）。
           フォーム内の要素は各自 width:100%/minWidth:0 で縮むため内容は欠けない。 */}
-      <div data-admin-scroll ref={setScrollEl} style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '16px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 28px)' }}>
+      <div data-admin-scroll ref={setScrollEl} onTouchStart={onSwipeStart} onTouchEnd={onSwipeEnd} onTouchCancel={() => { swipeStart.current = null; }} style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '16px 16px', paddingBottom: 'calc(env(safe-area-inset-bottom,0px) + 28px)' }}>
         <div style={contentBox}>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10 }}>ログイン中: <strong style={{ color: 'var(--text)' }}>{account.label}</strong>（担当: {prefLabel}）</div>
+        {['match', 'national'].includes(adminPageRelation(PAGE_PREF, org)) && (
+          <div style={{ marginBottom: 12, padding: '10px 12px', borderRadius: 10, background: `${primary}10`, border: `1px solid ${primary}33`, fontSize: 12.5, lineHeight: 1.7, color: 'var(--text)' }}>
+            この画面は<strong>{PREFECTURE_INFO[PAGE_PREF].label}地本</strong>の運営画面です。操作できる範囲はアカウントの担当範囲で決まります。
+          </div>
+        )}
+        {adminPageRelation(PAGE_PREF, org) === 'mismatch' && (
+          <div role="alert" style={{ marginBottom: 12, padding: '10px 12px', borderRadius: 10, background: '#f59e0b14', border: '1px solid #f59e0b55', fontSize: 12.5, lineHeight: 1.7, color: 'var(--text)' }}>
+            この画面は{PREFECTURE_INFO[PAGE_PREF].label}地本用ですが、ログイン中のアカウントの担当は{prefLabel}地本です（操作できるのは{prefLabel}地本のイベントだけです）。
+            {PREFECTURE_INFO[org] && <> <a href={adminPathFor(org)} style={{ color: 'var(--brand-fg)', fontWeight: 700 }}>{prefLabel}地本の運営画面へ移動</a></>}
+          </div>
+        )}
 
         {/* 権限はサーバー側のロールで決定（操作者ID＝displayId・氏名は表示しない） */}
         <div style={{ marginBottom: 14, padding: '10px 12px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 10 }}>
@@ -503,7 +576,11 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         <div style={{ display: 'flex', gap: 10 }}>
           {/* minWidth:0 で選択肢の長い select が縮む（無いと横はみ出しの原因になる） */}
           <div style={{ flex: 1, minWidth: 0 }}><div style={label}>イベント種別</div><select value={form.category} onChange={e => set('category', e.target.value)} style={input}>{CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
-          <div style={{ flex: 1, minWidth: 0 }}><div style={label}>申込要否</div><select value={form.tag} onChange={e => set('tag', e.target.value)} style={input}>{APPLY_OPTS.map(o => <option key={o} value={o}>{o || '—'}</option>)}</select></div>
+          <div style={{ flex: 1, minWidth: 0 }}><div style={label}>申込要否</div><select value={form.tag} onChange={e => set('tag', e.target.value)} style={input}>{APPLY_OPTS.map(o => {
+            // 同時に選べないタグ（例: タグで「入場無料」を選んでいると「要予約」は選べない）
+            const blocked = o && o !== form.tag && conflictingTags(o).some(t => normalizeTags(form.tags).includes(t));
+            return <option key={o} value={o} disabled={blocked}>{o || '—'}{blocked ? '（タグと同時に選べません）' : ''}</option>;
+          })}</select></div>
         </div>
         <div style={hint}>
           イベント種別はカードのバッジと「種別」の絞り込みに使われます（9種から1つ）。
@@ -515,11 +592,15 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
           {TAG_DEFS.map(({ id, label: tl }) => {
             const isOn = normalizeTags(form.tags).includes(id);
+            // 同時に選べない組（入場無料⇔要予約・家族向け⇔学生向け）。申込要否の選択も含めて判定する
+            const blockedBy = isOn ? null : conflictingTags(id).find(t => normalizeTags(form.tags).includes(t) || form.tag === t);
             return (
               <button
                 key={id}
                 type="button"
                 aria-pressed={isOn}
+                disabled={!!blockedBy}
+                title={blockedBy ? `「${blockedBy}」と同時に選べません` : undefined}
                 onClick={() => setForm(prev => {
                   const cur = normalizeTags(prev.tags);
                   return { ...prev, tags: cur.includes(id) ? cur.filter(t => t !== id) : [...cur, id] };
@@ -531,6 +612,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
                   background: isOn ? `${primary}18` : 'var(--card)',
                   color: isOn ? 'var(--brand-fg)' : 'var(--text-sub)',
                   fontSize: 12.5, fontWeight: isOn ? 700 : 500, fontFamily: F.sans,
+                  ...(blockedBy ? { opacity: 0.4, cursor: 'not-allowed', textDecoration: 'line-through' } : {}),
                 }}
               >
                 {isOn ? '✓ ' : ''}{tl}
@@ -541,6 +623,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
         <div style={hint}>
           公開サイトの絞り込みチップと同じ項目です。未選択でもイベント名・備考に該当する語があれば
           自動で絞り込みに出ますが、確実に出したいときはここで選んでください。
+          「入場無料」と「要予約」、「家族向け」と「学生向け」は同時に選べません（申込要否の選択も含みます）。
         </div>
 
         {/* 自衛隊の種別（陸/海/空）。合同開催は複数選択可。未選択なら文面から自動推定 */}
@@ -676,6 +759,15 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
           </>
         )}
 
+        {/* 画像（チラシ・会場写真）。公開画面は当面「（現在準備中）」のみで、登録した画像は運営画面でだけ見える */}
+        <SectionLabel>画像</SectionLabel>
+        {editingId
+          ? <EventImagesPanel key={`images-${editingId}`} eventId={editingId} adminFetch={adminFetch} primary={primary} styles={{ input, label, hint }} />
+          : <div style={hint}>画像はイベントを登録した後、編集画面から追加できます。</div>}
+
+        {/* 編集記録（誰が追加・修正したか）。既存イベントの編集時のみ */}
+        {editingId && <EditLogPanel key={`log-${editingId}`} eventId={editingId} adminFetch={adminFetch} styles={{ label }} />}
+
         <button onClick={() => setPreview(p => !p)} style={{ width: '100%', padding: 12, borderRadius: 10, marginBottom: 12, cursor: 'pointer', background: 'transparent', border: '1px solid var(--border)', color: 'var(--text)', fontSize: 13, fontWeight: 600 }}>{preview ? 'プレビューを隠す' : 'プレビュー（カード表示イメージ）'}</button>
         {preview && <PreviewCard form={form} primary={primary} prefLabel={isScoped ? prefLabel : (PREFECTURE_INFO[form.pref]?.label || form.pref)} />}
 
@@ -719,7 +811,7 @@ export default function AdminScreen({ theme, onBack, mode = 'login', onLoggedIn,
 
         {/* 利用者からの報告（report:read を持つロールのみ・別画面） */}
         {/* イベント別の閲覧数（担当範囲のみ・閲覧専用） */}
-        {isViewsView && <ViewStatsPanel adminFetch={adminFetch} primary={primary} />}
+        {isViewsView && <ViewStatsPanel adminFetch={adminFetch} primary={primary} scopeLabel={prefLabel} />}
 
         {isReportsView && <ReportsPanel adminFetch={adminFetch} primary={primary} account={account} onUnreadChange={loadReportUnread} canManage={perms.has('report:manage')} />}
 

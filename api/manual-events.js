@@ -25,6 +25,11 @@ function withPublicChanges(o) {
 
 /** 公開用に整える: 変更のお知らせ・FAQ・参加準備ガイドを公開してよい分だけにする */
 const toPublic = (o) => {
+  // 画像は当面公開しない（公開画面は「（現在準備中）」のみ。運営が登録した一覧・登録者も出さない）
+  if (o && (o.images !== undefined || o.imagesHidden !== undefined)) {
+    const { images, imagesHidden, ...rest } = o; // eslint-disable-line no-unused-vars
+    o = rest;
+  }
   const r = toPublicRecord(withPublicChanges(o));
   if (!r || r.access === undefined) return r;
   const { access, ...rest } = r;
@@ -48,7 +53,9 @@ export default async function handler(req, res) {
       // 権限判定用の事務所 office を除去。公開画面は office を使わない）。
       // status は残す: 公開画面は受付終了/中止のバッジを ev.status で表示するため
       // （以前は除去しており、中止にした手動イベントが通常表示されていた）。
-      .map(({ createdBy, updatedBy, createdAt, updatedAt, weatherLocationNeedsUpdate, office, ...pub }) => toPublic(pub));
+      .map(({ createdBy, updatedBy, createdAt, updatedAt, weatherLocationNeedsUpdate, office, ...pub }) =>
+        // 「_」で始まる管理用メタ（_log＝編集記録 等）も除去
+        toPublic(Object.fromEntries(Object.entries(pub).filter(([k]) => !k.startsWith('_')))));
 
     // 既存イベントの上書き（スクレイプイベント等）。表示フィールドのみ公開する。
     // 「_」で始まる管理用メタ（_by/_at/_pref/_office 等）はすべて除去（今後増えても漏れない）

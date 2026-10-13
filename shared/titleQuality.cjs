@@ -1,6 +1,7 @@
 'use strict';
 
 const { isProcurementSource } = require('./procurement.cjs');
+const { isExamResultEvent } = require('./examResult.cjs');
 
 /**
  * イベント名の品質管理モジュール（スクレイパー/チェックスクリプト共通）
@@ -297,6 +298,12 @@ function isJunkOrStubTitle(title) {
   if (/^[（(]?\s*(?:\d{1,2}[:：]\d{2}\s*)?(?:受付終了|最終受付\s*\d{1,2}[:：]\d{2})\s*[）)]?$/.test(t)) return true;
   // 募集告知（受付期間の告知でありイベントではない。「募集中 【一般曹候補生】募集」）
   if (/^(?:募集中[\s　]*)?【[^】]{2,30}】[\s　]*募集$/.test(t)) return true;
+  // サイト内リンクの文言（「自衛官募集ホームページ <自衛官募集X」）
+  if (/ホームページ\s*[<＜]|[<＜]\s*自衛官募集|募集ホームページ$/.test(t)) return true;
+  // 隊員の募集告知（「2等陸・海・空士（任期制自衛官）】募集」「一般曹候補生募集」）。
+  // 参加者募集のイベント（「体験搭乗 参加者募集」等）はイベント語があるので残す
+  if (/(自衛官|[陸海空]士|曹候補生|幹部候補生|航空学生|予備自衛官補?)[^。]{0,20}募集(中)?$/.test(t)
+      && !/説明会|見学|体験|搭乗|ツアー|参加者|相談会|イベント|フェア|公開/.test(t)) return true;
   // 採用案内の冊子（OCR 崩れ「今和8年度自衛官等探用案内」＝令和/採用 を含む）
   if (/(?:採用|探用)案内$/.test(t) && !/説明会|相談会|ガイダンス|セミナー|フェア/.test(t)) return true;
   if (/申込み?リンク|応募リンク|広報申込み/.test(t)) return true; // リンク案内の混入
@@ -450,7 +457,7 @@ function isStaleDatedEvent(ev) {
 // 兵庫のラジオ放送（.wav）が公開されていた事故の再発防止。
 
 // 文書であることを強く示す語（タイトル・会場欄・URL で判定）
-const NON_EVENT_DOC_RE = /福利厚生|待遇|給与|手当|共済|年金|宿舎|服務|利用規約|サイトポリシー|コンテンツ利用|著作権|求人をお考えの企業|退職自衛官の求人|採用案内冊子/;
+const NON_EVENT_DOC_RE = /福利厚生|待遇|給与|手当|共済|年金|宿舎|服務|利用規約|サイトポリシー|コンテンツ利用|著作権|求人をお考えの企業|退職自衛官の求人|採用案内冊子|招集教育|招集訓練|教育訓練日程/;
 // URL のファイル名に出る文書の目印（ローマ字表記）
 const NON_EVENT_URL_RE = /fukuri|kousei-kaizen|riyoukiyaku|kiyaku|privacy|sitepolicy|copyright|kyuyo|teate|kyosai/i;
 // 音声・動画ファイル（放送の録音であって参加するイベントではない）
@@ -470,6 +477,8 @@ function isNonEventDocument(ev) {
   let url = String(ev.url || '');
   try { url = decodeURIComponent(url); } catch { /* keep raw */ }
   if (MEDIA_URL_RE.test(url)) return true;
+  // 採用試験の合格者発表・試験結果（shared/examResult.cjs）
+  if (isExamResultEvent(ev)) return true;
   if (DOC_RESCUE_RE.test(title)) return false;
   if (NON_EVENT_DOC_RE.test(title) || NON_EVENT_DOC_RE.test(String(ev.place || ''))) return true;
   if (NON_EVENT_URL_RE.test(url.split(/[?#]/)[0].split('/').pop() || '')) return true;
@@ -671,9 +680,50 @@ const VERIFIED_OVERRIDES = [
   // 新潟・柏崎: 会場図の出店一覧「1 比角ラーメン… 8 金魚すくい…」がタイトルに、交通規制の注記が会場に
   // なっていた（2026-10-13 チラシ実物で照合: 第48回比角コミュニティ祭 比角ストリートフェスティバル
   // 10月18日(日)10:00～14:30。自衛隊は活動広報・装備品/車両展示・ミニ制服体験のブース出展）
-  { urlIncludes: 'r8.10.18kasiwazakimaturi2.pdf', date: '2026-10-18',
+  // ※掲載元の拡張子が .pdf → .jpg に変わり一致しなくなっていた（2026-10-14）。拡張子なしで一致させる
+  { urlIncludes: 'r8.10.18kasiwazakimaturi2', date: '2026-10-18',
     set: { title: '第48回比角コミュニティ祭 比角ストリートフェスティバル', place: '比角ストリートフェスティバル会場',
            time: '10:00～14:30', category: '地域参加' } },
+  // ── 2026-10-14 掲載中イベントの一次ソース照合（チラシ実物・掲載ページ）で確定した修正 ──
+  // 東京: 旧OCRの誤読「防衛省自行隧説明」。チラシ: 防衛省・自衛隊 NIGHT説明会 10/19(月)～10/23(金) 17:00～21:00 西東京地域事務所
+  { urlIncludes: 'nishitokyo/img/1019-1023_night', date: '2026-10-19',
+    set: { title: '自衛隊NIGHT説明会', endDate: '2026-10-23', endWeekday: '金', time: '17:00～21:00', place: '西東京地域事務所', category: '説明会' } },
+  // 群馬: 誤読「一良品七夢老届付石百貨市」、日付はチラシ下部の表示期限（10/31）を誤採用。
+  // チラシ: 第28回百貨市 ～良い品と夢を届ける百貨市～ 太田市立太田高等学校 10/17(土)・18(日) 10:00～14:00
+  { urlIncludes: 'gunma/sozai/event/20261017-18-2',
+    set: { title: '第28回百貨市（太田市立太田高等学校）', date: '2026-10-17', weekday: '土', endDate: '2026-10-18', endWeekday: '日',
+           time: '10:00～14:00', place: '太田市立太田高等学校', category: '地域参加' } },
+  // 茨城: 誤読「動勿大集合！in下檐况」。チラシ: 働くクルマ大集合！in下檜沢 令和8年10/25 10:00～15:00 旧檜沢小学校グラウンド
+  { urlIncludes: 'jimusho/img/hitachi/20261025_l', date: '2026-10-25',
+    set: { title: '働くクルマ大集合！in下檜沢', place: '旧檜沢小学校グラウンド', time: '10:00～15:00', category: '地域参加' } },
+  // 石川: 誤読「陵上自衛隧多用途入口一HH-1J体搭秉」。チラシ: 陸上自衛隊多用途ヘリコプターUH-1J体験搭乗 2026.11.14(土) 陸上自衛隊八尾駐屯地
+  { urlIncludes: 'ishikawa/event29/tirasi/taikentoujou', date: '2026-11-14',
+    set: { title: '陸上自衛隊多用途ヘリコプターUH-1J体験搭乗', place: '陸上自衛隊八尾駐屯地', category: '体験' } },
+  // 福井: 誤読「陵海空自衛隊福井市中八L一下寒行」。掲載ページ: 陸海空自衛隊福井市中パレード 2026.11.7(土) フェニックス通り・福井市中央公園
+  { urlIncludes: 'fukui/contents/9-event/images/2026_shichu-parade', date: '2026-11-07',
+    set: { title: '陸海空自衛隊福井市中パレード', place: 'フェニックス通り・福井市中央公園', category: '広報活動' } },
+  // 新潟: 複数の祭名が連結し「令和7年度」まで混入。チラシ: 柏崎工業高校 睦友祭 自衛隊展示＆体験ブース 10/24(土) 10:00～14:30
+  { urlIncludes: 'niigata/files/event/r8.10.24kashiwazaki', date: '2026-10-24',
+    set: { title: '柏崎工業高校 睦友祭（自衛隊展示＆体験ブース）', place: '柏崎工業高校', address: '新潟県柏崎市栄町5-16', time: '10:00～14:30', category: '地域参加' } },
+  // 長崎: 誤読「寒施二一十一」・年の取り違え（2027-03-29 で掲載）。チラシ: 竹松駐屯地 創立73周年 3月29日 0900～1500（年の記載なし）。
+  // 竹松駐屯地は1953年創立のため73周年＝2026年。ファイル名も 2026_takematu.pdf → 2026-03-29（終了済み）
+  { urlIncludes: 'nagasaki/pdf/event/2026_takematu', date: '2027-03-29',
+    set: { title: '竹松駐屯地創立73周年記念行事', date: '2026-03-29', weekday: '日', time: '09:00～15:00', place: '陸上自衛隊竹松駐屯地', category: '記念行事' } },
+  // 富山: 誤読「富山自衛隧演奏会」・日付の誤り（11/18）。チラシ: 富山自衛隊演奏会 Music Festa 2026 in TOYAMA 12.13 オーバード・ホール 中ホール
+  { urlIncludes: 'toyama/content/04-event/images/2026ivento', date: '2026-11-18',
+    set: { title: '富山自衛隊演奏会 Music Festa 2026 in TOYAMA', date: '2026-12-13', weekday: '日', place: 'オーバード・ホール 中ホール', category: '演奏会' } },
+  // 群馬: 会場の行をタイトルにしていた（「役場北駐車場/保健七久一」）。チラシ: よしおかふるさと祭り 令和8年10月18日(日) 9:00～15:00
+  { urlIncludes: 'gunma/sozai/event/20261018-3', date: '2026-10-18',
+    set: { title: 'よしおかふるさと祭り', place: '吉岡町役場北駐車場・保健センターほか', time: '09:00～15:00', category: '地域参加' } },
+  // 新潟: 誤読「比角二祭」。チラシ: 第48回比角コミュニティ祭 前日祭 10/17(土) 10:00～15:00 比角コミセン・東部公園
+  { urlIncludes: 'niigata/images/event/r8.10.18kasiwazakimaturi.', date: '2026-10-17',
+    set: { title: '第48回比角コミュニティ祭 前日祭', place: '比角コミセン・東部公園', time: '10:00～15:00', category: '地域参加' } },
+  // 新潟: 会場の誤り（パルムート新発田）。チラシ: ハローワーク新発田 職業説明会 令和8年11月4日(水) 10:00～12:00 ハローワーク新発田4階（新発田市日渡96）
+  { urlIncludes: 'niigata/images/honbu/r8.11.4shibatahwsetumeikai', date: '2026-11-04',
+    set: { title: 'ハローワーク新発田 自衛隊職業説明会', place: 'ハローワーク新発田4階', address: '新潟県新発田市日渡96', time: '10:00～12:00', category: '説明会' } },
+  // 福島: 掲載ページ: 実施日時 令和8年12月20日(日)～12月22日(火)（終了日が欠落していた）
+  { pref: 'fukushima', titleIncludes: '横須賀基地 インターンシップ', date: '2026-12-20',
+    set: { endDate: '2026-12-22', endWeekday: '火' } },
   // 複数日開催の終了日（チラシ記載）
   { urlIncludes: '2026taikenfes.pdf',      set: { endDate: '2026-07-27' } }, // 函館 7/25-27
   { urlIncludes: '202608premium-tour.pdf', set: { endDate: '2026-08-19' } }, // 福井 8/17-19

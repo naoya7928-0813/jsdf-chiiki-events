@@ -6,6 +6,7 @@ import eventChanges from './_event-changes.js';
 import eventGuides from './_event-guides.js';
 import events from './_events.js';
 import history from './_history.js';
+import images from './_images.js';
 import login from './_login.js';
 import logout from './_logout.js';
 import overrides from './_overrides.js';
@@ -18,6 +19,7 @@ export const HANDLERS = {
   'event-guides': eventGuides,
   events,
   history,
+  images,
   login,
   logout,
   overrides,

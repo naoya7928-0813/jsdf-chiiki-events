@@ -42,3 +42,11 @@ test('needsLocalReocr: 旧パイプラインの誤読だけを1回だけ読み�
   assert.equal(needsLocalReocr(null), false);
   assert.equal(needsLocalReocr({ ocr_status: 'success' }), false);
 });
+
+test('旧モデルの読み違い（簡体字ではない字への誤読）も読み直しの対象にする', () => {
+  const R = require('../scraper/lib/ocrRefresh.js');
+  for (const t of ['防衛省自行隧説明', '陵上自衛隧多用途入口一HH-1J体搭秉', '陵海空自衛隊福井市中八L一下寒行', '合和8年度予偏自衛官補招集教育訓日程']) {
+    assert.equal(R.looksMisread({ title: t }), true, t);
+  }
+  for (const t of ['陸上自衛隊 駐屯地見学', '令和8年度 自衛隊説明会', '丘陵地の散策会']) assert.equal(R.looksMisread({ title: t }), false, t);
+});

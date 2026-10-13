@@ -95,3 +95,15 @@ test('レート制限: 同じ通信元から 10 分に 60 回まで', async () =
   assert.equal(last.statusCode, 429);
 });
 
+
+test('出力用（report=1）: 掲載中・過去（アーカイブ）を担当範囲だけ返し、閲覧数を付ける', async () => {
+  const t = await stats('tokyo', { report: '1' });
+  assert.equal(t.statusCode, 200, JSON.stringify(t.body));
+  assert.ok(Array.isArray(t.body.rows) && t.body.rows.length > 0);
+  assert.ok(t.body.rows.every(r => r.pref === 'tokyo'), '担当外の地本を含めない');
+  assert.ok(t.body.rows.some(r => r.kind === 'archive'), '過去（アーカイブ）を含む');
+  assert.ok(t.body.rows.every(r => Number.isInteger(r.total) && Number.isInteger(r.d30)));
+  const n = await stats('nat', { report: '1' });
+  assert.ok(n.body.rows.length >= t.body.rows.length);
+  assert.ok(new Set(n.body.rows.map(r => r.pref)).size > 1);
+});

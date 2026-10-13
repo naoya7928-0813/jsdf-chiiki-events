@@ -51,3 +51,7 @@ scraper/source-update-report.json
 scraper/office-crawl-report.json
 
 scraper/office-crawl-verification.json
+
+# 運営アカウント（パスワードのハッシュ・初期パスワード一覧）。秘密情報のため絶対にコミットしない
+*.local.json
+*.local.csv

@@ -9,9 +9,10 @@
 import { checkOrigin, noStore, requireSameOrigin, rateLimit, requireAuth, hasPermission, canManageScope, canPublish, redis, cleanText, writeAudit } from '../_security.js';
 import W from '../../shared/weather.cjs';
 import { normalizeBranches } from '../../shared/branch.cjs';
-import { normalizeTags } from '../../shared/tags.cjs';
+import { normalizeTags, tagConflict } from '../../shared/tags.cjs';
 import G from '../../shared/eventGuide.cjs';
 import T from '../../shared/transit.cjs';
+import { withLog } from '../../shared/editLog.cjs';
 
 const KEY = 'manual:events';
 const MAX_EVENTS = 500;
@@ -82,6 +83,9 @@ function buildEvent(input, account) {
   // 属性タグ（オンライン・家族向け・抽選 等）。公開側の絞り込みチップと同じ定義を使う。
   // 申込要否(tag)とは別物なので混ぜない（tag は「要予約/予約不要/…」の単一値）。
   const tags = normalizeTags(e.tags);
+  // 同時に選べないタグ（入場無料⇔要予約・家族向け⇔学生向け。申込要否も含む）
+  const conflict = tagConflict(tags, e.tag);
+  if (conflict) return { error: conflict };
   // FAQ・参加準備ガイド（任意。登録後は /api/admin/event-guides で編集する）
   const faqIn = G.normalizeFaqInput(e.faq);
   if (faqIn.error) return { error: faqIn.error };
@@ -171,6 +175,8 @@ export default async function handler(req, res) {
       return res.status(403).json({ error: '公開する権限がありません（下書きで保存してください）' });
     }
     built.event.updatedBy = account.displayId;
+    // イベントごとの編集記録（誰が追加したか）。公開APIは「_」で始まるキーを出さない
+    built.event = withLog(built.event, { by: account.displayId, action: 'create', note: built.event.status === 'published' ? '公開で登録' : '下書きで登録' });
     try {
       if (await redis.hlen(KEY) >= MAX_EVENTS) return res.status(409).json({ error: '登録上限に達しています' });
       await redis.hset(KEY, { [built.event.id]: JSON.stringify(built.event) });
@@ -188,7 +194,7 @@ export default async function handler(req, res) {
     try {
       const raw = await redis.hget(KEY, id);
       if (!raw) return res.status(404).json({ error: 'not found' });
-      const ev = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      let ev = typeof raw === 'string' ? JSON.parse(raw) : raw;
       // 所属（pref/office）はサーバー側の保存値で判定（クライアントを信用しない）
       if (!canManageScope(account, { pref: ev.pref, office: ev.office })) {
         await writeAudit(account, { action: 'event.update', result: 'denied', targetId: id, organization: ev.pref, note: '担当外イベント' });
@@ -225,6 +231,11 @@ export default async function handler(req, res) {
         const t = normalizeTags(patch.tags);
         if (t.length) ev.tags = t; else delete ev.tags;
       }
+      // 同時に選べないタグ。タグを変える保存のときだけ見る（状態変更だけの保存を既存データで止めない）
+      if (patch.tags !== undefined || patch.tag !== undefined) {
+        const conflict = tagConflict(ev.tags, ev.tag);
+        if (conflict) return res.status(400).json({ error: conflict });
+      }
       if (patch.title !== undefined && !ev.title) return res.status(400).json({ error: 'タイトルは必須です' });
       if (patch.url !== undefined) {
         const u = String(patch.url || '').trim();
@@ -253,6 +264,8 @@ export default async function handler(req, res) {
       }
       ev.updatedAt = new Date().toISOString();
       ev.updatedBy = account.displayId;  // 編集した操作者（仮名・公開には出さない）
+      const onlyStatus = Object.keys(patch).every(k => k === 'status');
+      ev = withLog(ev, { by: account.displayId, action: onlyStatus ? 'status' : 'update', before });
       await redis.hset(KEY, { [id]: JSON.stringify(ev) });
       const note = patch.status !== undefined
         ? `状態→${({ draft: '下書き', published: '公開', closed: '締切', cancelled: '中止', postponed: '延期' })[ev.status] || ev.status}`
@@ -276,6 +289,10 @@ export default async function handler(req, res) {
         return res.status(403).json({ error: '権限がありません' });
       }
       await redis.hdel(KEY, id);
+      // 登録済みの画像データも消す（イベントと一緒に削除）
+      for (const im of Array.isArray(ev.images) ? ev.images : []) {
+        if (im && /^img-[a-z0-9]{12}$/.test(im.id)) { try { await redis.del(`img:${im.id}`); } catch { /* noop */ } }
+      }
       await writeAudit(account, { action: 'event.delete', result: 'success', targetId: id, organization: ev.pref, office: ev.office, title: ev.title, before: ev, note: '削除' });
       return res.status(200).json({ ok: true });
     } catch (err) { console.error('[admin/events] DELETE', err); return res.status(500).json({ error: 'failed to delete' }); }

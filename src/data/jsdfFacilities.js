@@ -2,6 +2,7 @@
  * 全国の主要な自衛隊施設（駐屯地・基地）— 会場名/住所の入力支援プルダウン用。
  * { pref, name, address, branch }  branch: 'army'|'navy'|'air'
  * ※ 主要施設の一覧。網羅ではなく順次追加可能（自由入力も併用）。
+ * ※ 2026-10-13 に誤り（守山＝愛知・築城＝福岡・鳥羽航空基地は存在しない 等）を修正し、施設を追加。
  * 住所は市区町村レベル中心（会場補助が目的）。
  */
 export const JSDF_FACILITIES = [
@@ -54,7 +55,6 @@ export const JSDF_FACILITIES = [
   { pref: 'yamanashi', name: '陸上自衛隊 北富士駐屯地', address: '山梨県富士吉田市', branch: 'army' },
   { pref: 'nagano', name: '陸上自衛隊 松本駐屯地', address: '長野県松本市', branch: 'army' },
   { pref: 'gifu', name: '航空自衛隊 岐阜基地', address: '岐阜県各務原市', branch: 'air' },
-  { pref: 'gifu', name: '陸上自衛隊 守山駐屯地', address: '愛知県名古屋市守山区', branch: 'army' },
   { pref: 'shizuoka', name: '陸上自衛隊 富士駐屯地', address: '静岡県駿東郡小山町', branch: 'army' },
   { pref: 'shizuoka', name: '陸上自衛隊 板妻駐屯地', address: '静岡県御殿場市', branch: 'army' },
   { pref: 'aichi', name: '航空自衛隊 小牧基地', address: '愛知県小牧市', branch: 'air' },
@@ -62,17 +62,17 @@ export const JSDF_FACILITIES = [
 
   // 近畿
   { pref: 'mie', name: '陸上自衛隊 久居駐屯地', address: '三重県津市久居', branch: 'army' },
-  { pref: 'mie', name: '海上自衛隊 鳥羽（航空基地）', address: '三重県', branch: 'navy' },
+  { pref: 'mie', name: '陸上自衛隊 明野駐屯地', address: '三重県伊勢市', branch: 'army' },
   { pref: 'shiga', name: '陸上自衛隊 大津駐屯地', address: '滋賀県大津市', branch: 'army' },
   { pref: 'shiga', name: '陸上自衛隊 今津駐屯地', address: '滋賀県高島市今津町', branch: 'army' },
   { pref: 'kyoto', name: '海上自衛隊 舞鶴基地', address: '京都府舞鶴市', branch: 'navy' },
   { pref: 'kyoto', name: '陸上自衛隊 福知山駐屯地', address: '京都府福知山市', branch: 'army' },
   { pref: 'osaka', name: '陸上自衛隊 信太山駐屯地', address: '大阪府和泉市', branch: 'army' },
-  { pref: 'osaka', name: '海上自衛隊 阪神基地隊', address: '兵庫県神戸市東灘区', branch: 'navy' },
+  { pref: 'hyogo', name: '海上自衛隊 阪神基地隊', address: '兵庫県神戸市東灘区', branch: 'navy' },
   { pref: 'hyogo', name: '陸上自衛隊 姫路駐屯地', address: '兵庫県姫路市峰南町', branch: 'army' },
   { pref: 'hyogo', name: '陸上自衛隊 伊丹駐屯地', address: '兵庫県伊丹市', branch: 'army' },
   { pref: 'nara', name: '航空自衛隊 奈良基地', address: '奈良県奈良市', branch: 'air' },
-  { pref: 'wakayama', name: '海上自衛隊 和歌山（基地分遣隊）', address: '和歌山県', branch: 'navy' },
+  { pref: 'wakayama', name: '海上自衛隊 由良基地分遣隊', address: '和歌山県日高郡由良町', branch: 'navy' },
 
   // 中国
   { pref: 'tottori', name: '陸上自衛隊 米子駐屯地', address: '鳥取県米子市', branch: 'army' },
@@ -100,13 +100,51 @@ export const JSDF_FACILITIES = [
   { pref: 'kumamoto', name: '陸上自衛隊 健軍駐屯地', address: '熊本県熊本市東区', branch: 'army' },
   { pref: 'kumamoto', name: '陸上自衛隊 北熊本駐屯地', address: '熊本県熊本市北区', branch: 'army' },
   { pref: 'oita', name: '陸上自衛隊 別府駐屯地', address: '大分県別府市', branch: 'army' },
-  { pref: 'oita', name: '航空自衛隊 築城（分屯）/ 日出生台演習場', address: '大分県', branch: 'army' },
+  { pref: 'oita', name: '陸上自衛隊 玖珠駐屯地', address: '大分県玖珠郡玖珠町', branch: 'army' },
+  { pref: 'oita', name: '陸上自衛隊 湯布院駐屯地', address: '大分県由布市', branch: 'army' },
   { pref: 'miyazaki', name: '航空自衛隊 新田原基地', address: '宮崎県児湯郡新富町', branch: 'air' },
   { pref: 'miyazaki', name: '陸上自衛隊 都城駐屯地', address: '宮崎県都城市', branch: 'army' },
   { pref: 'kagoshima', name: '海上自衛隊 鹿屋航空基地', address: '鹿児島県鹿屋市', branch: 'navy' },
   { pref: 'kagoshima', name: '陸上自衛隊 国分駐屯地', address: '鹿児島県霧島市', branch: 'army' },
   { pref: 'okinawa', name: '航空自衛隊 那覇基地', address: '沖縄県那覇市', branch: 'air' },
   { pref: 'okinawa', name: '陸上自衛隊 那覇駐屯地', address: '沖縄県那覇市', branch: 'army' },
+  // 2026-10-13 追加（公開中イベントの会場に使われていた施設・主要施設の補完）
+  { pref: 'sapporo', name: '陸上自衛隊 東千歳駐屯地', address: '北海道千歳市', branch: 'army' },
+  { pref: 'sapporo', name: '陸上自衛隊 北千歳駐屯地', address: '北海道千歳市', branch: 'army' },
+  { pref: 'aomori', name: '陸上自衛隊 弘前駐屯地', address: '青森県弘前市', branch: 'army' },
+  { pref: 'miyagi', name: '陸上自衛隊 多賀城駐屯地', address: '宮城県多賀城市', branch: 'army' },
+  { pref: 'miyagi', name: '陸上自衛隊 霞目駐屯地', address: '宮城県仙台市若林区', branch: 'army' },
+  { pref: 'fukushima', name: '陸上自衛隊 郡山駐屯地', address: '福島県郡山市', branch: 'army' },
+  { pref: 'tochigi', name: '陸上自衛隊 北宇都宮駐屯地', address: '栃木県宇都宮市', branch: 'army' },
+  { pref: 'gunma', name: '陸上自衛隊 新町駐屯地', address: '群馬県高崎市', branch: 'army' },
+  { pref: 'ibaraki', name: '陸上自衛隊 勝田駐屯地', address: '茨城県ひたちなか市', branch: 'army' },
+  { pref: 'ibaraki', name: '陸上自衛隊 古河駐屯地', address: '茨城県古河市', branch: 'army' },
+  { pref: 'tokyo', name: '航空自衛隊 府中基地', address: '東京都府中市', branch: 'air' },
+  { pref: 'tokyo', name: '航空自衛隊 目黒基地', address: '東京都目黒区', branch: 'air' },
+  { pref: 'tokyo', name: '陸上自衛隊 十条駐屯地', address: '東京都北区', branch: 'army' },
+  { pref: 'tokyo', name: '陸上自衛隊 立川駐屯地', address: '東京都立川市', branch: 'army' },
+  { pref: 'saitama', name: '航空自衛隊 熊谷基地', address: '埼玉県熊谷市', branch: 'air' },
+  { pref: 'chiba', name: '陸上自衛隊 下志津駐屯地', address: '千葉県千葉市若葉区', branch: 'army' },
+  { pref: 'chiba', name: '陸上自衛隊 松戸駐屯地', address: '千葉県松戸市', branch: 'army' },
+  { pref: 'kanagawa', name: '海上自衛隊 厚木航空基地', address: '神奈川県綾瀬市', branch: 'navy' },
+  { pref: 'kanagawa', name: '陸上自衛隊 久里浜駐屯地', address: '神奈川県横須賀市', branch: 'army' },
+  { pref: 'niigata', name: '陸上自衛隊 高田駐屯地', address: '新潟県上越市', branch: 'army' },
+  { pref: 'shizuoka', name: '航空自衛隊 浜松基地', address: '静岡県浜松市', branch: 'air' },
+  { pref: 'shizuoka', name: '陸上自衛隊 滝ヶ原駐屯地', address: '静岡県御殿場市', branch: 'army' },
+  { pref: 'aichi', name: '陸上自衛隊 守山駐屯地', address: '愛知県名古屋市守山区', branch: 'army' },
+  { pref: 'aichi', name: '陸上自衛隊 春日井駐屯地', address: '愛知県春日井市', branch: 'army' },
+  { pref: 'kyoto', name: '陸上自衛隊 桂駐屯地', address: '京都府京都市西京区', branch: 'army' },
+  { pref: 'kyoto', name: '陸上自衛隊 大久保駐屯地', address: '京都府宇治市', branch: 'army' },
+  { pref: 'osaka', name: '陸上自衛隊 八尾駐屯地', address: '大阪府八尾市', branch: 'army' },
+  { pref: 'hyogo', name: '陸上自衛隊 千僧駐屯地', address: '兵庫県伊丹市', branch: 'army' },
+  { pref: 'hyogo', name: '陸上自衛隊 青野原駐屯地', address: '兵庫県小野市', branch: 'army' },
+  { pref: 'hyogo', name: '陸上自衛隊 川西駐屯地', address: '兵庫県川西市', branch: 'army' },
+  { pref: 'yamaguchi', name: '陸上自衛隊 山口駐屯地', address: '山口県山口市', branch: 'army' },
+  { pref: 'fukuoka', name: '陸上自衛隊 小倉駐屯地', address: '福岡県北九州市小倉南区', branch: 'army' },
+  { pref: 'fukuoka', name: '陸上自衛隊 久留米駐屯地', address: '福岡県久留米市', branch: 'army' },
+  { pref: 'fukuoka', name: '航空自衛隊 芦屋基地', address: '福岡県遠賀郡芦屋町', branch: 'air' },
+  { pref: 'nagasaki', name: '陸上自衛隊 相浦駐屯地', address: '長崎県佐世保市', branch: 'army' },
+  { pref: 'kagoshima', name: '陸上自衛隊 川内駐屯地', address: '鹿児島県薩摩川内市', branch: 'army' },
 ];
 
 /** 指定地本（pref）の施設一覧 */

@@ -93,3 +93,20 @@ test('管理画面が選べるタグと絞り込みチップの項目が一致�
   assert.ok(!/const\s+TAG_/.test(admin), '管理画面にタグ定義が再実装されている');
   assert.deepStrictEqual(TAG_VALUES, TAG_DEFS.map(d => d.id));
 });
+
+// ── 同時に選べないタグ（2026-10-13） ───────────────────────────────
+const { conflictingTags, tagConflict, EXCLUSIVE_TAG_GROUPS } = require('./tags.cjs');
+
+test('同時に選べないタグ: 入場無料⇔要予約・家族向け⇔学生向け', () => {
+  assert.deepEqual(conflictingTags('入場無料'), ['要予約']);
+  assert.deepEqual(conflictingTags('学生向け'), ['家族向け']);
+  assert.deepEqual(conflictingTags('オンライン'), []);
+  assert.match(tagConflict(['入場無料', '要予約']), /入場無料.*要予約/);
+  assert.match(tagConflict(['家族向け', '学生向け']), /同時に選べません/);
+  assert.equal(tagConflict(['入場無料', '家族向け', 'オンライン']), null);
+  // 申込要否（tag）との組み合わせも見る
+  assert.match(tagConflict(['入場無料'], '要予約'), /同時に選べません/);
+  assert.equal(tagConflict(['入場無料'], '予約不要'), null);
+  assert.equal(tagConflict([], ''), null);
+  for (const g of EXCLUSIVE_TAG_GROUPS) for (const t of g) assert.ok(TAG_VALUES.includes(t), t);
+});
