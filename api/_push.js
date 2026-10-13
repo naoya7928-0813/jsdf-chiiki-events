@@ -35,27 +35,28 @@ export async function replaceWatchList(endpoint, eventIds) {
   const mine = watchingKey(endpoint);
   const prev = new Set(((await redis.smembers(mine)) || []).map(String));
   const next = new Set(eventIds.map(String));
-  let added = 0, removed = 0;
-  for (const id of prev) {
-    if (!next.has(id)) { await redis.srem(watchKey(id), endpoint); removed++; }
-  }
-  for (const id of next) {
-    if (!prev.has(id)) { await redis.sadd(watchKey(id), endpoint); added++; }
-    await redis.expire(watchKey(id), WATCH_TTL_SEC);
-  }
+  const removedIds = [...prev].filter(id => !next.has(id));
+  const addedIds = [...next].filter(id => !prev.has(id));
+  // 同時に発行して自動パイプライン（@upstash/redis 既定）で1往復にまとめる。
+  // 1件ずつ await すると最大100件×2往復になり、関数の実行時間制限に当たる
+  await Promise.all([
+    ...removedIds.map(id => redis.srem(watchKey(id), endpoint)),
+    ...addedIds.map(id => redis.sadd(watchKey(id), endpoint)),
+    ...[...next].map(id => redis.expire(watchKey(id), WATCH_TTL_SEC)),
+  ]);
   await redis.del(mine);
   if (next.size) {
     await redis.sadd(mine, ...next);
     await redis.expire(mine, WATCH_TTL_SEC);
   }
-  return { added, removed, total: next.size };
+  return { added: addedIds.length, removed: removedIds.length, total: next.size };
 }
 
 /** endpoint の見守りをすべて外す（購読解除・設定オフ・宛先失効時） */
 export async function clearWatchList(endpoint) {
   const mine = watchingKey(endpoint);
   const prev = ((await redis.smembers(mine)) || []).map(String);
-  for (const id of prev) await redis.srem(watchKey(id), endpoint);
+  await Promise.all(prev.map(id => redis.srem(watchKey(id), endpoint)));
   await redis.del(mine);
   return prev.length;
 }

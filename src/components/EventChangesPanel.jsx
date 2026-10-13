@@ -67,6 +67,7 @@ export default function EventChangesPanel({ eventId, adminFetch, primary, canPub
         let text = `「${def.label}」を登録しました。`;
         if (j.notify) {
           text += j.notify.skipped ? '（同じ内容を24時間以内に通知済みのため通知は送っていません）'
+            : j.notify.error ? '（通知の送信に失敗しました。変更は保存済みです。時間をおいて同じ内容で登録し直すと再送できます）'
             : j.notify.configured === false ? '（通知の設定が無いため送信できませんでした）'
             : `（お気に入り登録者 ${j.notify.watchers} 件中 ${j.notify.sent} 件へ通知しました）`;
         }

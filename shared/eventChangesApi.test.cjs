@@ -195,3 +195,27 @@ test('延期（postponed）は公開APIを通る', async () => {
   assert.equal(ev.status, 'postponed');
   assert.equal(ev.changes[0].type, 'postponed');
 });
+
+test('通知の送信に失敗しても変更は保存され、重複防止の印を外して再送できる', async () => {
+  const endpoint = 'https://fcm.googleapis.com/fcm/send/test-endpoint-2';
+  fake.store.set('push:subscriptions', new Map([[endpoint, JSON.stringify({ endpoint, keys: { p256dh: 'BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtUbVlUls0VJXg7A8u-Ts1XbjhazAkj7I99e8QcYP7DkM', auth: 'tBHItJI5svbpez7KI4CCXg' } })]]));
+  assert.equal((await call('../api/watch.js', 'POST', null, { endpoint, eventIds: [SCRAPED_ID] })).statusCode, 200);
+  // 購読情報の読み出し（HMGET）だけを失敗させる
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async (url, init) => {
+    if (String(init && init.body).includes('"hmget"')) return new Response(JSON.stringify({ error: 'boom' }), { status: 500 });
+    return realFetch(url, init);
+  };
+  const change = { type: 'notice', after: '集合場所が変わりました', public: true, notify: true, evidence: '公式ページ', confirmed: true };
+  let r;
+  try { r = await changes('POST', 'tokyo', { id: SCRAPED_ID, change }); } finally { globalThis.fetch = realFetch; }
+  assert.equal(r.statusCode, 200, '変更自体は保存して 200');
+  assert.equal(r.body.notify.error, 'send_failed');
+  const rec = JSON.parse(fake.store.get('manual:overrides').get(SCRAPED_ID));
+  assert.ok(rec.changes.some(c => c.after === '集合場所が変わりました'));
+  // 再登録すれば送れる（24時間の重複扱いにならない）
+  const before = sentPush.length;
+  const again = await changes('POST', 'tokyo', { id: SCRAPED_ID, change });
+  assert.equal(again.body.notify.sent, 1);
+  assert.equal(sentPush.length, before + 1);
+});

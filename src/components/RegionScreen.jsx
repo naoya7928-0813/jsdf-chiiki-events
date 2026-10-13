@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { ICO } from './Icons';
-import { F, ScreenHeader, BottomTabBar, splitDate } from './Shared';
+import { F, ScreenHeader, BottomTabBar, splitDate, StatusBadge } from './Shared';
+import { ChangeFlags } from './EventChanges';
 import { REGION_BY_ID, SUPPORTED_PREFECTURES } from '../data/regionMap';
 import { deadlineDaysUntil, daysUntil, daysLabel, daysColor, daysFgColor, jstTodayStr } from '../utils/date';
 
@@ -218,6 +219,9 @@ function EventCard({ ev, isFav, applied, primary, accent, onTap }) {
         {/* 内容列 */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5, flexWrap: 'wrap' }}>
+            {/* 中止・延期・受付終了と変更のお知らせ（一覧と同じ表示） */}
+            <StatusBadge status={ev.status} size="sm" />
+            <ChangeFlags ev={ev} />
             {ev.ended && (
               <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3, background: '#6b7280', color: '#fff', letterSpacing: 0.5 }}>終了済み</span>
             )}

@@ -132,15 +132,25 @@ export default async function handler(req, res) {
         if (!first) {
           notify = { skipped: 'duplicate' };
         } else {
-          notify = await sendToWatchers(id, msg);
-          const saved = parse(await redis.hget(key, id));
-          const list = C.sanitizeStoredChanges(saved.changes).map(c => (c.id === entry.id ? { ...c, notifiedAt: new Date().toISOString() } : c));
-          await redis.hset(key, { [id]: JSON.stringify({ ...saved, changes: list }) });
+          try {
+            notify = await sendToWatchers(id, msg);
+            const saved = parse(await redis.hget(key, id));
+            const list = C.sanitizeStoredChanges(saved.changes).map(c => (c.id === entry.id ? { ...c, notifiedAt: new Date().toISOString() } : c));
+            await redis.hset(key, { [id]: JSON.stringify({ ...saved, changes: list }) });
+          } catch (err) {
+            // 変更自体は保存済み。送れなかったときは重複防止の印を外し、登録し直せば再送できるようにする
+            // （外さないと24時間「通知済み」扱いになり、一度も届かないまま終わる）
+            console.error('[admin/event-changes] notify', err && err.message);
+            await redis.del(dedupKey).catch(() => {});
+            notify = { error: 'send_failed' };
+          }
         }
         await writeAudit(account, {
-          action: 'event.change.notify', result: notify.skipped ? 'skipped' : 'success', targetId: id,
+          action: 'event.change.notify', result: notify.skipped ? 'skipped' : notify.error ? 'failed' : 'success', targetId: id,
           organization: found.pref, office: found.office, title: current.title || '',
-          note: notify.skipped ? '同じ内容を24時間以内に通知済み' : `通知 送信${notify.sent}/見守り${notify.watchers}${notify.configured === false ? '（VAPID未設定）' : ''}`,
+          note: notify.skipped ? '同じ内容を24時間以内に通知済み'
+            : notify.error ? '通知の送信に失敗（変更は保存済み）'
+            : `通知 送信${notify.sent}/見守り${notify.watchers}${notify.configured === false ? '（VAPID未設定）' : ''}`,
         });
       }
       return res.status(200).json({ ok: true, entry, status: next.status || 'published', notify });

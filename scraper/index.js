@@ -594,7 +594,9 @@ async function checkRapidOcrAvailable() {
 
   for (const cmd of candidates) {
     try {
-      const { stdout } = await execFileAsync(cmd, [RAPID_OCR_SCRIPT, '--check'], { timeout: 15_000, maxBuffer: 1024 * 1024 });
+      // 1回だけの確認。モデル読み込みは通常 3〜7 秒だが、Chromium と並走する負荷下では 15 秒を超え、
+      // 全候補が時間切れになるとこの実行中ずっと RapidOCR が「利用不可」になる（2026-10-13 に手元で再現）
+      const { stdout } = await execFileAsync(cmd, [RAPID_OCR_SCRIPT, '--check'], { timeout: 60_000, maxBuffer: 1024 * 1024 });
       let engine = '';
       try { engine = JSON.parse(stdout).engine || ''; } catch { /* 旧CLIは engine を返さない */ }
       rapidOcrPython = cmd;

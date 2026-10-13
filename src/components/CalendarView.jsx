@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { F } from './Shared';
+import { F, StatusBadge } from './Shared';
+import { ChangeFlags } from './EventChanges';
 import { ICO } from './Icons';
 import { PREFECTURE_INFO } from '../data/regionMap';
 import { jstTodayStr } from '../utils/date';
@@ -177,6 +178,9 @@ export default function CalendarView({ events, onOpenDetail, primary, accent, fa
               }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 4, flexWrap: 'wrap' }}>
+                  {/* 中止・延期・受付終了と変更のお知らせ（一覧と同じ表示） */}
+                  <StatusBadge status={ev.status} size="sm" />
+                  <ChangeFlags ev={ev} />
                   <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 'var(--radius-tag, 2px)', background: 'var(--tag-bg)', color: 'var(--brand-fg)', letterSpacing: 0.5 }}>
                     {ev.category}
                   </span>
