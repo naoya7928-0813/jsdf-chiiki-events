@@ -15,6 +15,7 @@ import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
 import { injectGlobalStyles } from './globalStyles';
 import { recoverFromChunkError } from './utils/lazyChunk';
+import { reloadOnServiceWorkerUpdate } from './utils/swUpdate';
 
 // 公開アプリと同じグローバルCSS（CSS変数・リセット）。配色/ダークモードは
 // App 内で localStorage(jsdf-scheme / jsdf-dark) から復元するため、見た目は完全に揃う。
@@ -25,6 +26,9 @@ injectGlobalStyles();
 window.addEventListener('vite:preloadError', (e) => {
   if (recoverFromChunkError()) e.preventDefault();
 });
+
+// デプロイ後に古い運営画面（precache の admin.html）が残らないようにする
+reloadOnServiceWorkerUpdate();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
