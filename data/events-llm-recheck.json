@@ -2,11 +2,11 @@
   "updatedAt": "2026-10-14",
   "limit": 30,
   "summary": {
-    "checked": 339,
-    "flagged": 21,
-    "attempted": 14,
-    "corrected": 8,
-    "unverified": 4,
+    "checked": 346,
+    "flagged": 22,
+    "attempted": 15,
+    "corrected": 7,
+    "unverified": 6,
     "noSource": 3,
     "overBudget": 0,
     "skippedNoSource": 3,
@@ -56,7 +56,7 @@
       ]
     },
     {
-      "id": "to-off-20261024-456ez",
+      "id": "to-office-20261024-uopt4",
       "pref": "tokyo",
       "source": "https://www.mod.go.jp/pco/tokyo/event2/img/shinjuku.pdf",
       "reasons": [
@@ -85,13 +85,13 @@
         },
         {
           "field": "notes",
-          "from": "受付時間07:30～08:20。遅刻時は遅延証明書提示要。",
+          "from": "掲載元: 豊島出張所\n受付時間07:30～08:20。遅刻時は遅延証明書提示要。",
           "to": "受験票（顔写真付き）必携。公共交通機関の利用を推奨。"
         }
       ]
     },
     {
-      "id": "to-off-20261024-456ez",
+      "id": "to-office-20261024-adqaa",
       "pref": "tokyo",
       "source": "https://www.mod.go.jp/pco/tokyo/event2/img/meguro.pdf",
       "reasons": [
@@ -115,38 +115,8 @@
         },
         {
           "field": "notes",
-          "from": "受付時間07:30～08:20。遅刻時は遅延証明書提示要。",
+          "from": "掲載元: 豊島出張所\n受付時間07:30～08:20。遅刻時は遅延証明書提示要。",
           "to": "公共交通機関の遅延で遅刻される方は試験を受けることはできません。"
-        }
-      ]
-    },
-    {
-      "id": "to-off-20261024-456ez",
-      "pref": "tokyo",
-      "source": "https://www.mod.go.jp/pco/tokyo/event2/img/jujo.pdf",
-      "reasons": [
-        "日付がタイトルになっている"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "令和9年度入校第54期防衛医科大学校医学科学生採用第1次試験",
-          "to": "令和9年度入校第54期防衛医科大学校学生採用第1次試験"
-        },
-        {
-          "field": "address",
-          "from": null,
-          "to": "東京都北区十条台1-5-70"
-        },
-        {
-          "field": "time",
-          "from": "09:00～18:00",
-          "to": "07:30～08:20"
-        },
-        {
-          "field": "notes",
-          "from": "受験票・筆記具・昼食・ゴミ袋を持参。車での乗り入れ不可。",
-          "to": "試験時間: 09:00～18:00"
         }
       ]
     },
@@ -166,42 +136,32 @@
       ]
     },
     {
-      "id": "gu-office-20261017-3lo0j",
-      "pref": "gunma",
-      "source": "https://www.mod.go.jp/pco/gunma/sozai/event/20261017-18-1.jpg",
+      "id": "ni-office-20261031-8417t",
+      "pref": "niigata",
+      "source": "https://www.mod.go.jp/pco/niigata/files/event/r8.10.31keidaisai.pdf",
       "reasons": [
-        "タイトルが長すぎる（説明文・別イベントの混入）"
+        "タイトルが短すぎる"
       ],
       "changes": [
         {
-          "field": "title",
-          "from": "KYOAI GAKUEN UNIVERSITY SHARON FES 38th Co:Lab -コラボ",
-          "to": "SHARON FES 38th Co:Lab"
-        },
-        {
           "field": "endDate",
           "from": null,
-          "to": "2026-10-18"
-        },
-        {
-          "field": "address",
-          "from": null,
-          "to": "群馬県前橋市小屋原町1154-4"
-        },
-        {
-          "field": "time",
-          "from": "10/17(Sat) 10:00～16:30、10/18(Sun) 10:00～16:00",
-          "to": "10:00～16:30"
+          "to": "2026-11-01"
         },
         {
           "field": "category",
           "from": "広報活動",
-          "to": "地域参加"
+          "to": "一般公開"
+        },
+        {
+          "field": "tag",
+          "from": null,
+          "to": "入場無料"
         },
         {
           "field": "notes",
-          "from": "掲載元: 前橋募集案内所",
-          "to": null
+          "from": "掲載元: 加茂地域事務所\nイベント内容は予告なく変更となる場合がございます。",
+          "to": "イベント内容は予告なく変更となる場合がございます。"
         }
       ]
     },
