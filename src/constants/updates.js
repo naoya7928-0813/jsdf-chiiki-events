@@ -12,6 +12,12 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-10-14',
+    version: '1.45.34',
+    type:    'fix',
+    content: 'イベント情報を修正。',
+  },
+  {
+    date:    '2026-10-14',
     version: '1.45.33',
     type:    'improvement',
     content: '大きさくらべの施設選択を都道府県ごとに変更。',

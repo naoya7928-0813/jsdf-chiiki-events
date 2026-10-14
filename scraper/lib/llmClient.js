@@ -28,7 +28,9 @@ const {
 } = require('../../shared/llmExtract.cjs');
 
 // プロンプトを変えたら上げる。キャッシュキーに含めるので、古い結果を引きずらない。
-const PROMPT_VERSION = 'v1';
+// 独自辞書（shared/termDictionary.cjs）を変えたら古い指示の結果を使わないよう、辞書の版もキーに含める
+const { DICTIONARY_VERSION } = require('../../shared/termDictionary.cjs');
+const PROMPT_VERSION = `v2-${DICTIONARY_VERSION}`;
 
 const TIMEOUT_MS      = 45000;
 const MAX_TEXT_CHARS  = 6000;   // OCR 生テキストが長すぎるときの上限（先頭を優先）
