@@ -2,15 +2,15 @@
   "updatedAt": "2026-10-14",
   "limit": 30,
   "summary": {
-    "checked": 376,
-    "flagged": 22,
-    "attempted": 17,
-    "corrected": 10,
-    "unverified": 5,
-    "noSource": 2,
+    "checked": 339,
+    "flagged": 21,
+    "attempted": 14,
+    "corrected": 8,
+    "unverified": 4,
+    "noSource": 3,
     "overBudget": 0,
-    "skippedNoSource": 2,
-    "skippedNotEligible": 3,
+    "skippedNoSource": 3,
+    "skippedNotEligible": 4,
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
@@ -56,66 +56,6 @@
       ]
     },
     {
-      "id": "to-office-20261024-adqaa",
-      "pref": "tokyo",
-      "source": "https://www.mod.go.jp/pco/tokyo/event2/img/meguro.pdf",
-      "reasons": [
-        "日付がタイトルになっている"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "令和9年度入校第54期防衛医科大学校医学科学生採用第1次試験",
-          "to": "令和9年度入校第54期防衛医科大学校医学学生採用第1次試験"
-        },
-        {
-          "field": "address",
-          "from": null,
-          "to": "東京都目黒区中目黒2-2-1"
-        },
-        {
-          "field": "time",
-          "from": "09:00～18:00",
-          "to": "07:30～08:20"
-        },
-        {
-          "field": "notes",
-          "from": "掲載元: 豊島出張所\n受付時間07:30～08:20。遅刻時は遅延証明書提示要。",
-          "to": "公共交通機関の遅延で遅刻される方は試験を受けることはできません。"
-        }
-      ]
-    },
-    {
-      "id": "to-office-20261024-q8rhr",
-      "pref": "tokyo",
-      "source": "https://www.mod.go.jp/pco/tokyo/event2/img/jujo.pdf",
-      "reasons": [
-        "日付がタイトルになっている"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "令和9年度入校第54期防衛医科大学校医学科学生採用第1次試験",
-          "to": "令和9年度入校第54期防衛医科大学校学生採用第1次試験"
-        },
-        {
-          "field": "address",
-          "from": null,
-          "to": "東京都北区十条台1-5-70"
-        },
-        {
-          "field": "time",
-          "from": "09:00～18:00",
-          "to": "07:30～08:20"
-        },
-        {
-          "field": "notes",
-          "from": "掲載元: 豊島出張所\n受験票・筆記具・昼食・ゴミ袋を持参。車での乗り入れ不可。",
-          "to": "試験時間: 09:00～18:00"
-        }
-      ]
-    },
-    {
       "id": "to-off-20261024-456ez",
       "pref": "tokyo",
       "source": "https://www.mod.go.jp/pco/tokyo/event2/img/shinjuku.pdf",
@@ -151,67 +91,62 @@
       ]
     },
     {
-      "id": "s-20261121-5372q",
-      "pref": "saitama",
-      "source": "https://www.mod.go.jp/pco/saitama/event/img/8.11.21ongaku.jpg",
+      "id": "to-off-20261024-456ez",
+      "pref": "tokyo",
+      "source": "https://www.mod.go.jp/pco/tokyo/event2/img/meguro.pdf",
       "reasons": [
         "日付がタイトルになっている"
       ],
       "changes": [
         {
           "field": "title",
-          "from": "令和8年度自衛隊音楽まつり 招待席応募ご案内",
-          "to": "令和8年度自衛隊音楽まつり"
+          "from": "令和9年度入校第54期防衛医科大学校医学科学生採用第1次試験",
+          "to": "令和9年度入校第54期防衛医科大学校医学学生採用第1次試験"
         },
         {
           "field": "address",
           "from": null,
-          "to": "東京都千代田区北の丸公園2-3"
+          "to": "東京都目黒区中目黒2-2-1"
         },
         {
-          "field": "category",
-          "from": "地域参加",
-          "to": "演奏会"
-        },
-        {
-          "field": "tag",
-          "from": null,
-          "to": "抽選"
-        },
-        {
-          "field": "ageRequirement",
-          "from": "18歳以上32歳以下",
-          "to": "18歳～32歳以下の方"
+          "field": "time",
+          "from": "09:00～18:00",
+          "to": "07:30～08:20"
         },
         {
           "field": "notes",
-          "from": "日本国籍有る方",
-          "to": "日本国籍を有する方、3階自由席エリア、抽選"
+          "from": "受付時間07:30～08:20。遅刻時は遅延証明書提示要。",
+          "to": "公共交通機関の遅延で遅刻される方は試験を受けることはできません。"
         }
       ]
     },
     {
-      "id": "gu-office-20261024-n083a",
-      "pref": "gunma",
-      "source": "https://www.mod.go.jp/pco/gunma/sozai/event/20261023-24-1.jpg",
+      "id": "to-off-20261024-456ez",
+      "pref": "tokyo",
+      "source": "https://www.mod.go.jp/pco/tokyo/event2/img/jujo.pdf",
       "reasons": [
-        "タイトルが短すぎる"
+        "日付がタイトルになっている"
       ],
       "changes": [
         {
           "field": "title",
-          "from": "伊商祭",
-          "to": "伊勢崎商業高等学校 第24回 華城祭"
+          "from": "令和9年度入校第54期防衛医科大学校医学科学生採用第1次試験",
+          "to": "令和9年度入校第54期防衛医科大学校学生採用第1次試験"
         },
         {
-          "field": "category",
-          "from": "広報活動",
-          "to": "一般公開"
+          "field": "address",
+          "from": null,
+          "to": "東京都北区十条台1-5-70"
+        },
+        {
+          "field": "time",
+          "from": "09:00～18:00",
+          "to": "07:30～08:20"
         },
         {
           "field": "notes",
-          "from": "掲載元: 前橋募集案内所",
-          "to": "校内での写真撮影はご遠慮ください。"
+          "from": "受験票・筆記具・昼食・ゴミ袋を持参。車での乗り入れ不可。",
+          "to": "試験時間: 09:00～18:00"
         }
       ]
     },
@@ -220,43 +155,18 @@
       "pref": "gunma",
       "source": "https://www.mod.go.jp/pco/gunma/sozai/event/20261024-25-2.jpg",
       "reasons": [
-        "タイトルが短すぎる"
+        "同じ語句が繰り返されている（複数イベントの連結）"
       ],
       "changes": [
-        {
-          "field": "title",
-          "from": "大学祭",
-          "to": "ぐんま未来大学 ぐんま未来大学短期大学部 大学祭"
-        },
-        {
-          "field": "endDate",
-          "from": null,
-          "to": "2026-10-25"
-        },
         {
           "field": "place",
           "from": "ぐんま未来大学 ぐんま未来大学短期大学部",
           "to": null
-        },
-        {
-          "field": "time",
-          "from": "SAT 10:00～16:00 / SUN 10:00～15:00",
-          "to": "10:00～16:00"
-        },
-        {
-          "field": "category",
-          "from": "採用イベント",
-          "to": "地域参加"
-        },
-        {
-          "field": "notes",
-          "from": "掲載元: 前橋募集案内所",
-          "to": "10/24(SAT)10:00-16:00, 10/25(SUN)10:00-15:00"
         }
       ]
     },
     {
-      "id": "gu-office-20261017-mir58",
+      "id": "gu-office-20261017-3lo0j",
       "pref": "gunma",
       "source": "https://www.mod.go.jp/pco/gunma/sozai/event/20261017-18-1.jpg",
       "reasons": [
@@ -336,27 +246,42 @@
       ]
     },
     {
-      "id": "ku-office-20261012-8elim",
-      "pref": "kumamoto",
-      "source": "https://www.mod.go.jp/pco/kumamoto/event/thumbs/20261012_koukoukou.png",
+      "id": "ya-office-20261102-y6pwd",
+      "pref": "yamaguchi",
+      "source": "https://www.mod.go.jp/pco/yamaguchi/event-20261018.pdf",
       "reasons": [
-        "日付がタイトルになっている"
+        "タイトルが長すぎる（説明文・別イベントの混入）"
       ],
       "changes": [
         {
-          "field": "address",
-          "from": null,
-          "to": "熊本市西区春日2-10-1"
+          "field": "title",
+          "from": "車両展示（t救急車：第13後方支援隊） ・ガチャガチャ（山口地本オリジナルデザインの缶バッチなど） ・自衛官制服の体験試",
+          "to": "岩国祭"
         },
         {
-          "field": "ageRequirement",
-          "from": "高等工科学校に興味のある中学生および保護者等",
-          "to": "高工校に興味のある中学生（女子中学生含む。）及び保護者等"
+          "field": "date",
+          "from": "2026-11-02",
+          "to": "2026-10-17"
+        },
+        {
+          "field": "endDate",
+          "from": null,
+          "to": "2026-10-18"
+        },
+        {
+          "field": "place",
+          "from": null,
+          "to": "白崎八幡宮"
+        },
+        {
+          "field": "category",
+          "from": "体験",
+          "to": "地域参加"
         },
         {
           "field": "notes",
-          "from": "掲載元: 募集案内所・地域事務所\n保護者の同伴が必要。飲み物・茶菓子を用意。",
-          "to": "保護者の同伴が必要です。当日は公共交通機関または近隣の有料駐車場をご利用ください。"
+          "from": "掲載元: 募集案内所・地域事務所",
+          "to": null
         }
       ]
     }
@@ -373,6 +298,11 @@
       "reason": "no_source"
     },
     {
+      "id": "s-20261121-5372q",
+      "pref": "saitama",
+      "reason": "no_source"
+    },
+    {
       "id": "os-office-20261017-5u6ep",
       "pref": "osaka",
       "reason": "not_eligible"
@@ -385,6 +315,11 @@
     {
       "id": "ok-20261115-b75qj",
       "pref": "okayama",
+      "reason": "not_eligible"
+    },
+    {
+      "id": "ym-20261018-l6bla",
+      "pref": "yamaguchi",
       "reason": "not_eligible"
     }
   ]
