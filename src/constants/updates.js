@@ -12,6 +12,19 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-10-14',
+    version: '1.45.31',
+    type:    'feature',
+    content: '基地・駐屯地の滑走路の長さを東京タワー・東京スカイツリー・シロナガスクジラ・車と比べる「滑走路の長さくらべ」を追加。',
+    note:    '長さはおおよその目安。',
+  },
+  {
+    date:    '2026-10-14',
+    version: '1.44.31',
+    type:    'improvement',
+    content: '広さくらべの対象施設を追加。',
+  },
+  {
+    date:    '2026-10-14',
     version: '1.44.30',
     type:    'feature',
     content: '駐屯地・基地の広さを東京ドーム・東京ディズニーリゾートと比べる「会場の広さくらべ」を追加。',
