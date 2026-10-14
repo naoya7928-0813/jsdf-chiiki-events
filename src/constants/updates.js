@@ -12,6 +12,12 @@
 export const UPDATE_NOTES = [
   {
     date:    '2026-10-14',
+    version: '1.45.32',
+    type:    'improvement',
+    content: 'ホーム画面から大きさくらべを開けるように変更。',
+  },
+  {
+    date:    '2026-10-14',
     version: '1.45.31',
     type:    'feature',
     content: '基地・駐屯地の滑走路の長さを東京タワー・東京スカイツリー・シロナガスクジラ・車と比べる「滑走路の長さくらべ」を追加。',

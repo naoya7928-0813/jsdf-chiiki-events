@@ -4,6 +4,7 @@ import { BottomTabBar, F, Spinner, ErrorBanner, splitDate, StatusBadge } from '.
 import JapanMap from './JapanMap';
 import { useIsDesktop } from '../hooks/useBreakpoint';
 import NearbyOfficesModal from './NearbyOfficesModal';
+import SizeCompareModal from './SizeCompareModal';
 import { CORRIDOR_TRIAL_URL } from '../config';
 import { REGION_BY_ID, SUPPORTED_PREFECTURES, countEventsByRegion, getSupportedPrefsByRegion } from '../data/regionMap';
 
@@ -20,6 +21,8 @@ export default function HomeScreen({
 
   // 近くの施設モーダル
   const [nearbyOpen, setNearbyOpen] = useState(false);
+  // 大きさくらべ（基地・駐屯地の広さ・滑走路の長さ）
+  const [sizeOpen, setSizeOpen] = useState(false);
 
   // 地図上で選択中の地域ID
   const [selectedRegionId, setSelectedRegionId] = useState(initialRegionId ?? null);
@@ -63,7 +66,7 @@ export default function HomeScreen({
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '0 20px',
         }}>
-          <div>
+          <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: 10, letterSpacing: 1.5, color: 'rgba(255,255,255,0.65)', fontWeight: 500 }}>
               Main Page
             </div>
@@ -76,7 +79,7 @@ export default function HomeScreen({
               title="3D隊舎（試験公開）を開く"
               style={{
                 display: 'block', color: 'inherit', textDecoration: 'none',
-                fontFamily: F.serif, fontSize: 22, fontWeight: 600, letterSpacing: 1, marginTop: 4,
+                fontFamily: F.serif, fontSize: 'clamp(16px, 5.2vw, 22px)', fontWeight: 600, letterSpacing: 1, marginTop: 4, whiteSpace: 'nowrap',
               }}
             >
               地本イベントナビ
@@ -84,14 +87,29 @@ export default function HomeScreen({
           </div>
 
           {/* ヘッダー右側ボタン群 */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+
+            {/* 大きさくらべ（基地・駐屯地の広さ・滑走路の長さを身近なものと比べる） */}
+            <button
+              onClick={() => setSizeOpen(true)}
+              aria-label="基地・駐屯地の大きさくらべ"
+              title="大きさくらべ"
+              style={{
+                width: 'clamp(38px, 11vw, 44px)', height: 'clamp(38px, 11vw, 44px)', borderRadius: 10,
+                background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.22)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', padding: 0,
+              }}
+            >
+              {ICO.ruler('#fff', 20)}
+            </button>
 
             {/* 現在地検索ボタン */}
             <button
               onClick={() => setNearbyOpen(true)}
               aria-label="近くの施設を検索"
               style={{
-                width: 44, height: 44, borderRadius: 10,
+                width: 'clamp(38px, 11vw, 44px)', height: 'clamp(38px, 11vw, 44px)', borderRadius: 10,
                 background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.22)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 cursor: 'pointer', padding: 0,
@@ -105,7 +123,7 @@ export default function HomeScreen({
               onClick={onOpenNotifications}
               aria-label={`通知${unreadCount > 0 ? `（未読${unreadCount}件）` : ''}`}
               style={{
-                width: 44, height: 44, borderRadius: 10,
+                width: 'clamp(38px, 11vw, 44px)', height: 'clamp(38px, 11vw, 44px)', borderRadius: 10,
                 background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.22)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 cursor: 'pointer', padding: 0, position: 'relative',
@@ -296,6 +314,9 @@ export default function HomeScreen({
         onClose={() => setNearbyOpen(false)}
         theme={theme}
       />
+
+      {/* ── 大きさくらべ（ボトムシート） ── */}
+      <SizeCompareModal isOpen={sizeOpen} onClose={() => setSizeOpen(false)} />
     </div>
   );
 }
