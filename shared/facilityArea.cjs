@@ -219,11 +219,11 @@ function compareArea(ha) {
   return REFERENCES.map(r => ({ ...r, ratio: ha / r.ha }));
 }
 
-/** 倍率の読み上げ用の文言（「約64個分」「約0.6倍」） */
+/** 倍率の文言（「約64個分」「約0.4個分」。比較対象より小さくても「◯個分」で言う） */
 function ratioText(ratio) {
   if (!(ratio > 0)) return '';
-  if (ratio >= 1) return `約${ratio >= 10 ? Math.round(ratio) : Math.round(ratio * 10) / 10}個分`;
-  return `約${Math.max(0.1, Math.round(ratio * 10) / 10)}倍`;
+  const v = ratio >= 10 ? Math.round(ratio) : Math.max(0.1, Math.round(ratio * 10) / 10);
+  return `約${v.toLocaleString('ja-JP')}個分`;
 }
 
 /** 長さ m を比較対象ごとの倍率にする */
