@@ -747,6 +747,8 @@ PC幅では従来どおり折り返し表示。
   閲覧数は Upstash の1リクエスト上限に収まるよう ID を400件ずつ読む
 - **地本別の運営画面**: `/admin/<地本>`（vercel.json で `/admin.html` へ振り替え。`shared/adminPref.cjs`）。URL で権限は広がらない。
   ログイン画面はどの地本でも共通で、地本名の案内・タブ名はログイン後にだけ出す（担当違いなら警告と担当地本へのリンク）。
+- **運営画面の更新反映**: admin.html は SW の precache から返るため、デプロイ直後は古い画面が出る。`src/utils/swUpdate.js` が
+  新しい SW の制御開始（controllerchange）で読み直す（開いて20秒以内は自動、それ以降は入力を失わないよう画面下の案内から）。2026-10-14 追加
   アカウントは `scripts/admin-accounts.mjs`（init/add/passwd/disable/list/check/encode）で作る。手順は `docs/ADMIN_ACCOUNT_SETUP.md`。
   `*.local.json`/`*.local.csv`（パスワード・ハッシュ）は .gitignore 済み
 - **タグの排他**: 「入場無料」⇔「要予約」、「家族向け」⇔「学生向け」は同時に選べない（申込要否の選択も含む）。`shared/tags.cjs` の
