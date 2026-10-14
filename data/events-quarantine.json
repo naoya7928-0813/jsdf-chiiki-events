@@ -1,102 +1,18 @@
 {
-  "updatedAt": "2026-10-14",
-  "count": 8,
+  "updatedAt": "2026-10-15",
+  "count": 1,
   "events": [
     {
-      "id": "mi-office-20270128-o4a4d",
-      "pref": "miyagi",
-      "date": "2027-01-28",
-      "endDate": "",
-      "title": "令和8年度自衛官等採用試験案内",
-      "place": "防衛大学",
-      "url": "https://www.mod.go.jp/pco/miyagi/miyagitop/image/r8rec-schedule.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-14",
-      "reason": "日付がタイトルになっている"
-    },
-    {
-      "id": "ni-off-20270101-19282",
-      "pref": "niigata",
-      "date": "2027-01-01",
-      "endDate": "",
-      "title": "陸海空自衛官",
-      "place": "調機の充足完了及び空調が整備されていない駐屯地",
-      "url": "https://www.mod.go.jp/pco/niigata/files/top/fukurikousei-kaizen.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-14",
-      "reason": "非イベント文書の疑い"
-    },
-    {
-      "id": "fu-office-20261130-w9wpc",
+      "id": "fu-office-20261130-wkywa",
       "pref": "fukui",
       "date": "2026-11-30",
       "endDate": "",
-      "title": "合和8年度予偏自衛官補招集教育訓日程",
+      "title": "令和8年度予備自衛官補招集教育訓日程",
       "place": "",
       "url": "https://www.mod.go.jp/pco/fukui/contents/21-yobijieikantou/images/yobijiho-nittei.pdf",
       "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-14",
+      "quarantinedAt": "2026-10-15",
       "reason": "非イベント文書の疑い"
-    },
-    {
-      "id": "ai-office-20280620-ghetd",
-      "pref": "aichi",
-      "date": "2028-06-20",
-      "endDate": "",
-      "title": "陸上自衛隊高等工科学校生徒説明会",
-      "place": "自衛隊愛知地本豊田地域事務所（豊田合同庁舎3）",
-      "url": "https://www.mod.go.jp/pco/aichi/contact/toyota/seminar/toyota_se202606_11.jpg",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-14",
-      "reason": "OCR由来の不自然な未来日"
-    },
-    {
-      "id": "os-off-20270128-ql6ac",
-      "pref": "osaka",
-      "date": "2027-01-28",
-      "endDate": "",
-      "title": "令和8年度自衛官等 採用案内(:588KB)",
-      "place": "防衛大学",
-      "url": "https://www.mod.go.jp/pco/osaka/recruit/images/r8annai.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-14",
-      "reason": "日付がタイトルになっている"
-    },
-    {
-      "id": "os-off-20270128-ql6ac",
-      "pref": "osaka",
-      "date": "2027-01-28",
-      "endDate": "",
-      "title": "令和8年度自衛官等 採用案内(:588KB)",
-      "place": "防衛大学",
-      "url": "https://www.mod.go.jp/pco/osaka/recruit/images/r8annai.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-14",
-      "reason": "日付がタイトルになっている"
-    },
-    {
-      "id": "eh-off-20261018-hib7d",
-      "pref": "ehime",
-      "date": "2026-10-18",
-      "endDate": "",
-      "title": "令和8年度第2回一般曹候補生採用第2次試験",
-      "place": "陸上自衛隊松山駐屯地",
-      "url": "https://www.mod.go.jp/pco/ehime/recruit/img/jukenannai/02_soukousei2niji.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-14",
-      "reason": "日付がタイトルになっている"
-    },
-    {
-      "id": "ka-off-20270128-d6sn5",
-      "pref": "kagawa",
-      "date": "2027-01-28",
-      "endDate": "",
-      "title": "令和8年度自衛官等募集案内はこちら（PDF）",
-      "place": "防衛大学",
-      "url": "https://www.mod.go.jp/pco/kagawa/R8saiyouanai.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-14",
-      "reason": "日付がタイトルになっている"
     }
   ]
 }
