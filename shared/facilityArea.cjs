@@ -249,6 +249,6 @@ function haText(ha) {
 }
 
 module.exports = {
-  REFERENCES, FACILITY_AREAS, AREA_METHOD, RUNWAYS, LENGTH_REFERENCES, BRANCH_LABEL,
+  REFERENCES, FACILITY_AREAS, AREA_METHOD, RUNWAYS, LENGTH_REFERENCES, BRANCH_LABEL, KNOWN_FACILITIES: KNOWN,
   findFacility, findFacilityArea, compareArea, ratioText, haText, compareLength, lengthRatioText, mText,
 };

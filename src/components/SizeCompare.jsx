@@ -93,7 +93,7 @@ function RunwayFigure({ runwayM, refItem }) {
 }
 
 /** 全国の基地・駐屯地を大きい順に（棒は平方根で伸ばす＝小さい施設も見えるように） */
-function RankingList({ rows, current, value, text }) {
+function RankingList({ rows, current, currentLabel, value, text }) {
   const max = value(rows[0]) || 1;
   return (
     <div style={{ marginTop: 10, maxHeight: 360, overflowY: 'auto', border: '1px solid var(--border)', borderRadius: 10 }}>
@@ -104,7 +104,7 @@ function RankingList({ rows, current, value, text }) {
             <span style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'right' }}>{i + 1}</span>
             <div style={{ minWidth: 0 }}>
               <div style={{ fontSize: 12.5, fontWeight: me ? 700 : 500, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {f.name}{me ? '（この会場）' : ''}
+                {f.name}{me ? `（${currentLabel}）` : ''}
               </div>
               <div style={{ height: 6, borderRadius: 3, marginTop: 3, background: me ? 'var(--brand-fg)' : 'var(--border)', width: `${Math.max(2, 100 * Math.sqrt(value(f) / max))}%` }} />
             </div>
@@ -138,7 +138,7 @@ const toggleBtn = { width: '100%', padding: '9px 10px', borderRadius: 9, border:
 const noteStyle = { fontSize: 10.5, color: 'var(--text-muted)', lineHeight: 1.7, marginTop: 10 };
 const card = { background: 'var(--card)', borderRadius: 12, border: '1px solid var(--border)', padding: 14 };
 
-function AreaSection({ facility }) {
+function AreaSection({ facility, currentLabel }) {
   const area = facility.area;
   const [refId, setRefId] = useState('dome');
   const [showRanking, setShowRanking] = useState(false);
@@ -171,7 +171,7 @@ function AreaSection({ facility }) {
           {showRanking ? '全国の基地・駐屯地の広さを閉じる' : '全国の基地・駐屯地の広さとくらべる'}
         </button>
         {showRanking && (
-          <RankingList rows={[...FACILITY_AREAS].sort((a, b) => b.ha - a.ha)} current={facility.name}
+          <RankingList rows={[...FACILITY_AREAS].sort((a, b) => b.ha - a.ha)} current={facility.name} currentLabel={currentLabel}
             value={(f) => f.ha} text={(f) => <>{haText(f.ha)}<br />ドーム{ratioText(f.ha / dome.ha)}</>} />
         )}
 
@@ -186,7 +186,7 @@ function AreaSection({ facility }) {
   );
 }
 
-function RunwaySection({ facility }) {
+function RunwaySection({ facility, currentLabel }) {
   const rw = facility.runway;
   const [refId, setRefId] = useState('tower');
   const [showRanking, setShowRanking] = useState(false);
@@ -212,7 +212,7 @@ function RunwaySection({ facility }) {
           {showRanking ? '全国の滑走路の長さを閉じる' : '全国の基地・駐屯地の滑走路とくらべる'}
         </button>
         {showRanking && (
-          <RankingList rows={[...RUNWAYS].sort((a, b) => b.m - a.m)} current={facility.name}
+          <RankingList rows={[...RUNWAYS].sort((a, b) => b.m - a.m)} current={facility.name} currentLabel={currentLabel}
             value={(f) => f.m} text={(f) => <>{mText(f.m)}<br />タワー{lengthRatioText(f.m / 333, '本')}</>} />
         )}
 
@@ -226,13 +226,13 @@ function RunwaySection({ facility }) {
   );
 }
 
-export default function SizeCompare({ ev }) {
+export default function SizeCompare({ ev, currentLabel = 'この会場' }) {
   const facility = useMemo(() => findFacility(ev), [ev]);
   if (!facility) return null;
   return (
     <>
-      {facility.area && <AreaSection facility={facility} />}
-      {facility.runway && <RunwaySection facility={facility} />}
+      {facility.area && <AreaSection facility={facility} currentLabel={currentLabel} />}
+      {facility.runway && <RunwaySection facility={facility} currentLabel={currentLabel} />}
     </>
   );
 }
