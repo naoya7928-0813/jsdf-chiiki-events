@@ -26,6 +26,8 @@ const {
   cleanDeadlineText,
   toJapaneseKanji,
 } = require('./titleQuality.cjs');
+// 独自辞書（読み違い・正式な呼び方・カテゴリの決め方・イベント名の例）。プロンプトと出力の整形の両方で使う
+const { buildGlossaryPrompt, fixMisreadings } = require('./termDictionary.cjs');
 
 // ── 正準の固定値 ───────────────────────────────────────────────
 /** カテゴリ固定9値（CLAUDE.md）。これ以外は使わない */
@@ -130,6 +132,8 @@ function buildTextExtractPrompt({ prefLabel = '', today = '' } = {}) {
     '各フィールドのルール:',
     FIELD_RULES,
     '',
+    buildGlossaryPrompt(),
+    '',
     prefLabel ? `参考: この資料は「${prefLabel}」のものです。` : '',
     today ? `参考: 本日は ${today} です。年が省略された日付はこれを基準に解釈してよいが、` +
             '年が特定できない場合は date を null にすること。' : '',
@@ -156,6 +160,8 @@ function buildRecheckPrompt({ prefLabel = '', today = '' } = {}) {
     '各フィールドのルール:',
     FIELD_RULES,
     '',
+    buildGlossaryPrompt(),
+    '',
     prefLabel ? `参考: この資料は「${prefLabel}」のものです。` : '',
     today ? `参考: 本日は ${today} です。` : '',
     '',
@@ -171,7 +177,7 @@ function nullify(v) {
   if (typeof v !== 'string') return null;
   // モデルが簡体字で返してくることがあるため、ここで日本語へ寄せる
   // （プロンプトでも指示しているが、守られる前提にしない）
-  const s = toJapaneseKanji(v).trim();
+  const s = fixMisreadings(toJapaneseKanji(v)).trim();
   if (!s) return null;
   if (/^(?:null|undefined|なし|不明|未定|該当なし|記載なし|N\/A|-|―|—)$/i.test(s)) return null;
   return s;

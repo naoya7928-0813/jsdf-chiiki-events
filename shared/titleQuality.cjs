@@ -1,5 +1,6 @@
 'use strict';
 
+const { fixMisreadings } = require('./termDictionary.cjs');
 const { isProcurementSource } = require('./procurement.cjs');
 const { isExamResultEvent } = require('./examResult.cjs');
 
@@ -181,6 +182,18 @@ function cleanEventTitle(raw) {
   let t = normalizeJaText(toJapaneseKanji(String(raw))).replace(/\s+/g, ' ').trim();
   // 全角英数字→半角（「ｉｎ」「２０２６」等の表記ゆれ統一。記号・カナは触らない）
   t = t.replace(/[Ａ-Ｚａ-ｚ０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
+  // OCR の読み違い（「自衛隧」「鞋屯地」「合和8年」等）を独自辞書で直す（shared/termDictionary.cjs）
+  t = fixMisreadings(t);
+  // ファイル形式・サイズの付記（「（PDF：600KB）」「[PDF」「(PDF形式)」「（Word 1.2MB）」「(600KB)」）
+  t = t.replace(/\s*[（(［\[【]\s*(?:PDF|Word|Excel|JPE?G|PNG)(?:\s*(?:形式|ファイル|版))?(?:\s*[:：,、/]?\s*[\d.,]+\s*(?:KB|MB|kB|キロバイト|メガバイト))?\s*(?:[）)］\]】]|$)/gi, ' ')
+       .replace(/\s*[（(]\s*[\d.,]+\s*(?:KB|MB|kB)\s*[）)]/gi, ' ')
+       .replace(/\s*[（(]?(?:別ウィンドウ|新しいウィンドウ|新規ウィンドウ)で開(?:きます|く)[）)]?/g, ' ')
+       .replace(/\s*[（(](?:外部リンク|外部サイト)[）)]/g, ' ')
+       .replace(/\s*[【（(［\[](?:詳細|詳しく)は?(?:こちら|コチラ)[!！]*[】）)］\]]/g, ' ')
+       .replace(/\s+(?:PDF|PDF版)$/i, '')
+       .replace(/\s+/g, ' ').trim();
+  // 見出しのラベル「［イベント］」「【お知らせ】」「[行事]」（秋田の告知見出し等）
+  t = t.replace(/^[［\[【〔](?:イベント|イベント情報|行事|催し|催事|お知らせ|新着)[］\]】〕]\s*/, '');
   // 画像キャプション「（クリックで拡大します。）」の混入（前後どこでも。新潟等）
   t = t.replace(/[（(]?クリックで拡大します。?[）)]?/g, ' ').replace(/\s+/g, ' ').trim();
   t = t.replace(/^イベント情報\s*/, '');           // 見出し「イベント情報」の巻き込み
@@ -305,10 +318,16 @@ function isJunkOrStubTitle(title) {
   if (/(自衛官|[陸海空]士|曹候補生|幹部候補生|航空学生|予備自衛官補?)[^。]{0,20}募集(中)?$/.test(t)
       && !/説明会|見学|体験|搭乗|ツアー|参加者|相談会|イベント|フェア|公開/.test(t)) return true;
   // 採用案内の冊子（OCR 崩れ「今和8年度自衛官等探用案内」＝令和/採用 を含む）
-  if (/(?:採用|探用)案内$/.test(t) && !/説明会|相談会|ガイダンス|セミナー|フェア/.test(t)) return true;
+  if (/(?:採用|探用)案内(?:\s*[（(][^）)]*[）)])?$/.test(t) && !/説明会|相談会|ガイダンス|セミナー|フェア/.test(t)) return true;
+  // ファイルのダウンロード案内（「ダウンロード（PDF形式）」「PDFをダウンロード令和8年度…」）
+  if (/ダウンロード$/.test(t) || (/ダウンロード/.test(t) && !/説明会|相談会|見学|体験|フェア|まつり|祭|公開|演奏会/.test(t))) return true;
+  // ファイル形式だけ・ファイル名だけ（「PDF」「○○.pdf」）
+  if (/^(?:PDF|Word|Excel)$/i.test(t) || /\.(?:pdf|docx?|xlsx?|jpe?g|png)$/i.test(t)) return true;
   if (/申込み?リンク|応募リンク|広報申込み/.test(t)) return true; // リンク案内の混入
   // ラベル行がタイトル化（「主催:○○」「開催場所:○○」等）
   if (/^(?:主催|共催|開催場所|場所|会場|日時|日程|お問合せ先?)\s*[:：]/.test(t)) return true;
+  // 時間だけの行（「受付時間 9:00～16:00」「開催時間：10時から」）
+  if (/^(?:受付|開催|開場|開始|終了)?時間\s*[:：]?\s*\d/.test(t)) return true;
   // 番号付き一覧が平坦化されたもの（2026-10 新潟: 会場図の出店一覧
   // 「1 比角ラーメン・かけうどん（…） 8 金魚すくい（…） 15 占い」がタイトル化）
   if (/^[\d０-９]{1,2}\s+\S.*\s[\d０-９]{1,2}\s+\S/.test(t)) return true;

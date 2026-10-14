@@ -191,6 +191,16 @@ OCRの優先順は、無料ローカルOCR（**RapidOCR 日本語モデル → T
 - 1実行あたりの上限は **30件**（`LLM_RECHECK_LIMIT`）。超過分は今回は手を触れず次回へ回す
 - 結果は `data/events-llm-recheck.json`（公開サイトでは配信しない） に残し、scrape.yml が ntfy で管理者へ通知する
 
+### 独自辞書（`shared/termDictionary.cjs`。2026-10-14 導入）
+LLM（段1・段3）とイベント名の整形（`cleanEventTitle`）が**同じ辞書**を使い、実行ごとの表記・判断のブレを減らす。
+- `MISREADINGS`（OCR の読み違い→正しい表記。自衛隧→自衛隊・鞋屯地→駐屯地・探用→採用・合和8年→令和8年 等）を
+  `fixMisreadings` が直す（重なった読み違いも直るまで繰り返す）。`cleanEventTitle` と LLM 出力の `nullify` の両方が通す
+- `TERMS`（正式な呼び方）・`CATEGORY_RULES`（guessCategory と同じ優先順のカテゴリの決め方）・`TITLE_EXAMPLES`（良い例・悪い例）・
+  `NOT_TITLE_PARTS`（イベント名に含めない付記）を `buildGlossaryPrompt()` がプロンプトに入れる
+- ⚠️ `MISREADINGS` には日本語で正しく使われる語を入れない（「合和」は年号の数字が続くときだけ直す）。足したらテストを足す
+- ⚠️ 辞書を変えたら `DICTIONARY_VERSION` を上げる（`PROMPT_VERSION` に含まれ、古い指示の LLM キャッシュを使わなくなる）
+- 辞書のイベント名の例は、整形ルールの結果と食い違わないことを `shared/termDictionary.test.cjs` が検査する
+
 ### LLM の使い方の決めごと
 - **出力は必ず JSON**（Groq: `response_format: json_object` / Gemini: `responseMimeType: application/json`）。
   そのうえで **`normalizeLlmEvent` が規定外の値を捨てる**。モデルが規定を守ることに依存しない
@@ -261,6 +271,9 @@ OCRの優先順は、無料ローカルOCR（**RapidOCR 日本語モデル → T
 中点（`·` U+00B7・`•`）を `・` へ揃える。`cleanEventTitle` / `cleanPlaceText` が通す。
 ⚠️ **文字列全体に NFKC をかけないこと**。全角の記号・英数字まで巻き込み
 「（）」→「()」のように出典の表記を壊す。半角カナの連なりだけに限定する。
+
+**付記の除去（2026-10-14）**: ファイル形式・サイズ（「（PDF：600KB）」「[PDF」「(600KB)」）、「（別ウィンドウで開きます）」「（外部リンク）」「【詳細はこちら】」、
+見出しのラベル「［イベント］」「【お知らせ】」は `cleanEventTitle` が取り除く。ダウンロード案内・ファイル名だけ・時間だけの行（「受付時間 9:00～」）は除外。
 
 **除外（`isJunkOrStubTitle`＝中身なし/不正）**: 郵便番号・電話・住所混入、申込/リンク案内、様式・受験案内断片、ラベル行（「主催:」等）、OCR文字化け、部隊名のみ（種別なし）、助詞終わり、スタブ「○○地本イベント」、日本語がほぼ無い断片 等。
 
