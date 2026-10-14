@@ -144,7 +144,7 @@ function AreaSection({ facility, currentLabel }) {
   const [showRanking, setShowRanking] = useState(false);
   const comps = compareArea(area.ha);
   const sel = comps.find(c => c.id === refId) || comps[0];
-  const sub = (c) => (c.ratio >= 1 ? ratioText(c.ratio) : `の${ratioText(c.ratio)}`);
+  const sub = (c) => ratioText(c.ratio);
   const dome = REFERENCES.find(r => r.id === 'dome');
   return (
     <div style={{ padding: '6px 16px 14px' }}>
@@ -156,7 +156,7 @@ function AreaSection({ facility, currentLabel }) {
           の広さは <strong>{haText(area.ha)}</strong>。
           {area.note && <span style={{ display: 'block', fontSize: 11.5, color: 'var(--text-muted)' }}>※{area.note}</span>}
           <span style={{ display: 'block', fontSize: 15, fontWeight: 700, color: 'var(--brand-fg)', marginTop: 2 }}>
-            {sel.label}{sel.ratio >= 1 ? ' ' : ''}{sub(sel)}
+            {sel.label} {sub(sel)}
           </span>
         </div>
         <RefChooser items={comps} selId={sel.id} onSelect={setRefId} label="広さを比べる対象" sub={sub} />

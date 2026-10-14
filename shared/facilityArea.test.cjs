@@ -80,8 +80,8 @@ test('倍率の文言', () => {
   const iruma = F.compareArea(300);
   assert.equal(F.ratioText(iruma.find(r => r.id === 'dome').ratio), '約64個分');
   assert.equal(F.ratioText(iruma.find(r => r.id === 'tdl').ratio), '約5.9個分');
-  assert.equal(F.ratioText(0.55), '約0.6倍');
-  assert.equal(F.ratioText(0.01), '約0.1倍');
+  assert.equal(F.ratioText(0.55), '約0.6個分', '小さいときも「の」を付けず「◯個分」');
+  assert.equal(F.ratioText(0.01), '約0.1個分');
   assert.equal(F.haText(300), '約300ha');
   assert.equal(F.haText(3.24), '約3.2ha');
 });
