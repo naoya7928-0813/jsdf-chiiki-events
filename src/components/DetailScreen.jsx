@@ -8,6 +8,7 @@ import { EventGuideSection, EventFaqSection } from './EventGuide';
 import EventImages from './EventImages';
 import { recordView } from '../utils/viewTracker';
 import AccessGuide from './AccessGuide';
+import SizeCompare from './SizeCompare';
 import { useElementWidth, isTouchPhone, useIsShortViewport } from '../hooks/useBreakpoint';
 import { googleCalendarUrl, downloadIcs } from '../utils/calendar';
 import { useOnline } from '../hooks/useOnline';
@@ -648,6 +649,9 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
 
         {/* 公共交通機関でのアクセス（押したときだけ駅データ・位置情報を使う） */}
         <AccessGuide ev={ev} online={online} />
+
+        {/* 会場の広さくらべ（駐屯地・基地のときだけ。東京ドーム・ディズニーと比べる） */}
+        <SizeCompare ev={ev} />
 
         {/* 参加資格・締切 */}
         {(ev.ageRequirement || ev.deadline) && (

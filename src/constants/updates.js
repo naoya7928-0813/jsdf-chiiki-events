@@ -11,6 +11,13 @@
  */
 export const UPDATE_NOTES = [
   {
+    date:    '2026-10-14',
+    version: '1.44.30',
+    type:    'feature',
+    content: '駐屯地・基地の広さを東京ドーム・東京ディズニーリゾートと比べる「会場の広さくらべ」を追加。',
+    note:    '広さはおおよその目安。',
+  },
+  {
     date:    '2026-10-13',
     version: '1.43.30',
     type:    'improvement',

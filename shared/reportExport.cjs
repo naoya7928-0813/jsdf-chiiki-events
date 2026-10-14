@@ -161,23 +161,36 @@ function toXlsx(sheets) {
 }
 
 // ── PDF（印刷用 HTML） ─────────────────────────────────────────────
-function toPrintHtml(sheets, { title = '掲載イベントの統計' } = {}) {
-  const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const escHtml = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+
+/** 印刷用の本文（見出し＋表）。運営画面内のプレビューと印刷用ページの両方で使う。 */
+function toPrintBody(sheets, { title = '掲載イベントの統計' } = {}) {
+  const esc = escHtml;
   const table = (s) => `<h2>${esc(s.name)}</h2><table><thead><tr>${s.head.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${
     s.rows.map(r => `<tr>${r.map(v => `<td${typeof v === 'number' ? ' class="n"' : ''}>${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
   // 一覧は URL・ID を除いて印刷する（紙面の幅に収めるため）
   const printable = sheets.map(s => (s.name === 'イベント一覧'
     ? { ...s, head: s.head.slice(0, -2), rows: s.rows.map(r => r.slice(0, -2)) } : s));
-  return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>${esc(title)}</title><style>
-    body{font-family:"Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif;font-size:10px;color:#111;margin:16px}
-    h1{font-size:16px;margin:0 0 8px}h2{font-size:12.5px;margin:16px 0 6px;break-after:avoid}
-    table{border-collapse:collapse;width:100%;margin-bottom:6px}th,td{border:1px solid #bbb;padding:3px 5px;text-align:left;vertical-align:top}
-    th{background:#e8ecef}td.n{text-align:right;font-variant-numeric:tabular-nums}tr{break-inside:avoid}
-    .note{color:#555;margin:4px 0 10px}@page{size:A4 landscape;margin:12mm}
+  return `<h1>${esc(title)}</h1><div class="note">閲覧数はイベント詳細が開かれた回数です（人数ではありません）。</div>${printable.map(table).join('')}`;
+}
+
+/** 印刷用の CSS。scope を渡すとその要素の中だけに効く（運営画面内のプレビュー用）。 */
+function printCss(scope = '') {
+  const p = scope ? `${scope} ` : '';
+  return `${scope || 'body'}{font-family:"Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif;font-size:10px;color:#111;background:#fff}
+    ${p}h1{font-size:16px;margin:0 0 8px}${p}h2{font-size:12.5px;margin:16px 0 6px;break-after:avoid}
+    ${p}table{border-collapse:collapse;width:100%;margin-bottom:6px}${p}th,${p}td{border:1px solid #bbb;padding:3px 5px;text-align:left;vertical-align:top}
+    ${p}th{background:#e8ecef}${p}td.n{text-align:right;font-variant-numeric:tabular-nums}${p}tr{break-inside:avoid}
+    ${p}.note{color:#555;margin:4px 0 10px}@page{size:A4 landscape;margin:12mm}`;
+}
+
+function toPrintHtml(sheets, { title = '掲載イベントの統計' } = {}) {
+  return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>${escHtml(title)}</title><style>
+    body{margin:16px}${printCss()}
     @media screen{.bar{position:sticky;top:0;background:#fff;padding:8px 0;border-bottom:1px solid #ddd;margin-bottom:8px}}
     @media print{.bar{display:none}}
   </style></head><body><div class="bar">印刷画面で「PDFに保存」を選んでください（印刷画面が開かない場合は Ctrl+P／⌘+P、スマホは共有メニューの「プリント」）。</div>
-  <h1>${esc(title)}</h1><div class="note">閲覧数はイベント詳細が開かれた回数です（人数ではありません）。</div>${printable.map(table).join('')}</body></html>`;
+  ${toPrintBody(sheets, { title })}</body></html>`;
 }
 
-module.exports = { COLUMNS, STATUS_LABEL, KIND_LABEL, toRows, filterByDate, summarize, buildSheets, toCsv, toXlsx, toPrintHtml, crc32 };
+module.exports = { COLUMNS, STATUS_LABEL, KIND_LABEL, toRows, filterByDate, summarize, buildSheets, toCsv, toXlsx, toPrintHtml, toPrintBody, printCss, crc32 };
