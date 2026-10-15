@@ -667,7 +667,7 @@ test('normalizeJaText: 全角の記号・英数字は変えない（出典の表
 test('cleanEventTitle / cleanPlaceText が表記ゆれをならす', () => {
   assert.strictEqual(
     cleanEventTitle('｢はたらく車大集合｣に自衛隊ブース出展します'),
-    '「はたらく車大集合」に自衛隊ブース出展します',
+    'はたらく車大集合（自衛隊ブース出展）', // 半角かぎ括弧も直したうえで、告知文をイベント名の形に
   );
   assert.strictEqual(cleanPlaceText('中高校生·大学'), '中高校生・大学');
 });

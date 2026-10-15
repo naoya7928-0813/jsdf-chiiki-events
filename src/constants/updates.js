@@ -11,6 +11,19 @@
  */
 export const UPDATE_NOTES = [
   {
+    date:    '2026-10-15',
+    version: '1.45.36',
+    type:    'improvement',
+    content: '利用規約・プライバシーポリシーを改定。',
+    note:    '開いたときに一度だけ同意をお願いします。',
+  },
+  {
+    date:    '2026-10-15',
+    version: '1.45.35',
+    type:    'fix',
+    content: 'イベント情報を修正。',
+  },
+  {
     date:    '2026-10-14',
     version: '1.45.34',
     type:    'fix',

@@ -53,7 +53,7 @@ const { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta, offi
 const { resolveDeadline, rotationOffset, keysNeedingCarryOver } = require('../shared/scrapeDeadline.cjs');
 const parserHealth = require('../shared/parserHealth.cjs');
 // イベント名の品質管理（検証済み修正・整形・junk判定・年ズレ判定・重複統合）。最終出力の防御に使う
-const { applyVerifiedOverrides, cleanEventTitle, cleanPlaceText, splitPlaceAddress, cleanTimeText, cleanDeadlineText, isJunkOrStubTitle, isSuspiciousTitle, isStaleDatedEvent, dedupEvents, isArchivableEvent, safeUrl, isNonEventDocument, suspiciousFutureDate, isLikelySameEvent } = require('../shared/titleQuality.cjs');
+const { applyVerifiedOverrides, cleanEventTitle, cleanEventTitleWithPlace, cleanPlaceText, splitPlaceAddress, cleanTimeText, cleanDeadlineText, isJunkOrStubTitle, isSuspiciousTitle, isStaleDatedEvent, dedupEvents, isArchivableEvent, safeUrl, isNonEventDocument, suspiciousFutureDate, isLikelySameEvent } = require('../shared/titleQuality.cjs');
 const eventRegression = require('../shared/eventRegression.cjs');
 const { isCountableEvent } = require('../shared/dataQuality.cjs');
 // 受付終了/中止の状態判定・締切日解決（誤判定防止つき。shared/eventStatus.cjs）
@@ -4712,10 +4712,13 @@ async function writeOutput(data, timeCutoff = null) {
       const fixed = applyVerifiedOverrides(ev);
       // place に住所が連結していれば address 側へ分離（会場名の表示を綺麗にし、
       // かつ address を埋めて天気ジオコーディングの精度を上げる）
-      const { place, address } = splitPlaceAddress(cleanPlaceText(fixed.place), fixed.address);
+      // 告知文の形のタイトル（「「○○(秋田市)」に自衛隊ブース出展します」）は、会場をタイトルから取り出して
+      // 会場欄が空のときだけ入れる（秋田のカレンダーは会場欄が無い）
+      const { title: cleanTitle, place: titlePlace } = cleanEventTitleWithPlace(fixed.title);
+      const { place, address } = splitPlaceAddress(cleanPlaceText(fixed.place || titlePlace), fixed.address);
       return {
         ...fixed,
-        title:    cleanEventTitle(fixed.title),
+        title:    cleanTitle,
         place,
         address:  address || fixed.address || '',
         time:     cleanTimeText(fixed.time),
