@@ -1,252 +1,26 @@
 {
-  "updatedAt": "2026-10-15",
+  "updatedAt": "2026-10-16",
   "limit": 30,
   "summary": {
-    "checked": 377,
-    "flagged": 26,
-    "attempted": 17,
-    "corrected": 7,
-    "unverified": 10,
-    "noSource": 4,
+    "checked": 360,
+    "flagged": 17,
+    "attempted": 0,
+    "corrected": 0,
+    "unverified": 0,
+    "noSource": 3,
     "overBudget": 0,
-    "skippedNoSource": 4,
-    "skippedNotEligible": 5,
+    "skippedNoSource": 3,
+    "skippedNotEligible": 6,
     "skippedProviderUnavailable": 0,
-    "skippedCutoff": 0
+    "skippedCutoff": 8
   },
-  "corrections": [
-    {
-      "id": "to-off-20261024-456ez",
-      "pref": "tokyo",
-      "source": "https://www.mod.go.jp/pco/tokyo/event2/img/jujo.pdf",
-      "reasons": [
-        "日付がタイトルになっている"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "令和9年度入校第54期防衛医科大学校医学科学生採用第1次試験",
-          "to": "防衛医科大学校医学科学生採用第1次試験"
-        },
-        {
-          "field": "address",
-          "from": null,
-          "to": "東京都北区十条台1-5-70"
-        },
-        {
-          "field": "time",
-          "from": "09:00～18:00",
-          "to": "07:30～18:00"
-        },
-        {
-          "field": "tag",
-          "from": "学生向け",
-          "to": null
-        },
-        {
-          "field": "notes",
-          "from": "受験票・筆記具・昼食・ゴミ袋を持参。車での乗り入れ不可。",
-          "to": "最初の英語の試験終了時刻までに着席できない方は試験を受けることはできません。"
-        }
-      ]
-    },
-    {
-      "id": "gu-office-20261017-mir58",
-      "pref": "gunma",
-      "source": "https://www.mod.go.jp/pco/gunma/sozai/event/20261017-18-1.jpg",
-      "reasons": [
-        "タイトルが長すぎる（説明文・別イベントの混入）"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "KYOAI GAKUEN UNIVERSITY SHARON FES 38th Co:Lab -コラボ",
-          "to": "SHARON FES 38th Co:Lab"
-        },
-        {
-          "field": "endDate",
-          "from": null,
-          "to": "2026-10-18"
-        },
-        {
-          "field": "address",
-          "from": null,
-          "to": "群馬県前橋市小屋原町1154-4"
-        },
-        {
-          "field": "time",
-          "from": "10/17(Sat) 10:00～16:30、10/18(Sun) 10:00～16:00",
-          "to": "10:00～16:30"
-        },
-        {
-          "field": "category",
-          "from": "広報活動",
-          "to": "採用イベント"
-        },
-        {
-          "field": "notes",
-          "from": "掲載元: 前橋募集案内所",
-          "to": null
-        }
-      ]
-    },
-    {
-      "id": "ni-office-20261031-0zijr",
-      "pref": "niigata",
-      "source": "https://www.mod.go.jp/pco/niigata/images/event/r8.10.31keidaisai.jpg",
-      "reasons": [
-        "タイトルが短すぎる"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "経大祭",
-          "to": "新潟経営大学 経大祭"
-        },
-        {
-          "field": "endDate",
-          "from": null,
-          "to": "2026-11-01"
-        },
-        {
-          "field": "place",
-          "from": "新潟経営大学",
-          "to": "アリーナ"
-        },
-        {
-          "field": "category",
-          "from": "広報活動",
-          "to": "採用イベント"
-        },
-        {
-          "field": "tag",
-          "from": null,
-          "to": "入場無料"
-        },
-        {
-          "field": "notes",
-          "from": "掲載元: 加茂地域事務所\nイベント内容は予告なく変更となる場合がございます。",
-          "to": "イベント内容は予告なく変更となる場合がございます。"
-        }
-      ]
-    },
-    {
-      "id": "ni-office-20261031-8417t",
-      "pref": "niigata",
-      "source": "https://www.mod.go.jp/pco/niigata/files/event/r8.10.31keidaisai.pdf",
-      "reasons": [
-        "タイトルが短すぎる"
-      ],
-      "changes": [
-        {
-          "field": "place",
-          "from": "新潟経営大学",
-          "to": "アリーナ"
-        },
-        {
-          "field": "category",
-          "from": "一般公開",
-          "to": "採用イベント"
-        }
-      ]
-    },
-    {
-      "id": "ky-office-20261019-1f1lt",
-      "pref": "kyoto",
-      "source": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/img/081019_kyoto.jpg",
-      "reasons": [
-        "タイトルが長すぎる（説明文・別イベントの混入）"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "自衛隊説明会) ハローワーク京都七条 ！詳しくは上の画像をクリック！申し込みは下記のフォームボタンをクリックください！",
-          "to": "陸・海・空自衛隊個別説明会"
-        },
-        {
-          "field": "place",
-          "from": null,
-          "to": "ハローワーク京都七条"
-        },
-        {
-          "field": "time",
-          "from": null,
-          "to": "13:00～17:00"
-        },
-        {
-          "field": "tag",
-          "from": "要予約",
-          "to": "個別"
-        },
-        {
-          "field": "ageRequirement",
-          "from": null,
-          "to": "18歳～32歳"
-        },
-        {
-          "field": "notes",
-          "from": "掲載元: 募集案内所・地域事務所",
-          "to": null
-        }
-      ]
-    },
-    {
-      "id": "ya-office-20261102-y6pwd",
-      "pref": "yamaguchi",
-      "source": "https://www.mod.go.jp/pco/yamaguchi/event-20261018.pdf",
-      "reasons": [
-        "タイトルが長すぎる（説明文・別イベントの混入）"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "車両展示（t救急車：第13後方支援隊） ・ガチャガチャ（山口地本オリジナルデザインの缶バッチなど） ・自衛官制服の体験試",
-          "to": "岩国祭"
-        },
-        {
-          "field": "date",
-          "from": "2026-11-02",
-          "to": "2026-10-17"
-        },
-        {
-          "field": "endDate",
-          "from": null,
-          "to": "2026-10-18"
-        },
-        {
-          "field": "category",
-          "from": "体験",
-          "to": "地域参加"
-        },
-        {
-          "field": "notes",
-          "from": "掲載元: 募集案内所・地域事務所",
-          "to": null
-        }
-      ]
-    },
-    {
-      "id": "ku-office-20261012-8elim",
-      "pref": "kumamoto",
-      "source": "https://www.mod.go.jp/pco/kumamoto/event/thumbs/20261012_koukoukou.png",
-      "reasons": [
-        "日付がタイトルになっている"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "令和8年度第2回高等工科学校説明会",
-          "to": "高等工科学校説明会"
-        },
-        {
-          "field": "notes",
-          "from": "保護者の同伴が必要です。当日は公共交通機関または近隣の有料駐車場をご利用ください。",
-          "to": "保護者の同伴が必要です。当日は公共交通機関をご利用ください。"
-        }
-      ]
-    }
-  ],
+  "corrections": [],
   "skipped": [
+    {
+      "id": "mi-office-20270128-o4a4d",
+      "pref": "miyagi",
+      "reason": "cutoff"
+    },
     {
       "id": "ya-20261024-waz1q",
       "pref": "yamagata",
@@ -258,14 +32,39 @@
       "reason": "no_source"
     },
     {
-      "id": "s-20261121-5372q",
-      "pref": "saitama",
-      "reason": "no_source"
+      "id": "to-office-20261024-yjlum",
+      "pref": "tokyo",
+      "reason": "cutoff"
+    },
+    {
+      "id": "gu-office-20261024-n083a",
+      "pref": "gunma",
+      "reason": "cutoff"
+    },
+    {
+      "id": "ni-office-20261031-8417t",
+      "pref": "niigata",
+      "reason": "cutoff"
+    },
+    {
+      "id": "fu-office-20261130-wkywa",
+      "pref": "fukui",
+      "reason": "cutoff"
     },
     {
       "id": "gi-20261107-vm3v5",
       "pref": "gifu",
       "reason": "no_source"
+    },
+    {
+      "id": "ky-office-20261019-1f1lt",
+      "pref": "kyoto",
+      "reason": "cutoff"
+    },
+    {
+      "id": "os-office-20261107-0p3x1",
+      "pref": "osaka",
+      "reason": "not_eligible"
     },
     {
       "id": "os-office-20261017-5u6ep",
@@ -276,6 +75,11 @@
       "id": "os-office-20261107-l69n5",
       "pref": "osaka",
       "reason": "not_eligible"
+    },
+    {
+      "id": "eh-off-20261018-hib7d",
+      "pref": "ehime",
+      "reason": "cutoff"
     },
     {
       "id": "ok-20261115-b75qj",
@@ -291,6 +95,11 @@
       "id": "ym-20261018-l6bla",
       "pref": "yamaguchi",
       "reason": "not_eligible"
+    },
+    {
+      "id": "ya-office-20261102-y6pwd",
+      "pref": "yamaguchi",
+      "reason": "cutoff"
     }
   ]
 }
