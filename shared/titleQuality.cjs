@@ -174,7 +174,57 @@ function toHalfAlnum(s) {
  * イベント名の前後に付くゴミを整形する（除外ではなく修復）。
  * 例: 「# 海上自衛隊」「&自衛隊…」「NEW6/14&7/11 自衛隊…」「1オンライン説明会」
  */
+// ── 告知文の形のタイトルをイベント名の形にする（2026-10-15） ─────────────
+// 秋田地本のカレンダー「「あきたNEXTモーターショー(秋田市)」に自衛隊ブース出展します」、
+// 大分「別府市で「護衛艦ひゅうが一般公開」を行います。」のように、告知の文がそのままタイトルになっていた。
+// 会場（かっこ内の市町村・道の駅など）は splitAnnouncementTitle が place として返す（パーサーが会場欄へ入れる）。
+const PLACE_IN_PAREN_RE = /^(.*?)\s*[（(]([^（）()]*(?:市|町|村|区|郡|道の駅)[^（）()]*)[）)]\s*$/;
+function splitAnnouncementTitle(raw) {
+  let t = String(raw || '').trim();
+  let place = '';
+  const takePlace = (name) => {
+    const m = name.match(PLACE_IN_PAREN_RE);
+    if (m && m[1]) { place = m[2].trim(); return m[1].trim(); }
+    return name.trim();
+  };
+  let m;
+  // 「○○(市)」に自衛隊ブース出展します
+  if ((m = t.match(/^[「｢『](.+?)[」｣』]\s*(?:に|へ|で)\s*(?:自衛隊)?(ブース)?\s*を?\s*(出展|参加|出演)(?:します|いたします|しました|予定)?[!！。]*$/))) {
+    const what = m[3] === '出展' ? (m[2] ? '自衛隊ブース出展' : '自衛隊出展') : `自衛隊${m[3]}`;
+    return { title: `${takePlace(m[1])}（${what}）`, place };
+  }
+  // ○○にて自衛隊ブース出展します（会場名だけが書かれている）
+  if ((m = t.match(/^(.+?)\s*にて\s*(?:自衛隊)?(ブース)?\s*を?\s*出展(?:します|いたします)?[!！。]*$/))) {
+    const where = m[1].trim();
+    return { title: `${m[2] ? '自衛隊ブース出展' : '自衛隊出展'}（${where}）`, place: where };
+  }
+  // ○○フェアに出展します（会場）
+  if ((m = t.match(/^(.+?)\s*に\s*(?:自衛隊)?(ブース)?\s*を?\s*出展(?:します|いたします)[!！。]*\s*(?:[（(]([^）)]+)[）)])?$/))) {
+    return { title: `${m[1].trim()}（${m[2] ? '自衛隊ブース出展' : '自衛隊出展'}）`, place: (m[3] || '').trim() };
+  }
+  // ○○市で「△△」を行います。
+  if ((m = t.match(/^(.+?)で\s*[「｢『](.+?)[」｣』]\s*を\s*(?:行|おこな)います[!！。]*$/))) {
+    return { title: m[2].trim(), place: m[1].trim() };
+  }
+  // ○○は開催予定です(9/4 12時現在)
+  if ((m = t.match(/^(.*?)\s*(?:は)?(?:開催)?予定です[!！。]*\s*(?:[（(][^）)]*現在[）)])?$/))) {
+    return { title: m[1].trim(), place };
+  }
+  return { title: t, place };
+}
+
+/** タイトルを整形し、告知文から取り出した会場も返す（会場欄が空のときに使う） */
+function cleanEventTitleWithPlace(raw) {
+  const out = { place: '' };
+  const title = cleanTitleCore(raw, out);
+  return { title, place: out.place };
+}
+
 function cleanEventTitle(raw) {
+  return cleanTitleCore(raw, null);
+}
+
+function cleanTitleCore(raw, out) {
   if (!raw) return raw;
   // OCR が日本語の漢字を簡体字として誤読することがあるため、まず日本語へ直す
   // （「关山演习場」→「関山演習場」）。直せない中国語は isJunkOrStubTitle が弾く。
@@ -194,6 +244,14 @@ function cleanEventTitle(raw) {
        .replace(/\s+/g, ' ').trim();
   // 見出しのラベル「［イベント］」「【お知らせ】」「[行事]」（秋田の告知見出し等）
   t = t.replace(/^[［\[【〔](?:イベント|イベント情報|行事|催し|催事|お知らせ|新着)[］\]】〕]\s*/, '');
+  // 見出し語「説明会情報 」「イベント情報 」（空白で区切られた先頭のラベル）
+  t = t.replace(/^(?:説明会情報|イベント情報|行事予定)\s+/, '');
+  // 告知文の形「「○○」に自衛隊ブース出展します」→ イベント名の形（会場はパーサー側で会場欄へ）
+  {
+    const a = splitAnnouncementTitle(t);
+    t = a.title;
+    if (out && a.place) out.place = a.place;
+  }
   // 画像キャプション「（クリックで拡大します。）」の混入（前後どこでも。新潟等）
   t = t.replace(/[（(]?クリックで拡大します。?[）)]?/g, ' ').replace(/\s+/g, ' ').trim();
   t = t.replace(/^イベント情報\s*/, '');           // 見出し「イベント情報」の巻き込み
@@ -326,6 +384,9 @@ function isJunkOrStubTitle(title) {
   if (/申込み?リンク|応募リンク|広報申込み/.test(t)) return true; // リンク案内の混入
   // ラベル行がタイトル化（「主催:○○」「開催場所:○○」等）
   if (/^(?:主催|共催|開催場所|場所|会場|日時|日程|お問合せ先?)\s*[:：]/.test(t)) return true;
+  // 告知・注意書きの文（「○○の申込みは終了しました。」「内容等が変更となる場合があります。」）
+  if (/申込み?(?:受付)?は終了(?:しました|いたしました)。?$|場合があります。?$/.test(t)) return true;
+  // 会場だけ残った告知（「自衛隊ブース出展」「自衛隊出展」だけ）は会場欄があれば成り立つので除外しない
   // 時間だけの行（「受付時間 9:00～16:00」「開催時間：10時から」）
   if (/^(?:受付|開催|開場|開始|終了)?時間\s*[:：]?\s*\d/.test(t)) return true;
   // 番号付き一覧が平坦化されたもの（2026-10 新潟: 会場図の出店一覧
@@ -934,6 +995,8 @@ function cleanDeadlineText(raw) {
 
 module.exports = {
   safeUrl,
+  splitAnnouncementTitle,
+  cleanEventTitleWithPlace,
   SIMPLIFIED_TO_JP,
   toJapaneseKanji,
   normalizeJaText,

@@ -55,7 +55,7 @@ test('イベント名から「PDF」などの付記を取り除く', () => {
   assert.equal(clean('自衛隊説明会 [PDF'), '自衛隊説明会');
   assert.equal(clean('合同説明会(600KB)'), '合同説明会');
   assert.equal(clean('ブルーインパルス展示飛行(別ウィンドウで開きます)'), 'ブルーインパルス展示飛行');
-  assert.equal(clean('［イベント］「美郷町フェスタ2026(美郷町)」に自衛隊ブース出展します'), '「美郷町フェスタ2026(美郷町)」に自衛隊ブース出展します');
+  assert.equal(clean('［イベント］「美郷町フェスタ2026(美郷町)」に自衛隊ブース出展します'), '美郷町フェスタ2026（自衛隊ブース出展）');
   // 型番・正規の英字は残す
   assert.equal(clean('TC-90体験搭乗'), 'TC-90体験搭乗');
   assert.equal(clean('PDCAセミナー'), 'PDCAセミナー');
@@ -67,4 +67,30 @@ test('ファイルのダウンロード案内・採用案内の冊子はイベ�
   }
   // イベントは残す
   for (const t of ['自衛隊説明会', '採用説明会のご案内', '入間航空祭']) assert.ok(!Q.isJunkOrStubTitle(Q.cleanEventTitle(t)), t);
+});
+
+test('告知文の形のタイトルをイベント名の形にし、会場を取り出す（秋田・大分・愛媛・岩手）', () => {
+  const w = (t) => Q.cleanEventTitleWithPlace(t);
+  assert.deepEqual(w('「あきたNEXTモーターショー(秋田市)」に自衛隊ブース出展します'), { title: 'あきたNEXTモーターショー（自衛隊ブース出展）', place: '秋田市' });
+  assert.deepEqual(w('［イベント］「第3回HarvestFestival(由利本荘市 道の駅おおうち)」に自衛隊ブース出展します'), { title: '第3回HarvestFestival（自衛隊ブース出展）', place: '由利本荘市 道の駅おおうち' });
+  assert.deepEqual(w('［イベント］イオンモール秋田にて自衛隊ブース出展します'), { title: '自衛隊ブース出展（イオンモール秋田）', place: 'イオンモール秋田' });
+  assert.deepEqual(w('説明会情報 マイナビ転職フェアに出展します（いわて県民情報交流センター）'), { title: 'マイナビ転職フェア（自衛隊出展）', place: 'いわて県民情報交流センター' });
+  assert.deepEqual(w('別府市で「護衛艦ひゅうが一般公開」を行います。'), { title: '護衛艦ひゅうが一般公開', place: '別府市' });
+  assert.equal(w('第44回ふれ愛コンサートin愛媛は開催予定です(9/4 12時現在)').title, '第44回ふれ愛コンサートin愛媛');
+  // 「〜します」の告知文が残らない
+  for (const t of ['「美郷町フェスタ2026(美郷町)」に自衛隊ブース出展します', '大分市で「自衛隊サテライトブース」を行います。']) {
+    assert.ok(!/します|います/.test(Q.cleanEventTitle(t)), t);
+  }
+  // 通常のイベント名は変えない
+  for (const t of ['入間航空祭', '護衛艦「いずも」一般公開', '自衛隊説明会in秋田', '「自衛隊ふれあいフェスタ」']) {
+    assert.deepEqual(w(t), { title: Q.cleanEventTitle(t), place: '' });
+    assert.equal(Q.cleanEventTitle(t), t, t);
+  }
+});
+
+test('告知・注意書きの文はイベントにしない', () => {
+  for (const t of ['三自衛隊統一募集広報の申込みは終了しました。', '状況により内容等が変更となる場合があります。', '開催予定です！(9/4 12時現在)']) {
+    const c = Q.cleanEventTitle(t);
+    assert.ok(!c || Q.isJunkOrStubTitle(c), t);
+  }
 });
