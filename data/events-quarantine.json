@@ -1,7 +1,91 @@
 {
   "updatedAt": "2026-10-16",
-  "count": 3,
+  "count": 10,
   "events": [
+    {
+      "id": "mi-office-20270128-o4a4d",
+      "pref": "miyagi",
+      "date": "2027-01-28",
+      "endDate": "",
+      "title": "令和8年度自衛官等採用試験案内",
+      "place": "防衛大学",
+      "url": "https://www.mod.go.jp/pco/miyagi/miyagitop/image/r8rec-schedule.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-10-16",
+      "reason": "日付がタイトルになっている"
+    },
+    {
+      "id": "to-office-20261024-uopt4",
+      "pref": "tokyo",
+      "date": "2026-10-24",
+      "endDate": "",
+      "title": "令和9年度入校第54期防衛医科大学校医学科学生採用第1次試験",
+      "place": "ビジョンセンター新宿マインズタワー",
+      "url": "https://www.mod.go.jp/pco/tokyo/event2/img/shinjuku.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-10-16",
+      "reason": "日付がタイトルになっている"
+    },
+    {
+      "id": "to-office-20261024-adqaa",
+      "pref": "tokyo",
+      "date": "2026-10-24",
+      "endDate": "",
+      "title": "令和9年度入校第54期防衛医科大学校医学科学生採用第1次試験",
+      "place": "自衛隊目黒基地",
+      "url": "https://www.mod.go.jp/pco/tokyo/event2/img/meguro.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-10-16",
+      "reason": "日付がタイトルになっている"
+    },
+    {
+      "id": "to-off-20261024-456ez",
+      "pref": "tokyo",
+      "date": "2026-10-24",
+      "endDate": "",
+      "title": "令和9年度入校第54期防衛医科大学校医学科学生採用第1次試験",
+      "place": "ビジョンセンター新宿マインズタワー",
+      "url": "https://www.mod.go.jp/pco/tokyo/event2/img/shinjuku.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-10-16",
+      "reason": "日付がタイトルになっている"
+    },
+    {
+      "id": "to-off-20261024-456ez",
+      "pref": "tokyo",
+      "date": "2026-10-24",
+      "endDate": "",
+      "title": "令和9年度入校第54期防衛医科大学校医学科学生採用第1次試験",
+      "place": "自衛隊目黒基地",
+      "url": "https://www.mod.go.jp/pco/tokyo/event2/img/meguro.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-10-16",
+      "reason": "日付がタイトルになっている"
+    },
+    {
+      "id": "gu-office-20261024-iz2fy",
+      "pref": "gunma",
+      "date": "2026-10-24",
+      "endDate": "",
+      "title": "大学祭",
+      "place": "ぐんま未来大学 ぐんま未来大学短期大学部",
+      "url": "https://www.mod.go.jp/pco/gunma/sozai/event/20261024-25-2.jpg",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-10-16",
+      "reason": "タイトルが短すぎる"
+    },
+    {
+      "id": "ni-off-20270101-19282",
+      "pref": "niigata",
+      "date": "2027-01-01",
+      "endDate": "",
+      "title": "陸海空自衛官",
+      "place": "調機の充足完了及び空調が整備されていない駐屯地",
+      "url": "https://www.mod.go.jp/pco/niigata/files/top/fukurikousei-kaizen.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-10-16",
+      "reason": "非イベント文書の疑い"
+    },
     {
       "id": "fu-office-20261130-wkywa",
       "pref": "fukui",
@@ -12,7 +96,19 @@
       "url": "https://www.mod.go.jp/pco/fukui/contents/21-yobijieikantou/images/yobijiho-nittei.pdf",
       "source_type": "office_ocr",
       "quarantinedAt": "2026-10-16",
-      "reason": "非イベント文書の疑い"
+      "reason": "日付がタイトルになっている"
+    },
+    {
+      "id": "ai-office-20270411-44e7n",
+      "pref": "aichi",
+      "date": "2027-04-11",
+      "endDate": "",
+      "title": "令和8年度自衛官等採用案内 ＋",
+      "place": "防衛大学",
+      "url": "https://www.mod.go.jp/pco/aichi/event/r8saiyouannai.jpg",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-10-16",
+      "reason": "日付がタイトルになっている"
     },
     {
       "id": "ai-office-20280620-ghetd",
@@ -25,18 +121,6 @@
       "source_type": "office_ocr",
       "quarantinedAt": "2026-10-16",
       "reason": "OCR由来の不自然な未来日"
-    },
-    {
-      "id": "hy-office-20261017-q3dja",
-      "pref": "hyogo",
-      "date": "2026-10-17",
-      "endDate": "",
-      "title": "第19回：放送「自衛官の生活環境や待遇について💡💡」",
-      "place": "",
-      "url": "https://www.mod.go.jp/pco/hyogo/jimusyo/radio/20251017FMmikkixi.wav",
-      "source_type": "office_html",
-      "quarantinedAt": "2026-10-16",
-      "reason": "非イベント文書の疑い"
     }
   ]
 }
