@@ -1,162 +1,26 @@
 {
-  "updatedAt": "2026-10-16",
+  "updatedAt": "2026-10-17",
   "limit": 30,
   "summary": {
-    "checked": 397,
-    "flagged": 20,
-    "attempted": 10,
-    "corrected": 4,
-    "unverified": 5,
+    "checked": 383,
+    "flagged": 18,
+    "attempted": 0,
+    "corrected": 0,
+    "unverified": 0,
     "noSource": 3,
     "overBudget": 0,
     "skippedNoSource": 3,
     "skippedNotEligible": 7,
     "skippedProviderUnavailable": 0,
-    "skippedCutoff": 0
+    "skippedCutoff": 8
   },
-  "corrections": [
-    {
-      "id": "to-office-20261024-q8rhr",
-      "pref": "tokyo",
-      "source": "https://www.mod.go.jp/pco/tokyo/event2/img/jujo.pdf",
-      "reasons": [
-        "日付がタイトルになっている"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "令和9年度入校第54期防衛医科大学校医学科学生採用第1次試験",
-          "to": "防衛医科大学校医学科学生採用第1次試験"
-        },
-        {
-          "field": "address",
-          "from": null,
-          "to": "東京都北区十条台1-5-70"
-        },
-        {
-          "field": "time",
-          "from": "09:00～18:00",
-          "to": "07:30～18:00"
-        },
-        {
-          "field": "tag",
-          "from": "学生向け",
-          "to": null
-        },
-        {
-          "field": "notes",
-          "from": "掲載元: 豊島出張所\n受験票・筆記具・昼食・ゴミ袋を持参。車での乗り入れ不可。",
-          "to": "最初の英語の試験終了時刻までに着席できない方は試験を受けることはできません。"
-        }
-      ]
-    },
-    {
-      "id": "to-office-20261024-yjlum",
-      "pref": "tokyo",
-      "source": "https://www.mod.go.jp/pco/tokyo/event2/img/tachikawa.pdf",
-      "reasons": [
-        "日付がタイトルになっている"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "令和9年度入校第54期防衛医科大学校医学科学生採用第1次試験",
-          "to": "令和9年度入校第54期防衛医科大学校学生採用第1次試験"
-        },
-        {
-          "field": "address",
-          "from": null,
-          "to": "東京都立川市錦町4-2"
-        },
-        {
-          "field": "time",
-          "from": "09:00～18:00",
-          "to": "07:30～08:20"
-        },
-        {
-          "field": "notes",
-          "from": "掲載元: 豊島出張所\n受付時間07:30～08:20。遅刻時は遅延証明書提示要。",
-          "to": "受付時間内に試験会場に到着できない場合は、担当広報官又は募集課へ必ず連絡をしてください。"
-        }
-      ]
-    },
-    {
-      "id": "ky-office-20261019-1f1lt",
-      "pref": "kyoto",
-      "source": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/img/081019_kyoto.jpg",
-      "reasons": [
-        "タイトルが長すぎる（説明文・別イベントの混入）"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "自衛隊説明会) ハローワーク京都七条 ！詳しくは上の画像をクリック！申し込みは下記のフォームボタンをクリックください！",
-          "to": "陸・海・空自衛隊個別説明会"
-        },
-        {
-          "field": "place",
-          "from": null,
-          "to": "ハローワーク京都七条"
-        },
-        {
-          "field": "time",
-          "from": null,
-          "to": "13:00～17:00"
-        },
-        {
-          "field": "tag",
-          "from": "要予約",
-          "to": "個別"
-        },
-        {
-          "field": "ageRequirement",
-          "from": null,
-          "to": "18歳～32歳"
-        },
-        {
-          "field": "notes",
-          "from": "掲載元: 募集案内所・地域事務所",
-          "to": null
-        }
-      ]
-    },
-    {
-      "id": "ya-office-20261102-y6pwd",
-      "pref": "yamaguchi",
-      "source": "https://www.mod.go.jp/pco/yamaguchi/event-20261018.pdf",
-      "reasons": [
-        "タイトルが長すぎる（説明文・別イベントの混入）"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "車両展示（t救急車：第13後方支援隊） ・ガチャガチャ（山口地本オリジナルデザインの缶バッチなど） ・自衛官制服の体験試",
-          "to": "岩国祭"
-        },
-        {
-          "field": "date",
-          "from": "2026-11-02",
-          "to": "2026-10-17"
-        },
-        {
-          "field": "endDate",
-          "from": null,
-          "to": "2026-10-18"
-        },
-        {
-          "field": "category",
-          "from": "体験",
-          "to": "地域参加"
-        },
-        {
-          "field": "notes",
-          "from": "掲載元: 募集案内所・地域事務所",
-          "to": null
-        }
-      ]
-    }
-  ],
+  "corrections": [],
   "skipped": [
+    {
+      "id": "mi-office-20270128-o4a4d",
+      "pref": "miyagi",
+      "reason": "cutoff"
+    },
     {
       "id": "ya-20261024-waz1q",
       "pref": "yamagata",
@@ -168,9 +32,29 @@
       "reason": "no_source"
     },
     {
+      "id": "to-office-20261024-uopt4",
+      "pref": "tokyo",
+      "reason": "cutoff"
+    },
+    {
+      "id": "ni-office-20261031-n7q2y",
+      "pref": "niigata",
+      "reason": "cutoff"
+    },
+    {
+      "id": "ni-office-20261031-8417t",
+      "pref": "niigata",
+      "reason": "cutoff"
+    },
+    {
       "id": "gi-20261107-vm3v5",
       "pref": "gifu",
       "reason": "no_source"
+    },
+    {
+      "id": "ky-office-20261019-1f1lt",
+      "pref": "kyoto",
+      "reason": "cutoff"
     },
     {
       "id": "os-office-20261107-0p3x1",
@@ -206,6 +90,21 @@
       "id": "ym-20261018-l6bla",
       "pref": "yamaguchi",
       "reason": "not_eligible"
+    },
+    {
+      "id": "ya-office-20261102-y6pwd",
+      "pref": "yamaguchi",
+      "reason": "cutoff"
+    },
+    {
+      "id": "fu-off-20270109-7kurq",
+      "pref": "fukuoka",
+      "reason": "cutoff"
+    },
+    {
+      "id": "fu-off-20270109-7kurq",
+      "pref": "fukuoka",
+      "reason": "cutoff"
     }
   ]
 }
