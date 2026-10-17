@@ -1,12 +1,12 @@
 {
-  "updatedAt": "2026-10-17",
+  "updatedAt": "2026-10-18",
   "limit": 30,
   "summary": {
-    "checked": 399,
-    "flagged": 23,
-    "attempted": 13,
+    "checked": 366,
+    "flagged": 25,
+    "attempted": 15,
     "corrected": 5,
-    "unverified": 7,
+    "unverified": 10,
     "noSource": 3,
     "overBudget": 0,
     "skippedNoSource": 3,
@@ -16,9 +16,9 @@
   },
   "corrections": [
     {
-      "id": "to-office-20261024-yjlum",
+      "id": "to-off-20261024-456ez",
       "pref": "tokyo",
-      "source": "https://www.mod.go.jp/pco/tokyo/event2/img/tachikawa.pdf",
+      "source": "https://www.mod.go.jp/pco/tokyo/event2/img/jujo.pdf",
       "reasons": [
         "日付がタイトルになっている"
       ],
@@ -26,78 +26,83 @@
         {
           "field": "title",
           "from": "令和9年度入校第54期防衛医科大学校医学科学生採用第1次試験",
-          "to": "令和9年度入校第54期防衛医科大学校学生採用第1次試験"
+          "to": "防衛医科大学校医学科学生採用第1次試験"
         },
         {
           "field": "address",
           "from": null,
-          "to": "東京都立川市錦町4-2"
+          "to": "東京都北区十条台1-5-70"
         },
         {
           "field": "time",
           "from": "09:00～18:00",
-          "to": "07:30～08:20"
+          "to": "07:30～18:00"
+        },
+        {
+          "field": "tag",
+          "from": "学生向け",
+          "to": null
         },
         {
           "field": "notes",
-          "from": "掲載元: 豊島出張所\n受付時間07:30～08:20。遅刻時は遅延証明書提示要。",
-          "to": "受付時間内に試験会場に到着できない場合は、担当広報官又は募集課へ必ず連絡をしてください。"
+          "from": "受験票・筆記具・昼食・ゴミ袋を持参。車での乗り入れ不可。",
+          "to": "最初の英語の試験終了時刻までに着席できない方は試験を受けることはできません。"
         }
       ]
     },
     {
-      "id": "gu-office-20261017-mir58",
-      "pref": "gunma",
-      "source": "https://www.mod.go.jp/pco/gunma/sozai/event/20261017-18-1.jpg",
+      "id": "ni-office-20261031-n7q2y",
+      "pref": "niigata",
+      "source": "https://www.mod.go.jp/pco/niigata/files/event/r8.10.31-11.1hiutikoubo.pdf",
       "reasons": [
-        "タイトルが長すぎる（説明文・別イベントの混入）"
+        "イベント語が無く非イベントの兆候がある"
       ],
       "changes": [
         {
           "field": "title",
-          "from": "KYOAI GAKUEN UNIVERSITY SHARON FES 38th Co:Lab -コラボ",
-          "to": "SHARON FES 38th Co:Lab"
+          "from": "中央埠頭2号岸壁",
+          "to": "多用途支援艦「ひうち」特別公開"
         },
         {
           "field": "endDate",
           "from": null,
-          "to": "2026-10-18"
+          "to": "2026-11-01"
         },
         {
-          "field": "address",
+          "field": "place",
           "from": null,
-          "to": "群馬県前橋市小屋原町1154-4"
-        },
-        {
-          "field": "time",
-          "from": "10/17(Sat) 10:00～16:30、10/18(Sun) 10:00～16:00",
-          "to": "10:00～16:30"
+          "to": "寺泊港 中央埠頭2号岸壁"
         },
         {
           "field": "category",
           "from": "広報活動",
-          "to": "採用イベント"
+          "to": "艦艇公開"
+        },
+        {
+          "field": "tag",
+          "from": null,
+          "to": "抽選"
+        },
+        {
+          "field": "deadline",
+          "from": null,
+          "to": "10月23日（金）"
         },
         {
           "field": "notes",
-          "from": "掲載元: 前橋募集案内所",
-          "to": null
+          "from": "掲載元: 募集案内所・地域事務所",
+          "to": "事前申込 抽選制"
         }
       ]
     },
     {
-      "id": "ni-office-20261031-0zijr",
+      "id": "ni-office-20261031-8417t",
       "pref": "niigata",
-      "source": "https://www.mod.go.jp/pco/niigata/images/event/r8.10.31keidaisai.jpg",
+      "source": "https://www.mod.go.jp/pco/niigata/files/event/r8.10.31keidaisai.pdf",
       "reasons": [
         "タイトルが短すぎる"
       ],
       "changes": [
-        {
-          "field": "title",
-          "from": "経大祭",
-          "to": "新潟経営大学 経大祭"
-        },
         {
           "field": "endDate",
           "from": null,
