@@ -1,6 +1,6 @@
 {
   "updatedAt": "2026-10-18",
-  "count": 6,
+  "count": 9,
   "events": [
     {
       "id": "mi-office-20270128-o4a4d",
@@ -15,7 +15,7 @@
       "reason": "日付がタイトルになっている"
     },
     {
-      "id": "to-off-20261024-456ez",
+      "id": "to-office-20261024-uopt4",
       "pref": "tokyo",
       "date": "2026-10-24",
       "endDate": "",
@@ -27,28 +27,16 @@
       "reason": "日付がタイトルになっている"
     },
     {
-      "id": "to-off-20261024-456ez",
-      "pref": "tokyo",
+      "id": "gu-office-20261024-iz2fy",
+      "pref": "gunma",
       "date": "2026-10-24",
       "endDate": "",
-      "title": "令和9年度入校第54期防衛医科大学校医学科学生採用第1次試験",
-      "place": "自衛隊目黒基地",
-      "url": "https://www.mod.go.jp/pco/tokyo/event2/img/meguro.pdf",
+      "title": "大学祭",
+      "place": "ぐんま未来大学 ぐんま未来大学短期大学部",
+      "url": "https://www.mod.go.jp/pco/gunma/sozai/event/20261024-25-2.jpg",
       "source_type": "office_ocr",
       "quarantinedAt": "2026-10-18",
-      "reason": "日付がタイトルになっている"
-    },
-    {
-      "id": "ni-off-20270101-19282",
-      "pref": "niigata",
-      "date": "2027-01-01",
-      "endDate": "",
-      "title": "陸海空自衛官",
-      "place": "調機の充足完了及び空調が整備されていない駐屯地",
-      "url": "https://www.mod.go.jp/pco/niigata/files/top/fukurikousei-kaizen.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-18",
-      "reason": "非イベント文書の疑い"
+      "reason": "タイトルが短すぎる"
     },
     {
       "id": "fu-office-20261130-wkywa",
@@ -73,6 +61,54 @@
       "source_type": "office_ocr",
       "quarantinedAt": "2026-10-18",
       "reason": "OCR由来の不自然な未来日"
+    },
+    {
+      "id": "eh-off-20261018-hib7d",
+      "pref": "ehime",
+      "date": "2026-10-18",
+      "endDate": "",
+      "title": "令和8年度第2回一般曹候補生採用第2次試験",
+      "place": "陸上自衛隊松山駐屯地",
+      "url": "https://www.mod.go.jp/pco/ehime/recruit/img/jukenannai/02_soukousei2niji.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-10-18",
+      "reason": "日付がタイトルになっている"
+    },
+    {
+      "id": "ka-off-20270128-d6sn5",
+      "pref": "kagawa",
+      "date": "2027-01-28",
+      "endDate": "",
+      "title": "令和8年度自衛官等募集案内はこちら",
+      "place": "防衛大学",
+      "url": "https://www.mod.go.jp/pco/kagawa/R8saiyouanai.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-10-18",
+      "reason": "日付がタイトルになっている"
+    },
+    {
+      "id": "fu-off-20270109-7kurq",
+      "pref": "fukuoka",
+      "date": "2027-01-09",
+      "endDate": "",
+      "title": "平和のプロに、なろうと思う。",
+      "place": "芦屋地域事務所",
+      "url": "https://www.mod.go.jp/pco/fukuoka/recruit/images/2024/8.9.2shiken.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-10-18",
+      "reason": "イベント語が無く非イベントの兆候がある"
+    },
+    {
+      "id": "fu-off-20270109-7kurq",
+      "pref": "fukuoka",
+      "date": "2027-01-09",
+      "endDate": "",
+      "title": "平和のプロに、なろうと思う。",
+      "place": "芦屋地域事務所",
+      "url": "https://www.mod.go.jp/pco/fukuoka/recruit/images/2024/8.9.2shiken.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-10-18",
+      "reason": "イベント語が無く非イベントの兆候がある"
     }
   ]
 }
