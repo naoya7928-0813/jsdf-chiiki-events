@@ -2,11 +2,11 @@
   "updatedAt": "2026-10-19",
   "limit": 30,
   "summary": {
-    "checked": 333,
-    "flagged": 18,
-    "attempted": 9,
-    "corrected": 4,
-    "unverified": 5,
+    "checked": 328,
+    "flagged": 20,
+    "attempted": 11,
+    "corrected": 2,
+    "unverified": 9,
     "noSource": 3,
     "overBudget": 0,
     "skippedNoSource": 3,
@@ -15,71 +15,6 @@
     "skippedCutoff": 0
   },
   "corrections": [
-    {
-      "id": "to-office-20261024-yjlum",
-      "pref": "tokyo",
-      "source": "https://www.mod.go.jp/pco/tokyo/event2/img/tachikawa.pdf",
-      "reasons": [
-        "日付がタイトルになっている"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "令和9年度入校第54期防衛医科大学校医学科学生採用第1次試験",
-          "to": "令和9年度入校第54期防衛医科大学校学生採用第1次試験"
-        },
-        {
-          "field": "address",
-          "from": null,
-          "to": "東京都立川市錦町4-2"
-        },
-        {
-          "field": "time",
-          "from": "09:00～18:00",
-          "to": "07:30～08:20"
-        },
-        {
-          "field": "notes",
-          "from": "掲載元: 豊島出張所\n受付時間07:30～08:20。遅刻時は遅延証明書提示要。",
-          "to": "受付時間内に試験会場に到着できない場合は、担当広報官又は募集課へ必ず連絡をしてください。"
-        }
-      ]
-    },
-    {
-      "id": "to-off-20261024-456ez",
-      "pref": "tokyo",
-      "source": "https://www.mod.go.jp/pco/tokyo/event2/img/jujo.pdf",
-      "reasons": [
-        "日付がタイトルになっている"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "令和9年度入校第54期防衛医科大学校医学科学生採用第1次試験",
-          "to": "防衛医科大学校医学科学生採用第1次試験"
-        },
-        {
-          "field": "address",
-          "from": null,
-          "to": "東京都北区十条台1-5-70"
-        },
-        {
-          "field": "time",
-          "from": "09:00～18:00",
-          "to": "07:30～18:00"
-        },
-        {
-          "field": "tag",
-          "from": "学生向け",
-          "to": null
-        },
-        {
-          "field": "notes",
-          "from": "受験票・筆記具・昼食・ゴミ袋を持参。車での乗り入れ不可。",
-          "to": "最初の英語の試験終了時刻までに着席できない方は試験を受けることはできません。"
-        }
-      ]
-    },
     {
       "id": "ky-office-20261019-1f1lt",
       "pref": "kyoto",
