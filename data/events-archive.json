@@ -1,6 +1,278 @@
 {
-  "updatedAt": "2026-10-19",
+  "updatedAt": "2026-10-20",
   "events": [
+    {
+      "id": "to-office-20261019-891ru",
+      "pref": "tokyo",
+      "office": "",
+      "date": "2026-10-19",
+      "endDate": "",
+      "weekday": "月",
+      "title": "就職説明会",
+      "place": "北地域事務所",
+      "address": "",
+      "time": "",
+      "category": "採用イベント",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tokyo/kita/img/1019-1123_tensyoku.png",
+      "notes": "掲載元: 北地域事務所\n申込後、希望日・時間をお伺いします",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-19",
+      "weatherLocation": {
+        "latitude": 35.753,
+        "longitude": 139.734,
+        "label": "東京都北区",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-29T16:31:19.672+09:00"
+      },
+      "archivedAt": "2026-10-20"
+    },
+    {
+      "id": "t-20261019-oyo8x",
+      "pref": "tokyo",
+      "office": "",
+      "date": "2026-10-19",
+      "endDate": "",
+      "weekday": "月",
+      "title": "宇都宮駐屯地見学",
+      "place": "江東出張所",
+      "address": "",
+      "time": "10:00～15:00",
+      "category": "体験",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tokyo/koutou/index.html#1019",
+      "notes": "・部隊見学\n・装備品見学\n・体験喫食等\n多数の場合、抽選。日本国籍有方。",
+      "ageRequirement": "15~32歳",
+      "deadline": "10月12日（月）",
+      "deadlineDate": "2026-10-12",
+      "status": "closed",
+      "statusReason": "締切日経過",
+      "statusSource": "html",
+      "statusUpdatedAt": "2026-10-20",
+      "source_type": "office_html",
+      "firstSeen": "2026-09-15",
+      "weatherLocation": {
+        "latitude": 35.673,
+        "longitude": 139.817,
+        "label": "東京都江東区",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-02T08:50:36.640+09:00"
+      },
+      "archivedAt": "2026-10-20"
+    },
+    {
+      "id": "to-office-20261019-ole7j",
+      "pref": "tokyo",
+      "office": "",
+      "date": "2026-10-19",
+      "endDate": "",
+      "weekday": "月",
+      "title": "宇都宮屯地見学",
+      "place": "宇都宮屯地",
+      "address": "",
+      "time": "10:00～15:00",
+      "category": "体験",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tokyo/koutou/img/1019_utunomiya.jpg",
+      "notes": "掲載元: 江東出張所\n多数の場合、抽選。日本国籍有方。",
+      "ageRequirement": "15~32歳",
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-08",
+      "weatherLocation": {
+        "latitude": 35.69,
+        "longitude": 139.692,
+        "label": "東京都",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-07T23:55:51.463+09:00"
+      },
+      "archivedAt": "2026-10-20"
+    },
+    {
+      "id": "ky-set-20261019-i0gxm",
+      "pref": "kyoto",
+      "office": "",
+      "date": "2026-10-19",
+      "endDate": "",
+      "weekday": "月",
+      "title": "自衛官 就職・進学説明会",
+      "place": "ハローワーク京都七条",
+      "address": "",
+      "time": "13:00～17:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
+      "notes": "担当: 京都募集案内所",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-10-04",
+      "weatherLocation": {
+        "latitude": 35.021,
+        "longitude": 135.756,
+        "label": "京都府",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:30.769+09:00"
+      },
+      "archivedAt": "2026-10-20"
+    },
+    {
+      "id": "ky-office-20261019-1f1lt",
+      "pref": "kyoto",
+      "office": "",
+      "date": "2026-10-19",
+      "endDate": "",
+      "weekday": "月",
+      "title": "陸・海・空自衛隊個別説明会",
+      "place": "ハローワーク京都七条",
+      "address": "",
+      "time": "13:00～17:00",
+      "category": "説明会",
+      "tag": "個別",
+      "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/img/081019_kyoto.jpg",
+      "notes": "掲載元: 募集案内所・地域事務所",
+      "ageRequirement": "18歳～32歳",
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_html",
+      "firstSeen": "2026-10-06",
+      "weatherLocation": {
+        "latitude": 35.021,
+        "longitude": 135.756,
+        "label": "京都府",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:30.769+09:00"
+      },
+      "archivedAt": "2026-10-20"
+    },
+    {
+      "id": "ky-office-20261013-n3vja",
+      "pref": "kyoto",
+      "office": "",
+      "date": "2026-10-13",
+      "endDate": "2026-10-19",
+      "weekday": "火",
+      "title": "陸・海・空 自衛隊個別説明会",
+      "place": "京都テルサ西館3F",
+      "address": "",
+      "time": "10:00～16:00",
+      "category": "説明会",
+      "tag": "個別",
+      "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/img/081013_kyoto.jpg",
+      "notes": "予約不要",
+      "ageRequirement": "18歳～32歳",
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_html",
+      "firstSeen": "2026-10-06",
+      "weatherLocation": {
+        "latitude": 35.012,
+        "longitude": 135.768,
+        "label": "京都府京都市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-06T23:55:38.551+09:00"
+      },
+      "archivedAt": "2026-10-20"
+    },
+    {
+      "id": "hy-20261019-h1rir",
+      "pref": "hyogo",
+      "office": "",
+      "date": "2026-10-19",
+      "endDate": "",
+      "weekday": "月",
+      "title": "高等工科学校進路相談会",
+      "place": "川西地域事務所",
+      "address": "",
+      "time": "16:00～17:00 / 17:00～18:00 / 18:00～19:00 / 09:00～18:00",
+      "category": "説明会",
+      "tag": "学生向け",
+      "url": "https://www.mod.go.jp/pco/hyogo/want/setumeikai.html",
+      "notes": null,
+      "ageRequirement": "・中学校3年生「男子」・中学校勤務教諭 お申し込み お申し込みはこちらから ※メールソフトが起動します。ソフトが起動しない場合は 件名:高等工科学校進路相談会 本文:①希望会場:川西会場 ②氏名(兵庫 太郎) ③生年月日（西暦:20▲▲.▲▲.▲▲） ④住所（○○県○○市～） ⑤学校名（学年:■年生） ⑥連絡先(電話番号) ⑦希望",
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "hyogo_html",
+      "firstSeen": "2026-10-05",
+      "weatherLocation": {
+        "latitude": 34.83,
+        "longitude": 135.417,
+        "label": "兵庫県川西市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-05T08:54:38.633+09:00"
+      },
+      "archivedAt": "2026-10-20"
+    },
+    {
+      "id": "hi-20261019-65ebk",
+      "pref": "hiroshima",
+      "office": "",
+      "date": "2026-10-19",
+      "endDate": "",
+      "weekday": "月",
+      "title": "自衛隊説明会（福山・府中）",
+      "place": "ハローワーク福山（福山市東桜町）",
+      "address": "",
+      "time": "09:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/hiroshima/events/4163/",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-09-11",
+      "weatherLocation": {
+        "latitude": 34.397,
+        "longitude": 132.46,
+        "label": "ワーク福山（福山市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-16T08:55:06.431+09:00"
+      },
+      "archivedAt": "2026-10-20"
+    },
     {
       "id": "ya-20261018-tr9y4",
       "pref": "yamagata",
@@ -192,7 +464,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-10-19",
+      "statusUpdatedAt": "2026-10-20",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-08",
       "weatherLocation": {
@@ -203,7 +475,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-08T10:36:11.669+09:00"
       },
-      "archivedAt": "2026-10-19"
+      "archivedAt": "2026-10-20"
     },
     {
       "id": "s-20261018-sgjnd",
@@ -433,15 +705,7 @@
       "statusUpdatedAt": "",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-18",
-      "weatherLocation": {
-        "latitude": 36.291,
-        "longitude": 139.376,
-        "label": "群馬県太田市",
-        "accuracy": "venue",
-        "source": "gsi",
-        "geocodedAt": "2026-10-18T08:37:14.275+09:00"
-      },
-      "archivedAt": "2026-10-19"
+      "archivedAt": "2026-10-20"
     },
     {
       "id": "to-office-20261018-yecdz",
@@ -1079,7 +1343,7 @@
       "statusUpdatedAt": "",
       "source_type": "office_html",
       "firstSeen": "2026-10-14",
-      "archivedAt": "2026-10-19"
+      "archivedAt": "2026-10-20"
     },
     {
       "id": "ya-office-20261018-whkb7",
@@ -1895,7 +2159,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-16T08:55:02.954+09:00"
       },
-      "archivedAt": "2026-10-19"
+      "archivedAt": "2026-10-20"
     },
     {
       "id": "gi-office-20261017-uqzpb",
@@ -2167,7 +2431,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:31.252+09:00"
       },
-      "archivedAt": "2026-10-19"
+      "archivedAt": "2026-10-20"
     },
     {
       "id": "hy-20261017-tz7j1",
@@ -2915,7 +3179,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-14T15:23:16.911+09:00"
       },
-      "archivedAt": "2026-10-19"
+      "archivedAt": "2026-10-20"
     },
     {
       "id": "ok-office-20261015-em8ti",
@@ -2949,7 +3213,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-10-19"
+      "archivedAt": "2026-10-20"
     },
     {
       "id": "hi-office-20261015-y82nb",
@@ -2983,7 +3247,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
       },
-      "archivedAt": "2026-10-19"
+      "archivedAt": "2026-10-20"
     },
     {
       "id": "os-office-20261014-kbxkz",
@@ -3051,7 +3315,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-10-19"
+      "archivedAt": "2026-10-20"
     },
     {
       "id": "ok-office-20261014-r3krt",
@@ -3085,7 +3349,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-10-19"
+      "archivedAt": "2026-10-20"
     },
     {
       "id": "hi-20261014-3nw77",
@@ -3247,7 +3511,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-07T23:55:50.984+09:00"
       },
-      "archivedAt": "2026-10-19"
+      "archivedAt": "2026-10-20"
     },
     {
       "id": "sa-office-20261013-mdfav",
@@ -3315,7 +3579,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-06T23:55:36.928+09:00"
       },
-      "archivedAt": "2026-10-19"
+      "archivedAt": "2026-10-20"
     },
     {
       "id": "ky-set-20261013-x5krs",
@@ -3511,7 +3775,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-06T23:55:36.597+09:00"
       },
-      "archivedAt": "2026-10-19"
+      "archivedAt": "2026-10-20"
     },
     {
       "id": "ni-office-20261012-2fki3",
@@ -3817,7 +4081,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:38.485+09:00"
       },
-      "archivedAt": "2026-10-19"
+      "archivedAt": "2026-10-20"
     },
     {
       "id": "ka-office-20261012-5tfj3",
