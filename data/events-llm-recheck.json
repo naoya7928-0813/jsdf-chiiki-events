@@ -2,11 +2,11 @@
   "updatedAt": "2026-10-20",
   "limit": 30,
   "summary": {
-    "checked": 331,
+    "checked": 328,
     "flagged": 18,
     "attempted": 9,
-    "corrected": 2,
-    "unverified": 7,
+    "corrected": 3,
+    "unverified": 6,
     "noSource": 3,
     "overBudget": 0,
     "skippedNoSource": 3,
@@ -16,7 +16,7 @@
   },
   "corrections": [
     {
-      "id": "to-off-20261024-456ez",
+      "id": "to-office-20261024-q8rhr",
       "pref": "tokyo",
       "source": "https://www.mod.go.jp/pco/tokyo/event2/img/jujo.pdf",
       "reasons": [
@@ -45,8 +45,38 @@
         },
         {
           "field": "notes",
-          "from": "受験票・筆記具・昼食・ゴミ袋を持参。車での乗り入れ不可。",
+          "from": "掲載元: 豊島出張所\n受験票・筆記具・昼食・ゴミ袋を持参。車での乗り入れ不可。",
           "to": "最初の英語の試験終了時刻までに着席できない方は試験を受けることはできません。"
+        }
+      ]
+    },
+    {
+      "id": "gu-office-20261024-n083a",
+      "pref": "gunma",
+      "source": "https://www.mod.go.jp/pco/gunma/sozai/event/20261023-24-1.jpg",
+      "reasons": [
+        "タイトルが短すぎる"
+      ],
+      "changes": [
+        {
+          "field": "title",
+          "from": "伊商祭",
+          "to": "伊勢崎商業高等学校 第24回 華城祭"
+        },
+        {
+          "field": "date",
+          "from": "2026-10-24",
+          "to": "2025-10-24"
+        },
+        {
+          "field": "category",
+          "from": "広報活動",
+          "to": "地域参加"
+        },
+        {
+          "field": "notes",
+          "from": "掲載元: 前橋募集案内所",
+          "to": "一般公開"
         }
       ]
     },
