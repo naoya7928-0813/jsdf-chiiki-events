@@ -1,102 +1,26 @@
 {
-  "updatedAt": "2026-10-21",
+  "updatedAt": "2026-10-22",
   "limit": 30,
   "summary": {
-    "checked": 354,
-    "flagged": 21,
-    "attempted": 11,
-    "corrected": 2,
-    "unverified": 8,
+    "checked": 320,
+    "flagged": 12,
+    "attempted": 0,
+    "corrected": 0,
+    "unverified": 0,
     "noSource": 3,
     "overBudget": 0,
     "skippedNoSource": 3,
     "skippedNotEligible": 7,
     "skippedProviderUnavailable": 0,
-    "skippedCutoff": 0
+    "skippedCutoff": 2
   },
-  "corrections": [
-    {
-      "id": "to-off-20261024-456ez",
-      "pref": "tokyo",
-      "source": "https://www.mod.go.jp/pco/tokyo/event2/img/jujo.pdf",
-      "reasons": [
-        "日付がタイトルになっている"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "令和9年度入校第54期防衛医科大学校医学科学生採用第1次試験",
-          "to": "防衛医科大学校医学科学生採用第1次試験"
-        },
-        {
-          "field": "address",
-          "from": null,
-          "to": "東京都北区十条台1-5-70"
-        },
-        {
-          "field": "time",
-          "from": "09:00～18:00",
-          "to": "07:30～18:00"
-        },
-        {
-          "field": "tag",
-          "from": "学生向け",
-          "to": null
-        },
-        {
-          "field": "notes",
-          "from": "受験票・筆記具・昼食・ゴミ袋を持参。車での乗り入れ不可。",
-          "to": "最初の英語の試験終了時刻までに着席できない方は試験を受けることはできません。"
-        }
-      ]
-    },
-    {
-      "id": "ni-office-20261031-n7q2y",
-      "pref": "niigata",
-      "source": "https://www.mod.go.jp/pco/niigata/files/event/r8.10.31-11.1hiutikoubo.pdf",
-      "reasons": [
-        "イベント語が無く非イベントの兆候がある"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "中央埠頭2号岸壁",
-          "to": "多用途支援艦「ひうち」特別公開"
-        },
-        {
-          "field": "endDate",
-          "from": null,
-          "to": "2026-11-01"
-        },
-        {
-          "field": "place",
-          "from": null,
-          "to": "寺泊港 中央埠頭2号岸壁"
-        },
-        {
-          "field": "category",
-          "from": "広報活動",
-          "to": "艦艇公開"
-        },
-        {
-          "field": "tag",
-          "from": null,
-          "to": "抽選"
-        },
-        {
-          "field": "deadline",
-          "from": null,
-          "to": "10月23日（金）"
-        },
-        {
-          "field": "notes",
-          "from": "掲載元: 募集案内所・地域事務所",
-          "to": "事前申込 抽選制"
-        }
-      ]
-    }
-  ],
+  "corrections": [],
   "skipped": [
+    {
+      "id": "mi-office-20270128-o4a4d",
+      "pref": "miyagi",
+      "reason": "cutoff"
+    },
     {
       "id": "ya-20261024-waz1q",
       "pref": "yamagata",
@@ -146,6 +70,11 @@
       "id": "ya-office-20261102-yay3c",
       "pref": "yamaguchi",
       "reason": "not_eligible"
+    },
+    {
+      "id": "ya-office-20261102-y6pwd",
+      "pref": "yamaguchi",
+      "reason": "cutoff"
     }
   ]
 }
