@@ -1,6 +1,108 @@
 {
-  "updatedAt": "2026-10-22",
+  "updatedAt": "2026-10-23",
   "events": [
+    {
+      "id": "sa-office-20261022-f6g8j",
+      "pref": "saitama",
+      "office": "",
+      "date": "2026-10-22",
+      "endDate": "",
+      "weekday": "木",
+      "title": "砕氷艦「しらせ」一般公開参加希望者募集",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/saitama/",
+      "notes": "掲載元: 募集案内所・地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_html",
+      "firstSeen": "2026-10-22",
+      "weatherLocation": {
+        "latitude": 35.857,
+        "longitude": 139.649,
+        "label": "埼玉県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:19.230+09:00"
+      },
+      "archivedAt": "2026-10-23"
+    },
+    {
+      "id": "hy-20261022-rg663",
+      "pref": "hyogo",
+      "office": "",
+      "date": "2026-10-22",
+      "endDate": "",
+      "weekday": "木",
+      "title": "高等工科学校進路相談会",
+      "place": "川西地域事務所",
+      "address": "",
+      "time": "16:00～17:00 / 17:00～18:00 / 18:00～19:00 / 09:00～18:00",
+      "category": "説明会",
+      "tag": "学生向け",
+      "url": "https://www.mod.go.jp/pco/hyogo/want/setumeikai.html",
+      "notes": null,
+      "ageRequirement": "・中学校3年生「男子」・中学校勤務教諭 お申し込み お申し込みはこちらから ※メールソフトが起動します。ソフトが起動しない場合は 件名:高等工科学校進路相談会 本文:①希望会場:川西会場 ②氏名(兵庫 太郎) ③生年月日（西暦:20▲▲.▲▲.▲▲） ④住所（○○県○○市～） ⑤学校名（学年:■年生） ⑥連絡先(電話番号) ⑦希望",
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "hyogo_html",
+      "firstSeen": "2026-10-05",
+      "weatherLocation": {
+        "latitude": 34.83,
+        "longitude": 135.417,
+        "label": "兵庫県川西市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-05T08:54:38.633+09:00"
+      },
+      "archivedAt": "2026-10-23"
+    },
+    {
+      "id": "ok-office-20261022-z6r4u",
+      "pref": "okayama",
+      "office": "",
+      "date": "2026-10-22",
+      "endDate": "",
+      "weekday": "木",
+      "title": "医科・歯科幹部】募集",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/gsdf/jieikanbosyu/about/recruit/ikashikakambu.html",
+      "notes": "掲載元: 募集案内所・地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_html",
+      "firstSeen": "2026-09-23",
+      "weatherLocation": {
+        "latitude": 34.662,
+        "longitude": 133.935,
+        "label": "岡山県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.000+09:00"
+      },
+      "archivedAt": "2026-10-23"
+    },
     {
       "id": "mi-office-20261021-yywyv",
       "pref": "mie",
@@ -67,7 +169,7 @@
         "source": "gsi",
         "geocodedAt": "2026-07-13T07:58:32.830+09:00"
       },
-      "archivedAt": "2026-10-22"
+      "archivedAt": "2026-10-23"
     },
     {
       "id": "mi-office-20261021-lrz3o",
@@ -101,7 +203,7 @@
         "source": "gsi",
         "geocodedAt": "2026-07-13T07:58:32.830+09:00"
       },
-      "archivedAt": "2026-10-22"
+      "archivedAt": "2026-10-23"
     },
     {
       "id": "os-set-20261021-j0i9a",
@@ -237,7 +339,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-10-22"
+      "archivedAt": "2026-10-23"
     },
     {
       "id": "to-office-20261019-891ru",
@@ -294,7 +396,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-10-22",
+      "statusUpdatedAt": "2026-10-23",
       "source_type": "office_html",
       "firstSeen": "2026-09-15",
       "weatherLocation": {
@@ -305,7 +407,7 @@
         "source": "gsi",
         "geocodedAt": "2026-07-02T08:50:36.640+09:00"
       },
-      "archivedAt": "2026-10-22"
+      "archivedAt": "2026-10-23"
     },
     {
       "id": "to-office-20261019-ole7j",
@@ -339,7 +441,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-07T23:55:51.463+09:00"
       },
-      "archivedAt": "2026-10-22"
+      "archivedAt": "2026-10-23"
     },
     {
       "id": "ky-set-20261019-i0gxm",
@@ -407,7 +509,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:30.769+09:00"
       },
-      "archivedAt": "2026-10-22"
+      "archivedAt": "2026-10-23"
     },
     {
       "id": "ky-office-20261013-n3vja",
@@ -441,7 +543,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-06T23:55:38.551+09:00"
       },
-      "archivedAt": "2026-10-22"
+      "archivedAt": "2026-10-23"
     },
     {
       "id": "hy-20261019-h1rir",
@@ -702,7 +804,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-10-22",
+      "statusUpdatedAt": "2026-10-23",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-08",
       "weatherLocation": {
@@ -713,7 +815,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-08T10:36:11.669+09:00"
       },
-      "archivedAt": "2026-10-22"
+      "archivedAt": "2026-10-23"
     },
     {
       "id": "s-20261018-sgjnd",
@@ -943,7 +1045,7 @@
       "statusUpdatedAt": "",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-18",
-      "archivedAt": "2026-10-22"
+      "archivedAt": "2026-10-23"
     },
     {
       "id": "to-office-20261018-yecdz",
@@ -1589,7 +1691,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.480+09:00"
       },
-      "archivedAt": "2026-10-22"
+      "archivedAt": "2026-10-23"
     },
     {
       "id": "ya-office-20261018-whkb7",
@@ -2677,7 +2779,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:31.252+09:00"
       },
-      "archivedAt": "2026-10-22"
+      "archivedAt": "2026-10-23"
     },
     {
       "id": "hy-20261017-tz7j1",
@@ -3425,7 +3527,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-14T15:23:16.911+09:00"
       },
-      "archivedAt": "2026-10-22"
+      "archivedAt": "2026-10-23"
     },
     {
       "id": "ok-office-20261015-em8ti",
@@ -3459,7 +3561,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-10-22"
+      "archivedAt": "2026-10-23"
     },
     {
       "id": "hi-office-20261015-y82nb",
@@ -3493,7 +3595,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.248+09:00"
       },
-      "archivedAt": "2026-10-22"
+      "archivedAt": "2026-10-23"
     },
     {
       "id": "os-office-20261014-kbxkz",
