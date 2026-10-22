@@ -2,23 +2,23 @@
   "updatedAt": "2026-10-22",
   "limit": 30,
   "summary": {
-    "checked": 355,
-    "flagged": 21,
-    "attempted": 11,
+    "checked": 363,
+    "flagged": 24,
+    "attempted": 13,
     "corrected": 2,
-    "unverified": 8,
+    "unverified": 10,
     "noSource": 3,
     "overBudget": 0,
     "skippedNoSource": 3,
-    "skippedNotEligible": 7,
+    "skippedNotEligible": 8,
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
   "corrections": [
     {
-      "id": "to-office-20261024-yjlum",
+      "id": "to-off-20261024-456ez",
       "pref": "tokyo",
-      "source": "https://www.mod.go.jp/pco/tokyo/event2/img/tachikawa.pdf",
+      "source": "https://www.mod.go.jp/pco/tokyo/event2/img/jujo.pdf",
       "reasons": [
         "日付がタイトルになっている"
       ],
@@ -26,37 +26,17 @@
         {
           "field": "title",
           "from": "令和9年度入校第54期防衛医科大学校医学科学生採用第1次試験",
-          "to": "令和9年度入校第54期防衛医科大学校学生採用第1次試験"
+          "to": "防衛医科大学校医学科学生採用第1次試験"
         },
         {
           "field": "address",
           "from": null,
-          "to": "東京都立川市錦町4-2"
+          "to": "東京都北区十条台1-5-70"
         },
         {
           "field": "time",
           "from": "09:00～18:00",
-          "to": "07:30～08:20"
-        },
-        {
-          "field": "notes",
-          "from": "掲載元: 豊島出張所\n受付時間07:30～08:20。遅刻時は遅延証明書提示要。",
-          "to": "受付時間内に試験会場に到着できない場合は、担当広報官又は募集課へ必ず連絡をしてください。"
-        }
-      ]
-    },
-    {
-      "id": "eh-off-20270123-516jb",
-      "pref": "ehime",
-      "source": "https://www.mod.go.jp/pco/ehime/recruit/img/jukenannai/09_seito.pdf",
-      "reasons": [
-        "日付がタイトルになっている"
-      ],
-      "changes": [
-        {
-          "field": "address",
-          "from": null,
-          "to": "松山市南梅本町乙115番地"
+          "to": "07:30～18:00"
         },
         {
           "field": "tag",
@@ -65,8 +45,53 @@
         },
         {
           "field": "notes",
-          "from": "昼食は各自用意。受験票・筆記具持参。",
-          "to": "試験会場は志願者数により変更になる場合があります。"
+          "from": "受験票・筆記具・昼食・ゴミ袋を持参。車での乗り入れ不可。",
+          "to": "最初の英語の試験終了時刻までに着席できない方は試験を受けることはできません。"
+        }
+      ]
+    },
+    {
+      "id": "ni-office-20261031-n7q2y",
+      "pref": "niigata",
+      "source": "https://www.mod.go.jp/pco/niigata/files/event/r8.10.31-11.1hiutikoubo.pdf",
+      "reasons": [
+        "イベント語が無く非イベントの兆候がある"
+      ],
+      "changes": [
+        {
+          "field": "title",
+          "from": "中央埠頭2号岸壁",
+          "to": "多用途支援艦「ひうち」特別公開"
+        },
+        {
+          "field": "endDate",
+          "from": null,
+          "to": "2026-11-01"
+        },
+        {
+          "field": "place",
+          "from": null,
+          "to": "寺泊港 中央埠頭2号岸壁"
+        },
+        {
+          "field": "category",
+          "from": "広報活動",
+          "to": "艦艇公開"
+        },
+        {
+          "field": "tag",
+          "from": null,
+          "to": "抽選"
+        },
+        {
+          "field": "deadline",
+          "from": null,
+          "to": "10月23日（金）"
+        },
+        {
+          "field": "notes",
+          "from": "掲載元: 募集案内所・地域事務所",
+          "to": "事前申込 抽選制"
         }
       ]
     }
@@ -100,6 +125,11 @@
     {
       "id": "os-office-20261107-l69n5",
       "pref": "osaka",
+      "reason": "not_eligible"
+    },
+    {
+      "id": "eh-office-20261111-1mfzs",
+      "pref": "ehime",
       "reason": "not_eligible"
     },
     {
