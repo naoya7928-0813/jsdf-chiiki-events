@@ -2,25 +2,20 @@
   "updatedAt": "2026-10-24",
   "limit": 30,
   "summary": {
-    "checked": 353,
-    "flagged": 15,
-    "attempted": 0,
+    "checked": 369,
+    "flagged": 21,
+    "attempted": 9,
     "corrected": 0,
-    "unverified": 0,
+    "unverified": 8,
     "noSource": 3,
     "overBudget": 0,
     "skippedNoSource": 3,
     "skippedNotEligible": 9,
     "skippedProviderUnavailable": 0,
-    "skippedCutoff": 3
+    "skippedCutoff": 0
   },
   "corrections": [],
   "skipped": [
-    {
-      "id": "mi-office-20270128-o4a4d",
-      "pref": "miyagi",
-      "reason": "cutoff"
-    },
     {
       "id": "ya-20261024-waz1q",
       "pref": "yamagata",
@@ -40,11 +35,6 @@
       "id": "to-office-20261101-azn1x",
       "pref": "tochigi",
       "reason": "not_eligible"
-    },
-    {
-      "id": "fu-office-20261130-wkywa",
-      "pref": "fukui",
-      "reason": "cutoff"
     },
     {
       "id": "gi-20261107-vm3v5",
@@ -85,11 +75,6 @@
       "id": "ya-office-20261102-yay3c",
       "pref": "yamaguchi",
       "reason": "not_eligible"
-    },
-    {
-      "id": "ya-office-20261102-y6pwd",
-      "pref": "yamaguchi",
-      "reason": "cutoff"
     }
   ]
 }
