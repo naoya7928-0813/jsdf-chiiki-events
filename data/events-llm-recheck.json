@@ -5,8 +5,8 @@
     "checked": 321,
     "flagged": 16,
     "attempted": 6,
-    "corrected": 1,
-    "unverified": 4,
+    "corrected": 0,
+    "unverified": 5,
     "noSource": 2,
     "overBudget": 0,
     "skippedNoSource": 2,
@@ -14,33 +14,7 @@
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
-  "corrections": [
-    {
-      "id": "eh-off-20270123-516jb",
-      "pref": "ehime",
-      "source": "https://www.mod.go.jp/pco/ehime/recruit/img/jukenannai/09_seito.pdf",
-      "reasons": [
-        "日付がタイトルになっている"
-      ],
-      "changes": [
-        {
-          "field": "address",
-          "from": null,
-          "to": "松山市南梅本町乙115番地"
-        },
-        {
-          "field": "tag",
-          "from": "学生向け",
-          "to": null
-        },
-        {
-          "field": "notes",
-          "from": "昼食は各自用意。受験票・筆記具持参。",
-          "to": "試験会場は志願者数により変更になる場合があります。"
-        }
-      ]
-    }
-  ],
+  "corrections": [],
   "skipped": [
     {
       "id": "ya-20261025-c4z5s",
@@ -63,12 +37,12 @@
       "reason": "no_source"
     },
     {
-      "id": "os-office-20261107-7qd6f",
+      "id": "os-office-20261107-0p3x1",
       "pref": "osaka",
       "reason": "not_eligible"
     },
     {
-      "id": "os-office-20261107-0p3x1",
+      "id": "os-office-20261107-7qd6f",
       "pref": "osaka",
       "reason": "not_eligible"
     },
