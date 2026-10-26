@@ -1,31 +1,7 @@
 {
   "updatedAt": "2026-10-26",
-  "count": 7,
+  "count": 3,
   "events": [
-    {
-      "id": "as-off-20270128-tr87l",
-      "pref": "asahikawa",
-      "date": "2027-01-28",
-      "endDate": "",
-      "title": "令和8年度自衛官等採用試験予定表",
-      "place": "防衛大学",
-      "url": "https://www.mod.go.jp/pco/asahikawa/01_recruit/r8_nitteihyou.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-26",
-      "reason": "日付がタイトルになっている"
-    },
-    {
-      "id": "as-off-20270128-i34vl",
-      "pref": "asahikawa",
-      "date": "2027-01-28",
-      "endDate": "",
-      "title": "令和8年度自衛官等採用試験予定表",
-      "place": "防衛大学",
-      "url": "https://www.mod.go.jp/pco/asahikawa/01_recruit/r8_nitteihyou.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-26",
-      "reason": "日付がタイトルになっている"
-    },
     {
       "id": "mi-office-20270128-o4a4d",
       "pref": "miyagi",
@@ -39,16 +15,16 @@
       "reason": "日付がタイトルになっている"
     },
     {
-      "id": "fu-office-20261130-wkywa",
-      "pref": "fukui",
-      "date": "2026-11-30",
+      "id": "ni-off-20270101-19282",
+      "pref": "niigata",
+      "date": "2027-01-01",
       "endDate": "",
-      "title": "令和8年度予備自衛官補招集教育訓日程",
-      "place": "",
-      "url": "https://www.mod.go.jp/pco/fukui/contents/21-yobijieikantou/images/yobijiho-nittei.pdf",
+      "title": "陸海空自衛官",
+      "place": "調機の充足完了及び空調が整備されていない駐屯地",
+      "url": "https://www.mod.go.jp/pco/niigata/files/top/fukurikousei-kaizen.pdf",
       "source_type": "office_ocr",
       "quarantinedAt": "2026-10-26",
-      "reason": "日付がタイトルになっている"
+      "reason": "非イベント文書の疑い"
     },
     {
       "id": "ai-office-20280620-ghetd",
@@ -61,30 +37,6 @@
       "source_type": "office_ocr",
       "quarantinedAt": "2026-10-26",
       "reason": "OCR由来の不自然な未来日"
-    },
-    {
-      "id": "fu-off-20270109-7kurq",
-      "pref": "fukuoka",
-      "date": "2027-01-09",
-      "endDate": "",
-      "title": "平和のプロに、なろうと思う。",
-      "place": "芦屋地域事務所",
-      "url": "https://www.mod.go.jp/pco/fukuoka/recruit/images/2024/8.9.2shiken.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-26",
-      "reason": "イベント語が無く非イベントの兆候がある"
-    },
-    {
-      "id": "fu-off-20270109-7kurq",
-      "pref": "fukuoka",
-      "date": "2027-01-09",
-      "endDate": "",
-      "title": "平和のプロに、なろうと思う。",
-      "place": "芦屋地域事務所",
-      "url": "https://www.mod.go.jp/pco/fukuoka/recruit/images/2024/8.9.2shiken.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-26",
-      "reason": "イベント語が無く非イベントの兆候がある"
     }
   ]
 }
