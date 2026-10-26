@@ -2,11 +2,11 @@
   "updatedAt": "2026-10-26",
   "limit": 30,
   "summary": {
-    "checked": 290,
-    "flagged": 12,
-    "attempted": 3,
+    "checked": 281,
+    "flagged": 15,
+    "attempted": 6,
     "corrected": 1,
-    "unverified": 2,
+    "unverified": 5,
     "noSource": 1,
     "overBudget": 0,
     "skippedNoSource": 1,
@@ -16,47 +16,27 @@
   },
   "corrections": [
     {
-      "id": "ni-office-20261031-n7q2y",
-      "pref": "niigata",
-      "source": "https://www.mod.go.jp/pco/niigata/files/event/r8.10.31-11.1hiutikoubo.pdf",
+      "id": "eh-off-20270123-516jb",
+      "pref": "ehime",
+      "source": "https://www.mod.go.jp/pco/ehime/recruit/img/jukenannai/09_seito.pdf",
       "reasons": [
-        "イベント語が無く非イベントの兆候がある"
+        "日付がタイトルになっている"
       ],
       "changes": [
         {
-          "field": "title",
-          "from": "中央埠頭2号岸壁",
-          "to": "多用途支援艦「ひうち」特別公開"
-        },
-        {
-          "field": "endDate",
+          "field": "address",
           "from": null,
-          "to": "2026-11-01"
-        },
-        {
-          "field": "place",
-          "from": null,
-          "to": "寺泊港 中央埠頭2号岸壁"
-        },
-        {
-          "field": "category",
-          "from": "広報活動",
-          "to": "艦艇公開"
+          "to": "松山市南梅本町乙115番地"
         },
         {
           "field": "tag",
-          "from": null,
-          "to": "抽選"
-        },
-        {
-          "field": "deadline",
-          "from": null,
-          "to": "10月23日（金）"
+          "from": "学生向け",
+          "to": null
         },
         {
           "field": "notes",
-          "from": "掲載元: 募集案内所・地域事務所",
-          "to": "事前申込 抽選制"
+          "from": "昼食は各自用意。受験票・筆記具持参。",
+          "to": "試験会場は志願者数により変更になる場合があります。"
         }
       ]
     }
