@@ -1,9 +1,9 @@
 {
-  "updatedAt": "2026-10-27",
+  "updatedAt": "2026-10-28",
   "count": 6,
   "events": [
     {
-      "id": "as-office-20270128-80r9k",
+      "id": "as-off-20270128-tr87l",
       "pref": "asahikawa",
       "date": "2027-01-28",
       "endDate": "",
@@ -11,7 +11,19 @@
       "place": "防衛大学",
       "url": "https://www.mod.go.jp/pco/asahikawa/01_recruit/r8_nitteihyou.pdf",
       "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-27",
+      "quarantinedAt": "2026-10-28",
+      "reason": "日付がタイトルになっている"
+    },
+    {
+      "id": "as-off-20270128-i34vl",
+      "pref": "asahikawa",
+      "date": "2027-01-28",
+      "endDate": "",
+      "title": "令和8年度自衛官等採用試験予定表",
+      "place": "防衛大学",
+      "url": "https://www.mod.go.jp/pco/asahikawa/01_recruit/r8_nitteihyou.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-10-28",
       "reason": "日付がタイトルになっている"
     },
     {
@@ -23,8 +35,20 @@
       "place": "防衛大学",
       "url": "https://www.mod.go.jp/pco/miyagi/miyagitop/image/r8rec-schedule.pdf",
       "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-27",
+      "quarantinedAt": "2026-10-28",
       "reason": "日付がタイトルになっている"
+    },
+    {
+      "id": "gu-office-20261108-ovwm7",
+      "pref": "gunma",
+      "date": "2026-11-08",
+      "endDate": "",
+      "title": "三世代ふれあい長建パーク(境ふれあいパーク)及び 人材派遣ワイズコーポレーション境総合文化センター",
+      "place": "",
+      "url": "https://www.mod.go.jp/pco/gunma/event.html?id=o09",
+      "source_type": "office_html",
+      "quarantinedAt": "2026-10-28",
+      "reason": ""
     },
     {
       "id": "fu-office-20261130-wkywa",
@@ -35,7 +59,7 @@
       "place": "",
       "url": "https://www.mod.go.jp/pco/fukui/contents/21-yobijieikantou/images/yobijiho-nittei.pdf",
       "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-27",
+      "quarantinedAt": "2026-10-28",
       "reason": "日付がタイトルになっている"
     },
     {
@@ -47,32 +71,8 @@
       "place": "自衛隊愛知地本豊田地域事務所（豊田合同庁舎3）",
       "url": "https://www.mod.go.jp/pco/aichi/contact/toyota/seminar/toyota_se202606_11.jpg",
       "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-27",
+      "quarantinedAt": "2026-10-28",
       "reason": "OCR由来の不自然な未来日"
-    },
-    {
-      "id": "ka-off-20270128-d6sn5",
-      "pref": "kagawa",
-      "date": "2027-01-28",
-      "endDate": "",
-      "title": "令和8年度自衛官等募集案内はこちら",
-      "place": "防衛大学",
-      "url": "https://www.mod.go.jp/pco/kagawa/R8saiyouanai.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-27",
-      "reason": "日付がタイトルになっている"
-    },
-    {
-      "id": "fu-off-20270109-7kurq",
-      "pref": "fukuoka",
-      "date": "2027-01-09",
-      "endDate": "",
-      "title": "平和のプロに、なろうと思う。",
-      "place": "芦屋地域事務所",
-      "url": "https://www.mod.go.jp/pco/fukuoka/recruit/images/2024/8.9.2shiken.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-10-27",
-      "reason": "イベント語が無く非イベントの兆候がある"
     }
   ]
 }
