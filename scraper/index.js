@@ -601,6 +601,7 @@ async function checkRapidOcrAvailable() {
     'python',
   ].filter(Boolean);
 
+  let lastReason = '';
   for (const cmd of candidates) {
     try {
       // 1回だけの確認。モデル読み込みは通常 3〜7 秒だが、Chromium と並走する負荷下では 15 秒を超え、
@@ -618,11 +619,16 @@ async function checkRapidOcrAvailable() {
           + ' scraper/requirements-ocr.txt（rapidocr）を導入してください');
       }
       return true;
-    } catch { /* try next python command */ }
+    } catch (err) {
+      // rapidocr_cli.py は失敗時も {"ok":false,"error":...} を stdout に出す（モデルのハッシュ不一致など）。
+      // 理由を残さないと「未導入」と区別できない
+      try { lastReason = JSON.parse(err.stdout).error || ''; } catch { /* python 自体が無い等 */ }
+      /* try next python command */
+    }
   }
 
   rapidOcrAvailable = false;
-  console.warn('[OCRエンジン] RapidOCR: 利用不可（python / rapidocr-onnxruntime 未導入）');
+  console.warn(`[OCRエンジン] RapidOCR: 利用不可（${lastReason ? String(lastReason).slice(0, 200) : 'python / rapidocr 未導入'}）`);
   return false;
 }
 

@@ -8,6 +8,7 @@
 // （api/*.jsx が関数として検出されない環境があるため .js に統一）。
 import { ImageResponse } from '@vercel/og';
 import { siteUrl, siteHost } from '../shared/siteUrl.cjs';
+import { ogSafeText } from '../shared/ogText.cjs';
 
 export const config = { runtime: 'edge' };
 
@@ -37,11 +38,12 @@ async function loadSubsetFont(family, text, weight) {
 export default async function handler(req) {
   try {
     const { searchParams } = new URL(req.url);
-    const title = (searchParams.get('title') || '自衛隊地本イベント').slice(0, 60);
-    const date  = (searchParams.get('date')  || '').slice(0, 40);
-    const place = (searchParams.get('place') || '').slice(0, 40);
-    const pref  = (searchParams.get('pref')  || '').slice(0, 12);
-    const cat   = (searchParams.get('cat')   || '').slice(0, 12);
+    // クエリは誰でも任意に渡せるため、satori に渡す前に必ず無害化する（shared/ogText.cjs 参照）
+    const title = ogSafeText(searchParams.get('title'), 60) || '自衛隊地本イベント';
+    const date  = ogSafeText(searchParams.get('date'),  40);
+    const place = ogSafeText(searchParams.get('place'), 40);
+    const pref  = ogSafeText(searchParams.get('pref'),  12);
+    const cat   = ogSafeText(searchParams.get('cat'),   12);
 
     const brand = '地本イベントナビ（非公式）';
     const allText = `${title}${date}${place}${pref}${cat}${brand}開催日会場地本カテゴリ ：〜・|`;

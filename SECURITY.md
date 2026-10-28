@@ -38,6 +38,18 @@
 - IPレートリミット（Upstash Redis。障害時は可用性優先で通す）。
 - master ブランチ保護は **force push・ブランチ削除の禁止のみ**（2026-09-23 確認）。PR 必須・必須チェック・本番承認は未設定（下記「既知の制約」）。デプロイ前に `npm test` ＋ データ品質チェックをゲート。
 
+## 依存パッケージの脆弱性監査（2026-10-28 導入）
+- `node scripts/audit-deps.mjs` がサイト本体（`package-lock.json`）とスクレイパー（`scraper/package-lock.json`）の全依存を `npm audit` で調べ、
+  **`security/audit-allowlist.json`（確認して受け入れた指摘・理由・対策・期限）** と突き合わせる。判定は `shared/depAudit.cjs`。
+  - 一覧に無い指摘・期限切れ・一覧の書き漏れ → 失敗。今は出ない項目 → 警告（消してよい）
+  - PR チェック（`pr-check.yml`）と週1回の定期監査（`security-audit.yml`。失敗時は `NTFY_ADMIN_TOPIC` へ通知）で実行
+- 新しい指摘が出たときの手順:
+  1. `npm audit fix`（`scraper/` でも）で直せるか試す。**`--force`（互換性を壊す更新）は動作確認してから**
+  2. 直せない場合だけ、実際に悪用できる経路があるかを確かめ、回避策を入れる
+  3. `security/audit-allowlist.json` に `id`（GHSA）・`package`・`projects`・`reason`・`mitigation`・`expires`（確認日から最長6か月）・`reviewedAt` を書く
+- 受け入れ中の指摘と経緯は [docs/security-audit-20261028.md](docs/security-audit-20261028.md) を参照（OGP 画像の satori は `shared/ogText.cjs` で緩和）
+- OCR の Python 依存（`scraper/requirements-ocr.txt`）は `pip-audit -r scraper/requirements-ocr.txt` で確認する（CI 未導入）
+
 ## 脆弱性の報告
 - セキュリティ上の問題は、公開 Issue ではなく運営者へ非公開で連絡してください（連絡先は運営者間で共有）。報告には再現手順・影響範囲を含めてください。
 
@@ -47,4 +59,4 @@
 - `LEGACY_HEADER_AUTH` は **2026-08-26 に既定を false（拒否）へ反転**した。ヘッダ認証を許すとログイン施錠を迂回して総当りできるため、移行で必要な場合のみ明示的に `true` にする。
 - 監査ログは Redis リスト（上限 `AUDIT_MAX`）。長期保全のため**外部ログ保管への転送**は今後の課題。
 - 重要操作の再認証（step-up）・アカウント管理UI・承認フローのUIは未実装（API/データ構造は準備）。
-- 依存監査（npm audit / Dependabot / CodeQL / Secret scanning / SBOM）・アクションSHA固定・PR必須・本番承認環境は段階導入を推奨。
+- 依存監査（npm audit）は 2026-10-28 に CI へ導入済み（上記）。Dependabot / CodeQL / Secret scanning / SBOM・アクションSHA固定・PR必須・本番承認環境は段階導入を推奨。

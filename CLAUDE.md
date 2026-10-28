@@ -146,6 +146,10 @@ OCRの優先順は、無料ローカルOCR（**RapidOCR 日本語モデル → T
   モデル（約31MB）は modelscope.cn から取得し、scrape.yml が Actions cache に保持する
 - ⚠️ Tesseract の起動チェックは**言語一覧（`tesseract --list-langs` に jpn）で判定**する。以前は埋め込みの PNG が CRC 破損しており、
   導入済みなのに毎回「利用不可」だった。実チラシ比較で RapidOCR(日本語) が全件で上回ったため、Tesseract は予備（2番手）
+- ⚠️ **Tesseract は `spawn('tesseract', [...])` で直接呼ぶ**（`tesseractRecognize`。引数は配列・画像は標準入力）。
+  `node-tesseract-ocr` はコマンド文字列をシェルで実行する作りで OSコマンドインジェクションの脆弱性（修正版なし）があり、2026-10-28 に外した。戻さないこと
+- RapidOCR の `--check` はモデル置き場の全 `.onnx` を `default_models.yaml` の SHA256 と照合し、不一致は削除して失敗にする
+  （rapidocr 3.10.0 は新しく取得したモデルを照合しないため。2026-10-28）。失敗理由は「RapidOCR: 利用不可（…）」に出る
 - 旧パイプラインの結果のうち**誤読の痕跡（簡体字・不正タイトル）があるものだけ**、ローカルOCRで1回だけ読み直す
   （`scraper/lib/ocrRefresh.js`。1実行 `OCR_REFRESH_LIMIT`=20 件まで。API の画像OCRは呼ばない＝取得済みアセットの再OCR禁止を守る）
 - LLM（段1〜3）は**プロバイダが答えなかったとき（429・障害）の null をキャッシュしない**。以前は 90 日固定され、その資料は読み直されなかった
@@ -850,6 +854,10 @@ PC幅では従来どおり折り返し表示。
 - **IDOR対策**: イベント/オーバーライドの所属地本は**サーバー側で実データから解決**（手動イベントは Redis、スクレイプは events.json）して判定。存在しない対象は拒否。`/api/admin/overrides` の GET/POST/DELETE もスコープ強制。
 - **監査ログ（追記専用）**: `writeAudit`（`manual:history`）。操作・ログイン成功/失敗・権限拒否を requestId/操作者(displayId)/地本/事務所/対象/result/変更前後付きで記録。**削除APIは廃止**（history DELETE は405）。
 - **新APIを足すときは必ず `requireAuth` → `hasPermission`/`canManageScope` → `writeAudit` の順を通すこと。**
+- **依存パッケージの脆弱性は `node scripts/audit-deps.mjs` で監査する**（PR チェック・週1回の `security-audit.yml`）。
+  `security/audit-allowlist.json` に無い指摘・期限切れで失敗する。直せない指摘だけを理由・対策・期限（最長6か月）つきで足す。
+  `pr-check.yml` を `npm audit` 単体に戻さないこと（修正版の無い指摘で全 PR が赤になり、ゲートとして機能していなかった）。経緯は `docs/security-audit-20261028.md`
+- `/api/og` のクエリは**必ず `shared/ogText.cjs` の `ogSafeText` を通す**（satori の SVG エスケープ漏れ GHSA-wx4j-mvgx-mqwp の回避策。テストが漏れを検出）
 - 運営APIの処理は `api/admin/_<名前>.js` に書き、`api/admin/[action].js` の `HANDLERS` に登録する（関数数の上限対策。上記「デプロイ」参照）。
 
 ### 過去イベント閲覧（管理・閲覧専用）

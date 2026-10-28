@@ -1,0 +1,27 @@
+{
+  "$comment": "依存パッケージの脆弱性のうち『確認して受け入れた』もの。ここに無い指摘があると node scripts/audit-deps.mjs（PR チェック・定期監査）が失敗する。項目を足すときは reason（なぜ今は直せない／直さないか）・mitigation（代わりの対策）・expires（見直し期限。最長3か月を目安）・reviewedAt（確認した日）を必ず書く。projects は root（サイト本体）／scraper（スクレイパー）。詳細は SECURITY.md の『依存パッケージの脆弱性監査』と docs/SECURITY_AUDIT_2026-10.md",
+  "entries": [
+    {
+      "id": "GHSA-wx4j-mvgx-mqwp",
+      "package": "satori",
+      "projects": ["root"],
+      "severity": "moderate",
+      "reviewedAt": "2026-10-28",
+      "expires": "2027-01-31",
+      "reason": "@vercel/og 0.11.1 に同梱（バンドル済み）の satori 0.25.0 の SVG エスケープ漏れ。修正版 satori 0.33.5 を含む @vercel/og 1.0.3 は、Edge 用ビルドが同梱されていない hb.wasm を読みに行き OGP 画像を描画できない（2026-10-28 に検証）。overrides では同梱コードは変わらない。",
+      "mitigation": "攻撃者が決められる文字列を satori に渡さない（公式の回避策）。api/og.js のクエリはすべて shared/ogText.cjs の ogSafeText で < > & \" ' を全角化してから描画する（shared/ogText.test.cjs が漏れを検出）。出力は resvg で PNG にしてから返すため SVG はブラウザへ届かない。",
+      "resolveBy": "@vercel/og の Edge ビルドが直った版（1.0.4 以降など）で OGP 画像の描画を確認できたら更新し、この項目を消す"
+    },
+    {
+      "id": "GHSA-gcqx-w48m-w2h4",
+      "package": "deepmerge",
+      "projects": ["root", "scraper"],
+      "severity": "low",
+      "reviewedAt": "2026-10-28",
+      "expires": "2027-01-31",
+      "reason": "修正版が公開されていない（4.2.0 以降すべて該当）。root はビルド時だけ使う vite-plugin-pwa → workbox-build → @rollup/plugin-node-resolve、scraper は puppeteer-extra-plugin-stealth → puppeteer-extra-plugin-user-preferences 経由。",
+      "mitigation": "どちらも統合するのはコードに書いた固定の設定値だけで、外部（利用者・取得したページ）の入力は通らない。公開サイトの実行時には含まれない。",
+      "resolveBy": "deepmerge の修正版が出たら npm audit fix で更新し、この項目を消す"
+    }
+  ]
+}

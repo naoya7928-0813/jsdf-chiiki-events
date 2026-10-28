@@ -55,3 +55,7 @@ scraper/office-crawl-verification.json
 # 運営アカウント（パスワードのハッシュ・初期パスワード一覧）。秘密情報のため絶対にコミットしない
 *.local.json
 *.local.csv
+
+# Python の実行時に自動で作られるキャッシュ（環境ごとに変わるためコミットしない）
+__pycache__/
+*.pyc

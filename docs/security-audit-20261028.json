@@ -1,0 +1,220 @@
+{
+  "checkedAt": "2026-10-28",
+  "baselineCommit": "264ece2fa7a84faf183e0660aea9c7504ca36afd",
+  "branch": "security/dependency-audit-2026-10",
+  "report": "docs/security-audit-20261028.md",
+  "acceptedRisks": "security/audit-allowlist.json",
+  "tools": {
+    "node": "22.22.0",
+    "npm": "10.9.4",
+    "pip-audit": "2.10.1"
+  },
+  "scope": [
+    "依存パッケージ（サイト本体 package-lock.json・スクレイパー scraper/package-lock.json・OCR scraper/requirements-ocr.txt）",
+    "Vercel 関数（api/*.js・api/admin/_*.js）と Edge（middleware.js・api/og.js）",
+    "静的HTML生成（scripts/generate-events-html.mjs）と画面（src/）の出力エスケープ",
+    "GitHub Actions ワークフロー（.github/workflows/*.yml）",
+    "追跡ファイルと直近の履歴に含まれる秘密情報",
+    "セキュリティヘッダ（vercel.json）"
+  ],
+  "notApplicable": [
+    {
+      "topic": "PHP の脆弱性",
+      "reason": "PHP のファイル（*.php・composer.json）が無い。Node.js（React + Vercel Functions）構成のため該当しない"
+    }
+  ],
+  "dependencySummary": {
+    "root": {
+      "before": { "critical": 0, "high": 9, "moderate": 5, "low": 4, "total": 18 },
+      "after": { "critical": 0, "high": 0, "moderate": 2, "low": 4, "total": 6 },
+      "afterAdvisories": ["GHSA-wx4j-mvgx-mqwp (satori)", "GHSA-gcqx-w48m-w2h4 (deepmerge)"],
+      "note": "件数は npm audit の「影響を受けるパッケージ数」。巻き込まれただけの親パッケージも数える"
+    },
+    "scraper": {
+      "before": { "critical": 1, "high": 2, "moderate": 0, "low": 3, "total": 6 },
+      "after": { "critical": 0, "high": 0, "moderate": 0, "low": 3, "total": 3 },
+      "afterAdvisories": ["GHSA-gcqx-w48m-w2h4 (deepmerge)"]
+    },
+    "python": {
+      "file": "scraper/requirements-ocr.txt",
+      "result": "No known vulnerabilities found（pip-audit。依存の依存まで解決して確認）"
+    }
+  },
+  "findings": [
+    {
+      "id": "SEC-2026-10-01",
+      "category": "dependency",
+      "target": "root",
+      "severity": "high",
+      "title": "ビルド・実行時の依存に既知の脆弱性（vite・postcss・serialize-javascript・brace-expansion・fast-uri・nanoid・browserslist・source-map-js・@babel/* 等）",
+      "status": "fixed",
+      "resolution": "npm audit fix（互換性を壊さない範囲）で package-lock.json を更新",
+      "files": ["package-lock.json"],
+      "verify": "node scripts/audit-deps.mjs"
+    },
+    {
+      "id": "SEC-2026-10-02",
+      "category": "dependency",
+      "target": "scraper",
+      "severity": "critical",
+      "title": "node-tesseract-ocr の OSコマンドインジェクション（GHSA-8j44-735h-w4w2・修正版なし）",
+      "status": "fixed",
+      "impactBefore": "呼び出しは画像バッファ＋固定オプションのため悪用経路は無かったが、修正版が出ないパッケージだった",
+      "resolution": "パッケージを削除し、tesseract コマンドを spawn で直接呼ぶ（引数は配列・画像は標準入力・シェルを通さない）",
+      "files": ["scraper/index.js", "scraper/package.json", "scraper/package-lock.json"],
+      "verify": "偽の tesseract コマンドで引数（stdin stdout -l jpn --oem 1 --psm 6）と標準入力のバイト数・結果の受け取りを確認。本物での動作は次回スクレイプのログ「[OCRエンジン] Tesseract: 利用可能」と OCR 統計で確認する"
+    },
+    {
+      "id": "SEC-2026-10-03",
+      "category": "dependency",
+      "target": "scraper",
+      "severity": "high",
+      "title": "undici（TLS 証明書検証の回避・ヘッダ注入ほか）・brace-expansion の既知の脆弱性",
+      "status": "fixed",
+      "resolution": "npm audit fix で scraper/package-lock.json を更新",
+      "files": ["scraper/package-lock.json"],
+      "verify": "node scripts/audit-deps.mjs"
+    },
+    {
+      "id": "SEC-2026-10-04",
+      "category": "dependency",
+      "target": "root",
+      "severity": "moderate",
+      "title": "satori の SVG エスケープ漏れ（GHSA-wx4j-mvgx-mqwp / CVE-2026-94545）。/api/og が URL のクエリをそのまま描画していたため該当",
+      "status": "mitigated-accepted",
+      "resolution": "公式の回避策（攻撃者が決められる文字列を satori に渡さない）を実施。api/og.js の全クエリを shared/ogText.cjs の ogSafeText で無害化（< > & \" ' を全角化・制御文字除去）。@vercel/og 1.0.3（satori 0.33.5）への更新は、Edge 用ビルドが同梱されていない hb.wasm を読みに行き描画できないため見送り",
+      "files": ["api/og.js", "shared/ogText.cjs", "shared/ogText.test.cjs", "security/audit-allowlist.json"],
+      "expires": "2027-01-31",
+      "verify": "node --test shared/ogText.test.cjs（og.js の searchParams.get がすべて ogSafeText を通るかも検査）。Edge 用ビルドを Node で再現して PNG 生成を確認済み"
+    },
+    {
+      "id": "SEC-2026-10-05",
+      "category": "dependency",
+      "target": "root,scraper",
+      "severity": "low",
+      "title": "deepmerge のプロトタイプ汚染（GHSA-gcqx-w48m-w2h4・修正版なし）",
+      "status": "accepted",
+      "resolution": "root はビルド時だけ（vite-plugin-pwa → workbox-build）、scraper は puppeteer-extra-plugin-stealth 経由。統合するのは固定の設定値だけで外部入力は通らない",
+      "files": ["security/audit-allowlist.json"],
+      "expires": "2027-01-31"
+    },
+    {
+      "id": "SEC-2026-10-06",
+      "category": "ci",
+      "target": ".github/workflows/pr-check.yml",
+      "severity": "medium",
+      "title": "PR チェックの依存監査（npm audit --omit=dev）が修正版の無い指摘だけで常に失敗し、ゲートとして機能していなかった。スクレイパーは監査対象外だった",
+      "status": "fixed",
+      "resolution": "scripts/audit-deps.mjs（判定は shared/depAudit.cjs）に置き換え。サイト本体＋スクレイパーの全依存を監査し、security/audit-allowlist.json（理由・対策・期限つき）に無い指摘・期限切れ・書き漏れがあれば失敗",
+      "files": [".github/workflows/pr-check.yml", "scripts/audit-deps.mjs", "shared/depAudit.cjs", "shared/depAudit.test.cjs", "security/audit-allowlist.json"],
+      "verify": "現在の lockfile で exit 0、点検前の lockfile で exit 1（未対応の指摘を列挙）になることを確認"
+    },
+    {
+      "id": "SEC-2026-10-07",
+      "category": "ci",
+      "target": ".github/workflows/security-audit.yml",
+      "severity": "low",
+      "title": "PR が無い期間に公開された脆弱性・受け入れ期限切れに気付く仕組みが無かった",
+      "status": "fixed",
+      "resolution": "毎週水曜 10:41 JST に同じ監査を実行し、失敗時は NTFY_ADMIN_TOPIC へ通知するワークフローを追加（読み取り権限のみ・公開サイトには影響しない）",
+      "files": [".github/workflows/security-audit.yml"]
+    },
+    {
+      "id": "SEC-2026-10-08",
+      "category": "ci",
+      "target": ".github/workflows/deploy.yml",
+      "severity": "low",
+      "title": "GITHUB_TOKEN の権限指定が無く、リポジトリ設定の既定（書き込み可の場合あり）になっていた",
+      "status": "fixed",
+      "resolution": "permissions: contents: read を追加（デプロイは VERCEL_TOKEN で行い、リポジトリへは書き込まない）",
+      "files": [".github/workflows/deploy.yml"]
+    },
+    {
+      "id": "SEC-2026-10-09",
+      "category": "api",
+      "target": "api/weather.js",
+      "severity": "low",
+      "title": "回数制限が無く、座標を少しずつ変えるとキャッシュを素通りして Open-Meteo を呼ばせ続けられた（外部APIの制限・Redis 書き込みの浪費）",
+      "status": "fixed",
+      "resolution": "IP ごとに 60回/10分 の制限を追加（同じ座標・日付は CDN が返すため通常の閲覧では届かない）",
+      "files": ["api/weather.js"]
+    },
+    {
+      "id": "SEC-2026-10-10",
+      "category": "api",
+      "target": "api/subscribe.js",
+      "severity": "low",
+      "title": "購読登録の expirationTime を型を確かめずに保存していた（任意のオブジェクトを Redis に押し込める）",
+      "status": "fixed",
+      "resolution": "数値（有限）以外は null にして保存。ブラウザの PushSubscription.toJSON() は数値か null なので正規の登録は変わらない",
+      "files": ["api/subscribe.js"]
+    },
+    {
+      "id": "SEC-2026-10-11",
+      "category": "supply-chain",
+      "target": "scraper/lib/rapidocr_cli.py",
+      "severity": "low",
+      "title": "rapidocr 3.10.0 は新しくダウンロードしたモデルのハッシュを照合しない（照合は次回起動時の既存ファイル判定だけ）。Actions cache から復元したモデルも同じ",
+      "status": "fixed",
+      "resolution": "--check で、モデル置き場の全 .onnx を default_models.yaml の SHA256 と照合。不一致・既知でないファイルは削除して失敗にする（RapidOCR を使わず Tesseract 等へ回る）。失敗理由をスクレイプのログに出すよう scraper/index.js も修正",
+      "files": ["scraper/lib/rapidocr_cli.py", "scraper/index.js"],
+      "verify": "正規の3モデルは合格、1バイト追記したモデルと不明な .onnx は検出・削除されることを確認。偽の python で失敗理由がログに出ることを確認"
+    },
+    {
+      "id": "SEC-2026-10-12",
+      "category": "config",
+      "target": "Vercel 環境変数",
+      "severity": "medium",
+      "title": "LEGACY_PLAINTEXT_PASSWORDS の既定が true（運営アカウントの平文パスワードを許す移行期の設定）",
+      "status": "owner-action",
+      "resolution": "Vercel の環境変数を確認し、全アカウントを scrypt ハッシュ化したうえで LEGACY_PLAINTEXT_PASSWORDS=false を設定する（docs/ADMIN_ACCOUNT_SETUP.md）。リポジトリからは本番の設定値を確認できない"
+    },
+    {
+      "id": "SEC-2026-10-13",
+      "category": "api",
+      "target": "api/og.js",
+      "severity": "info",
+      "title": "OGP 画像 API（Edge）に回数制限が無い。クエリを変えると CDN キャッシュを素通りし、Edge 関数の実行と Google Fonts の取得が起きる",
+      "status": "open",
+      "resolution": "Vercel の基盤側の防御（DDoS 対策・Firewall のレート制限ルール）で扱うのが適切。必要なら Vercel Firewall で /api/og に IP 単位の制限を設定する（コード変更不要）"
+    },
+    {
+      "id": "SEC-2026-10-14",
+      "category": "api",
+      "target": "api/subscribe.js",
+      "severity": "info",
+      "title": "購読登録は Origin ヘッダの無い要求（curl 等）も受け付ける",
+      "status": "accepted",
+      "resolution": "設計どおり（SW 等の同一オリジン要求に Origin が付かない場合があるため）。endpoint は正規のプッシュサービスに限定・IP ごとに 20回/10分 の制限あり"
+    },
+    {
+      "id": "SEC-2026-10-15",
+      "category": "secrets",
+      "target": "git 履歴",
+      "severity": "info",
+      "title": "秘密情報の検索は追跡ファイル全体と直近61コミットのみ（作業環境のクローンが浅いため）",
+      "status": "owner-action",
+      "resolution": "GitHub のリポジトリ設定 → Code security で Secret scanning（Push protection）を有効にすると全履歴が検査される"
+    },
+    {
+      "id": "SEC-2026-10-16",
+      "category": "docs",
+      "target": "scraper/requirements-ocr.txt・scrape.yml・CLAUDE.md",
+      "severity": "info",
+      "title": "「日本語モデル（約31MB）は初回に modelscope.cn から取得」と書かれているが、rapidocr 3.10.0 は使用する PP-OCRv6 small（検出・認識）と方向分類モデルを wheel に同梱しており、ハッシュが一致する限りダウンロードしない",
+      "status": "open",
+      "resolution": "記述の更新は OCR の運用担当が判断（モデルのキャッシュ手順は害が無いので残してよい）"
+    }
+  ],
+  "verifiedOk": [
+    "運営API: すべての入口で requireAuth → 権限・担当範囲 → writeAudit の順。セッションは HttpOnly/Secure/SameSite=Strict、no-store",
+    "CSRF: 状態変更は Origin 完全一致＋Sec-Fetch-Site=same-origin（requireSameOrigin）",
+    "IDOR: イベントの所属はサーバー側で実データから解決（api/_eventScope.js）",
+    "ログイン: IP の回数制限＋アカウント単位の指数バックオフ。ヘッダ認証・ADMIN_SECRET は既定で無効",
+    "XSS: middleware.js・generate-events-html.mjs の esc()（& < > \"）、JSON-LD の < を \\u003c、ReportExport の esc、リンクの safeUrl（http(s) 以外を捨てる）、運営入力の URL は http(s) のみ",
+    "CSP: script-src 'self'（javascript: リンクやインラインスクリプトも実行されない）、frame-ancestors 'none'、object-src 'none'",
+    "GitHub Actions: 外部から細工できる値を run: に直接埋め込んでいない（workflow_dispatch の入力は env 経由）。pull_request_target は不使用",
+    "秘密情報: 追跡ファイルに API キー・トークン・秘密鍵なし。.env 類は追跡されていない（.env.example のみ）",
+    "Python 依存: pip-audit で既知の脆弱性なし"
+  ]
+}

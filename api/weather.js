@@ -8,7 +8,7 @@
 //   weather:{lat3}:{lon3}:{date}              … 通常キャッシュ（開催日数でTTL: 1h/6h/12h）
 //   weather:last-success:{lat3}:{lon3}:{date} … 最終正常データ（72h）。Open-Meteo障害時に stale:true で返す
 //   + CDN: Cache-Control s-maxage。日付境界は Asia/Tokyo 基準（shared/weather.cjs）。
-import { redis } from './_security.js';
+import { redis, rateLimit } from './_security.js';
 import W from '../shared/weather.cjs';
 
 export default async function handler(req, res) {
@@ -22,6 +22,10 @@ export default async function handler(req, res) {
   // 入力検証（数値・日本範囲・実在日付・0〜16日）
   const v = W.validateRequest({ latitude, longitude, date, today });
   if (!v.ok) return res.status(v.status).json({ error: v.error });
+
+  // 座標を少しずつ変えると CDN・Redis のキャッシュを素通りして Open-Meteo を呼ばせ続けられるため、
+  // IP ごとに回数を制限する（同じ座標・日付の再取得は CDN が返すので、通常の閲覧では届かない）
+  if (!await rateLimit(req, res, 'weather', 60, 600)) return; // 60回/10分/IP
 
   const result = await W.getWeather({ latitude, longitude, date, today, redis, fetchImpl: fetch });
 
