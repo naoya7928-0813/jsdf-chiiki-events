@@ -9,7 +9,7 @@
 //   氏名・位置・閲覧履歴は保存しない。購読解除・オフで消す。180日使われなければ失効。
 import webpush from 'web-push';
 import { createHash } from 'node:crypto';
-import { redis } from './_security.js';
+import { redis, isValidPushEndpoint } from './_security.js';
 
 export const SUBS_KEY = 'push:subscriptions';
 export const WATCH_TTL_SEC = 180 * 86400;
@@ -18,6 +18,21 @@ export const watchKey = (eventId) => `push:watch:${eventId}`;
 export const watchingKey = (endpoint) => `push:watching:${createHash('sha256').update(String(endpoint)).digest('hex').slice(0, 40)}`;
 
 const parse = (raw) => (typeof raw === 'string' ? JSON.parse(raw) : raw);
+
+/**
+ * 保存されている購読を、送信に使える形で返す（使えなければ null）。
+ * 正規のプッシュサービスの endpoint と暗号鍵（p256dh・auth）がそろっているものだけを通す。
+ * 購読先の検査（isValidPushEndpoint）を入れる前に保存された不正な値（endpoint が "test" など）が残っており、
+ * 通知のたびに送信に失敗し続けていた（2026-06〜10。Vercel の実行時エラーで確認）。null の購読は送らずに削除する。
+ */
+export function usableSubscription(raw) {
+  let sub;
+  try { sub = parse(raw); } catch { return null; }
+  if (!sub || typeof sub !== 'object' || !isValidPushEndpoint(sub.endpoint)) return null;
+  const k = sub.keys || {};
+  if (typeof k.p256dh !== 'string' || !k.p256dh || typeof k.auth !== 'string' || !k.auth) return null;
+  return sub;
+}
 
 /** VAPID が設定されていれば webpush を構成して true */
 export function configureVapid() {
@@ -78,9 +93,10 @@ export async function sendToWatchers(eventId, payload) {
   const stale = [];
   await Promise.allSettled(endpoints.map(async (ep, i) => {
     const raw = list[i];
-    if (!raw) { stale.push(ep); return; }   // 購読が既に無い（解除済み）
+    const sub = raw ? usableSubscription(raw) : null;
+    if (!sub) { stale.push(ep); return; }   // 購読が既に無い（解除済み）か、送信に使えない不正な値
     try {
-      await webpush.sendNotification(parse(raw), body, { TTL: 86400 });
+      await webpush.sendNotification(sub, body, { TTL: 86400 });
       sent++;
     } catch (err) {
       if (err && (err.statusCode === 404 || err.statusCode === 410)) stale.push(ep);
