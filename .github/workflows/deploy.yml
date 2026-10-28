@@ -27,6 +27,10 @@ on:
   # GitHub Actions UI から手動実行も可能
   workflow_dispatch:
 
+# リポジトリへは書き込まない（Vercel へのデプロイは VERCEL_TOKEN で行う）ため読み取りのみ
+permissions:
+  contents: read
+
 jobs:
   deploy:
     name: Vercel 本番デプロイ

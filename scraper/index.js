@@ -19,7 +19,7 @@ const fs        = require('fs');
 const fsp       = fs.promises;
 const crypto    = require('crypto');
 const os        = require('os');
-const { execFile } = require('child_process');
+const { execFile, spawn } = require('child_process');
 const { promisify } = require('util');
 const execFileAsync = promisify(execFile);
 const iconv     = require('iconv-lite');
@@ -519,27 +519,34 @@ function parseTextToEvent(text, mode = 'pdf') {
 }
 
 // ── ローカル Tesseract OCR（画像用） ───────────────────────────
-// node-tesseract-ocr ライブラリ（オプション依存。未インストール時はスキップ）
+// tesseract コマンドを直接呼ぶ（引数は配列・画像は標準入力。シェルを通さない）。
+// 以前は node-tesseract-ocr を使っていたが、コマンド文字列を組み立てて exec する作りで
+// OSコマンドインジェクションの脆弱性（GHSA-8j44-735h-w4w2・修正版なし）があるため外した。
 // GitHub Actions ubuntu-latest: tesseract-ocr-jpn を apt でインストール済みが前提
 
-let tesseractLib = null;
 let tesseractAvailable = null; // null=未チェック, true/false=チェック済み
 
-function getTesseract() {
-  if (!tesseractLib) {
-    try { tesseractLib = require('node-tesseract-ocr'); } catch { /* 未インストール */ }
-  }
-  return tesseractLib;
+/** 画像バッファを標準入力で tesseract に渡し、認識したテキストを返す。 */
+function tesseractRecognize(buf, { lang = 'jpn', oem = 1, psm = 6, timeoutMs = 60_000 } = {}) {
+  return new Promise((resolve, reject) => {
+    const child = spawn('tesseract', ['stdin', 'stdout', '-l', lang, '--oem', String(oem), '--psm', String(psm)],
+      { stdio: ['pipe', 'pipe', 'pipe'], timeout: timeoutMs });
+    const out = [];
+    const err = [];
+    child.stdout.on('data', d => out.push(d));
+    child.stderr.on('data', d => err.push(d));
+    child.on('error', reject);
+    child.on('close', (code) => {
+      if (code === 0) resolve(Buffer.concat(out).toString('utf8'));
+      else reject(new Error(`tesseract exit ${code}: ${Buffer.concat(err).toString('utf8').slice(0, 200)}`));
+    });
+    child.stdin.on('error', () => { /* 異常終了時の EPIPE は close 側で扱う */ });
+    child.stdin.end(buf);
+  });
 }
 
 async function checkTesseractAvailable() {
   if (tesseractAvailable !== null) return tesseractAvailable;
-  const lib = getTesseract();
-  if (!lib) {
-    tesseractAvailable = false;
-    console.warn('[OCRエンジン] Tesseract: node-tesseract-ocr が読み込めません → 無効');
-    return false;
-  }
   try {
     // 本体と日本語データ（jpn）が入っているかを言語一覧で確かめる。
     // 以前は埋め込みの 1x1 PNG で試し読みしていたが、その PNG が CRC 破損しており
@@ -565,9 +572,8 @@ async function checkTesseractAvailable() {
  */
 async function tryTesseractOcr(buf) {
   if (!await checkTesseractAvailable()) return null;
-  const lib = getTesseract();
   try {
-    const text = await lib.recognize(buf, { lang: 'jpn', oem: 1, psm: 6 });
+    const text = await tesseractRecognize(buf, { lang: 'jpn', oem: 1, psm: 6 });
     const jpCount = (text.match(/[぀-鿿]/g) || []).length;
     if (jpCount >= 10) ocrStats.localText++;
     return jpCount >= 10 ? text : null;
