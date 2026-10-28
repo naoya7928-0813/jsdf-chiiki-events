@@ -41,6 +41,8 @@
 | 14 | 情報 | `/api/subscribe` | Origin の無い要求も受け付ける | 受け入れ（設計どおり） |
 | 15 | 情報 | git 履歴 | 秘密情報の検索は直近61コミットのみ | **運営者対応**（Secret scanning） |
 | 16 | 情報 | OCR の説明文 | モデルは wheel に同梱されており、通常はダウンロードしない | 未対応（記述の更新は OCR 担当が判断） |
+| 17 | 低 | `/api/notify` | 古い不正な購読（endpoint が `test`）が残り、通知のたびに失敗 | 修正済み（送信前に判定して削除） |
+| 18 | 情報 | Vercel 環境変数 | 使われていない `VITE_NTFY_TOPIC` | 修正済み（運営者が削除） |
 
 ## 3. 主な項目の詳細
 
@@ -73,6 +75,11 @@
 ### 11 RapidOCR のモデル
 - rapidocr 3.10.0 は、新しくダウンロードしたモデルのハッシュを照合しない（照合は次回起動時に既存ファイルを使うかの判定だけ）。Actions cache から復元したファイルも同じ扱い。
 - `rapidocr_cli.py --check` が、モデル置き場の全 `.onnx` を `default_models.yaml` の SHA256 と照合する。不一致・未知のファイルは削除して失敗にし、その回は RapidOCR を使わない（Tesseract 等へ回る）。理由はスクレイプのログに出る。
+
+### 17・18 Vercel の確認で見つかったこと（同日）
+- Vercel の実行時エラーに `[notify] sendNotification error undefined test` が6月から出続けていた。購読先の検査（`isValidPushEndpoint`）を入れる前に保存された不正な購読が残っていたため。`api/_push.js` の `usableSubscription` を送信前に通し、使えない購読は送らずに削除する。
+- `LEGACY_PLAINTEXT_PASSWORDS` は Vercel にもデプロイ時の値にも無く、既定（平文を許す）のまま。運営アカウント（`ADMIN_ACCOUNTS_B64`）は GitHub Secrets から `deploy.yml`・`scrape.yml` が `-e` で渡している。`scripts/admin-accounts.mjs encode` で作った値なら必ずハッシュ化済みなので、そのうえで Vercel に `LEGACY_PLAINTEXT_PASSWORDS=false` を足す。
+- 使われていない `VITE_NTFY_TOPIC` は運営者が削除した。
 
 ## 4. 運営者にお願いする作業
 

@@ -5,6 +5,7 @@ import webpush from 'web-push';
 import { timingSafeEqual } from 'node:crypto';
 import { Redis } from '@upstash/redis';
 import { rateLimit } from './_security.js';
+import { usableSubscription, clearWatchList } from './_push.js';
 
 const redis = new Redis({
   url:   process.env.KV_REST_API_URL,
@@ -57,15 +58,23 @@ export default async function handler(req, res) {
   }
 
   const payload = JSON.stringify({ title, body, url, icon: '/icons/icon-192.png' });
-  const entries = Object.values(allSubs);
+
+  // ── 送信に使えない購読（不正な endpoint・鍵の欠落・壊れた JSON）は送らずに削除 ──
+  // ハッシュのフィールド名（保存時の endpoint）で消す。値が壊れていても確実に消せるように
+  const invalidFields = [];
+  const subs = [];
+  for (const [field, raw] of Object.entries(allSubs)) {
+    const sub = usableSubscription(raw);
+    if (sub) subs.push(sub);
+    else invalidFields.push(field);
+  }
 
   // ── 並列送信（410 Gone → 自動削除） ──────────────────────
   let sent = 0, failed = 0;
   const staleEndpoints = [];
 
   await Promise.allSettled(
-    entries.map(async raw => {
-      const sub = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    subs.map(async sub => {
       try {
         await webpush.sendNotification(sub, payload);
         sent++;
@@ -80,10 +89,15 @@ export default async function handler(req, res) {
     })
   );
 
-  // 期限切れ購読者を Redis から削除
-  if (staleEndpoints.length > 0) {
-    await redis.hdel(KEY, ...staleEndpoints).catch(() => {});
+  // 期限切れ・不正な購読を Redis から削除（お気に入りの見守り登録も外す）
+  const removeList = [...staleEndpoints, ...invalidFields];
+  if (removeList.length > 0) {
+    await redis.hdel(KEY, ...removeList).catch(() => {});
+    await Promise.allSettled(removeList.map(ep => clearWatchList(ep)));
+  }
+  if (invalidFields.length > 0) {
+    console.warn(`[notify] 送信に使えない購読を ${invalidFields.length} 件削除しました`);
   }
 
-  return res.status(200).json({ sent, failed, removed: staleEndpoints.length });
+  return res.status(200).json({ sent, failed, removed: staleEndpoints.length, invalid: invalidFields.length });
 }
