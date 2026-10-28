@@ -53,5 +53,7 @@ jobs:
       - name: 募集窓口の保存データ・公式照合記録チェック
         run: node scripts/check-offices.mjs
 
-      - name: 依存関係の脆弱性監査（本番依存のみ）
-        run: npm audit --omit=dev
+      # サイト本体＋スクレイパーの全依存を監査し、security/audit-allowlist.json（確認して受け入れた指摘・期限つき）
+      # に無い指摘・期限切れがあれば失敗する。以前の `npm audit --omit=dev` は修正版の無い指摘だけで毎回失敗していた
+      - name: 依存関係の脆弱性監査
+        run: node scripts/audit-deps.mjs

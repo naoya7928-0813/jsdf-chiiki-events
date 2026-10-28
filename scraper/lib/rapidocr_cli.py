@@ -10,11 +10,17 @@
 - 入っていなければ旧 rapidocr_onnxruntime にフォールバックする（ローカル環境の後方互換）
   どちらを使ったかは "engine" に出す（ログで判別できるように）
 
+モデルの改ざん検知（2026-10-28）: rapidocr 3.10.0 はモデルを新しくダウンロードした直後にハッシュを照合しない
+（照合は次回起動時の「既存ファイルを使うか」の判定だけ）。--check で、モデル置き場の全ファイルを
+default_models.yaml の SHA256 と照合し、一致しないものは消して失敗にする（RapidOCR を使わず Tesseract 等へ回る）。
+
 使い方:
-  python3 rapidocr_cli.py --check   … モデルを読み込んで1回推論できるかを確認（初回はダウンロードも兼ねる）
+  python3 rapidocr_cli.py --check   … モデルを読み込んで1回推論できるか＋ハッシュ照合（初回はダウンロードも兼ねる）
   python3 rapidocr_cli.py <画像パス>
 """
+import hashlib
 import json
+import os
 import sys
 
 
@@ -30,6 +36,71 @@ def load_engine():
         "Rec.model_type": ModelType.SMALL,
     })
     return engine, "rapidocr(japan PP-OCRv6 small)"
+
+
+def expected_model_hashes(yaml_path):
+    """default_models.yaml から「ファイル名 → SHA256」の対応を作る（model_dir の URL の末尾がファイル名）"""
+    import yaml
+    with open(yaml_path, encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    out = {}
+
+    def walk(node):
+        if isinstance(node, dict):
+            url, digest = node.get("model_dir"), node.get("SHA256")
+            if isinstance(url, str) and isinstance(digest, str):
+                out.setdefault(url.rsplit("/", 1)[-1], set()).add(digest.lower())
+            for v in node.values():
+                walk(v)
+        elif isinstance(node, list):
+            for v in node:
+                walk(v)
+
+    walk(data)
+    return out
+
+
+def sha256_of(path):
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def verify_models(models_dir, yaml_path):
+    """モデル置き場の .onnx を照合する。一致しないファイルは消す。
+    戻り値: (照合したファイル名の一覧, 一致しなかったファイル名の一覧)"""
+    expected = expected_model_hashes(yaml_path)
+    checked, bad = [], []
+    if not os.path.isdir(models_dir):
+        return checked, bad
+    for name in sorted(os.listdir(models_dir)):
+        path = os.path.join(models_dir, name)
+        if not os.path.isfile(path) or not name.endswith(".onnx"):
+            continue
+        if name not in expected:
+            bad.append(name + "（既知のハッシュなし）")
+        elif sha256_of(path) not in expected[name]:
+            bad.append(name)
+        else:
+            checked.append(name)
+            continue
+        try:
+            os.remove(path)   # 次回は正規のファイルを取り直させる
+        except OSError:
+            pass
+    return checked, bad
+
+
+def verify_installed_models():
+    """rapidocr（>=3）のモデル置き場を照合する。旧 rapidocr_onnxruntime では何もしない"""
+    try:
+        import rapidocr
+    except ImportError:
+        return [], []
+    pkg = os.path.dirname(rapidocr.__file__)
+    return verify_models(os.path.join(pkg, "models"), os.path.join(pkg, "default_models.yaml"))
 
 
 def run(engine, image):
@@ -53,7 +124,13 @@ def main():
         import numpy as np
         blank = np.full((64, 256, 3), 255, dtype=np.uint8)
         run(engine, blank)
-        print(json.dumps({"ok": True, "engine": name}, ensure_ascii=False))
+        checked, bad = verify_installed_models()
+        if bad:
+            print(json.dumps({"ok": False, "engine": name,
+                              "error": "モデルのハッシュが一致しません（削除しました）: " + ", ".join(bad)},
+                             ensure_ascii=False))
+            return 1
+        print(json.dumps({"ok": True, "engine": name, "verifiedModels": checked}, ensure_ascii=False))
         return 0
 
     if len(sys.argv) < 2:

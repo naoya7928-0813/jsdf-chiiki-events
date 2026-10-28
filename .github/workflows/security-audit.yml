@@ -1,0 +1,52 @@
+name: 依存パッケージの脆弱性監査（定期）
+
+# PR が無い週でも、新しく公開された脆弱性や受け入れ期限切れに気付けるようにする。
+# 判定は PR チェックと同じ scripts/audit-deps.mjs（受け入れ一覧: security/audit-allowlist.json）。
+# 失敗しても公開サイト・スクレイプには影響しない（監査だけのジョブ）。失敗時は管理者へ ntfy で通知する。
+on:
+  schedule:
+    # 毎週水曜 01:41 UTC = 10:41 JST（:00 は GitHub 側が混むため避ける）
+    - cron: '41 1 * * 3'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: npm audit（サイト本体＋スクレイパー）
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v5
+
+      - name: Node.js 22 をセットアップ
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      # npm audit は lockfile だけを見るため npm ci は不要
+      - name: 依存関係の脆弱性監査
+        run: node scripts/audit-deps.mjs
+
+      - name: 管理者へ通知（失敗時のみ）
+        if: failure()
+        env:
+          NTFY_ADMIN_TOPIC: ${{ secrets.NTFY_ADMIN_TOPIC }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$NTFY_ADMIN_TOPIC" ]; then
+            echo "::warning::NTFY_ADMIN_TOPIC が未設定のため通知しません"
+            exit 0
+          fi
+          curl -sS --fail-with-body --retry 3 --retry-all-errors --connect-timeout 10 --max-time 30 \
+            -H "Title: 🛡 依存パッケージに未対応の脆弱性があります" \
+            -H "Tags: shield" \
+            -H "Priority: default" \
+            -H "Content-Type: text/plain; charset=utf-8" \
+            -d "定期監査で、受け入れ一覧に無い脆弱性または受け入れ期限切れが見つかりました。実行サマリの表を確認してください。 ${RUN_URL}" \
+            "https://ntfy.sh/${NTFY_ADMIN_TOPIC}" \
+            || echo "::warning::管理者通知の送信に失敗しました"

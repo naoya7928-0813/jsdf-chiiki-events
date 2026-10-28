@@ -44,7 +44,9 @@ export default async function handler(req, res) {
     // 保存対象は必要フィールドのみ・サイズ上限あり（任意データの持ち込み防止）
     const clean = {
       endpoint: subscription.endpoint,
-      expirationTime: subscription.expirationTime ?? null,
+      // 数値（ミリ秒）か null だけを保存する（任意のオブジェクトを押し込ませない）
+      expirationTime: typeof subscription.expirationTime === 'number' && Number.isFinite(subscription.expirationTime)
+        ? subscription.expirationTime : null,
       keys: {
         p256dh: String(subscription.keys?.p256dh || '').slice(0, 256),
         auth:   String(subscription.keys?.auth   || '').slice(0, 64),
