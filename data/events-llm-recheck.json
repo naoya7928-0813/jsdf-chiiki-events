@@ -1,12 +1,12 @@
 {
-  "updatedAt": "2026-10-28",
+  "updatedAt": "2026-10-29",
   "limit": 30,
   "summary": {
-    "checked": 345,
-    "flagged": 16,
-    "attempted": 5,
-    "corrected": 1,
-    "unverified": 4,
+    "checked": 332,
+    "flagged": 14,
+    "attempted": 3,
+    "corrected": 0,
+    "unverified": 3,
     "noSource": 1,
     "overBudget": 0,
     "skippedNoSource": 1,
@@ -14,33 +14,7 @@
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
-  "corrections": [
-    {
-      "id": "eh-off-20270123-516jb",
-      "pref": "ehime",
-      "source": "https://www.mod.go.jp/pco/ehime/recruit/img/jukenannai/09_seito.pdf",
-      "reasons": [
-        "日付がタイトルになっている"
-      ],
-      "changes": [
-        {
-          "field": "address",
-          "from": null,
-          "to": "松山市南梅本町乙115番地"
-        },
-        {
-          "field": "tag",
-          "from": "学生向け",
-          "to": null
-        },
-        {
-          "field": "notes",
-          "from": "昼食は各自用意。受験票・筆記具持参。",
-          "to": "試験会場は志願者数により変更になる場合があります。"
-        }
-      ]
-    }
-  ],
+  "corrections": [],
   "skipped": [
     {
       "id": "gu-office-20261108-fb3kb",

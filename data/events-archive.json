@@ -1,6 +1,278 @@
 {
-  "updatedAt": "2026-10-28",
+  "updatedAt": "2026-10-29",
   "events": [
+    {
+      "id": "sa-office-20261028-xy1c4",
+      "pref": "saitama",
+      "office": "",
+      "date": "2026-10-28",
+      "endDate": "",
+      "weekday": "水",
+      "title": "自衛隊職業説明会inハローワーク朝霞",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/saitama/",
+      "notes": "掲載元: 募集案内所・地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_html",
+      "firstSeen": "2026-10-28",
+      "weatherLocation": {
+        "latitude": 35.857,
+        "longitude": 139.649,
+        "label": "埼玉県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:19.230+09:00"
+      },
+      "archivedAt": "2026-10-29"
+    },
+    {
+      "id": "sa-office-20261028-up0yn",
+      "pref": "saitama",
+      "office": "",
+      "date": "2026-10-28",
+      "endDate": "",
+      "weekday": "水",
+      "title": "警察・自衛隊合同職業セミナーin川口駅前",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/saitama/",
+      "notes": "掲載元: 募集案内所・地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_html",
+      "firstSeen": "2026-10-28",
+      "weatherLocation": {
+        "latitude": 35.857,
+        "longitude": 139.649,
+        "label": "埼玉県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:19.230+09:00"
+      },
+      "archivedAt": "2026-10-29"
+    },
+    {
+      "id": "fu-20261028-g2wq4",
+      "pref": "fukui",
+      "office": "",
+      "date": "2026-10-28",
+      "endDate": "",
+      "weekday": "水",
+      "title": "防災ふれあいプラザ",
+      "place": "アイシンスポーツアリーナ（越前市）",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "自衛隊車両展示・広報ブース等",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-10-04",
+      "weatherLocation": {
+        "latitude": 36.065,
+        "longitude": 136.222,
+        "label": "ツアリーナ（越前市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-04T08:54:41.441+09:00"
+      },
+      "archivedAt": "2026-10-29"
+    },
+    {
+      "id": "hy-20261028-vsmse",
+      "pref": "hyogo",
+      "office": "",
+      "date": "2026-10-28",
+      "endDate": "",
+      "weekday": "水",
+      "title": "自衛隊・警察 職業説明会",
+      "place": "ハローワーク伊丹",
+      "address": "",
+      "time": "09:30～12:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/hyogo/want/setumeikai.html",
+      "notes": null,
+      "ageRequirement": "お申し込み お申し込みはこちらから ※メールソフトが起動します。ソフトが起動しない場合は 件名:自衛隊・警察職業説明会ハローワーク伊丹会場 本文:①氏名 ②生年月日（西暦:20●●．▲▲．■■） ③住所（○○県○○市～） ④職業（会社名:△△株式会社） または学校名（学年:○○市立●●高校■年生） ⑤連絡先(電話番号) ⑥希望",
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "hyogo_html",
+      "firstSeen": "2026-10-15",
+      "weatherLocation": {
+        "latitude": 34.691,
+        "longitude": 135.183,
+        "label": "兵庫県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-05T08:55:09.444+09:00"
+      },
+      "archivedAt": "2026-10-29"
+    },
+    {
+      "id": "hy-20261028-cod1f",
+      "pref": "hyogo",
+      "office": "",
+      "date": "2026-10-28",
+      "endDate": "",
+      "weekday": "水",
+      "title": "自衛隊・警察 職業明会",
+      "place": "八口一一伊丹",
+      "address": "",
+      "time": "09:30～12:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/hyogo/want/setumeikai.html",
+      "notes": "電話で予約参加",
+      "ageRequirement": "18~33未満の方",
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "hyogo_box_ocr",
+      "firstSeen": "2026-10-15",
+      "weatherLocation": {
+        "latitude": 34.691,
+        "longitude": 135.183,
+        "label": "兵庫県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-09-17T08:54:00.530+09:00"
+      },
+      "archivedAt": "2026-10-29"
+    },
+    {
+      "id": "wa-off-20261028-tw20e",
+      "pref": "wakayama",
+      "office": "",
+      "date": "2026-10-28",
+      "endDate": "",
+      "weekday": "水",
+      "title": "入札情報 OC方式「灯油1号」",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/wakayama/2020/wp-content/uploads/2026/10/62ec16497743fe01224703d39ca843db.pdf",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-28",
+      "weatherLocation": {
+        "latitude": 34.226,
+        "longitude": 135.167,
+        "label": "和歌山県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-07-13T07:58:35.433+09:00"
+      },
+      "archivedAt": "2026-10-29"
+    },
+    {
+      "id": "ok-office-20261028-79s79",
+      "pref": "okayama",
+      "office": "",
+      "date": "2026-10-28",
+      "endDate": "",
+      "weekday": "水",
+      "title": "イベント 令和8年度 イベント情報（11月～12月）",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/okayama/iku/kohogyoumu.html",
+      "notes": "掲載元: 募集案内所・地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_html",
+      "firstSeen": "2026-10-28",
+      "weatherLocation": {
+        "latitude": 34.662,
+        "longitude": 133.935,
+        "label": "岡山県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.000+09:00"
+      },
+      "archivedAt": "2026-10-29"
+    },
+    {
+      "id": "hi-20261028-lp6c7",
+      "pref": "hiroshima",
+      "office": "",
+      "date": "2026-10-28",
+      "endDate": "",
+      "weekday": "水",
+      "title": "自衛隊説明会",
+      "place": "ハローワーク安芸高田（安芸高田市吉田町）",
+      "address": "",
+      "time": "10:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/hiroshima/events/4236/",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-09-29",
+      "weatherLocation": {
+        "latitude": 34.397,
+        "longitude": 132.46,
+        "label": "芸高田（安芸高田市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-16T08:55:09.994+09:00"
+      },
+      "archivedAt": "2026-10-29"
+    },
     {
       "id": "t-20261027-bcpen",
       "pref": "tokyo",
@@ -25,7 +297,7 @@
       "statusUpdatedAt": "",
       "source_type": "office_html",
       "firstSeen": "2026-09-28",
-      "archivedAt": "2026-10-28"
+      "archivedAt": "2026-10-29"
     },
     {
       "id": "hy-20261027-px440",
@@ -161,7 +433,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-10-28"
+      "archivedAt": "2026-10-29"
     },
     {
       "id": "fu-office-20261027-9f1lg",
@@ -739,7 +1011,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-06T23:55:36.269+09:00"
       },
-      "archivedAt": "2026-10-28"
+      "archivedAt": "2026-10-29"
     },
     {
       "id": "ib-office-20261025-qu6i4",
@@ -773,7 +1045,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-14T15:23:14.187+09:00"
       },
-      "archivedAt": "2026-10-28"
+      "archivedAt": "2026-10-29"
     },
     {
       "id": "to-office-20261025-jrzqf",
@@ -875,7 +1147,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-15T15:12:38.202+09:00"
       },
-      "archivedAt": "2026-10-28"
+      "archivedAt": "2026-10-29"
     },
     {
       "id": "ni-20261025-u57le",
@@ -1306,7 +1578,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-10-28",
+      "statusUpdatedAt": "2026-10-29",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-14",
       "weatherLocation": {
@@ -1317,7 +1589,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-10-28"
+      "archivedAt": "2026-10-29"
     },
     {
       "id": "hi-20261025-r7dxi",
@@ -2779,7 +3051,7 @@
         "source": "gsi",
         "geocodedAt": "2026-07-13T07:58:32.830+09:00"
       },
-      "archivedAt": "2026-10-28"
+      "archivedAt": "2026-10-29"
     },
     {
       "id": "ky-set-20261024-p7gqf",
@@ -3391,7 +3663,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-10-28"
+      "archivedAt": "2026-10-29"
     },
     {
       "id": "mi-office-20261021-yywyv",
@@ -3459,7 +3731,7 @@
         "source": "gsi",
         "geocodedAt": "2026-07-13T07:58:32.830+09:00"
       },
-      "archivedAt": "2026-10-28"
+      "archivedAt": "2026-10-29"
     },
     {
       "id": "mi-office-20261021-lrz3o",
@@ -3493,7 +3765,7 @@
         "source": "gsi",
         "geocodedAt": "2026-07-13T07:58:32.830+09:00"
       },
-      "archivedAt": "2026-10-28"
+      "archivedAt": "2026-10-29"
     },
     {
       "id": "os-set-20261021-j0i9a",
