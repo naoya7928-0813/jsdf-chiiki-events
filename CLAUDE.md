@@ -143,7 +143,8 @@ OCRの優先順は、無料ローカルOCR（**RapidOCR 日本語モデル → T
 **OCR 稼働確認（2026-10-13）で直したこと**（再発させないこと）:
 - ⚠️ **RapidOCR は日本語モデル（PP-OCRv6 small / `lang=japan`）で動かす**。旧 `rapidocr-onnxruntime` は既定が中国語モデルで、
   かなを落として簡体字に化ける（「駐屯地」→「鞋屯地」、「保健センター」→「保健七一」）。本番の文字化けタイトルの主因だった。
-  モデル（約31MB）は modelscope.cn から取得し、scrape.yml が Actions cache に保持する
+  rapidocr 3.10.0 は使うモデル（PP-OCRv6 small の検出・認識＝日本語を含む多言語、方向分類）を **wheel に同梱**しており、
+  ハッシュが一致する限りダウンロードしない（欠けた・壊れたときだけ modelscope.cn から取り直す）。scrape.yml の Actions cache はその保険
 - ⚠️ Tesseract の起動チェックは**言語一覧（`tesseract --list-langs` に jpn）で判定**する。以前は埋め込みの PNG が CRC 破損しており、
   導入済みなのに毎回「利用不可」だった。実チラシ比較で RapidOCR(日本語) が全件で上回ったため、Tesseract は予備（2番手）
 - ⚠️ **Tesseract は `spawn('tesseract', [...])` で直接呼ぶ**（`tesseractRecognize`。引数は配列・画像は標準入力）。

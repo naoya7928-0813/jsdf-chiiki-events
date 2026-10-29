@@ -36,13 +36,14 @@
 | 09 | 低 | `/api/weather` | 回数制限なし（キャッシュを素通りして外部APIを呼ばせ続けられる） | 修正済み（60回/10分/IP） |
 | 10 | 低 | `/api/subscribe` | `expirationTime` を型を確かめずに保存 | 修正済み |
 | 11 | 低 | RapidOCR のモデル | 新しく取得したモデルのハッシュを照合していない | 修正済み（`--check` で照合） |
-| 12 | 中 | Vercel 環境変数 | `LEGACY_PLAINTEXT_PASSWORDS` の既定が true（平文パスワードを許す） | **運営者対応** |
-| 13 | 情報 | `/api/og` | 回数制限なし（Edge 関数） | 未対応（Vercel Firewall を推奨） |
+| 12 | 中 | Vercel 環境変数 | `LEGACY_PLAINTEXT_PASSWORDS` の既定が true（平文パスワードを許す） | 修正済み（2026-10-29 に false を設定） |
+| 13 | 情報 | `/api/og` | 回数制限なし（Edge 関数） | **運営者対応**（Firewall 画面を一度開くとルールを追加できる） |
 | 14 | 情報 | `/api/subscribe` | Origin の無い要求も受け付ける | 受け入れ（設計どおり） |
 | 15 | 情報 | git 履歴 | 秘密情報の検索は直近61コミットのみ | **運営者対応**（Secret scanning） |
-| 16 | 情報 | OCR の説明文 | モデルは wheel に同梱されており、通常はダウンロードしない | 未対応（記述の更新は OCR 担当が判断） |
+| 16 | 情報 | OCR の説明文 | モデルは wheel に同梱されており、通常はダウンロードしない | 修正済み（記述を訂正） |
 | 17 | 低 | `/api/notify` | 古い不正な購読（endpoint が `test`）が残り、通知のたびに失敗 | 修正済み（送信前に判定して削除） |
 | 18 | 情報 | Vercel 環境変数 | 使われていない `VITE_NTFY_TOPIC` | 修正済み（運営者が削除） |
+| 19 | 情報 | GitHub Actions | `upload-artifact@v4` が Node.js 20 で動き非推奨の警告 | 修正済み（v6 へ更新） |
 
 ## 3. 主な項目の詳細
 
@@ -85,10 +86,11 @@
 
 | ID | 作業 | 場所 |
 |---|---|---|
-| 12 | 全アカウントを scrypt ハッシュ化し、`LEGACY_PLAINTEXT_PASSWORDS=false` を設定 | Vercel → Settings → Environment Variables（手順: `docs/ADMIN_ACCOUNT_SETUP.md`） |
 | 15 | Secret scanning と Push protection を有効化（全履歴が検査される） | GitHub → Settings → Code security |
-| 13 | （任意）`/api/og` に IP 単位のレート制限ルール | Vercel → Firewall |
-| — | 次回スクレイプのログで「Tesseract: 利用可能」「RapidOCR: 利用可能」を確認 | GitHub Actions → スクレイピング & データ更新 |
+| 13 | Firewall 画面を一度開いて設定を作る（その後「`/api/og` は同じIPから1分100回まで」のルールを追加。API からも追加できるようになる） | Vercel → プロジェクト → Firewall |
+| — | GitHub Secrets に残っている場合は、使っていない `ADMIN_SECRET`（旧共通パスワード）を削除 | GitHub → Settings → Secrets and variables → Actions |
+
+済み: 12（2026-10-29 に `LEGACY_PLAINTEXT_PASSWORDS=false` を設定）／OCR の動作確認（2026-10-28 のスクレイプで Tesseract・RapidOCR とも「利用可能」）
 
 ## 5. 問題なしと確認した項目
 

@@ -227,8 +227,8 @@
       "target": "Vercel 環境変数",
       "severity": "medium",
       "title": "LEGACY_PLAINTEXT_PASSWORDS の既定が true（運営アカウントの平文パスワードを許す移行期の設定）",
-      "status": "owner-action",
-      "resolution": "Vercel の環境変数を確認し、全アカウントを scrypt ハッシュ化したうえで LEGACY_PLAINTEXT_PASSWORDS=false を設定する（docs/ADMIN_ACCOUNT_SETUP.md）。リポジトリからは本番の設定値を確認できない。2026-10-28 の確認: Vercel のプロジェクト環境変数にも、デプロイ時に渡す値（deploy.yml・scrape.yml の -e。ADMIN_ACCOUNTS_B64／ADMIN_SECRET は GitHub Secrets から渡している）にも未設定＝既定の true のまま。LEGACY_HEADER_AUTH・LEGACY_ADMIN_SECRET・ENABLE_DEV_STAFF・SESSION_INSECURE は未設定（安全な既定）"
+      "status": "fixed",
+      "resolution": "Vercel の環境変数を確認し、全アカウントを scrypt ハッシュ化したうえで LEGACY_PLAINTEXT_PASSWORDS=false を設定する（docs/ADMIN_ACCOUNT_SETUP.md）。リポジトリからは本番の設定値を確認できない。2026-10-28 の確認: Vercel のプロジェクト環境変数にも、デプロイ時に渡す値（deploy.yml・scrape.yml の -e。ADMIN_ACCOUNTS_B64／ADMIN_SECRET は GitHub Secrets から渡している）にも未設定＝既定の true のまま。LEGACY_HEADER_AUTH・LEGACY_ADMIN_SECRET・ENABLE_DEV_STAFF・SESSION_INSECURE は未設定（安全な既定）。2026-10-29: 運営者が encode で作成済みと確認し、Vercel（production・preview）に LEGACY_PLAINTEXT_PASSWORDS=false を追加（元に戻すときは変数を削除）"
     },
     {
       "id": "SEC-2026-10-13",
@@ -236,8 +236,8 @@
       "target": "api/og.js",
       "severity": "info",
       "title": "OGP 画像 API（Edge）に回数制限が無い。クエリを変えると CDN キャッシュを素通りし、Edge 関数の実行と Google Fonts の取得が起きる",
-      "status": "open",
-      "resolution": "Vercel の基盤側の防御（DDoS 対策・Firewall のレート制限ルール）で扱うのが適切。必要なら Vercel Firewall で /api/og に IP 単位の制限を設定する（コード変更不要）"
+      "status": "owner-action",
+      "resolution": "Vercel Firewall に「/api/og は同じIPから1分100回まで」のルールを API で追加しようとしたが、このプロジェクトはファイアウォール設定が未作成（404: Seawall Config not found）で、作成の API も同じ応答だった（2026-10-29）。ダッシュボードの Firewall 画面を一度開いて設定を作れば、同じルールを追加できる"
     },
     {
       "id": "SEC-2026-10-14",
@@ -263,8 +263,8 @@
       "target": "scraper/requirements-ocr.txt・scrape.yml・CLAUDE.md",
       "severity": "info",
       "title": "「日本語モデル（約31MB）は初回に modelscope.cn から取得」と書かれているが、rapidocr 3.10.0 は使用する PP-OCRv6 small（検出・認識）と方向分類モデルを wheel に同梱しており、ハッシュが一致する限りダウンロードしない",
-      "status": "open",
-      "resolution": "記述の更新は OCR の運用担当が判断（モデルのキャッシュ手順は害が無いので残してよい）"
+      "status": "fixed",
+      "resolution": "CLAUDE.md・scraper/requirements-ocr.txt・scrape.yml・rapidocr_cli.py の記述を「wheel に同梱。欠けた・壊れたときだけ取り直す」に訂正（2026-10-29）"
     },
     {
       "id": "SEC-2026-10-17",
@@ -289,6 +289,20 @@
       "title": "使われていない VITE_NTFY_TOPIC が残っていた（VITE_ で始まる変数はコードから参照すると公開ページに埋め込まれる）",
       "status": "fixed",
       "resolution": "2026-10-28 に運営者が Vercel から削除（Vercel コネクタで削除を確認）。.env.example からも削除"
+    },
+    {
+      "id": "SEC-2026-10-19",
+      "category": "ci",
+      "target": ".github/workflows/*.yml",
+      "severity": "info",
+      "title": "actions/upload-artifact@v4 が Node.js 20 で動いており、実行ログに非推奨の警告が出ていた",
+      "status": "fixed",
+      "resolution": "upload-artifact を v6（Node.js 24）へ、office-crawl-verify.yml の setup-python を v6 へ更新（他のワークフローと揃える）。入力（name・path・retention-days・if-no-files-found）は変更なし",
+      "files": [
+        ".github/workflows/scrape.yml",
+        ".github/workflows/office-crawl-verify.yml",
+        ".github/workflows/source-update-monitor.yml"
+      ]
     }
   ],
   "verifiedOk": [
