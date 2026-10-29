@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: '22'
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
       - run: npm ci
@@ -48,7 +48,7 @@ jobs:
         with:
           path: scraper/ocr-cache.json
           key: ocr-cache-${{ runner.os }}-${{ github.run_id }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: office-crawl-verification-${{ github.run_id }}

@@ -125,8 +125,8 @@ jobs:
           python -m pip install -r scraper/requirements-ocr.txt
           echo "models=$(python -c 'import os, rapidocr; print(os.path.join(os.path.dirname(rapidocr.__file__), "models"))')" >> "$GITHUB_OUTPUT"
 
-      # 日本語認識モデル（約31MB）は初回推論時に modelscope.cn から取得される。
-      # 毎回取りに行くと外部障害で RapidOCR が丸ごと使えなくなるためキャッシュする。
+      # rapidocr 3.10.0 はモデル（約31MB）を wheel に同梱しており通常はダウンロードしない。
+      # 欠けた・壊れたときは modelscope.cn から取り直すため、外部障害に備えてキャッシュも残す。
       - name: RapidOCR モデルを復元
         if: steps.rapidocr.outputs.models != ''
         continue-on-error: true
@@ -226,7 +226,7 @@ jobs:
 
       - name: 募集窓口のHTML・OCR取得状況を保存
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: office-crawl-report-${{ github.run_id }}
           path: scraper/office-crawl-report.json

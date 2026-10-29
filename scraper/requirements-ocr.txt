@@ -1,5 +1,6 @@
 # RapidOCR（ローカルOCR）。認識モデルは日本語（PP-OCRv6 small / lang=japan）を使う。
 # 旧 rapidocr-onnxruntime は既定が中国語モデルで、かなを落とし簡体字に化けるため置き換えた（2026-10-13）。
-# モデル（約31MB）は初回実行時に modelscope.cn から取得される。scrape.yml がキャッシュする。
+# 使うモデル（PP-OCRv6 small の検出・認識と方向分類・約31MB）は wheel に同梱されており、通常はダウンロードしない。
+# 欠けた・ハッシュが合わないときだけ modelscope.cn から取り直す（scrape.yml のキャッシュはその保険）。
 rapidocr==3.10.0
 onnxruntime==1.31.0
