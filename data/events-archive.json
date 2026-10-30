@@ -1,6 +1,108 @@
 {
-  "updatedAt": "2026-10-29",
+  "updatedAt": "2026-10-30",
   "events": [
+    {
+      "id": "s-20261029-870f4",
+      "pref": "saitama",
+      "office": "",
+      "date": "2026-10-29",
+      "endDate": "",
+      "weekday": "木",
+      "title": "自衛隊職業説明会inハローワーク草加",
+      "place": "ハローワーク草加",
+      "address": "埼玉県草加市弁天４丁目１０－７",
+      "time": "09:00～13:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "予約なしのご参加も大歓迎です\n予約なしのご参加も大歓迎です",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-10-16",
+      "weatherLocation": {
+        "latitude": 35.843,
+        "longitude": 139.816,
+        "label": "埼玉県草加市",
+        "accuracy": "address",
+        "source": "gsi",
+        "geocodedAt": "2026-10-16T08:55:02.210+09:00"
+      },
+      "archivedAt": "2026-10-30"
+    },
+    {
+      "id": "sa-office-20261029-b81t1",
+      "pref": "saitama",
+      "office": "",
+      "date": "2026-10-29",
+      "endDate": "",
+      "weekday": "木",
+      "title": "自衛隊職業相談会in川口市",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/saitama/",
+      "notes": "掲載元: 募集案内所・地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_html",
+      "firstSeen": "2026-10-29",
+      "weatherLocation": {
+        "latitude": 35.857,
+        "longitude": 139.649,
+        "label": "埼玉県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:19.230+09:00"
+      },
+      "archivedAt": "2026-10-30"
+    },
+    {
+      "id": "hy-20261029-wst3k",
+      "pref": "hyogo",
+      "office": "",
+      "date": "2026-10-29",
+      "endDate": "",
+      "weekday": "木",
+      "title": "高等工科学校進路相談会",
+      "place": "川西地域事務所",
+      "address": "",
+      "time": "16:00～17:00 / 17:00～18:00 / 18:00～19:00 / 09:00～18:00",
+      "category": "説明会",
+      "tag": "学生向け",
+      "url": "https://www.mod.go.jp/pco/hyogo/want/setumeikai.html",
+      "notes": null,
+      "ageRequirement": "・中学校3年生「男子」・中学校勤務教諭 お申し込み お申し込みはこちらから ※メールソフトが起動します。ソフトが起動しない場合は 件名:高等工科学校進路相談会 本文:①希望会場:川西会場 ②氏名(兵庫 太郎) ③生年月日（西暦:20▲▲.▲▲.▲▲） ④住所（○○県○○市～） ⑤学校名（学年:■年生） ⑥連絡先(電話番号) ⑦希望",
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "hyogo_html",
+      "firstSeen": "2026-10-05",
+      "weatherLocation": {
+        "latitude": 34.83,
+        "longitude": 135.417,
+        "label": "兵庫県川西市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-05T08:54:38.633+09:00"
+      },
+      "archivedAt": "2026-10-30"
+    },
     {
       "id": "sa-office-20261028-xy1c4",
       "pref": "saitama",
@@ -297,7 +399,7 @@
       "statusUpdatedAt": "",
       "source_type": "office_html",
       "firstSeen": "2026-09-28",
-      "archivedAt": "2026-10-29"
+      "archivedAt": "2026-10-30"
     },
     {
       "id": "hy-20261027-px440",
@@ -433,7 +535,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-10-29"
+      "archivedAt": "2026-10-30"
     },
     {
       "id": "fu-office-20261027-9f1lg",
@@ -1011,7 +1113,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-06T23:55:36.269+09:00"
       },
-      "archivedAt": "2026-10-29"
+      "archivedAt": "2026-10-30"
     },
     {
       "id": "ib-office-20261025-qu6i4",
@@ -1045,7 +1147,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-14T15:23:14.187+09:00"
       },
-      "archivedAt": "2026-10-29"
+      "archivedAt": "2026-10-30"
     },
     {
       "id": "to-office-20261025-jrzqf",
@@ -1578,7 +1680,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-10-29",
+      "statusUpdatedAt": "2026-10-30",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-14",
       "weatherLocation": {
@@ -1589,7 +1691,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-10-29"
+      "archivedAt": "2026-10-30"
     },
     {
       "id": "hi-20261025-r7dxi",
@@ -3051,7 +3153,7 @@
         "source": "gsi",
         "geocodedAt": "2026-07-13T07:58:32.830+09:00"
       },
-      "archivedAt": "2026-10-29"
+      "archivedAt": "2026-10-30"
     },
     {
       "id": "ky-set-20261024-p7gqf",
@@ -3663,7 +3765,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-10-29"
+      "archivedAt": "2026-10-30"
     },
     {
       "id": "mi-office-20261021-yywyv",
