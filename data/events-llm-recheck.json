@@ -2,7 +2,7 @@
   "updatedAt": "2026-10-30",
   "limit": 30,
   "summary": {
-    "checked": 346,
+    "checked": 349,
     "flagged": 17,
     "attempted": 6,
     "corrected": 1,
@@ -16,42 +16,27 @@
   },
   "corrections": [
     {
-      "id": "ni-office-20261031-rpzyi",
-      "pref": "niigata",
-      "source": "https://www.mod.go.jp/pco/niigata/files/event/r8.8.31hiutityuusi.pdf",
+      "id": "eh-off-20270123-516jb",
+      "pref": "ehime",
+      "source": "https://www.mod.go.jp/pco/ehime/recruit/img/jukenannai/09_seito.pdf",
       "reasons": [
-        "イベント語が無く非イベントの兆候がある"
+        "日付がタイトルになっている"
       ],
       "changes": [
         {
-          "field": "title",
-          "from": "中央埠頭2号岸壁",
-          "to": "多用途支援艦「ひうち」艦艇広報 一般公開"
-        },
-        {
-          "field": "date",
-          "from": "2026-10-31",
-          "to": "2026-11-01"
-        },
-        {
-          "field": "place",
+          "field": "address",
           "from": null,
-          "to": "寺泊港中央埠頭2号岸壁"
+          "to": "松山市南梅本町乙115番地"
         },
         {
-          "field": "time",
-          "from": null,
-          "to": "11:45～14:30"
-        },
-        {
-          "field": "category",
-          "from": "広報活動",
-          "to": "艦艇公開"
+          "field": "tag",
+          "from": "学生向け",
+          "to": null
         },
         {
           "field": "notes",
-          "from": "掲載元: 募集案内所・地域事務所",
-          "to": "31日(土)は全日程中止。1日(日)のみの開催です。"
+          "from": "昼食は各自用意。受験票・筆記具持参。",
+          "to": "試験会場は志願者数により変更になる場合があります。"
         }
       ]
     }
