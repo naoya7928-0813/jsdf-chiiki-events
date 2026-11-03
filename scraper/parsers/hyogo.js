@@ -9,10 +9,12 @@ const TOP_URL = 'https://www.mod.go.jp/pco/hyogo/';
 const EVENT_URL = 'https://www.mod.go.jp/pco/hyogo/event/index.html';
 const SETSUMEIKAI_URL = 'https://www.mod.go.jp/pco/hyogo/want/setumeikai.html';
 
-const FIELD_LABEL_RE = /^(?:日\s*時|場\s*所|対\s*象|応募条件|締め切り|締切|申し?込み期限|申込期限|問い合わせ先|お問い合わせ先|注意事項)$/;
+const FIELD_LABEL_RE = /^(?:日\s*時|場\s*所|内\s*容|対\s*象|応募条件|締め切り|締切|申し?込み期限|申込期限|問い合わせ先|お問い合わせ先|注意事項)$/;
 const GENERIC_HEADING_RE = /^(?:イベント情報|自衛隊説明会|自衛隊\s*説明会まとめ|最新情報|お知らせ|職業説明会・相談会|\d{1,2}月|[《〖【]\s*\d{1,2}月\s*[》〗】])$/;
 const EVENT_HEADING_RE = /説明会|相談会|公開|見学|イベント|フェスタ|祭|まつり|演奏|コンサート|セミナー|ガイダンス|体験|展示|試験|座談会|交流会|オープンキャンパス|進学|就職|転職/i;
-const NEXT_FIELD = '(?=日\\s*時|場\\s*所|対\\s*象|応募条件|締め切り|締切|申し?込み期限|申込期限|問い合わせ先|お問い合わせ先|注意事項|$)';
+const NEXT_FIELD = '(?=日\\s*時|場\\s*所|内\\s*容|対\\s*象|応募条件|締め切り|締切|申し?込み期限|申込期限|問い合わせ先|お問い合わせ先|注意事項|$)';
+// ID 用（2026-11 に「内容」を区切りに加える前の形）。ID を変えないために残す
+const LEGACY_NEXT_FIELD = '(?=日\\s*時|場\\s*所|対\\s*象|応募条件|締め切り|締切|申し?込み期限|申込期限|問い合わせ先|お問い合わせ先|注意事項|$)';
 
 function compact(value) {
   return String(value || '').replace(/[\u00a0\u3000]/g, ' ').replace(/\s+/g, ' ').trim();
@@ -134,9 +136,21 @@ function fallbackSectionFromDocumentOrder($, heading, headings) {
  * まず「イベント見出しを含み、日時フィールドを持つ最小親要素」を使い、
  * ラッパーが無いページだけ文書順の範囲抽出へフォールバックする。
  */
+/**
+ * 見出しの語にイベント語が無くても、次の見出しが「日時」ならイベント名とみなす。
+ * 2026-10: 「自衛隊サテライトブース」「防災フェスin神戸北」「自衛隊が姫路駅にやってくる」が
+ * イベント語に当たらず、イベントページから1件も取れなくなっていた（構造で判定する）。
+ */
+function isStructuralEventHeading($, el) {
+  const t = compact($(el).text());
+  if (!t || t.length > 90 || FIELD_LABEL_RE.test(t) || GENERIC_HEADING_RE.test(t)) return false;
+  const next = $(el).nextAll('h3,h4,h5').first();
+  return next.length > 0 && /^日\s*時$/.test(compact(next.text()));
+}
+
 function eventSections($) {
   const headings = $('h3,h4,h5').toArray()
-    .filter(el => isEventHeadingText($(el).text()));
+    .filter(el => isEventHeadingText($(el).text()) || isStructuralEventHeading($, el));
 
   const sections = [];
   const seen = new Set();
@@ -157,6 +171,9 @@ function eventSections($) {
       section = fallbackSectionFromDocumentOrder($, heading, headings);
     }
 
+    // 語ではなく構造（直後が「日時」）で見出しと判断したもの。makeEventsFromSection の語の検査を通す
+    section.structural = !isEventHeadingText($(heading).text());
+
     // 同一ボックス内に同じイベント見出しが二重に存在する新HP構造を重複排除する。
     const key = [
       section.id || '',
@@ -171,9 +188,9 @@ function eventSections($) {
   return sections;
 }
 
-function field(text, labelPattern) {
+function field(text, labelPattern, nextField = NEXT_FIELD) {
   const src = toHalfWidth(compact(text));
-  const re = new RegExp(`(?:${labelPattern})\\s*[:：]?\\s*([\\s\\S]*?)${NEXT_FIELD}`, 'i');
+  const re = new RegExp(`(?:${labelPattern})\\s*[:：]?\\s*([\\s\\S]*?)${nextField}`, 'i');
   const m = src.match(re);
   return m ? compact(m[1]) : '';
 }
@@ -199,15 +216,22 @@ function resolveYear(month, day, weekday) {
   return daysAgo > 180 ? current + 1 : current;
 }
 
-function addDate(out, seen, year, month, day, weekday = '') {
+function isoDate(year, month, day) {
   const y = Number(year), m = Number(month), d = Number(day);
-  if (!Number.isInteger(y) || !Number.isInteger(m) || !Number.isInteger(d)) return;
+  if (!Number.isInteger(y) || !Number.isInteger(m) || !Number.isInteger(d)) return null;
   const dt = new Date(Date.UTC(y, m - 1, d));
-  if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== m - 1 || dt.getUTCDate() !== d) return;
-  const date = `${y}-${padTwo(m)}-${padTwo(d)}`;
-  if (isPast(date) || seen.has(date)) return;
+  if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== m - 1 || dt.getUTCDate() !== d) return null;
+  return `${y}-${padTwo(m)}-${padTwo(d)}`;
+}
+
+/** endDate を渡すと期間開催。初日が過ぎていても最終日が今日以降なら開催中として残す */
+function addDate(out, seen, year, month, day, weekday = '', endDate = null) {
+  const date = isoDate(year, month, day);
+  if (!date) return;
+  const end = endDate && endDate > date ? endDate : null;
+  if (isPast(end || date) || seen.has(date)) return;
   seen.add(date);
-  out.push({ date, weekday: String(weekday || '').replace(/[・\s祝]/g, '').slice(0, 1) });
+  out.push({ date, weekday: String(weekday || '').replace(/[・\s祝]/g, '').slice(0, 1), ...(end ? { endDate: end } : {}) });
 }
 
 /**
@@ -252,15 +276,29 @@ function parseDates(rawText) {
       year = resolveYear(month, day, weekday);
     }
     matches.push({ index: m.index, end: m.index + m[0].length, year, month, day, weekday });
+
+    // 「12月4日(金)、5日(土)、6日(日)」のように月を省いた続きの日付（同じ月）
+    let pos = m.index + m[0].length;
+    // 区切りが空白だけ・改行(<br>)で何も無いとき（「14日(土) 21日(土)」）は曜日が付いているものに限る（「2日間」等を拾わない）
+    const cont = /^(?:\s*[、,]\s*(\d{1,2})\s*日(?!間)(?:\s*\(([月火水木金土日祝・]+)\))?|\s*(\d{1,2})\s*日\s*\(([月火水木金土日祝・]+)\))/;
+    for (let c = cont.exec(src.slice(pos)); c; c = cont.exec(src.slice(pos))) {
+      const cDay = Number(c[1] || c[3]);
+      const cWeekday = c[2] || c[4] || '';
+      const cYear = m[1] || m[2] ? year : resolveYear(month, cDay, cWeekday);
+      matches.push({ index: pos, end: pos + c[0].length, year: cYear, month, day: cDay, weekday: cWeekday });
+      pos += c[0].length;
+    }
   }
 
-  // 「A～B」は期間なので開始日のみ。それ以外の列挙日はすべて登録する。
+  // 「A～B」は期間なので開始日1件（endDate=B）。それ以外の列挙日はすべて登録する。
   for (let i = 0; i < matches.length; i++) {
-    if (i > 0) {
-      const between = src.slice(matches[i - 1].end, matches[i].index);
-      if (/^\s*[～〜~\-]\s*$/.test(between)) continue;
-    }
     const m = matches[i];
+    const next = matches[i + 1];
+    if (next && /^\s*[～〜~\-]\s*$/.test(src.slice(m.end, next.index))) {
+      addDate(dates, seen, m.year, m.month, m.day, m.weekday, isoDate(next.year, next.month, next.day));
+      i++; // 期間の終わりの日は別の開催日として登録しない
+      continue;
+    }
     addDate(dates, seen, m.year, m.month, m.day, m.weekday);
   }
 
@@ -276,13 +314,16 @@ function cleanTitle(title) {
 
 function makeEventsFromSection(section, sourceUrl, defaultCategory) {
   const title = cleanTitle(section.title);
-  if (!title || !isEventHeadingText(title)) return [];
+  if (!title || (!section.structural && !isEventHeadingText(title))) return [];
 
   const dateText = field(section.text, '日\\s*時') || section.text;
   const dates = parseDates(dateText);
   if (!dates.length) return [];
 
-  const place = field(section.text, '場\\s*所').slice(0, 120);
+  // ID は修正前と同じ取り出し方の会場（「内容」で区切らない・絵文字を残す）で作る。
+  // 会場の整形を変えるたびに ID が変わると、お気に入り・運営の上書き（中止設定等）が外れるため
+  const idPlace = field(section.text, '場\\s*所', LEGACY_NEXT_FIELD).slice(0, 120);
+  const place = field(section.text, '場\\s*所').replace(/^[\p{Extended_Pictographic}️\s]+/u, '').slice(0, 120);
   const target = field(section.text, '対\\s*象|応募条件').slice(0, 240);
   const deadline = field(section.text, '締め切り|締切|申し?込み期限|申込期限').slice(0, 120);
   const time = timeFrom(dateText);
@@ -292,11 +333,12 @@ function makeEventsFromSection(section, sourceUrl, defaultCategory) {
   const notes = dateRange && dates.length === 1 ? `開催期間: ${dateText.slice(0, 100)}` : null;
   const assets = section.assets.map(raw => toAbs(raw, sourceUrl)).filter(Boolean);
 
-  return dates.map(({ date, weekday }) => ({
-    id: `hy-${date.replace(/-/g, '')}-${titleHash(date, `${title}|${place}|${section.id || ''}`)}`,
+  return dates.map(({ date, weekday, endDate }) => ({
+    id: `hy-${date.replace(/-/g, '')}-${titleHash(date, `${title}|${idPlace}|${section.id || ''}`)}`,
     pref: 'hyogo',
     date,
     weekday,
+    ...(endDate ? { endDate } : {}),
     title,
     place,
     address: '',
