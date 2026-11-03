@@ -54,6 +54,7 @@ jobs:
         run: npx playwright install chromium --with-deps
 
       - name: HTML監視状態を復元
+        id: state-cache
         uses: actions/cache@v5
         with:
           path: scraper/source-update-state.json
@@ -64,6 +65,12 @@ jobs:
       - name: 地本・募集案内所のHTMLを確認
         id: monitor
         run: |
+          # 前回の状態が無いと全 URL が「初回の基準値」になり、今回は更新を検知できない。
+          # 黙って「更新なし」に見えないよう警告を出す（キャッシュは 7 日使われないと消える。
+          # scrape.yml の「HP更新監視の状態を延命」で毎日読み込んで防いでいる）
+          if [ ! -f scraper/source-update-state.json ]; then
+            echo "::warning::HP更新監視の前回の状態がありません（キャッシュ消失）。今回は基準値の作成のみで、更新は検知できません。次回から比較します。"
+          fi
           node scraper/check-source-updates.js
           CHANGED=$(node -p "require('./scraper/source-update-report.json').changed")
           FAILED=$(node -p "require('./scraper/source-update-report.json').failed")
