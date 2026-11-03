@@ -1,57 +1,47 @@
 {
-  "updatedAt": "2026-10-31",
+  "updatedAt": "2026-11-03",
   "limit": 30,
   "summary": {
-    "checked": 354,
+    "checked": 309,
     "flagged": 17,
-    "attempted": 6,
+    "attempted": 8,
     "corrected": 1,
-    "unverified": 4,
+    "unverified": 7,
     "noSource": 1,
     "overBudget": 0,
     "skippedNoSource": 1,
-    "skippedNotEligible": 10,
+    "skippedNotEligible": 8,
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
   "corrections": [
     {
-      "id": "gu-office-20261101-2oqwb",
+      "id": "gu-office-20261114-v2ac2",
       "pref": "gunma",
-      "source": "https://www.mod.go.jp/pco/gunma/sozai/event/20261101-03-08-1.jpg",
+      "source": "https://www.mod.go.jp/pco/gunma/sozai/event/20261114-5.jpg",
       "reasons": [
-        "タイトルが長すぎる（説明文・別イベントの混入）"
+        "日付がタイトルになっている"
       ],
       "changes": [
         {
-          "field": "title",
-          "from": "市内の産業振興を促進するため、農産物の品質向上と消費拡大、商工業の発展と地域活性化を目的に今年も各地区にて産業祭",
-          "to": "いせさき産業祭"
-        },
-        {
-          "field": "endDate",
-          "from": null,
-          "to": "2026-11-08"
-        },
-        {
           "field": "place",
-          "from": "あすま総合運動公園",
-          "to": "赤堀コミュニティひろば、あずま総合運動公園、三代目ふれあい長津パーク"
-        },
-        {
-          "field": "time",
-          "from": null,
-          "to": "10:00～14:00"
+          "from": "カインズスーバーセンター前橋吉岡店",
+          "to": "カインズスーパーセンター前橋吉岡店"
         },
         {
           "field": "category",
           "from": "広報活動",
-          "to": "地域参加"
+          "to": "体験"
+        },
+        {
+          "field": "tag",
+          "from": null,
+          "to": "家族向け"
         },
         {
           "field": "notes",
-          "from": "掲載元: 前橋募集案内所",
-          "to": "雨天決行"
+          "from": "掲載元: 前橋募集案内所\nはしご車乗車体験・防災食の食べ方教室は要事前予約",
+          "to": "はしご車乗車体験・防災スタンプラリーは事前予約制"
         }
       ]
     }
@@ -65,16 +55,6 @@
     {
       "id": "ib-office-20261103-7057s",
       "pref": "ibaraki",
-      "reason": "not_eligible"
-    },
-    {
-      "id": "to-office-20261101-pltya",
-      "pref": "tochigi",
-      "reason": "not_eligible"
-    },
-    {
-      "id": "to-office-20261101-azn1x",
-      "pref": "tochigi",
       "reason": "not_eligible"
     },
     {
