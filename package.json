@@ -36,6 +36,8 @@
     "vite-plugin-pwa": "^0.21.1"
   },
   "overrides": {
-    "sharp": "^0.35.5"
+    "sharp": "^0.35.5",
+    "glob": "^14.0.2",
+    "minimatch": "^11.0.1"
   }
 }
