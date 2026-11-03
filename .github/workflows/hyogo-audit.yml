@@ -20,7 +20,9 @@ permissions:
 jobs:
   audit:
     name: 兵庫 HTML・OCR・募集窓口を全経路確認
-    runs-on: ubuntu-latest
+    # ubuntu-latest は 2026-10-31 から Ubuntu 26.04 になり、Playwright 1.59 が非対応で
+    # 「Playwright does not support chromium on ubuntu26.04-x64」で毎回失敗した。対応版が出るまで固定する
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true

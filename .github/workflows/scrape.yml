@@ -72,7 +72,9 @@ concurrency:
 jobs:
   scrape:
     name: イベントデータ取得
-    runs-on: ubuntu-latest
+    # ubuntu-latest は 2026-10-31 から Ubuntu 26.04 になり、Playwright 1.59 が非対応で
+    # 「Playwright does not support chromium on ubuntu26.04-x64」で毎回失敗した。対応版が出るまで固定する
+    runs-on: ubuntu-24.04
     # スクレイプ(約63分) + 目標スロットまでの待機(最大約93分) を見込んで上限を延ばす
     # 実行 約64分 + 目標スロットまでの待機 最大約83分 = 約147分。
     # 余裕を持たせて 180 分（従来 130 分のままだと待機中に打ち切られ通知できない）
