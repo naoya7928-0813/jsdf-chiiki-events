@@ -145,3 +145,34 @@ test('兵庫: 日付の読み取り（月を省いた続き・改行で区切り
     assert.deepEqual(parseDates('10月25日(日)～11月1日(日)'), []); // 期間ごと終了済み
   });
 });
+
+// ── WordPress 系の地本（滋賀・奈良・三重・和歌山）: 一覧ページの記事リンク ─────────────
+// 2026-10 ごろ、リンクが「https://www.mod.go.jp/pco/…」から「/pco/…」（ドメイン無し）に変わり、
+// 「mod.go.jp/pco/<地本>/post-」を含むリンクだけを探していたため 4 地本とも記事を 1 件も見つけられなかった。
+test('absPcoUrl: 地本サイト内のリンクを完全な URL にそろえる（他サイト・mailto は空）', { skip }, () => {
+  const { absPcoUrl } = require('../scraper/parsers/utils');
+  assert.equal(absPcoUrl('/pco/nara/post-1/#top'), 'https://www.mod.go.jp/pco/nara/post-1/');
+  assert.equal(absPcoUrl('http://mod.go.jp/pco/mie/post-2/'), 'https://www.mod.go.jp/pco/mie/post-2/');
+  assert.equal(absPcoUrl('https://www.mod.go.jp/pco/shiga/post-3/'), 'https://www.mod.go.jp/pco/shiga/post-3/');
+  assert.equal(absPcoUrl('https://evil.example/pco/nara/post-1/'), '');
+  assert.equal(absPcoUrl('mailto:a@example.jp'), '');
+  assert.equal(absPcoUrl(''), '');
+});
+
+test('WordPress 系 4 地本: ドメイン無し・完全な URL のどちらのリンクからも記事を見つける', { skip }, () => {
+  const load = html => cheerio.load(html, { decodeEntities: false });
+  const cases = [
+    ['shiga', 'parseShigaPostUrls', ['/pco/shiga/post-5479/', 'https://www.mod.go.jp/pco/shiga/event/event-3557/', '/pco/shiga/about/'],
+      ['https://www.mod.go.jp/pco/shiga/post-5479/', 'https://www.mod.go.jp/pco/shiga/event/event-3557/']],
+    ['nara', 'parseNaraPostUrls', ['/pco/nara/post-16883/', 'https://www.mod.go.jp/pco/nara/post-16843/', '/pco/nara/post-page/'],
+      ['https://www.mod.go.jp/pco/nara/post-16883/', 'https://www.mod.go.jp/pco/nara/post-16843/']],
+    ['mie', 'parseMiePostUrls', ['/pco/mie/post-10014/', '/pco/mie/events-page/', '/pco/mie/events-page/aki-fes/'],
+      ['https://www.mod.go.jp/pco/mie/post-10014/', 'https://www.mod.go.jp/pco/mie/events-page/aki-fes/']],
+    ['wakayama', 'parseWakayamaPostUrls', ['/pco/wakayama/post-8945/', '/pco/wakayama/post-8945/#more', 'https://www.mod.go.jp/pco/wakayama/post-8779/'],
+      ['https://www.mod.go.jp/pco/wakayama/post-8945/', 'https://www.mod.go.jp/pco/wakayama/post-8779/']],
+  ];
+  for (const [pref, fn, hrefs, expected] of cases) {
+    const html = hrefs.map(h => `<a href="${h}">x</a>`).join('');
+    assert.deepEqual(require(`../scraper/parsers/${pref}`)[fn](load(html)), expected, pref);
+  }
+});

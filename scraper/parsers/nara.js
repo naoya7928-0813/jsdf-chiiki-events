@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo, absPcoUrl } = require('./utils');
 
 /**
  * 奈良地本 WordPress 投稿ページのパーサー（1投稿 = 1イベント）
@@ -142,9 +142,10 @@ function parseNaraPost($, url, counter) {
  */
 function parseNaraPostUrls($) {
   const urls = [];
-  $('a[href*="mod.go.jp/pco/nara/post-"]').each((_, a) => {
-    const href = $(a).attr('href') || '';
-    if (href && /\/nara\/post-\d+/.test(href) && !urls.includes(href)) urls.push(href);
+  // 「https://www.mod.go.jp/pco/nara/…」と「/pco/nara/…」の両方（2026-10 にドメイン無しへ変更）
+  $('a[href*="/pco/nara/post-"]').each((_, a) => {
+    const href = absPcoUrl($(a).attr('href'));
+    if (href && /\/pco\/nara\/post-\d+/.test(href) && !urls.includes(href)) urls.push(href);
   });
   return urls;
 }
