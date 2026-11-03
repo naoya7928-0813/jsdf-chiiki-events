@@ -4,7 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { hashHtml, classifyChange } = require('./lib/sourceMonitor');
-const { decodeHtml } = require('./lib/officePageSnapshot');
+const { decodeHtml, metaRefreshTarget } = require('./lib/officePageSnapshot');
 
 const ROOT = path.join(__dirname, '..');
 const OFFICES_PATH = path.join(ROOT, 'public/data/offices.json');
@@ -154,6 +154,21 @@ function loadState() {
   return { version: 1, pages: {} };
 }
 
+/**
+ * ページの HTML を読む。DOM の読み取りが画面の移動と競合したら受信済みの HTML を使い、再リクエストしない。
+ * 受信済みの HTML も読めない（移動で破棄された）ときは、移動先の読み込みを待って DOM を読み直す。
+ */
+async function readHtml(page, response, headers) {
+  try { return await page.content(); }
+  catch (error) {
+    if (response?.body) {
+      try { return decodeHtml(await response.body(), headers); } catch { /* 移動で破棄された */ }
+    }
+    await page.waitForLoadState('domcontentloaded', { timeout: TIMEOUT_MS }).catch(() => {});
+    try { return await page.content(); } catch { throw error; }
+  }
+}
+
 async function takeSnapshot(context, source) {
   const page = await context.newPage();
   try {
@@ -174,20 +189,34 @@ async function takeSnapshot(context, source) {
     }
     if (status >= 500) throw new Error(`HTTP ${status}`);
 
-    const headers = response ? await response.allHeaders() : {};
-    let html;
-    try { html = await page.content(); }
-    catch (error) {
-      if (!response?.body) throw error;
-      // ナビゲーション競合時は受信済みHTMLを利用し、再リクエストしない。
-      html = decodeHtml(await response.body(), headers);
+    let headers = response ? await response.allHeaders() : {};
+    let html = await readHtml(page, response, headers);
+    let finalUrl = response?.url?.() || page.url();
+    let finalStatus = status;
+
+    // 転送用ページ（<meta refresh>。宮城の /pco/miyagi/ 等）は中身が変わらないので、転送先を監視する。
+    // 以前は本文の読み取り中に転送が起き「No resource with given identifier found」で失敗していた。
+    const target = metaRefreshTarget(html, finalUrl);
+    if (target) {
+      await waitForRequestSlot();
+      const next = await page.goto(target, { waitUntil: 'domcontentloaded', timeout: TIMEOUT_MS });
+      finalStatus = next ? next.status() : 0;
+      if (finalStatus === 403 || finalStatus === 429) {
+        const err = new Error(`HTTP ${finalStatus}`);
+        err.hardBlock = true;
+        throw err;
+      }
+      if (finalStatus >= 500) throw new Error(`HTTP ${finalStatus}`);
+      headers = next ? await next.allHeaders() : {};
+      html = await readHtml(page, next, headers);
+      finalUrl = next?.url?.() || target;
     }
     if (!html || html.length < 40) throw new Error('HTMLが空です');
 
     return {
       hash: hashHtml(html),
-      status,
-      finalUrl: response?.url?.() || page.url(),
+      status: finalStatus,
+      finalUrl,
       etag: headers.etag || null,
       lastModified: headers['last-modified'] || null,
       contentLength: html.length,

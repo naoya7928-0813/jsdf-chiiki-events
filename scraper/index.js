@@ -169,7 +169,8 @@ const URLS = {
   obihiro:          'https://www.mod.go.jp/pco/obihiro/topics_event.html',
   hakodate:         'https://www.mod.go.jp/pco/hakodate/publicity/',
   // 東北地本
-  miyagi:           'https://www.mod.go.jp/pco/miyagi/',
+  // /pco/miyagi/ は <meta refresh> の転送用ページ。本物のトップを直接開く（転送の待ちと読み取りの競合を避ける）
+  miyagi:           'https://www.mod.go.jp/pco/miyagi/miyagitop/index.html',
   aomori:           'https://www.mod.go.jp/pco/aomori/',
   iwate:            'https://www.mod.go.jp/pco/iwate/event/index.html',
   yamagata:         'https://www.mod.go.jp/pco/yamagata/event/event.html',
@@ -3421,6 +3422,11 @@ const officePageResponses = new Map();
 const officeAssetResults = new Map();
 const officeCrawlReport = { checkedAt: null, runId: process.env.GITHUB_RUN_ID || null, pages: [] };
 
+/** fetchPagePlaywright で取得したページの実際の URL（転送用ページなら転送先）。未取得なら渡した URL */
+function pageFinalUrl(url) {
+  return officePageResponses.get(normalizeUrl(url))?.finalUrl || url;
+}
+
 async function fetchPagePlaywright(ctx, url) {
   const normalized = normalizeUrl(url);
   const cached = officePageResponses.get(normalized);
@@ -3998,7 +4004,9 @@ async function scrapeOfficeAssets(withFreshContext, cutoff) {
 
     // イベント系リンクを分類（HTMLページ / PDF・画像の直接リンク）
     const skip                    = new Set([...alreadyScraped, ...exploredPages]);
-    const { pages: subPages, assets: directAssets } = findEventLinks($, hq.url, skip);
+    // リンクは実際に表示したページ（転送用ページなら転送先）の URL を基準に組み立てる
+    // （宮城: /pco/miyagi/ → miyagitop/index.html。転送前を基準にすると event.html 等が 404 になっていた）
+    const { pages: subPages, assets: directAssets } = findEventLinks($, pageFinalUrl(hq.url), skip);
     console.log(`  サブページ候補: ${subPages.length}件 / 直接アセット: ${directAssets.length}件`);
 
     await sleep(BETWEEN_PAGES_MS);
@@ -4077,7 +4085,7 @@ async function scrapeOfficeAssets(withFreshContext, cutoff) {
       const $sub = await withFreshContext(ctx => fetchPagePlaywright(ctx, subUrl));
       if (!$sub) { await sleep(3000); continue; }
 
-      const assets  = sortByPriority(extractAssets($sub, subUrl));
+      const assets  = sortByPriority(extractAssets($sub, pageFinalUrl(subUrl)));
       const highMed = assets.filter(a => a.priority !== 'low').slice(0, MAX_ASSETS_PER_PAGE);
       if (highMed.length === 0) { await sleep(3000); continue; }
 
