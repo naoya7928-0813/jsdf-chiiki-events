@@ -207,3 +207,48 @@ test('兵庫: 同じ日・同じ枠のチラシの OCR は、読み違いがあ�
     assert.ok(!('_hyogoAssets' in e) && !('_assetUrl' in e), '内部用の項目を公開データに残さない');
   }
 });
+
+// ── 転送用ページ（<meta refresh>）: 宮城の /pco/miyagi/ → miyagitop/index.html ─────────────
+// 転送前の URL を基準にリンクを組み立て「/pco/miyagi/event.html」等（存在しない）を開いて 404 を出していた。
+test('metaRefreshTarget: 同じサイト内・短い待ち時間の転送だけを返す', () => {
+  const { metaRefreshTarget } = require('../scraper/lib/officePageSnapshot');
+  const base = 'https://www.mod.go.jp/pco/miyagi/';
+  const top = 'https://www.mod.go.jp/pco/miyagi/miyagitop/index.html';
+  assert.equal(metaRefreshTarget(`<meta http-equiv="refresh" content="0; url=${top}">`, base), top);
+  assert.equal(metaRefreshTarget('<META HTTP-EQUIV="Refresh" CONTENT="0;URL=miyagitop/index.html">', base), top);
+  assert.equal(metaRefreshTarget('<meta http-equiv="refresh" content="0; url=https://evil.example/">', base), ''); // 別サイト
+  assert.equal(metaRefreshTarget('<meta http-equiv="refresh" content="600; url=x.html">', base), '');           // 定期再読み込み
+  assert.equal(metaRefreshTarget('<meta http-equiv="refresh" content="300">', base), '');                        // 転送先なし
+  assert.equal(metaRefreshTarget(`<meta http-equiv="refresh" content="0; url=${base}#top">`, base), '');         // 自分自身
+  assert.equal(metaRefreshTarget('<meta name="description" content="0; url=x">', base), '');
+});
+
+test('readOfficeSnapshot: 転送用ページなら転送先を1回だけ開き、転送先の URL と中身を組で返す', async () => {
+  const { readOfficeSnapshot } = require('../scraper/lib/officePageSnapshot');
+  const stub = 'https://www.mod.go.jp/pco/miyagi/';
+  const top = 'https://www.mod.go.jp/pco/miyagi/miyagitop/index.html';
+  const pages = {
+    [stub]: `<html><head><meta http-equiv="refresh" content="0; url=${top}"></head><body></body></html>`,
+    [top]: '<html><body><a href="event.html">イベント</a></body></html>',
+  };
+  const gotos = [];
+  let current = '';
+  const page = {
+    goto: async u => { gotos.push(u); current = u; return { status: () => 200, url: () => u }; },
+    content: async () => pages[current],
+    url: () => current,
+  };
+  const r = await readOfficeSnapshot(page, stub);
+  assert.deepEqual(gotos, [stub, top]);
+  assert.equal(r.finalUrl, top);
+  assert.match(r.html, /event\.html/);
+  assert.equal(new URL('event.html', r.finalUrl).href, 'https://www.mod.go.jp/pco/miyagi/miyagitop/event.html');
+});
+
+test('宮城: 新着イベントのリンクは本物のトップ（miyagitop/）を基準に組み立てる', { skip }, () => {
+  const html = `<div id="toppage-news"><h3>新着イベント EVENT</h3>
+    <dl><dt>2026.11.21</dt><dd><a href="event.html#aoba">青葉まつり</a></dd></dl></div>`;
+  const evs = parseAt('2026-11-03T09:00:00+09:00', 'miyagi', 'parseMiyagi', html);
+  assert.equal(evs.length, 1);
+  assert.equal(evs[0].url, 'https://www.mod.go.jp/pco/miyagi/miyagitop/event.html#aoba');
+});

@@ -2,9 +2,12 @@
 
 const { guessCategory, guessTag, isPast, toHalfWidth, padTwo , titleHash } = require('./utils');
 
+// 本物のトップページ（/pco/miyagi/ はここへの転送用ページ）。ページ内の相対リンクの基準
+const PAGE_URL = 'https://www.mod.go.jp/pco/miyagi/miyagitop/index.html';
+
 /**
  * 宮城地本トップページパーサー
- * URL: https://www.mod.go.jp/pco/miyagi/
+ * URL: https://www.mod.go.jp/pco/miyagi/miyagitop/index.html
  *
  * TOP ページの「EVENT新着イベント」セクション構造:
  *   <div id="toppage-news">
@@ -14,7 +17,8 @@ const { guessCategory, guessTag, isPast, toHalfWidth, padTwo , titleHash } = req
  *     </dl>
  *   </div>
  *
- * event.html は 404 のため TOP ページから直接取得。
+ * /pco/miyagi/ は中身の無い転送用ページ（<meta refresh>）で、本物のトップは miyagitop/index.html。
+ * イベント一覧（miyagitop/event.html）は案内所巡回（office-event-sources.json）が読むため、ここはトップの新着欄だけ。
  *
  * @param {import('cheerio').CheerioAPI} $
  * @returns {Array<Object>}
@@ -69,10 +73,12 @@ function parseMiyagi($) {
     if (!title) return;
 
     const rawUrl = $a.attr('href') || '';
-    // event.html は 404 のため内部アンカーリンクを除外
-    const url = rawUrl.startsWith('event.html') ? '' :
-                rawUrl.startsWith('http')       ? rawUrl :
-                rawUrl ? `https://www.mod.go.jp/pco/miyagi/${rawUrl}` : '';
+    // ページ内のリンクは本物のトップ（miyagitop/index.html）からの相対。
+    // 以前は /pco/miyagi/ を基準にして「/pco/miyagi/event.html」（存在しない）を作り、404 として空にしていた
+    let url = '';
+    if (rawUrl) {
+      try { url = new URL(rawUrl, PAGE_URL).href; } catch { url = ''; }
+    }
 
     const d = new Date(dateStr + 'T00:00:00');
     const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
