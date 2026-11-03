@@ -96,6 +96,7 @@ const { parseNagano }        = require('./parsers/nagano');
 const { parseKyoto, parseKyotoSetsumeikai }   = require('./parsers/kyoto');
 const { parseOsaka, parseOsakaSession }       = require('./parsers/osaka');
 const { parseHyogoEvents, parseHyogoSetsumeikai } = require('./parsers/hyogo');
+const { mergeHyogoOcr } = require('./lib/hyogoMerge');
 const { parseMiePost,      parseMiePostUrls }      = require('./parsers/mie');
 const { parseShigaPost,    parseShigaPostUrls }    = require('./parsers/shiga');
 const { parseNaraPost,     parseNaraPostUrls }     = require('./parsers/nara');
@@ -3209,6 +3210,7 @@ async function fetchHyogo(context) {
           deadline:       safeStr(item.deadline) || null,
           imageUrl:       '',
           source_type:    'hyogo_box_ocr',
+          _assetUrl:      assetUrl,
         });
       }
     }
@@ -3218,24 +3220,8 @@ async function fetchHyogo(context) {
 
   // OCRはHTMLの代替ではなく補完。同日同一イベントなら空欄だけ埋め、
   // HTMLに存在しないチラシイベントだけ追加する。
-  const merged = htmlEvents.map(ev => {
-    const { _hyogoAssets, ...clean } = ev;
-    clean.source_type = clean.source_type || 'hyogo_html';
-    return clean;
-  });
-
-  for (const ocrEv of ocrEvents) {
-    const twin = merged.find(ev => ev.date === ocrEv.date && isLikelySameEvent(ev, ocrEv));
-    if (twin) {
-      if (!twin.place && ocrEv.place) twin.place = ocrEv.place;
-      if (!twin.time && ocrEv.time) twin.time = ocrEv.time;
-      if (!twin.ageRequirement && ocrEv.ageRequirement) twin.ageRequirement = ocrEv.ageRequirement;
-      if (!twin.deadline && ocrEv.deadline) twin.deadline = ocrEv.deadline;
-      if (!twin.notes && ocrEv.notes) twin.notes = ocrEv.notes;
-      continue;
-    }
-    merged.push(ocrEv);
-  }
+  // 同じ開催日で、そのイベント枠に貼られていたチラシの OCR は同じイベントとして扱う（scraper/lib/hyogoMerge.js）
+  const merged = mergeHyogoOcr(htmlEvents, ocrEvents, isLikelySameEvent);
 
   const unique = dedupEvents(merged).sort((a, b) =>
     (a.date || '').localeCompare(b.date || '') || (a.title || '').localeCompare(b.title || '', 'ja')

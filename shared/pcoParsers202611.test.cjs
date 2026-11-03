@@ -176,3 +176,34 @@ test('WordPress 系 4 地本: ドメイン無し・完全な URL のどちらの
     assert.deepEqual(require(`../scraper/parsers/${pref}`)[fn](load(html)), expected, pref);
   }
 });
+
+// ── 兵庫: HTML のイベントにチラシ OCR を補う（scraper/lib/hyogoMerge.js） ─────────────
+// 2026-11-03: OCR が「神戸北」を「鐘戸北」、会場を「1階屋外E駐車場」と読み、名前・会場の似ている度合いでは
+// 同じイベントと判定できず、同じ日の同じイベントが二重に掲載された（4 件）。
+test('兵庫: 同じ日・同じ枠のチラシの OCR は、読み違いがあっても HTML のイベントにまとめる（空欄だけ補う）', () => {
+  const { mergeHyogoOcr } = require('../scraper/lib/hyogoMerge');
+  const { isLikelySameEvent } = require('./titleQuality.cjs');
+  const flyer = 'https://www.mod.go.jp/pco/hyogo/event/images/1107_kobe.jpg';
+  const html = [
+    { id: 'h1', date: '2026-11-07', title: '防災フェスin神戸北', place: 'イオンモール神戸北', time: '10:00～13:00', notes: null, _hyogoAssets: [flyer] },
+    { id: 'h2', date: '2026-11-08', title: '就職・転職説明会', place: '川西地域事務所', time: '', _hyogoAssets: [] },
+  ];
+  const ocr = [
+    // 同じ枠のチラシ・同じ日 → まとめる（HTML の値は上書きしない。空欄だけ補う）
+    { id: 'o1', date: '2026-11-07', title: '防災フェスin鐘戸北', place: '1階屋外E駐車場', time: '10:00～13:00', notes: '車両展示', source_type: 'hyogo_box_ocr', _assetUrl: flyer },
+    // 同じチラシでも別の日（チラシに載っている別日程）→ 追加
+    { id: 'o2', date: '2026-11-21', title: '防災フェスin鐘戸北', place: '', time: '', source_type: 'hyogo_box_ocr', _assetUrl: flyer },
+    // 別のチラシ・名前も違う → 同じ日でも追加
+    { id: 'o3', date: '2026-11-08', title: '自衛隊音楽まつり', place: '', time: '', source_type: 'hyogo_box_ocr', _assetUrl: 'https://www.mod.go.jp/pco/hyogo/x.jpg' },
+  ];
+  const out = mergeHyogoOcr(html, ocr, isLikelySameEvent);
+  assert.deepEqual(out.map(e => e.id), ['h1', 'h2', 'o2', 'o3']);
+  const h1 = out[0];
+  assert.equal(h1.title, '防災フェスin神戸北');
+  assert.equal(h1.place, 'イオンモール神戸北');
+  assert.equal(h1.notes, '車両展示');
+  assert.equal(h1.source_type, 'hyogo_html');
+  for (const e of out) {
+    assert.ok(!('_hyogoAssets' in e) && !('_assetUrl' in e), '内部用の項目を公開データに残さない');
+  }
+});
