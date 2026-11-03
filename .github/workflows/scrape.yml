@@ -162,6 +162,21 @@ jobs:
           restore-keys: |
             llm-cache-${{ runner.os }}-
 
+      # ── HP更新監視の状態を「使った」ことにする（source-update-monitor.yml 用） ──
+      # GitHub Actions のキャッシュは 7 日間使われないと消える。週1回の HP更新監視は
+      # 7 日ちょうどで動くため、1回失敗・遅延しただけで前回の状態が消え、全 URL が
+      # 「初回の基準値」になって更新を検知できなかった（2026-11-03。10/25 → 11/3 の 9 日）。
+      # 1日3回のスクレイプで読み込み（restore のみ。保存はしない）、消えないようにする。
+      # ファイルは .gitignore 済み・スクレイパーは読まない。path は監視側と同じにすること
+      # （path が違うとキャッシュの版が変わり、読み込めない＝延命にならない）
+      - name: HP更新監視の状態を延命（読み込みのみ）
+        uses: actions/cache/restore@v5
+        with:
+          path: scraper/source-update-state.json
+          key: source-update-state-${{ runner.os }}-keepalive
+          restore-keys: |
+            source-update-state-${{ runner.os }}-
+
       # ── Playwright Chromium バイナリをキャッシュ ─────────────
       - name: Playwright Chromium キャッシュを復元
         id: pw-cache
