@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo, absPcoUrl } = require('./utils');
 
 /**
  * 滋賀地本 WordPress 投稿ページのパーサー（1投稿 = 1イベント）
@@ -108,10 +108,11 @@ function parseShigaPost($, url, counter) {
  */
 function parseShigaPostUrls($) {
   const urls = [];
-  $('a[href*="mod.go.jp/pco/shiga/"]').each((_, a) => {
-    const href = $(a).attr('href') || '';
-    if (/\/post-\d+\//.test(href) && !urls.includes(href)) urls.push(href);
-    if (/\/event\/event-\d+\//.test(href) && !urls.includes(href)) urls.push(href);
+  // 「https://www.mod.go.jp/pco/shiga/…」と「/pco/shiga/…」の両方（2026-10 にドメイン無しへ変更）
+  $('a[href*="/pco/shiga/"]').each((_, a) => {
+    const href = absPcoUrl($(a).attr('href'));
+    if (!href || urls.includes(href)) return;
+    if (/\/pco\/shiga\/post-\d+\//.test(href) || /\/pco\/shiga\/event\/event-\d+\//.test(href)) urls.push(href);
   });
   return urls;
 }

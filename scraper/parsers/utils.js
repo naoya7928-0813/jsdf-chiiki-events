@@ -191,4 +191,28 @@ function extractLocationFromTitle(title) {
   return null;
 }
 
-module.exports = { reiwaToAD, reiwaNum, resolveYearByWeekday, HEISEI_BASE, padTwo, toHalfWidth, jstYear, isPast, guessCategory, guessTag, guessTags, calcWeekday, titleHash, extractLocationFromTitle };
+/**
+ * 地本サイト内のリンクを完全な URL（https://www.mod.go.jp/…）にそろえる。
+ * 2026-10 ごろ、WordPress 系の地本（滋賀・奈良・三重・和歌山）のリンクが
+ * 「https://www.mod.go.jp/pco/…」から「/pco/…」（ドメイン無し）に変わり、
+ * 「mod.go.jp/pco/<地本>/post-」を含むリンクだけを探していたパーサーが記事を1件も見つけられなくなった。
+ * mod.go.jp 以外のリンク・解釈できない値は '' を返す。#以降は落とす。
+ * @param {string} href
+ * @param {string} [base] 相対パス（「post-1/」等）を解決する基準。既定はサイトのルート
+ */
+function absPcoUrl(href, base = 'https://www.mod.go.jp/') {
+  const h = String(href || '').trim();
+  if (!h || /^(?:javascript|mailto|tel):/i.test(h)) return '';
+  try {
+    const u = new URL(h, base);
+    if (!/^https?:$/.test(u.protocol) || !/(^|\.)mod\.go\.jp$/i.test(u.hostname)) return '';
+    u.protocol = 'https:';
+    u.hostname = 'www.mod.go.jp';
+    u.hash = '';
+    return u.href;
+  } catch {
+    return '';
+  }
+}
+
+module.exports = { absPcoUrl, reiwaToAD, reiwaNum, resolveYearByWeekday, HEISEI_BASE, padTwo, toHalfWidth, jstYear, isPast, guessCategory, guessTag, guessTags, calcWeekday, titleHash, extractLocationFromTitle };

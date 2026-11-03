@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo, absPcoUrl } = require('./utils');
 
 /**
  * 和歌山地本 WordPress 投稿ページのパーサー（1投稿 = 1イベント）
@@ -108,9 +108,10 @@ function parseWakayamaPost($, url, counter) {
  */
 function parseWakayamaPostUrls($) {
   const urls = [];
-  $('a[href*="mod.go.jp/pco/wakayama/post-"]').each((_, a) => {
-    const href = $(a).attr('href') || '';
-    if (href && !urls.includes(href)) urls.push(href);
+  // 「https://www.mod.go.jp/pco/wakayama/…」と「/pco/wakayama/…」の両方（2026-10 にドメイン無しへ変更）
+  $('a[href*="/pco/wakayama/post-"]').each((_, a) => {
+    const href = absPcoUrl($(a).attr('href'));
+    if (href && /\/pco\/wakayama\/post-\d+/.test(href) && !urls.includes(href)) urls.push(href);
   });
   return urls;
 }

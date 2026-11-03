@@ -124,7 +124,7 @@ const { parseOita }      = require('./parsers/oita');
 const { parseMiyazaki }  = require('./parsers/miyazaki');
 const { parseKagoshima } = require('./parsers/kagoshima');
 const { parseOkinawa }   = require('./parsers/okinawa');
-const { toHalfWidth, reiwaToAD, reiwaNum, resolveYearByWeekday, HEISEI_BASE, padTwo, isPast, guessCategory, guessTag, calcWeekday, titleHash } = require('./parsers/utils');
+const { toHalfWidth, reiwaToAD, reiwaNum, resolveYearByWeekday, HEISEI_BASE, padTwo, isPast, guessCategory, guessTag, calcWeekday, titleHash, absPcoUrl } = require('./parsers/utils');
 
 // ── 設定 ─────────────────────────────────────────────────────
 const OUTPUT_PATH = path.join(__dirname, '../public/data/events.json');
@@ -2654,7 +2654,12 @@ function extractListPageStubs($, postUrls, prefKey, idPrefix, prefLabel) {
   $('a[href]').each((_, link) => {
     const url = ($(link).attr('href') || '').trim().replace(/\/$/, '') + '/';
     const normalUrl = ($(link).attr('href') || '').trim();
-    const matchUrl = postUrlSet.has(url) ? url : (postUrlSet.has(normalUrl) ? normalUrl : null);
+    // 投稿URLは absPcoUrl で完全なURLにそろえてある。一覧の「/pco/…」（ドメイン無し）のリンクも同じ形にして照合する
+    const absUrl = absPcoUrl(normalUrl);
+    const matchUrl = postUrlSet.has(url) ? url
+      : postUrlSet.has(normalUrl) ? normalUrl
+      : (absUrl && postUrlSet.has(absUrl)) ? absUrl
+      : null;
     if (!matchUrl || stubs.some(s => s.url === matchUrl)) return;
 
     // コンテナ: article → li → .post/.entry → 親3段目まで試みる

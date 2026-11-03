@@ -1,6 +1,6 @@
 'use strict';
 
-const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo } = require('./utils');
+const { guessCategory, guessTag, isPast, toHalfWidth, reiwaToAD, padTwo, absPcoUrl } = require('./utils');
 
 /**
  * 三重地本 WordPress 投稿ページのパーサー（1投稿 = 1イベント）
@@ -122,14 +122,15 @@ function parseMiePostUrls($) {
   const seen = new Set();
 
   // /post-N 形式（WP自動ID）
-  $('a[href*="mod.go.jp/pco/mie/post-"]').each((_, a) => {
-    const href = $(a).attr('href') || '';
-    if (href && !seen.has(href)) { seen.add(href); urls.push(href); }
+  // 「https://www.mod.go.jp/pco/mie/…」と「/pco/mie/…」の両方（2026-10 にドメイン無しへ変更）
+  $('a[href*="/pco/mie/post-"]').each((_, a) => {
+    const href = absPcoUrl($(a).attr('href'));
+    if (href && /\/pco\/mie\/post-\d+/.test(href) && !seen.has(href)) { seen.add(href); urls.push(href); }
   });
 
   // /events-page/[slug]/ 形式（親ページの子ページとして掲載する三重の形式）
-  $('a[href*="mod.go.jp/pco/mie/events-page/"]').each((_, a) => {
-    const href = $(a).attr('href') || '';
+  $('a[href*="/pco/mie/events-page/"]').each((_, a) => {
+    const href = absPcoUrl($(a).attr('href'));
     // /events-page/ 自身は除外、子スラッグのみ
     if (href && !/\/events-page\/?$/.test(href) && !seen.has(href)) {
       seen.add(href); urls.push(href);
