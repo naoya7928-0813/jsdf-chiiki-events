@@ -2,50 +2,19 @@
   "updatedAt": "2026-11-03",
   "limit": 30,
   "summary": {
-    "checked": 309,
-    "flagged": 17,
-    "attempted": 8,
-    "corrected": 1,
-    "unverified": 7,
+    "checked": 314,
+    "flagged": 13,
+    "attempted": 3,
+    "corrected": 0,
+    "unverified": 2,
     "noSource": 1,
     "overBudget": 0,
     "skippedNoSource": 1,
-    "skippedNotEligible": 8,
+    "skippedNotEligible": 9,
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
-  "corrections": [
-    {
-      "id": "gu-office-20261114-v2ac2",
-      "pref": "gunma",
-      "source": "https://www.mod.go.jp/pco/gunma/sozai/event/20261114-5.jpg",
-      "reasons": [
-        "日付がタイトルになっている"
-      ],
-      "changes": [
-        {
-          "field": "place",
-          "from": "カインズスーバーセンター前橋吉岡店",
-          "to": "カインズスーパーセンター前橋吉岡店"
-        },
-        {
-          "field": "category",
-          "from": "広報活動",
-          "to": "体験"
-        },
-        {
-          "field": "tag",
-          "from": null,
-          "to": "家族向け"
-        },
-        {
-          "field": "notes",
-          "from": "掲載元: 前橋募集案内所\nはしご車乗車体験・防災食の食べ方教室は要事前予約",
-          "to": "はしご車乗車体験・防災スタンプラリーは事前予約制"
-        }
-      ]
-    }
-  ],
+  "corrections": [],
   "skipped": [
     {
       "id": "gu-office-20261108-fb3kb",
@@ -54,6 +23,11 @@
     },
     {
       "id": "ib-office-20261103-7057s",
+      "pref": "ibaraki",
+      "reason": "not_eligible"
+    },
+    {
+      "id": "ib-20261121-e6nyb",
       "pref": "ibaraki",
       "reason": "not_eligible"
     },
