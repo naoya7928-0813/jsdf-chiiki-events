@@ -1,31 +1,7 @@
 {
   "updatedAt": "2026-11-05",
-  "count": 12,
+  "count": 6,
   "events": [
-    {
-      "id": "as-off-20270128-tr87l",
-      "pref": "asahikawa",
-      "date": "2027-01-28",
-      "endDate": "",
-      "title": "令和8年度自衛官等採用試験予定表",
-      "place": "防衛大学",
-      "url": "https://www.mod.go.jp/pco/asahikawa/01_recruit/r8_nitteihyou.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-11-05",
-      "reason": "日付がタイトルになっている"
-    },
-    {
-      "id": "as-off-20270128-i34vl",
-      "pref": "asahikawa",
-      "date": "2027-01-28",
-      "endDate": "",
-      "title": "令和8年度自衛官等採用試験予定表",
-      "place": "防衛大学",
-      "url": "https://www.mod.go.jp/pco/asahikawa/01_recruit/r8_nitteihyou.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-11-05",
-      "reason": "日付がタイトルになっている"
-    },
     {
       "id": "mi-office-20270128-o4a4d",
       "pref": "miyagi",
@@ -37,66 +13,6 @@
       "source_type": "office_ocr",
       "quarantinedAt": "2026-11-05",
       "reason": "日付がタイトルになっている"
-    },
-    {
-      "id": "mi-off-20270128-ke8x2",
-      "pref": "miyagi",
-      "date": "2027-01-28",
-      "endDate": "",
-      "title": "令和8年度自衛官等採用試験案内",
-      "place": "防衛大学",
-      "url": "https://www.mod.go.jp/pco/miyagi/miyagitop/image/r8rec-schedule.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-11-05",
-      "reason": "日付がタイトルになっている"
-    },
-    {
-      "id": "mi-off-20270128-ke8x2",
-      "pref": "miyagi",
-      "date": "2027-01-28",
-      "endDate": "",
-      "title": "令和8年度自衛官等採用試験案内",
-      "place": "防衛大学",
-      "url": "https://www.mod.go.jp/pco/miyagi/miyagitop/image/r8rec-schedule.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-11-05",
-      "reason": "日付がタイトルになっている"
-    },
-    {
-      "id": "fu-off-20261105-y8sca",
-      "pref": "fukushima",
-      "date": "2026-11-05",
-      "endDate": "",
-      "title": "自衛隊福島地方協力本部",
-      "place": "",
-      "url": "https://www.mod.go.jp/pco/fukushima/d_result/081105.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-11-05",
-      "reason": "イベント語が無く非イベントの兆候がある"
-    },
-    {
-      "id": "fu-off-20261105-y8sca",
-      "pref": "fukushima",
-      "date": "2026-11-05",
-      "endDate": "",
-      "title": "自衛隊福島地方協力本部",
-      "place": "",
-      "url": "https://www.mod.go.jp/pco/fukushima/d_result/081105.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-11-05",
-      "reason": "イベント語が無く非イベントの兆候がある"
-    },
-    {
-      "id": "fu-off-20261105-y8sca",
-      "pref": "fukushima",
-      "date": "2026-11-05",
-      "endDate": "",
-      "title": "自衛隊福島地方協力本部",
-      "place": "",
-      "url": "https://www.mod.go.jp/pco/fukushima/d_result/081105.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-11-05",
-      "reason": "イベント語が無く非イベントの兆候がある"
     },
     {
       "id": "to-office-20261120-x39ht",
@@ -121,6 +37,18 @@
       "source_type": "office_html",
       "quarantinedAt": "2026-11-05",
       "reason": ""
+    },
+    {
+      "id": "ni-off-20270101-19282",
+      "pref": "niigata",
+      "date": "2027-01-01",
+      "endDate": "",
+      "title": "陸海空自衛官",
+      "place": "調機の充足完了及び空調が整備されていない駐屯地",
+      "url": "https://www.mod.go.jp/pco/niigata/files/top/fukurikousei-kaizen.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-11-05",
+      "reason": "非イベント文書の疑い"
     },
     {
       "id": "fu-office-20261130-wkywa",
