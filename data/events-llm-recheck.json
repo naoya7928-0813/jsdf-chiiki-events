@@ -1,23 +1,94 @@
 {
-  "updatedAt": "2026-11-05",
+  "updatedAt": "2026-11-06",
   "limit": 30,
   "summary": {
-    "checked": 356,
-    "flagged": 15,
-    "attempted": 5,
-    "corrected": 0,
-    "unverified": 4,
+    "checked": 358,
+    "flagged": 21,
+    "attempted": 8,
+    "corrected": 2,
+    "unverified": 6,
     "noSource": 1,
     "overBudget": 0,
     "skippedNoSource": 1,
-    "skippedNotEligible": 9,
+    "skippedNotEligible": 12,
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
-  "corrections": [],
+  "corrections": [
+    {
+      "id": "gu-office-20261114-v2ac2",
+      "pref": "gunma",
+      "source": "https://www.mod.go.jp/pco/gunma/sozai/event/20261114-5.jpg",
+      "reasons": [
+        "日付がタイトルになっている"
+      ],
+      "changes": [
+        {
+          "field": "place",
+          "from": "カインズスーバーセンター前橋吉岡店",
+          "to": "カインズスーパーセンター前橋吉岡店"
+        },
+        {
+          "field": "category",
+          "from": "広報活動",
+          "to": "体験"
+        },
+        {
+          "field": "tag",
+          "from": null,
+          "to": "家族向け"
+        },
+        {
+          "field": "notes",
+          "from": "掲載元: 前橋募集案内所\nはしご車乗車体験・防災食の食べ方教室は要事前予約",
+          "to": "はしご車乗車体験・防災スタンプラリーは事前予約制"
+        }
+      ]
+    },
+    {
+      "id": "eh-off-20270123-516jb",
+      "pref": "ehime",
+      "source": "https://www.mod.go.jp/pco/ehime/recruit/img/jukenannai/09_seito.pdf",
+      "reasons": [
+        "日付がタイトルになっている"
+      ],
+      "changes": [
+        {
+          "field": "address",
+          "from": null,
+          "to": "松山市南梅本町乙115番地"
+        },
+        {
+          "field": "tag",
+          "from": "学生向け",
+          "to": null
+        },
+        {
+          "field": "notes",
+          "from": "昼食は各自用意。受験票・筆記具持参。",
+          "to": "試験会場は志願者数により変更になる場合があります。"
+        }
+      ]
+    }
+  ],
   "skipped": [
     {
+      "id": "gu-office-20261107-wc8q8",
+      "pref": "gunma",
+      "reason": "not_eligible"
+    },
+    {
       "id": "gu-office-20261108-fb3kb",
+      "pref": "gunma",
+      "reason": "not_eligible"
+    },
+    {
+      "id": "gu-office-20261114-ax2vx",
+      "pref": "gunma",
+      "reason": "not_eligible"
+    },
+    {
+      "id": "gu-office-20261114-gods3",
       "pref": "gunma",
       "reason": "not_eligible"
     },
