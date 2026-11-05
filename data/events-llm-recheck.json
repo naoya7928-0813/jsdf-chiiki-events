@@ -2,11 +2,11 @@
   "updatedAt": "2026-11-05",
   "limit": 30,
   "summary": {
-    "checked": 339,
-    "flagged": 17,
-    "attempted": 7,
-    "corrected": 1,
-    "unverified": 5,
+    "checked": 350,
+    "flagged": 23,
+    "attempted": 13,
+    "corrected": 2,
+    "unverified": 10,
     "noSource": 1,
     "overBudget": 0,
     "skippedNoSource": 1,
@@ -16,27 +16,62 @@
   },
   "corrections": [
     {
-      "id": "eh-off-20270123-516jb",
-      "pref": "ehime",
-      "source": "https://www.mod.go.jp/pco/ehime/recruit/img/jukenannai/09_seito.pdf",
+      "id": "to-office-20261118-5448s",
+      "pref": "tokyo",
+      "source": "https://www.mod.go.jp/pco/tokyo/tachikawa/img/1118-1120_syasin.jpg",
       "reasons": [
-        "日付がタイトルになっている"
+        "タイトルが短すぎる"
       ],
       "changes": [
         {
-          "field": "address",
+          "field": "title",
+          "from": "説明会",
+          "to": "自衛隊説明会"
+        },
+        {
+          "field": "endDate",
           "from": null,
-          "to": "松山市南梅本町乙115番地"
+          "to": "2026-11-20"
         },
         {
           "field": "tag",
-          "from": "学生向け",
-          "to": null
+          "from": null,
+          "to": "要予約"
         },
         {
           "field": "notes",
-          "from": "昼食は各自用意。受験票・筆記具持参。",
-          "to": "試験会場は志願者数により変更になる場合があります。"
+          "from": "掲載元: 立川出張所\n参加無料／所要時間1時間／個別ご案内",
+          "to": "参加無料／所要時間1時間"
+        }
+      ]
+    },
+    {
+      "id": "to-off-20261118-7udm6",
+      "pref": "tokyo",
+      "source": "https://www.mod.go.jp/pco/tokyo/tachikawa/img/1118-1120_syasin.jpg",
+      "reasons": [
+        "タイトルが短すぎる"
+      ],
+      "changes": [
+        {
+          "field": "title",
+          "from": "説明会",
+          "to": "自衛隊説明会"
+        },
+        {
+          "field": "endDate",
+          "from": null,
+          "to": "2026-11-20"
+        },
+        {
+          "field": "tag",
+          "from": null,
+          "to": "要予約"
+        },
+        {
+          "field": "notes",
+          "from": "参加無料／所要時間1時間／個別ご案内",
+          "to": "参加無料／所要時間1時間"
         }
       ]
     }
