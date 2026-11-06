@@ -2,76 +2,46 @@
   "updatedAt": "2026-11-06",
   "limit": 30,
   "summary": {
-    "checked": 366,
-    "flagged": 27,
-    "attempted": 10,
-    "corrected": 2,
-    "unverified": 7,
+    "checked": 375,
+    "flagged": 26,
+    "attempted": 7,
+    "corrected": 1,
+    "unverified": 5,
     "noSource": 1,
     "overBudget": 0,
     "skippedNoSource": 1,
-    "skippedNotEligible": 16,
+    "skippedNotEligible": 18,
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
   "corrections": [
     {
-      "id": "to-office-20261118-5448s",
-      "pref": "tokyo",
-      "source": "https://www.mod.go.jp/pco/tokyo/tachikawa/img/1118-1120_syasin.jpg",
+      "id": "to-off-20261114-f5g8s",
+      "pref": "tochigi",
+      "source": "https://www.mod.go.jp/pco/tochigi/doc/event/information/20261114_hokuohsai2026.pdf",
       "reasons": [
         "タイトルが短すぎる"
       ],
       "changes": [
         {
           "field": "title",
-          "from": "説明会",
-          "to": "自衛隊説明会"
+          "from": "北桜祭",
+          "to": "第53回北桜祭"
         },
         {
-          "field": "endDate",
+          "field": "address",
           "from": null,
-          "to": "2026-11-20"
+          "to": "栃木県"
         },
         {
-          "field": "tag",
-          "from": null,
-          "to": "要予約"
+          "field": "category",
+          "from": "広報活動",
+          "to": "地域参加"
         },
         {
           "field": "notes",
-          "from": "掲載元: 立川出張所\n参加無料／所要時間1時間／個別ご案内",
-          "to": "参加無料／所要時間1時間"
-        }
-      ]
-    },
-    {
-      "id": "to-off-20261118-7udm6",
-      "pref": "tokyo",
-      "source": "https://www.mod.go.jp/pco/tokyo/tachikawa/img/1118-1120_syasin.jpg",
-      "reasons": [
-        "タイトルが短すぎる"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "説明会",
-          "to": "自衛隊説明会"
-        },
-        {
-          "field": "endDate",
-          "from": null,
-          "to": "2026-11-20"
-        },
-        {
-          "field": "tag",
-          "from": null,
-          "to": "要予約"
-        },
-        {
-          "field": "notes",
-          "from": "参加無料／所要時間1時間／個別ご案内",
-          "to": "参加無料／所要時間1時間"
+          "from": "校内は足跡厳禁。スリッパ持参。撮影・SNS投稿禁止。ゴミ持ち帰り協力。",
+          "to": "校舎内は土足厳禁です。スリッパをご持参ください。"
         }
       ]
     }
@@ -105,6 +75,16 @@
     {
       "id": "ib-office-20261103-7057s",
       "pref": "ibaraki",
+      "reason": "not_eligible"
+    },
+    {
+      "id": "to-office-20261114-476oo",
+      "pref": "tochigi",
+      "reason": "not_eligible"
+    },
+    {
+      "id": "to-office-20261114-jctu1",
+      "pref": "tochigi",
       "reason": "not_eligible"
     },
     {
