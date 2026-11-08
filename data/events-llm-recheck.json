@@ -1,22 +1,22 @@
 {
-  "updatedAt": "2026-11-07",
+  "updatedAt": "2026-11-08",
   "limit": 30,
   "summary": {
-    "checked": 380,
-    "flagged": 32,
-    "attempted": 13,
+    "checked": 338,
+    "flagged": 25,
+    "attempted": 10,
     "corrected": 2,
-    "unverified": 10,
-    "noSource": 1,
+    "unverified": 7,
+    "noSource": 0,
     "overBudget": 0,
-    "skippedNoSource": 1,
-    "skippedNotEligible": 18,
+    "skippedNoSource": 0,
+    "skippedNotEligible": 15,
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
   "corrections": [
     {
-      "id": "to-office-20261118-5448s",
+      "id": "to-off-20261118-7udm6",
       "pref": "tokyo",
       "source": "https://www.mod.go.jp/pco/tokyo/tachikawa/img/1118-1120_syasin.jpg",
       "reasons": [
@@ -40,43 +40,43 @@
         },
         {
           "field": "notes",
-          "from": "掲載元: 立川出張所\n参加無料／所要時間1時間／個別ご案内",
+          "from": "参加無料／所要時間1時間／個別ご案内",
           "to": "参加無料／所要時間1時間"
         }
       ]
     },
     {
-      "id": "eh-off-20270123-516jb",
-      "pref": "ehime",
-      "source": "https://www.mod.go.jp/pco/ehime/recruit/img/jukenannai/09_seito.pdf",
+      "id": "to-off-20261114-f5g8s",
+      "pref": "tochigi",
+      "source": "https://www.mod.go.jp/pco/tochigi/doc/event/information/20261114_hokuohsai2026.pdf",
       "reasons": [
-        "日付がタイトルになっている"
+        "タイトルが短すぎる"
       ],
       "changes": [
         {
-          "field": "address",
-          "from": null,
-          "to": "松山市南梅本町乙115番地"
+          "field": "title",
+          "from": "北桜祭",
+          "to": "第53回北桜祭"
         },
         {
-          "field": "tag",
-          "from": "学生向け",
-          "to": null
+          "field": "address",
+          "from": null,
+          "to": "栃木県"
+        },
+        {
+          "field": "category",
+          "from": "広報活動",
+          "to": "地域参加"
         },
         {
           "field": "notes",
-          "from": "昼食は各自用意。受験票・筆記具持参。",
-          "to": "試験会場は志願者数により変更になる場合があります。"
+          "from": "校内は足跡厳禁。スリッパ持参。撮影・SNS投稿禁止。ゴミ持ち帰り協力。",
+          "to": "校舎内は土足厳禁です。スリッパをご持参ください。"
         }
       ]
     }
   ],
   "skipped": [
-    {
-      "id": "gu-office-20261107-wc8q8",
-      "pref": "gunma",
-      "reason": "not_eligible"
-    },
     {
       "id": "gu-office-20261108-fb3kb",
       "pref": "gunma",
@@ -110,16 +110,6 @@
     {
       "id": "to-office-20261114-jctu1",
       "pref": "tochigi",
-      "reason": "not_eligible"
-    },
-    {
-      "id": "gi-20261107-vm3v5",
-      "pref": "gifu",
-      "reason": "no_source"
-    },
-    {
-      "id": "os-office-20261107-0p3x1",
-      "pref": "osaka",
       "reason": "not_eligible"
     },
     {
@@ -160,11 +150,6 @@
     {
       "id": "ok-20261122-x428e",
       "pref": "okayama",
-      "reason": "not_eligible"
-    },
-    {
-      "id": "hi-20261107-xwnjm",
-      "pref": "hiroshima",
       "reason": "not_eligible"
     }
   ]
