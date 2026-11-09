@@ -1,6 +1,108 @@
 {
-  "updatedAt": "2026-11-09",
+  "updatedAt": "2026-11-10",
   "events": [
+    {
+      "id": "to-office-20261109-5r8mm",
+      "pref": "tokyo",
+      "office": "",
+      "date": "2026-11-09",
+      "endDate": "",
+      "weekday": "月",
+      "title": "防衛省・自衛隊就職・転職相談会",
+      "place": "ハローワーク木場",
+      "address": "",
+      "time": "13:00～17:00",
+      "category": "採用イベント",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tokyo/koutou/img/1109-1112_soudankai.png",
+      "notes": "掲載元: 江東出張所\n当日参加大歓迎",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-11-04",
+      "weatherLocation": {
+        "latitude": 35.69,
+        "longitude": 139.692,
+        "label": "東京都",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-11-04T10:54:30.923+09:00"
+      },
+      "archivedAt": "2026-11-10"
+    },
+    {
+      "id": "ib-office-20261109-6jxva",
+      "pref": "ibaraki",
+      "office": "",
+      "date": "2026-11-09",
+      "endDate": "",
+      "weekday": "月",
+      "title": "陸自ヘリ見学ツアー",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "体験",
+      "tag": "",
+      "url": "",
+      "notes": "掲載元: 募集案内所・地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-27",
+      "weatherLocation": {
+        "latitude": 36.342,
+        "longitude": 140.447,
+        "label": "茨城県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-10-06T23:55:36.928+09:00"
+      },
+      "archivedAt": "2026-11-10"
+    },
+    {
+      "id": "na-20261109-717zd",
+      "pref": "nagano",
+      "office": "",
+      "date": "2026-11-09",
+      "endDate": "",
+      "weekday": "月",
+      "title": "【安曇野市】公務員職業紹介",
+      "place": "安曇野市役所",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": "場所：安曇野市役所 １F東エントランス 時間： ９日 １３：００～１８：００ １０日 １３：００～２０：００ 参加機関：自衛隊・長野県警・安曇野市役所 「公務員って何してるの？」その疑問を解決！仕事内容、生活、ワークライフバランス、待遇など「公務員って結構いいじゃん！」って思える説明をいたします。話を聞くだけでもOKです。お気軽にお越しください。",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-10-21",
+      "weatherLocation": {
+        "latitude": 36.304,
+        "longitude": 137.906,
+        "label": "長野県安曇野市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-06T01:03:29.857+09:00"
+      },
+      "archivedAt": "2026-11-10"
+    },
     {
       "id": "mi-20261107-e0txs",
       "pref": "miyagi",
@@ -33,7 +135,7 @@
         "source": "gsi",
         "geocodedAt": "2026-11-04T17:03:07.723+09:00"
       },
-      "archivedAt": "2026-11-09"
+      "archivedAt": "2026-11-10"
     },
     {
       "id": "mi-20261108-4ohen",
@@ -67,7 +169,7 @@
         "source": "gsi",
         "geocodedAt": "2026-11-04T17:03:08.767+09:00"
       },
-      "archivedAt": "2026-11-09"
+      "archivedAt": "2026-11-10"
     },
     {
       "id": "ya-20261108-b6j2y",
@@ -203,7 +305,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-29T16:31:20.349+09:00"
       },
-      "archivedAt": "2026-11-09"
+      "archivedAt": "2026-11-10"
     },
     {
       "id": "to-office-20261108-5wgp7",
@@ -441,7 +543,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-29T16:25:35.659+09:00"
       },
-      "archivedAt": "2026-11-09"
+      "archivedAt": "2026-11-10"
     },
     {
       "id": "gu-office-20261108-glicl",
@@ -475,7 +577,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-29T23:33:58.518+09:00"
       },
-      "archivedAt": "2026-11-09"
+      "archivedAt": "2026-11-10"
     },
     {
       "id": "gu-office-20261108-mf59e",
@@ -509,7 +611,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-29T23:33:58.827+09:00"
       },
-      "archivedAt": "2026-11-09"
+      "archivedAt": "2026-11-10"
     },
     {
       "id": "gu-office-20261108-1677k",
@@ -713,7 +815,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-16T15:00:53.133+09:00"
       },
-      "archivedAt": "2026-11-09"
+      "archivedAt": "2026-11-10"
     },
     {
       "id": "ib-office-20261108-6pj2m",
@@ -747,7 +849,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-06T23:55:36.928+09:00"
       },
-      "archivedAt": "2026-11-09"
+      "archivedAt": "2026-11-10"
     },
     {
       "id": "to-office-20261108-13rbm",
@@ -1529,7 +1631,7 @@
         "source": "gsi",
         "geocodedAt": "2026-09-03T09:01:53.825+09:00"
       },
-      "archivedAt": "2026-11-09"
+      "archivedAt": "2026-11-10"
     },
     {
       "id": "ku-office-20261108-5m4rw",
@@ -1657,7 +1759,7 @@
       "statusUpdatedAt": "",
       "source_type": "office_html",
       "firstSeen": "2026-10-13",
-      "archivedAt": "2026-11-09"
+      "archivedAt": "2026-11-10"
     },
     {
       "id": "to-office-20261107-38wmn",
@@ -1748,7 +1850,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-09",
+      "statusUpdatedAt": "2026-11-10",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-22",
       "weatherLocation": {
@@ -1759,7 +1861,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-22T15:17:21.150+09:00"
       },
-      "archivedAt": "2026-11-09"
+      "archivedAt": "2026-11-10"
     },
     {
       "id": "gu-20261107-lspux",
@@ -2133,7 +2235,7 @@
         "source": "gsi",
         "geocodedAt": "2026-11-05T11:05:00.212+09:00"
       },
-      "archivedAt": "2026-11-09"
+      "archivedAt": "2026-11-10"
     },
     {
       "id": "ib-office-20261107-4xa3s",
@@ -2167,7 +2269,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-06T23:55:36.928+09:00"
       },
-      "archivedAt": "2026-11-09"
+      "archivedAt": "2026-11-10"
     },
     {
       "id": "to-office-20261107-rslkt",
@@ -2439,7 +2541,7 @@
         "source": "gsi",
         "geocodedAt": "2026-07-13T07:58:32.830+09:00"
       },
-      "archivedAt": "2026-11-09"
+      "archivedAt": "2026-11-10"
     },
     {
       "id": "os-office-20261107-0p3x1",
@@ -2507,7 +2609,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:31.252+09:00"
       },
-      "archivedAt": "2026-11-09"
+      "archivedAt": "2026-11-10"
     },
     {
       "id": "hy-20261107-6cqmv",
@@ -2993,7 +3095,7 @@
       "statusUpdatedAt": "",
       "source_type": "office_html",
       "firstSeen": "2026-11-07",
-      "archivedAt": "2026-11-09"
+      "archivedAt": "2026-11-10"
     },
     {
       "id": "iw-office-20261105-pla1x",
@@ -3061,7 +3163,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-23T08:54:03.555+09:00"
       },
-      "archivedAt": "2026-11-09"
+      "archivedAt": "2026-11-10"
     },
     {
       "id": "to-office-20261104-5yk5p",
@@ -3095,7 +3197,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-14T00:44:30.048+09:00"
       },
-      "archivedAt": "2026-11-09"
+      "archivedAt": "2026-11-10"
     },
     {
       "id": "ni-off-20261104-cj4te",
@@ -3212,7 +3314,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-09",
+      "statusUpdatedAt": "2026-11-10",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-04",
       "weatherLocation": {
@@ -3223,7 +3325,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-04T19:05:28.389+09:00"
       },
-      "archivedAt": "2026-11-09"
+      "archivedAt": "2026-11-10"
     },
     {
       "id": "os-office-20261104-771ik",
@@ -3603,7 +3705,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-06T23:55:36.928+09:00"
       },
-      "archivedAt": "2026-11-09"
+      "archivedAt": "2026-11-10"
     },
     {
       "id": "to-off-20261103-f0ecs",
@@ -3947,7 +4049,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-13T17:05:54.799+09:00"
       },
-      "archivedAt": "2026-11-09"
+      "archivedAt": "2026-11-10"
     },
     {
       "id": "oi-office-20261103-7ej1d",
@@ -3981,7 +4083,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-16T08:55:11.895+09:00"
       },
-      "archivedAt": "2026-11-09"
+      "archivedAt": "2026-11-10"
     },
     {
       "id": "iw-office-20261101-j6z07",
