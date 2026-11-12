@@ -74,14 +74,17 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-chromium-${{ runner.os }}-${{ hashFiles('scraper/package-lock.json') }}
 
+      # apt の障害で落ちないよう共通アクションを使う（scrape.yml と同じ。2026-11-11 のミラー障害の再発防止）
       - name: Tesseract OCR + poppler-utils をインストール
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y tesseract-ocr tesseract-ocr-jpn poppler-utils
+        continue-on-error: true
+        timeout-minutes: 8
+        uses: ./.github/actions/install-ocr-packages
 
       - name: Playwright Chromium をインストール
-        working-directory: scraper
-        run: npx playwright install chromium --with-deps
+        timeout-minutes: 12
+        uses: ./.github/actions/install-playwright-chromium
+        with:
+          working-directory: scraper
 
       - name: 兵庫限定でフルパイプラインを実行
         working-directory: scraper

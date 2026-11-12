@@ -35,9 +35,14 @@ jobs:
           key: office-verify-${{ github.run_id }}
           restore-keys: |
             ocr-cache-${{ runner.os }}-
-      - run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-jpn poppler-utils
-      - run: npx playwright install chromium --with-deps
-        working-directory: scraper
+      # apt の障害で落ちないよう共通アクションを使う（scrape.yml と同じ。2026-11-11 のミラー障害の再発防止）
+      - uses: ./.github/actions/install-ocr-packages
+        continue-on-error: true
+        timeout-minutes: 8
+      - uses: ./.github/actions/install-playwright-chromium
+        timeout-minutes: 12
+        with:
+          working-directory: scraper
       - name: HTML・OCRの限定再確認（イベント保存・通知なし）
         run: node scripts/verify-office-crawl.cjs
         env:

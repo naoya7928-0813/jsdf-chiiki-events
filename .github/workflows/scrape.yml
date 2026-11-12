@@ -90,6 +90,10 @@ jobs:
       - name: リポジトリをチェックアウト
         uses: actions/checkout@v5
 
+      # 準備段階（apt・npm・Playwright 等）で落ちたときに「不明な段階」にしない
+      - name: 失敗段階の初期値（準備）
+        run: echo "STAGE=setup" >> "$GITHUB_ENV"
+
       # ── Node.js のセットアップ ───────────────────────────────
       - name: Node.js 22 をセットアップ
         uses: actions/setup-node@v5
@@ -186,15 +190,23 @@ jobs:
           key: playwright-chromium-${{ runner.os }}-${{ hashFiles('scraper/package-lock.json') }}
 
       # ── Tesseract OCR + poppler-utils をインストール ────────────
+      # 2026-11-11 23:38 JST の回は Ubuntu のパッケージミラーの名前解決ができず、
+      # ここで11分待った末に exit 100 で落ち、スクレイプに一度も入らなかった。
+      # 共通アクションは .deb をキャッシュから入れ（ネット不要）、届かない回は警告だけで続行する。
+      # Tesseract は予備の OCR（主は RapidOCR）・pdftoppm も無ければ使わない作りのため、無くても走れる
       - name: Tesseract OCR + poppler-utils をインストール
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y tesseract-ocr tesseract-ocr-jpn poppler-utils
+        id: ocr-apt
+        continue-on-error: true
+        timeout-minutes: 8
+        uses: ./.github/actions/install-ocr-packages
 
       # ── Playwright 用 Chromium をインストール ────────────────
+      # 起動できればシステム依存（apt）は入れない（ミラー障害の影響を受けないようにする）
       - name: Playwright Chromium をインストール
-        working-directory: scraper
-        run: npx playwright install chromium --with-deps
+        timeout-minutes: 12
+        uses: ./.github/actions/install-playwright-chromium
+        with:
+          working-directory: scraper
 
       # ── スクレイパーのスモークテスト ──────────────────────────
       # 2026-07-07 に import 漏れ（ReferenceError）が本番実行で初めて露見し
@@ -769,6 +781,7 @@ jobs:
         if: failure()
         run: |
           case "${STAGE:-unknown}" in
+            setup)         LABEL="準備（パッケージ・ブラウザ等の導入）失敗" ;;
             smoke)         LABEL="スクレイパー スモークテスト失敗（コード不備の可能性）" ;;
             scrape)        LABEL="データ取得失敗" ;;
             health_check)  LABEL="データ健全性チェック失敗" ;;

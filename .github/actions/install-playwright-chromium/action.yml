@@ -1,0 +1,53 @@
+name: Playwright Chromium を導入
+description: >-
+  Chromium 本体を入れ、起動できるかを確かめる。起動できればシステム依存（apt）は入れない。
+  以前の `npx playwright install chromium --with-deps` は毎回 apt-get を呼ぶため、
+  パッケージミラーに届かない回（2026-11-11）はここでも10分前後待たされて落ちる。
+  ubuntu-24.04 のランナーには Chromium の依存が最初から入っているので、普段は apt を使わずに済む。
+inputs:
+  working-directory:
+    description: playwright を依存に持つディレクトリ
+    required: false
+    default: scraper
+  budget-seconds:
+    description: 依存（apt）の導入に使う時間の上限（秒）
+    required: false
+    default: '480'
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        BUDGET_SECONDS: ${{ inputs.budget-seconds }}
+      run: |
+        set -uo pipefail
+        DEADLINE=$((SECONDS + BUDGET_SECONDS))
+        remaining() { local r=$((DEADLINE - SECONDS)); [ "$r" -lt 1 ] && r=1; echo "$r"; }
+        can_launch() {
+          timeout 60 node -e "require('playwright').chromium.launch().then(b => b.close()).catch(e => { console.error(e.message.split('\n')[0]); process.exit(1); })"
+        }
+
+        # 1. ブラウザ本体（キャッシュがあれば数秒。配布元の一時的な失敗に備えて再試行）
+        ok=false
+        for i in 1 2 3; do
+          if timeout 300 npx playwright install chromium; then ok=true; break; fi
+          echo "Chromium のダウンロードに失敗（試行 $i）"; sleep $((i * 10))
+        done
+        [ "$ok" = true ] || { echo "::error::Chromium をダウンロードできませんでした"; exit 1; }
+
+        # 2. 起動できるなら依存はそろっている（apt を使わない）
+        if can_launch; then echo "Chromium: 起動確認OK（システム依存の導入は不要）"; exit 0; fi
+
+        # 3. 起動できないときだけ依存を入れる（時間の上限つきで再試行）
+        attempt=0
+        while [ "$(remaining)" -gt 30 ]; do
+          attempt=$((attempt + 1))
+          echo "Chromium のシステム依存を導入します（試行 $attempt・残り $(remaining) 秒）"
+          if timeout "$(remaining)" npx playwright install-deps chromium && can_launch; then
+            echo "Chromium: 起動確認OK"; exit 0
+          fi
+          sleep 15
+        done
+        echo "::error::Chromium を起動できません（システム依存を導入できませんでした。パッケージミラーの障害の可能性）"
+        exit 1

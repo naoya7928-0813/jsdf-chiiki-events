@@ -50,8 +50,10 @@ jobs:
           key: source-monitor-playwright-${{ runner.os }}-${{ hashFiles('scraper/package-lock.json') }}
 
       - name: Chromium をインストール
-        working-directory: scraper
-        run: npx playwright install chromium --with-deps
+        timeout-minutes: 12
+        uses: ./.github/actions/install-playwright-chromium
+        with:
+          working-directory: scraper
 
       - name: HTML監視状態を復元
         id: state-cache

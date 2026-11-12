@@ -1,0 +1,40 @@
+name: OCR 用パッケージ（Tesseract・poppler-utils）を導入
+description: >-
+  apt で tesseract-ocr / tesseract-ocr-jpn / poppler-utils を入れる。
+  取得した .deb を Actions cache に残し、次回はネットに出ずに入れる。
+  パッケージミラーに届かない回でも失敗にせず ::warning:: で知らせて続行する
+  （2026-11-11 にミラーの名前解決ができず定期スクレイプが丸ごと落ちた再発防止）。
+outputs:
+  installed:
+    description: tesseract(jpn) と pdftoppm の両方が使えるなら 'true'
+    value: ${{ steps.install.outputs.installed }}
+runs:
+  using: composite
+  steps:
+    - id: prefix
+      shell: bash
+      run: |
+        . /etc/os-release
+        echo "key=apt-ocr-debs-${RUNNER_OS}-${ID}${VERSION_ID}-" >> "$GITHUB_OUTPUT"
+
+    - id: restore
+      uses: actions/cache/restore@v5
+      with:
+        path: ~/apt-ocr-debs
+        key: ${{ steps.prefix.outputs.key }}latest
+        restore-keys: |
+          ${{ steps.prefix.outputs.key }}
+
+    - id: install
+      shell: bash
+      run: bash "${{ github.action_path }}/install.sh" "$HOME/apt-ocr-debs"
+
+    # .deb の顔ぶれが変わったときだけ保存する（毎回保存すると cache の枠を食う）
+    - if: >-
+        steps.install.outputs.debs_hash != '' &&
+        steps.restore.outputs.cache-matched-key != format('{0}{1}', steps.prefix.outputs.key, steps.install.outputs.debs_hash)
+      uses: actions/cache/save@v5
+      continue-on-error: true
+      with:
+        path: ~/apt-ocr-debs
+        key: ${{ steps.prefix.outputs.key }}${{ steps.install.outputs.debs_hash }}

@@ -927,7 +927,15 @@ ErrorBoundary（`src/components/ErrorBoundary.jsx`）のフォールバックが
 - OCR クォータ枯渇時は無料ローカル（Tesseract/RapidOCR）のみで動作する設計。`hasAnyOcrEngine()` と各 API キーの設定を確認
 - 同一アセットの再OCRは `scraper/ocr-cache.json`（GitHub Actions cache）で防止。キャッシュ破損時は Actions の cache を削除して再実行
 
-### 6. push が rejected になる
+### 6. 準備段階（apt・Chromium）で落ちる（stage=setup）
+- 2026-11-11 23:38 JST の回は Ubuntu のパッケージミラーの名前解決ができず、`apt-get install tesseract-ocr …` で11分待った末に
+  exit 100 で落ち、スクレイプ本体に入らなかった（当時は stage=unknown）。
+- 現在は **apt を共通アクションだけが呼ぶ**: `.github/actions/install-ocr-packages`（.deb を Actions cache から
+  ネット不要で入れる → 駄目ならミラーの名前解決を確かめて時間の上限つきで取得 → それでも駄目なら `::warning::` で**続行**）、
+  `.github/actions/install-playwright-chromium`（Chromium が起動できればシステム依存の apt を呼ばない）。
+- ⚠️ ワークフローに裸の `apt-get install tesseract…` や `playwright install --with-deps` を書き戻さないこと（`shared/ciSetup.test.cjs` が検出）
+
+### 7. push が rejected になる
 スクレイプの自動コミットと競合している。`git pull --rebase origin master` → `git push`（生成データの競合は `-X theirs` で最新を正とする）
 
 ## MCP ツール活用ガイド
