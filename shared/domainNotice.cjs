@@ -23,6 +23,10 @@
  *     「アドレスが変わりました。設定は引き継がれません」。
  *     お気に入りが空になっている理由を説明する
  *
+ *   新ドメインで、旧ドメインから自動で移ってきた … `migrated-here`
+ *     「アドレスが変わりました。お気に入り・設定は引き継ぎました。通知は登録し直してください」
+ *     （2026-11-13 から。旧ドメインの引っ越し用ページが設定を運ぶ。shared/domainMigration.cjs）
+ *
  *   それ以外（localhost・プレビュー・www 等）… 出さない
  *     開発中や検証用のURLで出しても意味がない
  *
@@ -89,9 +93,10 @@ function isLegacyHost(host) {
  * @param {string}  o.host       いま見ているホスト名（location.host）
  * @param {string?} o.dismissed  localStorage に入っている「閉じた記録」
  * @param {string}  o.today      JST の今日（YYYY-MM-DD）
- * @returns {{ show: boolean, mode: 'moved-away'|'moved-here'|null, newUrl: string }}
+ * @param {boolean} o.migrated   今回の読み込みで旧ドメインから設定を引き継いだか（src/utils/domainMigrationImport.js）
+ * @returns {{ show: boolean, mode: 'moved-away'|'moved-here'|'migrated-here'|null, newUrl: string }}
  */
-function decideDomainNotice({ host, dismissed, today }) {
+function decideDomainNotice({ host, dismissed, today, migrated }) {
   const none = { show: false, mode: null, newUrl: DEFAULT_SITE_URL };
 
   // 期限切れ。文字列比較で足りる（どちらも YYYY-MM-DD）
@@ -109,7 +114,10 @@ function decideDomainNotice({ host, dismissed, today }) {
 
   // 新ドメインは一度閉じたら出さない（毎回出す必要はない）
   if (dismissed === NOTICE_VERSION) return none;
-  if (h === currentHost()) return { show: true, mode: 'moved-here', newUrl: DEFAULT_SITE_URL };
+  if (h === currentHost()) {
+    // 旧ドメインから自動で移ってきた人には「引き継ぎました」と伝える（設定は消えていない）
+    return { show: true, mode: migrated ? 'migrated-here' : 'moved-here', newUrl: DEFAULT_SITE_URL };
+  }
 
   // localhost・プレビュー・www など。移行の当事者ではないので出さない
   return none;

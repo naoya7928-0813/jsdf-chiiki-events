@@ -11,6 +11,13 @@
  */
 export const UPDATE_NOTES = [
   {
+    date:    '2026-11-13',
+    version: '1.45.38',
+    type:    'improvement',
+    content: '以前のアドレスを開いたときに、新しいアドレスへ自動で移動するようにしました。',
+    note:    'お気に入りや設定は引き継がれます。通知は設定画面から登録し直してください。',
+  },
+  {
     date:    '2026-10-29',
     version: '1.45.37',
     type:    'improvement',

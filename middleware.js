@@ -8,8 +8,63 @@
 // 実ユーザーにも注入済み HTML を返すが、SPA は URL を見て通常どおり詳細を描画するため
 // 表示は変わらない。何らかの失敗時は素通し（return）して通常配信にフォールバックし、
 // ページを決して壊さない。
+import {
+  legacyResponseKind, legacyMigratePageHtml, legacyMigrateScriptSource, legacyServiceWorkerSource,
+} from './shared/domainMigration.cjs';
+
 const LEGACY_PRODUCTION_HOST = 'jsdf-chiiki-events.vercel.app';
 const CURRENT_ORIGIN = 'https://jsdf-chiiki-events.jp';
+
+/**
+ * 旧ドメインとして扱うホストか。
+ * 公開用の旧URLに加え、本番デプロイに付く `*.vercel.app`（チーム名付き・デプロイごと）も対象にする。
+ * プレビュー（VERCEL_ENV=preview）の `*.vercel.app` は検証用なので転送しない。
+ */
+export function isLegacyProductionHost(hostname, env = (typeof process !== 'undefined' ? process.env : {}) || {}) {
+  const h = String(hostname || '').toLowerCase();
+  if (h === LEGACY_PRODUCTION_HOST) return true;
+  return env.VERCEL_ENV === 'production' && /\.vercel\.app$/.test(h);
+}
+
+const NO_STORE = 'no-store, max-age=0';
+
+/**
+ * 旧ドメインへの返し方。
+ *   /sw.js      … 片付け用の Service Worker（古い SW と古い画面を外す。308 で返すと更新に失敗し続ける）
+ *   /__migrate.js … 引っ越し用ページのスクリプト
+ *   画面の読み込み … 引っ越し用ページ（端末内の設定を # に載せて .jp へ移る）
+ *   それ以外      … 308（検索エンジン・静的ファイル・API など）
+ */
+export function legacyResponse(request, url) {
+  const kind = legacyResponseKind({
+    pathname: url.pathname,
+    method: request.method,
+    secFetchDest: request.headers.get('sec-fetch-dest'),
+    secFetchMode: request.headers.get('sec-fetch-mode'),
+  });
+  if (kind === 'sw') {
+    return new Response(legacyServiceWorkerSource(), {
+      headers: { 'content-type': 'text/javascript; charset=utf-8', 'cache-control': NO_STORE },
+    });
+  }
+  if (kind === 'script') {
+    return new Response(legacyMigrateScriptSource(CURRENT_ORIGIN), {
+      headers: { 'content-type': 'text/javascript; charset=utf-8', 'cache-control': NO_STORE },
+    });
+  }
+  if (kind === 'page') {
+    return new Response(legacyMigratePageHtml(url.pathname + url.search, CURRENT_ORIGIN), {
+      headers: {
+        'content-type': 'text/html; charset=utf-8',
+        'cache-control': NO_STORE,
+        'x-robots-tag': 'noindex',
+        // 同じURLでも、遷移かどうかで中身が変わる
+        vary: 'Sec-Fetch-Dest, Sec-Fetch-Mode',
+      },
+    });
+  }
+  return Response.redirect(new URL(url.pathname + url.search, CURRENT_ORIGIN), 308);
+}
 
 export const config = {
   // 旧ドメインは任意パスから転送する必要があるため全リクエストを対象にする。
@@ -39,12 +94,11 @@ export default async function middleware(request) {
   try {
     const url = new URL(request.url);
 
-    // 公開用の旧 Vercel ドメインだけを 308 で現行 .jp へ移す。
+    // 公開用の旧 Vercel ドメインを現行 .jp へ移す（詳しくは shared/domainMigration.cjs）。
     // Preview の *.vercel.app は検証用途なので巻き込まない。
     // パスとクエリは維持する（URL フラグメントはHTTPリクエストに送られないため対象外）。
-    if (url.hostname.toLowerCase() === LEGACY_PRODUCTION_HOST) {
-      const target = new URL(url.pathname + url.search, CURRENT_ORIGIN);
-      return Response.redirect(target, 308);
+    if (isLegacyProductionHost(url.hostname)) {
+      return legacyResponse(request, url);
     }
 
     const m = url.pathname.match(/^\/event\/([^/]+)\/?$/);

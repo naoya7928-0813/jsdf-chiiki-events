@@ -1,3 +1,5 @@
+// 旧ドメインからの設定の受け取り。App が localStorage を読む前・アクセス解析が URL を拾う前に動かすため最初に置く
+import './utils/domainMigrationImport';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 // フォントはセルフホスト（Google Fonts への外部接続を廃止。CSP縮小・読み込み安定化）

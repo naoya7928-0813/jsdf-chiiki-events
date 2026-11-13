@@ -12,6 +12,7 @@ import { foregroundOnDark } from '../shared/brandColors.cjs';
 // PWA（ホーム画面アプリ）の配色・manifest・アイコンは shared/pwaTheme.cjs が唯一の出どころ
 import { themeColorFor, manifestPathFor, appleTouchIconFor } from '../shared/pwaTheme.cjs';
 import { decideDomainNotice, isLegacyHost, NOTICE_KEY, NOTICE_VERSION } from '../shared/domainNotice.cjs';
+import { wasMigratedOnThisLoad } from './utils/domainMigrationImport';
 import { jstTodayStr } from './utils/date';
 import { usePushSubscribed } from './hooks/usePushSubscribed';
 import { useFavoriteWatch } from './hooks/useFavoriteWatch';
@@ -341,7 +342,8 @@ export default function App({ operator = false }) {
     if (operator) return;
     let dismissed = null;
     try { dismissed = localStorage.getItem(NOTICE_KEY); } catch { /* 読めなくても出せばよい */ }
-    const d = decideDomainNotice({ host: window.location.host, dismissed, today: jstTodayStr() });
+    const migrated = wasMigratedOnThisLoad();
+    const d = decideDomainNotice({ host: window.location.host, dismissed, today: jstTodayStr(), migrated });
     if (d.show) setDomainNotice(d);
   }, [operator]);
 

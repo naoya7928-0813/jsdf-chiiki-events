@@ -101,7 +101,7 @@ test('vercel.json の CORS 許可オリジンが公開URLと一致している',
   }
 });
 
-test('middleware: 旧 vercel.app は現行 .jp へ 308 でパス・クエリを保って転送する', () => {
+test('middleware: 旧 vercel.app は現行 .jp へ 308 でパス・クエリを保って転送する', async () => {
   const src = fs.readFileSync(root('middleware.js'), 'utf8');
   const legacyHost = new URL(S.LEGACY_ORIGINS[0]).host;
 
@@ -111,12 +111,16 @@ test('middleware: 旧 vercel.app は現行 .jp へ 308 でパス・クエリを�
     'middleware の転送先が shared/siteUrl.cjs と一致していない');
   assert.match(src, /matcher:\s*\['\/:path\*'\]/,
     '旧ドメインの任意パスを捕捉できる matcher になっていない');
-  assert.match(src, /url\.hostname\.toLowerCase\(\) === LEGACY_PRODUCTION_HOST/,
-    '旧本番ホストだけを判定していない');
-  assert.match(src, /new URL\(url\.pathname \+ url\.search, CURRENT_ORIGIN\)/,
+  // 書き方ではなく動きで確かめる（2026-11-13 に旧ドメインの返し方を shared/domainMigration.cjs へ分けた。
+  // 画面の遷移には引っ越し用ページを返すため、ここではブラウザ以外＝Sec-Fetch ヘッダーなしの要求で見る）
+  const mw = await import('../middleware.js');
+  const res = await mw.default(new Request(`${S.LEGACY_ORIGINS[0]}/event/abc?x=1`));
+  assert.strictEqual(res && res.status, 308, '恒久リダイレクト（308）になっていない');
+  assert.strictEqual(res.headers.get('location'), `${S.DEFAULT_SITE_URL}/event/abc?x=1`,
     '転送時にパス・クエリを維持していない');
-  assert.match(src, /Response\.redirect\(target, 308\)/,
-    '恒久リダイレクト（308）になっていない');
+  // プレビュー（VERCEL_ENV が production でない）の *.vercel.app は転送しない
+  assert.ok(!mw.isLegacyProductionHost('jsdf-chiiki-events-git-x-team.vercel.app', { VERCEL_ENV: 'preview' }),
+    '旧本番ホストだけを判定していない');
 });
 
 test('index.html の絶対URLは既定ドメインのまま（ビルド時に SITE_URL へ置換する）', () => {

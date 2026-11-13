@@ -21,6 +21,7 @@ const NOTICE_CSS = `
  *
  *   moved-away（旧ドメイン）… 新しいURLへ移動してもらう。まだ気づいていない人向け
  *   moved-here（新ドメイン）… お気に入りや設定が空になっている理由を説明する
+ *   migrated-here（新ドメイン・旧ドメインから自動で移ってきた）… 設定は引き継いだこと・通知は登録し直しが要ること
  *
  * OfflineNotice と同じ作り（背景タップ・Esc・フォーカス移動）に合わせてある。
  * 見た目が揃っていないと、同じ「知らせるだけの窓」だと分かりにくいため。
@@ -34,6 +35,7 @@ export default function DomainNotice({ mode, newUrl, onClose, theme }) {
   const primary  = theme?.primary || '#0b2545';
   const closeRef = useRef(null);
   const movedAway = mode === 'moved-away';
+  const migrated  = mode === 'migrated-here';
 
   // Esc で閉じられるようにする（キーボード操作でも行き止まりにしない）
   useEffect(() => {
@@ -108,6 +110,19 @@ export default function DomainNotice({ mode, newUrl, onClose, theme }) {
               <div style={{ marginTop: 8 }}>
                 お手数ですが、下のボタンから移動し、ブックマークやホーム画面のアイコンを登録し直してください。
                 アドレスが変わるため、お気に入り・配色などの設定・通知の登録は引き継がれません。
+              </div>
+            </>
+          ) : migrated ? (
+            <>
+              このサイトのアドレスは{' '}
+              <b style={{ color: 'var(--text)', fontFamily: F.mono, wordBreak: 'break-all' }}>{host}</b>
+              {' '}に変わり、自動で移動しました。
+              <div style={{ marginTop: 8 }}>
+                <b style={{ color: 'var(--text)' }}>お気に入り・配色などの設定は引き継いでいます。</b>
+                通知を使っていた方は、お手数ですが設定画面から登録し直してください（通知の登録はアドレスごとのため引き継げません）。
+              </div>
+              <div style={{ marginTop: 8 }}>
+                ブックマークやホーム画面のアイコンも、新しいアドレスで登録し直すことをおすすめします。
               </div>
             </>
           ) : (

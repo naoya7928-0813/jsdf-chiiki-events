@@ -835,6 +835,12 @@ PC幅では従来どおり折り返し表示。
   **`docs/DOMAIN_MIGRATION.md`** を参照
 - **現在の公開URL: `https://jsdf-chiiki-events.jp`**（2026-09-03 に `*.vercel.app` から移行）。
   旧ドメインは `LEGACY_ORIGINS` に残してあり、書き込みAPIは当面どちらのオリジンからも通る
+- **旧ドメインからの自動移動（2026-11-13）**: `middleware.js` ＋ `shared/domainMigration.cjs`。旧ドメインの `/sw.js` は
+  片付け用 SW（古い SW・キャッシュを外す）、画面の読み込みは引っ越し用ページ（お気に入り・設定を URL の `#` に載せて .jp へ）、
+  それ以外は 308。.jp 側は `src/utils/domainMigrationImport.js`（`main.jsx` の最初の import）が受け取る。
+  ⚠ 旧ドメインの `/sw.js` を 308 に戻さないこと（SW の更新はリダイレクト禁止のため、以前に開いた端末が古い画面のまま残る）。
+  ⚠ Vercel の Domains で旧ドメインに 308 を設定しないこと（middleware に届かなくなる）。
+  ⚠ 引き継ぐ項目（`CARRY_KEYS`）に規約の同意・運営者情報を入れない。既にある値は上書きしない（誰でもリンクを作れるため）
 - ⚠ **`SITE_URL` は「コードの既定より優先される」ため、シークレットに旧ドメインが残っていると
   静的ページ・sitemap が旧ドメインで生成され、スクレイプの自動コミットで移行が巻き戻る**。
   これを防ぐため **`siteUrl()` は `LEGACY_ORIGINS` の値を公開URLとして採用しない**
