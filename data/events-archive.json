@@ -1,6 +1,92 @@
 {
-  "updatedAt": "2026-11-13",
+  "updatedAt": "2026-11-14",
   "events": [
+    {
+      "id": "to-office-20261113-jl69l",
+      "pref": "tokyo",
+      "office": "",
+      "date": "2026-11-13",
+      "endDate": "",
+      "weekday": "金",
+      "title": "夜間説明会",
+      "place": "航空自衛隊 府中基地内 府中分駐所",
+      "address": "",
+      "time": "18:00～20:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tokyo/fuchu/img/1113_yakan.jpg",
+      "notes": "掲載元: 府中分駐所\n18歳未満の方は保護者同伴必須",
+      "ageRequirement": "16歳～32歳",
+      "deadline": "11月12日（木）",
+      "deadlineDate": "2026-11-12",
+      "status": "closed",
+      "statusReason": "締切日経過",
+      "statusSource": "ocr",
+      "statusUpdatedAt": "2026-11-14",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-11-04",
+      "weatherLocation": {
+        "latitude": 35.69,
+        "longitude": 139.692,
+        "label": "東京都",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-11-04T00:38:35.826+09:00"
+      },
+      "archivedAt": "2026-11-14"
+    },
+    {
+      "id": "ni-20261113-jeedm",
+      "pref": "niigata",
+      "office": "",
+      "date": "2026-11-13",
+      "endDate": "",
+      "weekday": "金",
+      "title": "イオンスタイル三条須頃",
+      "place": "そよら三条須頃",
+      "address": "",
+      "time": "10:00～17:00",
+      "category": "地域参加",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-11-03",
+      "archivedAt": "2026-11-14"
+    },
+    {
+      "id": "ai-20261113-pb3si",
+      "pref": "aichi",
+      "office": "",
+      "date": "2026-11-13",
+      "endDate": "",
+      "weekday": "金",
+      "title": "金山所｜自衛隊制度説明会",
+      "place": "自衛隊愛知地方協力本部金山募集案内所",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://docs.google.com/forms/d/1UPGttH-kc2XbauS9G97BTdif-DnJ9_FJAOATH5HmfGE/edit?usp=drivesdk",
+      "notes": "自衛隊制度",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-11-04",
+      "archivedAt": "2026-11-14"
+    },
     {
       "id": "ib-20261112-yxekh",
       "pref": "ibaraki",
@@ -509,7 +595,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-14T15:23:16.911+09:00"
       },
-      "archivedAt": "2026-11-13"
+      "archivedAt": "2026-11-14"
     },
     {
       "id": "eh-office-20261111-1mfzs",
@@ -577,7 +663,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-11-13"
+      "archivedAt": "2026-11-14"
     },
     {
       "id": "is-office-20261110-oqwvl",
@@ -770,7 +856,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-13",
+      "statusUpdatedAt": "2026-11-14",
       "source_type": "office_ocr",
       "firstSeen": "2026-11-10",
       "weatherLocation": {
@@ -781,7 +867,7 @@
         "source": "gsi",
         "geocodedAt": "2026-11-04T10:54:32.134+09:00"
       },
-      "archivedAt": "2026-11-13"
+      "archivedAt": "2026-11-14"
     },
     {
       "id": "to-office-20261109-5r8mm",
@@ -849,7 +935,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-06T23:55:36.928+09:00"
       },
-      "archivedAt": "2026-11-13"
+      "archivedAt": "2026-11-14"
     },
     {
       "id": "na-20261109-717zd",
@@ -1087,7 +1173,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-29T16:31:20.349+09:00"
       },
-      "archivedAt": "2026-11-13"
+      "archivedAt": "2026-11-14"
     },
     {
       "id": "to-office-20261108-5wgp7",
@@ -1597,7 +1683,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-16T15:00:53.133+09:00"
       },
-      "archivedAt": "2026-11-13"
+      "archivedAt": "2026-11-14"
     },
     {
       "id": "ib-office-20261108-6pj2m",
@@ -1631,7 +1717,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-06T23:55:36.928+09:00"
       },
-      "archivedAt": "2026-11-13"
+      "archivedAt": "2026-11-14"
     },
     {
       "id": "to-office-20261108-13rbm",
@@ -2413,7 +2499,7 @@
         "source": "gsi",
         "geocodedAt": "2026-09-03T09:01:53.825+09:00"
       },
-      "archivedAt": "2026-11-13"
+      "archivedAt": "2026-11-14"
     },
     {
       "id": "ku-office-20261108-5m4rw",
@@ -2541,7 +2627,7 @@
       "statusUpdatedAt": "",
       "source_type": "office_html",
       "firstSeen": "2026-10-13",
-      "archivedAt": "2026-11-13"
+      "archivedAt": "2026-11-14"
     },
     {
       "id": "to-office-20261107-38wmn",
@@ -2632,7 +2718,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-13",
+      "statusUpdatedAt": "2026-11-14",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-22",
       "weatherLocation": {
@@ -2643,7 +2729,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-22T15:17:21.150+09:00"
       },
-      "archivedAt": "2026-11-13"
+      "archivedAt": "2026-11-14"
     },
     {
       "id": "gu-20261107-lspux",
@@ -3051,7 +3137,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-06T23:55:36.928+09:00"
       },
-      "archivedAt": "2026-11-13"
+      "archivedAt": "2026-11-14"
     },
     {
       "id": "to-office-20261107-rslkt",
@@ -3323,7 +3409,7 @@
         "source": "gsi",
         "geocodedAt": "2026-07-13T07:58:32.830+09:00"
       },
-      "archivedAt": "2026-11-13"
+      "archivedAt": "2026-11-14"
     },
     {
       "id": "os-office-20261107-0p3x1",
@@ -3391,7 +3477,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:31.252+09:00"
       },
-      "archivedAt": "2026-11-13"
+      "archivedAt": "2026-11-14"
     },
     {
       "id": "hy-20261107-6cqmv",
@@ -3877,7 +3963,7 @@
       "statusUpdatedAt": "",
       "source_type": "office_html",
       "firstSeen": "2026-11-07",
-      "archivedAt": "2026-11-13"
+      "archivedAt": "2026-11-14"
     },
     {
       "id": "iw-office-20261105-pla1x",
