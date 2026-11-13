@@ -2,10 +2,10 @@
   "updatedAt": "2026-11-13",
   "limit": 30,
   "summary": {
-    "checked": 286,
-    "flagged": 22,
-    "attempted": 9,
-    "corrected": 3,
+    "checked": 282,
+    "flagged": 20,
+    "attempted": 7,
+    "corrected": 2,
     "unverified": 5,
     "noSource": 1,
     "overBudget": 0,
@@ -16,92 +16,57 @@
   },
   "corrections": [
     {
-      "id": "to-office-20261118-5448s",
-      "pref": "tokyo",
-      "source": "https://www.mod.go.jp/pco/tokyo/tachikawa/img/1118-1120_syasin.jpg",
+      "id": "gu-office-20261114-v2ac2",
+      "pref": "gunma",
+      "source": "https://www.mod.go.jp/pco/gunma/sozai/event/20261114-5.jpg",
       "reasons": [
-        "タイトルが短すぎる"
+        "日付がタイトルになっている"
       ],
       "changes": [
         {
-          "field": "title",
-          "from": "説明会",
-          "to": "自衛隊説明会"
-        },
-        {
-          "field": "endDate",
-          "from": null,
-          "to": "2026-11-20"
-        },
-        {
-          "field": "tag",
-          "from": null,
-          "to": "要予約"
-        },
-        {
-          "field": "notes",
-          "from": "掲載元: 立川出張所\n参加無料／所要時間1時間／個別ご案内",
-          "to": "参加無料／所要時間1時間"
-        }
-      ]
-    },
-    {
-      "id": "to-off-20261118-7udm6",
-      "pref": "tokyo",
-      "source": "https://www.mod.go.jp/pco/tokyo/tachikawa/img/1118-1120_syasin.jpg",
-      "reasons": [
-        "タイトルが短すぎる"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "説明会",
-          "to": "自衛隊説明会"
-        },
-        {
-          "field": "endDate",
-          "from": null,
-          "to": "2026-11-20"
-        },
-        {
-          "field": "tag",
-          "from": null,
-          "to": "要予約"
-        },
-        {
-          "field": "notes",
-          "from": "参加無料／所要時間1時間／個別ご案内",
-          "to": "参加無料／所要時間1時間"
-        }
-      ]
-    },
-    {
-      "id": "to-off-20261114-f5g8s",
-      "pref": "tochigi",
-      "source": "https://www.mod.go.jp/pco/tochigi/doc/event/information/20261114_hokuohsai2026.pdf",
-      "reasons": [
-        "タイトルが短すぎる"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "北桜祭",
-          "to": "第53回北桜祭"
-        },
-        {
-          "field": "address",
-          "from": null,
-          "to": "栃木県"
+          "field": "place",
+          "from": "カインズスーバーセンター前橋吉岡店",
+          "to": "カインズスーパーセンター前橋吉岡店"
         },
         {
           "field": "category",
           "from": "広報活動",
-          "to": "地域参加"
+          "to": "体験"
+        },
+        {
+          "field": "tag",
+          "from": null,
+          "to": "家族向け"
         },
         {
           "field": "notes",
-          "from": "校内は足跡厳禁。スリッパ持参。撮影・SNS投稿禁止。ゴミ持ち帰り協力。",
-          "to": "校舎内は土足厳禁です。スリッパをご持参ください。"
+          "from": "掲載元: 前橋募集案内所\nはしご車乗車体験・防災食の食べ方教室は要事前予約",
+          "to": "はしご車乗車体験・防災スタンプラリーは事前予約制"
+        }
+      ]
+    },
+    {
+      "id": "eh-off-20270123-516jb",
+      "pref": "ehime",
+      "source": "https://www.mod.go.jp/pco/ehime/recruit/img/jukenannai/09_seito.pdf",
+      "reasons": [
+        "日付がタイトルになっている"
+      ],
+      "changes": [
+        {
+          "field": "address",
+          "from": null,
+          "to": "松山市南梅本町乙115番地"
+        },
+        {
+          "field": "tag",
+          "from": "学生向け",
+          "to": null
+        },
+        {
+          "field": "notes",
+          "from": "昼食は各自用意。受験票・筆記具持参。",
+          "to": "試験会場は志願者数により変更になる場合があります。"
         }
       ]
     }
