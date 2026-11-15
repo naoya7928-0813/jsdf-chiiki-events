@@ -1,80 +1,20 @@
 {
-  "updatedAt": "2026-11-14",
+  "updatedAt": "2026-11-15",
   "limit": 30,
   "summary": {
-    "checked": 296,
-    "flagged": 22,
-    "attempted": 8,
-    "corrected": 3,
-    "unverified": 5,
+    "checked": 257,
+    "flagged": 19,
+    "attempted": 10,
+    "corrected": 1,
+    "unverified": 8,
     "noSource": 1,
     "overBudget": 0,
     "skippedNoSource": 1,
-    "skippedNotEligible": 13,
+    "skippedNotEligible": 8,
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
   "corrections": [
-    {
-      "id": "to-office-20261118-5448s",
-      "pref": "tokyo",
-      "source": "https://www.mod.go.jp/pco/tokyo/tachikawa/img/1118-1120_syasin.jpg",
-      "reasons": [
-        "タイトルが短すぎる"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "説明会",
-          "to": "自衛隊説明会"
-        },
-        {
-          "field": "endDate",
-          "from": null,
-          "to": "2026-11-20"
-        },
-        {
-          "field": "tag",
-          "from": null,
-          "to": "要予約"
-        },
-        {
-          "field": "notes",
-          "from": "掲載元: 立川出張所\n参加無料／所要時間1時間／個別ご案内",
-          "to": "参加無料／所要時間1時間"
-        }
-      ]
-    },
-    {
-      "id": "gu-office-20261114-v2ac2",
-      "pref": "gunma",
-      "source": "https://www.mod.go.jp/pco/gunma/sozai/event/20261114-5.jpg",
-      "reasons": [
-        "日付がタイトルになっている"
-      ],
-      "changes": [
-        {
-          "field": "place",
-          "from": "カインズスーバーセンター前橋吉岡店",
-          "to": "カインズスーパーセンター前橋吉岡店"
-        },
-        {
-          "field": "category",
-          "from": "広報活動",
-          "to": "体験"
-        },
-        {
-          "field": "tag",
-          "from": null,
-          "to": "家族向け"
-        },
-        {
-          "field": "notes",
-          "from": "掲載元: 前橋募集案内所\nはしご車乗車体験・防災食の食べ方教室は要事前予約",
-          "to": "はしご車乗車体験・防災スタンプラリーは事前予約制"
-        }
-      ]
-    },
     {
       "id": "eh-off-20270123-516jb",
       "pref": "ehime",
@@ -103,39 +43,14 @@
   ],
   "skipped": [
     {
-      "id": "gu-office-20261114-ax2vx",
-      "pref": "gunma",
-      "reason": "not_eligible"
-    },
-    {
-      "id": "gu-office-20261114-gods3",
-      "pref": "gunma",
-      "reason": "not_eligible"
-    },
-    {
       "id": "ib-20261121-e6nyb",
       "pref": "ibaraki",
-      "reason": "not_eligible"
-    },
-    {
-      "id": "to-office-20261114-476oo",
-      "pref": "tochigi",
-      "reason": "not_eligible"
-    },
-    {
-      "id": "to-office-20261114-jctu1",
-      "pref": "tochigi",
       "reason": "not_eligible"
     },
     {
       "id": "gi-20261121-z8wp5",
       "pref": "gifu",
       "reason": "no_source"
-    },
-    {
-      "id": "os-office-20261107-7qd6f",
-      "pref": "osaka",
-      "reason": "not_eligible"
     },
     {
       "id": "em-20261129-mlxjy",
