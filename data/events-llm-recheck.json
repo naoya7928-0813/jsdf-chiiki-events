@@ -2,49 +2,19 @@
   "updatedAt": "2026-11-16",
   "limit": 30,
   "summary": {
-    "checked": 252,
-    "flagged": 18,
-    "attempted": 9,
-    "corrected": 2,
-    "unverified": 6,
+    "checked": 223,
+    "flagged": 17,
+    "attempted": 10,
+    "corrected": 1,
+    "unverified": 8,
     "noSource": 1,
     "overBudget": 0,
     "skippedNoSource": 1,
-    "skippedNotEligible": 8,
+    "skippedNotEligible": 6,
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
   "corrections": [
-    {
-      "id": "to-office-20261118-5448s",
-      "pref": "tokyo",
-      "source": "https://www.mod.go.jp/pco/tokyo/tachikawa/img/1118-1120_syasin.jpg",
-      "reasons": [
-        "タイトルが短すぎる"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "説明会",
-          "to": "自衛隊説明会"
-        },
-        {
-          "field": "endDate",
-          "from": null,
-          "to": "2026-11-20"
-        },
-        {
-          "field": "tag",
-          "from": null,
-          "to": "要予約"
-        },
-        {
-          "field": "notes",
-          "from": "掲載元: 立川出張所\n参加無料／所要時間1時間／個別ご案内",
-          "to": "参加無料／所要時間1時間"
-        }
-      ]
-    },
     {
       "id": "eh-off-20270123-516jb",
       "pref": "ehime",
@@ -103,18 +73,8 @@
       "reason": "not_eligible"
     },
     {
-      "id": "ok-20261115-b75qj",
-      "pref": "okayama",
-      "reason": "not_eligible"
-    },
-    {
       "id": "ok-20261122-x428e",
       "pref": "okayama",
-      "reason": "not_eligible"
-    },
-    {
-      "id": "ym-20261115-6624m",
-      "pref": "yamaguchi",
       "reason": "not_eligible"
     }
   ]
