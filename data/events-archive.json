@@ -1,6 +1,108 @@
 {
-  "updatedAt": "2026-11-16",
+  "updatedAt": "2026-11-17",
   "events": [
+    {
+      "id": "iw-office-20261116-jbwbx",
+      "pref": "iwate",
+      "office": "",
+      "date": "2026-11-16",
+      "endDate": "",
+      "weekday": "月",
+      "title": "お仕事相談会",
+      "place": "北上市文化交流センターさくらホール",
+      "address": "",
+      "time": "12:00～15:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/iwate/assets/img/event/until20261116/workinkitakami.jpg",
+      "notes": "掲載元: 募集案内所・地域事務所\n最終受付14:30",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-29",
+      "weatherLocation": {
+        "latitude": 39.287,
+        "longitude": 141.113,
+        "label": "岩手県北上市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-29T23:33:57.908+09:00"
+      },
+      "archivedAt": "2026-11-17"
+    },
+    {
+      "id": "ky-set-20261116-f6p5g",
+      "pref": "kyoto",
+      "office": "",
+      "date": "2026-11-16",
+      "endDate": "",
+      "weekday": "月",
+      "title": "自衛官 就職・進学説明会",
+      "place": "ハローワーク京都七条",
+      "address": "",
+      "time": "14:00～16:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kyoto/boshuka/jieikan/setsumeikai.html",
+      "notes": "担当: 京都募集案内所",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-11-04",
+      "weatherLocation": {
+        "latitude": 35.021,
+        "longitude": 135.756,
+        "label": "京都府",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:30.769+09:00"
+      },
+      "archivedAt": "2026-11-17"
+    },
+    {
+      "id": "hi-20261116-mo7gd",
+      "pref": "hiroshima",
+      "office": "",
+      "date": "2026-11-16",
+      "endDate": "",
+      "weekday": "月",
+      "title": "ハローワーク説明会（福山）",
+      "place": "ハローワーク福山（福山市東桜町）",
+      "address": "",
+      "time": "09:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/hiroshima/events/4431/",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-10-16",
+      "weatherLocation": {
+        "latitude": 34.397,
+        "longitude": 132.46,
+        "label": "ワーク福山（福山市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-16T08:55:06.431+09:00"
+      },
+      "archivedAt": "2026-11-17"
+    },
     {
       "id": "iw-office-20261115-gc8tf",
       "pref": "iwate",
@@ -22,7 +124,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-16",
+      "statusUpdatedAt": "2026-11-17",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-09",
       "weatherLocation": {
@@ -33,7 +135,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-09T23:49:08.290+09:00"
       },
-      "archivedAt": "2026-11-16"
+      "archivedAt": "2026-11-17"
     },
     {
       "id": "iw-office-20261115-09nli",
@@ -56,10 +158,10 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-16",
+      "statusUpdatedAt": "2026-11-17",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-06",
-      "archivedAt": "2026-11-16"
+      "archivedAt": "2026-11-17"
     },
     {
       "id": "ya-20261115-jwce8",
@@ -108,7 +210,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-16",
+      "statusUpdatedAt": "2026-11-17",
       "source_type": "office_ocr",
       "firstSeen": "2026-11-04",
       "weatherLocation": {
@@ -119,7 +221,7 @@
         "source": "gsi",
         "geocodedAt": "2026-11-04T00:38:36.793+09:00"
       },
-      "archivedAt": "2026-11-16"
+      "archivedAt": "2026-11-17"
     },
     {
       "id": "to-office-20261115-9j7qk",
@@ -153,7 +255,7 @@
         "source": "gsi",
         "geocodedAt": "2026-11-04T00:38:37.132+09:00"
       },
-      "archivedAt": "2026-11-16"
+      "archivedAt": "2026-11-17"
     },
     {
       "id": "gu-20261115-9ucby",
@@ -265,7 +367,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-30T16:23:36.759+09:00"
       },
-      "archivedAt": "2026-11-16"
+      "archivedAt": "2026-11-17"
     },
     {
       "id": "gu-office-20261115-r2ho6",
@@ -291,7 +393,7 @@
       "statusUpdatedAt": "",
       "source_type": "office_ocr",
       "firstSeen": "2026-11-04",
-      "archivedAt": "2026-11-16"
+      "archivedAt": "2026-11-17"
     },
     {
       "id": "ib-20261115-n5rt5",
@@ -541,7 +643,7 @@
       "statusUpdatedAt": "",
       "source_type": "",
       "firstSeen": "2026-11-03",
-      "archivedAt": "2026-11-16"
+      "archivedAt": "2026-11-17"
     },
     {
       "id": "na-20261115-bcj1c",
@@ -1067,7 +1169,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-23T08:54:03.909+09:00"
       },
-      "archivedAt": "2026-11-16"
+      "archivedAt": "2026-11-17"
     },
     {
       "id": "ka-office-20261115-axla4",
@@ -1135,7 +1237,7 @@
         "source": "gsi",
         "geocodedAt": "2026-07-14T19:08:37.512+09:00"
       },
-      "archivedAt": "2026-11-16"
+      "archivedAt": "2026-11-17"
     },
     {
       "id": "ak-20261114-g7ic2",
@@ -1226,7 +1328,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-16",
+      "statusUpdatedAt": "2026-11-17",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-16",
       "weatherLocation": {
@@ -1237,7 +1339,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-16T15:00:52.365+09:00"
       },
-      "archivedAt": "2026-11-16"
+      "archivedAt": "2026-11-17"
     },
     {
       "id": "ya-20261114-yciad",
@@ -2450,7 +2552,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-16",
+      "statusUpdatedAt": "2026-11-17",
       "source_type": "office_ocr",
       "firstSeen": "2026-11-04",
       "weatherLocation": {
@@ -2461,7 +2563,7 @@
         "source": "gsi",
         "geocodedAt": "2026-11-04T00:38:35.826+09:00"
       },
-      "archivedAt": "2026-11-16"
+      "archivedAt": "2026-11-17"
     },
     {
       "id": "ni-20261113-jeedm",
@@ -3023,7 +3125,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-14T15:23:16.911+09:00"
       },
-      "archivedAt": "2026-11-16"
+      "archivedAt": "2026-11-17"
     },
     {
       "id": "eh-office-20261111-1mfzs",
@@ -3091,7 +3193,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-11-16"
+      "archivedAt": "2026-11-17"
     },
     {
       "id": "is-office-20261110-oqwvl",
@@ -3284,7 +3386,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-16",
+      "statusUpdatedAt": "2026-11-17",
       "source_type": "office_ocr",
       "firstSeen": "2026-11-10",
       "weatherLocation": {
@@ -3295,7 +3397,7 @@
         "source": "gsi",
         "geocodedAt": "2026-11-04T10:54:32.134+09:00"
       },
-      "archivedAt": "2026-11-16"
+      "archivedAt": "2026-11-17"
     },
     {
       "id": "to-office-20261109-5r8mm",
@@ -3363,7 +3465,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-06T23:55:36.928+09:00"
       },
-      "archivedAt": "2026-11-16"
+      "archivedAt": "2026-11-17"
     },
     {
       "id": "na-20261109-717zd",
