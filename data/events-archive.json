@@ -1,6 +1,142 @@
 {
-  "updatedAt": "2026-11-17",
+  "updatedAt": "2026-11-18",
   "events": [
+    {
+      "id": "to-office-20261117-rnev8",
+      "pref": "tokyo",
+      "office": "",
+      "date": "2026-11-17",
+      "endDate": "",
+      "weekday": "火",
+      "title": "自衛隊個別説明会@ASTA",
+      "place": "田無ASTA専門店街 1Fイベントスペース",
+      "address": "",
+      "time": "10:00～16:00",
+      "category": "説明会",
+      "tag": "個別",
+      "url": "https://www.mod.go.jp/pco/tokyo/nishitokyo/img/1117-18_kobetu.png",
+      "notes": "掲載元: 西東京地域事務所\n飛び込み歓迎",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-16",
+      "weatherLocation": {
+        "latitude": 35.69,
+        "longitude": 139.692,
+        "label": "東京都",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-16T21:51:52.770+09:00"
+      },
+      "archivedAt": "2026-11-18"
+    },
+    {
+      "id": "ib-20261117-o6dc4",
+      "pref": "ibaraki",
+      "office": "",
+      "date": "2026-11-17",
+      "endDate": "",
+      "weekday": "火",
+      "title": "自衛隊サテライトブース in ヒタチエ",
+      "place": "ヒタチエ",
+      "address": "日立市幸町1丁目16-1 JR常磐線『日立駅』から徒歩4分",
+      "time": "15:00～18:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-11-03",
+      "weatherLocation": {
+        "latitude": 36.592,
+        "longitude": 140.659,
+        "label": "茨城県日立市",
+        "accuracy": "address",
+        "source": "gsi",
+        "geocodedAt": "2026-11-03T18:08:41.760+09:00"
+      },
+      "archivedAt": "2026-11-18"
+    },
+    {
+      "id": "eh-office-20261117-8llcr",
+      "pref": "ehime",
+      "office": "",
+      "date": "2026-11-17",
+      "endDate": "",
+      "weekday": "火",
+      "title": "自衛隊説明会",
+      "place": "ハローワーク宇和島",
+      "address": "",
+      "time": "09:30～11:30",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/ehime/briefing/img/uwa/harowauwajima1117.jpg",
+      "notes": "掲載元: 募集案内所・地域事務所\n2等陸海空士は18歳以上32歳まで、予備自衛官補は52歳未満まで",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-11-10",
+      "weatherLocation": {
+        "latitude": 33.842,
+        "longitude": 132.766,
+        "label": "愛媛県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-11-10T02:56:46.310+09:00"
+      },
+      "archivedAt": "2026-11-18"
+    },
+    {
+      "id": "hi-20261117-ft9df",
+      "pref": "hiroshima",
+      "office": "",
+      "date": "2026-11-17",
+      "endDate": "",
+      "weekday": "火",
+      "title": "ハローワーク説明会（府中）",
+      "place": "ハローワーク府中（府中市府中町）",
+      "address": "",
+      "time": "13:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/hiroshima/events/4433/",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-10-16",
+      "weatherLocation": {
+        "latitude": 34.397,
+        "longitude": 132.46,
+        "label": "ワーク府中（府中市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-16T21:51:59.253+09:00"
+      },
+      "archivedAt": "2026-11-18"
+    },
     {
       "id": "iw-office-20261116-jbwbx",
       "pref": "iwate",
@@ -33,7 +169,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-29T23:33:57.908+09:00"
       },
-      "archivedAt": "2026-11-17"
+      "archivedAt": "2026-11-18"
     },
     {
       "id": "ky-set-20261116-f6p5g",
@@ -124,7 +260,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-17",
+      "statusUpdatedAt": "2026-11-18",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-09",
       "weatherLocation": {
@@ -135,7 +271,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-09T23:49:08.290+09:00"
       },
-      "archivedAt": "2026-11-17"
+      "archivedAt": "2026-11-18"
     },
     {
       "id": "iw-office-20261115-09nli",
@@ -158,10 +294,10 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-17",
+      "statusUpdatedAt": "2026-11-18",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-06",
-      "archivedAt": "2026-11-17"
+      "archivedAt": "2026-11-18"
     },
     {
       "id": "ya-20261115-jwce8",
@@ -210,7 +346,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-17",
+      "statusUpdatedAt": "2026-11-18",
       "source_type": "office_ocr",
       "firstSeen": "2026-11-04",
       "weatherLocation": {
@@ -221,7 +357,7 @@
         "source": "gsi",
         "geocodedAt": "2026-11-04T00:38:36.793+09:00"
       },
-      "archivedAt": "2026-11-17"
+      "archivedAt": "2026-11-18"
     },
     {
       "id": "to-office-20261115-9j7qk",
@@ -255,7 +391,7 @@
         "source": "gsi",
         "geocodedAt": "2026-11-04T00:38:37.132+09:00"
       },
-      "archivedAt": "2026-11-17"
+      "archivedAt": "2026-11-18"
     },
     {
       "id": "gu-20261115-9ucby",
@@ -643,7 +779,7 @@
       "statusUpdatedAt": "",
       "source_type": "",
       "firstSeen": "2026-11-03",
-      "archivedAt": "2026-11-17"
+      "archivedAt": "2026-11-18"
     },
     {
       "id": "na-20261115-bcj1c",
@@ -1328,7 +1464,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-17",
+      "statusUpdatedAt": "2026-11-18",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-16",
       "weatherLocation": {
@@ -1339,7 +1475,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-16T15:00:52.365+09:00"
       },
-      "archivedAt": "2026-11-17"
+      "archivedAt": "2026-11-18"
     },
     {
       "id": "ya-20261114-yciad",
@@ -2552,7 +2688,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-17",
+      "statusUpdatedAt": "2026-11-18",
       "source_type": "office_ocr",
       "firstSeen": "2026-11-04",
       "weatherLocation": {
@@ -2563,7 +2699,7 @@
         "source": "gsi",
         "geocodedAt": "2026-11-04T00:38:35.826+09:00"
       },
-      "archivedAt": "2026-11-17"
+      "archivedAt": "2026-11-18"
     },
     {
       "id": "ni-20261113-jeedm",
@@ -3125,7 +3261,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-14T15:23:16.911+09:00"
       },
-      "archivedAt": "2026-11-17"
+      "archivedAt": "2026-11-18"
     },
     {
       "id": "eh-office-20261111-1mfzs",
@@ -3193,7 +3329,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-11-17"
+      "archivedAt": "2026-11-18"
     },
     {
       "id": "is-office-20261110-oqwvl",
@@ -3397,7 +3533,7 @@
         "source": "gsi",
         "geocodedAt": "2026-11-04T10:54:32.134+09:00"
       },
-      "archivedAt": "2026-11-17"
+      "archivedAt": "2026-11-18"
     },
     {
       "id": "to-office-20261109-5r8mm",
