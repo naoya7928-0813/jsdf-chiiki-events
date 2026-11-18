@@ -1,6 +1,278 @@
 {
-  "updatedAt": "2026-11-18",
+  "updatedAt": "2026-11-19",
   "events": [
+    {
+      "id": "ib-20261118-cx85n",
+      "pref": "ibaraki",
+      "office": "",
+      "date": "2026-11-18",
+      "endDate": "",
+      "weekday": "水",
+      "title": "自衛隊サテライトブース in ヒタチエ",
+      "place": "ヒタチエ",
+      "address": "日立市幸町1丁目16-1 JR常磐線『日立駅』から徒歩4分",
+      "time": "15:00～18:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-11-03",
+      "weatherLocation": {
+        "latitude": 36.592,
+        "longitude": 140.659,
+        "label": "茨城県日立市",
+        "accuracy": "address",
+        "source": "gsi",
+        "geocodedAt": "2026-11-03T18:08:41.760+09:00"
+      },
+      "archivedAt": "2026-11-19"
+    },
+    {
+      "id": "ya-20261118-q803c",
+      "pref": "yamanashi",
+      "office": "",
+      "date": "2026-11-18",
+      "endDate": "",
+      "weekday": "水",
+      "title": "自衛隊展",
+      "place": "山梨県立図書館1階イベントスペース（西）",
+      "address": "",
+      "time": "13:00～20:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/yamanashi/event.html",
+      "notes": "体験コーナー（ロープワーク、制服試着、VR体験）、展示コーナー（南極の氷、携行食、落下傘）、キャリア相談コーナー",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-11-17",
+      "weatherLocation": {
+        "latitude": 35.693,
+        "longitude": 138.687,
+        "label": "山梨県山梨市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-11-17T13:09:52.464+09:00"
+      },
+      "archivedAt": "2026-11-19"
+    },
+    {
+      "id": "ya-office-20261118-sxahe",
+      "pref": "yamanashi",
+      "office": "",
+      "date": "2026-11-18",
+      "endDate": "",
+      "weekday": "水",
+      "title": "特別イベント 自衛隊展",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/yamanashi/event.html",
+      "notes": "掲載元: 募集案内所・地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_html",
+      "firstSeen": "2026-11-17",
+      "weatherLocation": {
+        "latitude": 35.664,
+        "longitude": 138.568,
+        "label": "山梨県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-07-02T15:00:01.957+09:00"
+      },
+      "archivedAt": "2026-11-19"
+    },
+    {
+      "id": "ai-20261118-nt6bo",
+      "pref": "aichi",
+      "office": "",
+      "date": "2026-11-18",
+      "endDate": "",
+      "weekday": "水",
+      "title": "名古屋所｜自衛隊夜間説明会",
+      "place": "自衛隊愛知地方協力本部名古屋出張所",
+      "address": "",
+      "time": "19:00～20:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://forms.gle/jUq4HszktngKzpsbA",
+      "notes": "自衛隊制度\n保護者の参加可",
+      "ageRequirement": "高校3年生～33歳未満",
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-11-04",
+      "weatherLocation": {
+        "latitude": 35.18,
+        "longitude": 136.907,
+        "label": "愛知県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-04T08:54:42.848+09:00"
+      },
+      "archivedAt": "2026-11-19"
+    },
+    {
+      "id": "wa-off-20261118-vcaxb",
+      "pref": "wakayama",
+      "office": "",
+      "date": "2026-11-18",
+      "endDate": "",
+      "weekday": "水",
+      "title": "入札情報 OC方式「Tシャツ（WAKAYAMAPCO）」",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/wakayama/2020/wp-content/uploads/2026/11/67139149e754a386a59d5d293746b9dd.pdf",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-11-18",
+      "weatherLocation": {
+        "latitude": 34.226,
+        "longitude": 135.167,
+        "label": "和歌山県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-07-13T07:58:35.433+09:00"
+      },
+      "archivedAt": "2026-11-19"
+    },
+    {
+      "id": "wa-off-20261118-x4toe",
+      "pref": "wakayama",
+      "office": "",
+      "date": "2026-11-18",
+      "endDate": "",
+      "weekday": "水",
+      "title": "入札情報 OC方式「ポスター印刷」",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/wakayama/2020/wp-content/uploads/2026/11/9013692988e01b426749726682307531.pdf",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-11-18",
+      "weatherLocation": {
+        "latitude": 34.226,
+        "longitude": 135.167,
+        "label": "和歌山県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-07-13T07:58:35.433+09:00"
+      },
+      "archivedAt": "2026-11-19"
+    },
+    {
+      "id": "ok-office-20261118-7ng8e",
+      "pref": "okayama",
+      "office": "",
+      "date": "2026-11-18",
+      "endDate": "",
+      "weekday": "水",
+      "title": "ハローワーク笠岡（就職・転職）",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "採用イベント",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/okayama/setumei/setumei.html#harowa",
+      "notes": "掲載元: 募集案内所・地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_html",
+      "firstSeen": "2026-10-28",
+      "weatherLocation": {
+        "latitude": 34.662,
+        "longitude": 133.935,
+        "label": "岡山県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.000+09:00"
+      },
+      "archivedAt": "2026-11-19"
+    },
+    {
+      "id": "hi-20261118-hnvri",
+      "pref": "hiroshima",
+      "office": "",
+      "date": "2026-11-18",
+      "endDate": "",
+      "weekday": "水",
+      "title": "自衛官採用説明会",
+      "place": "",
+      "address": "",
+      "time": "14:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/hiroshima/events/4479/",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-11-17",
+      "weatherLocation": {
+        "latitude": 34.397,
+        "longitude": 132.46,
+        "label": "広島県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:36.248+09:00"
+      },
+      "archivedAt": "2026-11-19"
+    },
     {
       "id": "to-office-20261117-rnev8",
       "pref": "tokyo",
@@ -101,7 +373,7 @@
         "source": "gsi",
         "geocodedAt": "2026-11-10T02:56:46.310+09:00"
       },
-      "archivedAt": "2026-11-18"
+      "archivedAt": "2026-11-19"
     },
     {
       "id": "hi-20261117-ft9df",
@@ -169,7 +441,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-29T23:33:57.908+09:00"
       },
-      "archivedAt": "2026-11-18"
+      "archivedAt": "2026-11-19"
     },
     {
       "id": "ky-set-20261116-f6p5g",
@@ -260,7 +532,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-18",
+      "statusUpdatedAt": "2026-11-19",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-09",
       "weatherLocation": {
@@ -271,7 +543,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-09T23:49:08.290+09:00"
       },
-      "archivedAt": "2026-11-18"
+      "archivedAt": "2026-11-19"
     },
     {
       "id": "iw-office-20261115-09nli",
@@ -294,10 +566,10 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-18",
+      "statusUpdatedAt": "2026-11-19",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-06",
-      "archivedAt": "2026-11-18"
+      "archivedAt": "2026-11-19"
     },
     {
       "id": "ya-20261115-jwce8",
@@ -346,7 +618,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-18",
+      "statusUpdatedAt": "2026-11-19",
       "source_type": "office_ocr",
       "firstSeen": "2026-11-04",
       "weatherLocation": {
@@ -357,7 +629,7 @@
         "source": "gsi",
         "geocodedAt": "2026-11-04T00:38:36.793+09:00"
       },
-      "archivedAt": "2026-11-18"
+      "archivedAt": "2026-11-19"
     },
     {
       "id": "to-office-20261115-9j7qk",
@@ -391,7 +663,7 @@
         "source": "gsi",
         "geocodedAt": "2026-11-04T00:38:37.132+09:00"
       },
-      "archivedAt": "2026-11-18"
+      "archivedAt": "2026-11-19"
     },
     {
       "id": "gu-20261115-9ucby",
@@ -779,7 +1051,7 @@
       "statusUpdatedAt": "",
       "source_type": "",
       "firstSeen": "2026-11-03",
-      "archivedAt": "2026-11-18"
+      "archivedAt": "2026-11-19"
     },
     {
       "id": "na-20261115-bcj1c",
@@ -1464,7 +1736,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-18",
+      "statusUpdatedAt": "2026-11-19",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-16",
       "weatherLocation": {
@@ -1475,7 +1747,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-16T15:00:52.365+09:00"
       },
-      "archivedAt": "2026-11-18"
+      "archivedAt": "2026-11-19"
     },
     {
       "id": "ya-20261114-yciad",
@@ -2688,7 +2960,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-18",
+      "statusUpdatedAt": "2026-11-19",
       "source_type": "office_ocr",
       "firstSeen": "2026-11-04",
       "weatherLocation": {
@@ -2699,7 +2971,7 @@
         "source": "gsi",
         "geocodedAt": "2026-11-04T00:38:35.826+09:00"
       },
-      "archivedAt": "2026-11-18"
+      "archivedAt": "2026-11-19"
     },
     {
       "id": "ni-20261113-jeedm",
@@ -3261,7 +3533,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-14T15:23:16.911+09:00"
       },
-      "archivedAt": "2026-11-18"
+      "archivedAt": "2026-11-19"
     },
     {
       "id": "eh-office-20261111-1mfzs",
@@ -3329,7 +3601,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-11-18"
+      "archivedAt": "2026-11-19"
     },
     {
       "id": "is-office-20261110-oqwvl",
