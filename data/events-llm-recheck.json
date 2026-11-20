@@ -1,12 +1,12 @@
 {
-  "updatedAt": "2026-11-20",
+  "updatedAt": "2026-11-21",
   "limit": 30,
   "summary": {
-    "checked": 240,
-    "flagged": 17,
-    "attempted": 8,
-    "corrected": 3,
-    "unverified": 5,
+    "checked": 233,
+    "flagged": 15,
+    "attempted": 6,
+    "corrected": 0,
+    "unverified": 6,
     "noSource": 1,
     "overBudget": 0,
     "skippedNoSource": 1,
@@ -14,123 +14,7 @@
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
-  "corrections": [
-    {
-      "id": "eh-off-20270123-516jb",
-      "pref": "ehime",
-      "source": "https://www.mod.go.jp/pco/ehime/recruit/img/jukenannai/09_seito.pdf",
-      "reasons": [
-        "日付がタイトルになっている"
-      ],
-      "changes": [
-        {
-          "field": "address",
-          "from": null,
-          "to": "松山市南梅本町乙115番地"
-        },
-        {
-          "field": "tag",
-          "from": "学生向け",
-          "to": null
-        },
-        {
-          "field": "notes",
-          "from": "昼食は各自用意。受験票・筆記具持参。",
-          "to": "試験会場は志願者数により変更になる場合があります。"
-        }
-      ]
-    },
-    {
-      "id": "na-off-20261120-4t0rx",
-      "pref": "nagasaki",
-      "source": "https://www.mod.go.jp/pco/nagasaki/pdf/recruit/20261120_kyuujin.pdf",
-      "reasons": [
-        "イベント語が無く非イベントの兆候がある"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "防衛省職員（任期付自衛官）募集要項をアップしました。",
-          "to": "任期付自衛官募集要項"
-        },
-        {
-          "field": "date",
-          "from": "2026-11-20",
-          "to": "2026-02-09"
-        },
-        {
-          "field": "address",
-          "from": null,
-          "to": "〒857-1176 長崎県佐世保市崎辺町11番2"
-        },
-        {
-          "field": "category",
-          "from": "説明会",
-          "to": "採用イベント"
-        },
-        {
-          "field": "ageRequirement",
-          "from": "自衛官としての勤務期間が1年以上の者",
-          "to": "自衛官としての勤務期間が1年以上の者、本採用期間の末日において満53歳未満の者"
-        },
-        {
-          "field": "deadline",
-          "from": null,
-          "to": "1月30日（月）"
-        },
-        {
-          "field": "notes",
-          "from": null,
-          "to": "採用人員1名"
-        }
-      ]
-    },
-    {
-      "id": "na-off-20261120-4t0rx",
-      "pref": "nagasaki",
-      "source": "https://www.mod.go.jp/pco/nagasaki/pdf/recruit/20261120_kyuujin.pdf",
-      "reasons": [
-        "イベント語が無く非イベントの兆候がある"
-      ],
-      "changes": [
-        {
-          "field": "title",
-          "from": "防衛省職員（任期付自衛官）募集要項をアップしました。",
-          "to": "任期付自衛官募集要項"
-        },
-        {
-          "field": "date",
-          "from": "2026-11-20",
-          "to": "2026-02-09"
-        },
-        {
-          "field": "address",
-          "from": null,
-          "to": "〒857-1176 長崎県佐世保市崎辺町11番2"
-        },
-        {
-          "field": "category",
-          "from": "説明会",
-          "to": "採用イベント"
-        },
-        {
-          "field": "ageRequirement",
-          "from": "自衛官としての勤務期間が1年以上の者",
-          "to": "自衛官としての勤務期間が1年以上の者、本採用期間の末日において満53歳未満の者"
-        },
-        {
-          "field": "deadline",
-          "from": null,
-          "to": "1月30日（月）"
-        },
-        {
-          "field": "notes",
-          "from": null,
-          "to": "採用人員1名"
-        }
-      ]
-    }
-  ],
+  "corrections": [],
   "skipped": [
     {
       "id": "ib-20261121-e6nyb",
