@@ -3,55 +3,7 @@
   "count": 9,
   "events": [
     {
-      "id": "as-off-20270128-tr87l",
-      "pref": "asahikawa",
-      "date": "2027-01-28",
-      "endDate": "",
-      "title": "令和8年度自衛官等採用試験予定表",
-      "place": "防衛大学",
-      "url": "https://www.mod.go.jp/pco/asahikawa/01_recruit/r8_nitteihyou.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-11-20",
-      "reason": "日付がタイトルになっている"
-    },
-    {
-      "id": "as-off-20270128-i34vl",
-      "pref": "asahikawa",
-      "date": "2027-01-28",
-      "endDate": "",
-      "title": "令和8年度自衛官等採用試験予定表",
-      "place": "防衛大学",
-      "url": "https://www.mod.go.jp/pco/asahikawa/01_recruit/r8_nitteihyou.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-11-20",
-      "reason": "日付がタイトルになっている"
-    },
-    {
       "id": "mi-office-20270128-o4a4d",
-      "pref": "miyagi",
-      "date": "2027-01-28",
-      "endDate": "",
-      "title": "令和8年度自衛官等採用試験案内",
-      "place": "防衛大学",
-      "url": "https://www.mod.go.jp/pco/miyagi/miyagitop/image/r8rec-schedule.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-11-20",
-      "reason": "日付がタイトルになっている"
-    },
-    {
-      "id": "mi-off-20270128-ke8x2",
-      "pref": "miyagi",
-      "date": "2027-01-28",
-      "endDate": "",
-      "title": "令和8年度自衛官等採用試験案内",
-      "place": "防衛大学",
-      "url": "https://www.mod.go.jp/pco/miyagi/miyagitop/image/r8rec-schedule.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-11-20",
-      "reason": "日付がタイトルになっている"
-    },
-    {
-      "id": "mi-off-20270128-ke8x2",
       "pref": "miyagi",
       "date": "2027-01-28",
       "endDate": "",
@@ -75,16 +27,64 @@
       "reason": "タイトルが短すぎる"
     },
     {
-      "id": "fu-office-20261130-wkywa",
-      "pref": "fukui",
-      "date": "2026-11-30",
+      "id": "ni-off-20270101-19282",
+      "pref": "niigata",
+      "date": "2027-01-01",
       "endDate": "",
-      "title": "令和8年度予備自衛官補招集教育訓日程",
-      "place": "",
-      "url": "https://www.mod.go.jp/pco/fukui/contents/21-yobijieikantou/images/yobijiho-nittei.pdf",
+      "title": "陸海空自衛官",
+      "place": "調機の充足完了及び空調が整備されていない駐屯地",
+      "url": "https://www.mod.go.jp/pco/niigata/files/top/fukurikousei-kaizen.pdf",
       "source_type": "office_ocr",
       "quarantinedAt": "2026-11-20",
-      "reason": "日付がタイトルになっている"
+      "reason": "非イベント文書の疑い"
+    },
+    {
+      "id": "sh-office-20261120-etf53",
+      "pref": "shizuoka",
+      "date": "2026-11-20",
+      "endDate": "",
+      "title": "自衛隊静岡地方協力本部",
+      "place": "藤枝地域事務所",
+      "url": "https://www.mod.go.jp/pco/sizuoka/bosyu/pdf/66.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-11-20",
+      "reason": "イベント語が無く非イベントの兆候がある"
+    },
+    {
+      "id": "sh-off-20261120-icdbw",
+      "pref": "shizuoka",
+      "date": "2026-11-20",
+      "endDate": "",
+      "title": "自衛隊静岡地方協力本部",
+      "place": "",
+      "url": "https://www.mod.go.jp/pco/sizuoka/bosyu/pdf/66.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-11-20",
+      "reason": "イベント語が無く非イベントの兆候がある"
+    },
+    {
+      "id": "sh-off-20261120-icdbw",
+      "pref": "shizuoka",
+      "date": "2026-11-20",
+      "endDate": "",
+      "title": "自衛隊静岡地方協力本部",
+      "place": "",
+      "url": "https://www.mod.go.jp/pco/sizuoka/bosyu/pdf/66.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-11-20",
+      "reason": "イベント語が無く非イベントの兆候がある"
+    },
+    {
+      "id": "sh-off-20261120-icdbw",
+      "pref": "shizuoka",
+      "date": "2026-11-20",
+      "endDate": "",
+      "title": "自衛隊静岡地方協力本部",
+      "place": "",
+      "url": "https://www.mod.go.jp/pco/sizuoka/bosyu/pdf/66.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-11-20",
+      "reason": "イベント語が無く非イベントの兆候がある"
     },
     {
       "id": "ai-office-20280620-ghetd",
@@ -99,16 +99,16 @@
       "reason": "OCR由来の不自然な未来日"
     },
     {
-      "id": "ka-office-20261122-2swqi",
-      "pref": "kagoshima",
-      "date": "2026-11-22",
+      "id": "mi-off-20270128-u7giv",
+      "pref": "mie",
+      "date": "2027-01-28",
       "endDate": "",
-      "title": "後夜祭",
-      "place": "キャンパス内",
-      "url": "https://www.mod.go.jp/pco/kagoshima/img/event/20261121-22kokusaidaifes-3.jpg",
+      "title": "令和8年度自衛官等採用案内はこちら",
+      "place": "防衛大学",
+      "url": "https://www.mod.go.jp/pco/mie/wp2023/wp-content/uploads/2026/03/993bddd5b6bcef70f2d6fd26a4da7d58.pdf",
       "source_type": "office_ocr",
       "quarantinedAt": "2026-11-20",
-      "reason": "タイトルが短すぎる"
+      "reason": "日付がタイトルになっている"
     }
   ]
 }

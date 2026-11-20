@@ -2,15 +2,15 @@
   "updatedAt": "2026-11-20",
   "limit": 30,
   "summary": {
-    "checked": 231,
+    "checked": 238,
     "flagged": 16,
-    "attempted": 8,
+    "attempted": 7,
     "corrected": 0,
-    "unverified": 8,
+    "unverified": 7,
     "noSource": 1,
     "overBudget": 0,
     "skippedNoSource": 1,
-    "skippedNotEligible": 7,
+    "skippedNotEligible": 8,
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
@@ -19,6 +19,11 @@
     {
       "id": "ib-20261121-e6nyb",
       "pref": "ibaraki",
+      "reason": "not_eligible"
+    },
+    {
+      "id": "to-office-20261128-ofqv0",
+      "pref": "tochigi",
       "reason": "not_eligible"
     },
     {
