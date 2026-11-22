@@ -1,21 +1,9 @@
 {
   "updatedAt": "2026-11-22",
-  "count": 8,
+  "count": 7,
   "events": [
     {
-      "id": "as-off-20270128-tr87l",
-      "pref": "asahikawa",
-      "date": "2027-01-28",
-      "endDate": "",
-      "title": "令和8年度自衛官等採用試験予定表",
-      "place": "防衛大学",
-      "url": "https://www.mod.go.jp/pco/asahikawa/01_recruit/r8_nitteihyou.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-11-22",
-      "reason": "日付がタイトルになっている"
-    },
-    {
-      "id": "as-off-20270128-i34vl",
+      "id": "as-office-20270128-80r9k",
       "pref": "asahikawa",
       "date": "2027-01-28",
       "endDate": "",
@@ -28,30 +16,6 @@
     },
     {
       "id": "mi-office-20270128-o4a4d",
-      "pref": "miyagi",
-      "date": "2027-01-28",
-      "endDate": "",
-      "title": "令和8年度自衛官等採用試験案内",
-      "place": "防衛大学",
-      "url": "https://www.mod.go.jp/pco/miyagi/miyagitop/image/r8rec-schedule.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-11-22",
-      "reason": "日付がタイトルになっている"
-    },
-    {
-      "id": "mi-off-20270128-ke8x2",
-      "pref": "miyagi",
-      "date": "2027-01-28",
-      "endDate": "",
-      "title": "令和8年度自衛官等採用試験案内",
-      "place": "防衛大学",
-      "url": "https://www.mod.go.jp/pco/miyagi/miyagitop/image/r8rec-schedule.pdf",
-      "source_type": "office_ocr",
-      "quarantinedAt": "2026-11-22",
-      "reason": "日付がタイトルになっている"
-    },
-    {
-      "id": "mi-off-20270128-ke8x2",
       "pref": "miyagi",
       "date": "2027-01-28",
       "endDate": "",
@@ -97,6 +61,30 @@
       "source_type": "office_ocr",
       "quarantinedAt": "2026-11-22",
       "reason": "OCR由来の不自然な未来日"
+    },
+    {
+      "id": "mi-off-20270128-u7giv",
+      "pref": "mie",
+      "date": "2027-01-28",
+      "endDate": "",
+      "title": "令和8年度自衛官等採用案内はこちら",
+      "place": "防衛大学",
+      "url": "https://www.mod.go.jp/pco/mie/wp2023/wp-content/uploads/2026/03/993bddd5b6bcef70f2d6fd26a4da7d58.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-11-22",
+      "reason": "日付がタイトルになっている"
+    },
+    {
+      "id": "ka-off-20270128-d6sn5",
+      "pref": "kagawa",
+      "date": "2027-01-28",
+      "endDate": "",
+      "title": "令和8年度自衛官等募集案内はこちら",
+      "place": "防衛大学",
+      "url": "https://www.mod.go.jp/pco/kagawa/R8saiyouanai.pdf",
+      "source_type": "office_ocr",
+      "quarantinedAt": "2026-11-22",
+      "reason": "日付がタイトルになっている"
     }
   ]
 }

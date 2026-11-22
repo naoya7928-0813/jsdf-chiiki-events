@@ -2,25 +2,20 @@
   "updatedAt": "2026-11-22",
   "limit": 30,
   "summary": {
-    "checked": 219,
-    "flagged": 14,
-    "attempted": 6,
+    "checked": 205,
+    "flagged": 12,
+    "attempted": 5,
     "corrected": 0,
-    "unverified": 6,
+    "unverified": 5,
     "noSource": 0,
     "overBudget": 0,
     "skippedNoSource": 0,
-    "skippedNotEligible": 8,
+    "skippedNotEligible": 7,
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
   "corrections": [],
   "skipped": [
-    {
-      "id": "ib-20261121-e6nyb",
-      "pref": "ibaraki",
-      "reason": "not_eligible"
-    },
     {
       "id": "to-office-20261128-ofqv0",
       "pref": "tochigi",
