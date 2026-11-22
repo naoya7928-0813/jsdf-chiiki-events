@@ -3,10 +3,10 @@
   "limit": 30,
   "summary": {
     "checked": 205,
-    "flagged": 12,
-    "attempted": 5,
-    "corrected": 0,
-    "unverified": 5,
+    "flagged": 16,
+    "attempted": 9,
+    "corrected": 2,
+    "unverified": 7,
     "noSource": 0,
     "overBudget": 0,
     "skippedNoSource": 0,
@@ -14,7 +14,68 @@
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
-  "corrections": [],
+  "corrections": [
+    {
+      "id": "as-office-20261207-n1673",
+      "pref": "asahikawa",
+      "source": "https://www.mod.go.jp/pco/asahikawa/01_recruit/r9.01siken01.jpg",
+      "reasons": [
+        "日付がタイトルになっている"
+      ],
+      "changes": [
+        {
+          "field": "title",
+          "from": "令和8年度 冬の自衛官採用試験案内",
+          "to": "令和8年度 自衛官採用試験案内"
+        },
+        {
+          "field": "endDate",
+          "from": null,
+          "to": "2027-03-01"
+        },
+        {
+          "field": "ageRequirement",
+          "from": "18歳～33歳未満",
+          "to": "18歳～33歳未満の方"
+        },
+        {
+          "field": "deadline",
+          "from": "令和8年12月3日（水）",
+          "to": "12月3日（木）"
+        },
+        {
+          "field": "notes",
+          "from": "掲載元: 募集案内所・地域事務所\n筆記(Web)試験はスマートフォンでの受験が可能",
+          "to": "筆記(Web)試験は、スマートフォンでの受験が可能です。"
+        }
+      ]
+    },
+    {
+      "id": "eh-off-20270123-516jb",
+      "pref": "ehime",
+      "source": "https://www.mod.go.jp/pco/ehime/recruit/img/jukenannai/09_seito.pdf",
+      "reasons": [
+        "日付がタイトルになっている"
+      ],
+      "changes": [
+        {
+          "field": "address",
+          "from": null,
+          "to": "松山市南梅本町乙115番地"
+        },
+        {
+          "field": "tag",
+          "from": "学生向け",
+          "to": null
+        },
+        {
+          "field": "notes",
+          "from": "昼食は各自用意。受験票・筆記具持参。",
+          "to": "試験会場は志願者数により変更になる場合があります。"
+        }
+      ]
+    }
+  ],
   "skipped": [
     {
       "id": "to-office-20261128-ofqv0",
