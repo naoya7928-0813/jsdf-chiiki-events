@@ -608,7 +608,9 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
     送り、サーバーが絞り込みを引き継ぐ。`batchId`（公開データの更新時刻）が同じ呼び出しは二度送らない（`push:batch:*`・1日）
 - **公式リンクの検査**: `.github/workflows/link-check.yml`（週1回）→ `scripts/check-links.mjs`（`shared/linkCheck.cjs`）。
   正直な UA・robots.txt 順守・3秒間隔。404/410 だけをリンク切れとし、403・ボット確認画面は「確認できず」（回避しない）。
-  ⚠️ 取得先はスクレイプした値なので、IP直書き・localhost・内部向けドメイン・特殊ポートには接続しない（`isPublicHttpUrl`。リダイレクト先も1段ずつ確認）
+  ⚠️ 取得先はスクレイプした値なので内部ネットワークへ接続しない: URL の形（IP直書き・localhost・内部向けドメイン・特殊ポート）を `isPublicHttpUrl` で弾き、
+  **名前解決の結果**を `isPrivateAddress` で検査して検査済みのアドレスにだけ接続する（`makeSafeLookup` を node:http/https の `lookup` に渡す。
+  fetch は名前解決を差し替えられないので使わない）。リダイレクトは robots.txt を含めて1段ずつたどり、行き先ごとに検査し直す
 
 ## PWA（ホーム画面アプリ）（2026-09-01 整備）
 

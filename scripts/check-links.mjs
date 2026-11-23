@@ -12,7 +12,10 @@
 import { readFileSync, writeFileSync, appendFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { classifyLink, isChallengePage, parseRobots, robotsPolicyFromStatus, isPublicHttpUrl } from '../shared/linkCheck.cjs';
+import http from 'node:http';
+import https from 'node:https';
+import dns from 'node:dns';
+import { classifyLink, isChallengePage, parseRobots, robotsPolicyFromStatus, isPublicHttpUrl, makeSafeLookup } from '../shared/linkCheck.cjs';
 import { siteUrl } from '../shared/siteUrl.cjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -37,38 +40,62 @@ for (const [pref, arr] of Object.entries(data)) {
 const urls = [...byUrl.keys()].slice(0, MAX_URLS);
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-// 内部ネットワーク（IP直書き・localhost 等）へは接続しない。テスト用に LINK_CHECK_ALLOW_LOCAL=1 で外せる
+// 内部ネットワークへは接続しない（テスト用に LINK_CHECK_ALLOW_LOCAL=1 で外せる）。
+//   1. URL の形（IP直書き・localhost・内部向けドメイン・特殊ポート）を isPublicHttpUrl で弾く
+//   2. 名前解決の結果を isPrivateAddress で検査し、検査したアドレスにだけ接続する（lookup を差し替えるので、
+//      検査後に別のアドレスへつながる＝DNS の切り替えを使った回り込みも起きない）
+//   3. リダイレクトは自分で1段ずつたどり、行き先ごとに 1・2 をやり直す（robots.txt の取得も同じ）
+// fetch は名前解決を差し替えられないため、node:http/https で取得する
 const ALLOW_LOCAL = process.env.LINK_CHECK_ALLOW_LOCAL === '1';
 const reachable = (u) => ALLOW_LOCAL || isPublicHttpUrl(u);
-async function get(url) {
-  const ac = new AbortController();
-  const timer = setTimeout(() => ac.abort(), TIMEOUT_MS);
-  try {
-    // リダイレクトは自分で1段ずつたどり、行き先も公開URLか確かめる（最大5回）
-    let res, cur = url;
-    for (let hop = 0; ; hop++) {
-      if (!reachable(cur)) return { error: 'not-public-url' };
-      res = await fetch(cur, { headers: { 'user-agent': UA, accept: '*/*' }, redirect: 'manual', signal: ac.signal });
-      const loc = res.headers.get('location');
-      if (res.status >= 300 && res.status < 400 && loc && hop < 5) {
-        await res.body?.cancel().catch(() => {});
-        cur = new URL(loc, cur).href;
-        continue;
-      }
-      break;
+
+const safeLookup = makeSafeLookup(dns.lookup, ALLOW_LOCAL);
+
+/** 1回だけ GET する（リダイレクトはたどらない）。本文は readBody バイトまで読んで捨てる */
+function requestOnce(url, readBody) {
+  return new Promise((resolve) => {
+    let done = false;
+    const finish = (v) => { if (!done) { done = true; resolve(v); } };
+    const mod = url.startsWith('https:') ? https : http;
+    let req;
+    try {
+      req = mod.get(url, { headers: { 'user-agent': UA, accept: '*/*' }, lookup: safeLookup, timeout: TIMEOUT_MS }, (res) => {
+        const chunks = []; let size = 0;
+        const out = () => ({ status: res.statusCode, location: res.headers.location || '', body: Buffer.concat(chunks).toString('utf8') });
+        if (!readBody) { res.resume(); finish(out()); req.destroy(); return; }
+        res.on('data', (c) => {
+          chunks.push(c); size += c.length;
+          if (size >= readBody) { finish(out()); req.destroy(); }
+        });
+        res.on('end', () => finish(out()));
+        res.on('error', () => finish(out()));
+      });
+    } catch (err) { finish({ error: err.message }); return; }
+    req.on('timeout', () => { req.destroy(); finish({ error: 'timeout' }); });
+    req.on('error', (err) => finish({ error: err.code === 'EBLOCKED' ? 'not-public-address' : (err.code || err.message) }));
+  });
+}
+
+/** リダイレクトを1段ずつ検査しながらたどる（最大5回） */
+async function getFollow(url, readBody) {
+  let cur = url;
+  for (let hop = 0; hop <= 5; hop++) {
+    if (!reachable(cur)) return { error: 'not-public-url' };
+    const r = await requestOnce(cur, readBody);
+    if (r.error) return r;
+    if (r.status >= 300 && r.status < 400 && r.location && hop < 5) {
+      try { cur = new URL(r.location, cur).href; } catch { return { error: 'bad-redirect' }; }
+      continue;
     }
-    let start = '';
-    if (res.status === 403 || res.status === 503 || res.status === 429) {
-      start = (await res.text().catch(() => '')).slice(0, 2000);
-    } else {
-      await res.body?.cancel().catch(() => {});
-    }
-    return { status: res.status, challenge: isChallengePage(res.status, start) };
-  } catch (err) {
-    return { error: err.name === 'AbortError' ? 'timeout' : err.message };
-  } finally {
-    clearTimeout(timer);
+    return r;
   }
+  return { error: 'too-many-redirects' };
+}
+
+async function get(url) {
+  const r = await getFollow(url, 2000);
+  if (r.error) return { error: r.error };
+  return { status: r.status, challenge: isChallengePage(r.status, r.body) };
 }
 
 const robotsCache = new Map();
@@ -77,17 +104,11 @@ async function allowed(url) {
   const u = new URL(url);
   if (!robotsCache.has(u.origin)) {
     let fn;
-    const ac = new AbortController();
-    const timer = setTimeout(() => ac.abort(), TIMEOUT_MS);
-    try {
-      const res = await fetch(`${u.origin}/robots.txt`, { headers: { 'user-agent': UA }, signal: ac.signal });
-      const policy = robotsPolicyFromStatus(res.status);
-      if (policy === 'parse') fn = parseRobots(await res.text(), UA);
-      else { await res.body?.cancel().catch(() => {}); fn = () => policy === 'allow_all'; }
-    } catch {
-      fn = () => false; // robots.txt が取れない＝確認しない（RFC 9309）
-    } finally {
-      clearTimeout(timer);
+    const r = await getFollow(`${u.origin}/robots.txt`, 512 * 1024);
+    if (r.error) fn = () => false; // robots.txt が取れない＝確認しない（RFC 9309）
+    else {
+      const policy = robotsPolicyFromStatus(r.status);
+      fn = policy === 'parse' ? parseRobots(r.body, UA) : () => policy === 'allow_all';
     }
     robotsCache.set(u.origin, fn);
     await sleep(INTERVAL_MS);
