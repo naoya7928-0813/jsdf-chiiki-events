@@ -128,6 +128,19 @@ cd scraper && node index.js
 - ⚠️ **cron を変えたら `shared/scrapeDeadline.cjs` の `SLOTS` も直すこと**。
   テストが scrape.yml を読んでズレを検出する（以前は対応表がワークフロー内に手書きで二重管理だった）
 
+### 公式サイトへのアクセスの決めごと（2026-11-23。`scraper/lib/accessPolicy.js`）
+- **名乗る**: User-Agent は当サイト名と公開URL（`USER_AGENT`）。ブラウザのふりをしない（fetch のヘッダーも同じ値）
+- ⚠️ **ボット検知を回避しない**: `playwright-extra`・`puppeteer-extra-plugin-stealth`・`navigator.webdriver` の書き換え・偽の sec-ch-ua・
+  `--disable-blink-features=AutomationControlled` は 2026-11-23 に廃止した。戻さないこと（`shared/scraperAccess.test.cjs` が検出）。
+  理由: 相手（防衛省）との信頼を損ね、検知されると突然まとめて取れなくなる。週1回の HP 更新監視は同じ Actions から名乗り付きの
+  普通のブラウザで 322 ページを取得して失敗0件だった（2026-11-23）ので、偽装は不要と判断した
+- ボット確認画面で取れない地本は**失敗として扱い前回データを引き継ぐ**（`keysNeedingCarryOver`）。運営画面の手動登録で補い、必要なら地本に相談する
+- **軽くする**: ページ表示では画像・動画・フォント・CSS を読まない（`BLOCKED_RESOURCE_TYPES`。JavaScript は組み立てに要る地本があるので読む）。
+  チラシの画像・PDF は `downloadFile()`（キャッシュ・条件付きGET）で取るので影響しない。Referer は「リンクを見つけた mod.go.jp」で実際の値
+- **HP 更新監視（`check-source-updates.js`）の比べ方**は「見える文章＋リンク・画像・PDF の参照先」（`scraper/lib/sourceMonitor.js` の版 2）。
+  以前は HTML 全体を比べ、毎回変わる埋め込み（スクリプトのトークン等）で 322 URL 中 320 URL が毎週「更新あり」になり、
+  フルスクレイプを余計に起動していた。比べ方を変えたら `HASH_VERSION` を上げる（前回と版が違う回は基準値の作り直しにして、全件更新扱いにしない）
+
 - 対象: 47 都道府県の自衛隊地本公式サイト
 - 出力: `public/data/events.json`（`updatedAt` フィールド付き）
 - カテゴリ標準値: `説明会` / `採用イベント` / `一般公開` / `艦艇公開` / `体験` / `演奏会` / `記念行事` / `広報活動` / `地域参加`
@@ -942,7 +955,8 @@ ErrorBoundary（`src/components/ErrorBoundary.jsx`）のフォールバックが
 
 ### 3. スクレイプ失敗・イベント数急減（ntfy アラート）
 1. GitHub Actions のログで失敗した地本・ステップを特定（`gh run view <run-id> --log`）
-2. 地本サイト側の構造変更ならパーサー修正、Cloudflare 検知なら `withFreshContext`/待機時間を確認
+2. 地本サイト側の構造変更ならパーサー修正。ボット確認画面（Cloudflare）で取れないときは**回避しない**（前回データが引き継がれる。
+   運営画面の手動登録で補い、続くなら地本に相談する。上記「公式サイトへのアクセスの決めごと」）
 3. **データが消えた場合の復元**: `git show <正常だったコミット>:public/data/events.json > public/data/events.json` → HTML再生成 → commit/push
 4. イベントが全て消える事故の典型は「過去日付フィルター」（writeOutput）。日付生成ロジックと今日の日付の関係を確認
 

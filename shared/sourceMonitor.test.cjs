@@ -59,8 +59,26 @@ test('イベント本文やリンクの変更は更新として検知する', ()
 });
 
 test('初回はbaseline、同一HTMLはunchanged、差分はchanged', () => {
-  const current = { hash: hashHtml('<p>A</p>') };
+  const { HASH_VERSION } = require('../scraper/lib/sourceMonitor');
+  const current = { hash: hashHtml('<p>A</p>'), hashVersion: HASH_VERSION };
   assert.equal(classifyChange(null, current), 'baseline');
-  assert.equal(classifyChange({ hash: current.hash }, current), 'unchanged');
-  assert.equal(classifyChange({ hash: hashHtml('<p>B</p>') }, current), 'changed');
+  assert.equal(classifyChange({ hash: current.hash, hashVersion: HASH_VERSION }, current), 'unchanged');
+  assert.equal(classifyChange({ hash: hashHtml('<p>B</p>'), hashVersion: HASH_VERSION }, current), 'changed');
+  // 比べ方の版が変わった直後は基準値の作り直し（全ページ「更新あり」でフルスクレイプを起動しない）
+  assert.equal(classifyChange({ hash: 'old-format' }, current), 'baseline');
+});
+
+test('毎回変わる埋め込み（スクリプトのトークン・head の link/meta・配信基盤の参照）だけの差は更新にしない', () => {
+  const page = (token, ver) => `<html><head><title>イベント</title><meta name="csrf" content="${token}">
+    <link rel="stylesheet" href="/style.css?ver=${ver}"><script>window.__CF$cv$params={r:'${token}',t:'${ver}'};</script></head>
+    <body><script nonce="${token}">var x='${token}';</script><img src="/cdn-cgi/beacon?${token}">
+    <h2>12月6日 説明会</h2><a href="/flyer.pdf">チラシ</a><noscript>${token}</noscript></body></html>`;
+  assert.equal(hashHtml(page('aaa', 1)), hashHtml(page('bbb', 2)));
+});
+
+test('チラシの差し替え・日付の変更・画像の差し替えは更新として検知する', () => {
+  const base = '<body><h2>12月6日 説明会</h2><a href="/flyer.pdf">チラシ</a><img src="/a.jpg"></body>';
+  assert.notEqual(hashHtml(base), hashHtml(base.replace('/flyer.pdf', '/flyer2.pdf')));
+  assert.notEqual(hashHtml(base), hashHtml(base.replace('12月6日', '12月7日')));
+  assert.notEqual(hashHtml(base), hashHtml(base.replace('/a.jpg', '/b.jpg')));
 });
