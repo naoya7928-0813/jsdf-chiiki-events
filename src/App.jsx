@@ -3,7 +3,8 @@ import { useEvents } from './hooks/useEvents';
 // 遅延読込は lazyWithRecovery 経由（旧チャンクが消えた時に自動復旧する。utils/lazyChunk.js）
 import { lazyWithRecovery } from './utils/lazyChunk';
 import { COLOR_SCHEMES, DEFAULT_SCHEME } from './config';
-import { PREFECTURE_INFO } from './data/regionMap';
+import { PREFECTURE_INFO, SUPPORTED_PREFECTURES } from './data/regionMap';
+import { MY_PREF_KEY, normalizeMyPref, startScreenFor, defaultListRegion } from '../shared/myPref.cjs';
 import { OperatorNavContext } from './components/Shared';
 import { useBreakpoint, LayoutModeContext, isPhoneSized } from './hooks/useBreakpoint';
 import { applyOrientationPreference } from './utils/orientation';
@@ -44,6 +45,8 @@ function loadScheme()       { try { return localStorage.getItem('jsdf-scheme') |
 function loadRegion()       { try { return localStorage.getItem('jsdf-region') || 'all';          } catch { return 'all';          } }
 function loadDarkMode()     { try { return localStorage.getItem('jsdf-dark')   || 'system';       } catch { return 'system';       } }
 function loadLastMapRegion(){ try { return localStorage.getItem('jsdf-last-region') || null;       } catch { return null;           } }
+// 自分の都道府県（設定画面で選ぶ。端末内にだけ保存。shared/myPref.cjs）
+function loadMyPref() { try { return normalizeMyPref(localStorage.getItem(MY_PREF_KEY), SUPPORTED_PREFECTURES); } catch { return ''; } }
 function loadLastPrefId()   { try { return localStorage.getItem('jsdf-last-pref')   || null;       } catch { return null;           } }
 function loadAutoMode()     { try { return localStorage.getItem('jsdf-auto-mode') !== 'false';    } catch { return true;           } }
 function loadLayoutMode()   { try { return localStorage.getItem('jsdf-layout-mode') || 'auto';    } catch { return 'auto';         } }
@@ -154,7 +157,14 @@ export default function App({ operator = false }) {
   const isDesktopLayout = breakpoint === 'desktop';
 
   // ── ナビゲーション ────────────────────────────────────────
-  const [screen,      setScreen]      = useState('home');
+  // 自分の都道府県を設定していれば、トップ（/）から開いたときはその都道府県のイベント一覧から始める。
+  // 共有リンク（/event/… 等）から開いたときは従来どおりそのページを出す
+  const [myPref, setMyPref] = useState(() => (operator ? '' : loadMyPref()));
+  const [screen,      setScreen]      = useState(
+    () => startScreenFor({ myPref: operator ? '' : loadMyPref(), pathname: window.location.pathname, operator })
+  );
+  // 起動時に一覧から始めた場合、URL を /list に「置き換える」（履歴を1つ増やさない）
+  const startReplace = useRef(screen === 'list');
   // 404 の理由（'event'=掲載終了/存在しないイベント, 'path'=不明なURL）
   const [notFoundReason, setNotFoundReason] = useState('path');
   const [detailEvent, setDetailEvent] = useState(null);
@@ -221,8 +231,15 @@ export default function App({ operator = false }) {
   }, []);
 
   // ── 地本設定（ListScreen 用） ─────────────────────────────
-  // 起動時・画面遷移時は常に「全国」から開始（前回選択した都道府県を引き継がない）
-  const [region, setRegion] = useState('all');
+  // 起動時・一覧を開いたときは「自分の都道府県」（未設定なら全国）から開始。前回選択した都道府県は引き継がない
+  const [region, setRegion] = useState(() => defaultListRegion(operator ? '' : loadMyPref()));
+  // 設定画面で「自分の都道府県」を変えたとき（端末内に保存し、一覧の絞り込みもそれに合わせる）
+  const handleMyPrefChange = useCallback((value) => {
+    const v = normalizeMyPref(value, SUPPORTED_PREFECTURES);
+    setMyPref(v);
+    try { if (v) localStorage.setItem(MY_PREF_KEY, v); else localStorage.removeItem(MY_PREF_KEY); } catch { /* 保存できない環境 */ }
+    setRegion(defaultListRegion(v));
+  }, []);
   const handleRegionChange = useCallback((id) => {
     setRegion(id);
   }, []);
@@ -389,10 +406,10 @@ export default function App({ operator = false }) {
     const rgm = pathname.match(/^\/region\/([a-z]+)\/?$/);
     if (rgm) { setMapRegionId(rgm[1]); setScreen('region'); return; }
     const entry = Object.entries(ROUTE_SCREENS).find(([, p]) => p === pathname);
-    if (entry) { if (entry[0] === 'list') setRegion('all'); setScreen(entry[0]); return; }
+    if (entry) { if (entry[0] === 'list') setRegion(defaultListRegion(myPref)); setScreen(entry[0]); return; }
     setNotFoundReason('path');
     setScreen('notfound');
-  }, [findEventById, loading]);
+  }, [findEventById, loading, myPref]);
 
   // ── 404 は検索エンジンにインデックスさせない（ソフト404対策） ──
   // SPA は不明なURLでも HTTP 200 を返すため、noindex を動的に付けて
@@ -424,7 +441,11 @@ export default function App({ operator = false }) {
     if ((screen === 'detail' || (isWide && screen === 'list')) && detailEvent?.id) path = `/event/${encodeURIComponent(detailEvent.id)}`;
     else if (screen === 'region' && mapRegionId) path = `/region/${mapRegionId}`;
     else if (ROUTE_SCREENS[screen]) path = ROUTE_SCREENS[screen];
-    if (path && window.location.pathname !== path) window.history.pushState({}, '', path);
+    if (path && window.location.pathname !== path) {
+      if (startReplace.current) window.history.replaceState({}, '', path);
+      else window.history.pushState({}, '', path);
+    }
+    startReplace.current = false;
   }, [screen, detailEvent, mapRegionId, operator, isWide]);
 
   // ブラウザ/スマホの戻る・進む
@@ -689,8 +710,8 @@ export default function App({ operator = false }) {
           initialRegionId={mapRegionId}
           onOpenNotifications={() => setScreen('notifications')}
           onOpenList={(prefId) => {
-            // prefId あり → その都道府県タブを選択、なし → 全国（all）にリセット
-            handleRegionChange(prefId || 'all');
+            // prefId あり → その都道府県タブを選択、なし → 自分の都道府県（未設定なら全国）
+            handleRegionChange(prefId || defaultListRegion(myPref));
             setScreen('list');
           }}
           onOpenRegion={openRegion}
@@ -710,7 +731,7 @@ export default function App({ operator = false }) {
           onBack={() => setScreen('home')}
           onOpenDetail={(ev) => openDetail(ev, 'region')}
           onOpenHome={() => setScreen('home')}
-          onOpenList={() => { handleRegionChange('all'); setScreen('list'); }}
+          onOpenList={() => { handleRegionChange(defaultListRegion(myPref)); setScreen('list'); }}
           onOpenFavorites={() => setScreen('favorites')}
           onOpenSettings={() => setScreen('settings')}
         />
@@ -738,6 +759,7 @@ export default function App({ operator = false }) {
                 stale={stale} lastSyncedAt={lastSyncedAt}
                 theme={theme}
                 region={region} onRegionChange={handleRegionChange}
+                myPref={myPref}
                 favorites={favorites}
                 applied={applied}
                 onToggleApplied={handleToggleApplied}
@@ -788,6 +810,7 @@ export default function App({ operator = false }) {
             stale={stale} lastSyncedAt={lastSyncedAt}
             theme={theme}
             region={region} onRegionChange={handleRegionChange}
+            myPref={myPref}
             favorites={favorites}
             applied={applied}
             onToggleApplied={handleToggleApplied}
@@ -837,11 +860,13 @@ export default function App({ operator = false }) {
           autoApply={autoApply}
           onAutoApplyChange={handleAutoApplyChange}
           onOpenHome={() => setScreen('home')}
-          onOpenList={() => { handleRegionChange('all'); setScreen('list'); }}
+          onOpenList={() => { handleRegionChange(defaultListRegion(myPref)); setScreen('list'); }}
           onOpenRegion={openRegion}
           onOpenFavorites={() => setScreen('favorites')}
           onOpenLegal={(doc) => { setLegalDoc(doc); setScreen('legal'); }}
           onOpenReport={() => { setReportTarget(null); setReportBack('settings'); setScreen('report'); }}
+          myPref={myPref}
+          onMyPrefChange={handleMyPrefChange}
         />
       )}
 
@@ -883,7 +908,7 @@ export default function App({ operator = false }) {
           events={events}
           theme={theme}
           onOpenHome={() => setScreen('home')}
-          onOpenList={() => { handleRegionChange('all'); setScreen('list'); }}
+          onOpenList={() => { handleRegionChange(defaultListRegion(myPref)); setScreen('list'); }}
           onOpenDetail={(ev) => openDetail(ev, 'home')}
         />
       )}
@@ -897,7 +922,7 @@ export default function App({ operator = false }) {
           onOpenDetail={(ev) => openDetail(ev, 'favorites')}
           onBack={() => setScreen('home')}
           onOpenHome={() => setScreen('home')}
-          onOpenList={() => { handleRegionChange('all'); setScreen('list'); }}
+          onOpenList={() => { handleRegionChange(defaultListRegion(myPref)); setScreen('list'); }}
           onOpenRegion={openRegion}
           onOpenSettings={() => setScreen('settings')}
         />

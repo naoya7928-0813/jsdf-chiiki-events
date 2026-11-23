@@ -44,6 +44,7 @@ export default function ListScreen({
   events, loading, error, updatedAt, checkedAt, onRefresh,
   stale, lastSyncedAt,   // 表示中のデータが最新でない（オフライン・取得失敗）／最後に取得できた日時
   region, onRegionChange,
+  myPref = '',   // 設定画面の「自分の都道府県」（地域タブの先頭に1タップで戻れるボタンを出す）
   favorites, applied, onToggleApplied,
   onOpenHome, onOpenDetail, onOpenSettings, onOpenFavorites,
   theme,
@@ -100,7 +101,7 @@ export default function ListScreen({
     const c = regionTabScrollRef.current, b = activeRegionTabRef.current;
     if (!c || !b) return;
     c.scrollLeft = Math.max(0, b.offsetLeft - c.clientWidth / 2 + b.offsetWidth / 2);
-  }, [activeRegionId]);
+  }, [activeRegionId, region]);
 
   // 第2段（都道府県）タブ横スクロール
   const prefTabScrollRef = useRef(null);
@@ -417,13 +418,37 @@ export default function ListScreen({
         }}
           onWheel={e => { if (e.deltaY !== 0) { e.preventDefault(); e.currentTarget.scrollLeft += e.deltaY; } }}
         >
+          {/* 自分の都道府県へ1タップで戻る（設定しているときだけ） */}
+          {myPref && PREFECTURE_INFO[myPref] && (() => {
+            const isMine = region === myPref;
+            return (
+              <button
+                key="my-pref"
+                ref={isMine ? activeRegionTabRef : null}
+                onClick={() => handlePrefClick(myPref)}
+                aria-pressed={isMine}
+                aria-label={`自分の都道府県（${PREFECTURE_INFO[myPref].label}）のイベント`}
+                style={{
+                  flexShrink: 0, border: 'none', cursor: 'pointer', borderRadius: 20,
+                  background: isMine ? '#fff' : 'rgba(255,255,255,0.18)',
+                  color: isMine ? primary : '#fff',
+                  padding: '6px 12px', display: 'flex', alignItems: 'center', gap: 5,
+                  boxShadow: isMine ? '0 1px 4px rgba(0,0,0,0.15)' : 'none',
+                }}
+              >
+                <span aria-hidden="true" style={{ fontSize: 11 }}>★</span>
+                <span style={{ fontSize: 12, fontWeight: isMine ? 700 : 600, whiteSpace: 'nowrap' }}>{PREFECTURE_INFO[myPref].label}</span>
+                <span style={{ fontSize: 10, fontFamily: F.mono, opacity: 0.75 }}>{Array.isArray(events[myPref]) ? events[myPref].length : 0}</span>
+              </button>
+            );
+          })()}
           {REGION_TABS.map(rt => {
             const isA = activeRegionId === rt.id;
             const cnt = regionCounts[rt.id] ?? 0;
             return (
               <button
                 key={rt.id}
-                ref={isA ? activeRegionTabRef : null}
+                ref={isA && !(myPref && region === myPref) ? activeRegionTabRef : null}
                 onClick={() => handleRegionClick(rt.id)}
                 style={{
                   flexShrink: 0, border: 'none', cursor: 'pointer', borderRadius: 20,

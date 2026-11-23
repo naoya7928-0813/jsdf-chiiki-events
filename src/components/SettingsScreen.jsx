@@ -6,7 +6,7 @@ import { usePushNotification } from '../hooks/usePushNotification';
 import { useWatchPref } from '../hooks/useFavoriteWatch';
 import { fetchOfficesData } from '../hooks/useOffices';
 import { UPDATE_NOTES, TYPE_LABEL } from '../constants/updates';
-import { REGIONS } from '../data/regionMap';
+import { REGIONS, SUPPORTED_PREFECTURES, PREFECTURE_INFO } from '../data/regionMap';
 import { STANDARD_CATEGORIES } from './FilterBar';
 
 // package.json の version を vite.config.js の define で埋め込んだ定数
@@ -23,6 +23,7 @@ export default function SettingsScreen({
   onOpenHome, onOpenRegion, onOpenList, onOpenFavorites,
   onOpenLegal,
   onOpenReport,
+  myPref = '', onMyPrefChange,
 }) {
   const { primary, schemeKey, darkMode } = theme;
 
@@ -108,6 +109,16 @@ export default function SettingsScreen({
       {/* 設定は読みやすさ優先。デスクトップでも横に伸ばさず中央 720px に収める */}
       <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '16px 0 8px' }}>
       <div style={{ maxWidth: 720, margin: '0 auto', width: '100%' }}>
+
+        {/* ─ 0. 自分の都道府県（開いたときに最初に出す一覧） ─ */}
+        {onMyPrefChange && (
+          <>
+            <GroupTitle>自分の都道府県</GroupTitle>
+            <Card>
+              <MyPrefRow value={myPref} onChange={onMyPrefChange} />
+            </Card>
+          </>
+        )}
 
         {/* ─ 1. ブラウザ通知（Web Push） ─ */}
         <GroupTitle>ブラウザ通知</GroupTitle>
@@ -837,6 +848,42 @@ function PushFilterPanel({ filter, onChange, primary }) {
             onClick={() => onChange({ regions, categories: toggle(categories, c) })}>{c}</button>
         ))}
       </div>
+    </div>
+  );
+}
+
+// ─── 自分の都道府県（端末内にだけ保存。shared/myPref.cjs） ─────────────
+function MyPrefRow({ value, onChange }) {
+  const label = value ? (PREFECTURE_INFO[value]?.label || value) : '';
+  return (
+    <div style={{ padding: '12px 14px' }}>
+      <label htmlFor="my-pref-select" style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', display: 'block' }}>
+        アプリを開いたときに表示する都道府県
+      </label>
+      <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 3, lineHeight: 1.5 }}>
+        {value
+          ? `アプリを開くと、${label}のイベント一覧から始まります。一覧の「全国」タブでいつでも全国に戻れます。`
+          : '選ぶと、アプリを開いたときに全国の地図ではなく、その都道府県のイベント一覧から始まります。'}
+      </div>
+      <select
+        id="my-pref-select"
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        style={{
+          marginTop: 10, width: '100%', minHeight: 44, padding: '8px 10px', borderRadius: 8,
+          border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)',
+          fontSize: 15, fontFamily: F.sans,
+        }}
+      >
+        <option value="">設定しない（全国の地図から始める）</option>
+        {REGIONS.map(r => (
+          <optgroup key={r.id} label={r.label}>
+            {r.prefectures.filter(p => SUPPORTED_PREFECTURES.has(p.id)).map(p => (
+              <option key={p.id} value={p.id}>{p.label}{r.id === 'hokkaido' ? '（北海道）' : ''}</option>
+            ))}
+          </optgroup>
+        ))}
+      </select>
     </div>
   );
 }
