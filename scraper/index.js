@@ -4526,6 +4526,20 @@ async function main() {
   // カットオフの結果を残す（ワークフローが実行サマリと管理者通知に使う）
   writeCutoffReport(cutoff, prefSkipped);
 
+  // 一次ソースで照合済みの追加イベント（data/verified-events.json）を合流させる。
+  // 地本サイトに載らない基地の航空祭など。writeOutput の整形・検疫・重複統合・終了後の削除をそのまま通る
+  try {
+    const { mergeVerifiedEvents } = require('../shared/verifiedEvents.cjs');
+    const vf = path.join(__dirname, '../data/verified-events.json');
+    if (fs.existsSync(vf)) {
+      const r = mergeVerifiedEvents(output, JSON.parse(fs.readFileSync(vf, 'utf8')).events, Object.keys(require('../shared/eventPage.cjs').PREF_LABELS));
+      console.log(`[照合済み追加] ${r.added.length} 件を合流${r.errors.length ? `（不備 ${r.errors.length} 件: ${r.errors.join(' / ')}）` : ''}`);
+      for (const e of r.errors) console.log(`::warning title=照合済み追加イベントの不備::${e}`);
+    }
+  } catch (err) {
+    console.warn('[照合済み追加] 読み込みに失敗（スクレイプは続行）:', err.message);
+  }
+
   await writeOutput(output, cutoff);
   // 段1〜3で使ったLLM結果を保存（次回は変化した分だけ呼ぶ）
   llmCache.save();
@@ -5239,12 +5253,14 @@ async function notifyNewEvents(prevData, newData) {
     }
   }
 
-  // 新規イベントを収集
+  // 新規イベントを収集。判定は実際に書き出した公開データで行う（検疫・除外されたものを通知しない。
+  // 通知から開く個別ページが 404 にならないように）
+  try { newData = JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8')); } catch { /* 読めなければ渡された値 */ }
   const newEvents = [];
   for (const key of Object.keys(newData)) {
     if (!Array.isArray(newData[key])) continue;
     for (const ev of newData[key]) {
-      if (ev.id && !prevIds.has(ev.id)) newEvents.push(ev);
+      if (ev.id && !prevIds.has(ev.id)) newEvents.push({ ...ev, pref: ev.pref || key });
     }
   }
 
@@ -5263,7 +5279,14 @@ async function notifyNewEvents(prevData, newData) {
     title: `自衛隊イベント情報 +${newEvents.length}件`,
     body:  sample.map(e => `・${e.title} (${e.date})`).join('\n')
          + (newEvents.length > 3 ? `\n他 ${newEvents.length - 3} 件…` : ''),
-    url:   '/',
+    // 新着が1件ならそのイベントの詳細へ直接開く（複数なら一覧）。ID は公開データと同じもの
+    url:   newEvents.length === 1 && newEvents[0].id
+      ? `/event/${encodeURIComponent(newEvents[0].id)}`
+      : '/list',
+    // 端末ごとの「地域・種目」の絞り込み用（/api/notify が当てはまる新着だけで通知文を作る）
+    events: newEvents.slice(0, require('../shared/pushFilter.cjs').MAX_NEW_EVENTS).map(e => ({ id: e.id, pref: e.pref, category: e.category, title: e.title, date: e.date })),
+    // 同じ回の通知を二度送らないための目印（公開データの更新時刻）
+    batchId: `events-${String(newData.updatedAt || Date.now()).replace(/[^0-9]/g, '')}`,
   };
   fs.writeFileSync(PUSH_PAYLOAD_PATH, JSON.stringify(payload, null, 2), 'utf8');
   console.log(`[Push] 新規イベント ${newEvents.length} 件のペイロードを書き出し（送信はデプロイ後に workflow が実施）`);

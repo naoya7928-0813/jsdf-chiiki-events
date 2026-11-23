@@ -1,0 +1,50 @@
+name: 公式リンクのリンク切れ検査（定期）
+
+# 公開中イベントの公式リンク（url）が 404/410 になっていないかを週1回確かめる（scripts/check-links.mjs）。
+# 相手サイトに配慮し、正直な User-Agent・robots.txt 順守・1件ずつ3秒間隔。ボット確認画面は回避しない
+# （「確認できず」として扱い、リンク切れとは言わない）。データは変更しない（報告だけ）。
+on:
+  schedule:
+    # 毎週木曜 02:23 UTC = 11:23 JST（スクレイプの時間帯・:00 を避ける）
+    - cron: '23 2 * * 4'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  links:
+    name: 公式リンクの確認
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v5
+
+      - name: Node.js 22 をセットアップ
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: リンク切れ検査
+        env:
+          SITE_URL: ${{ secrets.SITE_URL }}
+        run: node scripts/check-links.mjs
+
+      - name: 管理者へ通知（リンク切れがあるときだけ）
+        env:
+          NTFY_ADMIN_TOPIC: ${{ secrets.NTFY_ADMIN_TOPIC }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          BN=$(node -e "try{console.log(require('./scraper/link-check-report.json').summary.broken)}catch{console.log(0)}")
+          if [ "$BN" -gt 0 ] && [ -n "$NTFY_ADMIN_TOPIC" ]; then
+            curl -sS --retry 3 --retry-all-errors --connect-timeout 10 --max-time 30 \
+              -H "Title: 公式リンク切れ ${BN} 件" \
+              -H "Tags: link" \
+              -H "Content-Type: text/plain; charset=utf-8" \
+              -d "公開中イベントの公式リンクが 404/410 になっています。イベントが中止・移動していないか公式サイトで確認してください。 ${RUN_URL}" \
+              "https://ntfy.sh/${NTFY_ADMIN_TOPIC}" \
+              || echo "::warning::管理者通知の送信に失敗しました"
+          fi

@@ -737,6 +737,10 @@ test('isSuspiciousTitle: 句点で終わるタイトルは本文の断片とし�
     assert.equal(Q.isNonEventDocument({ title: '第7回：放送「自衛官って休みあるん？あります！！」',
       url: 'https://www.mod.go.jp/pco/hyogo/jimusyo/radio/20241011FMmikkixi.wav' }), true);
     assert.equal(Q.isNonEventDocument({ title: '退職自衛官の求人をお考えの企業 様', url: 'https://example.jp/onegai.pdf' }), true);
+    // 就職援護（退職自衛官の雇用に向けた企業向け）の活動報告は一般向けイベントではない（2026-11-23 函館）
+    assert.equal(Q.isNonEventDocument({ title: '函館地本就職援護広報',
+      url: 'https://www.mod.go.jp/pco/hakodate/news/img/R7syuusyokuengo20260216.pdf' }), true);
+    assert.equal(Q.isNonEventDocument({ title: '広報', url: 'https://example.jp/img/R7syuusyokuengo20260216.pdf' }), true);
     assert.equal(Q.isNonEventDocument({ title: 'お知らせ', url: 'https://www.mod.go.jp/pco/hyogo/pdf/riyoukiyaku.pdf' }), true);
   });
 

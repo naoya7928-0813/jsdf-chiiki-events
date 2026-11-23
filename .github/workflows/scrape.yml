@@ -375,6 +375,27 @@ jobs:
             echo "検疫対象なし"
           fi
 
+      # ── 主要イベント（航空祭など）の掲載漏れ確認（shared/majorEvents.cjs） ──
+      # 基地主催の大型イベントは地本サイトに載らないことがあり、巡回だけでは拾えない。
+      # 例年の時期なのに本体が未掲載なら実行サマリと警告に出す（ジョブは落とさない）。
+      # 管理者通知は1日1回（朝の回＝JST 10時前に実行された回）だけにして、同じ内容を1日3回送らない。
+      # （cron 文字列を書くと scrapeDeadline.cjs と二重管理になるため時刻で判定する）
+      - name: 主要イベントの掲載漏れ確認
+        continue-on-error: true
+        run: |
+          node scripts/check-major-events.mjs
+          MN=$(node -e "try{console.log(require('./scraper/major-events-report.json').missing.length)}catch{console.log(0)}")
+          if [ "$MN" -gt 0 ] && [ "$(TZ=Asia/Tokyo date +%-H)" -lt 10 ] && [ "${{ github.event_name }}" = "schedule" ] && [ -n "${{ secrets.NTFY_ADMIN_TOPIC }}" ]; then
+            LIST=$(node -e "require('./scraper/major-events-report.json').missing.forEach(m=>console.log('・'+m.name+(m.status==='related_only'?'（ツアー等のみ掲載）':'')))")
+            curl -sS --retry 3 --retry-all-errors --connect-timeout 10 --max-time 30 \
+              -H "Title: 主要イベント ${MN} 件が未掲載の可能性" \
+              -H "Tags: mag" \
+              -H "Content-Type: text/plain; charset=utf-8" \
+              -d "$(printf '%s\n%s' '例年の時期ですが掲載がありません。公式ページで日程を確認し、必要なら運営画面で登録してください。' "$LIST")" \
+              "https://ntfy.sh/${{ secrets.NTFY_ADMIN_TOPIC }}" \
+              || echo "::warning::管理者通知（主要イベント）の送信に失敗しました（本来の処理には影響しません）"
+          fi
+
       # ── LLM再検査レポート（一次ソース照合で自動修正された内容の通知） ──
       # 段2でタイトル・開催日が怪しいと判定されたイベントを、段3がチラシ実物を
       # 読み直して修正している。何がどう書き換わったかを管理者が検証できるよう通知する。
@@ -417,7 +438,9 @@ jobs:
           #   書き換わる。これを add し忘れると未ステージの追跡変更として残り、後続の
           #   `git rebase` が "cannot rebase: You have unstaged changes" で失敗していた
           #   （2026-06-28 の天気/ジオコーディング機能導入以降、毎回 push 前に停止）。
-          git add public/data/events.json data/events-quarantine.json data/events-llm-recheck.json data/events-archive.json public/events.html public/events/ public/sitemap.xml scraper/geocode-cache.json
+          git add public/data/events.json data/events-quarantine.json data/events-llm-recheck.json data/events-archive.json public/events.html public/events/ public/topics/ public/sitemap.xml scraper/geocode-cache.json
+          # sitemap の lastmod の根拠（ページごとの中身の要約。中身が変わったときだけ日付を進める）
+          if [ -f data/seo-lastmod.json ]; then git add data/seo-lastmod.json; fi
           # 検疫の履歴（追記専用 JSONL）。隔離・解除があった回だけ作成・追記されるため、存在するときだけ追加する
           if [ -f data/events-quarantine-history.jsonl ]; then git add data/events-quarantine-history.jsonl; fi
           # 前回値の引き継ぎが連続している項目の状態（次回実行へ持ち越す。公開サイトからは配信しない）
@@ -462,7 +485,7 @@ jobs:
           # （2026-10-13 に重複ID 6件。手動実行と定期実行が重なった回）。rebase 後に本コミットの内容へ戻す。
           # ※ 検疫の履歴（追記専用 JSONL）は両方の追記を残したいので対象外
           OURS=$(git rev-parse HEAD)
-          GENERATED="public/data/events.json data/events-quarantine.json data/events-llm-recheck.json data/events-archive.json data/field-carry-state.json public/events.html public/events public/sitemap.xml scraper/geocode-cache.json"
+          GENERATED="public/data/events.json data/events-quarantine.json data/events-llm-recheck.json data/events-archive.json data/field-carry-state.json public/events.html public/events public/topics public/sitemap.xml data/seo-lastmod.json scraper/geocode-cache.json"
           PUSHED=0
           ATTEMPTS=3
           for i in $(seq 1 "$ATTEMPTS"); do
@@ -573,9 +596,14 @@ jobs:
           ADMIN_ACCOUNTS_B64: ${{ secrets.ADMIN_ACCOUNTS_B64 }}
 
       # ── ntfy.sh でプッシュ通知送信 ────────────────────────
-      - name: CDN 伝播待機（Vercel エッジに反映されるまで）
+      - name: CDN 伝播待機（公開サイトが新しいデータを返すまで）
         if: steps.commit.outputs.changed == 'true'
-        run: sleep 60
+        # 一律 60 秒待つだけだった（Issue #16）。利用者と同じ URL の updatedAt が今回の値になるまで待つ（最大5分・失敗させない）
+        env:
+          SITE_URL: ${{ secrets.SITE_URL }}
+        run: |
+          sleep 20
+          node scripts/wait-for-live-data.mjs
 
       - name: プッシュ通知を送信
         if: steps.commit.outputs.changed == 'true' && github.event.inputs.source_update_mode != 'true'
@@ -765,7 +793,7 @@ jobs:
             echo "[WebPush] 新着0件。スキップ"; exit 0
           fi
           echo "[WebPush] 新着 ${CNT} 件を購読者へ送信します（デプロイ反映後）"
-          BODY=$(node -e "const p=require('./scraper/push-payload.json');process.stdout.write(JSON.stringify({title:p.title,body:p.body,url:p.url||'/'}))")
+          BODY=$(node -e "const p=require('./scraper/push-payload.json');process.stdout.write(JSON.stringify({title:p.title,body:p.body,url:p.url||'/',events:p.events||[],count:p.count||0,batchId:p.batchId||''}))")
           curl -sS --retry 3 --retry-all-errors --connect-timeout 10 --max-time 30 \
             -X POST \
             -H "Content-Type: application/json" \

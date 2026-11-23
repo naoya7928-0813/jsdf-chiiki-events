@@ -14,10 +14,10 @@
  */
 
 /** 同意の版。この値が localStorage の記録と異なると再同意を求める */
-export const LEGAL_VERSION = '2026-10-15';
+export const LEGAL_VERSION = '2026-11-23';
 
 /** 表示用の改定日 */
-export const LEGAL_REVISED_AT = '2026年10月15日';
+export const LEGAL_REVISED_AT = '2026年11月23日';
 
 /** localStorage のキー（値＝同意した LEGAL_VERSION） */
 export const LEGAL_STORAGE_KEY = 'jsdf-legal-accepted';
@@ -27,11 +27,8 @@ export const LEGAL_STORAGE_KEY = 'jsdf-legal-accepted';
  * 再同意ダイアログに箇条書きで表示する。
  */
 export const LEGAL_CHANGES = [
-  '現在の運用に合わせて記載を見直しました（取り扱う情報の種類は増えていません）。',
-  '「経路を検索」を押したときは、出発地（現在地を含む）を当サービスのサーバーへ送ることを明記しました（保存しません）。',
-  'Googleカレンダー・X・LINE のボタンを押したときに、イベント名・日時・会場が各事業者へ渡されることを明記しました。',
-  'イベント情報の作成に、チラシの文字の読み取りと生成AIによる整理を使っていること（利用者の情報は送りません）と、利用しているサービスを追記しました。',
-  '天気・駅・地図データ（OpenStreetMap 等）の出典、「大きさくらべ」の数値が目安であることを追記しました。',
+  'イベント一覧の「現在地から近い順」で位置情報を使うことを追記しました（計算は端末内のみ。現在地は送信・保存しません）。',
+  '新着通知の対象（地域・種目）を選んだ場合に、その選択を通知の宛先とともにサーバーへ保存することを追記しました。',
 ]
 
 /**

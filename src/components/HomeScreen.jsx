@@ -1,10 +1,12 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, Suspense } from 'react';
 import { ICO } from './Icons';
 import { BottomTabBar, F, Spinner, ErrorBanner, splitDate, StatusBadge } from './Shared';
 import JapanMap from './JapanMap';
 import { useIsDesktop } from '../hooks/useBreakpoint';
-import NearbyOfficesModal from './NearbyOfficesModal';
-import SizeCompareModal from './SizeCompareModal';
+import { lazyWithRecovery } from '../utils/lazyChunk';
+// 開いたときだけ読む（初回表示の JS を減らす。2026-11-23 の実測で一覧の描画が遅かったため）
+const NearbyOfficesModal = lazyWithRecovery(() => import('./NearbyOfficesModal'));
+const SizeCompareModal = lazyWithRecovery(() => import('./SizeCompareModal'));
 import { CORRIDOR_TRIAL_URL } from '../config';
 import { REGION_BY_ID, SUPPORTED_PREFECTURES, countEventsByRegion, getSupportedPrefsByRegion } from '../data/regionMap';
 
@@ -20,9 +22,13 @@ export default function HomeScreen({
   const isDesktop = useIsDesktop();
 
   // 近くの施設モーダル
-  const [nearbyOpen, setNearbyOpen] = useState(false);
+  const [nearbyOpen, setNearbyOpenRaw] = useState(false);
+  const [nearbyLoaded, setNearbyLoaded] = useState(false);
+  const setNearbyOpen = (v) => { if (v) setNearbyLoaded(true); setNearbyOpenRaw(v); };
   // 大きさくらべ（基地・駐屯地の広さ・滑走路の長さ）
-  const [sizeOpen, setSizeOpen] = useState(false);
+  const [sizeOpen, setSizeOpenRaw] = useState(false);
+  const [sizeLoaded, setSizeLoaded] = useState(false);
+  const setSizeOpen = (v) => { if (v) setSizeLoaded(true); setSizeOpenRaw(v); };
 
   // 地図上で選択中の地域ID
   const [selectedRegionId, setSelectedRegionId] = useState(initialRegionId ?? null);
@@ -308,15 +314,23 @@ export default function HomeScreen({
         primary={primary}
       />
 
-      {/* ── 近くの施設モーダル（ボトムシート） ── */}
-      <NearbyOfficesModal
-        isOpen={nearbyOpen}
-        onClose={() => setNearbyOpen(false)}
-        theme={theme}
-      />
+      {/* ── 近くの施設モーダル（ボトムシート）。一度開いたら閉じる動きのため置いたままにする ── */}
+      {(nearbyOpen || nearbyLoaded) && (
+        <Suspense fallback={null}>
+          <NearbyOfficesModal
+            isOpen={nearbyOpen}
+            onClose={() => setNearbyOpen(false)}
+            theme={theme}
+          />
+        </Suspense>
+      )}
 
       {/* ── 大きさくらべ（ボトムシート） ── */}
-      <SizeCompareModal isOpen={sizeOpen} onClose={() => setSizeOpen(false)} />
+      {(sizeOpen || sizeLoaded) && (
+        <Suspense fallback={null}>
+          <SizeCompareModal isOpen={sizeOpen} onClose={() => setSizeOpen(false)} />
+        </Suspense>
+      )}
     </div>
   );
 }

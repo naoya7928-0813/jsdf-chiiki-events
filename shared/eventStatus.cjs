@@ -291,7 +291,34 @@ function mergeStatus(prevStatus, derived) {
   return { status: next, statusReason: derived ? derived.statusReason : '', sticky: false };
 }
 
+/**
+ * 申込の受付状況（一覧の「申込受付中」「締切間近」絞り込み用。2026-11-23 追加）。
+ * 締切日（deadlineDate＝資料に書かれた締切を日付にしたもの）が分かっているイベントだけを対象にし、
+ * 締切が書かれていないものは推測しない（どちらにも入らない）。
+ *   'open'  … 締切日が今日以降で、受付終了・中止・延期・終了済みでない
+ *   'soon'  … 'open' のうち締切まで7日以内（今日を含む）
+ *   null    … 締切が分からない／受付が終わっている
+ */
+const DEADLINE_SOON_DAYS = 7;
+function applicationState(ev, today) {
+  if (!ev || !today) return null;
+  let dl = ev.deadlineDate;
+  // 手動入力イベント等で deadlineDate が無いときは締切の文言から（年が補えて確かなときだけ）
+  if (!dl && ev.deadline) {
+    const r = resolveDeadlineDate(ev.deadline, ev.date);
+    if (r.reliable) dl = r.date;
+  }
+  if (typeof dl !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(dl)) return null;
+  if (['closed', 'cancelled', 'postponed', 'draft'].includes(ev.status)) return null;
+  const end = ev.endDate || ev.date;
+  if (end && end < today) return null;
+  if (dl < today) return null;
+  const days = (Date.parse(`${dl}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 86400000;
+  return days <= DEADLINE_SOON_DAYS ? 'soon' : 'open';
+}
+
 module.exports = {
+  applicationState, DEADLINE_SOON_DAYS,
   STATUS, STATUS_VALUES, PUBLIC_STATUS_VALUES, ENDED_KEEP_DAYS,
   normalizeText, detectCancelled, detectClosedText,
   resolveDeadlineDate, weekdayChar, deriveStatus, mergeStatus,

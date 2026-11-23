@@ -168,7 +168,8 @@ self.addEventListener('pushsubscriptionchange', event => {
       .then(sub => fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subscription: sub }),
+        // 以前の endpoint を添えて、地域・種目の絞り込みをサーバー側で引き継ぐ（SW は localStorage を読めない）
+        body: JSON.stringify({ subscription: sub, oldEndpoint: event.oldSubscription && event.oldSubscription.endpoint }),
       }))
   );
 });

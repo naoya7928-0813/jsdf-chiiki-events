@@ -1,5 +1,5 @@
 // GET /api/subscribe    – VAPID 公開鍵を返す（{ publicKey }）
-// POST /api/subscribe  – { subscription: PushSubscription }  → 購読登録
+// POST /api/subscribe  – { subscription: PushSubscription, filter?: {regions, categories} } → 購読登録（同じ endpoint は上書き＝絞り込みの変更にも使う）
 // DELETE /api/subscribe – { endpoint: string }               → 購読解除
 //
 // セキュリティ:
@@ -9,6 +9,7 @@
 import { Redis } from '@upstash/redis';
 import { checkOrigin, isValidPushEndpoint, rateLimit } from './_security.js';
 import { clearWatchList } from './_push.js';
+import { normalizePushFilter } from '../shared/pushFilter.cjs';
 
 const redis = new Redis({
   url:   process.env.KV_REST_API_URL,
@@ -52,6 +53,24 @@ export default async function handler(req, res) {
         auth:   String(subscription.keys?.auth   || '').slice(0, 64),
       },
     };
+    // 新着通知の地域・種目の絞り込み（既知の値だけ。空＝すべて。shared/pushFilter.cjs）
+    //   filter を送ってきた → その値で上書き（空なら絞り込みなし）
+    //   送ってこない（Service Worker の購読更新など） → 同じ／以前の endpoint に保存済みの絞り込みを引き継ぐ
+    let filter = null;
+    if (req.body && Object.prototype.hasOwnProperty.call(req.body, 'filter')) {
+      filter = normalizePushFilter(req.body.filter);
+    } else {
+      const oldEp = typeof req.body?.oldEndpoint === 'string' && isValidPushEndpoint(req.body.oldEndpoint) ? req.body.oldEndpoint : null;
+      try {
+        for (const ep of [subscription.endpoint, oldEp].filter(Boolean)) {
+          const raw = await redis.hget(KEY, ep);
+          const prev = typeof raw === 'string' ? JSON.parse(raw) : raw;
+          if (prev && prev.filter) { filter = normalizePushFilter(prev.filter); break; }
+        }
+        if (oldEp && oldEp !== subscription.endpoint) await redis.hdel(KEY, oldEp);
+      } catch { /* 引き継げなければ絞り込みなし（全件届く＝取りこぼさない側） */ }
+    }
+    if (filter) clean.filter = filter;
     if (!clean.keys.p256dh || !clean.keys.auth) {
       return res.status(400).json({ error: 'subscription.keys is required' });
     }

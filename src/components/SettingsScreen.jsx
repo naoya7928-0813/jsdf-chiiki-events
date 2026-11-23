@@ -6,6 +6,8 @@ import { usePushNotification } from '../hooks/usePushNotification';
 import { useWatchPref } from '../hooks/useFavoriteWatch';
 import { fetchOfficesData } from '../hooks/useOffices';
 import { UPDATE_NOTES, TYPE_LABEL } from '../constants/updates';
+import { REGIONS, SUPPORTED_PREFECTURES, PREFECTURE_INFO } from '../data/regionMap';
+import { STANDARD_CATEGORIES } from './FilterBar';
 
 // package.json の version を vite.config.js の define で埋め込んだ定数
 /* global __APP_VERSION__ */
@@ -21,6 +23,7 @@ export default function SettingsScreen({
   onOpenHome, onOpenRegion, onOpenList, onOpenFavorites,
   onOpenLegal,
   onOpenReport,
+  myPref = '', onMyPrefChange,
 }) {
   const { primary, schemeKey, darkMode } = theme;
 
@@ -107,6 +110,16 @@ export default function SettingsScreen({
       <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '16px 0 8px' }}>
       <div style={{ maxWidth: 720, margin: '0 auto', width: '100%' }}>
 
+        {/* ─ 0. 自分の都道府県（開いたときに最初に出す一覧） ─ */}
+        {onMyPrefChange && (
+          <>
+            <GroupTitle>自分の都道府県</GroupTitle>
+            <Card>
+              <MyPrefRow value={myPref} onChange={onMyPrefChange} />
+            </Card>
+          </>
+        )}
+
         {/* ─ 1. ブラウザ通知（Web Push） ─ */}
         <GroupTitle>ブラウザ通知</GroupTitle>
         <Card>
@@ -181,6 +194,9 @@ export default function SettingsScreen({
               <span style={{ display: 'flex', marginTop: 1, flexShrink: 0 }}>{ICO.warn('#e05252', 13)}</span>
               <span>{push.error}</span>
             </div>
+          )}
+          {push.supported && push.subscribed && (
+            <PushFilterPanel filter={push.filter} onChange={push.updateFilter} primary={primary} />
           )}
           {push.supported && push.subscribed && (
             <ToggleRow
@@ -797,5 +813,77 @@ function ExternalLinkRow({ label, url, last }) {
           stroke="var(--text-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     </a>
+  );
+}
+
+// ─── 新着通知の対象（地域・種目）。何も選ばなければすべて ─────────────
+function PushFilterPanel({ filter, onChange, primary }) {
+  const regions = filter?.regions || [];
+  const categories = filter?.categories || [];
+  const toggle = (list, v) => (list.includes(v) ? list.filter(x => x !== v) : [...list, v]);
+  const chip = (on) => ({
+    cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: F.sans, minHeight: 32,
+    padding: '5px 11px', borderRadius: 20, fontSize: 12, fontWeight: on ? 600 : 400,
+    border: `1.5px solid ${on ? primary : 'var(--border)'}`,
+    background: on ? primary : 'var(--bg)', color: on ? '#fff' : 'var(--text-muted)',
+  });
+  const row = { display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 6 };
+  return (
+    <div style={{ padding: '12px 14px', borderTop: '1px solid var(--sep)' }}>
+      <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>新着通知の対象</div>
+      <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.6, marginTop: 2 }}>
+        選んだ地域・種目の新着だけをお知らせします（何も選ばなければすべて）。選んだ内容は通知の宛先とともにサーバーへ保存します。
+      </div>
+      <div style={{ fontSize: 11, color: 'var(--text-sub)', marginTop: 10 }}>地域{regions.length ? `（${regions.length}）` : '（すべて）'}</div>
+      <div style={row}>
+        {REGIONS.map(r => (
+          <button key={r.id} style={chip(regions.includes(r.id))} aria-pressed={regions.includes(r.id)}
+            onClick={() => onChange({ regions: toggle(regions, r.id), categories })}>{r.label}</button>
+        ))}
+      </div>
+      <div style={{ fontSize: 11, color: 'var(--text-sub)', marginTop: 10 }}>種目{categories.length ? `（${categories.length}）` : '（すべて）'}</div>
+      <div style={row}>
+        {STANDARD_CATEGORIES.map(c => (
+          <button key={c} style={chip(categories.includes(c))} aria-pressed={categories.includes(c)}
+            onClick={() => onChange({ regions, categories: toggle(categories, c) })}>{c}</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── 自分の都道府県（端末内にだけ保存。shared/myPref.cjs） ─────────────
+function MyPrefRow({ value, onChange }) {
+  const label = value ? (PREFECTURE_INFO[value]?.label || value) : '';
+  return (
+    <div style={{ padding: '12px 14px' }}>
+      <label htmlFor="my-pref-select" style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', display: 'block' }}>
+        アプリを開いたときに表示する都道府県
+      </label>
+      <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 3, lineHeight: 1.5 }}>
+        {value
+          ? `アプリを開くと、${label}のイベント一覧から始まります。一覧の「全国」タブでいつでも全国に戻れます。`
+          : '選ぶと、アプリを開いたときに全国の地図ではなく、その都道府県のイベント一覧から始まります。'}
+      </div>
+      <select
+        id="my-pref-select"
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        style={{
+          marginTop: 10, width: '100%', minHeight: 44, padding: '8px 10px', borderRadius: 8,
+          border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)',
+          fontSize: 15, fontFamily: F.sans,
+        }}
+      >
+        <option value="">設定しない（全国の地図から始める）</option>
+        {REGIONS.map(r => (
+          <optgroup key={r.id} label={r.label}>
+            {r.prefectures.filter(p => SUPPORTED_PREFECTURES.has(p.id)).map(p => (
+              <option key={p.id} value={p.id}>{p.label}{r.id === 'hokkaido' ? '（北海道）' : ''}</option>
+            ))}
+          </optgroup>
+        ))}
+      </select>
+    </div>
   );
 }

@@ -6,6 +6,7 @@ import { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta } fr
 import { cleanTimeText, cleanDeadlineText, cleanPlaceText, splitPlaceAddress, safeUrl } from '../../shared/titleQuality.cjs';
 // 「終了済み」を残す日数はスクレイパーと共有（片方だけ変えると表示がズレる）
 import { ENDED_KEEP_DAYS } from '../../shared/eventStatus.cjs';
+import { mergePublished } from '../../shared/eventPage.cjs';
 // 運営が付けた属性タグ。既知のID以外は捨てる（配信データ・キャッシュ由来の混入対策）
 import { normalizeTags } from '../../shared/tags.cjs';
 // 運営が公開した変更のお知らせ（中止・延期・日時/会場変更）。壊れた値は捨てる
@@ -212,22 +213,9 @@ export function useEvents(autoMode = true) {
       const fromCache = res.headers.get('x-from-cache') === '1';
       const json = await res.json();
       if (typeof json !== 'object' || json === null) throw new Error('invalid response shape');
-      const { events: manual, overrides } = manualResp;
-      // 手動イベントを地本ごとに合流（既存配列の末尾に追加）
-      const merged = { ...json };
-      for (const ev of manual) {
-        const k = ev?.pref;
-        if (!k) continue;
-        merged[k] = Array.isArray(merged[k]) ? [...merged[k], ev] : [ev];
-      }
-      // 運営の上書き修正をイベントID一致で再適用（スクレイプ上書き後も反映）
-      const hasOverrides = overrides && Object.keys(overrides).length > 0;
-      if (hasOverrides) {
-        for (const k of Object.keys(merged)) {
-          if (!Array.isArray(merged[k])) continue;
-          merged[k] = merged[k].map(ev => (ev && overrides[ev.id]) ? { ...ev, ...overrides[ev.id] } : ev);
-        }
-      }
+      // 手動イベントの合流と運営の上書き修正（スクレイプ上書き後も反映）。
+      // 個別ページ（middleware.js）と同じ shared/eventPage.cjs の mergePublished を使う
+      const merged = mergePublished(json, manualResp);
       setRawData(merged);
       hasData.current = true;
       setError(null);
