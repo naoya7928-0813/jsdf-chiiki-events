@@ -533,13 +533,15 @@ function isStaleDatedEvent(ev) {
 // ── 非イベント文書の判定 ─────────────────────────────────────────
 // タイトルだけでは防げない「文書」の混入（福利厚生・待遇の資料、規約、求人企業向け案内、
 // ラジオ放送の音声ファイル等）を、URL・会場欄・備考も合わせて判定する。
+// 2026-11-23 函館「函館地本就職援護広報」（退職自衛官の雇用に向けた企業向け見学の活動報告。
+// チラシ本文は「2月8日、9日…実施した」＝令和7年度の実績。2027-02-08 として公開されていた）も同じ扱い。
 // 2026-09 新潟「陸海空自衛官」（福利厚生PDF。会場欄に本文「調機の充足完了及び空調が…」）、
 // 兵庫のラジオ放送（.wav）が公開されていた事故の再発防止。
 
 // 文書であることを強く示す語（タイトル・会場欄・URL で判定）
-const NON_EVENT_DOC_RE = /福利厚生|待遇|給与|手当|共済|年金|宿舎|服務|利用規約|サイトポリシー|コンテンツ利用|著作権|求人をお考えの企業|退職自衛官の求人|採用案内冊子|招集教育|招集訓練|教育訓練日程/;
+const NON_EVENT_DOC_RE = /福利厚生|待遇|給与|手当|共済|年金|宿舎|服務|利用規約|サイトポリシー|コンテンツ利用|著作権|求人をお考えの企業|退職自衛官の求人|就職援護|採用案内冊子|招集教育|招集訓練|教育訓練日程/;
 // URL のファイル名に出る文書の目印（ローマ字表記）
-const NON_EVENT_URL_RE = /fukuri|kousei-kaizen|riyoukiyaku|kiyaku|privacy|sitepolicy|copyright|kyuyo|teate|kyosai/i;
+const NON_EVENT_URL_RE = /fukuri|syu+syoku-?engo|shushoku-?engo|kousei-kaizen|riyoukiyaku|kiyaku|privacy|sitepolicy|copyright|kyuyo|teate|kyosai/i;
 // 音声・動画ファイル（放送の録音であって参加するイベントではない）
 const MEDIA_URL_RE = /\.(?:wav|mp3|m4a|aac|ogg|mp4|mov|wmv)(?:[?#]|$)/i;
 // 正式タイトルに明確なイベント語があれば文書扱いしない（「福利厚生説明会」等を救済）

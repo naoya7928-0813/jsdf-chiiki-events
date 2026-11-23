@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { ICO } from './Icons';
 import { Emblem, F, splitDate, SectionTitle, iconBtnStyle, StatusBadge } from './Shared';
 import { REGION_HQ, REGION_SOURCE } from '../config';
@@ -15,6 +15,7 @@ import { useOnline } from '../hooks/useOnline';
 // 運営が明示的に付けたタグ（公開の絞り込みチップと同じ定義）
 import { eventTags } from '../../shared/tags.cjs';
 import { jstTodayStr } from '../utils/date';
+import { relatedEvents } from '../../shared/eventPage.cjs';
 
 function officeSourceLabel(ev) {
   if (!ev?.source_type) return null;
@@ -23,7 +24,7 @@ function officeSourceLabel(ev) {
   return null;
 }
 
-export default function DetailScreen({ event, onBack, theme, favorites, applied, onToggleFavorite, onToggleApplied, autoApply, onMarkApplied, onReport, adminAuthed, onEditEvent, weatherMapMode = 'auto' }) {
+export default function DetailScreen({ event, onBack, theme, favorites, applied, onToggleFavorite, onToggleApplied, autoApply, onMarkApplied, onReport, adminAuthed, onEditEvent, weatherMapMode = 'auto', allEvents = null, updatedAt = null, onOpenEvent = null }) {
   // ── フック（Rules of Hooks: 早期 return の前に宣言する） ─────────
   const [copied,    setCopied]    = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
@@ -33,6 +34,12 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
   // ⚠ 早期 return（ev が無い場合）より前で呼ぶこと。後ろに置くとフックの数が
   //    レンダーごとに変わり、React が「Rendered fewer hooks than expected」で落ちる。
   const online = useOnline();
+
+  // 関連イベント（早期 return より前で計算する＝フックの数を一定に保つ）
+  const related = useMemo(() => {
+    if (!event?.id || !allEvents || typeof allEvents !== 'object') return [];
+    try { return relatedEvents(allEvents, event, event.pref, jstTodayStr(), 4); } catch { return []; }
+  }, [event, allEvents]);
 
   // 閲覧数の計測。イベントIDが変わったときだけ（同じ画面内の再描画・状態更新・自動更新では送らない）。
   // 重複・運営者の閲覧の除外は recordView 側
@@ -792,6 +799,12 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
             }}>
               当サイトは有志による非公式サイトです。防衛省・自衛隊および各地方協力本部とは直接関係ありません。イベントの開催可否・申込方法・変更などは、必ず公式ページで最新情報をご確認ください。
             </div>
+            {/* 当サイトが公式サイトを最後に確認した日時（データの取得時刻） */}
+            {updatedAt && (
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.75, paddingTop: 6 }}>
+                最終確認：{updatedAt}（当サイトが公式サイトを確認した日時）
+              </div>
+            )}
             {/* この情報の誤りを報告（イベントID・地本名を引き継ぐ） */}
             {onReport && (
               <button
@@ -809,6 +822,26 @@ export default function DetailScreen({ event, onBack, theme, favorites, applied,
             )}
           </div>
         </div>
+        {/* 関連するイベント（同じ地本 → 同じ種目。静的本文 shared/eventPage.cjs と同じ選び方） */}
+        {related.length > 0 && onOpenEvent && (
+          <div style={{ padding: '0 16px 20px' }}>
+            <SectionTitle>関連するイベント</SectionTitle>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {related.map(({ e }) => (
+                <button key={e.id} onClick={() => onOpenEvent(e)} style={{
+                  textAlign: 'left', width: '100%', minHeight: 44, padding: '8px 12px',
+                  background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 8,
+                  color: 'var(--text)', fontSize: 13, fontFamily: F.sans, cursor: 'pointer', lineHeight: 1.5,
+                }}>
+                  <span style={{ color: 'var(--text-muted)', fontSize: 11, marginRight: 6 }}>
+                    {Number(e.date.slice(5, 7))}/{Number(e.date.slice(8, 10))}
+                  </span>
+                  {e.title}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         {shortVp && (
           <div style={{ padding: '4px 16px 12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
             {secondaryActions}

@@ -216,3 +216,15 @@ test('条件付きの「中止」は確定中止にしない（誤判定防止�
   assert.notStrictEqual(at('雨天の場合は中止となる場合があります'), 'cancelled');
   assert.notStrictEqual(at('立川駐屯地見学'), 'cancelled');
 });
+
+test('applicationState: 締切日が分かるものだけ。受付終了・中止・終了済み・締切切れは対象外', () => {
+  const { applicationState } = require('./eventStatus.cjs');
+  const T = '2026-11-23';
+  assert.strictEqual(applicationState({ date: '2026-12-20', deadlineDate: '2026-12-10' }, T), 'open');
+  assert.strictEqual(applicationState({ date: '2026-12-20', deadlineDate: '2026-11-30' }, T), 'soon');
+  assert.strictEqual(applicationState({ date: '2026-12-20', deadlineDate: '2026-11-23' }, T), 'soon');
+  assert.strictEqual(applicationState({ date: '2026-12-20', deadlineDate: '2026-11-22' }, T), null);
+  assert.strictEqual(applicationState({ date: '2026-12-20', deadlineDate: '2026-12-10', status: 'closed' }, T), null);
+  assert.strictEqual(applicationState({ date: '2026-12-20', deadlineDate: '2026-12-10', status: 'cancelled' }, T), null);
+  assert.strictEqual(applicationState({ date: '2026-12-20' }, T), null); // 締切不明は推測しない
+});

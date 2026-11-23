@@ -587,6 +587,9 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 - **プッシュ通知**: Web Push（`/api/subscribe` に購読を保存 → `/api/notify` で配信）。
   旧 ntfy.sh トピック方式（`NTFY_TOPIC` / NtfyGuideModal）はアプリ側では廃止済みで、
   ntfy は scrape.yml からの管理者・地域別通知にのみ残っている（`src/config.js` 冒頭の注記を参照）
+  - 送信は commit → デプロイ → **公開サイトの events.json が今回の updatedAt を返すことを確認**（`scripts/wait-for-live-data.mjs`。
+    最大5分・失敗させない）→ 配信枠待ち の後（Issue #16）。新着が1件ならその個別ページ（`/event/<id>`）、複数なら `/list` を開く。
+    新着の判定は**書き出した公開データ**で行う（検疫・除外したイベントを通知しない＝通知から404へ飛ばない）
 
 ## PWA（ホーム画面アプリ）（2026-09-01 整備）
 
@@ -714,6 +717,8 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 | FAQ・参加準備ガイドの項目・状態・公開形 | `shared/eventGuide.cjs` | `/api/admin/event-guides`／`/api/admin/events`／`/api/manual-events`／詳細・運営画面 |
 | 閲覧数の集計・重複判定・並べ替え | `shared/viewStats.cjs` | `/api/view`／`/api/admin/view-stats`／`src/utils/viewTracker.js`／運営画面 |
 | 駅候補・目的地の決め方・経路URL・経路応答の正規化 | `shared/transit.cjs` | `AccessGuide.jsx`／`/api/transit`／`/api/admin/event-guides` |
+| イベント個別ページ・Event 構造化データ・今週末の範囲・関連イベント | `shared/eventPage.cjs` | `middleware.js`／`scripts/generate-events-html.mjs`／`FilterBar.jsx`／`DetailScreen.jsx` |
+| 申込の受付状況（申込受付中・締切間近） | `shared/eventStatus.cjs` の `applicationState` | `FilterBar.jsx`／`ListScreen.jsx` |
 | 管理APIの対象イベントの所属解決 | `api/_eventScope.js` | `/api/admin/overrides`／`/api/admin/event-changes` ほか |
 | 公開URL・許可オリジン | `shared/siteUrl.cjs` | 全体（上記「セキュリティ構成」参照）／`shared/domainNotice.cjs` |
 | ドメイン移行のお知らせを出すか | `shared/domainNotice.cjs` | `src/App.jsx`（`src/components/DomainNotice.jsx` を出す判断） |
@@ -960,11 +965,35 @@ ErrorBoundary（`src/components/ErrorBoundary.jsx`）のフォールバックが
 
 ## SEO 構成
 
+### イベント個別ページ（`/event/<id>`。2026-11-23 導入）
+URL は従来どおり。`middleware.js`（Edge）が `index.html` に **title・説明・canonical・robots・構造化データ（Event＋BreadcrumbList）・
+JS なしでも読める本文**を差し込む。中身は **`shared/eventPage.cjs` が唯一の出どころ**（`shared/eventPage.test.cjs`）。
+- 本文（`<main id="ssr-event">`）は同意画面の間は残し、アプリ本体を描画した時点で `App.jsx` が外す（同じ情報を詳細画面が出す。
+  詳細画面の「関連するイベント」「最終確認」も同じ関数 `relatedEvents` を使う）。検索エンジン向けだけの隠し本文にしないこと
+- 公開データに無い ID は **404**（`manual-*` は Redis にあるので SPA に任せる）。events.json が取れないときは判断せず素通し
+- **検索対象（index）**: 品質判定（`isEligibleForStructuredEvent`）を通り、終了前・公式URLあり・ファイル名の日付と開催日が9か月以上ずれていない
+  （`hasDateStampConflict`。過年度資料・誤読対策）。それ以外は `noindex, follow`。sitemap には index のものだけ載せる
+- **Event 構造化データ**は index の条件＋会場名が実在（掲載元の案内所名の代用でない）＋**開催地の都道府県が決まる**ときだけ。
+  開催地は 住所欄 → 既知の駐屯地・基地（`src/data/jsdfFacilities.js`）→ 座標の検索結果 の順。⚠️ 地本の担当県で埋めない
+  （座標の「会場名」検索は地本の県名を前置しているため、会場名に別の県名・「県の」断片があるときは使わない）
+- ⚠️ **推測で出さない**: 料金は「入場無料・参加無料」等と書かれているときだけ `price: 0`（無ければ `offers` を出さない）。
+  `availability`・`validFrom`・`organizer`・`performer`・`image` は出さない（地本は本文で「掲載元」と書く）
+- ⚠️ **一覧ページ（events.html・県別・種目別）には Event を置かない**（1イベント1ページ。テストが検出する）。一覧のイベント名は個別ページへ内部リンク
+- sitemap の `lastmod` は「中身が変わった日」。一覧ページはページごとの中身の要約を `data/seo-lastmod.json`（scrape.yml がコミット）に残し、
+  変わったときだけ日付を進める。個別ページは `eventLastmod`（初回掲載・照合・開催状況の更新・変更登録の最新日）。changefreq/priority は出さない
+- `/topics/weekend.html`（今週末）と events.html の「新着（直近3日）」は毎回作り直す。今週末の定義は `weekendRange`（画面の絞り込みと共有）
+
+### 主要イベントの掲載漏れ検出（2026-11-23 導入）
+`shared/majorEvents.cjs` の監視リスト（航空祭・音楽まつり等）と公開データ・運営側アーカイブを突き合わせ、例年の時期なのに本体が無いものを
+`scripts/check-major-events.mjs` が実行サマリと `::warning::` に出す（scrape.yml。ジョブは落とさない。管理者通知は朝の回だけ）。
+⚠️ 監視リストの `months` は内部の目安。**日付・会場を公開データに出さない**（運営が公式ページで確かめて手動登録する）。
+基地の公式イベント一覧（航空自衛隊 `mod.go.jp/asdf/event/`）は Cloudflare の確認画面で自動取得できない（回避しない）。
+
 | 要素 | 内容 |
 |------|------|
 | **Google Search Console** | 登録済み・サイトマップ送信済み（2026/05/17）|
 | **sitemap.xml** | スクレイプ毎に自動更新（トップ・events.html・都道府県別ページ含む）|
-| **JSON-LD（Event スキーマ）** | events.html と都道府県別ページに埋め込み |
+| **JSON-LD（Event スキーマ）** | イベント個別ページ（`/event/<id>`）だけ。一覧ページはパンくず・FAQ のみ |
 | **canonical タグ** | index.html・events.html・各都道府県ページに設定済み |
 | **Twitter Card** | 全静的ページに設定済み |
 | **都道府県別ページ** | `/events/<pref>.html` 形式・スクレイプ毎に自動生成 |
@@ -974,7 +1003,9 @@ ErrorBoundary（`src/components/ErrorBoundary.jsx`）のフォールバックが
 `node scripts/generate-events-html.mjs` を実行すると以下が生成される:
 - `public/events.html` — 全イベント一覧（JSON-LD・canonical・Twitter Card付き）
 - `public/events/<pref>.html` — イベントがある都道府県分（JSON-LD・canonical付き）
-- `public/sitemap.xml` — 全URLを含む更新済みサイトマップ
+- `public/topics/<種目>.html`・`public/topics/weekend.html`・`public/guide.html`
+- `public/sitemap.xml` — 全URL（検索対象のイベント個別ページを含む）と lastmod
+- `data/seo-lastmod.json` — lastmod の根拠（ページごとの中身の要約）
 
 ## 3D隊舎（試験公開・`/corridor/`）（2026-09-25 追加）
 

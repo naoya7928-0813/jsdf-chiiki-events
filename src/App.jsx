@@ -91,6 +91,15 @@ export default function App({ operator = false }) {
     () => (operator ? 'none' : consentStateFor(loadAcceptedLegalVersion()))
   );
 
+  // ── イベント個別ページの静的本文（middleware.js が /event/<id> に差し込む）を片付ける ──
+  // JS が動く前・同意画面の間はそのまま見せ（検索エンジンも読める）、アプリ本体を描画した時点で外す。
+  // 同じ内容はアプリの詳細画面が表示する（shared/eventPage.cjs の renderEventArticle）。
+  useEffect(() => {
+    if (consentState !== 'none') return;
+    document.getElementById('ssr-event')?.remove();
+    document.getElementById('ssr-event-style')?.remove();
+  }, [consentState]);
+
   // ── スプラッシュ ──────────────────────────────────────────
   // 世界観の演出だが毎回2〜3秒は毎日使う利用者の負担になるため、
   // セッション内の初回のみ表示する（同一セッションのリロード・画面遷移では再生しない。
@@ -751,6 +760,9 @@ export default function App({ operator = false }) {
                   adminAuthed={adminAuthed}
                   onEditEvent={editEventAsAdmin}
                   onBack={() => setDetailEvent(null)}
+                  allEvents={events}
+                  updatedAt={updatedAt}
+                  onOpenEvent={(e) => openDetail(e, detailBack)}
                   onReport={openReportForEvent}
                 />
               ) : (
@@ -799,6 +811,9 @@ export default function App({ operator = false }) {
           adminAuthed={adminAuthed}
           onEditEvent={editEventAsAdmin}
           onBack={() => setScreen(detailBack)}
+                  allEvents={events}
+                  updatedAt={updatedAt}
+                  onOpenEvent={(e) => openDetail(e, detailBack)}
           onReport={openReportForEvent}
         />
       )}

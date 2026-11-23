@@ -11,6 +11,19 @@
  */
 export const UPDATE_NOTES = [
   {
+    date:    '2026-11-23',
+    version: '1.47.37',
+    type:    'feature',
+    content: 'イベント一覧の絞り込みに「申込受付中」「締切間近」を追加しました。',
+    note:    '申込締切が分かっているイベントだけが対象です。',
+  },
+  {
+    date:    '2026-11-23',
+    version: '1.46.37',
+    type:    'feature',
+    content: 'イベント詳細に関連するイベントと情報の最終確認日時を表示するようにしました。',
+  },
+  {
     date:    '2026-10-29',
     version: '1.45.37',
     type:    'improvement',

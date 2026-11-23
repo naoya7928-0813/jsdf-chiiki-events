@@ -13,8 +13,14 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, unlink
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { REGIONS } from '../src/data/regionMap.js';
+import { JSDF_FACILITIES } from '../src/data/jsdfFacilities.js';
 import { siteUrl, DEFAULT_SITE_URL } from '../shared/siteUrl.cjs';
 import { isEligibleForStructuredEvent } from '../shared/titleQuality.cjs';
+import { createHash } from 'node:crypto';
+import {
+  PREF_LABELS, eventPath, isEventIndexable, isEventSchemaEligible, eventLastmod, isEnded,
+  weekendRange, isWeekendEvent,
+} from '../shared/eventPage.cjs';
 
 // 公開URLは shared/siteUrl.cjs が唯一の出どころ（ドメイン移行は SITE_URL の設定だけで済む）
 const SITE_URL = siteUrl(process.env);
@@ -27,26 +33,7 @@ const EVENTS_JSON = join(__dirname, '../public/data/events.json');
 const OUTPUT_HTML = join(__dirname, '../public/events.html');
 const EVENTS_DIR  = join(__dirname, '../public/events');
 
-// 地本名マッピング（英字キー → 表示名）
-const PREF_LABELS = {
-  sapporo:   '札幌',    asahikawa: '旭川',  obihiro:   '帯広',
-  hakodate:  '函館',    miyagi:    '宮城',  aomori:    '青森',
-  iwate:     '岩手',    yamagata:  '山形',  fukushima: '福島',
-  akita:     '秋田',    kanagawa:  '神奈川', tokyo:    '東京',
-  saitama:   '埼玉',    gunma:     '群馬',  tochigi:   '栃木',
-  ibaraki:   '茨城',    chiba:     '千葉',  niigata:   '新潟',
-  toyama:    '富山',    ishikawa:  '石川',  fukui:     '福井',
-  yamanashi: '山梨',    nagano:    '長野',  gifu:      '岐阜',
-  shizuoka:  '静岡',    aichi:     '愛知',  mie:       '三重',
-  shiga:     '滋賀',    kyoto:     '京都',  osaka:     '大阪',
-  hyogo:     '兵庫',    nara:      '奈良',  wakayama:  '和歌山',
-  ehime:     '愛媛',    kagawa:    '香川',  kochi:     '高知',
-  tokushima: '徳島',    tottori:   '鳥取',  shimane:   '島根',
-  okayama:   '岡山',    hiroshima: '広島',  yamaguchi: '山口',
-  fukuoka:   '福岡',    saga:      '佐賀',  nagasaki:  '長崎',
-  kumamoto:  '熊本',    oita:      '大分',  miyazaki:  '宮崎',
-  kagoshima: '鹿児島',  okinawa:   '沖縄',
-};
+// 地本名マッピングは shared/eventPage.cjs（middleware と共有）
 
 if (!existsSync(EVENTS_JSON)) {
   console.log('[generate-events-html] events.json が見つかりません。スキップします。');
@@ -74,6 +61,19 @@ allEvents.sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''));
 // （不正タイトル・検疫相当・非イベント文書・OCR 由来の不自然な未来日は Event として出さない）。
 // 判定は shared/titleQuality.cjs の isEligibleForStructuredEvent に一本化し、ここに規則を重複させない。
 const ldEligible = (ev) => isEligibleForStructuredEvent(ev, today);
+// 個別ページへ内部リンクしてよいか（存在し、中身のあるページ）。検索対象外（noindex）でもリンクは張る
+const linkable = (ev) => !!ev.id && ldEligible(ev);
+
+// 今週末（直近の土日）に開催がかかるイベント（topics/weekend.html・events.html の見出し）
+const weekend = weekendRange(today);
+const weekendEvents = allEvents.filter(ev => isWeekendEvent(ev, today));
+// 新着: 初回掲載が直近3日以内で、まだ終わっていないもの（更新性の見出し。件数が無ければ出さない）
+const addDaysIso = (s, n) => { const d = new Date(`${s}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+const NEW_SINCE = addDaysIso(today, -3);
+const newEvents = allEvents
+  .filter(ev => typeof ev.firstSeen === 'string' && ev.firstSeen >= NEW_SINCE && !isEnded(ev, today))
+  .slice(0, 20);
+const jaMd = (s) => `${Number(s.slice(5, 7))}月${Number(s.slice(8, 10))}日`;
 
 // 都道府県ごとにグループ化
 const byPref = {};
@@ -248,113 +248,8 @@ function faqSchema(prefLabel) {
   };
 }
 
-// 北海道は4地本（札幌・旭川・帯広・函館）に分かれるため、住所の都道府県名は北海道に統一する
-const HOKKAIDO_PREF_KEYS = new Set(['sapporo', 'asahikawa', 'obihiro', 'hakodate']);
-
-/**
- * `time`（"09:00～14:30"）を開始・終了時刻に分解する。
- * 開始と終了が **両方** 揃い、かつ終了が開始より後のときだけ返す。
- * 片方だけを startDate に足すと endDate（日付のみ＝その日の 0 時）が
- * startDate より前と解釈され得るため、揃わない場合は日付のみで出力する。
- */
-function parseTimeRange(time) {
-  const m = String(time ?? '').trim()
-    .match(/^(\d{1,2}):(\d{2})\s*[～~〜\-–—]\s*(\d{1,2}):(\d{2})$/);
-  if (!m) return null;
-  const [sh, sm, eh, em] = [m[1], m[2], m[3], m[4]].map(Number);
-  if (sh > 23 || eh > 23 || sm > 59 || em > 59) return null;
-  if (eh * 60 + em <= sh * 60 + sm) return null; // 日をまたぐ/逆転は不採用
-  const pad = (n) => String(n).padStart(2, '0');
-  return { start: `${pad(sh)}:${pad(sm)}`, end: `${pad(eh)}:${pad(em)}` };
-}
-
-/** Schema.org Event オブジェクトを生成 */
-function toEventSchema(ev, prefLabel) {
-  const prefKey = ev.prefKey ?? '';
-  const hq = hqByPref[prefKey];
-  // organizer.url は地本公式サイト（offices.json）を優先。無ければ当サイトの地本別ページ。
-  const organizerUrl = (hq && typeof hq.url === 'string' && /^https?:\/\//.test(hq.url))
-    ? hq.url
-    : (prefKey ? `${SITE_URL}/events/${prefKey}.html` : SITE_URL);
-
-  const obj = {
-    '@context': 'https://schema.org',
-    '@type': 'Event',
-    name: ev.title,
-    // 中止・延期は検索結果に正しく出す（Google は EventCancelled / EventPostponed を表示に使う）
-    eventStatus: ev.status === 'cancelled' ? 'https://schema.org/EventCancelled'
-      : ev.status === 'postponed' ? 'https://schema.org/EventPostponed'
-      : 'https://schema.org/EventScheduled',
-    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-    organizer: {
-      '@type': 'Organization',
-      name: `${prefLabel}地方協力本部`,
-      url: organizerUrl,
-    },
-    // 実施主体（演奏会は演奏団体として扱う）。個別の部隊名までは判別できないため地本名を用いる。
-    performer: {
-      '@type': ev.category === '演奏会' ? 'PerformingGroup' : 'Organization',
-      name: `${prefLabel}地方協力本部`,
-    },
-    url: ev.url || SITE_URL,
-    // イベント個別のチラシ画像があればそれを使う（リッチリザルトの見栄え向上）。
-    // 無ければサイト共通アイコンにフォールバック。
-    image: [
-      (typeof ev.imageUrl === 'string' && /^https?:\/\//.test(ev.imageUrl))
-        ? ev.imageUrl
-        : `${SITE_URL}/icons/icon-512.png`
-    ],
-    offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'JPY',
-      availability: 'https://schema.org/InStock',
-      url: ev.url || SITE_URL
-    }
-  };
-
-  // ── 開催日時（startDate / endDate は常に出力する） ─────────────────
-  // 単日開催でも endDate（＝同日）を明示する。Google の推奨項目であり、
-  // 未指定だと検索結果で開催期間が正しく扱われないことがある。
-  const endDay = (ev.endDate && ev.endDate >= ev.date) ? ev.endDate : ev.date;
-  const range = parseTimeRange(ev.time);
-  if (range) {
-    obj.startDate = `${ev.date}T${range.start}:00+09:00`;
-    obj.endDate   = `${endDay}T${range.end}:00+09:00`;
-  } else {
-    obj.startDate = ev.date;
-    obj.endDate   = endDay;
-  }
-
-  // offers.validFrom = 参加受付（＝情報公開）が有効になった日。
-  // スクレイパーが記録した初回掲載日 firstSeen を使い、無い場合は
-  // 「本日と開催日の早い方」を用いる（開催日より後にならないようにする）。
-  const isDate = (s) => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
-  const validFromDay = isDate(ev.firstSeen)
-    ? ev.firstSeen
-    : (today < ev.date ? today : ev.date);
-  obj.offers.validFrom = `${validFromDay}T00:00:00+09:00`;
-
-  // location is a required property for Google Event rich results.
-  const locationObj = {
-    '@type': 'Place',
-    name: ev.place || `${prefLabel}地方協力本部`,
-    address: {
-      '@type': 'PostalAddress',
-      addressCountry: 'JP',
-      // 地本名（札幌・旭川・帯広・函館）は都道府県名ではないため北海道に読み替える
-      addressRegion: HOKKAIDO_PREF_KEYS.has(prefKey) ? '北海道' : prefLabel
-    }
-  };
-  if (ev.address) {
-    locationObj.address.streetAddress = ev.address;
-  }
-  obj.location = locationObj;
-
-  const desc = [ev.category, ev.ageRequirement, ev.notes].filter(Boolean).join('。');
-  obj.description = desc || ev.title;
-  return obj;
-}
+// Event 構造化データは一覧ページに置かない（1イベント1ページ）。個別ページ /event/<id> に
+// middleware.js が shared/eventPage.cjs の buildEventSchema で出力する。
 
 /** イベントリスト HTML（<li> 要素）を生成 */
 function renderRows(events) {
@@ -365,7 +260,10 @@ function renderRows(events) {
     return [
       `<li>`,
       `<time datetime="${esc(ev.date)}">${dateDisplay}</time>`,
-      ` ／ <strong>${esc(ev.title)}</strong>`,
+      linkable(ev)
+        ? ` ／ <strong><a href="${esc(eventPath(ev))}">${esc(ev.title)}</a></strong>`
+        : ` ／ <strong>${esc(ev.title)}</strong>`,
+      ev.status === 'cancelled' ? ' ／ <b>中止</b>' : ev.status === 'postponed' ? ' ／ <b>延期</b>' : ev.status === 'closed' ? ' ／ 受付終了' : '',
       ev.category ? ` ／ カテゴリ：${esc(ev.category)}` : '',
       ev.place    ? ` ／ 会場：${esc(ev.place)}`    : '',
       ev.deadline ? ` ／ 締切：${esc(ev.deadline)}`  : '',
@@ -421,11 +319,15 @@ const sections = Object.entries(byPref).map(([label, events]) => {
   </section>`;
 }).join('\n\n');
 
-// JSON-LD は整形(インデント)不要。クローラーは圧縮JSONも同等に解釈するため非整形で出力し軽量化。
-const structuredEvents = allEvents.filter(ldEligible);
-const allJsonLd = jsonLdSafe(
-  structuredEvents.map(ev => toEventSchema(ev, ev.prefLabel))
-);
+// 一覧ページの構造化データはパンくずだけ（Event は個別ページ /event/<id> に置く）
+const structuredEvents = allEvents.filter(ev => isEventSchemaEligible(ev, today, { facilities: JSDF_FACILITIES }));
+const allJsonLd = jsonLdSafe([{
+  '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: '地本イベントナビ（非公式）', item: `${SITE_URL}/` },
+    { '@type': 'ListItem', position: 2, name: '自衛隊地本イベント一覧', item: `${SITE_URL}/events.html` },
+  ],
+}]);
 
 const mainHtml = `<!DOCTYPE html>
 <html lang="ja">
@@ -476,6 +378,14 @@ ${allJsonLd}
     参加・申込・中止・変更などの最新情報は、必ず各地方協力本部の公式ページでご確認ください。
   </p>
 
+${newEvents.length ? `  <section>
+    <h2>新着の自衛隊イベント（直近3日に掲載）</h2>
+    <ul>
+      ${renderRows(newEvents)}
+    </ul>
+  </section>` : ''}
+  <p><a href="/topics/weekend.html">今週末（${jaMd(weekend.sat)}${weekend.sun !== weekend.sat ? `・${jaMd(weekend.sun)}` : ''}）の自衛隊イベント（${weekendEvents.length}件）</a></p>
+
 ${sections}
 
   <section style="margin-top:3em">
@@ -513,11 +423,8 @@ for (const [prefKey, prefLabel] of Object.entries(PREF_LABELS)) {
   const events = byPrefKey[prefKey] ?? [];
   const hasEvents = events.length > 0;
 
-  // 構造化データ: パンくず + FAQ（常時）+ Event（イベントがある時のみ）
+  // 構造化データ: パンくず + FAQ。Event は個別ページ（/event/<id>）にだけ置く
   const schemas = [breadcrumbSchema(prefLabel, prefKey), faqSchema(prefLabel)];
-  if (hasEvents) {
-    for (const ev of events.filter(ldEligible)) schemas.push(toEventSchema(ev, prefLabel));
-  }
   const prefJsonLd = jsonLdSafe(schemas);
 
   const officeCount = (officesByPref[prefKey] || []).length;
@@ -627,7 +534,7 @@ function topicNav(currentSlug) {
   return `<nav class="topics-nav">種目から探す：${links}</nav>`;
 }
 
-const topicValidFiles = new Set(CATEGORY_TOPICS.map(t => `${t.slug}.html`));
+const topicValidFiles = new Set([...CATEGORY_TOPICS.map(t => `${t.slug}.html`), 'weekend.html']);
 for (const t of CATEGORY_TOPICS) {
   const evs = allEvents.filter(e => e.category === t.cat);
   // 都道府県別にまとめる（表示名の順序は allEvents=日付順を保つ）
@@ -649,7 +556,6 @@ for (const t of CATEGORY_TOPICS) {
       { '@type': 'ListItem', position: 1, name: '自衛隊地本イベント', item: `${SITE_URL}/events.html` },
       { '@type': 'ListItem', position: 2, name: t.h1, item: `${SITE_URL}/topics/${t.slug}.html` },
     ] },
-    ...evs.filter(ldEligible).map(ev => toEventSchema(ev, ev.prefLabel)),
   ];
   const topicJsonLd = jsonLdSafe(schemas);
   const desc = `全国の自衛隊「${t.cat}」イベントを横断でまとめた非公式ページ。${t.lead.slice(0, 60)}（${esc(updatedAt)}更新・${evs.length}件）`;
@@ -730,6 +636,75 @@ for (const f of readdirSync(TOPICS_DIR)) {
     unlinkSync(join(TOPICS_DIR, f));
     console.log(`[generate-events-html] 孤立ファイル削除: topics/${f}`);
   }
+}
+
+// ── 今週末の自衛隊イベント topics/weekend.html ─────────────────────
+// 「今週末 自衛隊 イベント」向け。中身は events.json の今週末分そのもの（毎回作り直す・URLは固定）。
+{
+  const label = `${jaMd(weekend.sat)}${weekend.sun !== weekend.sat ? `・${jaMd(weekend.sun)}` : ''}`;
+  const grouped = {};
+  for (const ev of weekendEvents) (grouped[ev.prefLabel] ||= []).push(ev);
+  const body = weekendEvents.length
+    ? Object.entries(grouped).map(([lbl, list]) => `  <section>
+    <h2>${esc(lbl)}（${list.length}件） <a href="/events/${list[0].prefKey}.html">（${esc(lbl)}の一覧）</a></h2>
+    <ul>
+      ${renderRows(list)}
+    </ul>
+  </section>`).join('\n')
+    : `  <p>今週末（${esc(label)}）に開催予定の自衛隊イベントは、現在掲載されていません。<a href="/events.html">全国の一覧</a>から近日のイベントをご覧ください。</p>`;
+  const html = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>今週末（${esc(label)}）の自衛隊イベント【全国・非公式まとめ】</title>
+  <meta name="description" content="今週末（${esc(label)}）に開催される全国の自衛隊イベント ${weekendEvents.length} 件。説明会・駐屯地／基地の一般公開・演奏会・地域イベントなどを都道府県別に掲載（${esc(updatedAt)} 更新・非公式）。" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="${SITE_URL}/topics/weekend.html" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+  <meta property="og:title" content="今週末の自衛隊イベント【非公式まとめ】" />
+  <meta property="og:description" content="今週末（${esc(label)}）に開催される全国の自衛隊イベント ${weekendEvents.length} 件。" />
+  <meta property="og:url" content="${SITE_URL}/topics/weekend.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="${SITE_URL}/icons/icon-512.png" />
+  <meta name="twitter:card" content="summary" />
+  <script type="application/ld+json">
+${jsonLdSafe([{ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+    { '@type': 'ListItem', position: 1, name: '自衛隊地本イベント一覧', item: `${SITE_URL}/events.html` },
+    { '@type': 'ListItem', position: 2, name: '今週末の自衛隊イベント', item: `${SITE_URL}/topics/weekend.html` },
+  ] }])}
+  </script>
+  <style>
+    body { font-family: sans-serif; max-width: 900px; margin: 0 auto; padding: 16px; line-height: 1.7; }
+    h1 { font-size: 1.4em; }
+    h2 { font-size: 1.1em; margin-top: 2em; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
+    nav { margin-bottom: 1.2em; font-size: 0.9em; }
+    ul { padding-left: 1.2em; }
+    li { margin: 6px 0; font-size: 0.95em; }
+    time { color: #555; }
+    .meta { color: #666; font-size: 0.85em; }
+    a { color: #0b2545; }
+  </style>
+</head>
+<body>
+  <nav><a href="/events.html">← 全国の自衛隊イベント一覧</a>　／　<a href="/">アプリ版（PWA）</a></nav>
+  <h1>今週末（${esc(label)}）の自衛隊イベント</h1>
+  <p>今週末に開催される（または開催期間が今週末にかかる）自衛隊イベントを、全国の地方協力本部の公開情報から集めています（${weekendEvents.length} 件・${esc(updatedAt)} 更新）。</p>
+  <p class="meta" style="border:1px solid #ccc;border-radius:4px;padding:8px 12px;background:#fffbe6">
+    当サイトは有志による非公式サイトです。防衛省・自衛隊および各地方協力本部とは直接関係ありません。
+    天候などにより中止・変更になることがあります。参加前に必ず公式ページで最新情報をご確認ください。
+  </p>
+${body}
+  ${topicNav('weekend')}
+  <section style="margin-top:2.5em">
+    <h2>地域から探す</h2>
+${nationalIndex()}
+  </section>
+</body>
+</html>
+`;
+  writeFileSync(join(TOPICS_DIR, 'weekend.html'), minifyHtml(html), 'utf8');
+  console.log(`[generate-events-html] topics/weekend.html を生成（${weekendEvents.length} 件）`);
 }
 
 // ── 参加ガイド guide.html を生成（長尾の情報収集クエリ向けエバーグリーン） ──
@@ -827,59 +802,66 @@ writeFileSync(join(__dirname, '../public/guide.html'), minifyHtml(guideHtml), 'u
 console.log('[generate-events-html] guide.html を生成');
 
 // ── sitemap.xml を更新 ──────────────────────────────────────────
-// 全都道府県ページを掲載。非ページの events.json は含めない（インデックス未登録の原因）。
-// イベントの有無で priority / changefreq を出し分け、クロール資源を有効ページへ誘導する
-// （0件県は事務所一覧が主コンテンツ＝更新頻度が低いので monthly / 低priority）。
+// lastmod は「そのページの中身が変わった日」。Google は changefreq / priority を使わないため出さない。
+// ページごとの中身の要約（ハッシュ）を data/seo-lastmod.json に残し、変わったときだけ今日の日付にする
+// （以前は全ページが毎回のスクレイプ日＝実際は変わっていないページも「更新」と申告していた）。
+// 個別イベントページは events.json の更新記録（初回掲載・照合・開催状況の更新）の最も新しい日を使う。
+const LASTMOD_STATE = join(__dirname, '../data/seo-lastmod.json');
+let lastmodState = {};
+try { lastmodState = JSON.parse(readFileSync(LASTMOD_STATE, 'utf8')) || {}; } catch { lastmodState = {}; }
+const nextLastmodState = {};
+const sig = (v) => createHash('sha256').update(JSON.stringify(v)).digest('hex').slice(0, 16);
+// 一覧に効く項目だけで要約する（最終更新の時刻など毎回変わる文言は含めない）
+const listSig = (evs) => sig(evs.map(e => [e.id, e.title, e.date, e.endDate, e.time, e.place, e.category,
+  e.deadline, e.tag, e.status, e.url]));
+function pageLastmod(path, signature) {
+  const prev = lastmodState[path];
+  const day = (prev && prev.sig === signature && prev.lastmod) ? prev.lastmod : today;
+  nextLastmodState[path] = { sig: signature, lastmod: day };
+  return day;
+}
+const urlEntry = (loc, mod) => `  <url>
+    <loc>${loc}</loc>${mod ? `
+    <lastmod>${mod}</lastmod>` : ''}
+  </url>`;
 
 const prefUrls = Object.keys(PREF_LABELS).map(k => {
-  const has = (byPrefKey[k] ?? []).length > 0;
-  return `  <url>
-    <loc>${SITE_URL}/events/${k}.html</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>${has ? 'daily' : 'monthly'}</changefreq>
-    <priority>${has ? '0.8' : '0.4'}</priority>
-  </url>`;
+  const evs = byPrefKey[k] ?? [];
+  const offices = (officesByPref[k] || []).map(o => [o.name, o.address, o.tel, o.url]);
+  return urlEntry(`${SITE_URL}/events/${k}.html`, pageLastmod(`/events/${k}.html`, sig([listSig(evs), offices])));
 }).join('\n');
 
-// カテゴリ横断ページ（種目LP）をサイトマップに追加
-const topicUrls = CATEGORY_TOPICS.map(t => {
-  const has = allEvents.some(e => e.category === t.cat);
-  return `  <url>
-    <loc>${SITE_URL}/topics/${t.slug}.html</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>${has ? 'weekly' : 'monthly'}</changefreq>
-    <priority>${has ? '0.7' : '0.4'}</priority>
-  </url>`;
-}).join('\n');
+const topicUrls = CATEGORY_TOPICS.map(t =>
+  urlEntry(`${SITE_URL}/topics/${t.slug}.html`,
+    pageLastmod(`/topics/${t.slug}.html`, listSig(allEvents.filter(e => e.category === t.cat))))
+).join('\n');
+
+const weekendUrl = urlEntry(`${SITE_URL}/topics/weekend.html`,
+  pageLastmod('/topics/weekend.html', sig([weekend.sat, listSig(weekendEvents)])));
+
+// 個別イベントページ: 検索対象（index）のものだけを載せる（終了済み・公式URLなし・不正タイトルは載せない）
+const indexableEvents = allEvents.filter(ev => isEventIndexable(ev, today));
+const eventUrls = indexableEvents.map(ev =>
+  urlEntry(`${SITE_URL}${eventPath(ev)}`, eventLastmod(ev) || pageLastmod(eventPath(ev), sig(ev)))
+).join('\n');
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>${SITE_URL}/</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>${SITE_URL}/events.html</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>${SITE_URL}/guide.html</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
+${urlEntry(`${SITE_URL}/`, pageLastmod('/', listSig(allEvents)))}
+${urlEntry(`${SITE_URL}/events.html`, pageLastmod('/events.html', listSig(allEvents)))}
+${urlEntry(`${SITE_URL}/guide.html`, pageLastmod('/guide.html', sig(GUIDE_FAQ)))}
+${weekendUrl}
 ${topicUrls}
 ${prefUrls}
+${eventUrls}
 </urlset>
 `;
 
 const sitemapPath = join(__dirname, '../public/sitemap.xml');
 writeFileSync(sitemapPath, sitemap, 'utf8');
-console.log(`[generate-events-html] sitemap.xml を更新（${Object.keys(PREF_LABELS).length + 3} URL）`);
+mkdirSync(dirname(LASTMOD_STATE), { recursive: true });
+writeFileSync(LASTMOD_STATE, JSON.stringify(nextLastmodState, null, 1) + '\n', 'utf8');
+console.log(`[generate-events-html] sitemap.xml を更新（固定・一覧 ${Object.keys(PREF_LABELS).length + CATEGORY_TOPICS.length + 4} URL ＋ イベント個別 ${indexableEvents.length} URL）`);
 
 // ── ドメイン移行時に、手書きの静的ファイル内の絶対URLも合わせる ──────────
 // robots.txt（Sitemap 行）と llms.txt（各URL）は手で書いているため、SITE_URL を
@@ -900,15 +882,18 @@ if (SITE_URL !== DEFAULT_SITE_URL) {
 }
 
 // ── 構造化データ（JSON-LD Event）の件数検査 ─────────────────────────────
-// 品質基準で一部を除外するため公開件数との完全一致は求めないが、極端に少ない場合は
-// 判定の暴走（正規イベントまで除外している）か入力データの破損なので、ビルドを止める。
+// Event は個別ページ（middleware）が出す。対象の判定（shared/eventPage.cjs）が暴走して
+// 正規イベントまで外していないか、開催前のイベントに対する割合で確かめる。
 {
-  const pub = allEvents.length;
+  const active = allEvents.filter(ev => !isEnded(ev, today)).length;
   const ld = structuredEvents.length;
-  console.log(`[generate-events-html] 構造化データ Event: ${ld} 件 / 公開 ${pub} 件（対象外 ${pub - ld} 件）`);
-  const MIN_PUBLIC = 20, MIN_RATIO = 0.5;
-  if (pub >= MIN_PUBLIC && ld < pub * MIN_RATIO) {
-    console.error(`::error title=generate-events-html::構造化データの Event が公開件数に比べて極端に少ない（${ld} / ${pub}）`);
+  console.log(`[generate-events-html] 個別ページ: 検索対象 ${indexableEvents.length} 件 / Event 構造化データ ${ld} 件 / 開催前 ${active} 件（公開 ${allEvents.length} 件）`);
+  const MIN_ACTIVE = 20, MIN_RATIO = 0.3, WARN_RATIO = 0.5;
+  if (active >= MIN_ACTIVE && ld < active * MIN_RATIO) {
+    console.error(`::error title=generate-events-html::Event 構造化データの対象が開催前イベントに比べて極端に少ない（${ld} / ${active}）`);
     process.exit(1);
+  }
+  if (active >= MIN_ACTIVE && ld < active * WARN_RATIO) {
+    console.warn(`::warning title=generate-events-html::Event 構造化データの対象が少なめです（${ld} / ${active}）。会場・住所・公式URLの取得状況を確認してください`);
   }
 }

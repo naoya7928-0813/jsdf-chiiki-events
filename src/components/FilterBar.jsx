@@ -4,6 +4,8 @@ import { F } from './Shared';
 import { BRANCH_DEFS, matchesBranch } from '../../shared/branch.cjs';
 import { TAG_DEFS, matchesTag } from '../../shared/tags.cjs';
 import { jstTodayStr } from '../utils/date';
+import { weekendRange } from '../../shared/eventPage.cjs';
+import { applicationState } from '../../shared/eventStatus.cjs';
 
 export { BRANCH_DEFS, matchesBranch };
 
@@ -27,18 +29,9 @@ export const PERIODS = [
 ];
 
 // 今週末（直近の土曜・日曜）の日付範囲を { sat, sun } で返す。
-// 日曜日は当日を週末扱い（過ぎた土曜には戻さない）。ListScreen と件数計算で共有。
-export function weekendRange(tStr) {
-  const addDays = (s, n) => {
-    const d = new Date(s + 'T00:00:00Z');
-    d.setUTCDate(d.getUTCDate() + n);
-    return d.toISOString().slice(0, 10);
-  };
-  const dow = new Date(tStr + 'T00:00:00Z').getUTCDay(); // 0=日 .. 6=土
-  if (dow === 0) return { sat: tStr, sun: tStr };          // 日曜: 当日のみ
-  const toSat = 6 - dow;
-  return { sat: addDays(tStr, toSat), sun: addDays(tStr, toSat + 1) };
-}
+// 日曜日は当日を週末扱い（過ぎた土曜には戻さない）。静的ページ（topics/weekend.html）と同じ定義を
+// shared/eventPage.cjs から使う（ListScreen と件数計算でも共有）。
+export { weekendRange };
 
 // ── タグ定義（固定リスト + 照合キーワード） ────────────────────
 // 各タグは title・notes・tag フィールドをまとめてキーワード検索する。
@@ -97,6 +90,21 @@ export function calcPeriodCounts(events) {
 export const APPLIED_TAG_ID = '申請済み';
 // 終了済みフィルター用の特別タグ ID（通常は非表示、このタグ選択時のみ表示）
 export const ENDED_TAG_ID = '終了済み';
+// 申込の受付状況（締切日が分かっているイベントだけ。shared/eventStatus.cjs の applicationState）
+export const OPEN_TAG_ID = '申込受付中';
+export const SOON_TAG_ID = '締切間近';
+/** 受付状況の絞り込みに当たるか（OPEN は締切間近も含む） */
+export function matchesApplication(ev, tagId, today = jstTodayStr()) {
+  const st = applicationState(ev, today);
+  if (tagId === OPEN_TAG_ID) return st === 'open' || st === 'soon';
+  if (tagId === SOON_TAG_ID) return st === 'soon';
+  return false;
+}
+
+const APPLICATION_CHIPS = [
+  { id: OPEN_TAG_ID, label: '申込受付中' },
+  { id: SOON_TAG_ID, label: '締切間近' },
+];
 
 // ─── 折り畳みトグルの山形アイコン ────────────────────────────
 function ChevUpDown({ up }) {
@@ -138,10 +146,13 @@ export default function FilterBar({
   };
 
   // タグごとのヒット件数（キーワード横断検索）
-  const tagCounts = useMemo(() =>
-    Object.fromEntries(TAG_DEFS.map(d => [d.id, events.filter(ev => matchesTag(ev, d.id)).length])),
-    [events]
-  );
+  const tagCounts = useMemo(() => {
+    const today = jstTodayStr();
+    return {
+      ...Object.fromEntries(TAG_DEFS.map(d => [d.id, events.filter(ev => matchesTag(ev, d.id)).length])),
+      ...Object.fromEntries(APPLICATION_CHIPS.map(d => [d.id, events.filter(ev => matchesApplication(ev, d.id, today)).length])),
+    };
+  }, [events]);
 
   // 種別ごとの件数（陸海空。判定できないイベントはどこにも入らない）
   const branchCounts = useMemo(() =>
@@ -441,7 +452,7 @@ export default function FilterBar({
               );
             })()}
 
-            {TAG_DEFS.map(({ id, label }) => {
+            {[...APPLICATION_CHIPS, ...TAG_DEFS].map(({ id, label }) => {
               const isOn = activeTag === id;
               const cnt  = tagCounts[id];
               return (

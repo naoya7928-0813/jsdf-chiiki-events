@@ -3,7 +3,7 @@ import { ICO } from './Icons';
 import { useIsShortViewport } from '../hooks/useBreakpoint';
 import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle, StatusBadge } from './Shared';
 import { ChangeFlags } from './EventChanges';
-import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, weekendRange, matchesTag, matchesBranch, APPLIED_TAG_ID, ENDED_TAG_ID } from './FilterBar';
+import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, weekendRange, matchesTag, matchesBranch, APPLIED_TAG_ID, ENDED_TAG_ID, OPEN_TAG_ID, SOON_TAG_ID, matchesApplication } from './FilterBar';
 import CalendarView from './CalendarView';
 import { daysUntil, deadlineDaysUntil, daysLabel, daysColor, daysFgColor, jstTodayStr } from '../utils/date';
 import { REGIONS, SUPPORTED_PREFECTURES, PREFECTURE_INFO, NEIGHBORS } from '../data/regionMap';
@@ -238,7 +238,9 @@ export default function ListScreen({
         const catOk = activeCategory === 'all'
           || (activeCategory === 'その他' ? !STANDARD_CATEGORIES.includes(ev.category) : ev.category === activeCategory);
         const tagOk = activeTag === 'all' || isEndedFilter
-          || (activeTag === APPLIED_TAG_ID ? (applied?.has(ev.id) ?? false) : matchesTag(ev, activeTag));
+          || (activeTag === APPLIED_TAG_ID ? (applied?.has(ev.id) ?? false)
+            : (activeTag === OPEN_TAG_ID || activeTag === SOON_TAG_ID) ? matchesApplication(ev, activeTag, tStr)
+            : matchesTag(ev, activeTag));
         // 陸・海・空。判定できないイベントは種別を選ぶと外れる（推測で見せない）
         const branchOk = matchesBranch(ev, activeBranch);
 
