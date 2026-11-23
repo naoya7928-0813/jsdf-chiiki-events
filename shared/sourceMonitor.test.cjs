@@ -82,3 +82,20 @@ test('チラシの差し替え・日付の変更・画像の差し替えは更�
   assert.notEqual(hashHtml(base), hashHtml(base.replace('12月6日', '12月7日')));
   assert.notEqual(hashHtml(base), hashHtml(base.replace('/a.jpg', '/b.jpg')));
 });
+
+test('スクリプト内のイベントデータ（広島の calendarEvents）の変更は検知し、他のスクリプトの変化は無視する', () => {
+  const { hashHtml: h } = require('../scraper/lib/sourceMonitor');
+  const page = (cal, token) => `<html><body><h1>イベント</h1>
+    <script>var calendarEvents = ${cal};</script>
+    <script>window.__token="${token}";</script></body></html>`;
+  const a = '[{"title":"自衛隊説明会","start":"2026-12-05 10:00:00","url":"https://example.jp/a"}]';
+  const b = '[{"title":"自衛隊説明会","start":"2026-12-06 10:00:00","url":"https://example.jp/a"}]';
+  assert.equal(h(page(a, 'x1')), h(page(a, 'y2')), '関係ないスクリプトの変化は無視する');
+  assert.notEqual(h(page(a, 'x1')), h(page(b, 'x1')), 'カレンダーの日付の変更は検知する');
+});
+
+test('監視で残すスクリプトのデータは、パーサーが読むものと同じ形', () => {
+  const { EVENT_SCRIPT_PATTERNS } = require('../scraper/lib/sourceMonitor');
+  const src = require('node:fs').readFileSync(require('node:path').join(__dirname, '../scraper/parsers/hiroshima.js'), 'utf8');
+  assert.ok(src.includes(EVENT_SCRIPT_PATTERNS[0].source), 'hiroshima.js の calendarEvents の読み方と揃える');
+});

@@ -12,9 +12,17 @@ const crypto = require('crypto');
  *   - 除く: <script>・<style>・<noscript>・<template>・コメント・<head> 内の <link>/<meta>・属性値のトークン
  *   - 残す: 本文の文字・<a href>・<img src>・<iframe src>・<embed src>・<object data>・<source src>
  *   - 参照先の /cdn-cgi/ や __cf_ のような配信基盤のURLは除く
+ *   - 例外: パーサーがスクリプト内のデータからイベントを読む地本は、そのデータだけ残す（EVENT_SCRIPT_PATTERNS）。
+ *     広島（hiroshima.js）は `var calendarEvents = [...]` からイベントを読むため、ここを除くとカレンダーだけの
+ *     更新を見落とす（監視は JavaScript を動かさずに HTML を取るので本文に出てこない）。2026-11-23 指摘
  * イベントの追加・日付の変更・チラシ（PDF/画像）の差し替えは、文章か参照先のどちらかが変わるので検知できる。
  */
 const HASH_VERSION = 2;
+
+/** スクリプト内にあるイベントのデータ（パーサーが読むもの）。scraper/parsers/ と揃える */
+const EVENT_SCRIPT_PATTERNS = [
+  /var\s+calendarEvents\s*=\s*(\[[\s\S]*?\]);/, // hiroshima.js
+];
 
 const REF_RE = /<(a|img|iframe|embed|source|object)\b[^>]*?\s(href|src|data)\s*=\s*(["'])(.*?)\3/gi;
 
@@ -24,7 +32,17 @@ function decodeEntities(s) {
 }
 
 function canonicalizeHtml(html) {
-  let s = String(html || '')
+  const raw = String(html || '');
+  const scriptData = [];
+  raw.replace(/<script\b[^>]*>([\s\S]*?)<\/script\s*>/gi, (_, body) => {
+    for (const re of EVENT_SCRIPT_PATTERNS) {
+      const m = body.match(re);
+      if (m) scriptData.push(m[1].replace(/\s+/g, ' ').trim());
+    }
+    return '';
+  });
+
+  let s = raw
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/<(script|style|noscript|template)\b[\s\S]*?<\/\1\s*>/gi, '')
     .replace(/<head\b[\s\S]*?<\/head\s*>/i, (head) => {
@@ -46,7 +64,7 @@ function canonicalizeHtml(html) {
     .replace(/\s+/g, ' ')
     .trim();
 
-  return `${text}\n${refs.join('\n')}`;
+  return `${text}\n${refs.join('\n')}${scriptData.length ? `\n${scriptData.join('\n')}` : ''}`;
 }
 
 function hashHtml(html) {
@@ -68,6 +86,7 @@ function classifyChange(previous, current) {
 
 module.exports = {
   HASH_VERSION,
+  EVENT_SCRIPT_PATTERNS,
   canonicalizeHtml,
   hashHtml,
   classifyChange,
