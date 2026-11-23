@@ -197,3 +197,26 @@ test('ファイル名の日付より9か月以上あとの開催日は検索対�
   assert.strictEqual(P.hasDateStampConflict(base({ date: '2026-12-05', url: 'https://x.jp/flyer20261101.pdf' })), false);
   assert.strictEqual(P.hasDateStampConflict(base()), false);
 });
+
+test('mergePublished: 運営の上書き修正（中止・日時変更）と手動イベントを合流し、個別ページに反映する', () => {
+  const d = data();
+  const merged = P.mergePublished(d, {
+    events: [{ id: 'manual-tokyo-20261220-ab', pref: 'tokyo', date: '2026-12-20', title: '運営登録の説明会', place: '市ヶ谷駐屯地',
+      url: 'https://www.mod.go.jp/pco/tokyo/m.html', address: '東京都新宿区市谷本村町5-1' }],
+    overrides: { 't-20261205-abc': { status: 'cancelled', date: '2026-12-06' } },
+  });
+  assert.strictEqual(d.tokyo[0].status, undefined); // 元データは変えない
+  const page = P.buildEventPage(merged, 't-20261205-abc', { siteUrl: SITE, today: TODAY });
+  const ev = page.jsonLd.find(x => x['@type'] === 'Event');
+  assert.strictEqual(ev.eventStatus, 'https://schema.org/EventCancelled');
+  assert.ok(ev.startDate.startsWith('2026-12-06'));
+  assert.ok(page.article.includes('中止'));
+  assert.ok(P.buildEventPage(merged, 'manual-tokyo-20261220-ab', { siteUrl: SITE, today: TODAY }));
+  // 取得できなかった（null）ときはそのまま
+  assert.deepStrictEqual(P.mergePublished(d, null), { ...d });
+});
+
+test('配線: middleware とアプリは同じ mergePublished で上書き修正を当てる', () => {
+  assert.ok(fs.readFileSync(root('middleware.js'), 'utf8').includes('mergePublished(raw, manual)'));
+  assert.ok(fs.readFileSync(root('src/hooks/useEvents.js'), 'utf8').includes('mergePublished(json, manualResp)'));
+});

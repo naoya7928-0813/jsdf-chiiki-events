@@ -32,7 +32,7 @@ test('sanitizeNewEvents: 不正なIDを捨て、長さと件数を制限する',
   const out = F.sanitizeNewEvents([{ id: '../x' }, { id: 'ok-1', title: 'x'.repeat(200) }, ...Array(60).fill({ id: 'z' })]);
   assert.strictEqual(out[0].id, 'ok-1');
   assert.strictEqual(out[0].title.length, 80);
-  assert.ok(out.length <= 50);
+  assert.ok(out.length <= F.MAX_NEW_EVENTS);
 });
 
 test('地域IDは画面の REGIONS と一致し、種目は固定9値', () => {
@@ -48,4 +48,18 @@ test('配線: 購読APIは絞り込みを保存し、通知APIは端末ごとに
   const notify = fs.readFileSync(path.join(__dirname, '../api/notify.js'), 'utf8');
   assert.ok(notify.includes('buildPushPayload'));
   assert.ok(/push:batch:/.test(notify));
+});
+
+test('上限を超えて切った回は、当てはまる新着が見えなくても概要を送る（取りこぼさない）', () => {
+  // 51件目以降だけが九州 → 以前は通知が届かなかった
+  const many = Array.from({ length: 60 }, (_, i) => ({ id: `e${i}`, pref: i < 55 ? 'tokyo' : 'fukuoka', category: '説明会', title: `t${i}`, date: '2026-12-01' }));
+  const sent = F.sanitizeNewEvents(many);
+  assert.strictEqual(sent.length, 60); // 上限内なら全件残す
+  const p = F.buildPushPayload(sent, { regions: ['kyushu'], categories: [] }, P2R, 60);
+  assert.strictEqual(p.title, '自衛隊イベント情報 +5件');
+  // 上限で切られた（実数 600・手元 500）うえで当てはまるものが無い → 概要
+  const cut = F.buildPushPayload(sent.slice(0, 50), { regions: ['kyushu'], categories: [] }, P2R, 600);
+  assert.ok(cut && cut.title.includes('新着あり'));
+  // 切っていなければ、当てはまらない端末には送らない
+  assert.strictEqual(F.buildPushPayload(sent.slice(0, 50), { regions: ['kyushu'], categories: [] }, P2R, 50), null);
 });

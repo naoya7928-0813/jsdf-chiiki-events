@@ -42,6 +42,8 @@ export default async function handler(req, res) {
   const { title, body, url = '/' } = req.body ?? {};
   if (!title || !body) return res.status(400).json({ error: 'title and body are required' });
   const newEvents = sanitizeNewEvents(req.body?.events);
+  // 新着の実数（上限で切った回の判定用）。送られてこなければ件数どおり
+  const newCount = Number.isFinite(Number(req.body?.count)) ? Math.max(Number(req.body.count), newEvents.length) : newEvents.length;
   const batchId = typeof req.body?.batchId === 'string' ? req.body.batchId.slice(0, 64) : '';
 
   // ── VAPID 設定 ────────────────────────────────────────────
@@ -76,7 +78,7 @@ export default async function handler(req, res) {
   // 端末ごとの通知文（地域・種目の絞り込みがある端末だけ作り直す）。当てはまる新着が無ければ送らない
   const payloadFor = (sub) => {
     if (!newEvents.length || !sub.filter) return payload;
-    const p = buildPushPayload(newEvents, sub.filter, PREFECTURE_TO_REGION);
+    const p = buildPushPayload(newEvents, sub.filter, PREFECTURE_TO_REGION, newCount);
     return p ? JSON.stringify({ ...p, icon: '/icons/icon-192.png' }) : null;
   };
 

@@ -39,19 +39,35 @@ function matchesPushFilter(filter, ev, prefToRegion) {
   return true;
 }
 
-/** 通知に載せる新着イベント（スクレイパーが送る）を安全な形に。最大50件 */
+/**
+ * 1回の通知で扱う新着の上限。これを超えた分は絞り込みに使えないため、
+ * 当てはまる新着が見つからない端末にも「新着あり」の概要を送る（取りこぼさない側に倒す）。
+ * 以前は 50 件で切っており、51件目以降だけが当てはまる端末に通知が届かなかった（2026-11-23 指摘）。
+ */
+const MAX_NEW_EVENTS = 500;
+
+/** 通知に載せる新着イベント（スクレイパーが送る）を安全な形に。最大 MAX_NEW_EVENTS 件 */
 function sanitizeNewEvents(list) {
   if (!Array.isArray(list)) return [];
   const s = (v, n) => String(v == null ? '' : v).slice(0, n);
-  return list.slice(0, 50)
+  return list.slice(0, MAX_NEW_EVENTS)
     .filter(e => e && typeof e === 'object' && /^[A-Za-z0-9_-]{1,80}$/.test(String(e.id || '')))
     .map(e => ({ id: String(e.id), pref: s(e.pref, 20), category: s(e.category, 20), title: s(e.title, 80), date: s(e.date, 10) }));
 }
 
-/** 1端末に送る通知の中身。当てはまる新着が無ければ null */
-function buildPushPayload(events, filter, prefToRegion) {
+/**
+ * 1端末に送る通知の中身。当てはまる新着が無ければ null。
+ * totalCount（新着の実数）が events の件数より多い＝上限で切った回は、当てはまるものが無くても
+ * 切った分に当てはまるかもしれないので、概要の通知を送る。
+ */
+function buildPushPayload(events, filter, prefToRegion, totalCount = events.length) {
   const hit = events.filter(e => matchesPushFilter(filter, e, prefToRegion));
-  if (!hit.length) return null;
+  if (!hit.length) {
+    if (totalCount > events.length) {
+      return { title: '自衛隊イベント情報 新着あり', body: `新着イベントが ${totalCount} 件あります。アプリで確認してください。`, url: '/list' };
+    }
+    return null;
+  }
   const sample = hit.slice(0, 3);
   return {
     title: `自衛隊イベント情報 +${hit.length}件`,
@@ -60,4 +76,4 @@ function buildPushPayload(events, filter, prefToRegion) {
   };
 }
 
-module.exports = { REGION_IDS, CATEGORIES, normalizePushFilter, matchesPushFilter, sanitizeNewEvents, buildPushPayload };
+module.exports = { MAX_NEW_EVENTS, REGION_IDS, CATEGORIES, normalizePushFilter, matchesPushFilter, sanitizeNewEvents, buildPushPayload };

@@ -5284,7 +5284,7 @@ async function notifyNewEvents(prevData, newData) {
       ? `/event/${encodeURIComponent(newEvents[0].id)}`
       : '/list',
     // 端末ごとの「地域・種目」の絞り込み用（/api/notify が当てはまる新着だけで通知文を作る）
-    events: newEvents.slice(0, 50).map(e => ({ id: e.id, pref: e.pref, category: e.category, title: e.title, date: e.date })),
+    events: newEvents.slice(0, require('../shared/pushFilter.cjs').MAX_NEW_EVENTS).map(e => ({ id: e.id, pref: e.pref, category: e.category, title: e.title, date: e.date })),
     // 同じ回の通知を二度送らないための目印（公開データの更新時刻）
     batchId: `events-${String(newData.updatedAt || Date.now()).replace(/[^0-9]/g, '')}`,
   };

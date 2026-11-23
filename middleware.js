@@ -13,7 +13,7 @@
 // 表示は変わらない。何らかの失敗時は素通し（return）して通常配信にフォールバックし、
 // ページを決して壊さない。
 import {
-  PREF_LABELS, esc, buildEventPage, injectEventPage, injectNotFound, isManualEventId,
+  PREF_LABELS, esc, buildEventPage, injectEventPage, injectNotFound, isManualEventId, mergePublished,
 } from './shared/eventPage.cjs';
 import { siteUrl } from './shared/siteUrl.cjs';
 // 会場名 → 開催地の都道府県（既知の駐屯地・基地）。構造化データの住所に使う
@@ -48,11 +48,19 @@ export default async function middleware(request) {
     // canonical・構造化データの URL は公開URL（プレビュー環境で開いても本番を指す）
     const SITE = siteUrl(process.env);
 
-    // events.json から対象イベントを探す（手動イベントは Redis 側のため見つからなければ SPA に任せる）
-    const data = await fetch(`${origin}/data/events.json`, { headers: { 'cache-control': 'no-cache' } })
-      .then(r => (r.ok ? r.json() : null))
-      .catch(() => null);
-    if (!data) return; // 取得できないときは判断しない（誤って 404 にしない）
+    // events.json と、運営の手動イベント・上書き修正（/api/manual-events。CDN で60秒キャッシュ）を並行取得し、
+    // アプリと同じ規則（shared/eventPage.cjs の mergePublished）で合流させる。
+    // 上書き修正を当てないと、運営が直した日時・会場・中止が本文と構造化データに出ない
+    const [raw, manual] = await Promise.all([
+      fetch(`${origin}/data/events.json`, { headers: { 'cache-control': 'no-cache' } })
+        .then(r => (r.ok ? r.json() : null))
+        .catch(() => null),
+      fetch(`${origin}/api/manual-events`)
+        .then(r => (r.ok ? r.json() : null))
+        .catch(() => null),
+    ]);
+    if (!raw) return; // 取得できないときは判断しない（誤って 404 にしない）
+    const data = mergePublished(raw, manual);
 
     const html = await fetch(`${origin}/index.html`, { headers: { 'cache-control': 'no-cache' } })
       .then(r => (r.ok ? r.text() : null))
@@ -63,7 +71,8 @@ export default async function middleware(request) {
     const page = buildEventPage(data, id, { siteUrl: SITE, today, facilities: JSDF_FACILITIES });
 
     if (!page) {
-      // 手動入力イベントは events.json に無いのが正常。SPA が /api/manual-events から表示する
+      // 手動入力イベントが見つからないのは /api/manual-events を取れなかったとき（下書き・削除済みを含む）。
+      // 判断できないので SPA に任せる
       if (isManualEventId(id)) return;
       // 掲載終了（公開データから外れた）・存在しない ID。画面は SPA の404画面のまま、
       // HTTP ステータスを 404 にして検索エンジンに「このURLは無い」と伝える

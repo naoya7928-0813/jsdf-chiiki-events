@@ -104,6 +104,31 @@ function isWeekendEvent(ev, today) {
   return ev.date <= sun && end >= sat && end >= today;
 }
 
+/**
+ * 公開データ（events.json）に、運営の手動イベントと上書き修正（/api/manual-events の { events, overrides }）を合流させる。
+ * アプリ（src/hooks/useEvents.js）と個別ページ（middleware.js）で同じ結果にするための唯一の実装。
+ *   - 手動イベントは地本ごとの配列の末尾に足す
+ *   - 上書き修正（日時・会場の修正、中止・延期など）はイベントID一致で上から重ねる
+ * 元の data は変更しない。manual が無い・形が違うときは data をそのまま返す。
+ */
+function mergePublished(data, manual) {
+  const merged = { ...(data || {}) };
+  const events = Array.isArray(manual && manual.events) ? manual.events : [];
+  const overrides = (manual && manual.overrides && typeof manual.overrides === 'object') ? manual.overrides : {};
+  for (const ev of events) {
+    const k = ev && ev.pref;
+    if (!k) continue;
+    merged[k] = Array.isArray(merged[k]) ? [...merged[k], ev] : [ev];
+  }
+  if (Object.keys(overrides).length > 0) {
+    for (const k of Object.keys(merged)) {
+      if (!Array.isArray(merged[k])) continue;
+      merged[k] = merged[k].map(ev => ((ev && overrides[ev.id]) ? { ...ev, ...overrides[ev.id] } : ev));
+    }
+  }
+  return merged;
+}
+
 /** 手動入力イベント（Redis にあり events.json には無い）の ID か */
 function isManualEventId(id) {
   return /^manual-/.test(String(id || ''));
@@ -504,7 +529,7 @@ function eventLastmod(ev) {
 }
 
 module.exports = {
-  PREF_LABELS, prefectureName, weekendRange, isWeekendEvent, esc, jsonLdSafe, baseEventId, findEvent, isManualEventId,
+  PREF_LABELS, prefectureName, weekendRange, isWeekendEvent, mergePublished, esc, jsonLdSafe, baseEventId, findEvent, isManualEventId,
   isEnded, parseTimeRange, isConfirmedFree, eventAddress, venuePrefecture, facilityRegion, hasDateStampConflict,
   isEventSchemaEligible, isEventIndexable, eventPath, buildEventSchema, buildBreadcrumb,
   eventDescription, eventTitleTag, relatedEvents, mapsUrl, renderEventArticle,

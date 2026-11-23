@@ -793,7 +793,7 @@ jobs:
             echo "[WebPush] 新着0件。スキップ"; exit 0
           fi
           echo "[WebPush] 新着 ${CNT} 件を購読者へ送信します（デプロイ反映後）"
-          BODY=$(node -e "const p=require('./scraper/push-payload.json');process.stdout.write(JSON.stringify({title:p.title,body:p.body,url:p.url||'/',events:p.events||[],batchId:p.batchId||''}))")
+          BODY=$(node -e "const p=require('./scraper/push-payload.json');process.stdout.write(JSON.stringify({title:p.title,body:p.body,url:p.url||'/',events:p.events||[],count:p.count||0,batchId:p.batchId||''}))")
           curl -sS --retry 3 --retry-all-errors --connect-timeout 10 --max-time 30 \
             -X POST \
             -H "Content-Type: application/json" \
