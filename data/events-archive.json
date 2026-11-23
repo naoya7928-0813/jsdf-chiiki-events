@@ -1,6 +1,278 @@
 {
-  "updatedAt": "2026-11-23",
+  "updatedAt": "2026-11-24",
   "events": [
+    {
+      "id": "to-off-20261123-bfvvf",
+      "pref": "tochigi",
+      "office": "",
+      "date": "2026-11-23",
+      "endDate": "",
+      "weekday": "月・祝",
+      "title": "真岡市秋のー大イベント！",
+      "place": "久保講堂南駐車場、真岡市民公園",
+      "address": "",
+      "time": "09:00～14:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/tochigi/doc/event/information/20261123_mookashi_daisangyousai.pdf",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-11-20",
+      "weatherLocation": {
+        "latitude": 36.566,
+        "longitude": 139.884,
+        "label": "栃木県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-11-20T11:58:10.130+09:00"
+      },
+      "archivedAt": "2026-11-24"
+    },
+    {
+      "id": "ya-20261123-fiucp",
+      "pref": "yamanashi",
+      "office": "",
+      "date": "2026-11-23",
+      "endDate": "",
+      "weekday": "月・祝",
+      "title": "甲府矯正展",
+      "place": "アイメッセ山梨",
+      "address": "",
+      "time": "09:30～15:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/yamanashi/event.html",
+      "notes": "検討中",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-11-17",
+      "weatherLocation": {
+        "latitude": 35.664,
+        "longitude": 138.568,
+        "label": "山梨県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-11-17T13:09:53.256+09:00"
+      },
+      "archivedAt": "2026-11-24"
+    },
+    {
+      "id": "na-20261123-5yoh3",
+      "pref": "nagano",
+      "office": "",
+      "date": "2026-11-23",
+      "endDate": "",
+      "weekday": "月・祝",
+      "title": "【松本市】公務員合同説明会",
+      "place": "イオンモール松本",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "",
+      "notes": "場所：イオンモール松本 風庭２F イオンホール 時間：１１：００～１６：００ (１５：４０受付終了) 内容：「公務員ってなにしてるの？」その疑問を解決！ 公務員の仕事内容、生活、ワークライフバランス、待遇等わかりやすく説明させていただきます。 当日は現役女性海上自衛官も来ますので詳しい説明が聞ける貴重な機会です。 少しでも興味がある、話を聞いてみたい方、ぜひお気軽にご参加ください。 【参加団体】 陸上自衛隊、海上自衛隊、航空自衛隊、長野県警、松本少年刑務所、北アルプス消防、木曽広域消防、松本市役所、安曇野市役所、大町市役所、防衛省事務官",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-10-06",
+      "weatherLocation": {
+        "latitude": 36.651,
+        "longitude": 138.181,
+        "label": "長野県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-23T14:35:52.228+09:00"
+      },
+      "archivedAt": "2026-11-24"
+    },
+    {
+      "id": "gi-20261123-tcrpo",
+      "pref": "gifu",
+      "office": "",
+      "date": "2026-11-23",
+      "endDate": "",
+      "weekday": "月・祝",
+      "title": "なかよしフェス！2026",
+      "place": "関ヶ原ふれあいセンター ふれあい広場",
+      "address": "不破郡関ヶ原町大字関ヶ原894-29",
+      "time": "09:30～11:30",
+      "category": "地域参加",
+      "tag": "",
+      "url": "",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-11-11",
+      "weatherLocation": {
+        "latitude": 35.367,
+        "longitude": 136.466,
+        "label": "岐阜県関ケ原町",
+        "accuracy": "address",
+        "source": "gsi",
+        "geocodedAt": "2026-11-11T01:16:57.071+09:00"
+      },
+      "archivedAt": "2026-11-24"
+    },
+    {
+      "id": "hy-20261123-1eodv",
+      "pref": "hyogo",
+      "office": "",
+      "date": "2026-11-23",
+      "endDate": "",
+      "weekday": "月・祝",
+      "title": "自衛隊 進学&就職/転職 相談会Weeek",
+      "place": "加古川地域事務所",
+      "address": "",
+      "time": "10:00～21:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/hyogo/want/setumeikai.html",
+      "notes": "開催期間: 11月23日(月)～29日(日) ※各日10:00～21:00までご予約可能です★",
+      "ageRequirement": "16歳～32歳までの方（17歳以下は必ず保護者同伴でお願いします。)",
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "hyogo_html",
+      "firstSeen": "2026-11-07",
+      "weatherLocation": {
+        "latitude": 34.757,
+        "longitude": 134.841,
+        "label": "兵庫県加古川市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-09-10T15:07:42.097+09:00"
+      },
+      "archivedAt": "2026-11-24"
+    },
+    {
+      "id": "hy-20261123-x18r5",
+      "pref": "hyogo",
+      "office": "",
+      "date": "2026-11-23",
+      "endDate": "",
+      "weekday": "月・祝",
+      "title": "就職・転職説明会",
+      "place": "川西地域事務所",
+      "address": "",
+      "time": "10:00～11:00 / 13:00～14:00 / 15:00～16:00 / 16:00～17:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/hyogo/want/setumeikai.html",
+      "notes": null,
+      "ageRequirement": "18歳～33歳未満の方 お申し込み お申し込みはこちらから ※メールソフトが起動します。ソフトが起動しない場合は 件名:就職・転職説明会 本文:①氏名(兵庫 太郎) ②ふりがな(ひょうご たろう) ③生年月日（西暦:20▲▲.▲▲.▲▲） ④住所（○○県○○市～） ⑤職業（会社名:△△株式会社） または学校名（学年:●●高校■年生） ⑥連絡先(電話番号) ⑦希望",
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "hyogo_html",
+      "firstSeen": "2026-11-03",
+      "weatherLocation": {
+        "latitude": 34.83,
+        "longitude": 135.417,
+        "label": "兵庫県川西市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-05T08:54:38.633+09:00"
+      },
+      "archivedAt": "2026-11-24"
+    },
+    {
+      "id": "eh-office-20261123-rum18",
+      "pref": "ehime",
+      "office": "",
+      "date": "2026-11-23",
+      "endDate": "",
+      "weekday": "月・祝",
+      "title": "陸上自衛隊松山駐屯地創立71周年記念行事",
+      "place": "陸上自衛隊松山駐屯地",
+      "address": "",
+      "time": "08:30～15:00",
+      "category": "記念行事",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/ehime/event/2026/chutontikinengyoji.jpg",
+      "notes": "掲載元: 募集案内所・地域事務所\n危険物（刃物類、火気類）の持込は禁止。駐屯地内は立入禁止場所あり。",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-10-06",
+      "weatherLocation": {
+        "latitude": 33.842,
+        "longitude": 132.766,
+        "label": "愛媛県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-07-14T19:08:36.311+09:00"
+      },
+      "archivedAt": "2026-11-24"
+    },
+    {
+      "id": "hi-20261123-bu1o8",
+      "pref": "hiroshima",
+      "office": "",
+      "date": "2026-11-23",
+      "endDate": "",
+      "weekday": "月・祝",
+      "title": "マイナビインターンシップ＆キャリア発見フェア",
+      "place": "ビッグ・ローズ（福山市御幸町上岩成字正戸）",
+      "address": "",
+      "time": "13:00",
+      "category": "採用イベント",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/hiroshima/events/4436/",
+      "notes": null,
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "",
+      "firstSeen": "2026-10-16",
+      "weatherLocation": {
+        "latitude": 34.397,
+        "longitude": 132.46,
+        "label": "広島県",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-16T21:51:59.578+09:00"
+      },
+      "archivedAt": "2026-11-24"
+    },
     {
       "id": "to-office-20261122-nalt9",
       "pref": "tokyo",
@@ -477,7 +749,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-11-23"
+      "archivedAt": "2026-11-24"
     },
     {
       "id": "ym-20261122-ecen5",
@@ -604,7 +876,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-23",
+      "statusUpdatedAt": "2026-11-24",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-06",
       "weatherLocation": {
@@ -615,7 +887,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-06T11:20:07.815+09:00"
       },
-      "archivedAt": "2026-11-23"
+      "archivedAt": "2026-11-24"
     },
     {
       "id": "t-20261121-calks",
@@ -641,7 +913,7 @@
       "statusUpdatedAt": "",
       "source_type": "office_html",
       "firstSeen": "2026-10-20",
-      "archivedAt": "2026-11-23"
+      "archivedAt": "2026-11-24"
     },
     {
       "id": "to-office-20261121-bn6vc",
@@ -881,7 +1153,7 @@
         "source": "gsi",
         "geocodedAt": "2026-11-17T18:30:19.845+09:00"
       },
-      "archivedAt": "2026-11-23"
+      "archivedAt": "2026-11-24"
     },
     {
       "id": "to-office-20261121-eadjm",
@@ -1588,10 +1860,10 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-11-23",
+      "statusUpdatedAt": "2026-11-24",
       "source_type": "office_html",
       "firstSeen": "2026-09-30",
-      "archivedAt": "2026-11-23"
+      "archivedAt": "2026-11-24"
     },
     {
       "id": "to-office-20261120-opbaa",
@@ -2135,7 +2407,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-11-23"
+      "archivedAt": "2026-11-24"
     },
     {
       "id": "hi-20261118-hnvri",
@@ -2271,7 +2543,7 @@
         "source": "gsi",
         "geocodedAt": "2026-11-10T02:56:46.310+09:00"
       },
-      "archivedAt": "2026-11-23"
+      "archivedAt": "2026-11-24"
     },
     {
       "id": "hi-20261117-ft9df",
@@ -2339,7 +2611,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-29T23:33:57.908+09:00"
       },
-      "archivedAt": "2026-11-23"
+      "archivedAt": "2026-11-24"
     },
     {
       "id": "ky-set-20261116-f6p5g",
