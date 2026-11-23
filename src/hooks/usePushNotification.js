@@ -51,6 +51,21 @@ function emitPushChange(subscribed) {
   } catch { /* CustomEvent 非対応環境では黙って諦める（バッジが出ないだけ） */ }
 }
 
+// ── 新着通知の地域・種目の絞り込み（空＝すべて）。端末に保存し、購読情報と一緒にサーバーへ送る ──
+const FILTER_KEY = 'jsdf-push-filter';
+export function loadPushFilter() {
+  try {
+    const v = JSON.parse(localStorage.getItem(FILTER_KEY) || 'null');
+    return {
+      regions: Array.isArray(v?.regions) ? v.regions.filter(x => typeof x === 'string') : [],
+      categories: Array.isArray(v?.categories) ? v.categories.filter(x => typeof x === 'string') : [],
+    };
+  } catch { return { regions: [], categories: [] }; }
+}
+function savePushFilter(f) {
+  try { localStorage.setItem(FILTER_KEY, JSON.stringify(f)); } catch { /* 保存できない環境 */ }
+}
+
 function urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64   = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -70,6 +85,7 @@ export function usePushNotification() {
   const [subscribed, setSubscribed] = useState(false);
   const [loading,    setLoading]    = useState(false);
   const [error,      setError]      = useState(null);
+  const [filter,     setFilterState] = useState(loadPushFilter);
 
   // ── 初期状態チェック（既存購読の確認） ───────────────────
   useEffect(() => {
@@ -124,7 +140,7 @@ export function usePushNotification() {
       const saveRes = await fetch('/api/subscribe', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ subscription: sub.toJSON() }),
+        body:    JSON.stringify({ subscription: sub.toJSON(), filter: loadPushFilter() }),
       });
       if (!saveRes.ok) throw new Error(`Subscribe API failed: ${saveRes.status}`);
 
@@ -175,5 +191,33 @@ export function usePushNotification() {
     }
   }, [supported]);
 
-  return { supported, reason, subscribed, loading, error, subscribe, unsubscribe };
+  // ── 地域・種目の絞り込みを変える（購読中ならサーバーの登録も同じ endpoint で上書きする） ──
+  const updateFilter = useCallback(async (next) => {
+    const prev = loadPushFilter();
+    setFilterState(next);
+    savePushFilter(next);
+    if (!supported || !subscribed) return;
+    if (offlineNow()) {
+      setError('オフラインのため通知の対象を変更できません。通信できる状態でお試しください。');
+      setFilterState(prev); savePushFilter(prev);
+      return;
+    }
+    setError(null);
+    try {
+      const swReg = await navigator.serviceWorker.ready;
+      const sub = await swReg.pushManager.getSubscription();
+      if (!sub) return;
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscription: sub.toJSON(), filter: next }),
+      });
+      if (!res.ok) throw new Error(String(res.status));
+    } catch {
+      setError('通知の対象を保存できませんでした。時間をおいて再度お試しください。');
+      setFilterState(prev); savePushFilter(prev);
+    }
+  }, [supported, subscribed]);
+
+  return { supported, reason, subscribed, loading, error, subscribe, unsubscribe, filter, updateFilter };
 }

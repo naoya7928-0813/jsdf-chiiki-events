@@ -61,3 +61,4 @@ __pycache__/
 *.pyc
 # 主要イベントの掲載漏れ検出の結果（scripts/check-major-events.mjs。毎回全置換）
 scraper/major-events-report.json
+scraper/link-check-report.json

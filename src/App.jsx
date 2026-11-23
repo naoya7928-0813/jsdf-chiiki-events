@@ -10,7 +10,7 @@ import { applyOrientationPreference } from './utils/orientation';
 import { consentStateFor, loadAcceptedLegalVersion } from './constants/legal';
 import { foregroundOnDark } from '../shared/brandColors.cjs';
 // PWA（ホーム画面アプリ）の配色・manifest・アイコンは shared/pwaTheme.cjs が唯一の出どころ
-import { themeColorFor, manifestPathFor, appleTouchIconFor } from '../shared/pwaTheme.cjs';
+import { themeColorFor, manifestPathFor, appleTouchIconFor, splashColorFor } from '../shared/pwaTheme.cjs';
 import { decideDomainNotice, isLegacyHost, NOTICE_KEY, NOTICE_VERSION } from '../shared/domainNotice.cjs';
 import { jstTodayStr } from './utils/date';
 import { usePushSubscribed } from './hooks/usePushSubscribed';
@@ -25,7 +25,9 @@ import { ICO }           from './components/Icons';
 import HomeScreen        from './components/HomeScreen';
 import ListScreen        from './components/ListScreen';
 import RegionScreen       from './components/RegionScreen';
-import SplashScreen       from './components/SplashScreen';
+// スプラッシュは初回だけ表示する演出で、乗り物のイラスト（SVG 約25万字）を含む。
+// 毎回の起動で読み込まないよう、表示するときだけ読む（2026-11-23 の実測で初回JSの約3割だった）
+const SplashScreen       = lazyWithRecovery(() => import('./components/SplashScreen'));
 // 初期表示に不要な画面は遅延読込でバンドル分割（フィードバック§1-2③）。
 // トップを開いただけで詳細・設定・報告等のコードまで落とさない。
 const DetailScreen       = lazyWithRecovery(() => import('./components/DetailScreen'));
@@ -636,7 +638,9 @@ export default function App({ operator = false }) {
 
       {/* ── スプラッシュ画面（テーマに応じた乗り物アニメーション） ── */}
       {showSplash && (
-        <SplashScreen schemeKey={schemeKey} onDone={handleSplashDone} />
+        <Suspense fallback={<div style={{ position: 'absolute', inset: 0, zIndex: 50, background: splashColorFor(schemeKey) }} />}>
+          <SplashScreen schemeKey={schemeKey} onDone={handleSplashDone} />
+        </Suspense>
       )}
 
       {/* ── ドメイン移行のお知らせ（スプラッシュが終わってから出す） ──

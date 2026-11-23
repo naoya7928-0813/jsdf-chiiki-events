@@ -1,0 +1,22 @@
+{
+  "_説明": "一次ソースで照合済みの追加イベント（shared/verifiedEvents.cjs）。公式資料を実際に読み、日時・会場の記載を引用できるものだけを入れる。evidence は公開データに出ない。",
+  "events": [
+    {
+      "id": "verified-hyakuri-koukusai-2026",
+      "pref": "ibaraki",
+      "date": "2026-12-06",
+      "title": "百里基地航空祭",
+      "place": "航空自衛隊百里基地",
+      "address": "茨城県小美玉市",
+      "time": "08:30～14:00",
+      "category": "一般公開",
+      "url": "https://www.mod.go.jp/asdf/hyakuri/2-5_pr/2-5-1_koukuusai_Pmoushikomi.html",
+      "notes": "百里基地の公式資料（令和8年10月1日付）で日時を確認。日時は予定で、天候等により規模・日時の変更や中止の場合があります。来場方法・交通規制は公式ページでご確認ください。",
+      "evidence": {
+        "url": "https://www.mod.go.jp/asdf/hyakuri/2-5_pr/koukusai/baiten/R8rinjibaiten_koukoku.pdf",
+        "quote": "令和８年度百里基地航空祭 … ３ 実施日時 （２）一般公開 令和８年１２月６日（日）０８：３０～１４：００ 注：実施日時は予定であり、官側の都合や天候等の理由により開催規模や日時等の変更又は中止となる場合がある。",
+        "checkedAt": "2026-11-23"
+      }
+    }
+  ]
+}

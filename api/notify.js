@@ -1,11 +1,16 @@
 // POST /api/notify
-// Body: { secret: string, title: string, body: string, url?: string }
+// Body: { title: string, body: string, url?: string, events?: [{id,pref,category,title,date}], batchId?: string }
+//   events があれば、端末ごとに「地域・種目」の絞り込み（購読時に保存）に当てはまる新着だけで通知文を作り、
+//   当てはまらない端末には送らない（shared/pushFilter.cjs）。
+//   batchId があれば同じ batchId の二度目以降の呼び出しは送らない（再試行による重複通知の防止・1日保持）
 // NOTIFY_SECRET 環境変数と一致した場合のみ全購読者にプッシュ通知を送信する
 import webpush from 'web-push';
 import { timingSafeEqual } from 'node:crypto';
 import { Redis } from '@upstash/redis';
 import { rateLimit } from './_security.js';
 import { usableSubscription, clearWatchList } from './_push.js';
+import { sanitizeNewEvents, buildPushPayload } from '../shared/pushFilter.cjs';
+import { PREFECTURE_TO_REGION } from '../src/data/regionMap.js';
 
 const redis = new Redis({
   url:   process.env.KV_REST_API_URL,
@@ -36,6 +41,8 @@ export default async function handler(req, res) {
 
   const { title, body, url = '/' } = req.body ?? {};
   if (!title || !body) return res.status(400).json({ error: 'title and body are required' });
+  const newEvents = sanitizeNewEvents(req.body?.events);
+  const batchId = typeof req.body?.batchId === 'string' ? req.body.batchId.slice(0, 64) : '';
 
   // ── VAPID 設定 ────────────────────────────────────────────
   const { VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_EMAIL } = process.env;
@@ -57,7 +64,21 @@ export default async function handler(req, res) {
     return res.status(200).json({ sent: 0, failed: 0, message: 'No subscribers' });
   }
 
+  // 同じ回の通知を二度送らない（curl の再試行・ワークフローの再実行）。Redis が使えなければ送る（可用性優先）
+  if (batchId) {
+    try {
+      const first = await redis.set(`push:batch:${batchId}`, '1', { nx: true, ex: 86400 });
+      if (first === null) return res.status(200).json({ sent: 0, failed: 0, duplicate: true });
+    } catch { /* 判定できないときは送る */ }
+  }
+
   const payload = JSON.stringify({ title, body, url, icon: '/icons/icon-192.png' });
+  // 端末ごとの通知文（地域・種目の絞り込みがある端末だけ作り直す）。当てはまる新着が無ければ送らない
+  const payloadFor = (sub) => {
+    if (!newEvents.length || !sub.filter) return payload;
+    const p = buildPushPayload(newEvents, sub.filter, PREFECTURE_TO_REGION);
+    return p ? JSON.stringify({ ...p, icon: '/icons/icon-192.png' }) : null;
+  };
 
   // ── 送信に使えない購読（不正な endpoint・鍵の欠落・壊れた JSON）は送らずに削除 ──
   // ハッシュのフィールド名（保存時の endpoint）で消す。値が壊れていても確実に消せるように
@@ -70,13 +91,15 @@ export default async function handler(req, res) {
   }
 
   // ── 並列送信（410 Gone → 自動削除） ──────────────────────
-  let sent = 0, failed = 0;
+  let sent = 0, failed = 0, skipped = 0;
   const staleEndpoints = [];
 
   await Promise.allSettled(
     subs.map(async sub => {
+      const body = payloadFor(sub);
+      if (!body) { skipped++; return; }
       try {
-        await webpush.sendNotification(sub, payload);
+        await webpush.sendNotification({ endpoint: sub.endpoint, keys: sub.keys, expirationTime: sub.expirationTime ?? null }, body);
         sent++;
       } catch (err) {
         if (err.statusCode === 410 || err.statusCode === 404) {
@@ -99,5 +122,5 @@ export default async function handler(req, res) {
     console.warn(`[notify] 送信に使えない購読を ${invalidFields.length} 件削除しました`);
   }
 
-  return res.status(200).json({ sent, failed, removed: staleEndpoints.length, invalid: invalidFields.length });
+  return res.status(200).json({ sent, failed, skipped, removed: staleEndpoints.length, invalid: invalidFields.length });
 }

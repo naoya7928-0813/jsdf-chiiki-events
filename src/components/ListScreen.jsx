@@ -1,10 +1,13 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect, Suspense } from 'react';
 import { ICO } from './Icons';
 import { useIsShortViewport } from '../hooks/useBreakpoint';
+import { sortByDistance, distanceLabel, RADIUS_OPTIONS_KM } from '../../shared/eventDistance.cjs';
 import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle, StatusBadge } from './Shared';
 import { ChangeFlags } from './EventChanges';
 import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, weekendRange, matchesTag, matchesBranch, APPLIED_TAG_ID, ENDED_TAG_ID, OPEN_TAG_ID, SOON_TAG_ID, matchesApplication } from './FilterBar';
-import CalendarView from './CalendarView';
+import { lazyWithRecovery } from '../utils/lazyChunk';
+// カレンダー表示を選んだときだけ読む
+const CalendarView = lazyWithRecovery(() => import('./CalendarView'));
 import { daysUntil, deadlineDaysUntil, daysLabel, daysColor, daysFgColor, jstTodayStr } from '../utils/date';
 import { REGIONS, SUPPORTED_PREFECTURES, PREFECTURE_INFO, NEIGHBORS } from '../data/regionMap';
 
@@ -194,6 +197,20 @@ export default function ListScreen({
   const [activeTag,      setActiveTag]      = useState('all');
   const [activePeriod,   setActivePeriod]   = useState('all');
   const [activeBranch,   setActiveBranch]   = useState('all');
+  // 現在地から近い順（shared/eventDistance.cjs）。現在地は画面の状態にだけ持ち、送信・保存しない
+  const [geo, setGeo] = useState({ status: 'idle', origin: null, msg: '' });
+  const [radiusKm, setRadiusKm] = useState(0);
+  const startNearby = () => {
+    if (!navigator.geolocation) { setGeo({ status: 'error', origin: null, msg: 'このブラウザは位置情報に対応していません' }); return; }
+    setGeo({ status: 'loading', origin: null, msg: '' });
+    navigator.geolocation.getCurrentPosition(
+      pos => setGeo({ status: 'on', origin: { lat: pos.coords.latitude, lon: pos.coords.longitude }, msg: '' }),
+      err => setGeo({ status: 'error', origin: null,
+        msg: err && err.code === 1 ? '位置情報の利用が許可されていません（端末やブラウザの設定をご確認ください）' : '現在地を取得できませんでした' }),
+      { enableHighAccuracy: false, timeout: 15000, maximumAge: 300000 },
+    );
+  };
+  const stopNearby = () => { setGeo({ status: 'idle', origin: null, msg: '' }); setRadiusKm(0); };
 
   // カテゴリ・タグ・期間・種別を変更しても検索テキストはリセットしない（同時適用）
   const handleCategoryChange = (cat)    => setActiveCategory(cat);
@@ -272,8 +289,14 @@ export default function ListScreen({
       });
   }, [list, activeCategory, activeTag, activePeriod, activeBranch, favorites, applied]);
 
+  // 現在地から近い順のときは、会場の位置が分かるものだけを距離順に1グループで出す
+  const nearby = useMemo(() => (
+    geo.status === 'on' && geo.origin ? sortByDistance(filteredList, geo.origin, radiusKm) : null
+  ), [filteredList, geo, radiusKm]);
+
   // ── イベントグループ化 ─────────────────────────────────────
   const grouped = useMemo(() => {
+    if (nearby) return nearby.list.length ? { '現在地から近い順': nearby.list } : {};
     const g = {};
     for (const e of filteredList) {
       // date が空（日程未定）の場合は専用グループへ（filteredList は末尾に並ぶ）
@@ -281,7 +304,21 @@ export default function ListScreen({
       (g[k] = g[k] || []).push(e);
     }
     return g;
-  }, [filteredList]);
+  }, [filteredList, nearby]);
+
+  // ── 段階描画（2026-11-23）。162件のカードを一度に描くと低速端末で1秒以上固まっていた（実測 TBT 約1.5秒）。
+  //    最初は画面に入る分＋α（INITIAL_CARDS 件）だけ描き、残りはブラウザの手が空いたときに描く。
+  //    件数・絞り込み・検索結果は全件で計算しているため、見た目の件数表示は変わらない。
+  //    小分けに足していく方式も試したが、足すたびに描画済みのカードも描き直すため却って遅かった（実測）
+  const INITIAL_CARDS = 24;
+  const [renderAll, setRenderAll] = useState(false);
+  useEffect(() => {
+    if (renderAll) return undefined;
+    const ric = window.requestIdleCallback || ((cb) => setTimeout(cb, 300));
+    const cancel = window.cancelIdleCallback || clearTimeout;
+    const h = ric(() => setRenderAll(true), { timeout: 1500 });
+    return () => cancel(h);
+  }, [renderAll]);
 
   // ── 検索フィルタ ──────────────────────────────────────────
   const filteredGrouped = useMemo(() => {
@@ -582,10 +619,15 @@ export default function ListScreen({
       <div ref={listScrollRef} style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 60px)' }}>
         <ErrorBanner message={error} />
 
+        {viewMode !== 'calendar' && (
+          <NearbyBar geo={geo} radiusKm={radiusKm} onStart={startNearby} onStop={stopNearby}
+            onRadius={setRadiusKm} unknown={nearby?.unknown ?? 0} primary={primary} />
+        )}
+
         {/* 初回ローディング中はスピナー（既にデータがある場合は出さない） */}
         {loading && list.length === 0 ? <Spinner primary={primary} /> : (
           viewMode === 'calendar' ? (
-            <CalendarView
+            <Suspense fallback={<Spinner primary={primary} />}><CalendarView
               events={filteredList}
               onOpenDetail={onOpenDetail}
               primary={primary}
@@ -593,7 +635,12 @@ export default function ListScreen({
               favorites={favorites}
               applied={applied}
               activePrefId={activePrefId}
-            />
+            /></Suspense>
+          ) :
+          Object.keys(filteredGrouped).length === 0 && nearby ? (
+            <div style={{ padding: '32px 20px', textAlign: 'center', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.8 }}>
+              {radiusKm > 0 ? `現在地から${radiusKm}km以内に、条件に合うイベントはありません。` : '条件に合う、会場の位置が分かるイベントはありません。'}
+            </div>
           ) :
           Object.keys(filteredGrouped).length === 0 ? (
             <EmptyState
@@ -604,7 +651,11 @@ export default function ListScreen({
               onSelectPref={handlePrefClick}
             />
           ) : (
-            Object.entries(filteredGrouped).map(([month, evs]) => (
+            (() => { let shown = 0; return Object.entries(filteredGrouped).map(([month, allEvs]) => {
+              if (!renderAll && shown >= INITIAL_CARDS) return null;
+              const evs = renderAll ? allEvs : allEvs.slice(0, Math.max(0, INITIAL_CARDS - shown));
+              shown += evs.length;
+              return (
               <div key={month}>
                 {/* 月区切り */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 20px 8px' }}>
@@ -612,7 +663,7 @@ export default function ListScreen({
                     {month}
                   </div>
                   <div style={{ flex: 1, height: 1, background: 'var(--month-sep)' }} />
-                  <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: F.mono }}>{evs.length}件</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: F.mono }}>{allEvs.length}件</div>
                 </div>
 
                 {evs.map((ev, evIdx) => {
@@ -763,6 +814,11 @@ export default function ListScreen({
                               <span style={{ minWidth: 0, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{ev.place}</span>
                             </div>
                           )}
+                          {Number.isFinite(ev.distanceM) && (
+                            <div style={{ fontSize: 11, color: 'var(--brand-fg)', fontWeight: 600, marginTop: 2 }}>
+                              現在地から {distanceLabel(ev)}
+                            </div>
+                          )}
                           {/* ④ URLあり → 公式ページ確認バッジ */}
                           {ev.url && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 5, fontSize: 10, color: 'var(--brand-fg)', fontWeight: 600 }}>
@@ -791,9 +847,21 @@ export default function ListScreen({
                   );
                 })}
               </div>
-            ))
+            );
+            }); })()
           )
         )}
+
+        {/* Web版（静的ページ）への案内。利用者にも見えるリンクで、検索エンジンの巡回経路も兼ねる
+            （以前の index.html の「画面外に隠したリンク集」は隠しコンテンツになるため廃止） */}
+        <nav aria-label="Web版の一覧" style={{
+          padding: '18px 16px 8px', fontSize: 11.5, lineHeight: 2, color: 'var(--text-muted)',
+          fontFamily: F.sans, textAlign: 'center',
+        }}>
+          Web版：<a href="/events.html" style={{ color: 'var(--brand-fg)' }}>都道府県別の一覧</a>
+          {'　／　'}<a href="/topics/weekend.html" style={{ color: 'var(--brand-fg)' }}>今週末のイベント</a>
+          {'　／　'}<a href="/guide.html" style={{ color: 'var(--brand-fg)' }}>参加ガイド</a>
+        </nav>
 
       </div>
 
@@ -802,6 +870,45 @@ export default function ListScreen({
         else if (id === 'settings')  onOpenSettings();
         else if (id === 'favorites') onOpenFavorites();
       }} primary={primary} />
+    </div>
+  );
+}
+
+// ─── 現在地から近い順（距離は直線・会場位置が分かるものだけ） ──────────
+function NearbyBar({ geo, radiusKm, onStart, onStop, onRadius, unknown, primary }) {
+  const chip = (on) => ({
+    flexShrink: 0, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: F.sans,
+    padding: '5px 12px', borderRadius: 20, fontSize: 12, fontWeight: on ? 600 : 400,
+    border: `1.5px solid ${on ? primary : 'var(--border)'}`,
+    background: on ? primary : 'var(--bg)', color: on ? '#fff' : 'var(--text-muted)', minHeight: 32,
+  });
+  if (geo.status !== 'on') {
+    return (
+      <div style={{ padding: '10px 16px 2px' }}>
+        <button onClick={onStart} disabled={geo.status === 'loading'} style={{ ...chip(false), display: 'flex', alignItems: 'center', gap: 6 }}>
+          {ICO.pin('var(--text-muted)', 12)}
+          {geo.status === 'loading' ? '現在地を取得中…' : '現在地から近い順に並べる'}
+        </button>
+        {geo.status === 'error' && (
+          <div role="alert" style={{ fontSize: 11, color: '#dc2626', marginTop: 6, lineHeight: 1.6 }}>{geo.msg}</div>
+        )}
+      </div>
+    );
+  }
+  return (
+    <div style={{ padding: '10px 16px 2px' }}>
+      <div className="jsdf-hscroll" style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2 }}>
+        {RADIUS_OPTIONS_KM.map(km => (
+          <button key={km} onClick={() => onRadius(km)} style={chip(radiusKm === km)} aria-pressed={radiusKm === km}>
+            {km === 0 ? '近い順（すべて）' : `${km}km以内`}
+          </button>
+        ))}
+        <button onClick={onStop} style={chip(false)}>解除</button>
+      </div>
+      <div style={{ fontSize: 10.5, color: 'var(--text-muted)', marginTop: 6, lineHeight: 1.6 }}>
+        距離は会場までの直線距離の目安です。現在地は端末内でのみ使い、送信・保存しません。
+        {unknown > 0 && `会場の位置が分からない ${unknown} 件は表示していません。`}
+      </div>
     </div>
   );
 }
