@@ -37,3 +37,13 @@ test('robots.txt の取得結果の扱い（RFC 9309）', () => {
   assert.strictEqual(L.robotsPolicyFromStatus(404), 'allow_all');
   assert.strictEqual(L.robotsPolicyFromStatus(503), 'disallow_all');
 });
+
+test('内部ネットワークの URL には接続しない（IP直書き・localhost・内部向けドメイン・特殊ポート・認証情報付き）', () => {
+  assert.ok(L.isPublicHttpUrl('https://www.mod.go.jp/pco/tokyo/x.html'));
+  assert.ok(L.isPublicHttpUrl('http://example.jp:80/a'));
+  for (const bad of ['http://169.254.169.254/latest/meta-data/', 'http://127.0.0.1/', 'http://[::1]/', 'http://localhost/',
+    'http://printer.local/', 'http://db.internal/', 'https://example.jp:8443/', 'ftp://example.jp/', 'javascript:alert(1)',
+    'https://user:pass@example.jp/', 'http://10.0.0.1/', 'not a url']) {
+    assert.strictEqual(L.isPublicHttpUrl(bad), false, bad);
+  }
+});

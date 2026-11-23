@@ -10,6 +10,24 @@
  * 「unknown」はリンク切れとして扱わない（防衛省サイトはボット確認で 403 を返すことが多い）。
  */
 
+/**
+ * 公開インターネット上の http(s) URL か（リンク検査で内部ネットワークへ接続しないため）。
+ * IP アドレス直書き・localhost・.local/.internal/.localhost・80/443 以外のポートは不可。
+ * 取得するのはスクレイプした値なので、万一おかしな URL が混ざっても内部へは行かない。
+ */
+function isPublicHttpUrl(url) {
+  let u;
+  try { u = new URL(String(url)); } catch { return false; }
+  if (u.protocol !== 'http:' && u.protocol !== 'https:') return false;
+  if (u.username || u.password) return false;
+  if (u.port && !['80', '443'].includes(u.port)) return false;
+  const h = u.hostname.toLowerCase().replace(/\.$/, '');
+  if (!h || !h.includes('.')) return false;
+  if (/^\[|^[\d.]+$|:/.test(h)) return false; // IPv4・IPv6 の直書き
+  if (/(^|\.)(localhost|local|internal|intranet|lan|home|corp)$/.test(h)) return false;
+  return true;
+}
+
 /** HTTP の結果を分類する */
 function classifyLink({ status, error, challenge, disallowed } = {}) {
   if (disallowed) return 'unknown';
@@ -71,4 +89,4 @@ function robotsPolicyFromStatus(status) {
   return 'disallow_all';
 }
 
-module.exports = { classifyLink, isChallengePage, parseRobots, robotsPolicyFromStatus };
+module.exports = { isPublicHttpUrl, classifyLink, isChallengePage, parseRobots, robotsPolicyFromStatus };

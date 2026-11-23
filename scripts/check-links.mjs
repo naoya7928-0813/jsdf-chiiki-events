@@ -12,7 +12,7 @@
 import { readFileSync, writeFileSync, appendFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { classifyLink, isChallengePage, parseRobots, robotsPolicyFromStatus } from '../shared/linkCheck.cjs';
+import { classifyLink, isChallengePage, parseRobots, robotsPolicyFromStatus, isPublicHttpUrl } from '../shared/linkCheck.cjs';
 import { siteUrl } from '../shared/siteUrl.cjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -37,11 +37,26 @@ for (const [pref, arr] of Object.entries(data)) {
 const urls = [...byUrl.keys()].slice(0, MAX_URLS);
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+// 内部ネットワーク（IP直書き・localhost 等）へは接続しない。テスト用に LINK_CHECK_ALLOW_LOCAL=1 で外せる
+const ALLOW_LOCAL = process.env.LINK_CHECK_ALLOW_LOCAL === '1';
+const reachable = (u) => ALLOW_LOCAL || isPublicHttpUrl(u);
 async function get(url) {
   const ac = new AbortController();
   const timer = setTimeout(() => ac.abort(), TIMEOUT_MS);
   try {
-    const res = await fetch(url, { headers: { 'user-agent': UA, accept: '*/*' }, redirect: 'follow', signal: ac.signal });
+    // リダイレクトは自分で1段ずつたどり、行き先も公開URLか確かめる（最大5回）
+    let res, cur = url;
+    for (let hop = 0; ; hop++) {
+      if (!reachable(cur)) return { error: 'not-public-url' };
+      res = await fetch(cur, { headers: { 'user-agent': UA, accept: '*/*' }, redirect: 'manual', signal: ac.signal });
+      const loc = res.headers.get('location');
+      if (res.status >= 300 && res.status < 400 && loc && hop < 5) {
+        await res.body?.cancel().catch(() => {});
+        cur = new URL(loc, cur).href;
+        continue;
+      }
+      break;
+    }
     let start = '';
     if (res.status === 403 || res.status === 503 || res.status === 429) {
       start = (await res.text().catch(() => '')).slice(0, 2000);
@@ -58,6 +73,7 @@ async function get(url) {
 
 const robotsCache = new Map();
 async function allowed(url) {
+  if (!reachable(url)) return false;
   const u = new URL(url);
   if (!robotsCache.has(u.origin)) {
     let fn;

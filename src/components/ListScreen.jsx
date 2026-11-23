@@ -2,6 +2,7 @@ import { useState, useMemo, useRef, useEffect, Suspense } from 'react';
 import { ICO } from './Icons';
 import { useIsShortViewport } from '../hooks/useBreakpoint';
 import { sortByDistance, distanceLabel, RADIUS_OPTIONS_KM } from '../../shared/eventDistance.cjs';
+import { parseQuery, matchesSearch, MAX_QUERY_LENGTH } from '../../shared/eventSearch.cjs';
 import { Emblem, BottomTabBar, F, splitDate, parseYM, Spinner, ErrorBanner, iconBtnStyle, StatusBadge } from './Shared';
 import { ChangeFlags } from './EventChanges';
 import FilterBar, { STANDARD_CATEGORIES, calcPeriodCounts, weekendRange, matchesTag, matchesBranch, APPLIED_TAG_ID, ENDED_TAG_ID, OPEN_TAG_ID, SOON_TAG_ID, matchesApplication } from './FilterBar';
@@ -220,7 +221,9 @@ export default function ListScreen({
   const handleBranchChange   = (branch) => setActiveBranch(branch);
 
   // ── フィルター適用済みリスト（期間×カテゴリ×タグ×種別、開催日昇順） ──
-  const filteredList = useMemo(() => {
+  // 絞り込み条件（期間×カテゴリ×タグ×種別×終了済み）に当てはまるか。
+  // 一覧と「全国で探した場合の件数」で同じ判定を使うため関数にしてある
+  const passFilters = useMemo(() => {
     // JST の今日を YYYY-MM-DD 文字列で取得
     const tStr = jstTodayStr();
     const Y  = Number(tStr.slice(0, 4));
@@ -251,8 +254,7 @@ export default function ListScreen({
     const nmE = `${nmY}-${pad(nmM)}-${pad(lastDay(nmY, nmM))}`;
 
     const isEndedFilter = activeTag === ENDED_TAG_ID;
-    return list
-      .filter(ev => {
+    return (ev) => {
         const catOk = activeCategory === 'all'
           || (activeCategory === 'その他' ? !STANDARD_CATEGORIES.includes(ev.category) : ev.category === activeCategory);
         const tagOk = activeTag === 'all' || isEndedFilter
@@ -280,15 +282,22 @@ export default function ListScreen({
         if (activePeriod === 'nextMonth') periodOk = ev.date >= nmS && ev.date <= nmE;
 
         return catOk && tagOk && branchOk && periodOk && endedOk;
-      })
-      .sort((a, b) => {
-        // 日程未定（date=""）は常に末尾へ
-        if (!a.date && !b.date) return 0;
-        if (!a.date) return 1;
-        if (!b.date) return -1;
-        return new Date(a.date) - new Date(b.date);
-      });
-  }, [list, activeCategory, activeTag, activePeriod, activeBranch, favorites, applied]);
+    };
+  }, [activeCategory, activeTag, activePeriod, activeBranch, favorites, applied]);
+
+  const filteredList = useMemo(() => list
+    .filter(passFilters)
+    .sort((a, b) => {
+      // 日程未定（date=""）は常に末尾へ
+      if (!a.date && !b.date) return 0;
+      if (!a.date) return 1;
+      if (!b.date) return -1;
+      return new Date(a.date) - new Date(b.date);
+    }), [list, passFilters]);
+
+  // 絞り込みが掛かっているか（0件のときに「解除」を出す）
+  const filtersActive = activeCategory !== 'all' || activeTag !== 'all' || activePeriod !== 'all' || activeBranch !== 'all';
+  const clearFilters = () => { setActiveCategory('all'); setActiveTag('all'); setActivePeriod('all'); setActiveBranch('all'); };
 
   // 現在地から近い順のときは、会場の位置が分かるものだけを距離順に1グループで出す
   const nearby = useMemo(() => (
@@ -322,20 +331,33 @@ export default function ListScreen({
   }, [renderAll]);
 
   // ── 検索フィルタ ──────────────────────────────────────────
+  // 全角/半角・ひらがな/カタカナを区別せず、空白区切りの語をすべて含むもの（shared/eventSearch.cjs）
+  const searchTerms = useMemo(() => parseQuery(searchQuery), [searchQuery]);
   const filteredGrouped = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) return grouped;
+    if (!searchTerms.length) return grouped;
     const result = {};
     for (const [month, evs] of Object.entries(grouped)) {
-      const matched = evs.filter(ev =>
-        [ev.title, ev.place, ev.address, ev.category, ev.tag].filter(Boolean).some(f =>
-          f.toLowerCase().includes(q)
-        )
-      );
+      const matched = evs.filter(ev => matchesSearch(ev, searchTerms, PREFECTURE_INFO[ev.pref]?.label));
       if (matched.length > 0) result[month] = matched;
     }
     return result;
-  }, [grouped, searchQuery]);
+  }, [grouped, searchTerms]);
+
+  // 地域を絞っているときに、全国で同じ条件で探した場合の件数（検索中だけ数える）。
+  // 「自分の都道府県」から始めた人が、他県の航空祭などを探しても見つからないと誤解しないように
+  const nationwideHits = useMemo(() => {
+    if (!searchTerms.length || region === 'all') return 0;
+    let n = 0;
+    for (const [k, evs] of Object.entries(events)) {
+      if (!SUPPORTED_PREFECTURES.has(k) || !Array.isArray(evs)) continue;
+      const label = PREFECTURE_INFO[k]?.label;
+      for (const ev of evs) if (passFilters(ev) && matchesSearch(ev, searchTerms, label)) n++;
+    }
+    return n;
+  }, [searchTerms, region, events, passFilters]);
+  const shownHits = useMemo(() => Object.values(filteredGrouped).reduce((n, a) => n + a.length, 0), [filteredGrouped]);
+  // 検索語を残したまま全国へ（地域タブの操作と違い、検索・絞り込みは消さない）
+  const searchNationwide = () => onRegionChange('all');
 
   const { primary, accent } = theme;
   const todayStr = jstTodayStr();
@@ -541,7 +563,11 @@ export default function ListScreen({
                 ref={searchInputRef}
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                placeholder="タイトル・場所・カテゴリで検索..."
+                placeholder="イベント名・会場・地域で検索（例: 航空祭）"
+                maxLength={MAX_QUERY_LENGTH}
+                inputMode="search"
+                enterKeyHint="search"
+                aria-label="イベントを検索"
                 style={{
                   flex: 1, background: 'none', border: 'none', outline: 'none',
                   color: '#fff', fontSize: 14, fontFamily: F.sans,
@@ -572,8 +598,18 @@ export default function ListScreen({
             }}>
               {searchQuery && (
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                  {ICO.search('rgba(255,255,255,0.65)', 12)} {Object.values(filteredGrouped).flat().length} 件ヒット
+                  {ICO.search('rgba(255,255,255,0.65)', 12)} {shownHits} 件ヒット
                 </span>
+              )}
+              {/* 地域を絞っているとき、全国なら見つかる分があれば1タップで広げられるようにする */}
+              {/* 0件のときは一覧側（EmptyState）に大きく出すので、ここでは出さない（同じボタンを2つ並べない） */}
+              {searchTerms.length > 0 && region !== 'all' && shownHits > 0 && nationwideHits > shownHits && (
+                <button onClick={searchNationwide} style={{
+                  background: 'rgba(255,255,255,0.18)', border: 'none', borderRadius: 12, color: '#fff',
+                  fontSize: 11, padding: '2px 10px', cursor: 'pointer', fontFamily: F.sans, minHeight: 24,
+                }}>
+                  全国で探す（{nationwideHits}件）
+                </button>
               )}
               {activePeriod !== 'all' && (
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
@@ -670,6 +706,10 @@ export default function ListScreen({
           Object.keys(filteredGrouped).length === 0 ? (
             <EmptyState
               searchQuery={searchQuery}
+              filtersActive={filtersActive}
+              onClearFilters={clearFilters}
+              nationwideHits={region !== 'all' ? nationwideHits : 0}
+              onSearchNationwide={searchNationwide}
               primary={primary}
               prefId={activePrefId}
               events={events}
@@ -939,7 +979,23 @@ function NearbyBar({ geo, radiusKm, onStart, onStop, onRadius, unknown, primary 
 }
 
 // ─── 空状態（検索ヒットなし or イベントなし） ──────────────
-function EmptyState({ searchQuery, primary, prefId, events, onSelectPref }) {
+function EmptyState({ searchQuery, primary, prefId, events, onSelectPref, filtersActive, onClearFilters, nationwideHits = 0, onSearchNationwide }) {
+  // 0件から抜け出す操作（全国で探す・絞り込みを解除）。当てはまるものだけを出す
+  const actionBtn = {
+    marginTop: 10, minHeight: 40, padding: '8px 18px', borderRadius: 20, cursor: 'pointer',
+    border: `1.5px solid ${primary}`, background: 'transparent', color: 'var(--brand-fg)',
+    fontSize: 13, fontWeight: 600, fontFamily: F.sans,
+  };
+  const actions = (
+    <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+      {nationwideHits > 0 && onSearchNationwide && (
+        <button style={actionBtn} onClick={onSearchNationwide}>全国で探す（{nationwideHits}件）</button>
+      )}
+      {filtersActive && onClearFilters && (
+        <button style={actionBtn} onClick={onClearFilters}>絞り込みを解除</button>
+      )}
+    </div>
+  );
   if (searchQuery) {
     return (
       <div style={{ padding: '40px 24px', textAlign: 'center' }}>
@@ -948,8 +1004,18 @@ function EmptyState({ searchQuery, primary, prefId, events, onSelectPref }) {
           「{searchQuery}」に一致するイベントはありません
         </div>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>
-          別のキーワードで検索してみてください
+          {nationwideHits > 0 ? 'ほかの地域で見つかりました。' : '別のキーワードで検索してみてください'}
         </div>
+        {actions}
+      </div>
+    );
+  }
+  // 絞り込みで0件になっただけ（イベント自体はある）。「公開中のイベントが無い」と誤解させない
+  if (filtersActive) {
+    return (
+      <div style={{ padding: '40px 24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: 14, fontFamily: F.sans }}>
+        <div>条件に合うイベントはありません</div>
+        {actions}
       </div>
     );
   }
