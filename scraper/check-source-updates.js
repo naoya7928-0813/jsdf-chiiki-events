@@ -3,7 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { hashHtml, classifyChange } = require('./lib/sourceMonitor');
+const { hashHtml, classifyChange, HASH_VERSION } = require('./lib/sourceMonitor');
 const { decodeHtml, metaRefreshTarget } = require('./lib/officePageSnapshot');
 
 const ROOT = path.join(__dirname, '..');
@@ -215,6 +215,7 @@ async function takeSnapshot(context, source) {
 
     return {
       hash: hashHtml(html),
+      hashVersion: HASH_VERSION,
       status: finalStatus,
       finalUrl,
       etag: headers.etag || null,

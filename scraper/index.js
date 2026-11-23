@@ -59,9 +59,9 @@ const { isCountableEvent } = require('../shared/dataQuality.cjs');
 // 受付終了/中止の状態判定・締切日解決（誤判定防止つき。shared/eventStatus.cjs）
 const eventStatus = require('../shared/eventStatus.cjs');
 
-const { chromium } = require('playwright-extra');
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-chromium.use(StealthPlugin());
+// 公式サイトへは当サイトを名乗った普通のブラウザで取得する（ボット検知の回避はしない。lib/accessPolicy.js）
+const { chromium } = require('playwright');
+const { USER_AGENT, launchArgs, createScraperContext } = require('./lib/accessPolicy');
 
 const { parseKanagawa }      = require('./parsers/kanagawa');
 const { parseTokyo }         = require('./parsers/tokyo');
@@ -351,7 +351,7 @@ async function downloadFile(url, { conditional = true } = {}) {
   const existing = normUrl ? assetCache.getByUrl(normUrl) : null;
 
   const headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+    'User-Agent': USER_AGENT,
     'Referer':    'https://www.mod.go.jp/',
   };
   // OCR成功済みエントリのみ条件付きGET（未OCRなら必ず再ダウンロード）。
@@ -2041,35 +2041,8 @@ function isChallengeTitle(title) {
 
 // ── Playwright ブラウザ設定 ──────────────────────────────────
 
-/**
- * Cloudflare ボット検知を回避するためのステルス設定を施した
- * Playwright ブラウザコンテキストを返す。
- */
-async function createStealthContext(browser) {
-  const context = await browser.newContext({
-    userAgent:  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    viewport:   { width: 1280, height: 800 },
-    locale:     'ja-JP',
-    timezoneId: 'Asia/Tokyo',
-    extraHTTPHeaders: {
-      'Accept-Language':           'ja,en-US;q=0.9,en;q=0.8',
-      'Accept':                    'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-      'Upgrade-Insecure-Requests': '1',
-      'sec-ch-ua':                 '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
-      'sec-ch-ua-mobile':          '?0',
-      'sec-ch-ua-platform':        '"Windows"',
-    },
-  });
-
-  await context.addInitScript(() => {
-    Object.defineProperty(navigator, 'webdriver',  { get: () => undefined });
-    Object.defineProperty(navigator, 'plugins',    { get: () => [1, 2, 3, 4, 5] });
-    Object.defineProperty(navigator, 'languages',  { get: () => ['ja-JP', 'ja', 'en-US'] });
-    window.chrome = { runtime: {} };
-  });
-
-  return context;
-}
+// ブラウザコンテキストは lib/accessPolicy.js の createScraperContext（名乗り付き・画像等を読まない）。
+// 以前の「ボット検知を回避するステルス設定」（偽の UA・navigator.webdriver の書き換え等）は 2026-11-23 に廃止した。
 
 // ── スクレイピング本体 ───────────────────────────────────────
 
@@ -2128,7 +2101,7 @@ async function fetchKanagawa(context) {
   // ── native fetch + iconv フォールバック ──
   const res = await fetchWithTimeout(URLS.kanagawa, {
     headers: {
-      'User-Agent':      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+      'User-Agent':      USER_AGENT,
       'Accept':          'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
       'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
       'Referer':         'https://www.mod.go.jp/',
@@ -2162,7 +2135,7 @@ async function fetchTokyo(context) {
   try {
     const res = await fetchWithTimeout(CALENDAR_URL, {
       headers: {
-        'User-Agent':      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'User-Agent':      USER_AGENT,
         'Accept':          '*/*',
         'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
         'Referer':         'https://www.mod.go.jp/pco/tokyo/event2/index.html',
@@ -2231,7 +2204,7 @@ async function enrichTokyoFromOfficePages(events, context) {
     try {
       const res = await fetchWithTimeout(page, {
         headers: {
-          'User-Agent':      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'User-Agent':      USER_AGENT,
           'Accept':          'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
           'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
           'Referer':         'https://www.mod.go.jp/pco/tokyo/event2/index.html',
@@ -2372,7 +2345,7 @@ async function fetchHtmlPref(context, prefLabel, url, parserFn) {
 
   const res = await fetchWithTimeout(url, {
     headers: {
-      'User-Agent':      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+      'User-Agent':      USER_AGENT,
       'Accept':          'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
       'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
       'Referer':         'https://www.mod.go.jp/',
@@ -2580,7 +2553,7 @@ async function fetchAkita() {
   console.log('[秋田] Google Calendar iCal 取得...');
   const fetchIcal = async (url) => {
     const res = await fetchWithTimeout(url, {
-      headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'text/calendar, */*' },
+      headers: { 'User-Agent': USER_AGENT, 'Accept': 'text/calendar, */*' },
     });
     if (!res.ok) { console.warn(`[秋田] iCal ${res.status}: ${url}`); return ''; }
     return res.text();
@@ -2602,7 +2575,7 @@ async function fetchNagano() {
   console.log(`[長野] iCal フィード取得: ${URLS.nagano}`);
   const res = await fetchWithTimeout(URLS.nagano, {
     headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+      'User-Agent': USER_AGENT,
       'Accept':     'text/calendar, */*',
     },
   });
@@ -3020,7 +2993,7 @@ async function fetchStaticDocumentOnce(context, prefLabel, url) {
   const staticContext = await browser.newContext({
     javaScriptEnabled: false,
     locale: 'ja-JP',
-    userAgent: 'Mozilla/5.0 (compatible; jsdf-chiiki-events low-load scraper; +https://github.com/naoya7928-0813/jsdf-chiiki-events)',
+    userAgent: USER_AGENT,
   });
 
   const page = await staticContext.newPage();
@@ -4287,20 +4260,11 @@ async function main() {
   let hqExploredPrefs = new Set(); // このrunでHQ探索した地本（未探索地本は前回officeイベントを維持）
   let kantoOfficeEvents = [];
 
-  const isLinux = process.platform === 'linux';
-  const browser = await chromium.launch({
-    headless: true,
-    args: [
-      ...(isLinux ? ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'] : []),
-      '--disable-infobars',
-      '--disable-blink-features=AutomationControlled',
-      '--lang=ja-JP',
-    ],
-  });
+  const browser = await chromium.launch({ headless: true, args: launchArgs() });
 
-  // 地本ごとに新規コンテキストを生成する（共有セッションだと Cloudflare に検知される）
+  // 地本ごとに新規コンテキストを生成する（Cookie 等を地本の間で持ち越さない）
   async function withFreshContext(fn) {
-    const ctx = await createStealthContext(browser);
+    const ctx = await createScraperContext(browser);
     try { return await fn(ctx); }
     finally { await ctx.close(); }
   }
@@ -5301,4 +5265,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { extractOfficeHtmlEvents, extractOfficeCandidateAssets, extractKantoOfficeCandidateAssets, loadRecruitmentOfficePages, fetchPagePlaywright, createStealthContext, ocrFlyerFull, hasAnyOcrEngine, getOfficePageResponse: url => officePageResponses.get(normalizeUrl(url)) };
+module.exports = { extractOfficeHtmlEvents, extractOfficeCandidateAssets, extractKantoOfficeCandidateAssets, loadRecruitmentOfficePages, fetchPagePlaywright, createScraperContext, ocrFlyerFull, hasAnyOcrEngine, getOfficePageResponse: url => officePageResponses.get(normalizeUrl(url)) };
