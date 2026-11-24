@@ -262,6 +262,16 @@ jobs:
           retention-days: 14
           if-no-files-found: warn
 
+      # パーサー失敗の疑いがあった地本のページ HTML（構造変更へ追従するための材料。公開サイトには出さない）
+      - name: パーサー失敗ページの HTML を保存
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: parser-failures-${{ github.run_id }}
+          path: scraper/parser-failures/
+          retention-days: 7
+          if-no-files-found: ignore
+
       # ── カットオフ（時間切れ打ち切り）の結果を読む ──────────────
       # 配信スロットに間に合わせるため、間に合わない地本は取得を見送っている。
       # 見送った地本は前回データのままなので公開データは壊れないが、

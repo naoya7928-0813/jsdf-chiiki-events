@@ -24,3 +24,20 @@ test('assessParseResult: 今日以降の日付が2件以上あるのに0件な�
   assert.equal(assessParseResult({ text: '準備中', eventCount: 0, today: '2026-09-23' }).ok, true); // 本当に掲載が無い
   assert.equal(assessParseResult({ text: '令和８年９月２６日のみ', eventCount: 0, today: '2026-09-23' }).ok, true); // 1件は判定しない
 });
+
+test('パーサー失敗の疑いがあったページは HTML を残してから失敗にする（構造変更への追従用）', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const cheerio = require('../scraper/node_modules/cheerio');
+  const { assertParseHealthy, PARSER_FAILURE_DIR } = require('../scraper/index.js');
+  const file = path.join(PARSER_FAILURE_DIR, 'テスト県.html');
+  fs.rmSync(file, { force: true });
+  const y = new Date(Date.now() + 9 * 3600 * 1000).getUTCFullYear() + 1;
+  const $ = cheerio.load(`<html><body>${[1, 2, 3, 4, 5].map(d => `<p>${y}年1月${d}日 説明会</p>`).join('')}</body></html>`);
+  assert.throws(() => assertParseHealthy('テスト県', $, []), /パーサー失敗の疑い/);
+  assert.ok(fs.readFileSync(file, 'utf8').includes('説明会'));
+  fs.rmSync(file, { force: true });
+  const $ok = cheerio.load('<html><body><p>お知らせ</p></body></html>');
+  assertParseHealthy('テスト県', $ok, []);
+  assert.ok(!fs.existsSync(file), '正常なときは保存しない');
+});

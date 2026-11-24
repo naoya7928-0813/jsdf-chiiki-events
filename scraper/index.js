@@ -2288,12 +2288,33 @@ async function fetchSaitama(context) {
  * パーサー失敗（ページ構造の変更）として例外を投げ、呼び出し側（地本ループ）で
  * 「取得失敗＝前回データ維持」に乗せる。HTTP 200 で 0 件＝正常 とはみなさない。
  */
+/**
+ * パーサー失敗の疑いがあったページの HTML を残す（2026-11-24）。
+ * 公式サイトはこの実行環境（GitHub Actions）以外からは取得できないことがあるため、ページ構造の変更に
+ * パーサーを追従させるときの材料を、取得済みの HTML から作る（追加のアクセスはしない）。
+ * scrape.yml が scraper/parser-failures/ を実行の成果物（短期保存）として上げる。公開サイトには出さない。
+ */
+const PARSER_FAILURE_DIR = path.join(__dirname, 'parser-failures');
+function saveParserFailureHtml(prefLabel, $) {
+  try {
+    fs.mkdirSync(PARSER_FAILURE_DIR, { recursive: true });
+    const name = String(prefLabel).replace(/[^\p{L}\p{N}_-]+/gu, '_').slice(0, 40) || 'unknown';
+    fs.writeFileSync(path.join(PARSER_FAILURE_DIR, `${name}.html`), $.html());
+    console.log(`[${prefLabel}] ページの HTML を parser-failures/${name}.html に保存しました（パーサー修正用）`);
+  } catch (err) {
+    console.warn(`[${prefLabel}] HTML の保存に失敗: ${err.message}`);
+  }
+}
+
 function assertParseHealthy(prefLabel, $, events) {
   const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
   const text = $('body').text();
   const h = parserHealth.assessParseResult({ text, eventCount: events.length, today });
   console.log(`[${prefLabel}] 診断: 本文の今日以降の日付 ${h.futureDateMarkers} 件 / 取得 ${h.parsedEvents} 件`);
-  if (!h.ok) throw new Error(`パーサー失敗の疑い: ${h.reason}`);
+  if (!h.ok) {
+    saveParserFailureHtml(prefLabel, $);
+    throw new Error(`パーサー失敗の疑い: ${h.reason}`);
+  }
 }
 
 async function fetchHtmlPref(context, prefLabel, url, parserFn) {
@@ -5265,4 +5286,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { extractOfficeHtmlEvents, extractOfficeCandidateAssets, extractKantoOfficeCandidateAssets, loadRecruitmentOfficePages, fetchPagePlaywright, createScraperContext, ocrFlyerFull, hasAnyOcrEngine, getOfficePageResponse: url => officePageResponses.get(normalizeUrl(url)) };
+module.exports = { assertParseHealthy, PARSER_FAILURE_DIR, extractOfficeHtmlEvents, extractOfficeCandidateAssets, extractKantoOfficeCandidateAssets, loadRecruitmentOfficePages, fetchPagePlaywright, createScraperContext, ocrFlyerFull, hasAnyOcrEngine, getOfficePageResponse: url => officePageResponses.get(normalizeUrl(url)) };
