@@ -1,6 +1,74 @@
 {
-  "updatedAt": "2026-11-24",
+  "updatedAt": "2026-11-25",
   "events": [
+    {
+      "id": "sa-office-20261124-2b31l",
+      "pref": "saitama",
+      "office": "",
+      "date": "2026-11-24",
+      "endDate": "",
+      "weekday": "火",
+      "title": "自衛隊職業相談会 in 川口市",
+      "place": "",
+      "address": "",
+      "time": "",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/saitama/",
+      "notes": "掲載元: 募集案内所・地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_html",
+      "firstSeen": "2026-11-24",
+      "weatherLocation": {
+        "latitude": 35.857,
+        "longitude": 139.649,
+        "label": "埼玉県",
+        "accuracy": "prefecture",
+        "source": "gsi",
+        "geocodedAt": "2026-06-28T22:18:19.230+09:00"
+      },
+      "archivedAt": "2026-11-25"
+    },
+    {
+      "id": "hy-20261124-xwlfz",
+      "pref": "hyogo",
+      "office": "",
+      "date": "2026-11-24",
+      "endDate": "",
+      "weekday": "火",
+      "title": "自衛隊職業説明会",
+      "place": "西宮ハローワーク2階",
+      "address": "",
+      "time": "10:00～12:00",
+      "category": "説明会",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/hyogo/want/setumeikai.html",
+      "notes": "高校生2年生以下の参加は保護者同伴必須",
+      "ageRequirement": "中学生以上52歳未満",
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "hyogo_html",
+      "firstSeen": "2026-10-05",
+      "weatherLocation": {
+        "latitude": 34.738,
+        "longitude": 135.342,
+        "label": "兵庫県西宮市",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-10-05T08:55:00.695+09:00"
+      },
+      "archivedAt": "2026-11-25"
+    },
     {
       "id": "to-off-20261123-bfvvf",
       "pref": "tochigi",
@@ -237,7 +305,7 @@
         "source": "gsi",
         "geocodedAt": "2026-07-14T19:08:36.311+09:00"
       },
-      "archivedAt": "2026-11-24"
+      "archivedAt": "2026-11-25"
     },
     {
       "id": "hi-20261123-bu1o8",
@@ -749,7 +817,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-11-24"
+      "archivedAt": "2026-11-25"
     },
     {
       "id": "ym-20261122-ecen5",
@@ -876,7 +944,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-24",
+      "statusUpdatedAt": "2026-11-25",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-06",
       "weatherLocation": {
@@ -887,7 +955,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-06T11:20:07.815+09:00"
       },
-      "archivedAt": "2026-11-24"
+      "archivedAt": "2026-11-25"
     },
     {
       "id": "t-20261121-calks",
@@ -1153,7 +1221,7 @@
         "source": "gsi",
         "geocodedAt": "2026-11-17T18:30:19.845+09:00"
       },
-      "archivedAt": "2026-11-24"
+      "archivedAt": "2026-11-25"
     },
     {
       "id": "to-office-20261121-eadjm",
@@ -1860,10 +1928,10 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-11-24",
+      "statusUpdatedAt": "2026-11-25",
       "source_type": "office_html",
       "firstSeen": "2026-09-30",
-      "archivedAt": "2026-11-24"
+      "archivedAt": "2026-11-25"
     },
     {
       "id": "to-office-20261120-opbaa",
@@ -2407,7 +2475,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-11-24"
+      "archivedAt": "2026-11-25"
     },
     {
       "id": "hi-20261118-hnvri",
@@ -2543,7 +2611,7 @@
         "source": "gsi",
         "geocodedAt": "2026-11-10T02:56:46.310+09:00"
       },
-      "archivedAt": "2026-11-24"
+      "archivedAt": "2026-11-25"
     },
     {
       "id": "hi-20261117-ft9df",
