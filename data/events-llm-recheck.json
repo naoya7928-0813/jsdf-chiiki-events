@@ -2,19 +2,55 @@
   "updatedAt": "2026-11-24",
   "limit": 30,
   "summary": {
-    "checked": 177,
-    "flagged": 15,
-    "attempted": 9,
-    "corrected": 0,
-    "unverified": 8,
+    "checked": 187,
+    "flagged": 11,
+    "attempted": 6,
+    "corrected": 1,
+    "unverified": 5,
     "noSource": 0,
     "overBudget": 0,
     "skippedNoSource": 0,
-    "skippedNotEligible": 6,
+    "skippedNotEligible": 5,
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
-  "corrections": [],
+  "corrections": [
+    {
+      "id": "as-office-20261207-n1673",
+      "pref": "asahikawa",
+      "source": "https://www.mod.go.jp/pco/asahikawa/01_recruit/r9.01siken01.jpg",
+      "reasons": [
+        "日付がタイトルになっている"
+      ],
+      "changes": [
+        {
+          "field": "title",
+          "from": "令和8年度 冬の自衛官採用試験案内",
+          "to": "令和8年度 自衛官採用試験案内"
+        },
+        {
+          "field": "endDate",
+          "from": null,
+          "to": "2027-03-01"
+        },
+        {
+          "field": "ageRequirement",
+          "from": "18歳～33歳未満",
+          "to": "18歳～33歳未満の方"
+        },
+        {
+          "field": "deadline",
+          "from": "令和8年12月3日（水）",
+          "to": "12月3日（木）"
+        },
+        {
+          "field": "notes",
+          "from": "掲載元: 募集案内所・地域事務所\n筆記(Web)試験はスマートフォンでの受験が可能",
+          "to": "筆記(Web)試験は、スマートフォンでの受験が可能です。"
+        }
+      ]
+    }
+  ],
   "skipped": [
     {
       "id": "to-office-20261128-ofqv0",
@@ -28,11 +64,6 @@
     },
     {
       "id": "eh-office-20270102-uve5r",
-      "pref": "ehime",
-      "reason": "not_eligible"
-    },
-    {
-      "id": "eh-office-20270102-bvr17",
       "pref": "ehime",
       "reason": "not_eligible"
     },
