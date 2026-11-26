@@ -1,6 +1,74 @@
 {
-  "updatedAt": "2026-11-26",
+  "updatedAt": "2026-11-27",
   "events": [
+    {
+      "id": "ky-office-20261126-qxxj7",
+      "pref": "kyoto",
+      "office": "",
+      "date": "2026-11-26",
+      "endDate": "",
+      "weekday": "木",
+      "title": "自衛隊サテライトブース",
+      "place": "ビエラ福知山 ちいとま",
+      "address": "",
+      "time": "15:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kyoto/kouhoushitsu/img/20261126_h.pdf",
+      "notes": "掲載元: 募集案内所・地域事務所",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-11-25",
+      "weatherLocation": {
+        "latitude": 35.021,
+        "longitude": 135.756,
+        "label": "京都府",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-11-25T04:09:40.273+09:00"
+      },
+      "archivedAt": "2026-11-27"
+    },
+    {
+      "id": "ky-office-20261126-p3cb8",
+      "pref": "kyoto",
+      "office": "",
+      "date": "2026-11-26",
+      "endDate": "",
+      "weekday": "木",
+      "title": "自衛隊サテライトブース",
+      "place": "イオンモールKYOTO",
+      "address": "",
+      "time": "10:00～19:00",
+      "category": "広報活動",
+      "tag": "",
+      "url": "https://www.mod.go.jp/pco/kyoto/kouhoushitsu/img/20261126.pdf",
+      "notes": "掲載元: 募集案内所・地域事務所\n最終日は16:00まで",
+      "ageRequirement": null,
+      "deadline": null,
+      "deadlineDate": null,
+      "status": "",
+      "statusReason": "",
+      "statusSource": "",
+      "statusUpdatedAt": "",
+      "source_type": "office_ocr",
+      "firstSeen": "2026-11-17",
+      "weatherLocation": {
+        "latitude": 35.021,
+        "longitude": 135.756,
+        "label": "京都府",
+        "accuracy": "venue",
+        "source": "gsi",
+        "geocodedAt": "2026-11-17T18:30:21.175+09:00"
+      },
+      "archivedAt": "2026-11-27"
+    },
     {
       "id": "t-20261125-b1b2y",
       "pref": "tokyo",
@@ -22,10 +90,10 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-11-26",
+      "statusUpdatedAt": "2026-11-27",
       "source_type": "office_html",
       "firstSeen": "2026-11-05",
-      "archivedAt": "2026-11-26"
+      "archivedAt": "2026-11-27"
     },
     {
       "id": "to-office-20261125-fftds",
@@ -297,7 +365,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-15T15:12:43.625+09:00"
       },
-      "archivedAt": "2026-11-26"
+      "archivedAt": "2026-11-27"
     },
     {
       "id": "sa-office-20261124-2b31l",
@@ -603,7 +671,7 @@
         "source": "gsi",
         "geocodedAt": "2026-07-14T19:08:36.311+09:00"
       },
-      "archivedAt": "2026-11-26"
+      "archivedAt": "2026-11-27"
     },
     {
       "id": "hi-20261123-bu1o8",
@@ -1115,7 +1183,7 @@
         "source": "gsi",
         "geocodedAt": "2026-06-28T22:18:36.000+09:00"
       },
-      "archivedAt": "2026-11-26"
+      "archivedAt": "2026-11-27"
     },
     {
       "id": "ym-20261122-ecen5",
@@ -1242,7 +1310,7 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "ocr",
-      "statusUpdatedAt": "2026-11-26",
+      "statusUpdatedAt": "2026-11-27",
       "source_type": "office_ocr",
       "firstSeen": "2026-10-06",
       "weatherLocation": {
@@ -1253,7 +1321,7 @@
         "source": "gsi",
         "geocodedAt": "2026-10-06T11:20:07.815+09:00"
       },
-      "archivedAt": "2026-11-26"
+      "archivedAt": "2026-11-27"
     },
     {
       "id": "t-20261121-calks",
@@ -1519,7 +1587,7 @@
         "source": "gsi",
         "geocodedAt": "2026-11-17T18:30:19.845+09:00"
       },
-      "archivedAt": "2026-11-26"
+      "archivedAt": "2026-11-27"
     },
     {
       "id": "to-office-20261121-eadjm",
@@ -2226,10 +2294,10 @@
       "status": "closed",
       "statusReason": "締切日経過",
       "statusSource": "html",
-      "statusUpdatedAt": "2026-11-26",
+      "statusUpdatedAt": "2026-11-27",
       "source_type": "office_html",
       "firstSeen": "2026-09-30",
-      "archivedAt": "2026-11-26"
+      "archivedAt": "2026-11-27"
     },
     {
       "id": "to-office-20261120-opbaa",
