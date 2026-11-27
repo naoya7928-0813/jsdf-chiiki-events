@@ -387,6 +387,10 @@ test('検索対象: 300日以上先で題名・URLに年の記載が無いもの
   assert.strictEqual(P.isUnverifiedFarFuture(base({ date: '2027-12-19', title: '音楽隊演奏会2027in秋田' }), TODAY), false);
   assert.strictEqual(P.isUnverifiedFarFuture(base({ date: '2027-12-19', title: '令和9年 防災フェア' }), TODAY), false);
   assert.strictEqual(P.isUnverifiedFarFuture(base({ date: '2027-06-01' }), TODAY), false);
+  // URL に年月日が続けて書かれていれば裏付けあり（20271219.pdf）。別の年・別の数字列では裏付けにしない
+  assert.strictEqual(P.isUnverifiedFarFuture(base({ date: '2027-12-19', url: 'https://www.mod.go.jp/pco/a/20271219.pdf' }), TODAY), false);
+  assert.strictEqual(P.isUnverifiedFarFuture(base({ date: '2027-12-19', url: 'https://www.mod.go.jp/pco/a/20261219.pdf' }), TODAY), true);
+  assert.strictEqual(P.isUnverifiedFarFuture(base({ date: '2027-12-19', url: 'https://www.mod.go.jp/pco/a/1202712199.pdf' }), TODAY), true);
 });
 
 test('scraper: 個別リンクの無いイベントに取得元ページを残し、url が空のときだけ公開データの url にする', () => {

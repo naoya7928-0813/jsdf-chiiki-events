@@ -280,7 +280,12 @@ function isUnverifiedFarFuture(ev, today) {
   if (!isDate(ev?.date) || !isDate(today)) return false;
   const days = (Date.parse(`${ev.date}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 86400000;
   if (days < FAR_FUTURE_DAYS) return false;
-  return !hasYearEvidence(ev, Number(ev.date.slice(0, 4)));
+  const year = Number(ev.date.slice(0, 4));
+  if (hasYearEvidence(ev, year)) return false;
+  // URL の「20271219」のように年月日が続けて書かれた日付も年の裏付けにする（hasYearEvidence は年の直後に数字が続くと認めない）
+  let url = String(ev.url || '');
+  try { url = decodeURIComponent(url); } catch { /* そのまま */ }
+  return !new RegExp(`(?:^|\\D)${year}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\\d|3[01])(?:\\D|$)`).test(url);
 }
 
 /**
