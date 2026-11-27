@@ -480,7 +480,8 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
   - `changes[]`: `{id, type, reason, before, after, public, notify, evidence, confirmed, at, by, notifiedAt?}`（新しい順・最大30件）
   - 「日時変更」は開催状況ではない（新しい日時で開催予定のまま）。種別ごとに連動する status は `CHANGE_TYPES` が唯一の出どころ
 - 受付終了の自動判定（`detectClosedText`）は「定員になり次第受付終了」「なくなり次第終了」のような**予告を終了にしない**（2026-11-27 修正）。
-  ⚠️ closed は前回状態を引き継ぐ（`mergeStatus`）ので、誤判定で一度 closed になったイベントは運営画面で「開催予定に戻す」を登録する
+  closed は前回状態を引き継ぐ（`mergeStatus`）が、前回の理由が「受付終了告知」で、その根拠の文（`statusEvidence`）を今の規則で判定し直すと
+  終了でないときは引き継がない（規則を直せば誤判定も直る。2026-11-27 愛知「公務員合同説明会」: 申込フォームは受付中だった）。締切日経過は従来どおり引き継ぐ
 - ⚠️ **`postponed` は運営の登録でのみ付く**。自動判定（`deriveStatus`）は延期を出さない（「延期の場合あり」等で延期扱いにしない）。
   中止も確定語だけで判定し、根拠（`statusEvidence`＝本文の抜き出し）と確信度（`statusConfidence`）を events.json に残す。
   運営画面で根拠を確認し、誤りなら「開催予定に戻す」を登録する
@@ -1028,7 +1029,8 @@ JS なしでも読める本文**を差し込む。中身は **`shared/eventPage.
   次に作り直すまで「sitemap にあるのに noindex」になっていた。実測で毎回1〜9件）
 - **公式URL（`url`）が無いイベント**は、スクレイパーがイベントを読み取ったページ（`fetchHtmlPref` の取得先）を `source_page` に残し、
   writeOutput が url が空のときだけ url にする（`markSourcePage`。2026-11-27）。⚠️ 取得直後に `ev.url` へ入れないこと（愛知は ev.url を詳細ページとして開く）。
-  iCal（長野・秋田）や募集案内所巡回は対象外
+  長野・秋田（Google カレンダーの公開 iCal）は、そのカレンダーの公開ページ（`googleCalendarPageUrl`＝`calendar.google.com/calendar/embed?src=…`）を取得元にする。
+  秋田は2つのカレンダーのうち実際にイベントを載せていた方（2つ目は 2026-11 時点で iCal 404・公開ページ 401 の非公開）。募集案内所巡回は対象外
 - ID の引き継ぎ導入前に入れ替わって消えた旧URLのうち、同じイベントと確認できた2件は middleware が今のURLへ 301（`LEGACY_EVENT_ID_ALIASES`。
   転送先が公開データから外れれば 404）。新しい入れ替わりは ID の引き継ぎが防ぐので、ここへは足さない
 - **Event 構造化データ**は index の条件＋会場名が実在（掲載元の案内所名の代用でない）＋**開催地の都道府県が決まる**ときだけ。

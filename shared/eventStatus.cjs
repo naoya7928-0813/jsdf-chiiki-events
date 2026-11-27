@@ -280,15 +280,21 @@ function yearBefore(dateStr) {
  *   published へ戻さない（中止表示の消失で復活させない）。
  * - closed → published への自動復帰も避ける（受付は通常再開しない）。ただし
  *   新判定が cancelled のときは cancelled を優先。
+ * - ただし前回の closed が本文の告知による判定（受付終了告知）で、その根拠の文（prevEvidence）を今の規則で判定し直すと
+ *   終了ではないときは、前回の判定の誤りとして引き継がない（2026-11-27 愛知: 「定員になり次第受付終了」を終了と誤判定し、
+ *   規則を直しても前回状態の維持で受付終了のままになっていた。申込フォームは受付中）。本当の終了告知は判定し直しても closed なので引き継ぐ
  * @param {string} prevStatus 前回の status（無ければ ''）
  * @param {{status:string,statusReason:string}} derived deriveStatus の結果
+ * @param {{prevReason?:string, prevEvidence?:string}} [prev] 前回の判定理由と根拠
  */
-function mergeStatus(prevStatus, derived) {
+function mergeStatus(prevStatus, derived, { prevReason = '', prevEvidence = '' } = {}) {
   const next = derived && derived.status ? derived.status : STATUS.PUBLISHED;
   if (prevStatus === STATUS.CANCELLED && next !== STATUS.CANCELLED) {
     return { status: STATUS.CANCELLED, statusReason: derived.statusReason || '中止告知（前回状態を維持）', sticky: true };
   }
-  if (prevStatus === STATUS.CLOSED && next === STATUS.PUBLISHED) {
+  const misjudgedClose = prevReason === '受付終了告知' && String(prevEvidence || '').trim() !== ''
+    && !detectClosedText(prevEvidence).closed;
+  if (prevStatus === STATUS.CLOSED && next === STATUS.PUBLISHED && !misjudgedClose) {
     return { status: STATUS.CLOSED, statusReason: derived.statusReason || '受付終了（前回状態を維持）', sticky: true };
   }
   return { status: next, statusReason: derived ? derived.statusReason : '', sticky: false };

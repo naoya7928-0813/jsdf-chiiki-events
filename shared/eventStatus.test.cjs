@@ -239,3 +239,21 @@ test('closed: 「〜になり次第受付終了」「なくなり次第終了」
     assert.strictEqual(st(t), 'closed', t);
   }
 });
+
+// 2026-11-27: 愛知「公務員合同説明会」(2027-02-13)。申込フォームは受付中なのに、誤判定の受付終了が前回状態の維持で残っていた
+test('mergeStatus: 前回の受付終了の根拠を今の規則で判定し直して終了でなければ引き継がない（本当の終了・締切日経過は引き継ぐ）', () => {
+  const misjudged = { prevReason: '受付終了告知', prevEvidence: '…同説明会 公安系公務員 定員30名、定員になり次第受付終了 田原文化会館201・202会議室' };
+  assert.strictEqual(S.mergeStatus('closed', { status: 'published', statusReason: '' }, misjudged).status, 'published');
+  assert.strictEqual(S.mergeStatus('closed', { status: 'published', statusReason: '' }, misjudged).sticky, false);
+  // 本当の終了告知・締切日経過・根拠が残っていない古いデータは従来どおり引き継ぐ
+  for (const prev of [
+    { prevReason: '受付終了告知', prevEvidence: '…定員に達したため受付を終了しました' },
+    { prevReason: '締切日経過', prevEvidence: '申込締切 2026-11-01' },
+    { prevReason: '受付終了告知', prevEvidence: '' },
+    {},
+  ]) assert.strictEqual(S.mergeStatus('closed', { status: 'published', statusReason: '' }, prev).status, 'closed', JSON.stringify(prev));
+  // 中止は根拠に関係なく引き継ぐ
+  assert.strictEqual(S.mergeStatus('cancelled', { status: 'published' }, misjudged).status, 'cancelled');
+  const src = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'scraper', 'index.js'), 'utf8');
+  assert.match(src, /mergeStatus\(prevStatusById\.get\(ev\.id\) \|\| '', derived,\s*\{ prevReason: prevMeta\.reason, prevEvidence: prevMeta\.evidence \}\)/);
+});

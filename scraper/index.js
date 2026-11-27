@@ -127,7 +127,7 @@ const { parseOita }      = require('./parsers/oita');
 const { parseMiyazaki }  = require('./parsers/miyazaki');
 const { parseKagoshima } = require('./parsers/kagoshima');
 const { parseOkinawa }   = require('./parsers/okinawa');
-const { toHalfWidth, reiwaToAD, reiwaNum, resolveYearByWeekday, HEISEI_BASE, padTwo, isPast, guessCategory, guessTag, calcWeekday, titleHash, absPcoUrl } = require('./parsers/utils');
+const { toHalfWidth, reiwaToAD, reiwaNum, resolveYearByWeekday, HEISEI_BASE, padTwo, isPast, guessCategory, guessTag, calcWeekday, titleHash, absPcoUrl, googleCalendarPageUrl } = require('./parsers/utils');
 
 // ── 設定 ─────────────────────────────────────────────────────
 const OUTPUT_PATH = path.join(__dirname, '../public/data/events.json');
@@ -2577,6 +2577,10 @@ async function fetchAkita() {
     fetchIcal(URLS.akita_ical2),
   ]);
   const events = parseAkita(ics1, ics2);
+  // 取得元はそのイベントを載せていたカレンダーの公開ページ（読めたカレンダーだけ。2つ目は 2026-11 時点で非公開）
+  const fromCal1 = new Set(parseAkita(ics1).map(e => e.id));
+  markSourcePage(events.filter(e => fromCal1.has(e.id)), googleCalendarPageUrl(URLS.akita_ical1));
+  if (ics2) markSourcePage(events.filter(e => !fromCal1.has(e.id)), googleCalendarPageUrl(URLS.akita_ical2));
   console.log(`[秋田] ${events.length} 件取得 (iCal)`);
   return events;
 }
@@ -2597,7 +2601,8 @@ async function fetchNagano() {
   const icsText = await res.text();
   const events  = parseNagano(icsText);
   console.log(`[長野] ${events.length} 件取得 (iCal)`);
-  return events;
+  // 取得元は長野地本の公開 Google カレンダーのページ
+  return markSourcePage(events, googleCalendarPageUrl(URLS.nagano));
 }
 
 /**
@@ -4898,7 +4903,7 @@ async function writeOutput(data, timeCutoff = null) {
     for (const e of prevData[k]) {
       if (!e || !e.id) continue;
       if (e.status) prevStatusById.set(e.id, e.status);
-      if (e.statusEvidence || e.statusConfidence) prevStatusMetaById.set(e.id, { evidence: e.statusEvidence, confidence: e.statusConfidence });
+      if (e.statusEvidence || e.statusConfidence) prevStatusMetaById.set(e.id, { evidence: e.statusEvidence, confidence: e.statusConfidence, reason: e.statusReason });
       if (/^\d{4}-\d{2}-\d{2}$/.test(String(e.firstSeen ?? ''))) prevFirstSeenById.set(e.id, e.firstSeen);
     }
   }
@@ -4924,7 +4929,10 @@ async function writeOutput(data, timeCutoff = null) {
       // 機械判定可能な締切日（原文 deadline は保持）
       if (derived.deadlineDate) { ev.deadlineDate = derived.deadlineDate; deadlineDateCount++; }
       // 前回状態との統合（cancelled/closed は復活させない）
-      const merged = eventStatus.mergeStatus(prevStatusById.get(ev.id) || '', derived);
+      // 前回の判定理由・根拠も渡す（誤判定だった受付終了を、規則を直した後まで引き継がないため）
+      const prevMeta = prevStatusMetaById.get(ev.id) || {};
+      const merged = eventStatus.mergeStatus(prevStatusById.get(ev.id) || '', derived,
+        { prevReason: prevMeta.reason, prevEvidence: prevMeta.evidence });
       if (merged.status === 'closed' || merged.status === 'cancelled') {
         ev.status = merged.status;
         ev.statusReason = merged.statusReason || derived.statusReason || '';
