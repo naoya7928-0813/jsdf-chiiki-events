@@ -879,3 +879,19 @@ test('照合: サイト内リンクの文言（「自衛官募集ホームペー
   assert.equal(isJunk14('自衛官募集ホームページ <自衛官募集X'), true);
   assert.equal(isJunk14('自衛隊ホームページ紹介イベント'), false);
 });
+
+// 2026-11-27: 東京「リーフレット」（2027-01-28）。採用案内PDF（saiyouanai2026.pdf）のリンク文言がイベント名になり、
+// 表中の最終合格発表日がイベントの開催日として公開・Event 構造化データまで出ていた（一次ソースのPDFで確認）
+test('非イベント: 資料の種類だけのタイトル・採用案内の資料は公開しない（イベント語があれば残す）', () => {
+  const tq = require('./titleQuality.cjs');
+  for (const t of ['リーフレット', 'パンフレット', 'チラシ', 'リーフレット（PDF）']) {
+    assert.strictEqual(tq.isJunkOrStubTitle(t), true, t);
+  }
+  for (const t of ['チラシ配布活動', 'ポスター展', '自衛隊パンフレット展示会']) {
+    assert.strictEqual(tq.isJunkOrStubTitle(t), false, t);
+  }
+  assert.strictEqual(tq.isNonEventDocument({ title: '令和8年度自衛官等', url: 'https://www.mod.go.jp/pco/tokyo/saiyou/saiyouanai2026.pdf' }), true);
+  assert.strictEqual(tq.isNonEventDocument({ title: 'x', url: 'https://www.mod.go.jp/pco/x/saiyouannai_r8.pdf' }), true);
+  // 正式タイトルにイベント語があれば救済（採用説明会のチラシ名がたまたま saiyouannai でも消さない）
+  assert.strictEqual(tq.isNonEventDocument({ title: '採用説明会', url: 'https://www.mod.go.jp/pco/x/saiyouannai.pdf' }), false);
+});

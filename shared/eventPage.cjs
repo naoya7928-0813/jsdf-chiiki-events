@@ -9,7 +9,8 @@
  * 決めごと（推測で埋めない）:
  *   - 料金は「無料」と資料に書かれているときだけ price 0 を出す。分からなければ offers 自体を出さない
  *   - 受付状況（availability）・受付開始日（validFrom）は資料から分からないので出さない
- *   - 主催者（organizer）・出演者（performer）は分からないので出さない。地本は「掲載元」として本文に書く
+ *   - 主催者（organizer）は分からないので出さない。地本は「掲載元」として本文に書く（主催とは限らない）
+ *   - 出演者（performer）はイベント名に特定できる音楽隊名が書かれているときだけ出す（explicitPerformers）
  *   - 会場名が無い／掲載元の案内所名で埋めただけ／都道府県が決められないイベントは Event を出さない
  *   - 画像は出さない（チラシは権利を確認できないため。shared/eventImages.cjs の方針と同じ）
  *   - Event は個別ページにだけ置く（一覧ページには置かない。Google の「1イベント1ページ」の考え方）
@@ -132,6 +133,15 @@ function mergePublished(data, manual) {
 /** 手動入力イベント（Redis にあり events.json には無い）の ID か */
 function isManualEventId(id) {
   return /^manual-/.test(String(id || ''));
+}
+
+/**
+ * /api/manual-events の応答が「手動イベントを最後まで読めた」ものか。
+ * Redis 障害時の応答（{ events: [] }）は complete を持たないので false。
+ * middleware はこれが true のときだけ、見つからない manual-* の ID を 404 にする。
+ */
+function isCompleteManualResponse(manual) {
+  return !!manual && typeof manual === 'object' && manual.complete === true && Array.isArray(manual.events);
 }
 
 /** 終了済みか（endDate||date が今日より前） */
@@ -279,6 +289,28 @@ function eventPath(ev) {
   return `/event/${encodeURIComponent(baseEventId(ev?.id))}`;
 }
 
+/**
+ * 出演者（performer）。イベント名に特定できる音楽隊の名前が書かれているときだけ返す（2026-11-27）。
+ *   - 「陸上自衛隊東北方面音楽隊演奏会」→ 陸上自衛隊東北方面音楽隊 / 「第12音楽隊クリスマスコンサート」→ 第12音楽隊
+ *   - 「自衛隊音楽隊ふれあいコンサート」のような総称は、どの部隊か分からないので出さない
+ *   - 備考・会場・カテゴリからは推測しない（「演奏会」だから音楽隊が出る、とはしない）
+ * 戻り値: PerformingGroup の配列（無ければ []）
+ */
+const BAND_QUALIFIER_RE = /^(?:第[0-9０-９]{1,3}|[一-龥]{1,6}(?:方面|中央|航空|地方|総監部|基地|師団|旅団)|東京|横須賀|佐世保|呉|舞鶴|大湊)$/;
+function explicitPerformers(ev) {
+  const title = String(ev?.title || '');
+  const names = [];
+  for (const m of title.matchAll(/([一-龥々0-9０-９]{1,16})音楽隊/g)) {
+    const run = m[1];
+    const branch = run.match(/^((?:陸上|海上|航空)?自衛隊)/)?.[1] || '';
+    const qualifier = run.slice(branch.length);
+    if (!BAND_QUALIFIER_RE.test(qualifier)) continue;
+    const name = `${run}音楽隊`;
+    if (!names.includes(name)) names.push(name);
+  }
+  return names.map(name => ({ '@type': 'PerformingGroup', name }));
+}
+
 /** Schema.org Event（出せないときは null） */
 function buildEventSchema(ev, { siteUrl, today, prefKey, facilities } = {}) {
   if (!isEventSchemaEligible(ev, today, { facilities })) return null;
@@ -308,6 +340,9 @@ function buildEventSchema(ev, { siteUrl, today, prefKey, facilities } = {}) {
     obj.isAccessibleForFree = true;
     obj.offers = { '@type': 'Offer', price: '0', priceCurrency: 'JPY', url: ev.url };
   }
+  // 出演者はイベント名に部隊名が明記された音楽隊だけ（推測しない）
+  const performers = explicitPerformers(ev);
+  if (performers.length) obj.performer = performers.length === 1 ? performers[0] : performers;
   const desc = eventDescription(ev, { prefKey });
   if (desc) obj.description = desc;
   // 公式の掲載ページ（一次情報）
@@ -529,8 +564,8 @@ function eventLastmod(ev) {
 }
 
 module.exports = {
-  PREF_LABELS, prefectureName, weekendRange, isWeekendEvent, mergePublished, esc, jsonLdSafe, baseEventId, findEvent, isManualEventId,
-  isEnded, parseTimeRange, isConfirmedFree, eventAddress, venuePrefecture, facilityRegion, hasDateStampConflict,
+  PREF_LABELS, prefectureName, weekendRange, isWeekendEvent, mergePublished, esc, jsonLdSafe, baseEventId, findEvent, isManualEventId, isCompleteManualResponse,
+  isEnded, parseTimeRange, isConfirmedFree, explicitPerformers, eventAddress, venuePrefecture, facilityRegion, hasDateStampConflict,
   isEventSchemaEligible, isEventIndexable, eventPath, buildEventSchema, buildBreadcrumb,
   eventDescription, eventTitleTag, relatedEvents, mapsUrl, renderEventArticle,
   buildEventPage, injectEventPage, injectNotFound, eventLastmod, statusLabel, ARTICLE_STYLE,

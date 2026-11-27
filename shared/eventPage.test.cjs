@@ -220,3 +220,73 @@ test('配線: middleware とアプリは同じ mergePublished で上書き修正
   assert.ok(fs.readFileSync(root('middleware.js'), 'utf8').includes('mergePublished(raw, manual)'));
   assert.ok(fs.readFileSync(root('src/hooks/useEvents.js'), 'utf8').includes('mergePublished(json, manualResp)'));
 });
+
+test('Event: 出演者はイベント名に特定できる音楽隊名があるときだけ（総称・推測では出さない）', () => {
+  const opt = { siteUrl: SITE, today: TODAY, prefKey: 'tokyo' };
+  const s1 = P.buildEventSchema(base({ title: '陸上自衛隊東北方面音楽隊演奏会2027in秋田' }), opt);
+  assert.deepStrictEqual(s1.performer, { '@type': 'PerformingGroup', name: '陸上自衛隊東北方面音楽隊' });
+  assert.deepStrictEqual(P.explicitPerformers({ title: '【高崎市】第12音楽隊クリスマスファミリーコンサート' }).map(p => p.name), ['第12音楽隊']);
+  assert.deepStrictEqual(P.explicitPerformers({ title: '茨城地本枠 航空中央音楽隊クリスマスコンサート' }).map(p => p.name), ['航空中央音楽隊']);
+  assert.deepStrictEqual(P.explicitPerformers({ title: '海上自衛隊東京音楽隊 定期演奏会' }).map(p => p.name), ['海上自衛隊東京音楽隊']);
+  // どの部隊か分からない総称・回数・地名だけ・演奏会という種目だけでは出さない
+  for (const title of ['自衛隊音楽隊ふれあいコンサートin今治', '陸上自衛隊音楽隊', '第1回音楽隊フェス', '今治市音楽隊', '富山自衛隊演奏会']) {
+    assert.deepStrictEqual(P.explicitPerformers({ title }), [], title);
+  }
+  assert.strictEqual(P.buildEventSchema(base({ title: '富山自衛隊演奏会', category: '演奏会' }), opt).performer, undefined);
+  // 備考に書かれた音楽隊からは推測しない（イベント名だけを見る）
+  assert.strictEqual(P.buildEventSchema(base({ notes: '出演: 第1音楽隊' }), opt).performer, undefined);
+});
+
+test('手動イベントの404判定: /api/manual-events を最後まで読めたときだけ「無い」と判断する', () => {
+  assert.strictEqual(P.isCompleteManualResponse({ events: [], overrides: {}, complete: true }), true);
+  // Redis 障害時の応答（complete なし）・取得失敗（null）・形の違うもの
+  assert.strictEqual(P.isCompleteManualResponse({ events: [] }), false);
+  assert.strictEqual(P.isCompleteManualResponse(null), false);
+  assert.strictEqual(P.isCompleteManualResponse({ complete: true }), false);
+  const api = fs.readFileSync(root('api/manual-events.js'), 'utf8');
+  assert.match(api, /json\(\{ events, overrides, complete: true \}\)/, '成功時だけ complete を付けること');
+  assert.match(api, /catch \(err\) \{[\s\S]*?json\(\{ events: \[\] \}\)/, '失敗時の応答に complete を付けないこと');
+});
+
+// middleware を実際に動かして HTTP ステータス・robots・canonical の組み合わせを確かめる（fetch は偽物）
+test('middleware: 掲載中は200＋index＋canonical、無いIDは404＋noindex、手動イベントは取得できたときだけ404', async () => {
+  const { pathToFileURL } = require('node:url');
+  const mw = (await import(pathToFileURL(root('middleware.js')).href)).default;
+  const html = fs.readFileSync(root('index.html'), 'utf8');
+  const future = '2099-12-05';
+  const events = { updatedAt: '2026/11/27 05:00', tokyo: [base({ id: 'to-20991205-abc', date: future })] };
+  const run = async (path, { manual = { events: [], overrides: {}, complete: true } } = {}) => {
+    const orig = global.fetch;
+    global.fetch = async (u) => {
+      const p = new URL(u).pathname;
+      if (p === '/data/events.json') return new Response(JSON.stringify(events), { status: 200 });
+      if (p === '/api/manual-events') return manual === 'fail' ? new Response('', { status: 500 }) : new Response(JSON.stringify(manual), { status: 200 });
+      if (p === '/index.html') return new Response(html, { status: 200 });
+      return new Response('', { status: 404 });
+    };
+    try { return await mw(new Request(`https://jsdf-chiiki-events.jp${path}`)); } finally { global.fetch = orig; }
+  };
+  const ok = await run('/event/to-20991205-abc');
+  assert.strictEqual(ok.status, 200);
+  const body = await ok.text();
+  assert.match(body, /<meta name="robots" content="index, follow"/);
+  assert.match(body, /<link rel="canonical" href="https:\/\/jsdf-chiiki-events\.jp\/event\/to-20991205-abc"/);
+  assert.match(body, /"@type":"Event"/);
+
+  const gone = await run('/event/to-20240101-old');
+  assert.strictEqual(gone.status, 404);
+  assert.match(await gone.text(), /<meta name="robots" content="noindex, follow"/);
+
+  // 手動イベント: 一覧を読めて無ければ 404（削除済み・下書き）。短いキャッシュ
+  const mGone = await run('/event/manual-deleted');
+  assert.strictEqual(mGone.status, 404);
+  assert.match(mGone.headers.get('cache-control'), /s-maxage=60/);
+  // 一覧を読めなかった（障害で complete なし／HTTPエラー）ときは判断せず素通し（SPA に任せる）
+  assert.strictEqual(await run('/event/manual-deleted', { manual: { events: [] } }), undefined);
+  assert.strictEqual(await run('/event/manual-deleted', { manual: 'fail' }), undefined);
+  // 手動イベントが一覧にあれば個別ページ
+  const mOk = await run('/event/manual-1', { manual: { events: [base({ id: 'manual-1', date: future })], overrides: {}, complete: true } });
+  assert.strictEqual(mOk.status, 200);
+  // 対象外のパスは素通し
+  assert.strictEqual(await run('/list'), undefined);
+});

@@ -14,6 +14,7 @@
 // ページを決して壊さない。
 import {
   PREF_LABELS, esc, buildEventPage, injectEventPage, injectNotFound, isManualEventId, mergePublished,
+  isCompleteManualResponse,
 } from './shared/eventPage.cjs';
 import { siteUrl } from './shared/siteUrl.cjs';
 // 会場名 → 開催地の都道府県（既知の駐屯地・基地）。構造化データの住所に使う
@@ -71,18 +72,22 @@ export default async function middleware(request) {
     const page = buildEventPage(data, id, { siteUrl: SITE, today, facilities: JSDF_FACILITIES });
 
     if (!page) {
-      // 手動入力イベントが見つからないのは /api/manual-events を取れなかったとき（下書き・削除済みを含む）。
-      // 判断できないので SPA に任せる
-      if (isManualEventId(id)) return;
+      // 手動入力イベント（manual-*）は /api/manual-events にある。取得できなかった（通信・Redis の障害）ときは
+      // 判断できないので SPA に任せる。取得できたのに無い＝削除済み・下書きなので 404 にする
+      // （以前は常に SPA に任せており、削除済みの URL が 200＋index で返るソフト404になっていた。2026-11-27）
+      const manualId = isManualEventId(id);
+      if (manualId && !isCompleteManualResponse(manual)) return;
       // 掲載終了（公開データから外れた）・存在しない ID。画面は SPA の404画面のまま、
       // HTTP ステータスを 404 にして検索エンジンに「このURLは無い」と伝える
+      // （本文の SPA は自分でデータを取り直すので、利用者の表示は変わらない）
       const nf = injectNotFound(html);
       if (!nf) return;
       return new Response(nf, {
         status: 404,
         headers: {
           'content-type': 'text/html; charset=utf-8',
-          'cache-control': 'public, max-age=0, s-maxage=300',
+          // 手動イベントは /api/manual-events の CDN キャッシュ（60秒）だけ遅れて現れるので、404 も同じ長さに留める
+          'cache-control': manualId ? 'public, max-age=0, s-maxage=60' : 'public, max-age=0, s-maxage=300',
           'x-robots-tag': 'noindex',
         },
       });
