@@ -1021,6 +1021,7 @@ module.exports = {
   isNonEventDocument,
   suspiciousFutureDate,
   isEligibleForStructuredEvent,
+  hasYearEvidence,
   dedupEvents,
   normForDedup,
   isSameEventTitle,

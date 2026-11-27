@@ -11,6 +11,12 @@
  */
 export const UPDATE_NOTES = [
   {
+    date:    '2026-11-27',
+    version: '1.50.41',
+    type:    'fix',
+    content: 'イベント情報を修正しました。',
+  },
+  {
     date:    '2026-11-23',
     version: '1.50.40',
     type:    'improvement',

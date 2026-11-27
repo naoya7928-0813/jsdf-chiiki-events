@@ -16,6 +16,7 @@
  *   - 同じ地本・同じ開催日（初日）
  *   - 正規化したタイトルが一致、または長い方が短い方を含む（両方8文字以上。dedupEvents と同じ基準）
  *   - 会場が矛盾しない（どちらかが空・掲載元の案内所名だけ／一致／一方が他方を含む）
+ *   - 開始時刻が矛盾しない（両方書かれていて違えば別の回）
  *   - 候補が1対1（前回側も今回側も相手が1件だけ）。同じ日に同名の別会場イベントがあるときは引き継がない
  *   - 前回の ID を今回ほかのイベントが使っていない
  *
@@ -40,10 +41,20 @@ function placesCompatible(a, b) {
   return pa === pb || pa.includes(pb) || pb.includes(pa);
 }
 
+/** 開始時刻（"HH:MM"）。読めなければ '' */
+function startTime(ev) {
+  const m = String(ev && ev.time || '').replace(/[０-９：]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+    .match(/(\d{1,2}):(\d{2})/);
+  return m ? `${m[1].padStart(2, '0')}:${m[2]}` : '';
+}
+
 /** 前回と今回の2件が同じイベントか（ID の引き継ぎ用。上の条件のうち1対1以外） */
 function isSameEventForId(prev, cur) {
   if (!prev || !cur || !prev.date || prev.date !== cur.date) return false;
   if (!sameTitle(prev.title, cur.title)) return false;
+  // 同じ日・同名・同会場でも開始時刻が両方書かれていて違えば別の回（午前の部・午後の部）として扱う（2026-11-27）
+  const ta = startTime(prev), tb = startTime(cur);
+  if (ta && tb && ta !== tb) return false;
   return placesCompatible(prev, cur);
 }
 

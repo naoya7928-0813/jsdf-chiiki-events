@@ -215,4 +215,15 @@ function absPcoUrl(href, base = 'https://www.mod.go.jp/') {
   }
 }
 
-module.exports = { absPcoUrl, reiwaToAD, reiwaNum, resolveYearByWeekday, HEISEI_BASE, padTwo, toHalfWidth, jstYear, isPast, guessCategory, guessTag, guessTags, calcWeekday, titleHash, extractLocationFromTitle };
+/**
+ * Google カレンダーの公開 iCal（…/calendar/ical/<ID>/public/basic.ics）から、人が見られる公開カレンダーのページ URL を作る。
+ * 長野・秋田はイベントを地本の Google カレンダーから読むため、その公開ページを取得元（公式の掲載ページ）にする（2026-11-27）。
+ * 公開 iCal を読めた＝カレンダーが公開されているときだけ使う。形が違えば ''。
+ */
+function googleCalendarPageUrl(icsUrl) {
+  const m = String(icsUrl || '').match(/^https:\/\/calendar\.google\.com\/calendar\/ical\/([^/?#]+)\/public\/basic\.ics$/);
+  if (!m || !/^[A-Za-z0-9._%-]+$/.test(m[1])) return '';
+  return `https://calendar.google.com/calendar/embed?src=${m[1]}&ctz=Asia%2FTokyo`;
+}
+
+module.exports = { googleCalendarPageUrl, absPcoUrl, reiwaToAD, reiwaNum, resolveYearByWeekday, HEISEI_BASE, padTwo, toHalfWidth, jstYear, isPast, guessCategory, guessTag, guessTags, calcWeekday, titleHash, extractLocationFromTitle };

@@ -228,3 +228,32 @@ test('applicationState: 締切日が分かるものだけ。受付終了・中�
   assert.strictEqual(applicationState({ date: '2026-12-20', deadlineDate: '2026-12-10', status: 'cancelled' }, T), null);
   assert.strictEqual(applicationState({ date: '2026-12-20' }, T), null); // 締切不明は推測しない
 });
+
+// 2026-11-27: 愛知「公務員合同説明会」の「定員30名、定員になり次第受付終了」を受付終了と誤判定していた（予告であって終了ではない）
+test('closed: 「〜になり次第受付終了」「なくなり次第終了」は予告なので受付終了にしない。確定の告知は従来どおり', () => {
+  const st = (text) => S.deriveStatus({ text, today: '2026-11-27', eventDate: '2026-12-10' }).status;
+  for (const t of ['定員30名、定員になり次第受付終了', '満席になり次第終了', 'チケットがなくなり次第終了', '定員に達し次第締切']) {
+    assert.strictEqual(st(t), 'published', t);
+  }
+  for (const t of ['受付終了しました', '定員に達したため受付を終了しました', '申込を締め切りました']) {
+    assert.strictEqual(st(t), 'closed', t);
+  }
+});
+
+// 2026-11-27: 愛知「公務員合同説明会」(2027-02-13)。申込フォームは受付中なのに、誤判定の受付終了が前回状態の維持で残っていた
+test('mergeStatus: 前回の受付終了の根拠を今の規則で判定し直して終了でなければ引き継がない（本当の終了・締切日経過は引き継ぐ）', () => {
+  const misjudged = { prevReason: '受付終了告知', prevEvidence: '…同説明会 公安系公務員 定員30名、定員になり次第受付終了 田原文化会館201・202会議室' };
+  assert.strictEqual(S.mergeStatus('closed', { status: 'published', statusReason: '' }, misjudged).status, 'published');
+  assert.strictEqual(S.mergeStatus('closed', { status: 'published', statusReason: '' }, misjudged).sticky, false);
+  // 本当の終了告知・締切日経過・根拠が残っていない古いデータは従来どおり引き継ぐ
+  for (const prev of [
+    { prevReason: '受付終了告知', prevEvidence: '…定員に達したため受付を終了しました' },
+    { prevReason: '締切日経過', prevEvidence: '申込締切 2026-11-01' },
+    { prevReason: '受付終了告知', prevEvidence: '' },
+    {},
+  ]) assert.strictEqual(S.mergeStatus('closed', { status: 'published', statusReason: '' }, prev).status, 'closed', JSON.stringify(prev));
+  // 中止は根拠に関係なく引き継ぐ
+  assert.strictEqual(S.mergeStatus('cancelled', { status: 'published' }, misjudged).status, 'cancelled');
+  const src = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'scraper', 'index.js'), 'utf8');
+  assert.match(src, /mergeStatus\(prevStatusById\.get\(ev\.id\) \|\| '', derived,\s*\{ prevReason: prevMeta\.reason, prevEvidence: prevMeta\.evidence \}\)/);
+});

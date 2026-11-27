@@ -92,3 +92,16 @@ test('scraper: 取得経路の判定に ID の接頭辞を使わない（引き�
   // ID の引き継ぎは前回値の保護（ID で前回を引く）より前
   assert.ok(src.indexOf('carryOverEventIds(prevData, data)') < src.indexOf('eventRegression.buildEventIndex(prevData)'));
 });
+
+test('ID 引き継ぎ: 同じ日・同名・同会場でも開始時刻が両方書かれていて違えば別の回として引き継がない', () => {
+  const prev = { tochigi: [ev({ id: 'am', place: 'A会館', time: '10:00～12:00' })] };
+  const data = { tochigi: [ev({ id: 'pm', place: 'A会館', time: '14:00～16:00' })] };
+  assert.deepStrictEqual(carryOverEventIds(prev, data), []);
+  assert.strictEqual(data.tochigi[0].id, 'pm');
+  // 片方だけ時刻が書かれている・同じ開始時刻（終了時刻の書き方違い・全角）なら同じイベント
+  for (const [a, b] of [['', '10:00～12:00'], ['10:00～12:00', '１０：００～１２：３０']]) {
+    const d = { tochigi: [ev({ id: 'new', place: 'A会館', time: b })] };
+    carryOverEventIds({ tochigi: [ev({ id: 'old', place: 'A会館', time: a })] }, d);
+    assert.strictEqual(d.tochigi[0].id, 'old', `${a} / ${b}`);
+  }
+});
