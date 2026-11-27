@@ -52,8 +52,9 @@ const { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta, offi
 // 配信スロットに間に合わせる打ち切り（カットオフ）と、実行ごとの開始位置ずらし
 const { resolveDeadline, rotationOffset, keysNeedingCarryOver } = require('../shared/scrapeDeadline.cjs');
 const parserHealth = require('../shared/parserHealth.cjs');
-// イベント名の品質管理（検証済み修正・整形・junk判定・年ズレ判定・重複統合）。最終出力の防御に使う
+// イベントIDの引き継ぎ（取得経路・表記ゆれで ID＝個別ページの URL が変わるのを防ぐ）
 const { carryOverEventIds } = require('../shared/eventIdContinuity.cjs');
+// イベント名の品質管理（検証済み修正・整形・junk判定・年ズレ判定・重複統合）。最終出力の防御に使う
 const { applyVerifiedOverrides, cleanEventTitle, cleanEventTitleWithPlace, cleanPlaceText, splitPlaceAddress, cleanTimeText, cleanDeadlineText, isJunkOrStubTitle, isSuspiciousTitle, isStaleDatedEvent, dedupEvents, isArchivableEvent, safeUrl, isNonEventDocument, suspiciousFutureDate, isLikelySameEvent } = require('../shared/titleQuality.cjs');
 const eventRegression = require('../shared/eventRegression.cjs');
 const { isCountableEvent } = require('../shared/dataQuality.cjs');
