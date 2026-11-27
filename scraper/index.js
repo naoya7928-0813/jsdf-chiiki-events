@@ -2338,7 +2338,7 @@ async function fetchHtmlPref(context, prefLabel, url, parserFn) {
     const events = parserFn($);
     console.log(`[${prefLabel}] ${events.length} 件取得 (Playwright)`);
     assertParseHealthy(prefLabel, $, events);
-    return events;
+    return markSourcePage(events, url);
   } catch (err) {
     console.warn(`[${prefLabel}] Playwright 失敗: ${err.message} → fetch にフォールバック`);
   } finally {
@@ -2359,6 +2359,18 @@ async function fetchHtmlPref(context, prefLabel, url, parserFn) {
   const events = parserFn($);
   console.log(`[${prefLabel}] ${events.length} 件取得 (fetch fallback)`);
   assertParseHealthy(prefLabel, $, events);
+  return markSourcePage(events, url);
+}
+
+/**
+ * 個別のリンクが無いイベントに、そのイベントを読み取ったページ（取得元）の URL を source_page として残す（2026-11-27）。
+ * writeOutput が「url が空のときだけ」url に入れる。url に直接入れないのは、取得後に ev.url を詳細ページとして
+ * 開きに行く地本（愛知）があり、一覧ページを詳細として読んでしまうため。
+ * 公式URLが無いと個別ページが検索対象外（noindex）・Event 構造化データの対象外になり、正規のイベントが検索に出なかった。
+ */
+function markSourcePage(events, url) {
+  if (!Array.isArray(events) || !/^https?:\/\//.test(String(url || ''))) return events;
+  for (const ev of events) if (ev && !ev.url && !ev.source_page) ev.source_page = url;
   return events;
 }
 
@@ -4721,8 +4733,10 @@ async function writeOutput(data, timeCutoff = null) {
         address:  address || fixed.address || '',
         time:     cleanTimeText(fixed.time),
         deadline: cleanDeadlineText(fixed.deadline) || null,
-        // http(s) 以外の URL は公開データに載せない（javascript: 等の混入防止）
-        url:      safeUrl(fixed.url),
+        // http(s) 以外の URL は公開データに載せない（javascript: 等の混入防止）。
+        // 個別のリンクが無いときは、イベントを読み取った取得元ページ（markSourcePage）を公式の掲載ページとする
+        url:      safeUrl(fixed.url) || safeUrl(fixed.source_page),
+        source_page: undefined, // 内部用（公開データに出さない）
         imageUrl: safeUrl(fixed.imageUrl) || undefined,
       };
     });

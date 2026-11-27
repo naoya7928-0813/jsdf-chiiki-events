@@ -18,7 +18,7 @@ import { siteUrl, DEFAULT_SITE_URL } from '../shared/siteUrl.cjs';
 import { isEligibleForStructuredEvent } from '../shared/titleQuality.cjs';
 import { createHash } from 'node:crypto';
 import {
-  PREF_LABELS, eventPath, isEventIndexable, isEventSchemaEligible, eventLastmod, isEnded,
+  PREF_LABELS, eventPath, isEventIndexable, isSitemapEvent, isEventSchemaEligible, eventLastmod, isEnded,
   weekendRange, isWeekendEvent,
 } from '../shared/eventPage.cjs';
 
@@ -841,7 +841,9 @@ const weekendUrl = urlEntry(`${SITE_URL}/topics/weekend.html`,
 
 // 個別イベントページ: 検索対象（index）のものだけを載せる（終了済み・公式URLなし・不正タイトルは載せない）
 const indexableEvents = allEvents.filter(ev => isEventIndexable(ev, today));
-const eventUrls = indexableEvents.map(ev =>
+// sitemap には今日で終わるものを載せない（日付が変わると noindex になり、次に作り直すまで sitemap と食い違う）
+const sitemapEvents = allEvents.filter(ev => isSitemapEvent(ev, today));
+const eventUrls = sitemapEvents.map(ev =>
   urlEntry(`${SITE_URL}${eventPath(ev)}`, eventLastmod(ev) || pageLastmod(eventPath(ev), sig(ev)))
 ).join('\n');
 
@@ -861,7 +863,7 @@ const sitemapPath = join(__dirname, '../public/sitemap.xml');
 writeFileSync(sitemapPath, sitemap, 'utf8');
 mkdirSync(dirname(LASTMOD_STATE), { recursive: true });
 writeFileSync(LASTMOD_STATE, JSON.stringify(nextLastmodState, null, 1) + '\n', 'utf8');
-console.log(`[generate-events-html] sitemap.xml を更新（固定・一覧 ${Object.keys(PREF_LABELS).length + CATEGORY_TOPICS.length + 4} URL ＋ イベント個別 ${indexableEvents.length} URL）`);
+console.log(`[generate-events-html] sitemap.xml を更新（固定・一覧 ${Object.keys(PREF_LABELS).length + CATEGORY_TOPICS.length + 4} URL ＋ イベント個別 ${sitemapEvents.length} URL／検索対象 ${indexableEvents.length} 件のうち今日で終わるものを除く）`);
 
 // ── ドメイン移行時に、手書きの静的ファイル内の絶対URLも合わせる ──────────
 // robots.txt（Sitemap 行）と llms.txt（各URL）は手で書いているため、SITE_URL を

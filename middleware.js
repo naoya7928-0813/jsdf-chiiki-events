@@ -14,7 +14,7 @@
 // ページを決して壊さない。
 import {
   PREF_LABELS, esc, buildEventPage, injectEventPage, injectNotFound, isManualEventId, mergePublished,
-  isCompleteManualResponse,
+  isCompleteManualResponse, legacyEventRedirect,
 } from './shared/eventPage.cjs';
 import { siteUrl } from './shared/siteUrl.cjs';
 // 会場名 → 開催地の都道府県（既知の駐屯地・基地）。構造化データの住所に使う
@@ -72,6 +72,14 @@ export default async function middleware(request) {
     const page = buildEventPage(data, id, { siteUrl: SITE, today, facilities: JSDF_FACILITIES });
 
     if (!page) {
+      // ID の引き継ぎ導入前に入れ替わって消えた旧URL（同じイベントと確認済みのものだけ）は今のURLへ 301
+      const moved = legacyEventRedirect(data, id);
+      if (moved) {
+        return new Response(null, {
+          status: 301,
+          headers: { location: `${origin}${moved}`, 'cache-control': 'public, max-age=0, s-maxage=300' },
+        });
+      }
       // 手動入力イベント（manual-*）は /api/manual-events にある。取得できなかった（通信・Redis の障害）ときは
       // 判断できないので SPA に任せる。取得できたのに無い＝削除済み・下書きなので 404 にする
       // （以前は常に SPA に任せており、削除済みの URL が 200＋index で返るソフト404になっていた。2026-11-27）

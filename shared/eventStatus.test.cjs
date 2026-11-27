@@ -228,3 +228,14 @@ test('applicationState: 締切日が分かるものだけ。受付終了・中�
   assert.strictEqual(applicationState({ date: '2026-12-20', deadlineDate: '2026-12-10', status: 'cancelled' }, T), null);
   assert.strictEqual(applicationState({ date: '2026-12-20' }, T), null); // 締切不明は推測しない
 });
+
+// 2026-11-27: 愛知「公務員合同説明会」の「定員30名、定員になり次第受付終了」を受付終了と誤判定していた（予告であって終了ではない）
+test('closed: 「〜になり次第受付終了」「なくなり次第終了」は予告なので受付終了にしない。確定の告知は従来どおり', () => {
+  const st = (text) => S.deriveStatus({ text, today: '2026-11-27', eventDate: '2026-12-10' }).status;
+  for (const t of ['定員30名、定員になり次第受付終了', '満席になり次第終了', 'チケットがなくなり次第終了', '定員に達し次第締切']) {
+    assert.strictEqual(st(t), 'published', t);
+  }
+  for (const t of ['受付終了しました', '定員に達したため受付を終了しました', '申込を締め切りました']) {
+    assert.strictEqual(st(t), 'closed', t);
+  }
+});

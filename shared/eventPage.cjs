@@ -7,9 +7,9 @@
  *   - scripts/generate-events-html.mjs … 一覧ページからの内部リンク・sitemap の URL と lastmod
  *
  * 決めごと（推測で埋めない）:
- *   - 料金は「無料」と資料に書かれているときだけ price 0 を出す。分からなければ offers 自体を出さない
+ *   - 料金は「無料」または「参加料○円」（金額が1種類だけ）と資料に書かれているときだけ出す。分からなければ offers 自体を出さない
  *   - 受付状況（availability）・受付開始日（validFrom）は資料から分からないので出さない
- *   - 主催者（organizer）は分からないので出さない。地本は「掲載元」として本文に書く（主催とは限らない）
+ *   - 主催者（organizer）は資料に「○○主催」「主催：○○」と書かれているときだけ出す。地本は「掲載元」として本文に書く（主催とは限らない）
  *   - 出演者（performer）はイベント名に特定できる音楽隊名が書かれているときだけ出す（explicitPerformers）
  *   - 会場名が無い／掲載元の案内所名で埋めただけ／都道府県が決められないイベントは Event を出さない
  *   - 画像は出さない（チラシは権利を確認できないため。shared/eventImages.cjs の方針と同じ）
@@ -18,7 +18,7 @@
  * Edge でも動くよう Node 専用 API（fs・crypto 等）は使わない。
  */
 
-const { isEligibleForStructuredEvent, isPlaceholderPlace } = require('./titleQuality.cjs');
+const { isEligibleForStructuredEvent, isPlaceholderPlace, hasYearEvidence } = require('./titleQuality.cjs');
 
 /** 地本キー → 表示名（middleware・静的ページ生成で共有） */
 const PREF_LABELS = Object.freeze({
@@ -271,6 +271,19 @@ function isEventSchemaEligible(ev, today, opts) {
 }
 
 /**
+ * 開催日が300日以上先なのに、題名・URL にその年（西暦・令和）の記載が無い。
+ * 年の読み違い（2026-11 茨城: 同じ「航空中央音楽隊クリスマスコンサート」が 2026-12-19 と 2027-12-19 の2件）の疑いがあるので、
+ * 公開はそのままにして検索対象・構造化データからだけ外す（OCR 以外の経路も対象。suspiciousFutureDate は OCR 由来だけを見る）
+ */
+const FAR_FUTURE_DAYS = 300;
+function isUnverifiedFarFuture(ev, today) {
+  if (!isDate(ev?.date) || !isDate(today)) return false;
+  const days = (Date.parse(`${ev.date}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 86400000;
+  if (days < FAR_FUTURE_DAYS) return false;
+  return !hasYearEvidence(ev, Number(ev.date.slice(0, 4)));
+}
+
+/**
  * 個別ページを検索結果に出すか（robots index）。
  * 構造化データほど厳しくはしないが、中身が確かめられないもの（公式URLなし）・終了済み・不正タイトルは出さない。
  */
@@ -281,7 +294,37 @@ function isEventIndexable(ev, today) {
   if (isEnded(ev, today)) return false;
   if (!isHttpUrl(ev.url)) return false;
   if (hasDateStampConflict(ev)) return false;
+  if (isUnverifiedFarFuture(ev, today)) return false;
   return true;
+}
+
+/**
+ * sitemap に載せるか。検索対象（index）で、かつ「今日のうちに終わらない」もの。
+ * sitemap は1日数回しか作り直さないため、今日で終わるイベントを載せると日付が変わってから
+ * 次に作り直すまで「sitemap にあるのに noindex」になる（2026-11 の実測で毎回1〜9件）。ページ自体は今日中は index のまま
+ */
+function isSitemapEvent(ev, today) {
+  if (!isEventIndexable(ev, today)) return false;
+  const d = new Date(`${today}T00:00:00Z`);
+  if (Number.isNaN(d.getTime())) return false;
+  d.setUTCDate(d.getUTCDate() + 1);
+  return !isEnded(ev, d.toISOString().slice(0, 10));
+}
+
+/**
+ * ID の引き継ぎ（shared/eventIdContinuity.cjs）を入れる前に、同じイベントの ID が入れ替わって消えた旧URL → 今のID。
+ * どちらも同じ公式PDF・同じ日時・同じ会場で確認済み（2026-11-27）。転送先が公開データにあるときだけ 301、無ければ 404
+ * （イベントが終わって公開データから外れれば自然に転送しなくなる）。新しい入れ替わりは ID の引き継ぎが防ぐので、ここへは足さない
+ */
+const LEGACY_EVENT_ID_ALIASES = Object.freeze({
+  'to-office-20261129-yyt3m': 'to-off-20261129-4zdvw',   // 栃木 HondaFes 26（20261129_26hondafes.pdf）
+  'to-office-20261228-i7pm6': 'to-off-20261228-tqmmr',   // 栃木 防衛大学校学生等との懇談会（tochigi_boudaisei_kondankai_1228.pdf）
+});
+function legacyEventRedirect(data, id) {
+  const to = LEGACY_EVENT_ID_ALIASES[baseEventId(id)];
+  if (!to || findEvent(data, id)) return null;
+  const hit = findEvent(data, to);
+  return hit ? eventPath(hit.ev) : null;
 }
 
 /** 個別ページの URL（パス） */
@@ -293,13 +336,18 @@ function eventPath(ev) {
  * 出演者（performer）。イベント名に特定できる音楽隊の名前が書かれているときだけ返す（2026-11-27）。
  *   - 「陸上自衛隊東北方面音楽隊演奏会」→ 陸上自衛隊東北方面音楽隊 / 「第12音楽隊クリスマスコンサート」→ 第12音楽隊
  *   - 「自衛隊音楽隊ふれあいコンサート」のような総称は、どの部隊か分からないので出さない
- *   - 備考・会場・カテゴリからは推測しない（「演奏会」だから音楽隊が出る、とはしない）
+ *   - 題名が演奏・公演であることを示すときだけ（「第10音楽隊見学ツアー」は出さない）
+ *   - 備考・会場・カテゴリからは推測しない（「演奏会」だから音楽隊が出る、とはしない）。
+ *     備考に出演者が書かれた例は 2026-11-27 時点の全1,600件に無く、精度を確かめられないので扱わない
  * 戻り値: PerformingGroup の配列（無ければ []）
  */
 const BAND_QUALIFIER_RE = /^(?:第[0-9０-９]{1,3}|[一-龥]{1,6}(?:方面|中央|航空|地方|総監部|基地|師団|旅団)|東京|横須賀|佐世保|呉|舞鶴|大湊)$/;
+// 題名が演奏（公演）であることを示す語。「第10音楽隊見学ツアー」のように音楽隊を見学する催しでは出演者としない（2026-11-27 再検証）
+const PERFORMANCE_RE = /演奏|コンサート|音楽会|公演|ステージ|ライブ|リサイタル|パレード|ドリル|音楽祭/;
 function explicitPerformers(ev) {
   const title = String(ev?.title || '');
   const names = [];
+  if (!PERFORMANCE_RE.test(title)) return [];
   for (const m of title.matchAll(/([一-龥々0-9０-９]{1,16})音楽隊/g)) {
     const run = m[1];
     const branch = run.match(/^((?:陸上|海上|航空)?自衛隊)/)?.[1] || '';
@@ -309,6 +357,41 @@ function explicitPerformers(ev) {
     if (!names.includes(name)) names.push(name);
   }
   return names.map(name => ({ '@type': 'PerformingGroup', name }));
+}
+
+/**
+ * 主催者（organizer）。資料に「○○主催」「主催：○○」と書かれているときだけ返す（2026-11-27）。
+ *   - 例: 「ハローワーク村上主催 職業説明会」→ ハローワーク村上 / 「（防衛省中国四国防衛局主催）」→ 防衛省中国四国防衛局
+ *   - 掲載元（地本・募集案内所）を主催者にしない。地本が主催と書かれていればそのときだけ地本を出す
+ *   - 名前が組織名の形（協会・局・市・実行委員会 等で終わる／ハローワーク○○）のときだけ。「主催者」「共催」は拾わない
+ *   - 主催者が2つ以上書かれている・読み取れないときは出さない
+ * 戻り値: { '@type': 'Organization', name } か null
+ */
+const ORG_NAME_RE = /^(?:ハローワーク[^\s]{1,10}|.{1,22}(?:協会|連合会|連盟|組合|協議会|委員会|実行委員会|商工会議所|商工会|会議所|財団|法人|株式会社|新聞社|放送|センター|大学|学校|本部|局|庁|省|署|所|市|町|村|区|県|府|都|道|会|団|クラブ))$/;
+function explicitOrganizer(ev) {
+  const text = `${ev?.title || ''}\n${ev?.notes || ''}`;
+  const names = new Set();
+  // 「○○主催」（直前は文の区切り）／「主催：○○」
+  for (const m of text.matchAll(/(?:^|[\s（(「『【［\[、。・／/])([^\s（）()「」『』【】［\]、。・／/:：]{2,24}?)(?:が)?主催(?!者)/gm)) names.add(m[1]);
+  for (const m of text.matchAll(/主催(?!者)\s*[:：]\s*([^\s（）()「」『』【】、。・／/]{2,24})/g)) names.add(m[1]);
+  const ok = [...names].filter(n => ORG_NAME_RE.test(n) && !/^(?:自衛隊|当本部|当所|本部)$/.test(n));
+  return ok.length === 1 ? { '@type': 'Organization', name: ok[0] } : null;
+}
+
+/**
+ * 有料の参加・入場料金（円）。「参加料500円」のように料金の項目名と金額が書かれ、文中の金額が1種類だけのときの金額（文字列）。
+ * 金額が複数ある（大人・子ども、前売・当日 等）・条件付きで読めないときは null（推測で1つに決めない）。
+ */
+const FEE_RE = /(?:参加料|参加費|入場料|観覧料|受講料|入館料|乗船料|体験料|見学料)\s*(?:は|：|:)?\s*([0-9０-９][0-9０-９,，]*)\s*円/g;
+function explicitPaidPrice(ev) {
+  const text = `${ev?.title || ''}\n${ev?.notes || ''}`.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
+  const toNum = (s) => Number(String(s).replace(/[,，]/g, ''));
+  const fees = [...text.matchAll(FEE_RE)].map(m => toNum(m[1]));
+  if (!fees.length) return null;
+  const all = new Set([...text.matchAll(/([0-9][0-9,，]*)\s*円/g)].map(m => toNum(m[1])));
+  if (all.size !== 1) return null;
+  const v = fees[0];
+  return Number.isFinite(v) && v > 0 ? String(v) : null;
 }
 
 /** Schema.org Event（出せないときは null） */
@@ -336,10 +419,20 @@ function buildEventSchema(ev, { siteUrl, today, prefKey, facilities } = {}) {
     obj.endDate = endDay;
   }
   // 料金は「無料」と確認できたときだけ。分からなければ offers を出さない
-  if (isConfirmedFree(ev)) {
+  // 無料・有料が両方読めるとき（「参加無料」と「参加料500円」）はどちらとも決めず出さない。
+  // offers.url は出さない: Google は「チケットを購入できるページ」を求めるが、掲載元の告知ページはそれに当たらない（2026-11-27）。
+  // availability（受付状況）も出さない: 受付終了の自動判定には誤りがあり得るため（「定員になり次第受付終了」の誤判定を確認）
+  const free = isConfirmedFree(ev);
+  const paid = explicitPaidPrice(ev);
+  if (free && !paid) {
     obj.isAccessibleForFree = true;
-    obj.offers = { '@type': 'Offer', price: '0', priceCurrency: 'JPY', url: ev.url };
+    obj.offers = { '@type': 'Offer', price: '0', priceCurrency: 'JPY' };
+  } else if (paid && !free) {
+    obj.offers = { '@type': 'Offer', price: paid, priceCurrency: 'JPY' };
   }
+  // 主催者は資料に明記されているときだけ（掲載元の地本で代用しない）
+  const organizer = explicitOrganizer(ev);
+  if (organizer) obj.organizer = organizer;
   // 出演者はイベント名に部隊名が明記された音楽隊だけ（推測しない）
   const performers = explicitPerformers(ev);
   if (performers.length) obj.performer = performers.length === 1 ? performers[0] : performers;
@@ -565,7 +658,8 @@ function eventLastmod(ev) {
 
 module.exports = {
   PREF_LABELS, prefectureName, weekendRange, isWeekendEvent, mergePublished, esc, jsonLdSafe, baseEventId, findEvent, isManualEventId, isCompleteManualResponse,
-  isEnded, parseTimeRange, isConfirmedFree, explicitPerformers, eventAddress, venuePrefecture, facilityRegion, hasDateStampConflict,
+  isEnded, parseTimeRange, isConfirmedFree, explicitPerformers, explicitOrganizer, explicitPaidPrice,
+  isSitemapEvent, LEGACY_EVENT_ID_ALIASES, legacyEventRedirect, isUnverifiedFarFuture, eventAddress, venuePrefecture, facilityRegion, hasDateStampConflict,
   isEventSchemaEligible, isEventIndexable, eventPath, buildEventSchema, buildBreadcrumb,
   eventDescription, eventTitleTag, relatedEvents, mapsUrl, renderEventArticle,
   buildEventPage, injectEventPage, injectNotFound, eventLastmod, statusLabel, ARTICLE_STYLE,

@@ -253,7 +253,9 @@ test('middleware: 掲載中は200＋index＋canonical、無いIDは404＋noindex
   const { pathToFileURL } = require('node:url');
   const mw = (await import(pathToFileURL(root('middleware.js')).href)).default;
   const html = fs.readFileSync(root('index.html'), 'utf8');
-  const future = '2099-12-05';
+  // middleware は実際の今日（JST）で判定するので、開催日は今日から30日後にする（遠い将来は年の読み違い対策で noindex になる）
+  const d30 = new Date(Date.now() + 9 * 3600 * 1000 + 30 * 86400000).toISOString().slice(0, 10);
+  const future = d30;
   const events = { updatedAt: '2026/11/27 05:00', tokyo: [base({ id: 'to-20991205-abc', date: future })] };
   const run = async (path, { manual = { events: [], overrides: {}, complete: true } } = {}) => {
     const orig = global.fetch;
@@ -289,4 +291,109 @@ test('middleware: 掲載中は200＋index＋canonical、無いIDは404＋noindex
   assert.strictEqual(mOk.status, 200);
   // 対象外のパスは素通し
   assert.strictEqual(await run('/list'), undefined);
+});
+
+// ── 2026-11-27 追加: 主催者・有料料金・演奏でない音楽隊・sitemap・旧URLの転送 ──
+test('Event: 主催者は「○○主催」「主催：○○」と明記されたときだけ（掲載元の地本で代用しない）', () => {
+  const opt = { siteUrl: SITE, today: TODAY, prefKey: 'tokyo' };
+  assert.deepStrictEqual(P.explicitOrganizer({ title: 'ハローワーク村上主催 職業説明会' }), { '@type': 'Organization', name: 'ハローワーク村上' });
+  assert.strictEqual(P.explicitOrganizer({ title: '第４１回防衛問題セミナー開催（防衛省中国四国防衛局主催）' }).name, '防衛省中国四国防衛局');
+  assert.strictEqual(P.explicitOrganizer({ title: 'トラックの日', notes: '内容：車両展示。トラック協会主催トラックの日イベントに参加いたします。' }).name, 'トラック協会');
+  assert.strictEqual(P.explicitOrganizer({ title: '防災フェア', notes: '主催：横浜市' }).name, '横浜市');
+  // 主催の記載なし・掲載元だけ・「主催者」・組織名の形でない・2つ以上 は出さない
+  for (const ev of [
+    { title: '自衛隊説明会', notes: '掲載元: 宇都宮募集案内所' },
+    { title: '説明会', notes: '詳細は主催者へお問い合わせください' },
+    { title: '説明会', notes: 'みんなで主催しよう' },
+    { title: 'A市主催 合同説明会', notes: 'B協会主催の部もあります' },
+  ]) assert.strictEqual(P.explicitOrganizer(ev), null, ev.title);
+  const s = P.buildEventSchema(base({ title: '職業説明会', notes: '主催：ハローワーク品川' }), opt);
+  assert.deepStrictEqual(s.organizer, { '@type': 'Organization', name: 'ハローワーク品川' });
+  assert.strictEqual(P.buildEventSchema(base(), opt).organizer, undefined);
+});
+
+test('Event: 有料の料金は「参加料○円」の金額が1種類だけのとき。無料と有料が両方読めるときは出さない。offers.url・availability は出さない', () => {
+  const opt = { siteUrl: SITE, today: TODAY, prefKey: 'tokyo' };
+  assert.strictEqual(P.explicitPaidPrice({ title: 'キッズワークス', notes: '参加料500円/1プログラム、事前予約は1人2プログラムまで' }), '500');
+  assert.strictEqual(P.explicitPaidPrice({ title: 'x', notes: '入場料：１，０００円' }), '1000');
+  // 金額が複数・料金の項目名が無い・商品名の「100円」は読まない
+  for (const notes of ['小学生以下無料。芸人ライブは要チケット購入（前売り300円、当日500円）', '参加費 大人500円・子ども300円',
+    '来場交通費500円分QUOカードプレゼント']) assert.strictEqual(P.explicitPaidPrice({ title: 'x', notes }), null, notes);
+  assert.strictEqual(P.explicitPaidPrice({ title: '100円商店街' }), null);
+  const paid = P.buildEventSchema(base({ notes: '参加料500円' }), opt);
+  assert.deepStrictEqual(paid.offers, { '@type': 'Offer', price: '500', priceCurrency: 'JPY' });
+  assert.strictEqual(paid.isAccessibleForFree, undefined);
+  const free = P.buildEventSchema(base({ tag: '入場無料' }), opt);
+  assert.deepStrictEqual(free.offers, { '@type': 'Offer', price: '0', priceCurrency: 'JPY' });
+  assert.strictEqual(P.buildEventSchema(base({ tag: '入場無料', notes: '参加費500円' }), opt).offers, undefined);
+  // 受付終了でも availability（SoldOut 等）は出さない（受付状況の自動判定は誤りがあり得る）
+  assert.strictEqual(P.buildEventSchema(base({ tag: '入場無料', status: 'closed' }), opt).offers.availability, undefined);
+});
+
+test('Event: 音楽隊を見学する催し（演奏でない）は出演者にしない', () => {
+  assert.deepStrictEqual(P.explicitPerformers({ title: '第10音楽隊見学ツアー' }), []);
+  assert.deepStrictEqual(P.explicitPerformers({ title: '陸上自衛隊第14旅団 第14音楽隊【自衛隊ふれあいコンサート in あいなん】' }).map(p => p.name), ['第14音楽隊']);
+  assert.deepStrictEqual(P.explicitPerformers({ title: '航空自衛隊 中部航空音楽隊 メモリアルコンサート' }).map(p => p.name), ['中部航空音楽隊']);
+});
+
+test('sitemap: 検索対象のうち今日で終わるものは載せない（日付が変わると noindex になるため）', () => {
+  assert.strictEqual(P.isSitemapEvent(base({ date: TODAY }), TODAY), false);
+  assert.strictEqual(P.isEventIndexable(base({ date: TODAY }), TODAY), true, 'ページ自体は今日中は index のまま');
+  assert.strictEqual(P.isSitemapEvent(base({ date: TODAY, endDate: '2026-11-24' }), TODAY), true);
+  assert.strictEqual(P.isSitemapEvent(base({ date: '2026-11-24' }), TODAY), true);
+  assert.strictEqual(P.isSitemapEvent(base({ date: '2026-11-24', url: '' }), TODAY), false);
+  const gen = fs.readFileSync(root('scripts/generate-events-html.mjs'), 'utf8');
+  assert.match(gen, /const sitemapEvents = allEvents\.filter\(ev => isSitemapEvent\(ev, today\)\)/);
+  assert.match(gen, /const eventUrls = sitemapEvents\.map/);
+});
+
+test('旧URLの転送: 確認済みの組だけ、転送先が公開データにあるときに今のURLへ', () => {
+  for (const [from, to] of Object.entries(P.LEGACY_EVENT_ID_ALIASES)) {
+    assert.notStrictEqual(from, to);
+    assert.strictEqual(P.LEGACY_EVENT_ID_ALIASES[to], undefined, '転送先がさらに転送されない');
+  }
+  const data = { tochigi: [base({ id: 'to-off-20261129-4zdvw', pref: 'tochigi' })] };
+  assert.strictEqual(P.legacyEventRedirect(data, 'to-office-20261129-yyt3m'), '/event/to-off-20261129-4zdvw');
+  assert.strictEqual(P.legacyEventRedirect({ tochigi: [] }, 'to-office-20261129-yyt3m'), null, '転送先が無ければ 404 のまま');
+  assert.strictEqual(P.legacyEventRedirect(data, 'to-xx-unknown'), null);
+});
+
+test('middleware: 旧URLは 301、転送先が掲載終了なら 404', async () => {
+  const { pathToFileURL } = require('node:url');
+  const mw = (await import(pathToFileURL(root('middleware.js')).href)).default;
+  const html = fs.readFileSync(root('index.html'), 'utf8');
+  const run = async (events) => {
+    const orig = global.fetch;
+    global.fetch = async (u) => {
+      const p = new URL(u).pathname;
+      if (p === '/data/events.json') return new Response(JSON.stringify(events), { status: 200 });
+      if (p === '/api/manual-events') return new Response(JSON.stringify({ events: [], overrides: {}, complete: true }), { status: 200 });
+      if (p === '/index.html') return new Response(html, { status: 200 });
+      return new Response('', { status: 404 });
+    };
+    try { return await mw(new Request('https://jsdf-chiiki-events.jp/event/to-office-20261129-yyt3m')); } finally { global.fetch = orig; }
+  };
+  const moved = await run({ tochigi: [base({ id: 'to-off-20261129-4zdvw', pref: 'tochigi', date: '2099-11-29' })] });
+  assert.strictEqual(moved.status, 301);
+  assert.strictEqual(moved.headers.get('location'), 'https://jsdf-chiiki-events.jp/event/to-off-20261129-4zdvw');
+  assert.strictEqual((await run({ tochigi: [] })).status, 404);
+});
+
+test('検索対象: 300日以上先で題名・URLに年の記載が無いものは外す（年の読み違い対策。表示はそのまま）', () => {
+  const far = base({ date: '2027-12-19', title: '茨城地本枠 航空中央音楽隊クリスマスコンサート' });
+  assert.strictEqual(P.isUnverifiedFarFuture(far, TODAY), true);
+  assert.strictEqual(P.isEventIndexable(far, TODAY), false);
+  // 年の記載があれば対象（「演奏会2027」・令和9年）／300日未満は対象
+  assert.strictEqual(P.isUnverifiedFarFuture(base({ date: '2027-12-19', title: '音楽隊演奏会2027in秋田' }), TODAY), false);
+  assert.strictEqual(P.isUnverifiedFarFuture(base({ date: '2027-12-19', title: '令和9年 防災フェア' }), TODAY), false);
+  assert.strictEqual(P.isUnverifiedFarFuture(base({ date: '2027-06-01' }), TODAY), false);
+});
+
+test('scraper: 個別リンクの無いイベントに取得元ページを残し、url が空のときだけ公開データの url にする', () => {
+  const src = fs.readFileSync(root('scraper/index.js'), 'utf8');
+  assert.strictEqual((src.match(/return markSourcePage\(events, url\);/g) || []).length, 2, 'fetchHtmlPref の両方の経路（Playwright／fetch）');
+  assert.match(src, /url:\s+safeUrl\(fixed\.url\) \|\| safeUrl\(fixed\.source_page\)/);
+  assert.match(src, /source_page: undefined/, 'source_page は公開データに出さない');
+  // ev.url を詳細ページとして開く地本があるため、取得直後の ev.url は書き換えない
+  assert.match(src, /if \(ev && !ev\.url && !ev\.source_page\) ev\.source_page = url;/);
 });
