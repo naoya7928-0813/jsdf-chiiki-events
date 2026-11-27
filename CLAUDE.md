@@ -445,6 +445,8 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
   決めた日付の曜日が食い違う＝年の取り違え）で除外する。「受付は終了しました」「お待ちしております」は告知なので除外しない
 - **採用試験の日程**（「防衛医科大学校学生採用第1次試験」）も `shared/examResult.cjs` で除外（試験の説明会・対策講座は残す）。
   **サイト内リンクの文言**（「自衛官募集ホームページ <自衛官募集X」。2027-01-28 として17地本に掲載されていた）は `isJunkOrStubTitle`
+- **資料の種類だけのタイトル**（「リーフレット」「パンフレット」）は `isJunkOrStubTitle`、**採用案内の資料**（URL の `saiyouanai`）は
+  `isNonEventDocument`（2026-11-27。東京「リーフレット」が採用案内PDFの最終合格発表日 2027-01-28 で公開され、Event 構造化データまで出ていた。一次ソースで確認）
 - **予備自衛官補の招集教育訓練日程**（`isNonEventDocument`）・**隊員の募集告知**（「（任期制自衛官）】募集」「一般曹候補生募集」。
   参加者募集のイベントは残す）も非イベント
 - **旧OCRの読み違い**（中国語モデルが日本語にもある別の字へ誤読: 自衛隧・陵上自衛・合和8年・予偏・搭秉）は簡体字ではないため
@@ -494,7 +496,8 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
   プライバシーポリシーに記載済み（`LEGAL_VERSION` 2026-10-13）
 - 構造化データ: 中止は `EventCancelled`、延期は `EventPostponed`（`scripts/generate-events-html.mjs`）
 - 既知の制約: 自動収集イベントの ID はタイトル・日付から作るため、地本サイト側で名称・日付が変わると ID が変わり、
-  旧 ID の上書き（中止設定等）は表示されなくなる（運営画面で新しいイベントに登録し直す）
+  旧 ID の上書き（中止設定等）は表示されなくなる（運営画面で新しいイベントに登録し直す）。
+  取得経路の違い・表記ゆれだけなら前回の ID を引き継ぐ（`shared/eventIdContinuity.cjs`）
 
 ## イベント別 FAQ・参加準備ガイド（2026-10-13 導入）
 
@@ -754,6 +757,7 @@ OCRキャッシュ（ocr-cache.json）は誤ったタイトルを保持し続け
 | イベント個別ページ・Event 構造化データ・今週末の範囲・関連イベント | `shared/eventPage.cjs` | `middleware.js`／`scripts/generate-events-html.mjs`／`FilterBar.jsx`／`DetailScreen.jsx` |
 | 現在地からの距離・会場座標の採否 | `shared/eventDistance.cjs` | `ListScreen.jsx` |
 | 新着通知の地域・種目の絞り込み | `shared/pushFilter.cjs` | `/api/subscribe`／`/api/notify`／`SettingsScreen.jsx` |
+| 自動収集イベントの ID の引き継ぎ（URL を変えない） | `shared/eventIdContinuity.cjs` | `scraper/index.js`（writeOutput） |
 | 照合済み追加イベントの検査・合流 | `shared/verifiedEvents.cjs`（データは `data/verified-events.json`） | `scraper/index.js` |
 | 申込の受付状況（申込受付中・締切間近） | `shared/eventStatus.cjs` の `applicationState` | `FilterBar.jsx`／`ListScreen.jsx` |
 | 管理APIの対象イベントの所属解決 | `api/_eventScope.js` | `/api/admin/overrides`／`/api/admin/event-changes` ほか |
@@ -1008,14 +1012,23 @@ URL は従来どおり。`middleware.js`（Edge）が `index.html` に **title�
 JS なしでも読める本文**を差し込む。中身は **`shared/eventPage.cjs` が唯一の出どころ**（`shared/eventPage.test.cjs`）。
 - 本文（`<main id="ssr-event">`）は同意画面の間は残し、アプリ本体を描画した時点で `App.jsx` が外す（同じ情報を詳細画面が出す。
   詳細画面の「関連するイベント」「最終確認」も同じ関数 `relatedEvents` を使う）。検索エンジン向けだけの隠し本文にしないこと
-- 公開データに無い ID は **404**（`manual-*` は Redis にあるので SPA に任せる）。events.json が取れないときは判断せず素通し
+- 公開データに無い ID は **404**。`manual-*` は `/api/manual-events` を最後まで読めた（応答の `complete: true`）のに無いときだけ 404
+  （削除済み・下書き。CDN の遅れに合わせて404のキャッシュは60秒）。読めなかったとき・events.json が取れないときは判断せず素通し
+  （以前は `manual-*` を常に素通しし、削除済みの URL が 200＋index のソフト404になっていた。2026-11-27）
+- ⚠️ **自動収集イベントの ID は前回のものを引き継ぐ**（`shared/eventIdContinuity.cjs`。2026-11-27）。取得経路（HQチラシ探索 `-off-`／
+  募集案内所巡回 `-office-`）やタイトルの読み方で同じイベントの ID が回ごとに入れ替わり、sitemap に載せた URL が次の回に404になっていた
+  （Search Console「見つかりませんでした（404）」の主因。履歴35回で未終了イベントの ID 消失 38件→10件）。同じ地本・同じ開催日・
+  同名（8文字以上の包含も可）・会場が矛盾しない・1対1 のときだけ引き継ぐ。経路の判定は ID の接頭辞ではなく `source_path`（`hq_flyer`/`office`）で行う
 - **検索対象（index）**: 品質判定（`isEligibleForStructuredEvent`）を通り、終了前・公式URLあり・ファイル名の日付と開催日が9か月以上ずれていない
   （`hasDateStampConflict`。過年度資料・誤読対策）。それ以外は `noindex, follow`。sitemap には index のものだけ載せる
 - **Event 構造化データ**は index の条件＋会場名が実在（掲載元の案内所名の代用でない）＋**開催地の都道府県が決まる**ときだけ。
   開催地は 住所欄 → 既知の駐屯地・基地（`src/data/jsdfFacilities.js`）→ 座標の検索結果 の順。⚠️ 地本の担当県で埋めない
   （座標の「会場名」検索は地本の県名を前置しているため、会場名に別の県名・「県の」断片があるときは使わない）
 - ⚠️ **推測で出さない**: 料金は「入場無料・参加無料」等と書かれているときだけ `price: 0`（無ければ `offers` を出さない）。
-  `availability`・`validFrom`・`organizer`・`performer`・`image` は出さない（地本は本文で「掲載元」と書く）
+  `availability`・`validFrom`・`organizer`・`image` は出さない（地本は本文で「掲載元」と書く。掲載元＝主催とは限らない）。
+  `performer` は**イベント名に特定できる音楽隊名**（「東北方面音楽隊」「第12音楽隊」「航空中央音楽隊」等）があるときだけ（`explicitPerformers`。
+  「自衛隊音楽隊」のような総称・備考・種目からは推測しない）。Search Console の推奨項目の警告（重大ではない）はこの方針で残る。
+  画像は自動生成の OGP（文字だけのカード・1200×630）も流用しない（2026-11-27 判断。イベントを表す画像ではなく、推奨の縦横比とも合わない）
 - ⚠️ **一覧ページ（events.html・県別・種目別）には Event を置かない**（1イベント1ページ。テストが検出する）。一覧のイベント名は個別ページへ内部リンク
 - sitemap の `lastmod` は「中身が変わった日」。一覧ページはページごとの中身の要約を `data/seo-lastmod.json`（scrape.yml がコミット）に残し、
   変わったときだけ日付を進める。個別ページは `eventLastmod`（初回掲載・照合・開催状況の更新・変更登録の最新日）。changefreq/priority は出さない

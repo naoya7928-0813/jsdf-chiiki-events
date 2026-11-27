@@ -53,6 +53,7 @@ const { officeIsJunk, cleanOfficeTitle, cleanOfficePlace, stripTrailingCta, offi
 const { resolveDeadline, rotationOffset, keysNeedingCarryOver } = require('../shared/scrapeDeadline.cjs');
 const parserHealth = require('../shared/parserHealth.cjs');
 // イベント名の品質管理（検証済み修正・整形・junk判定・年ズレ判定・重複統合）。最終出力の防御に使う
+const { carryOverEventIds } = require('../shared/eventIdContinuity.cjs');
 const { applyVerifiedOverrides, cleanEventTitle, cleanEventTitleWithPlace, cleanPlaceText, splitPlaceAddress, cleanTimeText, cleanDeadlineText, isJunkOrStubTitle, isSuspiciousTitle, isStaleDatedEvent, dedupEvents, isArchivableEvent, safeUrl, isNonEventDocument, suspiciousFutureDate, isLikelySameEvent } = require('../shared/titleQuality.cjs');
 const eventRegression = require('../shared/eventRegression.cjs');
 const { isCountableEvent } = require('../shared/dataQuality.cjs');
@@ -3602,6 +3603,9 @@ function makeOfficeEvent({ meta, parsed, title, place, url, notes, sourceType, t
     ageRequirement,
     deadline,
     source_type:    sourceType,
+    // 取得経路の印。ID は前回のものを引き継ぐことがある（shared/eventIdContinuity.cjs）ため、
+    // 経路の判定に ID の接頭辞（-off-/-office-）を使わない
+    source_path:    'office',
   };
 }
 
@@ -4019,6 +4023,7 @@ async function scrapeOfficeAssets(withFreshContext, cutoff) {
             ageRequirement: safeStr(ocr.ageRequirement) || null,
             deadline:       safeStr(ocr.deadline)       || null,
             source_type:    'office_ocr',
+            source_path:    'hq_flyer', // 地本HQのチラシ探索由来（前回データ維持の判定に使う）
           });
           foundAtLeastOne = true;
           console.log(`    ✓ ${parsed.dateStr} ${title.slice(0, 30)}`);
@@ -4359,7 +4364,7 @@ async function main() {
   // 前回の office イベント（office_notice除く）は、その情報源（ページ/チラシURL）を
   // 今回読み直した場合に限って最新の巡回結果に置き換え、読み直せなかったものは維持する
   // （「巡回された回だけイベントが現れる」ちらつき・途中打ち切りによる消失を防ぐ）。
-  // 例外: HQ探索由来のチラシ（id に -off- を含む office_ocr）は、その地本のHQを探索した回は
+  // 例外: HQ探索由来のチラシ（source_path: 'hq_flyer' の office_ocr。印の無い古いデータは id の -off-）は、その地本のHQを探索した回は
   // 最新の探索結果を正とする（掲載から外れたチラシはページを読んでも URL が出てこないため）。
   // 過去日付・不正タイトルは writeOutput の最終フィルタで除外される。
   {
@@ -4372,7 +4377,10 @@ async function main() {
         if (!st.startsWith('office_') || st === 'office_notice') continue;
         if (!e.date || !e.id || officeIds.has(e.id)) continue;
         if (wasRevisited(e.url)) continue; // 今回読み直した情報源 → 最新の巡回結果が正
-        const hqFlyer = st === 'office_ocr' && String(e.id).includes('-off-');
+        // 取得経路の印（source_path）で判定する。ID は前回のものを引き継ぐことがあり接頭辞では決められない。
+        // 印の無い古いデータだけ従来どおり ID の -off- で判定する
+        const hqFlyer = st === 'office_ocr'
+          && (e.source_path ? e.source_path === 'hq_flyer' : String(e.id).includes('-off-'));
         if (hqFlyer && hqExploredPrefs.has(key)) continue;
         officeEvents.push(e);
         officeIds.add(e.id);
@@ -4765,6 +4773,18 @@ async function writeOutput(data, timeCutoff = null) {
     });
   }
   if (removedCount > 0) console.log(`[フィルタ] 過去イベント ${removedCount} 件を削除`);
+
+  // ── イベントIDの引き継ぎ ── shared/eventIdContinuity.cjs ─────────────────
+  // 取得経路（-off-/-office-）やタイトルの読み方の違いで同じイベントの ID が変わると、個別ページの URL が変わり
+  // 旧 URL が 404 になる（お気に入り・運営の上書き・閲覧数も切れる）。前回公開していた同じイベントと
+  // 1対1で確かめられたときだけ前回の ID を使い続ける。前回値の保護・status・firstSeen が ID で前回を引くため、その前に行う
+  {
+    const idChanges = carryOverEventIds(prevData, data);
+    if (idChanges.length) {
+      console.log(`[ID] 前回と同じイベントの ID を ${idChanges.length} 件引き継ぎました（URL を変えない）`);
+      for (const c of idChanges.slice(0, 40)) console.log(`  - [${c.pref}] ${c.date} ${c.title}: ${c.from} → ${c.to}`);
+    }
+  }
 
   // ── 前回値の保護（非退行）── shared/eventRegression.cjs ─────────────────
   // 原則: 取れなかった ≠ 公式が消した。整形・除外・検疫・重複統合の後、status 導出の前に行う

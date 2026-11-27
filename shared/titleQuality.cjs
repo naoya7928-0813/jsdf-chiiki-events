@@ -379,6 +379,9 @@ function isJunkOrStubTitle(title) {
   if (/(?:採用|探用)案内(?:\s*[（(][^）)]*[）)])?$/.test(t) && !/説明会|相談会|ガイダンス|セミナー|フェア/.test(t)) return true;
   // ファイルのダウンロード案内（「ダウンロード（PDF形式）」「PDFをダウンロード令和8年度…」）
   if (/ダウンロード$/.test(t) || (/ダウンロード/.test(t) && !/説明会|相談会|見学|体験|フェア|まつり|祭|公開|演奏会/.test(t))) return true;
+  // 資料の種類だけ（「リーフレット」「パンフレット」。2026-11 東京: 採用案内PDFのリンク文言がイベント名になり、
+  // 表中の最終合格発表日 2027-01-28 で公開・Event 構造化データまで出ていた）
+  if (/^(?:リーフレット|パンフレット|チラシ|ポスター|フライヤー)(?:\s*[（(][^）)]*[）)])?$/.test(t)) return true;
   // ファイル形式だけ・ファイル名だけ（「PDF」「○○.pdf」）
   if (/^(?:PDF|Word|Excel)$/i.test(t) || /\.(?:pdf|docx?|xlsx?|jpe?g|png)$/i.test(t)) return true;
   if (/申込み?リンク|応募リンク|広報申込み/.test(t)) return true; // リンク案内の混入
@@ -541,7 +544,8 @@ function isStaleDatedEvent(ev) {
 // 文書であることを強く示す語（タイトル・会場欄・URL で判定）
 const NON_EVENT_DOC_RE = /福利厚生|待遇|給与|手当|共済|年金|宿舎|服務|利用規約|サイトポリシー|コンテンツ利用|著作権|求人をお考えの企業|退職自衛官の求人|就職援護|採用案内冊子|招集教育|招集訓練|教育訓練日程/;
 // URL のファイル名に出る文書の目印（ローマ字表記）
-const NON_EVENT_URL_RE = /fukuri|syu+syoku-?engo|shushoku-?engo|kousei-kaizen|riyoukiyaku|kiyaku|privacy|sitepolicy|copyright|kyuyo|teate|kyosai/i;
+// saiyou(a)nnai = 採用案内（試験日程・合格発表日の一覧表。表中の日付をイベントの開催日と誤読する）
+const NON_EVENT_URL_RE = /saiyou-?ann?ai|fukuri|syu+syoku-?engo|shushoku-?engo|kousei-kaizen|riyoukiyaku|kiyaku|privacy|sitepolicy|copyright|kyuyo|teate|kyosai/i;
 // 音声・動画ファイル（放送の録音であって参加するイベントではない）
 const MEDIA_URL_RE = /\.(?:wav|mp3|m4a|aac|ogg|mp4|mov|wmv)(?:[?#]|$)/i;
 // 正式タイトルに明確なイベント語があれば文書扱いしない（「福利厚生説明会」等を救済）

@@ -73,9 +73,11 @@ export default async function handler(req, res) {
       }
     } catch { /* 取得失敗は無視 */ }
 
-    return res.status(200).json({ events, overrides });
+    // complete: 手動イベントの一覧を最後まで読めた印。middleware.js は「complete なのに無い manual-* の ID」だけを
+    // 削除済みとして 404 にする（取得失敗の空配列で 404 にしない）。失敗時の応答には付けないこと
+    return res.status(200).json({ events, overrides, complete: true });
   } catch (err) {
     console.error('[manual-events] redis error', err);
-    return res.status(200).json({ events: [] }); // 取得失敗時は空（本体表示を妨げない）
+    return res.status(200).json({ events: [] }); // 取得失敗時は空（本体表示を妨げない）。complete は付けない
   }
 }
