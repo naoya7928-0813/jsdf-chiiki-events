@@ -42,10 +42,15 @@ function parseScheduleDates(text) {
     // 2026-11 実例「11月11日(火)、12日(水)」）は日付を捨てず、修正前と同じく今年として扱う。
     // 半年以上前の月日だけは年末に載る翌年の予定とみなす。曜日は公開時に日付から計算し直される。
     let y = resolveYearByWeekday(it.month, it.day, it.weekday, nowYear);
+    const thisYear = `${nowYear}-${padTwo(it.month)}-${padTwo(it.day)}`;
+    const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
     if (!y) {
-      const thisYear = `${nowYear}-${padTwo(it.month)}-${padTwo(it.day)}`;
-      const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
       y = (Date.parse(today) - Date.parse(thisYear)) / 86400000 > 180 ? nowYear + 1 : nowYear;
+    } else if (y === nowYear + 1 && thisYear >= today) {
+      // 今年のその日がまだ先にあるのに曜日だけが翌年に合うときは、曜日の書き間違いとして今年にする（2026-11-27）。
+      // 実例: 「12月19日（日）」（2026-12-19 は土曜）を 2027-12-19 と読んでいた。同じ演奏会の募集案内所のチラシ（防衛省のページ）は 2026-12-19。
+      // 年の書かれていない翌年の同じ月日を1年以上前に載せることはまず無い。今年の日付が過ぎていれば従来どおり翌年
+      y = nowYear;
     }
     const date = `${y}-${padTwo(it.month)}-${padTwo(it.day)}`;
     const dt = new Date(`${date}T00:00:00Z`);

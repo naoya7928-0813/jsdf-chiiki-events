@@ -895,16 +895,3 @@ test('非イベント: 資料の種類だけのタイトル・採用案内の資
   // 正式タイトルにイベント語があれば救済（採用説明会のチラシ名がたまたま saiyouannai でも消さない）
   assert.strictEqual(tq.isNonEventDocument({ title: '採用説明会', url: 'https://www.mod.go.jp/pco/x/saiyouannai.pdf' }), false);
 });
-
-// 2026-11-27: 茨城「茨城地本枠 航空中央音楽隊クリスマスコンサート」の年の読み違い（2027-12-19）。会場（水戸市民会館）の公式サイトで 2026-12-19（土）を確認
-test('照合済みの修正: 茨城の航空中央音楽隊クリスマスコンサートは 2026-12-19（同じ演奏会の重複は1件に統合）', () => {
-  const tq = require('./titleQuality.cjs');
-  const hq = { id: 'ib-20271219-uqhk2', pref: 'ibaraki', date: '2027-12-19', title: '茨城地本枠 航空中央音楽隊クリスマスコンサート', place: '水戸市民会館', time: '13:00' };
-  const office = { id: 'ib-office-20261219-ro5ie', pref: 'ibaraki', date: '2026-12-19', title: '航空中央音楽隊クリスマスコンサート', place: '水戸市民会館グロービスホール(大ホール)', time: '14:00' };
-  assert.strictEqual(tq.applyVerifiedOverrides(hq).date, '2026-12-19');
-  assert.strictEqual(tq.dedupEvents([tq.applyVerifiedOverrides(hq), tq.applyVerifiedOverrides(office)]).length, 1);
-  // 他県・別の日・別の催しには当てない
-  assert.strictEqual(tq.applyVerifiedOverrides({ ...hq, pref: 'tochigi' }).date, '2027-12-19');
-  assert.strictEqual(tq.applyVerifiedOverrides({ ...hq, date: '2027-12-18' }).date, '2027-12-18');
-  assert.strictEqual(tq.applyVerifiedOverrides({ ...hq, title: '航空中央音楽隊 定期演奏会' }).date, '2027-12-19');
-});
