@@ -2,15 +2,15 @@
   "updatedAt": "2026-11-27",
   "limit": 30,
   "summary": {
-    "checked": 223,
-    "flagged": 13,
-    "attempted": 7,
+    "checked": 226,
+    "flagged": 10,
+    "attempted": 5,
     "corrected": 0,
-    "unverified": 6,
+    "unverified": 4,
     "noSource": 0,
     "overBudget": 0,
     "skippedNoSource": 0,
-    "skippedNotEligible": 6,
+    "skippedNotEligible": 5,
     "skippedProviderUnavailable": 0,
     "skippedCutoff": 0
   },
@@ -39,11 +39,6 @@
     {
       "id": "eh-office-20261210-228d6",
       "pref": "ehime",
-      "reason": "not_eligible"
-    },
-    {
-      "id": "ng-20261201-j9gew",
-      "pref": "nagasaki",
       "reason": "not_eligible"
     }
   ]
